@@ -91,7 +91,7 @@ internal sealed class PatternCheck<T>(string pattern, RegexOptions options) : Ch
         if ((options & ~RegexOptions.CultureInvariant) != RegexOptions.None)
             throw new InvalidOperationException($"The pattern '{pattern}' passes an option other than RegexOptions.CultureInvariant, which the browser does not read as .NET does; move the work to the server, or mark the rule .ServerOnly().");
         var copy = BrowserPattern.CopyOf(pattern, reason => new InvalidOperationException("The pattern '" + pattern + "' " + reason.TrimEnd('.') + ", or mark the rule .ServerOnly()."));
-        return member.TestsTheValue(value => BrowserTerms.NullOr(value, BrowserTerms.Matches(value, copy)),
+        return member.TestsTheValue(value => BrowserTerms.NullOr(value, BrowserTerms.Matches(value, copy)), nameof(RuleBuilderExtensions.Matches),
             arguments => arguments.With("RegularExpression", pattern));
     }
 }

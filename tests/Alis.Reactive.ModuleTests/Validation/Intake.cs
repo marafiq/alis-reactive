@@ -302,3 +302,132 @@ public sealed class DayText : JsonConverter<DateTime>
 
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options) => writer.WriteStringValue(value.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture));
 }
+
+public enum DoseStatus
+{
+    Due,
+    Given,
+    Held,
+}
+
+public sealed class DoseChart
+{
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public DoseStatus Charted { get; set; }
+
+    public DoseStatus Planned { get; set; }
+
+    [JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
+    public int Vials { get; set; }
+
+    public int Doses { get; set; }
+
+    [JsonConverter(typeof(MilligramsText))]
+    public decimal Milligrams { get; set; }
+
+    [JsonConverter(typeof(WardCode))]
+    public string? Ward { get; set; }
+}
+
+public sealed class ChartedDoseRules : ReactiveValidator<DoseChart>
+{
+    public ChartedDoseRules() => RuleFor(chart => chart.Charted).Equal(DoseStatus.Given).WithMessage("Chart the dose as given.")
+        .IsInEnum().WithMessage("Chart a status the round knows.")
+        .NotEmpty().WithMessage("Chart the dose.");
+}
+
+public sealed class PlannedDoseRules : ReactiveValidator<DoseChart>
+{
+    public PlannedDoseRules() => RuleFor(chart => chart.Planned).Equal(DoseStatus.Given).WithMessage("Chart the dose as given.")
+        .IsInEnum().WithMessage("Chart a status the round knows.")
+        .NotEmpty().WithMessage("Chart the dose.");
+}
+
+public sealed class CountedVialsRules : ReactiveValidator<DoseChart>
+{
+    public CountedVialsRules() => RuleFor(chart => chart.Vials).GreaterThan(0);
+}
+
+public sealed class BoundedVialsRules : ReactiveValidator<DoseChart>
+{
+    public BoundedVialsRules() => RuleFor(chart => chart.Vials).InclusiveBetween(1, 4);
+}
+
+public sealed class WeighedMilligramsRules : ReactiveValidator<DoseChart>
+{
+    public WeighedMilligramsRules() => RuleFor(chart => chart.Milligrams).GreaterThan(0m);
+}
+
+public sealed class ExactMilligramsRules : ReactiveValidator<DoseChart>
+{
+    public ExactMilligramsRules() => RuleFor(chart => chart.Milligrams).Equal(5m);
+}
+
+public sealed class SuppliedVialsRules : ReactiveValidator<DoseChart>
+{
+    public SuppliedVialsRules() => RuleFor(chart => chart.Vials).LessThanOrEqualTo(chart => chart.Doses).WithMessage("No more vials than doses.");
+}
+
+public sealed class ShortWardRules : ReactiveValidator<DoseChart>
+{
+    public ShortWardRules() => RuleFor(chart => chart.Ward).MaximumLength(3);
+}
+
+public sealed class CodedWardRules : ReactiveValidator<DoseChart>
+{
+    public CodedWardRules() => RuleFor(chart => chart.Ward).Matches("^[A-Z][0-9]$");
+}
+
+public sealed class SetDoseRules : ReactiveValidator<ChartedRound>
+{
+    public SetDoseRules() => RuleForEach(round => round.Amounts).Equal(2.5m).WithMessage("Give the set dose.");
+}
+
+public sealed class PlainSetDoseRules : ReactiveValidator<MedicationRound>
+{
+    public PlainSetDoseRules() => RuleForEach(round => round.Amounts).Equal(2.5m).WithMessage("Give the set dose.");
+}
+
+public sealed class PositiveAmountsRules : ReactiveValidator<ChartedRound>
+{
+    public PositiveAmountsRules() => RuleForEach(round => round.Amounts).GreaterThan(0m);
+}
+
+public sealed class ChartedAmountsRules : ReactiveValidator<ChartedRound>
+{
+    public ChartedAmountsRules() => RuleFor(round => round.Amounts).NotNull().WithMessage("Chart the amounts.");
+}
+
+public sealed class PlainAmountsRules : ReactiveValidator<MedicationRound>
+{
+    public PlainAmountsRules() => RuleFor(round => round.Amounts).NotNull().WithMessage("Chart the amounts.");
+}
+
+public sealed class FilledAmountsRules : ReactiveValidator<ChartedRound>
+{
+    public FilledAmountsRules() => RuleFor(round => round.Amounts).NotEmpty().WithMessage("Give a dose.");
+}
+
+public sealed class SealedSetDoseRules : ReactiveValidator<SealedRound>
+{
+    public SealedSetDoseRules() => RuleForEach(round => round.Amounts).Equal(2.5m);
+}
+
+public sealed class SealedAmountsRules : ReactiveValidator<SealedRound>
+{
+    public SealedAmountsRules() => RuleFor(round => round.Amounts).NotEmpty();
+}
+
+public sealed class MilligramsText : JsonConverter<decimal>
+{
+    public override decimal Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => decimal.Parse((reader.GetString() ?? "0").Split(' ')[0], CultureInfo.InvariantCulture);
+
+    public override void Write(Utf8JsonWriter writer, decimal value, JsonSerializerOptions options) => writer.WriteStringValue(value.ToString(CultureInfo.InvariantCulture) + " mg");
+}
+
+public sealed class WardCode : JsonConverter<string>
+{
+    public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => reader.GetString()?.Substring("Ward ".Length);
+
+    public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options) => writer.WriteStringValue("Ward " + value);
+}

@@ -230,6 +230,71 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
     }
 
     [Test]
+    public void a_fixed_value_is_written_in_the_form_its_member_holds()
+    {
+        Assert.That(RulesOf<DoseChart>(validation => validation.Add<PlannedDoseRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["planned"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":1}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Chart the dose as given."},{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"or","args":[{"kind":"op","op":"or","args":[{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":0}]},{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":1}]}]},{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":2}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Chart a status the round knows."},{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"neq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":0}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Chart the dose."}]}],"groups":[]}]}"""));
+        Assert.That(RulesOf<DoseChart>(validation => validation.Add<ChartedDoseRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["charted"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":"Given"}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Chart the dose as given."},{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"or","args":[{"kind":"op","op":"or","args":[{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":"Due"}]},{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":"Given"}]}]},{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":"Held"}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Chart a status the round knows."},{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"neq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":"Due"}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Chart the dose."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void each_item_is_compared_with_a_fixed_value_written_in_the_form_its_list_holds()
+    {
+        Assert.That(RulesOf<MedicationRound>(validation => validation.Add<PlainSetDoseRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":2.5}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give the set dose."}]}],"groups":[]}]}"""));
+        Assert.That(RulesOf<ChartedRound>(validation => validation.Add<SetDoseRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"eqDecimal","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":"2.5"}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give the set dose."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void an_ordering_or_a_range_of_a_value_held_in_its_own_form_is_refused_naming_the_rules_check()
+    {
+        Assert.That(() => PlanOf<DoseChart>(validation => validation.Add<CountedVialsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(chart => chart.Vials).GreaterThan' orders 'chart.Vials', which its own JSON number handling writes unlike JavaScript's value, so the browser does not order it as .NET does; order it on the server."));
+        Assert.That(() => PlanOf<DoseChart>(validation => validation.Add<BoundedVialsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(chart => chart.Vials).InclusiveBetween' orders 'chart.Vials', which its own JSON number handling writes unlike JavaScript's value, so the browser does not order it as .NET does; order it on the server."));
+        Assert.That(() => PlanOf<DoseChart>(validation => validation.Add<WeighedMilligramsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(chart => chart.Milligrams).GreaterThan' orders 'chart.Milligrams', which its own JSON converter writes unlike JavaScript's value, so the browser does not order it as .NET does; order it on the server."));
+        Assert.That(() => PlanOf<ChartedRound>(validation => validation.Add<PositiveAmountsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleForEach(round => round.Amounts).GreaterThan' orders 'round.Amounts', which its own JSON number handling writes unlike JavaScript's value, so the browser does not order it as .NET does; order it on the server."));
+    }
+
+    [Test]
+    public void a_decimal_its_own_converter_writes_compared_with_a_fixed_value_is_refused_naming_the_rules_check()
+        => Assert.That(() => PlanOf<DoseChart>(validation => validation.Add<ExactMilligramsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(chart => chart.Milligrams).Equal' compares a decimal its own converter writes as text, whose text the converter decides; compare it on the server."));
+
+    [Test]
+    public void a_member_its_own_number_handling_writes_compared_with_another_member_is_refused_naming_the_rules_check()
+        => Assert.That(() => PlanOf<DoseChart>(validation => validation.Add<SuppliedVialsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(chart => chart.Vials).LessThanOrEqualTo' compares two members, and its own JSON number handling writes 'chart.Vials' unlike JavaScript's value, so the browser does not compare them as .NET does; compare them on the server."));
+
+    [Test]
+    public void a_length_check_over_a_text_its_own_converter_writes_is_refused_naming_the_rules_check()
+        => Assert.That(() => PlanOf<DoseChart>(validation => validation.Add<ShortWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(chart => chart.Ward).MaximumLength' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_pattern_over_a_text_its_own_converter_writes_is_refused_naming_the_rules_check()
+        => Assert.That(() => PlanOf<DoseChart>(validation => validation.Add<CodedWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(chart => chart.Ward).Matches' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_list_its_own_number_handling_writes_refuses_a_null_test_and_takes_an_emptiness_test_as_a_condition_does()
+    {
+        Assert.That(RulesOf<MedicationRound>(validation => validation.Add<PlainAmountsRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"neq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":null}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Chart the amounts."}]}],"groups":[]}]}"""));
+        Assert.That(() => PlanOf<ChartedRound>(validation => validation.Add<ChartedAmountsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(round => round.Amounts).NotNull' compares 'round.Amounts', which its own JSON number handling writes unlike JavaScript's value, and .NET compares the object it holds; compare it on the server."));
+        Assert.That(RulesOf<ChartedRound>(validation => validation.Add<FilledAmountsRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts"],"tests":[{"check":{"kind":"fn","params":["value","instance"],"body":{"kind":"op","op":"not","args":[{"kind":"op","op":"empty","args":[{"kind":"ref","name":"value"}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give a dose."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_check_of_a_list_its_own_converter_writes_whole_is_refused_naming_the_rules_check()
+    {
+        Assert.That(() => PlanOf<SealedRound>(validation => validation.Add<SealedSetDoseRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleForEach(round => round.Amounts).Equal' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+        Assert.That(() => PlanOf<SealedRound>(validation => validation.Add<SealedAmountsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(round => round.Amounts).NotEmpty' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+    }
+
+    [Test]
     public void a_container_whose_model_has_no_registered_validator_is_refused_where_the_view_renders()
         => Assert.That(() => PlanOf<Supplies>(validation => validation.Add<DeputyCardRules>()),
             Throws.InvalidOperationException.With.Message.EqualTo("Validate(container) checks container 'intake' by the validator registered for Supplies, and none is registered: register one with services.AddReactiveFluentValidation(validation => validation.Add<TValidator>())."));

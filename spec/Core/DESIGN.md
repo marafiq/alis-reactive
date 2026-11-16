@@ -3860,14 +3860,16 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   through its key, as a condition does (D6.12, D8.10).
   - C# writes each operand as its type's key over the checked body's value, picked by the member's source as
     `spec/Core/conversions.md`'s Keys pick it, and a member the body lacks over its start (D16.6); a fixed value is
-    written in the member's form and keyed as the member (D7.7).
+    written in the form its member holds, an item's in its list's, and keyed as the member (D7.7).
   - A null member passes an ordering and a range, fails `Equal` and passes `NotEqual`, as FluentValidation's
     comparison checks read it (`probe:fv-date-comparisons`), where a condition holds no ordering with null (D8.9).
   - Over each item of a list (`RuleForEach`), the other member is read from the model the validator checks, which
     the browser's test is handed beside the item, so an item is compared with its peer as the endpoint compares it,
     under the same null rules (X16.39).
-  - A check whose comparison the list's lambda refuses is refused with the lambda's own message, its term the
-    rule's check as the validator writes it, as `'RuleFor(v => v.At).GreaterThan'` (X6.40 to X6.43, X6.57).
+  - A check whose own test the list's lambda refuses is refused with the lambda's own message, naming the rule's
+    check as the validator writes it, as `'RuleFor(v => v.At).GreaterThan'`: a comparison (X6.40 to X6.43, X6.57), and
+    a length, a pattern or an item's test over a value its own converter writes (X6.39). A read the validator wrote,
+    a peer or a holder, keeps its own name.
   - A text the member's type cannot hold fails first, with the binder's message (D16.7). A date or a time a converter
     writes is refused, the app's options' (X6.57) and the member's own (X6.43).
   - Both lines read a date in a check as a `Date`'s `getTime`, to the millisecond, and leave a `TimeOnly` and a

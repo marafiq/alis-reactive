@@ -35,33 +35,39 @@ internal sealed class ItemLambda
     private readonly Dictionary<ParameterExpression, string> _items;
     private readonly HashSet<ParameterExpression> _heldInTheBase;
     private readonly HeldForm _form;
-    private readonly Func<BinaryExpression, string> _termOf;
+    private readonly RuleCheck? _check;
     private readonly HeldForm _datesJudgedBy;
 
     private ItemLambda(LambdaExpression lambda, Dictionary<ParameterExpression, string> items, HashSet<ParameterExpression> heldInTheBase, HeldForm form,
-        Func<BinaryExpression, string> termOf, HeldForm datesJudgedBy)
+        RuleCheck? check, HeldForm datesJudgedBy)
     {
         _lambda = lambda;
         _items = items;
         _heldInTheBase = heldInTheBase;
         _form = form;
-        _termOf = termOf;
+        _check = check;
         _datesJudgedBy = datesJudgedBy;
     }
 
     internal static FnExpression Of(LambdaExpression lambda, HeldForm form) => Outermost(lambda, form).Fn(lambda, body => body);
 
-    internal static FnExpression Checking(LambdaExpression test, HeldForm form, string term, HeldForm datesJudgedBy)
-        => new ItemLambda(test, [], [], form, _ => term, datesJudgedBy).Fn(test, body => body);
+    internal static FnExpression Checking(LambdaExpression test, HeldForm valueForm, string term, HeldForm datesJudgedBy)
+        => new ItemLambda(test, [], [], valueForm, new RuleCheck(term, test.Parameters[0]), datesJudgedBy).Fn(test, body => body);
+
+    internal static FnExpression CheckingAMemberBesideItsPeer(LambdaExpression test, HeldForm form, string term, HeldForm datesJudgedBy)
+        => new ItemLambda(test, [], [], form, new RuleCheck(term, null), datesJudgedBy).Fn(test, body => body);
 
     internal static FnExpression CheckingAnItemBesideItsHolder(LambdaExpression test, string itemName, HeldForm itemsForm, string term, HeldForm datesJudgedBy)
     {
         var item = test.Parameters[0];
         var holder = test.Parameters[1];
         var holderName = Item + "1";
-        var read = new ItemLambda(test, new Dictionary<ParameterExpression, string> { [item] = itemName, [holder] = holderName }, [holder], itemsForm, _ => term, datesJudgedBy);
+        var read = new ItemLambda(test, new Dictionary<ParameterExpression, string> { [item] = itemName, [holder] = holderName }, [holder], itemsForm, new RuleCheck(term, item), datesJudgedBy);
         return new FnExpression([itemName, holderName], read.Term(test.Body));
     }
+
+    internal static InvalidOperationException WrittenUnlikeItsBase(string named, WrittenMember written, HeldForm form)
+        => new($"'{named}' is written by {written.WhatWritesItsOwnForm}, unlike {form.BaseFormName}, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.");
 
     internal static (FnExpression Function, HeldForm Form) Selecting(LambdaExpression field, HeldForm form, bool fieldHoldsNull)
         => Outermost(field, form).Fn(field, body => fieldHoldsNull ? body : new OpExpression(Operator.NonNull, [body]), takenAsHeld: _ => true);
@@ -85,9 +91,13 @@ internal sealed class ItemLambda
     internal static InvalidOperationException NoBrowserForm(LinqExpression term)
         => Refused(term, "has no browser form in a list's lambda; use a member the framework translates, or move the work to the server.");
 
-    private static ItemLambda Outermost(LambdaExpression lambda, HeldForm form) => new(lambda, [], [], form, Printed.Of, form);
+    private static ItemLambda Outermost(LambdaExpression lambda, HeldForm form) => new(lambda, [], [], form, null, form);
 
-    private ItemLambda Binding(Dictionary<ParameterExpression, string> items) => new(_lambda, items, _heldInTheBase, _form, _termOf, _datesJudgedBy);
+    private ItemLambda Binding(Dictionary<ParameterExpression, string> items) => new(_lambda, items, _heldInTheBase, _form, _check, _datesJudgedBy);
+
+    private string TermOf(BinaryExpression comparison) => _check?.Term ?? Printed.Of(comparison);
+
+    private string Named(LinqExpression read, string asWritten) => _check is { Value: { } value } check && new ItemFinder([value]).Finds(read) ? check.Term : asWritten;
 
     private HeldForm FormRootedAt(ParameterExpression root) => _heldInTheBase.Contains(root) ? _form.Base : _form;
 
@@ -135,12 +145,7 @@ internal sealed class ItemLambda
         var read = Unconverted(node);
         if (!ReadsAnItem(read)) return _form.Base.Beside(ViewValues.Of(read), read.Type);
         if (TranslatedMembers.TryTranslating(read, this, out var translated)) return translated;
-        if (ReadsItsOwnForm(read, out var own))
-        {
-            throw new InvalidOperationException(
-                $"'{own.Named}' is written by {own.Written.WhatWritesItsOwnForm}, unlike {_form.BaseFormName}, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.");
-        }
-
+        if (ReadsItsOwnForm(read, out var own)) throw WrittenUnlikeItsBase(Named(read, own.Named), own.Written, _form);
         return read switch
         {
             ParameterExpression item when _items.TryGetValue(item, out var name) => new RefExpression(name),
@@ -280,7 +285,7 @@ internal sealed class ItemLambda
 
     private void RefuseADateTheAppsConverterWrites(BinaryExpression comparison, Type compared)
     {
-        if (Keys.WrittenByAConverterOfTheApps(compared, _datesJudgedBy)) throw Keys.ComparesADateTheAppsConverterWrites(_termOf(comparison), compared);
+        if (Keys.WrittenByAConverterOfTheApps(compared, _datesJudgedBy)) throw Keys.ComparesADateTheAppsConverterWrites(TermOf(comparison), compared);
     }
 
     private void RefuseAMemberInItsOwnFormBesideAnother(BinaryExpression comparison, LinqExpression left, LinqExpression right)
@@ -349,12 +354,7 @@ internal sealed class ItemLambda
         return node;
     }
 
-    internal bool ReadsAnItem(LinqExpression node)
-    {
-        var finder = new ItemFinder(_items);
-        finder.Visit(node);
-        return finder.Found;
-    }
+    internal bool ReadsAnItem(LinqExpression node) => new ItemFinder(_items.Keys).Finds(node);
 
     private static InvalidOperationException ConvertedUnlikeTheBrowser(UnaryExpression conversion)
     {
@@ -367,19 +367,27 @@ internal sealed class ItemLambda
     private InvalidOperationException ComparesObjects(BinaryExpression comparison)
         => ComparisonRefused(comparison, "compares objects, and the browser compares objects by reference; compare a member of each, such as d => d.Carer.Name == lead.");
 
-    private InvalidOperationException ComparisonRefused(BinaryExpression comparison, string reason) => new($"'{_termOf(comparison)}' {reason}");
+    private InvalidOperationException ComparisonRefused(BinaryExpression comparison, string reason) => new($"'{TermOf(comparison)}' {reason}");
 
     private static InvalidOperationException Refused(LinqExpression term, string reason) => new($"'{Printed.Of(term)}' {reason}");
 
     private sealed record OwnFormRead(LinqExpression Member, string Named, WrittenMember Written, PlanExpression Value);
 
-    private sealed class ItemFinder(Dictionary<ParameterExpression, string> items) : ExpressionVisitor
+    private sealed record RuleCheck(string Term, ParameterExpression? Value);
+
+    private sealed class ItemFinder(ICollection<ParameterExpression> items) : ExpressionVisitor
     {
-        internal bool Found { get; private set; }
+        private bool _found;
+
+        internal bool Finds(LinqExpression node)
+        {
+            Visit(node);
+            return _found;
+        }
 
         protected override LinqExpression VisitParameter(ParameterExpression node)
         {
-            Found |= items.ContainsKey(node);
+            _found |= items.Contains(node);
             return node;
         }
     }
