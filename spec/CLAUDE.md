@@ -1823,6 +1823,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   recommondation. nice one": the browser honours Stop, each later check of the rule passing where an earlier one
   failed, written into its fn with no schema change, and X16.34's refusal of a Stop rule's later checks leaves with it
   (U17, its own piece).
+- The lead, 2026-11-16, building the JSON body's enum node by the owner's answer (3) above, decided by quality: a
+  `json` body carries `enums`, each the member's name, its wire path and a `JsonForm` (`enum`, `flags` or `list`)
+  whose rows go from the held form, written as the query's `enum` and `flags` rows are, to the JSON its endpoint binds,
+  on net10 the member's type under MVC's `JsonOptions` and on net48 its C# name; the browser applies them in the
+  request's `guard`, where the query's stop, so a held form no row lists stops there and the check reads the held form
+  (schema.md, D9.13, X9.29). A literal enum is written in the same endpoint form. Schema.tla lists no contract field,
+  so no TLC spec changes. Two promises are reworded to the lines, by the lead: X9.20's page reads the ward from a
+  reply, the app's form, since a select's value is in the live form (D7.7, gate 1's P8), so only a source the server's
+  JSON wrote can hold two values in one form; X7.11's opposites compare the choice with Given and show a literal, since
+  a value its own converter writes is shown by the server (D7.7). The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

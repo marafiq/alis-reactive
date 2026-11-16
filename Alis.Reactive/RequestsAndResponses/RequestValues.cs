@@ -135,16 +135,39 @@ internal static class RequestValues
         return new WrittenScalarWireForm();
     }
 
+    internal static JsonForm JsonFormOf(Type type, HeldForm held, BlockWriter writer, string member)
+    {
+        if (held.DataOptions.GetTypeInfo(type).IsList(out var item)) return new ListJsonForm(JsonFormOf(item.Type, held, writer, member), ItemAbsence(item.Type));
+        var enumeration = Nullable.GetUnderlyingType(type) ?? type;
+        var rows = HeldRows(type, held, writer, member);
+        var json = writer.Content.Json;
+        if (!writer.Content.NamesFlags(enumeration))
+            return new EnumJsonForm(rows.Select(row => new JsonEnumValue(row.Held, EnumEndpoints.Sent(row.Value, enumeration, json))).ToArray());
+        var flags = rows.Select(row => new JsonFlagValue(row.Held, row.Number, EnumEndpoints.Sent(row.Value, enumeration, json))).OrderByDescending(row => row.Number).ToArray();
+        var sentAsTexts = flags.All(row => row.Sent.ValueKind == JsonValueKind.String);
+        var sentAsNumbers = flags.All(row => row.Sent.ValueKind == JsonValueKind.Number);
+        if (!sentAsTexts && !sentAsNumbers)
+            throw new InvalidOperationException($"'{member}' is a flags enum its endpoint's JSON options write as texts and numbers apart, and a JSON body joins a combination's texts or sends its number; write each value of it as text, or each as its number.");
+        return new FlagsJsonForm(flags);
+    }
+
     private static ScalarWireForm EnumForm(Type type, HeldForm held, BlockWriter writer, string member)
     {
+        var rows = HeldRows(type, held, writer, member);
+        return writer.Content.NamesFlags(Nullable.GetUnderlyingType(type) ?? type)
+            ? new FlagsScalarWireForm(rows.Select(row => new FlagValue(row.Held, row.Name, row.Number)).OrderByDescending(row => row.Number).ToArray())
+            : new EnumScalarWireForm(rows.Select(row => new EnumValue(row.Held, row.Name)).ToArray());
+    }
+
+    private static List<HeldRow> HeldRows(Type type, HeldForm held, BlockWriter writer, string member)
+    {
         var enumeration = Nullable.GetUnderlyingType(type) ?? type;
-        var rows = new List<EnumValue>();
-        var flags = new List<FlagValue>();
+        var rows = new List<HeldRow>();
         var byHeld = new Dictionary<string, string>(StringComparer.Ordinal);
         var isFlags = writer.Content.NamesFlags(enumeration);
-        foreach (var value in Enum.GetValues(enumeration))
+        foreach (Enum value in Enum.GetValues(enumeration))
         {
-            var name = ((Enum)value).ToString();
+            var name = value.ToString();
             var written = held.Beside(value, type).Value;
             if (written.ValueKind is not (JsonValueKind.String or JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False))
                 throw new InvalidOperationException($"'{member}' holds {name} as {written.GetRawText()} under its own JSON converter, and a request sends one text or number per member; send a member written as text or a number.");
@@ -156,16 +179,21 @@ internal static class RequestValues
             }
 
             byHeld.Add(key, name);
-            rows.Add(new EnumValue(written, name));
-            if (!isFlags) continue;
-            var number = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
-            if (number < 0 || number > 9007199254740991m)
-                throw new InvalidOperationException($"'{member}' names flags value {name} outside 0 to 9007199254740991; give each flag a non-negative JavaScript-safe integer.");
-            flags.Add(new FlagValue(written, name, decimal.ToInt64(number)));
+            rows.Add(new HeldRow(value, name, written, isFlags ? FlagNumber(value, name, member) : 0));
         }
 
-        return isFlags ? new FlagsScalarWireForm(flags.OrderByDescending(row => row.Number).ToArray()) : new EnumScalarWireForm(rows);
+        return rows;
     }
+
+    private static long FlagNumber(Enum value, string name, string member)
+    {
+        var number = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+        if (number < 0 || number > 9007199254740991m)
+            throw new InvalidOperationException($"'{member}' names flags value {name} outside 0 to 9007199254740991; give each flag a non-negative JavaScript-safe integer.");
+        return decimal.ToInt64(number);
+    }
+
+    private sealed record HeldRow(Enum Value, string Name, JsonElement Held, long Number);
 
     private static InvalidOperationException Object(string member)
         => new($"'{member}' holds an object or a nested list; send its scalar members by their paths, or send it in a JSON body.");

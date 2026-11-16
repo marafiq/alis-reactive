@@ -27,4 +27,17 @@ internal static class WireRecords
             _ => throw new InvalidOperationException("A request wire form has no contract writer."),
         };
     }
+
+    internal static RecordExpression Of(JsonForm form) => form switch
+    {
+        EnumJsonForm enumeration => new ContractRecord<EnumJsonForm>().Set(json => json.Kind, enumeration.Kind)
+            .Set(json => json.Values, new ListExpression(enumeration.Values.Select(value => new ContractRecord<JsonEnumValue>()
+                .Set(row => row.Held, new LitExpression(value.Held)).Set(row => row.Sent, new LitExpression(value.Sent)).Written).ToArray())).Written,
+        FlagsJsonForm flags => new ContractRecord<FlagsJsonForm>().Set(json => json.Kind, flags.Kind)
+            .Set(json => json.Values, new ListExpression(flags.Values.Select(value => new ContractRecord<JsonFlagValue>()
+                .Set(row => row.Held, new LitExpression(value.Held)).Set(row => row.Number, value.Number).Set(row => row.Sent, new LitExpression(value.Sent)).Written).ToArray())).Written,
+        ListJsonForm list => new ContractRecord<ListJsonForm>().Set(json => json.Kind, list.Kind)
+            .Set(json => json.Item, Of(list.Item)).Set(json => json.ItemWhenNothing, list.ItemWhenNothing).Written,
+        _ => throw new InvalidOperationException("A JSON body's enum form has no contract writer."),
+    };
 }

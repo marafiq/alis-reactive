@@ -263,6 +263,7 @@ public class WhenThePlanContractIsGenerated
             ContainerCapture={"oneOf":[{"$ref":"#/$defs/NoneContainerCapture"},{"$ref":"#/$defs/MissingContainerCapture"},{"$ref":"#/$defs/CapturedContainerCapture"}]}
             DateScalarWireForm={"type":"object","properties":{"kind":{"const":"date"}},"required":["kind"],"additionalProperties":false}
             ElementBusyTarget={"type":"object","properties":{"kind":{"const":"element"},"id":{"type":"string"}},"required":["kind","id"],"additionalProperties":false}
+            EnumJsonForm={"type":"object","properties":{"kind":{"const":"enum"},"values":{"type":"array","items":{"$ref":"#/$defs/JsonEnumValue"}}},"required":["kind","values"],"additionalProperties":false}
             EnumScalarWireForm={"type":"object","properties":{"kind":{"const":"enum"},"values":{"type":"array","items":{"$ref":"#/$defs/EnumValue"}}},"required":["kind","values"],"additionalProperties":false}
             EnumValue={"type":"object","properties":{"held":{},"name":{"type":"string"}},"required":["held","name"],"additionalProperties":false}
             EvaluatedValue={}
@@ -272,6 +273,7 @@ public class WhenThePlanContractIsGenerated
             FileResponseBody={"type":"object","properties":{"kind":{"const":"file"},"value":{"$ref":"#/$defs/ResponseFile"}},"required":["kind","value"],"additionalProperties":false}
             FileSentBody={"type":"object","properties":{"kind":{"const":"file"},"value":{"$ref":"#/$defs/ValueRead"},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["kind","value","inputs"],"additionalProperties":false}
             FlagValue={"type":"object","properties":{"held":{},"name":{"type":"string"},"number":{"type":"integer"}},"required":["held","name","number"],"additionalProperties":false}
+            FlagsJsonForm={"type":"object","properties":{"kind":{"const":"flags"},"values":{"type":"array","items":{"$ref":"#/$defs/JsonFlagValue"}}},"required":["kind","values"],"additionalProperties":false}
             FlagsScalarWireForm={"type":"object","properties":{"kind":{"const":"flags"},"values":{"type":"array","items":{"$ref":"#/$defs/FlagValue"}}},"required":["kind","values"],"additionalProperties":false}
             FormCheck={"type":"object","properties":{"registration":{"type":"string"},"body":{"$ref":"#/$defs/CheckedBody"},"inputs":{"type":"array","items":{"$ref":"#/$defs/SentInput"}},"place":{"$ref":"#/$defs/FormPlace"}},"required":["registration","body","inputs","place"],"additionalProperties":false}
             FormDestination={"oneOf":[{"$ref":"#/$defs/SummaryFormDestination"},{"$ref":"#/$defs/NoticeFormDestination"}]}
@@ -287,9 +289,13 @@ public class WhenThePlanContractIsGenerated
             InputEntry={"type":"object","properties":{"id":{"type":"string"},"binding":{"$ref":"#/$defs/InputBinding"}},"required":["id","binding"],"additionalProperties":false}
             InstantScalarWireForm={"type":"object","properties":{"kind":{"const":"instant"}},"required":["kind"],"additionalProperties":false}
             ItemWhenNothing={"enum":["empty","stop"]}
+            JsonEnumValue={"type":"object","properties":{"held":{},"sent":{}},"required":["held","sent"],"additionalProperties":false}
+            JsonFlagValue={"type":"object","properties":{"held":{},"number":{"type":"integer"},"sent":{}},"required":["held","number","sent"],"additionalProperties":false}
+            JsonForm={"oneOf":[{"$ref":"#/$defs/EnumJsonForm"},{"$ref":"#/$defs/FlagsJsonForm"},{"$ref":"#/$defs/ListJsonForm"}]}
             JsonResponseBody={"type":"object","properties":{"kind":{"const":"json"},"value":{"$ref":"#/$defs/EvaluatedValue"}},"required":["kind","value"],"additionalProperties":false}
-            JsonSentBody={"type":"object","properties":{"kind":{"const":"json"},"value":{"$ref":"#/$defs/EvaluatedValue"},"guarded":{"type":"array","items":{"$ref":"#/$defs/GuardedMember"}},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["kind","value","guarded","inputs"],"additionalProperties":false}
+            JsonSentBody={"type":"object","properties":{"kind":{"const":"json"},"value":{"$ref":"#/$defs/EvaluatedValue"},"guarded":{"type":"array","items":{"$ref":"#/$defs/GuardedMember"}},"enums":{"type":"array","items":{"$ref":"#/$defs/SentEnum"}},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["kind","value","guarded","enums","inputs"],"additionalProperties":false}
             LeftOutInputCapture={"type":"object","properties":{"kind":{"const":"leftOut"}},"required":["kind"],"additionalProperties":false}
+            ListJsonForm={"type":"object","properties":{"kind":{"const":"list"},"item":{"$ref":"#/$defs/JsonForm"},"itemWhenNothing":{"$ref":"#/$defs/ItemWhenNothing"}},"required":["kind","item","itemWhenNothing"],"additionalProperties":false}
             ListWireForm={"type":"object","properties":{"kind":{"const":"list"},"item":{"$ref":"#/$defs/ScalarWireForm"},"itemWhenNothing":{"$ref":"#/$defs/ItemWhenNothing"}},"required":["kind","item","itemWhenNothing"],"additionalProperties":false}
             MemberPathPart={"type":"object","properties":{"kind":{"const":"member"},"name":{"type":"string"},"value":{"$ref":"#/$defs/ValueRead"},"form":{"$ref":"#/$defs/ScalarWireForm"}},"required":["kind","name","value","form"],"additionalProperties":false}
             MissingBusyTarget={"type":"object","properties":{"kind":{"const":"missing"},"id":{"type":"string"}},"required":["kind","id"],"additionalProperties":false}
@@ -316,6 +322,7 @@ public class WhenThePlanContractIsGenerated
             RetryPolicy={"oneOf":[{"$ref":"#/$defs/NoneRetryPolicy"},{"$ref":"#/$defs/StandardRetryPolicy"}]}
             ScalarWireForm={"oneOf":[{"$ref":"#/$defs/TextScalarWireForm"},{"$ref":"#/$defs/NumberScalarWireForm"},{"$ref":"#/$defs/BooleanScalarWireForm"},{"$ref":"#/$defs/DateScalarWireForm"},{"$ref":"#/$defs/InstantScalarWireForm"},{"$ref":"#/$defs/WrittenScalarWireForm"},{"$ref":"#/$defs/EnumScalarWireForm"},{"$ref":"#/$defs/FlagsScalarWireForm"}]}
             SentBody={"oneOf":[{"$ref":"#/$defs/NoneSentBody"},{"$ref":"#/$defs/JsonSentBody"},{"$ref":"#/$defs/UrlEncodedSentBody"},{"$ref":"#/$defs/MultipartSentBody"},{"$ref":"#/$defs/TextSentBody"},{"$ref":"#/$defs/FileSentBody"}]}
+            SentEnum={"type":"object","properties":{"name":{"type":"string"},"path":{"type":"array","items":{"type":"string"}},"form":{"$ref":"#/$defs/JsonForm"}},"required":["name","path","form"],"additionalProperties":false}
             SentField={"type":"object","properties":{"name":{"type":"string"},"path":{"type":"array","items":{"$ref":"#/$defs/PathStep"}},"value":{"$ref":"#/$defs/ValueRead"},"form":{"$ref":"#/$defs/WireForm"},"whenNothing":{"$ref":"#/$defs/WhenNothing"},"when":{"type":"boolean"}},"required":["name","path","value","form","whenNothing","when"],"additionalProperties":false}
             SentHeader={"type":"object","properties":{"name":{"type":"string"},"value":{"$ref":"#/$defs/ValueRead"},"form":{"$ref":"#/$defs/ScalarWireForm"},"when":{"type":"boolean"}},"required":["name","value","form","when"],"additionalProperties":false}
             SentInput={"type":"object","properties":{"name":{"type":"string"},"entry":{"$ref":"#/$defs/InputEntry"}},"required":["name","entry"],"additionalProperties":false}

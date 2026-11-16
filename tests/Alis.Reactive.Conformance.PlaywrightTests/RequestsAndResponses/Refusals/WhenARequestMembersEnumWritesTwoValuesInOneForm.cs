@@ -25,9 +25,9 @@ public sealed class WhenARequestMembersEnumWritesTwoValuesInOneForm(string host)
 
         var rendered = await NewWorld();
         await rendered.Page.GotoAsync(RefusalPages.WardBedsOfWardsInTheirOwnForms);
-        await rendered.Page.GetByRole(AriaRole.Combobox, new PageGetByRoleOptions { Name = "Ward", Exact = true }).SelectOptionAsync("East Annex");
         var sent = await rendered.Page.RunAndWaitForRequestAsync(() => rendered.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Find beds", Exact = true }).ClickAsync(), "**/ward-beds**");
         Assert.That(sent.Method, Is.EqualTo("GET"));
         Assert.That(sent.Url, Does.EndWith("/refusals/requests-and-responses/ward-beds?Ward=EastAnnex"));
+        await Expect(rendered.Page.Locator("#beds")).ToHaveTextAsync("Beds of EastAnnex");
     }
 }

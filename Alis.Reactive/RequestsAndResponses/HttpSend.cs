@@ -183,10 +183,11 @@ internal sealed class NoneSentBody : SentBody
 
 internal sealed class JsonSentBody : SentBody
 {
-    internal JsonSentBody(EvaluatedValue value, IReadOnlyList<GuardedMember> guarded, SentInputs inputs)
+    internal JsonSentBody(EvaluatedValue value, IReadOnlyList<GuardedMember> guarded, IReadOnlyList<SentEnum> enums, SentInputs inputs)
     {
         Value = value;
         Guarded = guarded;
+        Enums = enums;
         Inputs = inputs;
     }
 
@@ -196,7 +197,25 @@ internal sealed class JsonSentBody : SentBody
 
     public IReadOnlyList<GuardedMember> Guarded { get; }
 
+    public IReadOnlyList<SentEnum> Enums { get; }
+
     public SentInputs Inputs { get; }
+}
+
+internal sealed class SentEnum
+{
+    internal SentEnum(string name, IReadOnlyList<string> path, JsonForm form)
+    {
+        Name = name;
+        Path = path;
+        Form = form;
+    }
+
+    public string Name { get; }
+
+    public IReadOnlyList<string> Path { get; }
+
+    public JsonForm Form { get; }
 }
 
 internal sealed class GuardedMember

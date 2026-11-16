@@ -1,12 +1,12 @@
 import { Submission } from "../InputsAndIds/index";
 import {
   assertNever, notBuilt, type Culture, type Expression, type HttpSend, type InputBinding, type MultipartPart, type PathPart, type PathStep, type ScalarWireForm, type SentBody,
-  type SentField, type SentHeader, type SentInput, type SentInputs, type Shape, type TimeZone, type WireForm,
+  type SentEnum, type SentField, type SentHeader, type SentInput, type SentInputs, type Shape, type TimeZone, type WireForm,
 } from "../Schema/index";
 import { plugin } from "../Plugins/index";
 import { Stop } from "../ValuesAndSources/index";
 import { captureBusy, type CapturedBusy } from "./busy";
-import { fieldTexts, formDataPlace, held, invariantPlace, scalarText, type TextPlace } from "./wire";
+import { enumJson, fieldTexts, formDataPlace, held, invariantPlace, scalarText, type TextPlace } from "./wire";
 
 export { Submission };
 
@@ -92,6 +92,17 @@ function without(holder: unknown, path: readonly string[]): unknown {
   return copy;
 }
 
+function withEnum(holder: unknown, member: SentEnum): unknown {
+  return replaced(holder, member.path, held => (held === undefined || held === null ? held : enumJson(held, member.form, member.name)));
+}
+
+function replaced(holder: unknown, path: readonly string[], replace: (held: unknown) => unknown): unknown {
+  const [step, ...past] = path;
+  if (step === undefined) return replace(holder);
+  if (typeof holder !== "object" || holder === null || !Object.hasOwn(holder, step)) return holder;
+  return { ...holder, [step]: replaced(Reflect.get(holder, step), past, replace) };
+}
+
 interface FormWriting {
   readonly zone: TimeZone;
   readonly place: TextPlace;
@@ -106,7 +117,7 @@ function bodyOf(body: SentBody, headers: Headers, writing: FormWriting): BodyIni
     case "none":
       return null;
     case "json": {
-      const value = withContainer(body.value, body.inputs);
+      const value = withContainer(body.enums.reduce<unknown>((sent, member) => withEnum(sent, member), body.value), body.inputs);
       refuseFiles(value);
       headers.set("Content-Type", "application/json");
       return JSON.stringify(value);

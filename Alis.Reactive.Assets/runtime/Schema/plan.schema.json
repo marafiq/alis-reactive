@@ -2806,6 +2806,12 @@
             "$ref": "#/$defs/GuardedMember"
           }
         },
+        "enums": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SentEnum"
+          }
+        },
         "inputs": {
           "$ref": "#/$defs/SentInputs"
         }
@@ -2814,6 +2820,7 @@
         "kind",
         "value",
         "guarded",
+        "enums",
         "inputs"
       ],
       "additionalProperties": false
@@ -2834,6 +2841,128 @@
       "required": [
         "path",
         "when"
+      ],
+      "additionalProperties": false
+    },
+    "SentEnum": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "form": {
+          "$ref": "#/$defs/JsonForm"
+        }
+      },
+      "required": [
+        "name",
+        "path",
+        "form"
+      ],
+      "additionalProperties": false
+    },
+    "JsonForm": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/EnumJsonForm"
+        },
+        {
+          "$ref": "#/$defs/FlagsJsonForm"
+        },
+        {
+          "$ref": "#/$defs/ListJsonForm"
+        }
+      ]
+    },
+    "EnumJsonForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "enum"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/JsonEnumValue"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "JsonEnumValue": {
+      "type": "object",
+      "properties": {
+        "held": {},
+        "sent": {}
+      },
+      "required": [
+        "held",
+        "sent"
+      ],
+      "additionalProperties": false
+    },
+    "FlagsJsonForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "flags"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/JsonFlagValue"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "JsonFlagValue": {
+      "type": "object",
+      "properties": {
+        "held": {},
+        "number": {
+          "type": "integer"
+        },
+        "sent": {}
+      },
+      "required": [
+        "held",
+        "number",
+        "sent"
+      ],
+      "additionalProperties": false
+    },
+    "ListJsonForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "list"
+        },
+        "item": {
+          "$ref": "#/$defs/JsonForm"
+        },
+        "itemWhenNothing": {
+          "$ref": "#/$defs/ItemWhenNothing"
+        }
+      },
+      "required": [
+        "kind",
+        "item",
+        "itemWhenNothing"
       ],
       "additionalProperties": false
     },

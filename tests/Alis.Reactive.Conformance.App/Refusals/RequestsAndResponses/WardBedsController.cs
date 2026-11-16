@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using Alis.Reactive.Conformance.World;
 using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Conformance.App.Refusals;
 
@@ -11,34 +10,28 @@ public sealed class WardBedsController : Controller
     private const string PlainText = "text/plain";
 
     [HttpGet(RefusalPages.WardBedsOfTwoWardsInOneForm)]
-    public IActionResult OfTwoWardsInOneForm() => View("/Refusals/RequestsAndResponses/WardBedsOfTwoWardsInOneForm.cshtml", new BedSearch { Ward = BedWard.EastWing, Wards = TheWards() });
+    public IActionResult OfTwoWardsInOneForm() => View("/Refusals/RequestsAndResponses/WardBedsOfTwoWardsInOneForm.cshtml", new BedSearch("Morning"));
 
     [HttpGet(RefusalPages.WardBedsOfWardsInTheirOwnForms)]
-    public IActionResult OfWardsInTheirOwnForms() => View("/Refusals/RequestsAndResponses/WardBedsOfWardsInTheirOwnForms.cshtml", new NamedBedSearch { Ward = NamedBedWard.EastWing, Wards = TheWards() });
+    public IActionResult OfWardsInTheirOwnForms() => View("/Refusals/RequestsAndResponses/WardBedsOfWardsInTheirOwnForms.cshtml", new BedSearch("Morning"));
+
+    [HttpGet(RefusalEndpoints.WardOfTheRound)]
+    public IActionResult WardOfTheRound() => Json(new NamedWardOfTheRound { Ward = NamedBedWard.EastAnnex });
 
     [HttpGet(RefusalEndpoints.WardBeds)]
     public IActionResult Beds(BedsOfANamedWard query) => Content($"Beds of {query.Ward}", PlainText);
-
-    private static List<SelectListItem> TheWards() => new List<SelectListItem>
-    {
-        new("East Wing", nameof(NamedBedWard.EastWing)),
-        new("East Annex", nameof(NamedBedWard.EastAnnex)),
-        new("West Wing", nameof(NamedBedWard.WestWing)),
-    };
 }
 
-public sealed class BedSearch
-{
-    public BedWard Ward { get; set; }
+public sealed record BedSearch(string Round);
 
-    public IReadOnlyList<SelectListItem> Wards { get; init; } = [];
+public sealed class WardOfTheRound
+{
+    public BedWard Ward { get; init; }
 }
 
-public sealed class NamedBedSearch
+public sealed class NamedWardOfTheRound
 {
-    public NamedBedWard Ward { get; set; }
-
-    public IReadOnlyList<SelectListItem> Wards { get; init; } = [];
+    public NamedBedWard Ward { get; init; }
 }
 
 public sealed class BedsOfAWard

@@ -210,7 +210,7 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
   const post = (body: Body, antiforgery: Send["antiforgery"] = { kind: "none" }): Send => ({ ...get(), method: "POST", body, antiforgery });
   const urlEncoded = (fields: readonly Field[]): Body => ({ kind: "urlEncoded", fields, inputs: emptyInputs });
   const multipart = (parts: Extract<Body, { kind: "multipart" }>["parts"]): Body => ({ kind: "multipart", parts, inputs: emptyInputs });
-  const json = (held: unknown): Body => ({ kind: "json", value: held, guarded: [], inputs: emptyInputs });
+  const json = (held: unknown, enums: Extract<Body, { kind: "json" }>["enums"] = []): Body => ({ kind: "json", value: held, guarded: [], enums, inputs: emptyInputs });
   const sent = async (body: BodyInit | null): Promise<string> => new Response(body).text();
 
   test.each<Send["method"]>(["POST", "PUT", "DELETE"])("MethodsCarryTheirBodies: %s is sent as written, with no body when the plan carries none", method => {
@@ -231,6 +231,35 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
     const form = prepare(post(urlEncoded([missing, { ...missing, name: "Phone", path: ["Phone"], form: { kind: "text" }, whenNothing: "empty" }])), clock, enUs);
     expect(await sent(form.body)).toBe("Phone=");
     expect(form.request).toStrictEqual({ Phone: null });
+  });
+
+  test("JsonEnumSentAsItsEndpointBindsIt: a held form is sent as its row's endpoint form, a list item by item, and nothing or null is left as it is (D9.13)", async () => {
+    const shift = { kind: "enum", values: [{ held: 0, sent: "day" }, { held: 1, sent: "night" }] } as const;
+    const enums = [
+      { name: "Shift", path: ["shift"], form: shift },
+      { name: "Rota.Shifts", path: ["rota", "shifts"], form: { kind: "list", item: shift, itemWhenNothing: "empty" } },
+      { name: "Missing", path: ["missing"], form: shift },
+      { name: "Cleared", path: ["cleared"], form: shift },
+    ] as const;
+    expect(await sent(prepare(post(json({ shift: 1, rota: { shifts: [0, null, 1] }, cleared: null }, enums)), clock, enUs).body))
+      .toBe('{"shift":"night","rota":{"shifts":["day",null,"night"]},"cleared":null}');
+  });
+
+  test("JsonFlagsSentAsItsEndpointBindsIt: a held flags value is split and sent as its rows' texts joined, or as its number where its rows are numbers (D9.13)", async () => {
+    const asTexts = { kind: "flags", values: care.values.map(row => ({ held: row.held, number: row.number, sent: row.name.toLowerCase() })) } as const;
+    const asNumbers = { kind: "flags", values: care.values.map(row => ({ held: row.held, number: row.number, sent: row.number })) } as const;
+    expect(await sent(prepare(post(json({ care: "mon, sat, sun" }, [{ name: "Care", path: ["care"], form: asTexts }])), clock, enUs).body))
+      .toBe('{"care":"mon, weekend"}');
+    expect(await sent(prepare(post(json({ care: "weekend, mon" }, [{ name: "Care", path: ["care"], form: asNumbers }])), clock, enUs).body))
+      .toBe('{"care":97}');
+  });
+
+  test("JsonEnumUnlistedStops: a held form no row lists stops the request, naming the member and its forms (D9.13)", () => {
+    const shift = { kind: "enum", values: [{ held: 0, sent: "day" }, { held: 1, sent: "night" }] } as const;
+    expect(() => prepare(post(json({ shift: 2 }, [{ name: "Shift", path: ["shift"], form: shift }])), clock, enUs))
+      .toThrow("The request's member 'Shift' holds 2; its enum forms are 0, 1.");
+    expect(() => prepare(post(json({ shifts: [0, null] }, [{ name: "Shifts", path: ["shifts"], form: { kind: "list", item: shift, itemWhenNothing: "stop" } }])), clock, enUs))
+      .toThrow("The request's member 'Shifts' must hold a list whose items all hold values.");
   });
 
   test("ObjectNothingBindsAsDeclared: an object that reads nothing is null in JSON and left out of form data", async () => {
@@ -335,7 +364,7 @@ describe("when a request sends a container, a form or an input", () => {
   });
 
   test("ContainerInAnyBody: a JSON body holds the container's inputs over the members it sets, and multipart sends them as fields", () => {
-    const json = prepare(post({ kind: "json", value: { ward: "North", room: "R4" }, guarded: [], inputs: container({ ward: "East" }, [ward]) }), clock, enUs);
+    const json = prepare(post({ kind: "json", value: { ward: "North", room: "R4" }, guarded: [], enums: [], inputs: container({ ward: "East" }, [ward]) }), clock, enUs);
     expect(json.body).toBe("{\"ward\":\"East\",\"room\":\"R4\"}");
     const multipart = prepare(post({ kind: "multipart", parts: [], inputs: container({ beds: 2.5 }, [beds]) }), clock, deDe);
     expect([...(multipart.body as FormData).entries()]).toStrictEqual([["Beds", "2,5"]]);
@@ -389,7 +418,7 @@ describe("when a part's condition reads false, D10.16 leaves the part out as if 
       kind: "json",
       value,
       guarded: [{ path: ["address"], when: false }, { path: ["note"], when: false }, { path: ["address", "city"], when: false }, { path: ["contact", "phone"], when: true }],
-      inputs: emptyInputs,
+      enums: [], inputs: emptyInputs,
     })).body;
     expect(body.kind === "json" ? body.value : body.kind).toEqual({ ward: "North", contact: { phone: "0113" } });
     expect(value).toEqual({ ward: "North", note: "late", address: { city: "Leeds" }, contact: { phone: "0113" } });

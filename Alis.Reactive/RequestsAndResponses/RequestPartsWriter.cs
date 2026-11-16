@@ -386,9 +386,12 @@ internal sealed class RequestPartsWriter
         if (_body == Body.None && !tokenInField) return new ContractRecord<NoneSentBody>().Set(body => body.Kind, "none").Written;
         if (_body == Body.Json)
         {
+            IReadOnlyList<(IReadOnlyList<string> Names, JsonLeaf Leaf)> members = [.. _pathJson.Select(copy => copy()), .. _json];
             return new ContractRecord<JsonSentBody>().Set(body => body.Kind, "json")
-                .Set(body => body.Value, JsonBodyValues.Object([.. _pathJson.Select(copy => copy()), .. _json]))
-                .Set(body => body.Guarded, new ListExpression(GuardedMembers().ToArray())).Set(body => body.Inputs, Inputs).Written;
+                .Set(body => body.Value, JsonBodyValues.Object(members))
+                .Set(body => body.Guarded, new ListExpression(GuardedMembers().ToArray()))
+                .Set(body => body.Enums, new ListExpression(members.SelectMany(member => member.Leaf.Enums.Select(sent => (Expression)SentEnumRecord(sent.Name, member.Names, sent.Form))).ToArray()))
+                .Set(body => body.Inputs, Inputs).Written;
         }
 
         if (_body == Body.Multipart)
@@ -423,6 +426,11 @@ internal sealed class RequestPartsWriter
 
         foreach (var names in guarded) yield return GuardedRecord(names, _jsonGuards[names]);
     }
+
+    private static RecordExpression SentEnumRecord(string name, IReadOnlyList<string> path, JsonForm form)
+        => new ContractRecord<SentEnum>().Set(sent => sent.Name, name)
+            .Set(sent => sent.Path, new ListExpression(path.Select(step => (Expression)Literals.Text(step)).ToArray()))
+            .Set(sent => sent.Form, WireRecords.Of(form)).Written;
 
     private static RecordExpression GuardedRecord(IReadOnlyList<string> path, Expression when)
         => new ContractRecord<GuardedMember>().Set(member => member.Path, new ListExpression(path.Select(name => (Expression)Literals.Text(name)).ToArray())).Set(member => member.When, when).Written;

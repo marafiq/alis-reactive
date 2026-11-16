@@ -161,3 +161,84 @@ internal sealed class FlagValue
 
     public long Number { get; }
 }
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Kind))]
+[JsonDerivedType(typeof(EnumJsonForm))]
+[JsonDerivedType(typeof(FlagsJsonForm))]
+[JsonDerivedType(typeof(ListJsonForm))]
+internal abstract class JsonForm
+{
+    private protected JsonForm()
+    {
+    }
+
+    public abstract string Kind { get; }
+}
+
+internal sealed class EnumJsonForm : JsonForm
+{
+    internal EnumJsonForm(IReadOnlyList<JsonEnumValue> values)
+    {
+        Values = values;
+    }
+
+    public override string Kind => "enum";
+
+    public IReadOnlyList<JsonEnumValue> Values { get; }
+}
+
+internal sealed class FlagsJsonForm : JsonForm
+{
+    internal FlagsJsonForm(IReadOnlyList<JsonFlagValue> values)
+    {
+        Values = values;
+    }
+
+    public override string Kind => "flags";
+
+    public IReadOnlyList<JsonFlagValue> Values { get; }
+}
+
+internal sealed class ListJsonForm : JsonForm
+{
+    internal ListJsonForm(JsonForm item, ItemWhenNothing itemWhenNothing)
+    {
+        Item = item;
+        ItemWhenNothing = itemWhenNothing;
+    }
+
+    public override string Kind => "list";
+
+    public JsonForm Item { get; }
+
+    public ItemWhenNothing ItemWhenNothing { get; }
+}
+
+internal sealed class JsonEnumValue
+{
+    internal JsonEnumValue(JsonElement held, JsonElement sent)
+    {
+        Held = held;
+        Sent = sent;
+    }
+
+    public JsonElement Held { get; }
+
+    public JsonElement Sent { get; }
+}
+
+internal sealed class JsonFlagValue
+{
+    internal JsonFlagValue(JsonElement held, long number, JsonElement sent)
+    {
+        Held = held;
+        Number = number;
+        Sent = sent;
+    }
+
+    public JsonElement Held { get; }
+
+    public long Number { get; }
+
+    public JsonElement Sent { get; }
+}

@@ -2083,6 +2083,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `X9.28` behavior (D9.12): with the app's `Care-Site: North` among the configured headers, a request whose own header
   `care-site` holds `South` reaches the endpoint with one `Care-Site`, `South`, and a request with no header of its own
   sends `North`.
+- `X9.29` behavior (D9.13): a JSON body whose member a reply's read sets, its enum held as its own converter writes it,
+  sends that value in the form its endpoint binds, and a held form no value of the enum is held as stops the request,
+  naming the member and the forms its enum is held as.
 
 ## Q10. The request's flow and its response
 

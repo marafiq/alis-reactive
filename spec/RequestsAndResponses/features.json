@@ -423,6 +423,10 @@
         {
           "id": "X9.28",
           "rung": "behavior"
+        },
+        {
+          "id": "X9.29",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -509,10 +513,10 @@
         },
         {
           "for": "X9.20",
-          "page": "A view whose GET sets r => r.Ward from a picker of the Ward enum whose EastWing and EastAnnex each carry JsonStringEnumMemberName(\"east\").",
+          "page": "A view whose Find beds button GETs the round's ward and, in its success route, GETs the beds with r => r.Ward set from the ward that reply holds, of the Ward enum whose EastWing and EastAnnex each carry JsonStringEnumMemberName(\"east\").",
           "gesture": "Open the page.",
           "outcome": "The page is refused where it renders with \"'r => r.Ward' holds EastWing and EastAnnex in one form, \\\"east\\\", under the app's options, so the browser cannot tell which one it holds; give one of them a JsonStringEnumMemberName of its own.\"",
-          "opposite": "With EastAnnex named east-annex, the page renders and picking East Annex sends Ward=EastAnnex.",
+          "opposite": "With EastAnnex named east-annex, the page renders, and Find beds, whose reply holds East Annex, sends Ward=EastAnnex and shows Beds of EastAnnex.",
           "defect": "The page renders and sends Ward=EastWing for either value."
         },
         {
@@ -634,6 +638,14 @@
           "outcome": "notes-site reads South.",
           "opposite": "Click Refresh notes: notes-site reads North.",
           "defect": "C# that writes the request's own header beside the configured one, or compares the two names by case, sends both, and fetch's Headers joins them, so notes-site reads North, South; C# that lets the configured header win sends North from both buttons."
+        },
+        {
+          "for": "X9.29",
+          "page": "A chart status page whose Send the status button GETs a resident's chart, whose Status its own JSON converter writes as Missed, and in its success route POSTs r => r.Status from that read in a JSON body, writing Finished in its Finally; the endpoint answers Bound and the status it bound.",
+          "gesture": "Click Send the status on Ada Hart's chart.",
+          "outcome": "The POST's body is {\"status\":\"missed\"}, the form the app's JSON options write, and the answer reads Bound Missed.",
+          "opposite": "On Ben Okafor's chart, whose status the endpoint writes as Skipped, a form no value of the enum is held as, the POST stops: the sending line reads Finished, the answer keeps its dash, and the console holds one error, \"The request's member 'Status' holds \"Skipped\"; its enum forms are \"Due\", \"Given\", \"Missed\".\"",
+          "defect": "The held form sent, so the body is {\"status\":\"Missed\"}; or the unknown form sent, so the answer reads a status the endpoint did not receive."
         }
       ],
       "verdicts": [

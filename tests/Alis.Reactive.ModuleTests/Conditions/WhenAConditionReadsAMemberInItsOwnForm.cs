@@ -4,6 +4,7 @@ using Alis.Reactive.Conditions;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.ValuesAndSources;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace Alis.Reactive.ModuleTests.Conditions;
@@ -208,6 +209,17 @@ public sealed class WhenAConditionReadsAMemberInItsOwnForm
                 "A choice joins 'd.Charted', which its own JSON converter writes unlike JavaScript's value, with another value read from the page; choose between it and a value the view writes, or choose on the server."));
 
     [Test]
+    public void a_choice_names_the_base_form_of_the_member_its_own_converter_writes_when_it_is_read_second()
+        => Assert.That(
+            () => RenderedOnAReply(pipeline => pipeline.Get("/dose").OnSuccess<CartDose>((dose, pipeline) =>
+            {
+                var cart = pipeline.Component<DoseCart>("cart");
+                cart.Flagged.Set(cart.Flagged.Choose(cart.Status, dose.Body.Read(d => d.Charted)).Eq(DoseStatus.Given));
+            })),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "A choice joins 'd.Charted', which its own JSON converter writes unlike the app's options, with another value read from the page; choose between it and a value the view writes, or choose on the server."));
+
+    [Test]
     public void a_choice_of_two_reads_of_one_member_keeps_its_form()
         => Assert.That(
             Rendered(cart => cart.Flagged.Set(cart.Flagged.Choose(
@@ -341,6 +353,14 @@ public sealed class WhenAConditionReadsAMemberInItsOwnForm
         Assert.That(PlanSchema.ProblemsOf(TwoChartsJoined), Is.Empty);
         Assert.That(PlanSchema.ProblemsOf(ChartInGivenOrDue), Is.Empty);
         Assert.That(PlanSchema.ProblemsOf(RebateInATenth), Is.Empty);
+    }
+
+    private static string RenderedOnAReply(Action<Pipeline<DoseRound>> write)
+    {
+        var html = Views.Of(new DoseRound("North"), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
+        var plan = html.ReactivePlan<DoseRound>();
+        html.On(plan, trigger => trigger.DomReady(write));
+        return Views.TextOf(html.RenderPlan(plan));
     }
 
     private static string Rendered(Action<DoseCart> step)

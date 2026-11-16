@@ -88,7 +88,7 @@ public static class Choices
     {
         if (first.WritesOtherwiseThan(second) is not { } own) return first;
         throw new InvalidOperationException(
-            $"A choice joins '{own.Read}', which {own.Cause} writes unlike {first.BaseFormName}, with another value read from the page; choose between it and a value the view writes, or choose on the server.");
+            $"A choice joins '{own.Read}', which {own.Cause} writes unlike {own.BaseFormName}, with another value read from the page; choose between it and a value the view writes, or choose on the server.");
     }
 
     private static TypedSource<TValue> Chosen<TValue>(Operator op, HeldForm form, params Expression[] terms)

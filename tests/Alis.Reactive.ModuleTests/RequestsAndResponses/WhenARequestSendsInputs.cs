@@ -64,7 +64,7 @@ public sealed class WhenARequestSendsInputs
     {
         var json = RequestPage.Rendered(pipeline => pipeline.Post<IntakeSend>("/intakes", request => request.Json(pipeline.Container<IntakeSend>("contact"), body => body.Set(r => r.Beds, 2))));
         Assert.That(RequestPage.Send(json, "body").GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"record","fields":[{"name":"beds","value":{"kind":"lit","value":2}}]}},{"name":"guarded","value":{"kind":"list","items":[]}},{"name":"inputs","value":""" + ContainerInputs("sends", "contact") + "}]}"));
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"record","fields":[{"name":"beds","value":{"kind":"lit","value":2}}]}},{"name":"guarded","value":{"kind":"list","items":[]}},{"name":"enums","value":{"kind":"list","items":[]}},{"name":"inputs","value":""" + ContainerInputs("sends", "contact") + "}]}"));
         var encoded = RequestPage.Rendered(pipeline => pipeline.Put<IntakeSend>("/intakes", request => request.UrlEncoded(pipeline.Container<IntakeSend>("contact"), body => body.Set(r => r.Ward, "North"))));
         Assert.That(RequestPage.Send(encoded, "body").GetRawText(), Is.EqualTo(
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"urlEncoded"}},{"name":"fields","value":{"kind":"list","items":[""" + WardNorth + """]}},{"name":"inputs","value":""" + ContainerInputs("sends", "contact") + "}]}"));
@@ -110,7 +110,7 @@ public sealed class WhenARequestSendsInputs
     {
         var plan = DeskPlan(pipeline => pipeline.Post<IntakeSend>("/intakes", request => request.Json(body => body.Input(r => r.Beds, pipeline.Input(m => m.Beds)))));
         Assert.That(RequestPage.Send(plan, "body").GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"as","expr":{"kind":"record","fields":[{"name":"beds","value":{"kind":"ref","name":"requestValue1"}}]},"shape":{"kind":"object","fields":{"beds":{"shape":{"kind":"number","of":"fraction","text":"invariant","overflow":"nothing"},"nothing":"omit"}}}}},{"name":"guarded","value":{"kind":"list","items":[]}},{"name":"inputs","value":{"kind":"record","fields":[{"name":"container","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"none"}}]}},{"name":"individual","value":{"kind":"list","items":[""" + Captured(BedsInput, "Beds") + "]}}]}}]}"));
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"as","expr":{"kind":"record","fields":[{"name":"beds","value":{"kind":"ref","name":"requestValue1"}}]},"shape":{"kind":"object","fields":{"beds":{"shape":{"kind":"number","of":"fraction","text":"invariant","overflow":"nothing"},"nothing":"omit"}}}}},{"name":"guarded","value":{"kind":"list","items":[]}},{"name":"enums","value":{"kind":"list","items":[]}},{"name":"inputs","value":{"kind":"record","fields":[{"name":"container","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"none"}}]}},{"name":"individual","value":{"kind":"list","items":[""" + Captured(BedsInput, "Beds") + "]}}]}}]}"));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
 

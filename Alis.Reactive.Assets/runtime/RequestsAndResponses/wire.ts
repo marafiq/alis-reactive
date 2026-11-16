@@ -1,5 +1,5 @@
-import { assertNever, notBuilt, type Culture, type FlagValue, type ScalarWireForm, type SentField, type TimeZone, type ValueRead } from "../Schema/index";
-import { flagNames } from "../Conditions/index";
+import { assertNever, notBuilt, type Culture, type FlagValue, type ItemWhenNothing, type JsonForm, type ScalarWireForm, type SentField, type TimeZone, type ValueRead } from "../Schema/index";
+import { flagNames, flagRows } from "../Conditions/index";
 import { Stop } from "../ValuesAndSources/index";
 
 export interface TextPlace {
@@ -89,10 +89,7 @@ export function scalarText(value: unknown, form: ScalarWireForm, name: string, z
       return instantText(dateValue(value, name), zone);
     case "enum": {
       const row = form.values.find(row => row.held === value);
-      if (row === undefined) {
-        throw new Stop("The request's member '" + name + "' holds " + JSON.stringify(value) + "; its enum forms are " +
-          form.values.map(row => JSON.stringify(row.held)).join(", ") + ".");
-      }
+      if (row === undefined) throw unlisted(name, value, form.values);
       return row.name;
     }
     case "flags":
@@ -100,6 +97,46 @@ export function scalarText(value: unknown, form: ScalarWireForm, name: string, z
     default:
       return assertNever(form);
   }
+}
+
+export function enumJson(value: unknown, form: JsonForm, name: string): unknown {
+  switch (form.kind) {
+    case "enum": {
+      const row = form.values.find(row => row.held === value);
+      if (row === undefined) throw unlisted(name, value, form.values);
+      return row.sent;
+    }
+    case "flags": {
+      const taken = flagRows(value, form.values);
+      if (taken === undefined) throw invalidFlags(value, name);
+      const texts = taken.map(row => row.sent).filter(sent => typeof sent === "string");
+      return texts.length === taken.length ? texts.join(", ") : taken.reduce((sum, row) => sum + row.number, 0);
+    }
+    case "list": {
+      if (!Array.isArray(value)) throw invalid(name, "a list");
+      const item = form.item;
+      const whenNothing = form.itemWhenNothing;
+      return Array.from(value as readonly unknown[], held => (held === undefined || held === null ? itemNothing(whenNothing, name) : enumJson(held, item, name)));
+    }
+    default:
+      return assertNever(form);
+  }
+}
+
+function itemNothing(whenNothing: ItemWhenNothing, name: string): null {
+  switch (whenNothing) {
+    case "empty":
+      return null;
+    case "stop":
+      throw invalid(name, "a list whose items all hold values");
+    default:
+      return assertNever(whenNothing);
+  }
+}
+
+function unlisted(name: string, value: unknown, rows: readonly { readonly held: unknown }[]): Stop {
+  return new Stop("The request's member '" + name + "' holds " + JSON.stringify(value) + "; its enum forms are " +
+    rows.map(row => JSON.stringify(row.held)).join(", ") + ".");
 }
 
 function invalid(name: string, expected: string): Stop {

@@ -2543,6 +2543,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F1 X9.29 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/ChartStatus.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F1 X9.8 0": {
     "modules": [],
     "views": [

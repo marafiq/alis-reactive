@@ -263,7 +263,7 @@
           "page": "A medication page whose dose badge shows a found chart's status, which the member's own JSON converter writes, IfNull the status a select on the page holds.",
           "gesture": "Open the page.",
           "outcome": "The page is refused where the view renders with X7.11's message, naming the chart's status and its own converter.",
-          "opposite": "The same IfNull with the fallback DoseStatus.Given, a value the view writes, renders, and the badge shows Given for a resident with no chart.",
+          "opposite": "The same IfNull with the fallback DoseStatus.Given renders, and for a resident with no chart a When on it equal to Given shows the literal Given.",
           "defect": "The two forms join, so the badge holds the converter's text on one arm and the select's text on the other, and a comparison with Given fails on one of them."
         },
         {
@@ -271,7 +271,7 @@
           "page": "A medication page whose dose badge shows Choose on a test between a found chart's status, which the member's own JSON converter writes, and the status a select on the page holds.",
           "gesture": "Open the page.",
           "outcome": "The page is refused where the view renders with X7.11's message, naming the chart's status and its own converter.",
-          "opposite": "The same Choose with the literal arm DoseStatus.Given renders, and the badge shows Given when the test holds.",
+          "opposite": "The same Choose with the literal arm DoseStatus.Given renders, and when the test holds a When on it equal to Given shows the literal Given.",
           "defect": "The two forms join, so the badge holds the converter's text on one arm and the select's text on the other, and a comparison with Given fails on one of them."
         },
         {

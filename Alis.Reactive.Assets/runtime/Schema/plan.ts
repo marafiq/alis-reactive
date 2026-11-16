@@ -714,12 +714,48 @@ export interface JsonSentBody {
   readonly kind: "json";
   readonly value: EvaluatedValue;
   readonly guarded: readonly GuardedMember[];
+  readonly enums: readonly SentEnum[];
   readonly inputs: SentInputs;
 }
 
 export interface GuardedMember {
   readonly path: readonly string[];
   readonly when: boolean;
+}
+
+export interface SentEnum {
+  readonly name: string;
+  readonly path: readonly string[];
+  readonly form: JsonForm;
+}
+
+export type JsonForm = EnumJsonForm | FlagsJsonForm | ListJsonForm;
+
+export interface EnumJsonForm {
+  readonly kind: "enum";
+  readonly values: readonly JsonEnumValue[];
+}
+
+export interface JsonEnumValue {
+  readonly held: JsonValue;
+  readonly sent: JsonValue;
+}
+
+export interface FlagsJsonForm {
+  readonly kind: "flags";
+  readonly values: readonly JsonFlagValue[];
+}
+
+export interface JsonFlagValue {
+  readonly held: JsonValue;
+  readonly number: number;
+  readonly sent: JsonValue;
+}
+
+export interface ListJsonForm {
+  readonly kind: "list";
+  readonly item: JsonForm;
+  readonly itemWhenNothing: ItemWhenNothing;
 }
 
 export interface UrlEncodedSentBody {

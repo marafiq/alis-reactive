@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.RequestsAndResponses;
@@ -56,7 +57,7 @@ public sealed class WhenARequestSendsABody
         var plan = RequestPage.Rendered(pipeline => pipeline.Put<SearchRequest>("/notes", request => request.Json(body => body
             .Set(r => r.Id, 7).Set(r => r.Address.Ward, "North").Set(r => r.Name, "Ada").Set(r => r.On, new DateTime(2026, 1, 12, 9, 30, 0, DateTimeKind.Utc)))));
         Assert.That(RequestPage.Send(plan, "body").GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"record","fields":[{"name":"id","value":{"kind":"lit","value":7}},{"name":"address","value":{"kind":"record","fields":[{"name":"ward","value":{"kind":"lit","value":"North"}}]}},{"name":"not.the.binding","value":{"kind":"lit","value":"Ada"}},{"name":"on","value":{"kind":"lit","value":"2026-01-12T09:30:00"}}]}},{"name":"guarded","value":{"kind":"list","items":[]}},{"name":"inputs","value":""" + NoInputs + "}]}"));
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"record","fields":[{"name":"id","value":{"kind":"lit","value":7}},{"name":"address","value":{"kind":"record","fields":[{"name":"ward","value":{"kind":"lit","value":"North"}}]}},{"name":"not.the.binding","value":{"kind":"lit","value":"Ada"}},{"name":"on","value":{"kind":"lit","value":"2026-01-12T09:30:00"}}]}},{"name":"guarded","value":{"kind":"list","items":[]}},{"name":"enums","value":{"kind":"list","items":[]}},{"name":"inputs","value":""" + NoInputs + "}]}"));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
 
@@ -228,9 +229,55 @@ public sealed class WhenARequestSendsABody
                 "AddReactiveRequests makes one antiforgery choice; call Antiforgery(AntiforgeryIn.Header), Antiforgery(AntiforgeryIn.FormField) or NoAntiforgery() once."));
 
     [Test]
-    public void an_enum_a_source_holds_in_a_json_body_names_the_node_it_waits_on()
-        => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<NoteRequest>("/notes", request => request.Json(body => body.Set(r => r.Shift, pipeline.Component<SearchPanel>("search").Shift)))),
-            Throws.InstanceOf<NotImplementedException>().With.Message.StartsWith("'r => r.Shift' holds an enum a source reads, and a JSON body sends it as its endpoint binds it (D9.13)"));
+    public void an_enum_a_live_object_holds_is_sent_in_a_json_body_by_rows_from_its_held_form_to_its_endpoints_form()
+    {
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<NoteRequest>("/notes", request => request.Json(body => body.Set(r => r.Shift, pipeline.Component<SearchPanel>("search").Shift))),
+            json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "enums").GetRawText(), Is.EqualTo(
+            """{"kind":"list","items":[{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"Shift"}},{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"shift"}]}},{"name":"form","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"enum"}},{"name":"values","value":{"kind":"list","items":[{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":0}},{"name":"sent","value":{"kind":"lit","value":"none"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":1}},{"name":"sent","value":{"kind":"lit","value":"day"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":2}},{"name":"sent","value":{"kind":"lit","value":"night"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":3}},{"name":"sent","value":{"kind":"lit","value":"both"}}]}]}}]}}]}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
+    public void a_literal_enum_in_a_json_body_is_sent_as_the_row_of_its_value_sends_it()
+    {
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<NoteRequest>("/notes", request => request.Json(body => body.Set(r => r.Shift, RequestShift.Day))),
+            json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "value").GetRawText(), Is.EqualTo(
+            """{"kind":"record","fields":[{"name":"shift","value":{"kind":"lit","value":"day"}}]}"""));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "enums").GetRawText(), Is.EqualTo("""{"kind":"list","items":[]}"""));
+    }
+
+    [Test]
+    public void a_literal_list_and_object_of_enums_in_a_json_body_are_written_as_the_apps_options_write_them()
+    {
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<RotaRequest>("/rota", request => request.Json(body => body
+                .Set(r => r.Shifts, [RequestShift.Day, RequestShift.Night]).Set(r => r.Week, new RotaWeek { Monday = RequestShift.Both }))),
+            json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "value").GetRawText(), Is.EqualTo(
+            """{"kind":"record","fields":[{"name":"shifts","value":{"kind":"lit","value":["day","night"]}},{"name":"week","value":{"kind":"lit","value":{"monday":"both"}}}]}"""));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "enums").GetRawText(), Is.EqualTo("""{"kind":"list","items":[]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
+    public void a_flags_enum_the_startup_names_is_sent_in_a_json_body_by_rows_that_carry_each_values_number()
+    {
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<FlagQuery>("/notes", request => request.Json(body => body.Set(r => r.Shifts, pipeline.Component<WirePanel>("wire").Flags))),
+            json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)),
+            services => services.AddReactiveFluentValidation(validation => validation.Flags<NamedShifts>()));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "enums").GetRawText(), Is.EqualTo(
+            """{"kind":"list","items":[{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"Shifts"}},{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"shifts"}]}},{"name":"form","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"flags"}},{"name":"values","value":{"kind":"list","items":[{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":2}},{"name":"number","value":{"kind":"lit","value":2}},{"name":"sent","value":{"kind":"lit","value":"night"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":1}},{"name":"number","value":{"kind":"lit","value":1}},{"name":"sent","value":{"kind":"lit","value":"day"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":0}},{"name":"number","value":{"kind":"lit","value":0}},{"name":"sent","value":{"kind":"lit","value":"none"}}]}]}}]}}]}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
+    public void a_flags_enum_its_endpoint_writes_as_texts_and_numbers_apart_is_refused_in_a_json_body()
+        => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<FlagQuery>("/notes", request => request.Json(body => body.Set(r => r.Shifts, pipeline.Component<WirePanel>("wire").Flags))),
+                json => json.Converters.Add(new ShiftsWrittenAsANumberForNone()),
+                services => services.AddReactiveFluentValidation(validation => validation.Flags<NamedShifts>())),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'r => r.Shifts' is a flags enum its endpoint's JSON options write as texts and numbers apart, and a JSON body joins a combination's texts or sends its number; write each value of it as text, or each as its number."));
 
     [Test]
     public void a_json_body_literals_member_past_javascripts_whole_numbers_is_refused_naming_its_path()
@@ -251,6 +298,31 @@ public sealed class WhenARequestSendsABody
         foreach (var field in fields.GetProperty("items").EnumerateArray()) names.Add(RequestPage.Field(field, "name").GetProperty("value").GetString()!);
         return [.. names];
     }
+}
+
+public sealed class ShiftsWrittenAsANumberForNone : JsonConverter<NamedShifts>
+{
+    public override NamedShifts Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => (NamedShifts)reader.GetInt32();
+
+    public override void Write(Utf8JsonWriter writer, NamedShifts value, JsonSerializerOptions options)
+    {
+        if (value == NamedShifts.None)
+            writer.WriteNumberValue(0);
+        else
+            writer.WriteStringValue(value.ToString());
+    }
+}
+
+public sealed class RotaRequest
+{
+    public List<RequestShift> Shifts { get; init; } = [];
+
+    public RotaWeek Week { get; init; } = new();
+}
+
+public sealed class RotaWeek
+{
+    public RequestShift Monday { get; init; }
 }
 
 public sealed class NoteRequest

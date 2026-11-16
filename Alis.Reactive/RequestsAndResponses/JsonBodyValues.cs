@@ -17,11 +17,12 @@ namespace Alis.Reactive.RequestsAndResponses;
 
 internal sealed class JsonLeaf
 {
-    private JsonLeaf(Expression value, Shape kept, bool leftOutWhenNothing)
+    private JsonLeaf(Expression value, Shape kept, bool leftOutWhenNothing, IReadOnlyList<(string Name, JsonForm Form)> enums)
     {
         Value = value;
         Kept = kept;
         LeftOutWhenNothing = leftOutWhenNothing;
+        Enums = enums;
     }
 
     internal Expression Value { get; }
@@ -30,9 +31,13 @@ internal sealed class JsonLeaf
 
     internal bool LeftOutWhenNothing { get; }
 
-    internal static JsonLeaf NullWhenNothing(Expression value) => new(value, AnyShape.Instance, false);
+    internal IReadOnlyList<(string Name, JsonForm Form)> Enums { get; }
 
-    internal static JsonLeaf LeftOut(Expression value, Shape kept) => new(value, kept, true);
+    internal static JsonLeaf NullWhenNothing(Expression value) => new(value, AnyShape.Instance, false, []);
+
+    internal static JsonLeaf LeftOut(Expression value, Shape kept) => new(value, kept, true, []);
+
+    internal JsonLeaf SentBy(string name, JsonForm form) => new(Value, Kept, LeftOutWhenNothing, [(name, form)]);
 }
 
 internal static class JsonBodyValues
@@ -40,7 +45,7 @@ internal static class JsonBodyValues
     internal static JsonLeaf Literal<TValue>(TValue value, BlockWriter writer, LambdaExpression member)
     {
         Literals.RefuseAtAnyDepth(value, writer.Content.Json.BodyForm, member.ToString());
-        var written = new LitExpression(JsonSerializer.SerializeToElement(value, writer.Content.Json.BodyForm));
+        var written = new LitExpression(EnumEndpoints.Literal(value, writer.Content.Json));
         return value is null ? Leaf<TValue>(written, writer, member) : JsonLeaf.NullWhenNothing(written);
     }
 
@@ -48,15 +53,21 @@ internal static class JsonBodyValues
         => Captured<TValue>(RequestValues.Captured(Sources.Of(source), writer, capture), Sources.FormOf(source), writer, member);
 
     internal static JsonLeaf Captured<TValue>(Expression captured, HeldForm form, BlockWriter writer, LambdaExpression member)
-        => Leaf<TValue>(Value<TValue>(captured, form, writer, member.ToString()), writer, member);
+    {
+        var held = form.DataOptions.GetTypeInfo(typeof(TValue));
+        var scalar = held.IsList(out var item) ? item : held;
+        if (!RequestValues.IsEnum(scalar.Type)) return Leaf<TValue>(Value<TValue>(captured, form, writer, member.ToString()), writer, member);
+        var sent = RequestValues.JsonFormOf(typeof(TValue), form, writer, member.ToString());
+        return Leaf(captured, writer, member, () => AnyShape.Instance).SentBy(new RequestMember(member).Name, sent);
+    }
 
     private static JsonLeaf Leaf<TValue>(Expression value, BlockWriter writer, LambdaExpression member)
-    {
-        var body = writer.Content.Json.BodyForm;
-        return ConversionShapes.NothingOf(body.GetTypeInfo(member.ReturnType)) == FieldNothing.Omit
-            ? JsonLeaf.LeftOut(value, Kept<TValue>(body.GetTypeInfo(typeof(TValue)), member.ToString()))
+        => Leaf(value, writer, member, () => Kept<TValue>(writer.Content.Json.BodyForm.GetTypeInfo(typeof(TValue)), member.ToString()));
+
+    private static JsonLeaf Leaf(Expression value, BlockWriter writer, LambdaExpression member, Func<Shape> kept)
+        => ConversionShapes.NothingOf(writer.Content.Json.BodyForm.GetTypeInfo(member.ReturnType)) == FieldNothing.Omit
+            ? JsonLeaf.LeftOut(value, kept())
             : JsonLeaf.NullWhenNothing(value);
-    }
 
     internal static Expression Object(IReadOnlyList<(IReadOnlyList<string> Names, JsonLeaf Leaf)> members)
     {
@@ -86,12 +97,6 @@ internal static class JsonBodyValues
         var held = form.DataOptions.GetTypeInfo(typeof(TValue));
         var isList = held.IsList(out var item);
         var scalar = item ?? held;
-        if (RequestValues.IsEnum(scalar.Type))
-        {
-            throw new NotImplementedException(
-                $"'{member}' holds an enum a source reads, and a JSON body sends it as its endpoint binds it (D9.13): the rows from its held form to that form, which no node of the plan carries yet; set it from a literal, or send it in form data.");
-        }
-
         if (form.Own is { } own)
         {
             throw new NotImplementedException(

@@ -380,7 +380,8 @@ no argument type of its own (D9.1).
   - `query`, which a GET's `Form`, `Inputs` and `Input`s fill (N10.7);
   - `body`: none, JSON, URL-encoded, multipart with its fields and file parts, text, or one file as the whole body,
     with the inputs it sends: a native form's submission set, a container's framework inputs, its `Input`s (D9.6 to
-    D9.10, D9.15, D9.16, D9.21);
+    D9.10, D9.15, D9.16, D9.21), and in JSON the enums its sources hold, each with its rows from the held form to the
+    form its endpoint binds (D9.13);
   - `headers`, the `Accept` its success route's kind takes among them (D9.11, D9.12, D10.6);
   - `antiforgery`: none, or the token C# wrote where the view rendered and its place, the header or the field, on a
     POST, PUT or DELETE to the page's origin (D9.22);
@@ -427,6 +428,22 @@ no argument type of its own (D9.1).
   binding, so a value whose condition fails is never read, and writes the check's entry of a guarded field as
   nothing there. A header the defaults configure carries the `cond` of the request's own header's binding over
   `false` and `true` (D9.12, D10.16).
+- `SentEnum`, an enum a JSON body sends from a source (D9.13): `name`, the member's C# path; `path`, the wire names to
+  it in the body's `value`; and `form`, its `JsonForm`, the rows C# writes from the held form to the form its endpoint
+  binds, on net10 the request member's type under MVC's `JsonOptions` and on net48 its C# name. In its `guard` state
+  the browser replaces the value at `path` by its rows, as the query's `enum` and `flags` read theirs, and leaves a
+  member the body lacks or holds as null as it is; a held form no row lists stops the request, naming the member and
+  its forms, so the check reads the held form as it reads a query's. The forms are closed:
+
+  | Kind | Carries | Meaning |
+  |------|---------|---------|
+  | `enum` | `values`: a list of `JsonEnumValue` | the `sent` of the value whose `held` equals what the source holds |
+  | `flags` | `values`: a list of `JsonFlagValue`, the largest `number` first | `Enum.ToString`'s split of what the source holds, as `flags` splits it; the `sent` of the values it takes, the smallest first, joined by ", " where each is a text, else the sum of their `number`s |
+  | `list` | `item`: a `JsonForm`; `itemWhenNothing`: `empty` or `stop` | each item by `item`; an item that reads nothing or holds null is null or stops the request |
+
+  A `JsonEnumValue` is its `held`, as `EnumValue`'s, and `sent`, the JSON its endpoint binds that value from; a
+  `JsonFlagValue` is those and its `number`. A flags enum whose values its endpoint writes as texts and numbers apart is
+  refused where the view renders. A literal enum is written in the endpoint's form where the view renders.
 - `HttpResponse`, the reply a `request` binds in its routes and `chained` block (N10.2, N10.7, D10.23): `status`,
   `outcome`, `headers`, the headers of the answer the browser hands the page, lib.dom's `Headers`, whose `get` a `call`
   reads (N10.7), `request`, the members as the request sent them, `inputs`, the inputs it sent, each its binding name
@@ -445,7 +462,7 @@ each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `H
 `Alis.Reactive/Schema/RequestChoices.cs`):
 - `HttpSend`: `method` (a `RequestMethod`), `url` (`parts`, a list of `PathPart`, `text` with its `text` or `member`
   with its `name`, `value` and scalar `form`; and `query`, the URL's own), `query` (`fields`, a list of `SentField`,
-  and `inputs`), `body` (a `SentBody`: `none`; `json` with its `value`, `guarded` and `inputs`; `urlEncoded` with its
+  and `inputs`), `body` (a `SentBody`: `none`; `json` with its `value`, `guarded`, `enums` and `inputs`; `urlEncoded` with its
   `fields` and `inputs`; `multipart` with its `parts`, each a `field` with its `SentField` or a `file` with its
   `name`, `value` and `when`, and `inputs`; `text` and `file`, each with its `value` and `inputs`), `headers` (a list
   of `SentHeader`: `name`, `value`, scalar `form`, `when`),
@@ -585,4 +602,6 @@ The diff beyond the kinds, each with the decision that makes it:
 - `HttpResponse` gains `headers`, `request` and `inputs` (N10.7, D10.18), and `FormPlace` joins `FormCheck` (D16.13);
 - `HttpSend`'s wire forms gain `enum` and `flags`, and a list's `item` is a scalar form in place of a kind's text (D9.13,
   N16.4);
+- the `json` body gains `enums`, each a `SentEnum` whose `JsonForm` is `enum`, `flags` or `list` (D9.13, the owner,
+  2026-11-16);
 - plugin data `hub` and `stream` gain `offer` (D21.11).

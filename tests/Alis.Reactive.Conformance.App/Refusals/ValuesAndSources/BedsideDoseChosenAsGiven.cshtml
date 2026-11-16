@@ -16,8 +16,9 @@
     @(Html.InputField(plan, m => m.Status, options => options.Label("Status")).NativeDropDown(build => build.Items(Model.Statuses)))
     <button type="button" @Html.Raises(plan, BedsideDoses.CheckTheDose)>Check the dose</button>
     Html.On(plan, trigger => trigger.CustomEvent(BedsideDoses.CheckTheDose, pipeline => pipeline.Get(Model.Chart)
-        .OnSuccess<BedsideChartSearch>((found, pipeline) => pipeline.Element("dose-badge").Text.Set(
-            dose.Container.Read(m => m.SeenAtTheBedside).Choose(BedsideDoseStatus.Given, found.Body.Read(search => search.Chart.Status))))));
+        .OnSuccess<BedsideChartSearch>((found, pipeline) => pipeline
+            .When(dose.Container.Read(m => m.SeenAtTheBedside).Choose(BedsideDoseStatus.Given, found.Body.Read(search => search.Chart.Status)).Eq(BedsideDoseStatus.Given))
+            .Then(pipeline => pipeline.Element("dose-badge").Text.Set("Given")))));
 }
 <p>Dose: <span id="dose-badge">-</span></p>
 @Html.RenderPlan(plan)

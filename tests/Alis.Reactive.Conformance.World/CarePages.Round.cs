@@ -17,6 +17,8 @@ public static partial class CarePages
     public const string StaffSearchLogged = Round + "staff-search/logged";
     public const string StaffRosterWithAnOpenShift = Round + "staff-roster/an-open-shift";
     public const string StaffRosterWithEveryShiftFilled = Round + "staff-roster/every-shift-filled";
+    public const string ChartStatusOfAMissedDose = Round + "chart-status/missed-dose";
+    public const string ChartStatusOfASkippedDose = Round + "chart-status/skipped-dose";
     public const string SupplyRound = Round + "supplies";
     public const string OrderStart = Round + "order-start";
     public const string NurseCall = Round + "nurse-call";
