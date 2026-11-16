@@ -55,6 +55,13 @@ public sealed class SignedRound
     public string Carer { get; set; } = "";
 }
 
+public sealed class HandoverNotes
+{
+    public int Room { get; set; }
+
+    public string[] Lines { get; set; } = [];
+}
+
 public static class CareEvents
 {
     public static readonly AppEvent RoundStarted = AppEvent.Declare();
@@ -68,6 +75,8 @@ public static class CareEvents
     public static readonly AppEvent<RoundOfCarers> RoundStaffed = AppEvent.Declare<RoundOfCarers>();
 
     public static readonly AppEvent<SignedRound> RoundSigned = AppEvent.Declare<SignedRound>();
+
+    public static readonly AppEvent<HandoverNotes> HandedOver = AppEvent.Declare<HandoverNotes>();
 }
 
 public sealed class CareDesk : Plugin

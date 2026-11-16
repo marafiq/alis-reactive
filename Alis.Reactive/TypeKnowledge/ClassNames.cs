@@ -11,6 +11,7 @@ internal static class ClassNames
 {
     private const char ArityMark = '`';
     private const char ArgumentsOpen = '[';
+    private const char RankOpen = '[';
 
     private static readonly Dictionary<Type, string> Keywords = new()
     {
@@ -62,7 +63,24 @@ internal static class ClassNames
     }
 
     internal static string AsCSharpWritesIt(Type type)
-        => Keywords.TryGetValue(type, out var keyword) ? keyword : Composed(type, AsCSharpWritesIt);
+    {
+        if (Keywords.TryGetValue(type, out var keyword)) return keyword;
+        return type.IsArray ? ElementThenRanks(type, AsCSharpWritesIt) : Composed(type, AsCSharpWritesIt);
+    }
+
+    private static string ElementThenRanks(Type array, Func<Type, string> named)
+    {
+        var ranks = new StringBuilder();
+        var element = array;
+        while (element.IsArray)
+        {
+            var level = LevelOf(element);
+            ranks.Append(level.Rank);
+            element = level.Element;
+        }
+
+        return named(element) + ranks;
+    }
 
     private static string ByTypeNames(Type type) => Composed(type, ByTypeNames);
 
@@ -87,4 +105,12 @@ internal static class ClassNames
 
     [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "A type's name is its identity (D18.1), and D14.3 names a generic declaring class's type arguments by it.")]
     private static string NameOf(Type type) => type.Name;
+
+    [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "An array's own name ends in its rank's brackets, and its element type is the owner's read for a message to name an array as C# writes it (D18.1; the owner, 2026-11-16: \"approved for change string[]\").")]
+    private static (string Rank, Type Element) LevelOf(Type array)
+    {
+        var name = array.Name;
+        var element = array.GetElementType() ?? throw new InvalidOperationException("An array is a type with an element type.");
+        return (name.Substring(name.LastIndexOf(RankOpen)), element);
+    }
 }

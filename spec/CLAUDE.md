@@ -1833,6 +1833,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   reply, the app's form, since a select's value is in the live form (D7.7, gate 1's P8), so only a source the server's
   JSON wrote can hold two values in one form; X7.11's opposites compare the choice with Given and show a literal, since
   a value its own converter writes is shown by the server (D7.7). The owner can overrule it.
+- The owner, 2026-11-16, answering the lead's ask to name an array in a message as C# writes it, verbatim:
+  "approved for change string[]". Read by the lead: Type.GetElementType, read in TypeKnowledge/ClassNames.cs, joins
+  the owner's list of type-information reads (U20), so a message names an array by its innermost element as C# writes
+  it, then each rank's brackets, the outermost first (D18.1); an id's scope keeps the array's Type.Name (D14.3).
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

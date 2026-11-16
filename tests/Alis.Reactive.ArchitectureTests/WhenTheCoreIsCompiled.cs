@@ -32,6 +32,7 @@ public class WhenTheCoreIsCompiled
         "TriggersAndPipelines/Pipeline.cs System.Activator.CreateInstance",
         "TypeKnowledge/ClassNames.cs System.Reflection.MemberInfo.Name",
         "TypeKnowledge/ClassNames.cs System.Type.FullName",
+        "TypeKnowledge/ClassNames.cs System.Type.GetElementType",
         "TypeKnowledge/ClassNames.cs System.Type.GetGenericArguments",
         "TypeKnowledge/ClassNames.cs System.Type.IsArray",
         "TypeKnowledge/ClassNames.cs System.Type.IsInterface",

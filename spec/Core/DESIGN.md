@@ -4900,10 +4900,14 @@ plans (Q19).
     factory on the declaration, which net48's runtime does not support;
   - `Expression.Compile` in validation, where the server runs a condition, a member read and a fixed operand, the tree
     the browser reads (Q16, C13).
-  The owner granted one more on 2026-11-16, (5) of `spec/CLAUDE.md`, which the rewrite's list holds:
+  The owner granted two more on 2026-11-16, each in `spec/CLAUDE.md`, which the rewrite's list holds:
   - the C# member behind a member of the app's contract, `JsonPropertyInfo.AttributeProvider` read as a `MemberInfo`
     for its `Name`, in `TypeKnowledge/WrittenMember.cs`, since System.Text.Json's member names no C# member: markup's
-    raise names the payload member it refuses as C# declares it (M1.X8, M1.X9).
+    raise names the payload member it refuses as C# declares it (M1.X8, M1.X9), (5) of the owner's answers;
+  - an array's element type, `Type.GetElementType`, in `TypeKnowledge/ClassNames.cs`, so a message names an array as
+    C# writes it: its innermost element as C# writes it, then each rank's brackets, the outermost first, each read from
+    its own array's `Type.Name` (`string[]`, `int?[]`, `List<string>[]`, `int[][,]`); an id's scope keeps the array's
+    `Type.Name` (D14.3).
   The POC stands until the rewrite's request, declarations, validation and inputs units: it sends an enum a source
   holds as it is held, its `Enum.ToString` of a literal and its `new T()` are on no list in `WhenTheCoreIsCompiled`,
   and it refuses a member a generic class declares.

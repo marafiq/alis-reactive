@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Alis.Reactive.InputsAndIds;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Html;
@@ -32,6 +33,13 @@ public sealed class WhenAnInputsIdIsDerived
     {
         Assert.That(IdGenerator.For<ChartEntry<int>, string>(m => m.Initials), Is.EqualTo("Alis_Reactive_ModuleTests_InputsAndIds_ChartEntry_Int32___Initials"));
         Assert.That(IdGenerator.For<ChartEntry<string>, string>(m => m.Initials), Is.EqualTo("Alis_Reactive_ModuleTests_InputsAndIds_ChartEntry_String___Initials"));
+    }
+
+    [Test]
+    public void an_array_type_argument_is_named_by_its_own_type_name()
+    {
+        Assert.That(IdGenerator.For<ChartEntry<int[]>, string>(m => m.Initials), Is.EqualTo("Alis_Reactive_ModuleTests_InputsAndIds_ChartEntry_Int32_____Initials"));
+        Assert.That(IdGenerator.For<ChartEntry<List<string>[]>, string>(m => m.Initials), Is.EqualTo("Alis_Reactive_ModuleTests_InputsAndIds_ChartEntry_List_1_____Initials"));
     }
 
     [Test]

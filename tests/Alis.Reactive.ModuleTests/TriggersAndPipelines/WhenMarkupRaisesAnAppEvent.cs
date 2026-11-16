@@ -111,6 +111,26 @@ public sealed class WhenMarkupRaisesAnAppEvent
     }
 
     [Test]
+    public void a_payload_that_holds_an_array_is_refused_naming_the_array_as_csharp_writes_it()
+    {
+        var html = Views.Of(new CareCall("North"));
+        var plan = html.ReactivePlan<CareCall>();
+
+        Action theView = () =>
+        {
+            html.Raises(plan, CareEvents.HandedOver, new HandoverNotes { Room = 3, Lines = ["Fluids at seven"] });
+            html.RenderPlan(plan);
+        };
+
+        Assert.That(
+            () => theView(),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'HandoverNotes.Lines' is a string[], and markup carries each member of the payload it raises as the text of one attribute, "
+                + "so a member it carries is text, a number, a bool, a date, a Guid or an enum. "
+                + "Raise a payload that holds a record or a list from a pipeline, with p.Dispatch."));
+    }
+
+    [Test]
     public void a_payload_of_null_whose_type_names_a_member_so_no_attribute_carries_it_back_is_refused_naming_the_member_its_name_and_dispatch()
     {
         var html = Views.Of(new CareCall("North"));
