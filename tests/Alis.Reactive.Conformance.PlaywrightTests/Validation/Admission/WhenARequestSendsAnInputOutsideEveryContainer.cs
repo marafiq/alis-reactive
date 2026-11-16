@@ -19,7 +19,7 @@ public sealed class WhenARequestSendsAnInputOutsideEveryContainer(string host) :
         await empty.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Assign", Exact = true }).ClickAsync();
         await Expect(empty.Page.GetByRole(AriaRole.Group, new PageGetByRoleOptions { Name = "Ward", Exact = true })
             .GetByText("Ward is required.", new LocatorGetByTextOptions { Exact = true })).ToBeVisibleAsync();
-        await Expect(empty.Page.GetByRole(AriaRole.Alert).GetByText("Ward is required.", new LocatorGetByTextOptions { Exact = true })).ToBeVisibleAsync();
+        await Expect(empty.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Notices", Exact = true })).ToHaveTextAsync("Notices: error: Ward is required.");
 
         var named = await NewWorld();
         await named.Page.GotoAsync(CarePages.WardAssignment);

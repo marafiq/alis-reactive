@@ -46,7 +46,7 @@
   "hosts": [
     {
       "id": "net10",
-      "what": "ASP.NET Core MVC on net10 with the app's default options: camel-case members and enum names, Syncfusion's licence registered, ShowBusy() with NativeLoader, ShowReconnect() with the Native offer, request defaults sending X-Requested-With with a 401 route, a catch-all, ShowValidationErrors() and the standard retry, antiforgery in a header, Flags<CareDays>() of the conformance library and of the care rota, and Flags<RotaDays>(), named, its process clock in America/New_York",
+      "what": "ASP.NET Core MVC on net10 with the app's default options: camel-case members and enum names, Syncfusion's licence registered, ShowBusy(), the conformance library's busy indicator and notice in every layout whose pages send a request but the shell's, which renders NativeLoader and NativeToast, ShowReconnect() with the Native offer, request defaults with a 401 route and a catch-all that each show a notice, ShowValidationErrors() and the standard retry, antiforgery in a header, Flags<CareDays>() of the conformance library and of the care rota, and Flags<RotaDays>(), named, its process clock in America/New_York",
       "framework": "net10"
     },
     {
@@ -101,12 +101,7 @@
     },
     {
       "id": "defaultHooks",
-      "what": "request defaults whose WhileLoading awaits the session plugin's Renew and whose Finally appends defaults finally, awaits Flush and then writes flushed into the flush line, each settled at once unless the test holds it",
-      "framework": "net10"
-    },
-    {
-      "id": "noBusyComponent",
-      "what": "ShowBusy() with no script that provides the busy component",
+      "what": "net10's request defaults, with a WhileLoading that awaits the session plugin's Renew and a Finally that appends defaults finally, awaits Flush and then writes flushed into the flush line, each settled at once unless the test holds it",
       "framework": "net10"
     },
     {
@@ -193,10 +188,10 @@
           "declares": "ConformanceComponent"
         },
         {
-          "id": "residentsBusy",
-          "kind": "nativeSlice",
-          "module": "NativeAppLevelObjects",
-          "role": "the host's busy indicator, NativeLoader, which ShowBusy() shows over a request's target"
+          "id": "busy",
+          "kind": "plugin",
+          "module": "RequestsAndResponses",
+          "role": "the page's busy indicator, the conformance library's ConformanceBusy, which the layout renders: it provides the plugin busy under ShowBusy() and shows each target a request holds in its status Busy"
         }
       ]
     },
@@ -304,6 +299,18 @@
           "id": "intakeValidator",
           "kind": "validator",
           "role": "the intake's validator: the resident, the next of kin and the visit rules"
+        },
+        {
+          "id": "busy",
+          "kind": "plugin",
+          "module": "RequestsAndResponses",
+          "role": "the page's busy indicator, the conformance library's ConformanceBusy, which the layout renders: it provides the plugin busy under ShowBusy() and shows each target a request holds in its status Busy"
+        },
+        {
+          "id": "notice",
+          "kind": "plugin",
+          "module": "RequestsAndResponses",
+          "role": "the page's notice, the conformance library's ConformanceNotice, which the layout renders: it provides the plugin notice and shows each notice the core passes it in its status Notices"
         }
       ]
     },
@@ -461,6 +468,12 @@
           "kind": "nativeSlice",
           "role": "the record's NativeButton buttons: Call the nurse, and the night checks' Sign off",
           "module": "NativeComponents"
+        },
+        {
+          "id": "busy",
+          "kind": "plugin",
+          "module": "RequestsAndResponses",
+          "role": "the page's busy indicator, the conformance library's ConformanceBusy, which the layout renders: it provides the plugin busy under ShowBusy() and shows each target a request holds in its status Busy"
         }
       ]
     },
@@ -607,6 +620,12 @@
           "kind": "nativeSlice",
           "role": "NativeReconnectOffer, the offer the layout shows when the round's live connections give up",
           "module": "NativeAppLevelObjects"
+        },
+        {
+          "id": "busy",
+          "kind": "plugin",
+          "module": "RequestsAndResponses",
+          "role": "the page's busy indicator, the conformance library's ConformanceBusy, which the layout renders: it provides the plugin busy under ShowBusy() and shows each target a request holds in its status Busy"
         }
       ]
     },
@@ -2500,7 +2519,8 @@
       ],
       "parts": [
         "inputs",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "busy"
       ],
       "harness": [
         "seed"
@@ -2663,7 +2683,8 @@
       "parts": [
         "doses",
         "roundEndpoint",
-        "scanner"
+        "scanner",
+        "busy"
       ],
       "harness": [
         "seed",
@@ -2693,7 +2714,8 @@
       "parts": [
         "tabSlot",
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "busy"
       ],
       "harness": [
         "seed",
@@ -2971,7 +2993,8 @@
       "parts": [
         "tabSlot",
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "busy"
       ],
       "harness": [
         "seed",
@@ -4308,7 +4331,6 @@
       ],
       "parts": [
         "rows",
-        "residentsBusy",
         "residentsEndpoint"
       ],
       "harness": [
@@ -5218,7 +5240,8 @@
       "parts": [
         "board",
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "busy"
       ],
       "harness": [
         "seed",
@@ -5389,7 +5412,8 @@
       "parts": [
         "board",
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "busy"
       ],
       "harness": [
         "seed",
@@ -5427,7 +5451,8 @@
         "board",
         "doses",
         "roundEndpoint",
-        "scanner"
+        "scanner",
+        "busy"
       ],
       "harness": [
         "seed",
@@ -5463,7 +5488,8 @@
       "parts": [
         "board",
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "busy"
       ],
       "harness": [
         "seed",
@@ -6247,7 +6273,7 @@
         "filters",
         "list",
         "residentsEndpoint",
-        "residentsBusy"
+        "busy"
       ],
       "harness": [
         "seed"
@@ -6352,7 +6378,7 @@
       "parts": [
         "list",
         "residentsEndpoint",
-        "residentsBusy"
+        "busy"
       ],
       "harness": [
         "seed",
@@ -6367,7 +6393,7 @@
         {
           "verb": "clock",
           "action": null,
-          "on": "the retry's standard first wait, NativeLoader shown while it holds"
+          "on": "the retry's wait, run until the page sends the retry, the busy status reading Busy: census while it holds"
         }
       ]
     },
@@ -6397,7 +6423,8 @@
       ],
       "parts": [
         "inputs",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "notice"
       ],
       "harness": [
         "seed"
@@ -6474,7 +6501,7 @@
         {
           "verb": "clock",
           "action": null,
-          "on": "the retry's standard first wait"
+          "on": "the retry's wait, run until the page sends the retry"
         }
       ]
     },
@@ -6488,7 +6515,8 @@
       ],
       "parts": [
         "list",
-        "residentsEndpoint"
+        "residentsEndpoint",
+        "busy"
       ],
       "harness": [
         "seed",
@@ -6519,7 +6547,8 @@
         "tabSlot",
         "tabForm",
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "busy"
       ],
       "harness": [
         "seed"
@@ -6536,7 +6565,8 @@
       "parts": [
         "list",
         "residentsEndpoint",
-        "census"
+        "census",
+        "busy"
       ],
       "harness": [
         "seed",
@@ -6561,7 +6591,7 @@
       "index": 0,
       "screen": "residents",
       "hosts": [
-        "noBusyComponent"
+        "net10"
       ],
       "parts": [
         "list",
@@ -6830,7 +6860,7 @@
         {
           "verb": "clock",
           "action": null,
-          "on": "the retry's standard first wait"
+          "on": "the retry's wait, run until the page sends the retry"
         }
       ]
     },
@@ -6886,7 +6916,7 @@
         {
           "verb": "clock",
           "action": null,
-          "on": "the retry's standard first wait"
+          "on": "the retry's wait, run until the page sends the retry"
         }
       ]
     },
@@ -7480,7 +7510,8 @@
       "parts": [
         "intakeForm",
         "inputs",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "notice"
       ],
       "harness": [
         "seed"
@@ -7497,7 +7528,8 @@
       "parts": [
         "intakeForm",
         "inputs",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "notice"
       ],
       "harness": [
         "seed"

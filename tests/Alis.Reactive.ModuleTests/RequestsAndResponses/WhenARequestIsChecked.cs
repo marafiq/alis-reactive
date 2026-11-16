@@ -34,6 +34,14 @@ public sealed class WhenARequestIsChecked
             """{"name":"place","value":{"kind":"record","fields":[{"name":"destination","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"summary"}},{"name":"containerId","value":{"kind":"lit","value":"move"}}]}}]}}"""));
 
     [Test]
+    public void a_check_whose_failures_show_at_the_notice_names_the_notice_contract()
+    {
+        Assert.That(Contracts(pipeline => pipeline.Post<Transfer>("/transfers", request => request.Set(r => r.Ward, "North"))), Is.EqualTo("""{"kind":"list","items":[{"kind":"lit","value":"notice"}]}"""));
+        Assert.That(Contracts(pipeline => pipeline.Post<Transfer>("/transfers", request => request.Inputs(pipeline.Container<Transfer>("move")))), Is.EqualTo("""{"kind":"list","items":[]}"""));
+        Assert.That(Contracts(pipeline => pipeline.Post<Transfer>("/transfers", request => request.Set(r => r.Ward, "North")).NoValidation()), Is.EqualTo("""{"kind":"list","items":[]}"""));
+    }
+
+    [Test]
     public void a_named_rule_set_checks_by_the_registered_validator_under_that_set()
         => Assert.That(Check(pipeline => pipeline.Post<Transfer>("/transfers", request => request.Set(r => r.Ward, "North")).Validate<TransferRules>("moving")), Does.Contain(
             $$$$"""{"kind":"call","path":["validate"],"members":"required","target":{"kind":"obj","id":"$form:{{{{Rules}}}}:moving"},"args":[{"kind":"record","fields":[{"name":"registration","value":{"kind":"lit","value":"{{{{Rules}}}}:moving"}}"""));
@@ -93,6 +101,8 @@ public sealed class WhenARequestIsChecked
     }
 
     private static string Check(Action<Pipeline<Transfer>> write) => RequestPage.Request(Plan(write)).GetProperty("check").GetRawText();
+
+    private static string Contracts(Action<Pipeline<Transfer>> write) => RequestPage.Send(Plan(write), "contracts").GetRawText();
 
     private static string Plan(Action<Pipeline<Transfer>> write)
     {

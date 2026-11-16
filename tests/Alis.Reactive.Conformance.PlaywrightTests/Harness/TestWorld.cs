@@ -7,9 +7,13 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.Harness;
 
 public sealed class TestWorld
 {
+    private static readonly DateTime ClockStart = new(2026, 1, 15, 12, 0, 0, DateTimeKind.Utc);
+    private static readonly TimeSpan ClockStep = TimeSpan.FromMilliseconds(100);
+    private static readonly TimeSpan RetryBudget = TimeSpan.FromSeconds(30);
     private readonly HttpClient _harness;
     private readonly IBrowserContext _context;
     private readonly ConcurrentQueue<string> _consoleErrors = new();
+    private readonly ConcurrentQueue<Uri> _sent = new();
 
     private TestWorld(HttpClient harness, IBrowserContext context, IPage page)
     {
@@ -17,12 +21,16 @@ public sealed class TestWorld
         _context = context;
         Page = page;
         page.Console += (_, message) => Keep(message);
+        page.Request += (_, request) => _sent.Enqueue(new Uri(request.Url));
     }
 
     public IPage Page { get; }
 
     [BesideThePage]
     public IReadOnlyCollection<string> ConsoleErrors => _consoleErrors;
+
+    [BesideThePage]
+    public int SentTo(string endpoint) => _sent.Count(address => address.AbsolutePath == endpoint);
 
     public async Task Seed(Seed seed) => (await _harness.PostAsJsonAsync(WorldEndpoints.Seed, seed)).EnsureSuccessStatusCode();
 
@@ -33,6 +41,22 @@ public sealed class TestWorld
     public Task<ArmedGate> Arm<TGate>(TGate gate, string endpoint)
         where TGate : struct, Enum
         => Arm(new GateOrder { Gate = GateName.Of(gate), At = endpoint });
+
+    public Task InstallTheClock() => Page.Clock.InstallAsync(new ClockInstallOptions { TimeDate = ClockStart });
+
+    public Task HoldTheClock() => Page.Clock.PauseAtAsync(ClockStart.AddHours(1));
+
+    public async Task RunTheClockUntilItSends(string endpoint, int requests)
+    {
+        var run = TimeSpan.Zero;
+        while (SentTo(endpoint) < requests)
+        {
+            if (run >= RetryBudget)
+                throw new InvalidOperationException("The page sent " + SentTo(endpoint) + " of " + requests + " requests to " + endpoint + " in " + RetryBudget.TotalSeconds + " seconds of its clock.");
+            await Page.Clock.RunForAsync((long)ClockStep.TotalMilliseconds);
+            run += ClockStep;
+        }
+    }
 
     private async Task<ArmedGate> Arm(GateOrder order)
     {

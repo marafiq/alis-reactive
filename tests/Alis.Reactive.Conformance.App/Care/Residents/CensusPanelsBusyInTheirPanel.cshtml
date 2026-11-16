@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PanelCensusBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Census panels";
+    var plan = Html.ReactivePlan<PanelCensusBoard>();
+}
+<h1>Census of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, ResidentsBusyEvents.LoadBoth)>Load both</button>
+<section id="panel" aria-label="Panel">
+    @(plan.ConformanceComponent("census-north", new ConformanceStart { Text = "North census" }))
+    @(plan.ConformanceComponent("census-south", new ConformanceStart { Text = "South census" }))
+</section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentsBusyEvents.LoadBoth, pipeline => pipeline.Parallel(
+        pipeline => pipeline.Get(CareEndpoints.CensusOfTheNorthPanel).Busy("panel")
+            .OnSuccess(Content.Json<PanelCensus>(), (census, pipeline) => pipeline.Component<ConformanceComponent>("census-north").Value.Set(census.Body.Read(counted => counted.Count))),
+        pipeline => pipeline.Get(CareEndpoints.CensusOfTheSouthPanel).Busy("panel")
+            .OnSuccess(Content.Json<PanelCensus>(), (census, pipeline) => pipeline.Component<ConformanceComponent>("census-south").Value.Set(census.Body.Read(counted => counted.Count))))));
+}
+@Html.RenderPlan(plan)

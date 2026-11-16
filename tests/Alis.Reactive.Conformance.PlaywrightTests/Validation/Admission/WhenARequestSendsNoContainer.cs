@@ -17,7 +17,7 @@ public sealed class WhenARequestSendsNoContainer(string host) : ConformanceFixtu
         var unwarded = await NewWorld();
         await unwarded.Page.GotoAsync(CarePages.BedAssignment);
         await unwarded.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Assign", Exact = true }).ClickAsync();
-        await Expect(unwarded.Page.GetByRole(AriaRole.Alert).GetByText("Ward is required.", new LocatorGetByTextOptions { Exact = true })).ToBeVisibleAsync();
+        await Expect(unwarded.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Notices", Exact = true })).ToHaveTextAsync("Notices: error: Ward is required.");
         await Expect(unwarded.Page.Locator("#assigned")).ToHaveTextAsync("");
 
         var warded = await NewWorld();

@@ -22,12 +22,12 @@ public sealed class WhenARoutesAwaitedMethodRejects(string host) : ConformanceFi
         await refused.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Start", Exact = true }).ClickAsync();
         var held = await armed.Held();
         await Expect(refused.Page.Locator("#settle-status")).ToHaveTextAsync("Settling");
-        await Expect(refused.Page.Locator("#order-busy")).ToBeVisibleAsync();
+        await Expect(refused.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: order-busy");
         await held.Release();
 
         await Expect(refused.Page.Locator("#order-status")).ToHaveTextAsync("Finished");
         await Expect(refused.Page.Locator("#settle-status")).ToHaveTextAsync("Settling");
-        await Expect(refused.Page.Locator("#order-busy")).ToBeHiddenAsync();
+        await Expect(refused.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: none");
 
         var answered = await NewWorld();
         await answered.Page.GotoAsync(CarePages.OrderStart);
@@ -36,11 +36,11 @@ public sealed class WhenARoutesAwaitedMethodRejects(string host) : ConformanceFi
         await answered.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Start", Exact = true }).ClickAsync();
         var heldToAnswer = await armedToAnswer.Held();
         await Expect(answered.Page.Locator("#settle-status")).ToHaveTextAsync("Settling");
-        await Expect(answered.Page.Locator("#order-busy")).ToBeVisibleAsync();
+        await Expect(answered.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: order-busy");
         await heldToAnswer.Release();
 
         await Expect(answered.Page.Locator("#settle-status")).ToHaveTextAsync("Settled");
         await Expect(answered.Page.Locator("#order-status")).ToHaveTextAsync("Finished");
-        await Expect(answered.Page.Locator("#order-busy")).ToBeHiddenAsync();
+        await Expect(answered.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: none");
     }
 }

@@ -2171,9 +2171,10 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 
   Its numbers are .NET's standard resilience handler's: 3 retries after the first attempt, an exponential wait with
   jitter from 2 seconds, a 429's or 503's `Retry-After` in place of the wait, and 30 seconds in all, past which the
-  retries end. The app sets the attempts and the first wait once, in the defaults' `Retry(attempts, firstWait)`; a
-  request takes the policy or `NoRetry()`, and sets no numbers of its own. Another policy is a later extension, the
-  owner's.
+  retries end. The nth retry waits the first wait times 2 to the power n - 1, times a factor drawn between one half
+  and one and a half, so the standard policy's first retry waits between 1 and 3 seconds. The app sets the attempts
+  and the first wait once, in the defaults' `Retry(attempts, firstWait)`; a request takes the policy or `NoRetry()`,
+  and sets no numbers of its own. Another policy is a later extension, the owner's.
   - `Retry-After` is the server's word when it sends one (RFC 9110, section 10.2.3): its seconds, or its HTTP date
     taken against the response's own `Date`, so the browser's clock does not enter. A wait that would pass the
     30 seconds ends the retries at once, and the error route runs. A value in neither form is the server's

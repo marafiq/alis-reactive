@@ -18,7 +18,7 @@ public sealed class WhenARoutesRequestReadsAPathValueTheAnswerLacks(string host)
         await full.Page.GotoAsync(CarePages.FreeBedOnAFullWard);
         await full.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Find a free bed", Exact = true }).ClickAsync();
         await Expect(full.Page.Locator("#bed-status")).ToHaveTextAsync("Closed");
-        await Expect(full.Page.Locator("#bed-busy")).ToBeHiddenAsync();
+        await Expect(full.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: none");
         await Expect(full.Page.Locator("#bed-name")).ToHaveTextAsync("");
 
         var eastFourFree = await NewWorld();
@@ -26,6 +26,6 @@ public sealed class WhenARoutesRequestReadsAPathValueTheAnswerLacks(string host)
         await eastFourFree.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Find a free bed", Exact = true }).ClickAsync();
         await Expect(eastFourFree.Page.Locator("#bed-name")).ToHaveTextAsync("East 4");
         await Expect(eastFourFree.Page.Locator("#bed-status")).ToHaveTextAsync("Closed");
-        await Expect(eastFourFree.Page.Locator("#bed-busy")).ToBeHiddenAsync();
+        await Expect(eastFourFree.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: none");
     }
 }

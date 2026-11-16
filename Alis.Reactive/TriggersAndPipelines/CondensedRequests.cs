@@ -341,5 +341,5 @@ public static class CondensedRequests
     /// <summary>Reaches the page's notice, to show a text as a success, an error, a warning or information.</summary>
     /// <param name="pipeline">The pipeline the step is written in.</param>
     /// <returns>The notice.</returns>
-    public static Notice Notice<TModel>(this Pipeline<TModel> pipeline) => throw new NotImplementedException();
+    public static Notice Notice<TModel>(this Pipeline<TModel> pipeline) => new(pipeline.Writer, () => RequestScopes.NoticeShown(pipeline.Writer));
 }

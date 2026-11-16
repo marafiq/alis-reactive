@@ -12,9 +12,10 @@
 <h1>Medication order: @Model.Medication</h1>
 @(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner" }))
 <button type="button" @Html.Raises(plan, OrderStarts.Start)>Start</button>
-<p id="order-busy" hidden>Ordering</p>
-<p>Scanner: <span id="settle-status"></span></p>
-<p>Order: <span id="order-status"></span></p>
+<section id="order-busy" aria-label="Order">
+    <p>Scanner: <span id="settle-status"></span></p>
+    <p>Order: <span id="order-status"></span></p>
+</section>
 @{
     Html.On(plan, trigger => trigger.CustomEvent(OrderStarts.Start, pipeline => pipeline
         .Post(OrderStartEndpoints.Orders)

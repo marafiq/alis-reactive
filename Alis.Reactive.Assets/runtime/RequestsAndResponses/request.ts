@@ -3,7 +3,9 @@ import {
   assertNever, notBuilt, type Culture, type Expression, type HttpSend, type InputBinding, type MultipartPart, type PathPart, type PathStep, type ScalarWireForm, type SentBody,
   type SentField, type SentHeader, type SentInput, type SentInputs, type Shape, type TimeZone, type WireForm,
 } from "../Schema/index";
+import { plugin } from "../Plugins/index";
 import { Stop } from "../ValuesAndSources/index";
+import { captureBusy, type CapturedBusy } from "./busy";
 import { fieldTexts, formDataPlace, held, invariantPlace, scalarText, type TextPlace } from "./wire";
 
 export { Submission };
@@ -16,21 +18,13 @@ export interface PreparedRequest {
   readonly request: object;
   readonly inputs: readonly SentInput[];
   readonly respondedJson: boolean;
+  readonly retry: HttpSend["retry"];
+  readonly releaseBusy: () => void;
 }
 
-export function prepare(send: HttpSend, zone: TimeZone, culture: Culture): PreparedRequest {
-  noRetry(send.retry);
-  noBusy(send.busy);
-  for (const contract of send.contracts) {
-    switch (contract) {
-      case "busy":
-        throw notBuilt("the busy contract: U18's busy indicator");
-      case "notice":
-        throw notBuilt("the notice contract: U18's notices");
-      default:
-        assertNever(contract);
-    }
-  }
+export function prepare(send: HttpSend, zone: TimeZone, culture: Culture, busy: CapturedBusy = captureBusy(send.busy), findPlugin: typeof plugin = plugin): PreparedRequest {
+  const contracts = new Map<HttpSend["contracts"][number], unknown>();
+  for (const contract of send.contracts) contracts.set(contract, findPlugin(contract, ""));
   const request = {};
   const path = send.url.parts.map(part => pathText(part, zone, request)).join("");
   const query = new URLSearchParams();
@@ -46,7 +40,8 @@ export function prepare(send: HttpSend, zone: TimeZone, culture: Culture): Prepa
   const field = token.kind === "token" && token.place.kind === "field" ? { name: token.place.name, value: token.value } : undefined;
   const body = bodyOf(send.body, headers, { zone, place: formDataPlace(culture), request, token: field });
   const inputs = [...sentInputs(send.query.inputs), ...sentInputs(send.body.kind === "none" ? noInputs : send.body.inputs)];
-  return { method: send.method, url, headers, body, request, inputs, respondedJson: send.respondedJson };
+  const releaseBusy = busy.hold(contracts.get("busy"));
+  return { method: send.method, url, headers, body, request, inputs, respondedJson: send.respondedJson, retry: send.retry, releaseBusy };
 }
 
 interface FormWriting {
@@ -244,30 +239,6 @@ function refuseFiles(value: unknown): void {
     return;
   }
   if (typeof value === "object" && value !== null) for (const member of Object.values(value)) refuseFiles(member);
-}
-
-function noRetry(retry: HttpSend["retry"]): void {
-  switch (retry.kind) {
-    case "none":
-      return;
-    case "standard":
-      throw notBuilt("the standard retry policy: U18's retry");
-    default:
-      assertNever(retry);
-  }
-}
-
-function noBusy(busy: HttpSend["busy"]): void {
-  switch (busy.kind) {
-    case "none":
-      return;
-    case "page":
-      throw notBuilt("page busy: U18's busy indicator");
-    case "targets":
-      throw notBuilt("target busy: U18's busy indicator");
-    default:
-      assertNever(busy);
-  }
 }
 
 function sentInputs(capture: SentInputs): readonly SentInput[] {

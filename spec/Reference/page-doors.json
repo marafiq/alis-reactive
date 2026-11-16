@@ -434,8 +434,7 @@
   },
   "M15.F1 X2.4 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/MoveInNextOfKin.cshtml",
@@ -539,9 +538,7 @@
     ]
   },
   "M17.F1 X11.14 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/BedAdmission.cshtml",
       "/Care/Admission/BedAdmissionWithNoBedRequest.cshtml",
@@ -569,9 +566,7 @@
     ]
   },
   "M17.F1 X11.4 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/OrderStart.cshtml",
       "/Shared/_Layout.cshtml"
@@ -624,9 +619,7 @@
     ]
   },
   "M17.F1 X4.4 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/FreeBed.cshtml",
       "/Shared/_Layout.cshtml"
@@ -672,8 +665,7 @@
   },
   "M18.F1 X13.4 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/AddressedMoveIn.cshtml",
@@ -2517,6 +2509,38 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F2 X10.15 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/AttemptsCounted.cshtml",
+      "/Care/Residents/AttemptsCountedOnce.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F2 X10.16 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/SummaryOfOneCard.cshtml",
+      "/Care/Residents/SummaryOfTwoCards.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F2 X10.19 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/CensusPanels.cshtml",
+      "/Care/Residents/CensusPanelsBusyInTheirPanel.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F2 X10.20 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/ResidentsLoad.cshtml",
+      "/Care/Residents/_NoBusyLayout.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F2 X10.29 0": {
     "modules": [
       "NativeComponents"
@@ -2538,8 +2562,7 @@
   },
   "M6.F2 X10.5 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/AdmitResident.cshtml",
@@ -2550,6 +2573,14 @@
     "modules": [],
     "views": [
       "/Care/Residents/WingCounts.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F2 X10.8 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/CensusRetried.cshtml",
+      "/Care/Residents/CensusRetriedOnce.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -2795,8 +2826,7 @@
   },
   "M8.F4 X1.5 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/FamilyMembers.cshtml",
@@ -2838,7 +2868,6 @@
   },
   "M8.F4 X16.15 0": {
     "modules": [
-      "NativeAppLevelObjects",
       "NativeComponents"
     ],
     "views": [
@@ -2848,9 +2877,7 @@
   },
   "M8.F4 X16.16 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/WardAssignment.cshtml",
@@ -2870,8 +2897,7 @@
   },
   "M8.F4 X16.18 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Round/SupplyCodes.cshtml",
@@ -2922,8 +2948,7 @@
   },
   "M8.F4 X8.3 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/VisitorSignIn.cshtml",

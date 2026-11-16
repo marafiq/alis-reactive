@@ -192,7 +192,7 @@ internal sealed class RequestPartsWriter
         Open(stage);
         HeaderName(name);
         HeaderNames.Value(name, value);
-        _headers.Add(HeaderRecord(name, RequestValues.Held(ContractRecord<SentHeader>.Literal(value)), new TextScalarWireForm()));
+        _headers.Add(LiteralHeader(name, value));
         return _stage;
     }
 
@@ -235,7 +235,7 @@ internal sealed class RequestPartsWriter
         return new RequestCheckParts("'" + method.Text + " " + _url.Url + "'", CheckedFormat(method), inputs, sentValue, entries, ContainerId, names);
     }
 
-    internal RecordExpression Send(RequestMethod method, SuccessBody success, bool respondedJson)
+    internal RecordExpression Send(RequestMethod method, SuccessBody success, bool respondedJson, SendDefaults defaults)
     {
         var token = Token(method);
         var url = new ContractRecord<RequestUrl>()
@@ -249,15 +249,21 @@ internal sealed class RequestPartsWriter
             .Set(sent => sent.Url, url)
             .Set(sent => sent.Query, new ContractRecord<SentQuery>().Set(query => query.Fields, new ListExpression(_query.ToArray())).Set(query => query.Inputs, _body == Body.None ? Inputs : NoInputs).Written)
             .Set(sent => sent.Body, SentBody(token.InField))
-            .Set(sent => sent.Headers, new ListExpression([.. _headers, HeaderRecord("Accept", RequestValues.Held(ContractRecord<SentHeader>.Literal(accept)), new TextScalarWireForm())]))
+            .Set(sent => sent.Headers, new ListExpression([.. DefaultHeaders(defaults), .. _headers, LiteralHeader("Accept", accept)]))
             .Set(sent => sent.Antiforgery, token.Record)
-            .Set(sent => sent.Retry, new ContractRecord<NoneRetryPolicy>().Set(retry => retry.Kind, "none").Written)
-            .Set(sent => sent.Busy, new ContractRecord<NoneBusy>().Set(busy => busy.Kind, "none").Written)
+            .Set(sent => sent.Retry, defaults.Retry)
+            .Set(sent => sent.Busy, defaults.Busy)
             .Set(sent => sent.RespondedJson, respondedJson)
-            .Set(sent => sent.Contracts, new ListExpression([])).Written;
+            .Set(sent => sent.Contracts, defaults.Contracts).Written;
     }
 
     private static RecordExpression NoContainer => new ContractRecord<NoneContainerCapture>().Set(container => container.Kind, "none").Written;
+
+    private IEnumerable<Expression> DefaultHeaders(SendDefaults defaults)
+        => defaults.Headers.Where(header => !_headerNames.Contains(header.Name)).Select(header => LiteralHeader(header.Name, header.Value));
+
+    private static RecordExpression LiteralHeader(string name, string value)
+        => HeaderRecord(name, RequestValues.Held(ContractRecord<SentHeader>.Literal(value)), new TextScalarWireForm());
 
     private static RecordExpression NoInputs => new ContractRecord<SentInputs>()
         .Set(sent => sent.Container, NoContainer)
@@ -461,4 +467,15 @@ internal sealed class RequestPartsWriter
         if (stage != _stage) throw new InvalidOperationException("A request's parts stage is already used; write its parts in one chain.");
         _stage++;
     }
+}
+
+internal sealed class SendDefaults(IReadOnlyList<(string Name, string Value)> headers, RecordExpression retry, RecordExpression busy, ListExpression contracts)
+{
+    internal IReadOnlyList<(string Name, string Value)> Headers { get; } = headers;
+
+    internal RecordExpression Retry { get; } = retry;
+
+    internal RecordExpression Busy { get; } = busy;
+
+    internal ListExpression Contracts { get; } = contracts;
 }

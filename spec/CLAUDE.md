@@ -1730,6 +1730,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   states no meaning. A literal is judged at every depth against the contract it was written by, a member a derived
   type adds by the discriminator it is written under; an `object` member's number is written unjudged, since its
   JSON names no .NET type to judge it by. The owner can overrule it.
+- The owner, 2026-11-15, after the net10 defaults sent X-Requested-With: "I think I have noted before Excel clustered
+  with. If you design it correctly with the content types around HTTP standards, explain to me why you keep going
+  back to Excel clustered with" (dictated, for X-Requested-With), restating the decision of 2026-11-06
+  (`spec/NOTES.md`). No request default of the conformance app sends X-Requested-With: a request says what it takes
+  by `Accept`, from its route's content kind (D9.13), and a header every request sends is an app's own choice
+  (D9.12), which makes every request it reaches on another origin a preflighted one.
 - The owner, 2026-11-15, on P8's live form, given the lead's two options and its recommendation: "I'll go with your
   recommendation, though I don't fully understand the context yet. But let's go with your recommendation." The live
   form keeps the app's `RespectRequiredConstructorParameters` (`Alis.Reactive/PathsAndWire/AppJson.cs`), since the

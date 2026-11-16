@@ -1881,6 +1881,65 @@
           ]
         }
       ]
+    },
+    {
+      "name": "ConformanceBusy",
+      "kind": "live",
+      "what": "the conformance library's busy indicator, the object its script provides as the plugin busy when its element mounts (D17.14): show(target?: string): void and hide(target?: string): void set a state on one target, the page where none is passed, and it never hides by itself (D10.21); the core alone calls both, so the app's C# declares no member of it and holds its render helper alone",
+      "members": [],
+      "behaviors": [
+        {
+          "behavior": "Html.ConformanceBusy() renders its element once, in a layout, and its script provides the plugin busy when that element mounts; a page whose layout renders none provides no busy.",
+          "tests": [
+            "X10.20"
+          ]
+        },
+        {
+          "behavior": "It shows what it holds shown in a status named Busy, whose whole text is Busy: and each shown target's id, ordered as text and parted by a comma and a space, the page as the page, and Busy: none while nothing is shown; a show of a shown target and a hide of a hidden one change nothing.",
+          "tests": [
+            "X10.3",
+            "X10.8",
+            "X10.16",
+            "X10.17",
+            "X10.19",
+            "X4.4",
+            "X11.4",
+            "X11.5",
+            "X11.23",
+            "X21.8"
+          ]
+        },
+        {
+          "behavior": "It lists every call the core made in a status named Busy calls, whose whole text is Busy calls: and each call in the order made, parted by a semicolon and a space, a call its method's name, show or hide, a space and its target's id, the page as the page, and Busy calls: none until the first.",
+          "tests": [
+            "X10.8",
+            "X10.16"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ConformanceNotice",
+      "kind": "live",
+      "what": "the conformance library's notice, the object its script provides as the plugin notice when its element mounts (D17.14): show(text: string | null | undefined, kind: string): void; it keeps every notice and has no time and no dismiss (D11.9), and the core alone calls it (D10.21), so the app's C# declares no member of it and holds its render helper alone",
+      "members": [],
+      "behaviors": [
+        {
+          "behavior": "Html.ConformanceNotice() renders its element once, in a layout, and its script provides the plugin notice when that element mounts.",
+          "tests": [
+            "X16.15",
+            "X16.16"
+          ]
+        },
+        {
+          "behavior": "It shows every notice it was passed in a status named Notices, whose whole text is Notices: and each notice in the order shown, parted by a semicolon and a space, a notice its kind, a colon, a space and its text, (null) for null and (undefined) for undefined, and Notices: none until one shows.",
+          "tests": [
+            "X16.15",
+            "X16.16",
+            "X10.12"
+          ]
+        }
+      ]
     }
   ],
   "cells": {

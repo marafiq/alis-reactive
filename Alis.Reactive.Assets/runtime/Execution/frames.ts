@@ -36,6 +36,10 @@ function completesNothing(): void {
   return undefined;
 }
 
+function releasesNothing(): void {
+  return undefined;
+}
+
 export class BlockFrame {
   readonly kind = "block";
   readonly isAFinally: boolean;
@@ -95,6 +99,7 @@ export class RequestFrame {
   #loaded = 0;
   #owed = 0;
   #abrupt = false;
+  #release: () => void = releasesNothing;
 
   constructor(statement: RequestStatement, context: Context) {
     this.#statement = statement;
@@ -128,9 +133,12 @@ export class RequestFrame {
           }),
         };
       }
-      case "guard":
-        this.#state = { kind: "attempt", request: prepare(state.send, this.#context.plan.timeZone, this.#context.plan.culture) };
+      case "guard": {
+        const request = prepare(state.send, this.#context.plan.timeZone, this.#context.plan.culture);
+        this.#release = request.releaseBusy;
+        this.#state = { kind: "attempt", request };
         return completed;
+      }
       case "attempt":
         return {
           kind: "waits",
@@ -152,6 +160,9 @@ export class RequestFrame {
       case "finally": {
         const layer = this.#statement.layers[this.#owed - 1];
         if (layer === undefined) {
+          const release = this.#release;
+          this.#release = releasesNothing;
+          release();
           this.#state = this.#abrupt ? { kind: "after" } : state.after;
           return completed;
         }

@@ -292,20 +292,6 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
   });
 });
 
-describe("when a request reaches a deferred U18 case, it names the piece it waits on", () => {
-  test("DeferredRetry: a standard policy waits on retry", () => {
-    expect(() => prepare({ ...get(), retry: { kind: "standard", attempts: 3, firstWaitMilliseconds: 2000 } }, clock, enUs)).toThrow("U18's retry");
-  });
-
-  test.each<Send["busy"]>([{ kind: "page" }, { kind: "targets", values: [] }])("DeferredBusy: $kind waits on the indicator", busy => {
-    expect(() => prepare({ ...get(), busy }, clock, enUs)).toThrow("U18's busy indicator");
-  });
-
-  test.each<Send["contracts"][number]>(["busy", "notice"])("DeferredContract: %s waits on its component contract", contract => {
-    expect(() => prepare({ ...get(), contracts: [contract] }, clock, enUs)).toThrow("contract: U18's");
-  });
-});
-
 type Captured = Extract<Send["query"]["inputs"]["container"], { kind: "captured" }>;
 type Binding = Captured["inputs"][number]["entry"]["binding"];
 const bound = (name: string, path: Binding["path"], shape: Extract<Binding["value"], { kind: "as" }>["shape"]): Captured["inputs"][number] => ({

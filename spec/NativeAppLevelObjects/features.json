@@ -848,10 +848,10 @@
         },
         {
           "for": "X17.38",
-          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\") in an app that takes ShowBusy() and renders Html.NativeLoader(\"Loading\"), whose stylesheet shows .alis-loader--target as a 20 pixel square, each row with a Discharge control from one NativeActionButton whose block posts the row's id and on success sets the control's text to Discharged. The harness gates Bea's POST (Lanes.tla's Respond).",
+          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\") in an app that takes ShowBusy(), each row with a Discharge control from one NativeActionButton whose block posts the row's id and on success sets the control's text to Discharged. The harness gates Bea's POST (Lanes.tla's Respond).",
           "gesture": "Click Bea's Discharge; once the harness reports Bea's POST held, check the controls, then release it.",
-          "outcome": "While it is held Bea's control shows the loader's overlay and Ada's and Cy's show none; after the release no control shows one and Bea's reads Discharged.",
-          "opposite": "Click Ada's Discharge instead: while the harness holds its POST only Ada's control shows the overlay.",
+          "outcome": "While it is held Bea's control holds aria-busy and Ada's and Cy's hold none; after the release no control holds it and Bea's reads Discharged.",
+          "opposite": "Click Ada's Discharge instead: while the harness holds its POST only Ada's control holds aria-busy.",
           "defect": "A busy target that names the action's first control, or the page, shows the wrong row or every row busy; the target is the control the block's success route writes, read when the request starts (D10.21).",
           "observes": "Lanes.tla:Respond"
         },

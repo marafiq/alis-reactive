@@ -19,7 +19,7 @@ public sealed class WhenARequestOwnsItsBlocks
     public void loading_before_any_await_can_write_the_vendors_payload()
     {
         var plan = WithPayload((raised, pipeline) => pipeline.Get("/staff").WhileLoading(pipeline => raised.Note.Set("Loading")));
-        Assert.That(RequestPage.Request(plan).GetProperty("layers")[0].GetProperty("whileLoading").GetRawText(), Is.EqualTo(
+        Assert.That(RequestPage.Request(plan).GetProperty("layers")[1].GetProperty("whileLoading").GetRawText(), Is.EqualTo(
             """[{"kind":"set","path":["note"],"members":"required","content":false,"target":{"kind":"ref","name":"e"},"value":{"kind":"lit","value":"Loading"}}]"""));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }

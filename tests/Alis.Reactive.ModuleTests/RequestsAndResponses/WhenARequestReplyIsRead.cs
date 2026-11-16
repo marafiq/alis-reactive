@@ -28,7 +28,7 @@ public sealed class WhenARequestReplyIsRead
         });
         var request = RequestPage.Request(plan);
         Assert.That(request.GetProperty("layers").GetRawText(), Is.EqualTo(
-            """[{"whileLoading":[{"kind":"set","path":["textContent"],"members":"required","content":true,"target":{"kind":"obj","id":"loading"},"value":{"kind":"lit","value":"Loading"}}],"finally":[{"kind":"set","path":["textContent"],"members":"required","content":true,"target":{"kind":"obj","id":"finally"},"value":{"kind":"lit","value":"Settled"}}]}]"""));
+            """[{"whileLoading":[],"finally":[]},{"whileLoading":[{"kind":"set","path":["textContent"],"members":"required","content":true,"target":{"kind":"obj","id":"loading"},"value":{"kind":"lit","value":"Loading"}}],"finally":[{"kind":"set","path":["textContent"],"members":"required","content":true,"target":{"kind":"obj","id":"finally"},"value":{"kind":"lit","value":"Settled"}}]}]"""));
         Assert.That(request.GetProperty("success").GetRawText(), Is.EqualTo(
             """{"kind":"text","do":[{"kind":"set","path":["textContent"],"members":"required","content":true,"target":{"kind":"obj","id":"found"},"value":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"optional","target":{"kind":"get","path":["body"],"members":"required","target":{"kind":"ref","name":"reply1"}}},"shape":{"kind":"string","date":"none","negativeZero":"0"}}}]}"""));
         Assert.That(request.GetProperty("statuses").GetRawText(), Is.EqualTo(

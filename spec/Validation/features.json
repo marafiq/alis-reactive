@@ -2178,17 +2178,17 @@
         },
         {
           "for": "X16.15",
-          "page": "A ward page with no form whose Assign button posts a request setting Bed to 4 and nothing else; the validator holds RuleFor(a => a.Ward).NotEmpty().WithMessage(\"Ward is required.\"); the page holds the Native notice and writes the endpoint's answer, \"{ward}, bed {bed}\", into assigned.",
+          "page": "A ward page with no form whose Assign button posts a request setting Bed to 4 and nothing else; the validator holds RuleFor(a => a.Ward).NotEmpty().WithMessage(\"Ward is required.\"); the page's layout renders the notice, and the page writes the endpoint's answer, \"{ward}, bed {bed}\", into assigned.",
           "gesture": "Click Assign.",
-          "outcome": "The notice shows \"Ward is required.\", assigned stays empty, and no request is sent.",
+          "outcome": "The notices status reads \"Notices: error: Ward is required.\", assigned stays empty, and no request is sent.",
           "opposite": "With the request also setting Ward to North, Assign shows North, bed 4 in assigned.",
           "defect": "A request that sends no container is not checked, so Assign is sent and the endpoint answers \"Ward is required.\" with a 400; or the failure has no place and shows nowhere."
         },
         {
           "for": "X16.16",
-          "page": "A ward page whose Ward input sits outside every container, and whose Assign posts a request sending it under r => r.Ward; the validator holds RuleFor(a => a.Ward).NotEmpty().WithMessage(\"Ward is required.\").ServerOnly(); the page holds the Native notice.",
+          "page": "A ward page whose Ward input sits outside every container, and whose Assign posts a request sending it under r => r.Ward; the validator holds RuleFor(a => a.Ward).NotEmpty().WithMessage(\"Ward is required.\").ServerOnly(); the page's layout renders the notice.",
           "gesture": "Leave Ward empty and click Assign.",
-          "outcome": "\"Ward is required.\" shows beside Ward and in the notice.",
+          "outcome": "\"Ward is required.\" shows beside Ward, and the notices status reads \"Notices: error: Ward is required.\".",
           "opposite": "Typing North and clicking Assign shows no message.",
           "defect": "An input outside every container has no message element the request knows, so the message shows in the notice only.",
           "observes": "Composition.tla:Route"

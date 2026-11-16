@@ -1,5 +1,4 @@
 @using Alis.Reactive.Conformance.App.Care
-@using Alis.Reactive.Native.NativeAppLevelObjects
 @using Alis.Reactive.Native.NativeComponents
 @using Alis.Reactive.RequestsAndResponses
 @using Alis.Reactive.RenderingAndDelivery
@@ -21,5 +20,4 @@
     .OnSuccess(Content.Text, (assigned, pipeline) => pipeline.Element("assigned").Text.Set(assigned.Body))
     .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))
 <p>Assigned: <span id="assigned"></span></p>
-@Html.NativeToast(TimeSpan.FromSeconds(5), "Dismiss")
 @Html.RenderPlan(plan)

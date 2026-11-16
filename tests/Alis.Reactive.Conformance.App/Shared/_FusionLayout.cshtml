@@ -1,3 +1,4 @@
+@using Alis.Reactive.Conformance.App.Components
 <!doctype html>
 <html lang="en">
 <head>
@@ -9,6 +10,8 @@
     <main>
         @RenderBody()
     </main>
+    @Html.ConformanceBusy()
+    @Html.ConformanceNotice()
     <script src="~/js/alis-reactive-conformance.js" asp-append-version="true"></script>
     <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
 </body>

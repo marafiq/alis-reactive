@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Conformance.World;
 using Alis.Reactive.RenderingAndDelivery;
+using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.TriggersAndPipelines;
 
 namespace Alis.Reactive.Conformance.App;
@@ -56,7 +57,13 @@ internal static class AppHost
                 services.AddReactiveRequests(requests => { });
                 return;
             default:
-                services.AddReactiveRequests(requests => requests.Antiforgery(AntiforgeryIn.Header));
+                services.AddReactiveRequests(requests => requests
+                    .Antiforgery(AntiforgeryIn.Header)
+                    .ShowBusy()
+                    .ShowValidationErrors()
+                    .OnError(401, Content.None, (expired, pipeline) => pipeline.Notice().Warning("Your session has ended."))
+                    .OnError((failed, pipeline) => pipeline.Notice().Error("The request failed."))
+                    .Retry(3, TimeSpan.FromSeconds(2)));
                 return;
         }
     }

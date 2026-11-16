@@ -30,7 +30,11 @@ its views.
   other request with no world gets none.
 - `Components/` holds the conformance library (`spec/Reference/native.json`), a folder for each component with its
   declaration, its payloads, its live objects and the data classes its members name; what several components
-  reach sits in `Components/` itself. A declaration mirrors its component member for member, each by its C# name and
+  reach sits in `Components/` itself. Its busy indicator and its notice are no declarations
+  (`Components/ConformanceBusy/`, `Components/ConformanceNotice/`): each is a render helper a layout calls once and a
+  script that provides its contract's plugin, "busy" or "notice", when the helper's element mounts, since the core
+  alone calls a contract's members (D10.21); each shows what the core told it in one status, Busy or Notices, as
+  `spec/Reference/native.json` states it. A declaration mirrors its component member for member, each by its C# name and
   its door as that file states them; none is edited by hand to differ from it. A data class's member starts at what
   that file's type and every promise that reads the member lacking state, and a reference member the file holds
   non-null that starts at null is written null-forgiving, as `Components/ConformanceComponent/Binding.cs` writes its
@@ -46,7 +50,11 @@ its views.
   world names, `ComponentVersion` of the world contract, one of the versions `spec/Reference/native.json` lists, and its endpoint members name the endpoints of
   `World/WorldArea.cs` its methods await, each at the settle gate and answering as a seed says: a 500, a count or the
   check's answer. A page's layout is `Shared/_Layout.cshtml`, which
-  links the framework's script, unless the page renders something of its own beside its body, as the ward's does.
+  links the framework's script, unless the page renders something of its own beside its body, as the ward's does. A
+  layout whose pages send a request renders `Html.ConformanceBusy()` and `Html.ConformanceNotice()` after its body,
+  since the host's request defaults name both contracts and a request whose page lacks either stops before it sends
+  (D10.21); the shell's layout renders the Native ones in their place, and the page of X10.20 takes
+  `Care/Residents/_NoBusyLayout.cshtml`, which renders the notice alone.
 - `Bench/` holds the component bench, a folder for each family of cells of `spec/Reference/native.json`
   (`Bench/Properties/` the first; `Bench/Poc15/` holds a controller for each member the event.poc15 cells reach; a
   page reaches another family's endpoint by its constant of `BenchEndpoints` alone, as `Bench/Lanes/` loads the card):
@@ -71,9 +79,8 @@ its views.
   on `window.__alisPlugins`; `build.mjs` bundles each into the app's wwwroot, at its path in lower case, where git
   ignores it. `Bench/Schema/` holds the bench's page of module 14, two plans that handle one element's events. `Care/Shell/` holds the shell screen's pages, which take
   `Care/Shell/_ShellLayout.cshtml`: it renders the drawer and the confirm beside the body, as an app's layout
-  renders its app-level objects. A page whose request sends no container renders the notice region,
-  `Html.NativeToast`, itself, since the core shows that request's failed check there (D16.13), and it needs no
-  pipeline door for it (the lead's reversal, 2026-11-13). A shell page that styles the drawer writes a style
+  renders its app-level objects. A page whose request sends no container shows that request's failed check in the
+  notice its layout renders (D16.13), and it needs no pipeline door for it (the lead's reversal, 2026-11-13). A shell page that styles the drawer writes a style
   element in the layout's Styles section, which the layout renders in its head (`Care/Shell/ShiftNotes.cshtml`).
   A care page whose plugins are scripts takes its
   screen's own layout, `Care/Record/_ScriptedLayout.cshtml`, which links the scripts the page names before the

@@ -1,5 +1,6 @@
 import { assertNever, notBuilt, type HttpResponse, type RequestStatement, type ResponseBody, type Route, type SuccessBody } from "../Schema/index";
 import type { PreparedRequest } from "./request";
+import { Retry, waitToRetry } from "./retry";
 
 type Routes = Pick<RequestStatement, "success" | "statuses" | "otherwise">;
 type Decoded = { readonly kind: "body"; readonly body: ResponseBody } | { readonly kind: "content" } | { readonly kind: "network" };
@@ -22,6 +23,22 @@ export function routeFor(reply: HttpResponse, routes: Routes): Route {
 }
 
 export async function attempt(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string): Promise<HttpResponse> {
+  const retry = new Retry(request.retry, request.method);
+  let sent = 1;
+  for (;;) {
+    signal.throwIfAborted();
+    const reply = await sendOnce(request, routes, signal, pageUrl);
+    signal.throwIfAborted();
+    const wait = retry.next(reply, sent);
+    if (wait === undefined) return reply;
+    await waitToRetry(wait, signal);
+    signal.throwIfAborted();
+    if (!retry.withinBudget(0)) return reply;
+    sent += 1;
+  }
+}
+
+async function sendOnce(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string): Promise<HttpResponse> {
   let response: Response;
   try {
     response = await fetch(request.url, { method: request.method, headers: request.headers, body: request.body, redirect: "follow", signal });

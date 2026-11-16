@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentsLoad
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Load residents";
+    var plan = Html.ReactivePlan<ResidentsLoad>();
+}
+<h1>Residents of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, ResidentsBusyEvents.Load)>Load</button>
+<p>Status: <span id="load-status">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentsBusyEvents.Load, pipeline => pipeline.Get(CareEndpoints.ResidentsLoaded)
+        .WhileLoading(pipeline => pipeline.Element("load-status").Text.Set("Loading"))
+        .OnSuccess(pipeline => pipeline.Element("load-status").Text.Set("Loaded"))));
+}
+@Html.RenderPlan(plan)

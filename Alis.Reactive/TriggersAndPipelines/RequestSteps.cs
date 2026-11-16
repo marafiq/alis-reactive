@@ -37,9 +37,11 @@ public static class RequestSteps
         => FormChecks.WithNoRequest<TContainer>(pipeline.Writer, container.ElementId);
 
     /// <summary>Shows a server's validation errors as the request's failures: every message in its summary, and each at the input the request sent under its key.</summary>
+    /// <remarks>The request is the one whose route the step is written in. A step in no route of a request is refused where the view renders.</remarks>
     /// <param name="pipeline">The pipeline of a request's route.</param>
     /// <param name="problem">The source of the errors: the body of a 400 answer, or another route's.</param>
-    public static void ShowValidationErrors<TModel>(this Pipeline<TModel> pipeline, ITypedSource<ValidationProblem> problem) => throw new NotImplementedException();
+    public static void ShowValidationErrors<TModel>(this Pipeline<TModel> pipeline, ITypedSource<ValidationProblem> problem)
+        => RequestScopes.ShowValidationErrors(pipeline.Writer, Sources.Of(problem ?? throw new ArgumentNullException(nameof(problem))));
 
     /// <summary>Loads the HTML a reply read into an element, replacing what the element held.</summary>
     /// <remarks>What the element held is released first: its plans stop and its components leave.</remarks>

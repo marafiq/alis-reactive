@@ -9,9 +9,10 @@
 }
 <h1>Free beds on the @Model.Ward</h1>
 <button type="button" @Html.Raises(plan, FreeBedEvents.Find)>Find a free bed</button>
-<p id="bed-busy" hidden>Opening the bed</p>
-<p>Bed: <span id="bed-name"></span></p>
-<p>Status: <span id="bed-status">-</span></p>
+<section id="bed-busy" aria-label="Bed">
+    <p>Bed: <span id="bed-name"></span></p>
+    <p>Status: <span id="bed-status">-</span></p>
+</section>
 @{
     Html.On(plan, trigger => trigger.CustomEvent(FreeBedEvents.Find, pipeline => pipeline
         .Get(Model.FreeBeds)

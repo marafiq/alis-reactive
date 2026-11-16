@@ -13,7 +13,7 @@ public sealed class WhenABodylessRequestIsWritten
     [Test]
     public void a_get_with_no_defaults_carries_every_part_of_its_contract()
     {
-        var plan = RequestPage.Rendered(pipeline => pipeline.Get("/residents?ward=North"));
+        var plan = RequestPage.Rendered(pipeline => pipeline.Get("/residents?ward=North").NoDefaults());
         Assert.That(RequestPage.Request(plan).GetRawText(), Is.EqualTo(Baseline));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
@@ -21,7 +21,7 @@ public sealed class WhenABodylessRequestIsWritten
     [Test]
     public void a_typed_get_with_no_parts_has_the_same_complete_contract()
     {
-        var plan = RequestPage.Rendered(pipeline => pipeline.Get<SearchRequest>("/residents?ward=North", request => { }));
+        var plan = RequestPage.Rendered(pipeline => pipeline.Get<SearchRequest>("/residents?ward=North", request => { }).NoDefaults());
         Assert.That(RequestPage.Request(plan).GetRawText(), Is.EqualTo(Baseline));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }

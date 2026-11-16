@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Census panels";
+    var plan = Html.ReactivePlan<CensusBoard>();
+}
+<h1>Census of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, ResidentsBusyEvents.LoadBoth)>Load both</button>
+<button type="button" @Html.Raises(plan, ResidentsBusyEvents.LoadThird)>Load third</button>
+@(plan.ConformanceComponent("census-north", new ConformanceStart { Text = "North census" }))
+@(plan.ConformanceComponent("census-south", new ConformanceStart { Text = "South census" }))
+<p>Third: <span id="third-status">-</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ResidentsBusyEvents.LoadBoth, pipeline => pipeline.Parallel(
+            pipeline => pipeline.Get(CareEndpoints.CensusOfTheNorthPanel)
+                .OnSuccess(Content.Json<PanelCensus>(), (census, pipeline) => pipeline.Component<ConformanceComponent>("census-north").Value.Set(census.Body.Read(counted => counted.Count))),
+            pipeline => pipeline.Get(CareEndpoints.CensusOfTheSouthPanel)
+                .OnSuccess(Content.Json<PanelCensus>(), (census, pipeline) => pipeline.Component<ConformanceComponent>("census-south").Value.Set(census.Body.Read(counted => counted.Count)))))
+        .CustomEvent(ResidentsBusyEvents.LoadThird, pipeline => pipeline.Get(CareEndpoints.CensusOfTheThirdCount)
+            .OnSuccess(Content.Json<PanelCensus>(), (census, pipeline) => pipeline.When(census.Body.Read(counted => counted.Count).Eq("3"))
+                .Then(pipeline => pipeline.Element("third-status").Text.Set("Counted")))));
+}
+@Html.RenderPlan(plan)

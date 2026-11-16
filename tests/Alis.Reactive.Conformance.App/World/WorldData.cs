@@ -10,6 +10,7 @@ internal sealed class WorldData
     private readonly ConcurrentQueue<string> _residents = new();
     private readonly ConcurrentQueue<string> _carers = new();
     private readonly ConcurrentDictionary<(string Gate, string At), WorldGate> _gates = new();
+    private readonly ConcurrentDictionary<string, ConcurrentQueue<int>> _answers = new(StringComparer.Ordinal);
     private volatile string _word = "";
     private volatile string _componentText = "Alpha";
     private volatile string _componentOuterText = "Gamma";
@@ -112,6 +113,7 @@ internal sealed class WorldData
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
         foreach (var carer in seed.Carers) _carers.Enqueue(carer);
+        foreach (var (endpoint, statuses) in seed.Answers) _answers[endpoint] = new ConcurrentQueue<int>(statuses);
         if (seed.Word is { } word) _word = word;
         if (seed.ComponentText is { } text) _componentText = text;
         if (seed.ComponentOuterText is { } outerText) _componentOuterText = outerText;
@@ -144,6 +146,8 @@ internal sealed class WorldData
         if (seed.BindingStarted is { } bindingStarted) _bindingStarted = bindingStarted;
         if (seed.BindingsWhole is { } bindingsWhole) _bindingsWhole = bindingsWhole;
     }
+
+    internal int NextAnswer(string endpoint) => _answers.TryGetValue(endpoint, out var statuses) && statuses.TryDequeue(out var status) ? status : StatusCodes.Status200OK;
 
     internal void Arm(GateOrder order) => _gates[(order.Gate, order.At)] = new WorldGate();
 

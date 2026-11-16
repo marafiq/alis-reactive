@@ -116,16 +116,16 @@ public sealed class PostRequest<TModel, TRequest>
 
     /// <summary>Takes none of the request defaults the app configured at startup; the antiforgery token is still sent.</summary>
     /// <returns>The request.</returns>
-    public PostRequest<TModel, TRequest> NoDefaults() => throw new NotImplementedException();
+    public PostRequest<TModel, TRequest> NoDefaults() => new(_request, _request.NoDefaults(_stage));
 
     /// <summary>Shows the busy indicator on the elements named while the request runs, in place of the elements its success route writes.</summary>
     /// <param name="elementIds">The ids of the elements the indicator shows on; with none, it shows on the page.</param>
     /// <returns>The request.</returns>
-    public PostRequest<TModel, TRequest> Busy(params string[] elementIds) => throw new NotImplementedException();
+    public PostRequest<TModel, TRequest> Busy(params string[] elementIds) => new(_request, _request.Busy(_stage, elementIds));
 
     /// <summary>Shows no busy indicator for the request.</summary>
     /// <returns>The request.</returns>
-    public PostRequest<TModel, TRequest> NoBusy() => throw new NotImplementedException();
+    public PostRequest<TModel, TRequest> NoBusy() => new(_request, _request.NoBusy(_stage));
 }
 
 /// <summary>
@@ -211,16 +211,16 @@ public sealed class PostRequest<TModel, TRequest, TReply>
 
     /// <summary>Takes none of the request defaults the app configured at startup; the antiforgery token is still sent.</summary>
     /// <returns>The request.</returns>
-    public PostRequest<TModel, TRequest, TReply> NoDefaults() => throw new NotImplementedException();
+    public PostRequest<TModel, TRequest, TReply> NoDefaults() => new(_request, _request.NoDefaults(_stage), _reply);
 
     /// <summary>Shows the busy indicator on the elements named while the request runs, in place of the elements its success route writes.</summary>
     /// <param name="elementIds">The ids of the elements the indicator shows on; with none, it shows on the page.</param>
     /// <returns>The request.</returns>
-    public PostRequest<TModel, TRequest, TReply> Busy(params string[] elementIds) => throw new NotImplementedException();
+    public PostRequest<TModel, TRequest, TReply> Busy(params string[] elementIds) => new(_request, _request.Busy(_stage, elementIds), _reply);
 
     /// <summary>Shows no busy indicator for the request.</summary>
     /// <returns>The request.</returns>
-    public PostRequest<TModel, TRequest, TReply> NoBusy() => throw new NotImplementedException();
+    public PostRequest<TModel, TRequest, TReply> NoBusy() => new(_request, _request.NoBusy(_stage), _reply);
 
     /// <summary>Runs a pipeline after the request succeeded and its <c>Finally</c> ran.</summary>
     /// <remarks>A request the pipeline sends reads the reply, and this door ends the request's sentence.</remarks>

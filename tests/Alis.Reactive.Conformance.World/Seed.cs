@@ -10,6 +10,8 @@ public sealed class Seed
 
     public string? Word { get; set; }
 
+    public IDictionary<string, IList<int>> Answers { get; set; } = new Dictionary<string, IList<int>>();
+
     public int? CachedRoundsPlanVersion { get; set; }
 
     public int? CachedVitalsPlanVersion { get; set; }
@@ -139,6 +141,8 @@ public sealed class Seed
     public static Seed TheRecordEndpointsCount(int count) => new() { RecordCount = count };
 
     public static Seed TheCheckEndpointsAnswer(bool answer) => new() { CheckAnswer = answer };
+
+    public static Seed TheEndpointAnswers(string endpoint, params int[] statuses) => new() { Answers = { [endpoint] = statuses } };
 
     public static Seed TheBindingsBeta(int count, string started) => new() { BindingsBetaCount = count, BindingsBetaStarted = started };
 
