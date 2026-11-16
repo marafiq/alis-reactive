@@ -1570,11 +1570,11 @@
     "packages": {
       "counts": {
         "packages": 6,
-        "pins": 25,
+        "pins": 26,
         "problems": 0,
-        "references": 22
+        "references": 25
       },
-      "detail": "section 2.9 packs 6 ids, main's but Alis.Reactive.FluentValidator and the decided Alis.Reactive.OpenTelemetry; each ships only bundles, each dependency and each of 22 references the kept projects take is pinned in section 2.7 at its version",
+      "detail": "section 2.9 packs 6 ids, main's but Alis.Reactive.FluentValidator and the decided Alis.Reactive.OpenTelemetry; each ships only bundles, each dependency and each of 25 references the kept projects take is pinned in section 2.7 at its version",
       "pass": true
     },
     "paths": {
@@ -1596,7 +1596,7 @@
         "unrefused": 0
       },
       "detail": "247 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "51f278c297fae66b8dd4b460f44233061788deace7ba74bac23d818fdcfa037f",
+      "digest": "e60ae5e54073262daaed30e1056657e506163c46c6c06364becc8578a9b15194",
       "pass": true
     },
     "probes": {
@@ -4186,7 +4186,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "e8465ac66d7b870609158abe02df715d87b69fc7",
+  "read_at_head": "c3e874492ad3fe18e10ab15f954195db75f2825e",
   "step": {
     "failing": [],
     "name": "End of session",
