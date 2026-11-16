@@ -22,9 +22,9 @@ internal sealed partial class MemberPath
 
     internal string BindingName => string.Join(".", _links.Select(link => link.ClrName));
 
-    internal partial IReadOnlyList<PathStep> BodyPath { get; }
+    internal IReadOnlyList<PathStep> BodyPath => [.. BodyNames.Select(name => new MemberStep(name))];
 
-    internal partial IReadOnlyList<string> BodyNames { get; }
+    internal IReadOnlyList<string> BodyNames => [.. _links.Select(link => BodyName(link.Written, link.ClrName))];
 
     internal IReadOnlyList<PathStep> DataPath => [.. _links.Select(link => new MemberStep(link.Written.Name))];
 
@@ -51,6 +51,8 @@ internal sealed partial class MemberPath
         members.RefuseAReadPastItsOwnConverter(field.Body.ToString());
         return string.Join(".", members._links.Select(link => link.Written.Name));
     }
+
+    internal static partial string BodyName(WrittenMember written, string clrName);
 
     internal static InvalidOperationException NoMemberPath(LambdaExpression path)
         => new($"'{path}' names no member path, so the browser has no member to read; read a member and the members past it, such as record => record.Detail.Name.");

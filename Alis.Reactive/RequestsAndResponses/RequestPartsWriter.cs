@@ -27,9 +27,9 @@ internal sealed class RequestPartsWriter
     private readonly Dictionary<string, Expression> _path = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _members = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _headerNames = new(StringComparer.OrdinalIgnoreCase);
-    private readonly List<Func<(IReadOnlyList<string> Names, JsonLeaf Leaf)>> _pathJson = [];
+    private readonly List<Func<(IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)>> _pathJson = [];
     private readonly List<Expression> _pathFields = [];
-    private readonly List<(IReadOnlyList<string> Names, JsonLeaf Leaf)> _json = [];
+    private readonly List<(IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)> _json = [];
     private readonly HashSet<string> _jsonMembers = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<Expression> _fields = [];
     private Body _body = Body.None;
@@ -40,7 +40,7 @@ internal sealed class RequestPartsWriter
     private readonly Dictionary<string, Action> _setMembers = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Expression, Func<Expression>> _checkedEntries = [];
     private readonly Stack<RefExpression> _guards = new();
-    private readonly Dictionary<IReadOnlyList<string>, RefExpression> _jsonGuards = [];
+    private readonly Dictionary<IReadOnlyList<JsonStep>, RefExpression> _jsonGuards = [];
     private readonly Dictionary<string, RefExpression> _headerGuards = new(StringComparer.OrdinalIgnoreCase);
     private bool _closed;
     private int _stage;
@@ -85,9 +85,9 @@ internal sealed class RequestPartsWriter
 
     internal int Submits(int stage, string formId, string model) => Contains(stage, formId, ModelPlugin.Submits(_writer.Content, formId, model));
 
-    internal int Input(int stage, LambdaExpression member, string inputId, Func<int, int> placed)
+    internal int Input<TRequest, TMember>(int stage, Expression<Func<TRequest, TMember>> member, string inputId, Func<int, int> placed)
     {
-        var name = new RequestMember(member).Name;
+        var name = Member(member).Name;
         if (_inputMembers.Contains(name))
             throw new InvalidOperationException($"Request member '{name}' overlaps a member already supplied; send each member once, and send either an object or its members.");
         if (_setMembers.TryGetValue(name, out var dropped))
@@ -116,25 +116,10 @@ internal sealed class RequestPartsWriter
         return _stage;
     }
 
-    internal int Literal<TValue>(int stage, LambdaExpression member, TValue value, bool path)
-    {
-        if (SentByAnInput(member)) return Skipped(stage);
-        Open(stage);
-        var (held, form) = RequestValues.LiteralHeld(value, _writer, member.ToString());
-        Add(member, (RequestValues.Held(held), form), path, held);
-        if (path) _pathJson.Add(() => (JsonNames(member), JsonBodyValues.Literal(value, _writer, member)));
-        return _stage;
-    }
+    internal int Literal<TRequest, TValue>(int stage, Expression<Func<TRequest, TValue>> member, TValue value, bool path) => Literal(stage, Member(member), value, path);
 
-    internal int Source<TValue>(int stage, LambdaExpression member, ITypedSource<TValue> value, bool path)
-    {
-        if (SentByAnInput(member)) return Skipped(stage);
-        Open(stage);
-        var sent = RequestValues.Source(value, _writer, member.ToString(), path ? _captures.Add : Capture);
-        Add(member, (sent.Value, sent.Form), path, Sources.Of(value));
-        if (path) _pathJson.Add(() => (JsonNames(member), JsonBodyValues.Captured<TValue>(sent.Captured, Sources.FormOf(value), _writer, member)));
-        return _stage;
-    }
+    internal int Source<TRequest, TMember, TValue>(int stage, Expression<Func<TRequest, TMember>> member, ITypedSource<TValue> value, bool path)
+        => Source(stage, Member(member), value, path);
 
     internal int Json(int stage, Action<int> members) => Opened(stage, Body.Json, members);
 
@@ -166,55 +151,38 @@ internal sealed class RequestPartsWriter
         return _stage;
     }
 
-    internal int BodyLiteral<TValue>(int stage, LambdaExpression member, TValue value)
+    internal int BodyLiteral<TRequest, TValue>(int stage, Expression<Func<TRequest, TValue>> member, TValue value) => BodyLiteral(stage, Member(member), value);
+
+    internal int BodySource<TRequest, TMember, TValue>(int stage, Expression<Func<TRequest, TMember>> member, ITypedSource<TValue> value)
+        => BodySource(stage, Member(member), value);
+
+    internal bool FillsAPlaceholder<TRequest, TMember>(Expression<Func<TRequest, TMember>> member) => FillsAPlaceholder(Member(member));
+
+    internal int PlacedLiteral<TRequest, TValue>(int stage, Expression<Func<TRequest, TValue>> member, TValue value)
     {
-        if (SentByAnInput(member)) return Skipped(stage);
-        Open(stage);
-        if (_body == Body.Json) AddJson(member, JsonBodyValues.Literal(value, _writer, member));
-        else AddField(member, RequestValues.Literal(value, _writer, member.ToString()));
-        return _stage;
+        var named = Member(member);
+        return FillsAPlaceholder(named) ? Literal(stage, named, value, true) : BodyLiteral(stage, named, value);
     }
 
-    internal int BodySource<TValue>(int stage, LambdaExpression member, ITypedSource<TValue> value)
+    internal int PlacedSource<TRequest, TMember, TValue>(int stage, Expression<Func<TRequest, TMember>> member, ITypedSource<TValue> value)
     {
-        if (SentByAnInput(member)) return Skipped(stage);
-        Open(stage);
-        if (_body == Body.Json)
-        {
-            AddJson(member, JsonBodyValues.Source(value, _writer, member, Capture));
-            return _stage;
-        }
-
-        var sent = RequestValues.Source(value, _writer, member.ToString(), Capture);
-        AddField(member, (sent.Value, sent.Form));
-        return _stage;
+        var named = Member(member);
+        return FillsAPlaceholder(named) ? Source(stage, named, value, true) : BodySource(stage, named, value);
     }
 
-    internal bool FillsAPlaceholder(LambdaExpression member)
-    {
-        var named = new RequestMember(member);
-        return named.TopLevel && _url.Has(named.Name);
-    }
-
-    internal int PlacedLiteral<TValue>(int stage, LambdaExpression member, TValue value)
-        => FillsAPlaceholder(member) ? Literal(stage, member, value, true) : BodyLiteral(stage, member, value);
-
-    internal int PlacedSource<TValue>(int stage, LambdaExpression member, ITypedSource<TValue> value)
-        => FillsAPlaceholder(member) ? Source(stage, member, value, true) : BodySource(stage, member, value);
-
-    internal int FilePart(int stage, LambdaExpression member, BrowserFile file)
+    internal int FilePart<TRequest, TFile>(int stage, Expression<Func<TRequest, TFile>> member, BrowserFile file)
     {
         Open(stage);
         var captured = RequestValues.Captured(file.Bound.Target, _writer, Capture);
-        AddFile(member, RequestValues.ReadUnlessNull(captured, new ListExpression([captured])));
+        AddFile(Member(member), RequestValues.ReadUnlessNull(captured, new ListExpression([captured])));
         return _stage;
     }
 
-    internal int FileParts(int stage, LambdaExpression member, Expression files)
+    internal int FileParts<TRequest, TFiles>(int stage, Expression<Func<TRequest, TFiles>> member, Expression files)
     {
         Open(stage);
         var captured = RequestValues.Captured(files, _writer, Capture);
-        AddFile(member, RequestValues.Read(captured, new OpExpression(Operator.ToArray, [captured])));
+        AddFile(Member(member), RequestValues.Read(captured, new OpExpression(Operator.ToArray, [captured])));
         return _stage;
     }
 
@@ -239,8 +207,7 @@ internal sealed class RequestPartsWriter
     }
 
     internal bool SendsInJson(string member)
-        => _body == Body.Json && (_jsonMembers.Any(name => member.Equals(name, StringComparison.OrdinalIgnoreCase) || member.StartsWith(name + ".", StringComparison.OrdinalIgnoreCase)) ||
-            _path.ContainsKey(member));
+        => _body == Body.Json && (_jsonMembers.Any(name => RequestMember.Holds(name, member)) || _path.ContainsKey(member));
 
     internal bool SendsAnyInJson => _body == Body.Json && (_jsonMembers.Count > 0 || _path.Count > 0);
 
@@ -334,15 +301,63 @@ internal sealed class RequestPartsWriter
         _ => method == RequestMethod.Post || method == RequestMethod.Put || method == RequestMethod.Delete ? BodyFormat.None : BodyFormat.UrlEncoded,
     };
 
-    private void Checks(Expression field, LambdaExpression member, Expression value)
+    private void Checks(Expression field, RequestMember member, Expression value)
         => _checkedEntries[field] = () => new RecordExpression([
-            new RecordField("path", new ListExpression(JsonNames(member).Select(name => (Expression)Literals.Text(name)).ToArray())),
+            new RecordField("path", new ListExpression(BodySteps(member).Select(step => (Expression)ContractRecord<SentField>.Literal(step.Step)).ToArray())),
             new RecordField("value", value),
         ]);
 
     private Expression Guarded(Expression read) => _guards.Count == 0 ? read : new OpExpression(Operator.Cond, [_guards.Peek(), read, Nothing]);
 
-    private bool SentByAnInput(LambdaExpression member) => _inputMembers.Contains(new RequestMember(member).Name);
+    private bool SentByAnInput(RequestMember member) => _inputMembers.Contains(member.Name);
+
+    private int Literal<TValue>(int stage, RequestMember member, TValue value, bool path)
+    {
+        if (SentByAnInput(member)) return Skipped(stage);
+        Open(stage);
+        var (held, form) = RequestValues.LiteralHeld(value, _writer, member.Lambda.ToString());
+        Add(member, (RequestValues.Held(held), form), path, held);
+        if (path) _pathJson.Add(() => (BodySteps(member), JsonBodyValues.Literal(value, _writer, member.Lambda)));
+        return _stage;
+    }
+
+    private int Source<TValue>(int stage, RequestMember member, ITypedSource<TValue> value, bool path)
+    {
+        if (SentByAnInput(member)) return Skipped(stage);
+        Open(stage);
+        var sent = RequestValues.Source(value, _writer, member.Lambda.ToString(), path ? _captures.Add : Capture);
+        Add(member, (sent.Value, sent.Form), path, Sources.Of(value));
+        if (path) _pathJson.Add(() => (BodySteps(member), JsonBodyValues.Captured<TValue>(sent.Captured, Sources.FormOf(value), _writer, member)));
+        return _stage;
+    }
+
+    private int BodyLiteral<TValue>(int stage, RequestMember member, TValue value)
+    {
+        if (SentByAnInput(member)) return Skipped(stage);
+        Open(stage);
+        if (_body == Body.Json) AddJson(member, JsonBodyValues.Literal(value, _writer, member.Lambda));
+        else AddField(member, RequestValues.Literal(value, _writer, member.Lambda.ToString()));
+        return _stage;
+    }
+
+    private int BodySource<TValue>(int stage, RequestMember member, ITypedSource<TValue> value)
+    {
+        if (SentByAnInput(member)) return Skipped(stage);
+        Open(stage);
+        if (_body == Body.Json)
+        {
+            AddJson(member, JsonBodyValues.Source(value, _writer, member, Capture));
+            return _stage;
+        }
+
+        var sent = RequestValues.Source(value, _writer, member.Lambda.ToString(), Capture);
+        AddField(member, (sent.Value, sent.Form));
+        return _stage;
+    }
+
+    private bool FillsAPlaceholder(RequestMember member) => member.TopLevel && _url.Has(member.Name);
+
+    private RequestMember Member<TRequest, TMember>(Expression<Func<TRequest, TMember>> member) => RequestMember.Of(member, _writer.Content.Json.App);
 
     private int Skipped(int stage)
     {
@@ -386,11 +401,11 @@ internal sealed class RequestPartsWriter
         if (_body == Body.None && !tokenInField) return new ContractRecord<NoneSentBody>().Set(body => body.Kind, "none").Written;
         if (_body == Body.Json)
         {
-            IReadOnlyList<(IReadOnlyList<string> Names, JsonLeaf Leaf)> members = [.. _pathJson.Select(copy => copy()), .. _json];
+            IReadOnlyList<(IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)> members = [.. _pathJson.Select(copy => copy()), .. _json];
             return new ContractRecord<JsonSentBody>().Set(body => body.Kind, "json")
                 .Set(body => body.Value, JsonBodyValues.Object(members))
                 .Set(body => body.Guarded, new ListExpression(GuardedMembers().ToArray()))
-                .Set(body => body.Enums, new ListExpression(members.SelectMany(member => member.Leaf.Enums.Select(sent => (Expression)SentEnumRecord(sent.Name, member.Names, sent.Form))).ToArray()))
+                .Set(body => body.Enums, new ListExpression(members.SelectMany(member => member.Leaf.Enums.Select(sent => (Expression)SentEnumRecord(sent.Name, member.Path, sent.Form))).ToArray()))
                 .Set(body => body.Inputs, Inputs).Written;
         }
 
@@ -408,9 +423,9 @@ internal sealed class RequestPartsWriter
 
     private IEnumerable<Expression> GuardedMembers()
     {
-        var members = _json.Select(member => member.Names).ToArray();
+        var members = _json.Select(member => member.Path).ToArray();
         var guarded = members.Where(_jsonGuards.ContainsKey).ToArray();
-        var holders = new List<IReadOnlyList<string>>();
+        var holders = new List<IReadOnlyList<JsonStep>>();
         foreach (var holder in guarded.SelectMany(names => Enumerable.Range(1, names.Count - 1).Select(length => names.Take(length).ToArray())))
         {
             if (!holders.Any(known => known.SequenceEqual(holder))) holders.Add(holder);
@@ -427,13 +442,13 @@ internal sealed class RequestPartsWriter
         foreach (var names in guarded) yield return GuardedRecord(names, _jsonGuards[names]);
     }
 
-    private static RecordExpression SentEnumRecord(string name, IReadOnlyList<string> path, JsonForm form)
-        => new ContractRecord<SentEnum>().Set(sent => sent.Name, name)
-            .Set(sent => sent.Path, new ListExpression(path.Select(step => (Expression)Literals.Text(step)).ToArray()))
-            .Set(sent => sent.Form, WireRecords.Of(form)).Written;
+    private static RecordExpression SentEnumRecord(string name, IReadOnlyList<JsonStep> path, JsonForm form)
+        => new ContractRecord<SentEnum>().Set(sent => sent.Name, name).Set(sent => sent.Path, TextPath(path)).Set(sent => sent.Form, WireRecords.Of(form)).Written;
 
-    private static RecordExpression GuardedRecord(IReadOnlyList<string> path, Expression when)
-        => new ContractRecord<GuardedMember>().Set(member => member.Path, new ListExpression(path.Select(name => (Expression)Literals.Text(name)).ToArray())).Set(member => member.When, when).Written;
+    private static RecordExpression GuardedRecord(IReadOnlyList<JsonStep> path, Expression when)
+        => new ContractRecord<GuardedMember>().Set(member => member.Path, TextPath(path)).Set(member => member.When, when).Written;
+
+    private static ListExpression TextPath(IReadOnlyList<JsonStep> path) => new(path.Select(step => (Expression)Literals.Text(step.Name)).ToArray());
 
     private int Opened(int stage, Body body, Action<int> members)
     {
@@ -443,9 +458,10 @@ internal sealed class RequestPartsWriter
         return _stage;
     }
 
-    private void Add(LambdaExpression member, (Expression Value, WireForm Form) sent, bool path, Expression read)
+    private void Add(RequestMember named, (Expression Value, WireForm Form) sent, bool path, Expression read)
     {
-        var named = Named(member);
+        Named(named);
+        var member = named.Lambda;
         var sentMember = new SentMember(member.ToString(), named.Name, path, member.ReturnType, sent.Form, read, _guards.Count > 0);
         if (path)
         {
@@ -459,9 +475,9 @@ internal sealed class RequestPartsWriter
                 throw new InvalidOperationException($"Path member '{member}' holds a list or an object; send it in the query and fill the placeholder with a scalar member.");
             _path.Add(named.Name, new ContractRecord<MemberPathPart>().Set(part => part.Kind, "member")
                 .Set(part => part.Name, named.Name).Set(part => part.Value, sent.Value).Set(part => part.Form, WireRecords.Of(sent.Form)).Written);
-            var pathField = FieldRecord(member, named, sent, Literal(true));
+            var pathField = FieldRecord(named, sent, Literal(true));
             _pathFields.Add(pathField);
-            Checks(pathField, member, sent.Value);
+            Checks(pathField, named, sent.Value);
             var pathJsonAt = _pathJson.Count;
             _sent.Add(sentMember);
             _setMembers[named.Name] = () =>
@@ -474,9 +490,9 @@ internal sealed class RequestPartsWriter
             return;
         }
 
-        var queried = FieldRecord(member, named, sent, When);
+        var queried = FieldRecord(named, sent, When);
         _query.Add(queried);
-        Checks(queried, member, Guarded(sent.Value));
+        Checks(queried, named, Guarded(sent.Value));
         _sent.Add(sentMember);
         _setMembers[named.Name] = () =>
         {
@@ -485,20 +501,33 @@ internal sealed class RequestPartsWriter
         };
     }
 
-    private void AddField(LambdaExpression member, (Expression Value, WireForm Form) sent)
+    private void AddField(RequestMember named, (Expression Value, WireForm Form) sent)
     {
-        var named = Named(member);
-        var field = FieldRecord(member, named, sent, When);
+        Named(named);
+        var field = FieldRecord(named, sent, When);
         var placed = _body == Body.Multipart ? FieldPart(field) : field;
         _fields.Add(placed);
-        Checks(placed, member, Guarded(sent.Value));
+        Checks(placed, named, Guarded(sent.Value));
         _setMembers[named.Name] = () => _fields.Remove(placed);
     }
 
-    private void AddJson(LambdaExpression member, JsonLeaf leaf)
+    private void AddJson(RequestMember member, JsonLeaf leaf)
     {
         var named = Named(member).Name;
-        var entry = (JsonNames(member), leaf);
+        var entry = (BodySteps(member), leaf);
+        var pastAPosition = entry.Item1.Any(step => step.IsIndex);
+        if (pastAPosition && leaf.Enums.Count > 0)
+        {
+            throw new NotImplementedException(
+                $"'{member.Name}' is set past a list position from an enum a source reads, and a JSON body writes that enum in its endpoint's form by its member path, which no node of the plan carries through a list yet; set it from a literal, or send it in form data.");
+        }
+
+        if (_guards.Count > 0 && pastAPosition)
+        {
+            throw new NotImplementedException(
+                $"'{member.Name}' is set past a list position under a condition on the request's parts, and a JSON body leaves out a part whose condition fails by its member path, which no node of the plan carries through a list yet; set it with no condition, or send it in form data.");
+        }
+
         _jsonMembers.Add(named);
         _json.Add(entry);
         if (_guards.Count > 0) _jsonGuards.Add(entry.Item1, _guards.Peek());
@@ -510,17 +539,15 @@ internal sealed class RequestPartsWriter
         };
     }
 
-    private void AddFile(LambdaExpression member, Expression value)
+    private void AddFile(RequestMember member, Expression value)
     {
         var named = Named(member);
         _fields.Add(new ContractRecord<FileMultipartPart>().Set(part => part.Kind, "file").Set(part => part.Name, named.Name).Set(part => part.Value, value).Set(part => part.When, When).Written);
     }
 
-    private RequestMember Named(LambdaExpression member)
+    private RequestMember Named(RequestMember named)
     {
-        var named = new RequestMember(member);
-        if (_members.Any(name => name.Equals(named.Name, StringComparison.OrdinalIgnoreCase) ||
-                name.StartsWith(named.Name + ".", StringComparison.OrdinalIgnoreCase) || named.Name.StartsWith(name + ".", StringComparison.OrdinalIgnoreCase)))
+        if (_members.Any(name => RequestMember.Holds(name, named.Name) || RequestMember.Holds(named.Name, name)))
         {
             throw new InvalidOperationException($"Request member '{named.Name}' overlaps a member already supplied; send each member once, and send either an object or its members.");
         }
@@ -529,13 +556,12 @@ internal sealed class RequestPartsWriter
         return named;
     }
 
-    private IReadOnlyList<string> JsonNames(LambdaExpression member)
-        => MemberPath.TryOf(member, _writer.Content.Json.BodyForm, out var path) ? path.BodyNames : throw MemberPath.NoMemberPath(member);
+    private IReadOnlyList<JsonStep> BodySteps(RequestMember member) => member.BodySteps(_writer.Content.Json.BodyForm);
 
-    private static RecordExpression FieldRecord(LambdaExpression member, RequestMember named, (Expression Value, WireForm Form) sent, Expression when)
+    private static RecordExpression FieldRecord(RequestMember named, (Expression Value, WireForm Form) sent, Expression when)
         => new ContractRecord<SentField>().Set(field => field.Name, named.Name).Set(field => field.Path, new ListExpression(named.Path.Select(step => ContractRecord<SentField>.Literal(step)).ToArray()))
             .Set(field => field.Value, sent.Value).Set(field => field.Form, WireRecords.Of(sent.Form))
-            .Set(field => field.WhenNothing, RequestValues.Absence(member.ReturnType)).Set(field => field.When, when).Written;
+            .Set(field => field.WhenNothing, RequestValues.Absence(named.Lambda.ReturnType)).Set(field => field.When, when).Written;
 
     private static RecordExpression FieldPart(Expression field)
         => new ContractRecord<FieldMultipartPart>().Set(part => part.Kind, "field").Set(part => part.Field, field).Written;

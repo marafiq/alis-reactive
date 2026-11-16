@@ -20,11 +20,11 @@ public sealed class QueryParts<TRequest>
         _stage = stage;
     }
 
-    internal QueryParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, _parts.FillsAPlaceholder(member)));
+    internal QueryParts<TRequest> PlacedLiteral<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, _parts.FillsAPlaceholder(member)));
 
-    internal QueryParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, _parts.FillsAPlaceholder(member)));
+    internal QueryParts<TRequest> PlacedSource<TMember, TValue>(Expression<Func<TRequest, TMember>> member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, _parts.FillsAPlaceholder(member)));
 
-    internal QueryParts<TRequest> PlacedInput<TValue>(LambdaExpression member, BoundInput<TValue> input)
+    internal QueryParts<TRequest> PlacedInput<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.Source(stage, member, input.Value, _parts.FillsAPlaceholder(member))));
 
     internal QueriedParts<TRequest> Submitted(RequestForm<TRequest> form) => new(_parts, _parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))));
@@ -115,11 +115,11 @@ public sealed class QueriedParts<TRequest>
         _stage = stage;
     }
 
-    internal QueriedParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, _parts.FillsAPlaceholder(member)));
+    internal QueriedParts<TRequest> PlacedLiteral<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, _parts.FillsAPlaceholder(member)));
 
-    internal QueriedParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, _parts.FillsAPlaceholder(member)));
+    internal QueriedParts<TRequest> PlacedSource<TMember, TValue>(Expression<Func<TRequest, TMember>> member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, _parts.FillsAPlaceholder(member)));
 
-    internal QueriedParts<TRequest> PlacedInput<TValue>(LambdaExpression member, BoundInput<TValue> input)
+    internal QueriedParts<TRequest> PlacedInput<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.Source(stage, member, input.Value, _parts.FillsAPlaceholder(member))));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
@@ -200,11 +200,11 @@ public sealed class BodyParts<TRequest>
         _stage = stage;
     }
 
-    internal BodiedParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.Multipart(_stage, stage => _parts.PlacedLiteral(stage, member, value)));
+    internal BodiedParts<TRequest> PlacedLiteral<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => new(_parts, _parts.Multipart(_stage, stage => _parts.PlacedLiteral(stage, member, value)));
 
-    internal BodiedParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.Multipart(_stage, stage => _parts.PlacedSource(stage, member, value)));
+    internal BodiedParts<TRequest> PlacedSource<TMember, TValue>(Expression<Func<TRequest, TMember>> member, ITypedSource<TValue> value) => new(_parts, _parts.Multipart(_stage, stage => _parts.PlacedSource(stage, member, value)));
 
-    internal BodiedParts<TRequest> PlacedInput<TValue>(LambdaExpression member, BoundInput<TValue> input)
+    internal BodiedParts<TRequest> PlacedInput<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         => new(_parts, _parts.Multipart(_stage, stage => _parts.Input(stage, member, input.Id, placed => _parts.PlacedSource(placed, member, input.Value))));
 
     internal BodiedParts<TRequest> Submitted(RequestForm<TRequest> form) => new(_parts, _parts.Multipart(_parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))), _ => { }));
@@ -355,11 +355,11 @@ public sealed class BodiedParts<TRequest>
         _stage = stage;
     }
 
-    internal BodiedParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.PlacedLiteral(_stage, member, value));
+    internal BodiedParts<TRequest> PlacedLiteral<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => new(_parts, _parts.PlacedLiteral(_stage, member, value));
 
-    internal BodiedParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.PlacedSource(_stage, member, value));
+    internal BodiedParts<TRequest> PlacedSource<TMember, TValue>(Expression<Func<TRequest, TMember>> member, ITypedSource<TValue> value) => new(_parts, _parts.PlacedSource(_stage, member, value));
 
-    internal BodiedParts<TRequest> PlacedInput<TValue>(LambdaExpression member, BoundInput<TValue> input)
+    internal BodiedParts<TRequest> PlacedInput<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.PlacedSource(stage, member, input.Value)));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>

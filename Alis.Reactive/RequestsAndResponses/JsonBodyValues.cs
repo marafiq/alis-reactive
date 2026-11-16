@@ -40,6 +40,13 @@ internal sealed class JsonLeaf
     internal JsonLeaf SentBy(string name, JsonForm form) => new(Value, Kept, LeftOutWhenNothing, [(name, form)]);
 }
 
+internal readonly record struct JsonStep(string Name, bool IsIndex)
+{
+    internal int Index => int.Parse(Name, NumberStyles.None, CultureInfo.InvariantCulture);
+
+    internal PathStep Step => IsIndex ? new IndexStep(Index) : new MemberStep(Name);
+}
+
 internal static class JsonBodyValues
 {
     internal static JsonLeaf Literal<TValue>(TValue value, BlockWriter writer, LambdaExpression member)
@@ -49,16 +56,17 @@ internal static class JsonBodyValues
         return value is null ? Leaf<TValue>(written, writer, member) : JsonLeaf.NullWhenNothing(written);
     }
 
-    internal static JsonLeaf Source<TValue>(ITypedSource<TValue> source, BlockWriter writer, LambdaExpression member, Action<LetStatement> capture)
+    internal static JsonLeaf Source<TValue>(ITypedSource<TValue> source, BlockWriter writer, RequestMember member, Action<LetStatement> capture)
         => Captured<TValue>(RequestValues.Captured(Sources.Of(source), writer, capture), Sources.FormOf(source), writer, member);
 
-    internal static JsonLeaf Captured<TValue>(Expression captured, HeldForm form, BlockWriter writer, LambdaExpression member)
+    internal static JsonLeaf Captured<TValue>(Expression captured, HeldForm form, BlockWriter writer, RequestMember member)
     {
+        var lambda = member.Lambda;
         var held = form.DataOptions.GetTypeInfo(typeof(TValue));
         var scalar = held.IsList(out var item) ? item : held;
-        if (!RequestValues.IsEnum(scalar.Type)) return Leaf<TValue>(Value<TValue>(captured, form, writer, member.ToString()), writer, member);
-        var sent = RequestValues.JsonFormOf(typeof(TValue), form, writer, member.ToString());
-        return Leaf(captured, writer, member, () => AnyShape.Instance).SentBy(new RequestMember(member).Name, sent);
+        if (!RequestValues.IsEnum(scalar.Type)) return Leaf<TValue>(Value<TValue>(captured, form, writer, lambda.ToString()), writer, lambda);
+        var sent = RequestValues.JsonFormOf(typeof(TValue), form, writer, lambda.ToString());
+        return Leaf(captured, writer, lambda, () => AnyShape.Instance).SentBy(member.Name, sent);
     }
 
     private static JsonLeaf Leaf<TValue>(Expression value, BlockWriter writer, LambdaExpression member)
@@ -69,16 +77,16 @@ internal static class JsonBodyValues
             ? JsonLeaf.LeftOut(value, kept())
             : JsonLeaf.NullWhenNothing(value);
 
-    internal static Expression Object(IReadOnlyList<(IReadOnlyList<string> Names, JsonLeaf Leaf)> members)
+    internal static Expression Object(IReadOnlyList<(IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)> members)
     {
         var fields = new List<RecordField>();
         var leftOut = new Dictionary<string, FieldConversion>(StringComparer.Ordinal);
-        foreach (var named in members.GroupBy(member => member.Names[0], StringComparer.Ordinal))
+        foreach (var named in members.GroupBy(member => member.Path[0].Name, StringComparer.Ordinal))
         {
-            var nested = named.Where(member => member.Names.Count > 1).Select(member => ((IReadOnlyList<string>)[.. member.Names.Skip(1)], member.Leaf)).ToArray();
+            var nested = Past(named);
             if (nested.Length > 0)
             {
-                fields.Add(new RecordField(named.Key, Object(nested)));
+                fields.Add(new RecordField(named.Key, Nested(nested)));
                 continue;
             }
 
@@ -90,6 +98,37 @@ internal static class JsonBodyValues
         var record = new RecordExpression(fields);
         return leftOut.Count == 0 ? record : new AsExpression(record, new ObjectShape(leftOut));
     }
+
+    private static Expression Nested(IReadOnlyList<(IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)> members)
+        => members[0].Path[0].IsIndex ? List(members) : Object(members);
+
+    private static ListExpression List(IReadOnlyList<(IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)> positions)
+    {
+        var items = new List<Expression>();
+        foreach (var position in positions.GroupBy(member => member.Path[0].Index).OrderBy(position => position.Key))
+        {
+            if (position.Key != items.Count)
+            {
+                throw new NotImplementedException(
+                    $"The request sets a member at position {position.Key} of a list in its JSON body and none at position {items.Count}, and no line states what a JSON body sends at a position the request leaves out; set a member at each position from 0, or send the list whole.");
+            }
+
+            var nested = Past(position);
+            items.Add(nested.Length > 0 ? Nested(nested) : ItemValue(position.Single().Leaf, position.Key));
+        }
+
+        return new ListExpression([.. items]);
+    }
+
+    private static Expression ItemValue(JsonLeaf leaf, int position)
+    {
+        if (!leaf.LeftOutWhenNothing) return leaf.Value;
+        throw new NotImplementedException(
+            $"The request sets position {position} of a list in its JSON body from a value the body leaves out when it reads nothing, and no line states what a list sends at a position that reads nothing; set it from a literal, or send the list whole.");
+    }
+
+    private static (IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)[] Past(IEnumerable<(IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)> named)
+        => [.. named.Where(member => member.Path.Count > 1).Select(member => ((IReadOnlyList<JsonStep>)[.. member.Path.Skip(1)], member.Leaf))];
 
     private static Expression Value<TValue>(Expression captured, HeldForm form, BlockWriter writer, string member)
     {

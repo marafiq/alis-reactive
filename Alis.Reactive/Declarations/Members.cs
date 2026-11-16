@@ -54,7 +54,7 @@ public class ReadOnly<TValue> : TypedSource<TValue>
     public TypedSource<TResult> Read<TResult>(Expression<Func<TValue, TResult>> path)
         => ReadPast<TResult>(path);
 
-    internal virtual TypedSource<TResult> ReadPast<TResult>(LambdaExpression path)
+    internal virtual TypedSource<TResult> ReadPast<TResult>(Expression<Func<TValue, TResult>> path)
         => DataReads.Past<TResult>(Expression, Form, path, Form.DataOptions);
 
     private Shape? DateShapeOfAnEventsMember()

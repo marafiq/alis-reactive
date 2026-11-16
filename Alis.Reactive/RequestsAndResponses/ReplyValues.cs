@@ -66,9 +66,9 @@ internal sealed class SentRequestValue<TRequest>(JsObject reply, RequestPartsWri
     internal override Schema.Expression Expression
         => parts.SendsAnyInJson ? throw JsonReadBack("The request, read whole, sends members") : base.Expression;
 
-    internal override TypedSource<TResult> ReadPast<TResult>(LambdaExpression path)
+    internal override TypedSource<TResult> ReadPast<TResult>(Expression<Func<TRequest, TResult>> path)
     {
-        var member = new RequestMember(path);
+        var member = RequestMember.Of(path, Owner.Bound.Writer.Content.Json.App);
         if (parts.SendsInJson(member.Name)) throw JsonReadBack($"'{path}' is sent");
         return new Computed<TResult>(new GetExpression(member.Path, PathMembers.Optional, base.Expression), Form);
     }
