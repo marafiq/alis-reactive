@@ -34,4 +34,8 @@ public static partial class CarePages
     public const string DutyBoardWithBeaOnDuty = Round + "duty-board/bea-on-duty";
     public const string DoseLookupOfATraceDose = Round + "dose-lookup/trace-dose";
     public const string DoseLookupOfAHalfGramDose = Round + "dose-lookup/half-gram-dose";
+    public const string MedicationReviewUnderSkip = Round + "medication-review/skip";
+    public const string MedicationReviewUnderReplace = Round + "medication-review/replace";
+    public const string MedicationSignOff = Round + "medication-sign-off";
+    public const string DoseScan = Round + "dose-scan";
 }

@@ -169,6 +169,12 @@ function everyPromiseJobRan(): Promise<void> {
   });
 }
 
+const jammedDesk = {
+  jam: (): never => {
+    throw new Error("The desk jammed.");
+  },
+};
+
 function stopsLogged() {
   return vi.spyOn(console, "error").mockImplementation(() => undefined);
 }
@@ -182,6 +188,7 @@ const rings: Step = { kind: "set", path: ["rung"], members: "required", content:
 const awaits = (name: string): Step => ({ kind: "do", await: true, expr: named(name) });
 const unloads: Step = { kind: "do", await: false, expr: calls("slot", "unload") };
 const stops = (reason: string): Step => ({ kind: "stop", reason });
+const jams: Step = { kind: "do", await: false, expr: calls("desk", "jam") };
 const when = (name: string, then: Block, otherwise: Block): Step => ({ kind: "if", when: named(name), then, else: otherwise });
 const layer = (whileLoading: Block, last: Block): Layer => ({ whileLoading, finally: last });
 const request = (...layers: Layer[]): Step => ({
@@ -387,6 +394,98 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
     expect(chart.lines).toStrictEqual(["finally start 1", "finally start 2", "finally end 1", "defaults finally 1"]);
   });
 
+  test("RunningHasADriver: a step that throws after an await ends its run, so under skip the handler's next raise runs it again", async () => {
+    const logged = stopsLogged();
+    const chart = new Chart();
+    const first = gate();
+    const second = gate();
+    const lane = new Lane("skip", [awaits("settle"), charts(named("round")), jams, charts(text("after the error"))], aRoundsOwner);
+
+    lane.raise(raisedWith({ chart, desk: jammedDesk, settle: first.held, round: "round 1" }));
+    first.opens(null);
+    await everyPromiseJobRan();
+    lane.raise(raisedWith({ chart, desk: jammedDesk, settle: second.held, round: "round 2" }));
+    second.opens(null);
+    await everyPromiseJobRan();
+
+    expect([chart.lines, logged.mock.calls]).toStrictEqual([["round 1", "round 2"], [["The desk jammed."], ["The desk jammed."]]]);
+  });
+
+  test("RunningHasADriver: a step that throws after an await ends its run, so under replace the handler's next raise begins at once", async () => {
+    stopsLogged();
+    const chart = new Chart();
+    const first = gate();
+    const lane = new Lane("replace", [charts(named("round")), awaits("settle"), jams, charts(text("after the error"))], aRoundsOwner);
+
+    lane.raise(raisedWith({ chart, desk: jammedDesk, settle: first.held, round: "round 1" }));
+    first.opens(null);
+    await everyPromiseJobRan();
+    lane.raise(raisedWith({ chart, desk: jammedDesk, settle: gate().held, round: "round 2" }));
+
+    expect(chart.lines).toStrictEqual(["round 1", "round 2"]);
+  });
+
+  test("NothingRunsAfterAnError: an error in a request's Finally runs no later step of that Finally and none after the request, and the defaults' Finally it owes runs after it", () => {
+    const logged = stopsLogged();
+    const chart = new Chart();
+    const lane = new Lane("overlap", [
+      request(
+        layer([], [charts(text("defaults finally"))]),
+        layer([], [charts(text("finally starts")), jams, charts(text("finally ends"))]),
+        layer([stops("No bed is free.")], []),
+      ),
+      charts(text("after the request")),
+    ], aRoundsOwner);
+
+    lane.raise(raisedWith({ chart, desk: jammedDesk }));
+
+    expect([chart.lines, logged.mock.calls]).toStrictEqual([["finally starts", "defaults finally"], [["No bed is free."], ["The desk jammed."]]]);
+  });
+
+  test("ErrorRunsNothingAfter: an error in a request's own WhileLoading runs the defaults' Finally, whose WhileLoading completed, not its own, and no step after the request", () => {
+    stopsLogged();
+    const chart = new Chart();
+    const lane = new Lane("overlap", [
+      request(
+        layer([charts(text("defaults loading"))], [charts(text("defaults finally"))]),
+        layer([charts(text("loading")), jams, charts(text("after the error"))], [charts(text("finally"))]),
+      ),
+      charts(text("after the request")),
+    ], aRoundsOwner);
+
+    lane.raise(raisedWith({ chart, desk: jammedDesk }));
+
+    expect(chart.lines).toStrictEqual(["defaults loading", "loading", "defaults finally"]);
+  });
+
+  test("BranchStopEndsOnlyItself: an error in one block of an all ends that block alone, and the other block and the step after the all run", () => {
+    stopsLogged();
+    const chart = new Chart();
+    const lane = new Lane("overlap", [{ kind: "all", blocks: [[jams, charts(text("north"))], [charts(text("south"))]] }, charts(text("after the all"))], aRoundsOwner);
+
+    lane.raise(raisedWith({ chart, desk: jammedDesk }));
+
+    expect(chart.lines).toStrictEqual(["south", "after the all"]);
+  });
+
+  test("TheOldFinallyRunsBeforeTheNewRun: a run its own step replaces runs its Finally to an error it throws, and the new run begins after it", () => {
+    stopsLogged();
+    const chart = new Chart();
+    const lane = new Lane("replace", [
+      charts(named("rang")),
+      request(layer([], [charts(named("finally")), jams, charts(text("after the error"))]), layer([rings, stops("The round ends at its send.")], [])),
+      charts(named("after")),
+    ], aRoundsOwner);
+    const quiet = new Bell(() => undefined);
+    const bell = new Bell(() => {
+      lane.raise(raisedWith({ chart, desk: jammedDesk, bell: quiet, rang: "rang 2", finally: "finally 2", after: "after 2" }));
+    });
+
+    lane.raise(raisedWith({ chart, desk: jammedDesk, bell, rang: "rang 1", finally: "finally 1", after: "after 1" }));
+
+    expect(chart.lines).toStrictEqual(["rang 1", "finally 1", "rang 2", "finally 2"]);
+  });
+
   test("TheOldFinallyRunsBeforeTheNewRun: a run its own step replaces runs its Finally before the new run's first step", () => {
     stopsLogged();
     const chart = new Chart();
@@ -540,6 +639,19 @@ describe("when a run is traced, each span it starts ends once with how it ended 
       "alis.run#1 starts {}",
       "alis.run#1 alis.stop {\"alis.reason\":\"The bed is taken.\"}",
       "alis.run#1 stopped",
+    ]);
+  });
+
+  test("a step that throws logs the thrown error's message once, records an error with no message on the run's span, and the run ends stopped", () => {
+    const logged = stopsLogged();
+    const spans = new Spans();
+    const lane = new Lane("overlap", [jams, charts(text("after"))], aRoundsOwner);
+
+    lane.raise(tracedWith(spans, { chart: new Chart(), desk: jammedDesk }));
+
+    expect([spans.recorded, logged.mock.calls]).toStrictEqual([
+      ["alis.run#1 starts {}", "alis.run#1 alis.error {}", "alis.run#1 stopped"],
+      [["The desk jammed."]],
     ]);
   });
 
@@ -761,22 +873,16 @@ describe("when a release ends the runs of its owners that are in their own step 
     expect([chart.lines, waited]).toStrictEqual([["the page goes on", "the card goes on"], [false]]);
   });
 
-  test("a run whose step threw past it is in its own step no more", () => {
+  test("a run whose step throws ends at that step, so a release of its owner after it finds no run in its own step", () => {
+    const logged = stopsLogged();
     const chart = new Chart();
     const waited: boolean[] = [];
-    const cardHandler = new Lane("overlap", [{ kind: "do", await: false, expr: calls("desk", "jam") }, charts(text("the card goes on"))], theCard);
+    const cardHandler = new Lane("overlap", [jams, charts(text("the card goes on"))], theCard);
     const pageHandler = new Lane("overlap", [unloads, charts(text("the page goes on"))], thePage);
-    const desk = {
-      jam: () => {
-        throw new Error("The desk jammed.");
-      },
-    };
 
-    expect(() => {
-      cardHandler.raise(raisedWith({ chart, desk }));
-    }).toThrow("The desk jammed.");
+    cardHandler.raise(raisedWith({ chart, desk: jammedDesk }));
     pageHandler.raise(raisedWith({ chart, slot: aSlotEnding(theCard, chart, waited) }));
 
-    expect([chart.lines, waited]).toStrictEqual([["the page goes on"], [false]]);
+    expect([chart.lines, waited, logged.mock.calls]).toStrictEqual([["the page goes on"], [false], [["The desk jammed."]]]);
   });
 });

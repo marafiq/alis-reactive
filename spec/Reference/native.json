@@ -1442,6 +1442,15 @@
           "door": "Method",
           "csharp": "Act()"
         }
+      ],
+      "behaviors": [
+        {
+          "behavior": "ItemAt(position) answers the held item at that position, counted from 1; at a position that holds no item it throws an Error, There is no held item at 4. for 4.",
+          "tests": [
+            "X11.25 #0",
+            "X11.25 #1"
+          ]
+        }
       ]
     },
     {

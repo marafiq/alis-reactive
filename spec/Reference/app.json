@@ -2762,6 +2762,46 @@
     },
     {
       "feature": "M17.F1",
+      "for": "X11.25",
+      "index": 2,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "scanner",
+        "busy"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the POST of /reviews"
+        }
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.25",
+      "index": 3,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "scanner"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M17.F1",
       "for": "X11.5",
       "index": 0,
       "screen": "record",

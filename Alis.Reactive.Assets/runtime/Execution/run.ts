@@ -16,20 +16,29 @@ interface Halted {
   readonly reason: string;
 }
 
+interface Thrown {
+  readonly kind: "throws";
+  readonly error: unknown;
+}
+
 interface Recorded {
   readonly name: EventName;
   readonly attributes: Attributes;
 }
 
 const aPageMismatch: Recorded = { name: "alis.stop", attributes: {} };
-const aRejection: Recorded = { name: "alis.error", attributes: {} };
+const anError: Recorded = { name: "alis.error", attributes: {} };
 
 function runsNothing(): void {
   return undefined;
 }
 
+function messageOf(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 function rejected(error: unknown): string {
-  return "An awaited step rejected, so its pipeline stops: " + (error instanceof Error ? error.message : String(error));
+  return "An awaited step rejected, so its pipeline stops: " + messageOf(error);
 }
 
 function aStopStatement(reason: string): Recorded {
@@ -163,6 +172,9 @@ export class Run {
       case "halts":
         this.#stops(outcome.reason, aPageMismatch);
         return;
+      case "throws":
+        this.#stops(messageOf(outcome.error), anError);
+        return;
       case "ends":
         this.#frames.pop();
         if (frame.kind === "request" && frame.endsAbruptly) this.#unwinds();
@@ -170,12 +182,11 @@ export class Run {
     }
   }
 
-  #outcomeOf(frame: Frame): Outcome | Halted {
+  #outcomeOf(frame: Frame): Outcome | Halted | Thrown {
     try {
       return frame.kind === "request" ? frame.step(this) : frame.step();
-    } catch (stopped) {
-      if (!(stopped instanceof Stop)) throw stopped;
-      return { kind: "halts", reason: stopped.reason };
+    } catch (thrown) {
+      return thrown instanceof Stop ? { kind: "halts", reason: thrown.reason } : { kind: "throws", error: thrown };
     }
   }
 
@@ -214,7 +225,7 @@ export class Run {
       },
       (error: unknown) => {
         this.#settles(wait, () => {
-          this.#stops(rejected(error), aRejection);
+          this.#stops(rejected(error), anError);
         });
       },
     );

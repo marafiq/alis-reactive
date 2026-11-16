@@ -448,6 +448,22 @@
           "observes": "Lanes.tla:Throws"
         },
         {
+          "for": "X11.25",
+          "page": "A medication sign-off page on the round. Its dose scanner, a ConformanceComponent, raises Raised from its own box, the box's number as the payload's Count, and its payload's held object holds three items, Dose A, Dose B and Dose C. The Raised handler sends POST /reviews with the busy indicator review-busy; its success route appends Reviewed to the review history, its Finally calls Act() on the item the payload's Held.ItemAt gives for Count and then appends Finished, and the step after the request appends Closed. The harness gates the POST /reviews (Lanes.tla's Respond).",
+          "gesture": "Type 4 into the scanner's box and click its Raise; once the harness reports the POST held, release it.",
+          "outcome": "The review history reads Reviewed, review-busy hides and the console holds one error, There is no held item at 4.: the Finally's step after the error and the step after the request never run.",
+          "opposite": "With 1 typed before the Raise, its release shows Dose A, acted, the history reads ReviewedFinishedClosed and the console holds no error.",
+          "defect": "An error in a Finally runs that layer on to its end, so the history reads ReviewedFinished; or the error is thrown out of its run, which stays running, so the request's busy target is never released and review-busy stays shown."
+        },
+        {
+          "for": "X11.25",
+          "page": "A dose scan page on the round. Its dose scanner, a ConformanceComponent, raises Raised from its own box, the box's number as the payload's Count, and its payload's held object holds three items, Dose A, Dose B and Dose C. The Raised handler, under skip, appends Scanned to the scan history, calls Act() on the item the payload's Held.ItemAt gives for Count, appends Checked, and then sends POST /reviews, its first await, whose Finally appends Finished.",
+          "gesture": "Type 4 into the scanner's box and click its Raise; then type 1 and click Raise.",
+          "outcome": "After the first Raise the scan history reads Scanned and the console holds one error, There is no held item at 4.; after the second the history reads ScannedScannedCheckedFinished.",
+          "opposite": "With 1 typed before the first Raise, the history reads ScannedCheckedFinished and the console holds no error.",
+          "defect": "The error a step throws in the raise's own turn is thrown out of its run to the scanner, and the run stays running: under skip the lane counts it in flight, so the second Raise runs nothing and the history keeps Scanned, and the console holds no error the runtime logged."
+        },
+        {
           "for": "X11.5",
           "page": "The resident record whose tab slot holds the resident card partial. The card's Refresh sends GET /residents/7, with the busy indicator ward-busy outside the slot and a success route that writes Refreshed into ward-status, also outside the slot; the record's Close card button unloads the slot. The harness gates GET /residents/7 (Composition.tla's Answer).",
           "gesture": "Click Refresh; once the harness reports GET /residents/7 held, click Close card, then release it.",
