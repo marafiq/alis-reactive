@@ -5,11 +5,11 @@
 @using Alis.Reactive.RequestsAndResponses
 @using Alis.Reactive.RenderingAndDelivery
 @using Alis.Reactive.TriggersAndPipelines
-@model ConformanceForm
+@model StrictConformanceForm
 @{
     Layout = "/Shared/_Layout.cshtml";
     ViewData["Title"] = "The bench";
-    var plan = Html.ReactivePlan<ConformanceForm>();
+    var plan = Html.ReactivePlan<StrictConformanceForm>();
 }
 <h1>The bench</h1>
 @using (var codes = Html.BeginRequestForm(plan, "codes"))
@@ -20,7 +20,7 @@
     </fieldset>
     @(Html.InputField(plan, m => m.IsStrict, options => options.Label("Strict")).NativeCheckBox())
     @(Html.NativeButton("save", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<ConformanceForm>(BenchEndpoints.Form, request => request.Form(codes.Form))
+        .Post<StrictConformanceForm>(BenchEndpoints.FormStrict, request => request.Form(codes.Form))
         .Validate<StrictCodeRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("shown").Text.Set(saved.Body))))
 }

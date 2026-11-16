@@ -3329,7 +3329,7 @@
       ],
       "version": "current",
       "promise": {
-        "page": "A form, its ConformanceComponent bound to ConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's form endpoint, the rule written When(m => m.IsStrict), and a strict box.",
+        "page": "A form, its ConformanceComponent bound to StrictConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's endpoint for that form, the rule written When(m => m.IsStrict), and a strict box.",
         "gesture": "Tick strict, then click Save.",
         "outcome": "The message Pick a code. shows beside the component.",
         "opposite": "With strict unticked Save sends the form and shows Saved.",

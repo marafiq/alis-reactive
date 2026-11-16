@@ -5,6 +5,11 @@ namespace Alis.Reactive.Conformance.App.Bench;
 public sealed class ConformanceForm
 {
     public string? Code { get; set; }
+}
+
+public sealed class StrictConformanceForm
+{
+    public string? Code { get; set; }
 
     public bool IsStrict { get; set; }
 }

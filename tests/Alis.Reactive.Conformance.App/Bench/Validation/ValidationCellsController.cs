@@ -16,7 +16,7 @@ public sealed class ValidationCellsController : Controller
     public IActionResult ValidationSummary() => View("/Bench/Validation/CodeForm.cshtml", new ConformanceForm());
 
     [HttpGet(BenchPages.ValidationCondition)]
-    public IActionResult ValidationCondition() => View("/Bench/Validation/StrictCodeForm.cshtml", new ConformanceForm());
+    public IActionResult ValidationCondition() => View("/Bench/Validation/StrictCodeForm.cshtml", new StrictConformanceForm());
 
     [HttpGet(BenchPages.ValidationListItem)]
     public IActionResult ValidationListItem() => View("/Bench/Validation/EntriesForm.cshtml", new ConformanceEntries { Entries = [new(), new()] });
@@ -26,6 +26,9 @@ public sealed class ValidationCellsController : Controller
 
     [HttpPost(BenchEndpoints.Form)]
     public IActionResult Form([FromForm] ConformanceForm form) => Content(form.Code is { } code ? $"Saved {code}" : "Saved");
+
+    [HttpPost(BenchEndpoints.FormStrict)]
+    public IActionResult FormStrict([FromForm] StrictConformanceForm form) => Content(form.Code is { } code ? $"Saved {code}" : "Saved");
 
     [HttpPost(BenchEndpoints.FormEntries)]
     public IActionResult FormEntries([FromForm] ConformanceEntries form) => Content($"Saved {string.Join(" and ", form.Entries.Select(entry => entry.Code))}");

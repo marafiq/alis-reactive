@@ -1110,7 +1110,9 @@ block a view ends by `using` (N14.3), a form the owner decides before the unit t
 component is declared an input. Its six validation cells stand on that block: each request names the validator that
 checks it (`Validate<TValidator>()`), the plain rule and the rule under `When` two validators of one form, since no door
 names a rule set (D16.2 sends that form to gate 2); the validators are written and not registered until U17 builds the
-startup call, and the form endpoint answers what it bound until N16.1's door. Three cells wait: a source that calls a
+startup call, and the form endpoint answers what it bound until N16.1's door. Since 2026-11-16 the app registers them,
+and the rule under `When` checks a form of its own, since a model has one registered validator. Three cells
+wait: a source that calls a
 hub (N21.1), a push (the realtime doors and the harness's push verb) and a slot whose host destroys its component (the
 harness's restart verb). source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so a source at its
 pattern is refused by the type (D7.5, X7.4). The eight component slices of module 24 are declared in

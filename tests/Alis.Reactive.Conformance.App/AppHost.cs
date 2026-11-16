@@ -127,7 +127,35 @@ internal static class AppHost
     }
 
     internal static void AddValidation(IServiceCollection services)
-        => services.AddReactiveFluentValidation(validators => validators.Flags<Components.CareDays>().Flags<Care.CareDays>().Flags<Care.RotaDays>());
+        => services.AddReactiveFluentValidation(validators => validators
+            .Flags<Components.CareDays>()
+            .Flags<Care.CareDays>()
+            .Flags<Care.RotaDays>()
+            .Add<Bench.CodeRules>()
+            .Add<Bench.StrictCodeRules>()
+            .Add<Bench.EntriesRules>()
+            .Add<Bench.FirstRules>()
+            .Add<Care.ArrivalIntakeRules>()
+            .Add<Care.BedAssignmentRules>()
+            .Add<Care.DeputyAppointmentRules>()
+            .Add<Care.DeputyNamelessAppointmentRules>()
+            .Add<Care.HomeLeadRules>()
+            .Add<Care.HouseholdContactsRules>()
+            .Add<Care.IntakeAssessmentRules>()
+            .Add<Care.QuickAdmissionRules>()
+            .Add<Care.ResidentAdmissionRules>()
+            .Add<Care.RoomAdmissionRules>()
+            .Add<Care.RoomNumberingRules>()
+            .Add<Care.StateMoveInTexasRules>()
+            .Add<Care.StateMoveInMassachusettsRules>()
+            .Add<Care.VisitorSignInRules>()
+            .Add<Care.WardAssignmentRules>()
+            .Add<Care.CarePlanRules>()
+            .Add<Care.CareRotaRules>()
+            .Add<Care.EarlyCareRotaRules>()
+            .Add<Care.RoundDosingRules>()
+            .Add<Care.SupplyCountRules>()
+            .Add<Refusals.VisitValidator>());
 
     private static void WriteEnumNames(JsonSerializerOptions json) => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 

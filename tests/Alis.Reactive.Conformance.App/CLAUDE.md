@@ -99,8 +99,11 @@ its views.
   screen's own layout, `Care/Record/_ScriptedLayout.cshtml`, which links the scripts the page names before the
   framework's: the bench's
   sits on the same row of the table, so each keeps its own. `Bench/Validation/` holds the validation cells: their
-  forms, their validators (`Bench/Validation/ValidationRules.cs`, not registered until the request's check reads them, D16.2;
-  a request names its validator by `Validate<TValidator>()`) and the form endpoints, which answer what they bound;
+  forms, their validators (`Bench/Validation/ValidationRules.cs`; a request names its validator by
+  `Validate<TValidator>()`) and the form endpoints, which answer what they bound. `AppHost.cs` registers each
+  validator a page's request names, an endpoint resolves or a promise of the condensed default checks, one `Add`
+  each, and no other, since a registered validator gives its model the condensed default (D16.2); a model has one
+  validator, so the condition cell's form is a model of its own, `StrictConformanceForm`, posted to its own endpoint;
   a page groups each field it checks in a fieldset or a region that names it, the scope a test reads its message
   in.
 - `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has its

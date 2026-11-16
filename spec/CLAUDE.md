@@ -1049,7 +1049,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `Validate<TValidator>()`; whether U17 lets two registered validators of one model stand beside the condensed
   default is U17's question, raised here. The validators are written and not registered, since the startup call
   throws until U17; the form endpoints answer what they bound, since N16.1's door is not declared. The owner can
-  overrule each.
+  overrule each. U17's catalog answered it: a model has one registered validator (D16.2), so the rule under `When`
+  checks a model of its own, `StrictConformanceForm`, posted to its own endpoint, and the app registers each
+  validator a request names, an endpoint resolves or a promise of the condensed default checks (the lead,
+  2026-11-16).
 - The lead, 2026-11-12, landing twenty-five more pages, three forks' work, and settling what they read into. A care
   page's plugins are the test app's, declared on the core's doors beside the page (a bell, a tally, a radio whose
   unsubscribe throws, each script written by U13), and a care screen whose pages name scripts keeps its own layout,
@@ -1457,7 +1460,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The lead, 2026-11-13, on X16.20's live check and M4.X3's sorted list, designed by a Fable agent at xhigh
   (LIVE-LIST-FABLE.md of the handoff folder) and decided from its answer read at the source. X16.20's page names no
   state of D16.15's live check: its form and the fieldset container inside it are bare blocks, live through the
-  validator registered at startup, so the page stands now, red, and the registration waits for U17 as X16.22's does.
+  validator registered at startup, so the page stands now, red, and the registration waits for U17 as X16.22's does
+  (both registered since 2026-11-16; the live check itself waits on its block's door, D16.15).
   The live check a block names is declared with the first view that names one, as the lead's line of 2026-11-12 says;
   the agent's form for it, a closed value of two states, none and a rule set by its name, passed to both block doors,
   is in that file for then. The gap the lead raised on 2026-11-12, a list operation's result that does not fit a

@@ -7,7 +7,7 @@ public sealed class CodeRules : ReactiveValidator<ConformanceForm>
     public CodeRules() => RuleFor(form => form.Code).NotEmpty().WithMessage("Pick a code.");
 }
 
-public sealed class StrictCodeRules : ReactiveValidator<ConformanceForm>
+public sealed class StrictCodeRules : ReactiveValidator<StrictConformanceForm>
 {
     public StrictCodeRules() => RuleFor(form => form.Code).NotEmpty().WithMessage("Pick a code.").When(form => form.IsStrict);
 }
