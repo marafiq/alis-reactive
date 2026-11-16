@@ -41,7 +41,7 @@ public sealed partial class ReactivePlan<TModel>
     /// <returns>The object, whose events a view handles with <c>Reactive</c>.</returns>
     public ReactiveComponent<TComponent, TModel> Component<TComponent>()
         where TComponent : Component, IAppLevelComponent, new()
-        => throw new NotImplementedException();
+        => new(new Pipeline<TModel>(Writer).Component<TComponent>(), Writer);
 
     /// <summary>Writes a value as the plan writes a literal, for the options a render helper starts its component with.</summary>
     /// <remarks>A date, an enum and a number reach the component's code in the forms the plan's own values take.</remarks>
@@ -214,8 +214,13 @@ internal static class Raiser
 public sealed class ReactiveComponent<TComponent, TModel>
     where TComponent : Component, IAppLevelComponent, new()
 {
-    internal ReactiveComponent()
+    private readonly TComponent _component;
+    private readonly BlockWriter _writer;
+
+    internal ReactiveComponent(TComponent component, BlockWriter writer)
     {
+        _component = component;
+        _writer = writer;
     }
 
     /// <summary>Runs a pipeline each time the object raises an event that has no payload.</summary>
@@ -224,7 +229,8 @@ public sealed class ReactiveComponent<TComponent, TModel>
     /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
     /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The object.</returns>
-    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0) => throw new NotImplementedException();
+    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline, callerFile, callerLine);
 
     /// <summary>Runs a pipeline each time the object raises an event, with the event's payload.</summary>
     /// <param name="raised">The event, as a member of the object's declaration.</param>
@@ -234,7 +240,7 @@ public sealed class ReactiveComponent<TComponent, TModel>
     /// <returns>The object.</returns>
     public ReactiveComponent<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline, callerFile, callerLine);
 
     /// <summary>Runs a pipeline each time the object raises an event that has no payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the object's declaration.</param>
@@ -243,7 +249,8 @@ public sealed class ReactiveComponent<TComponent, TModel>
     /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
     /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The object.</returns>
-    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0) => throw new NotImplementedException();
+    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
+        => Handles(raised(_component), policy, (_, steps) => pipeline(steps), callerFile, callerLine);
 
     /// <summary>Runs a pipeline each time the object raises an event, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the object's declaration.</param>
@@ -254,7 +261,16 @@ public sealed class ReactiveComponent<TComponent, TModel>
     /// <returns>The object.</returns>
     public ReactiveComponent<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => Handles(raised(_component), policy, pipeline, callerFile, callerLine);
+
+    private ReactiveComponent<TComponent, TModel> Handles<TArgs>(Event<TArgs> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline, string callerFile, int callerLine)
+        where TArgs : JsObject, new()
+    {
+        var (on, path) = Raiser.Of(raised);
+        var steps = _writer.Handler(() => pipeline(JsObject.Reaching<TArgs>(new Received(_writer)), new Pipeline<TModel>(_writer)));
+        _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, policy.Grammar, steps), callerFile, callerLine);
+        return this;
+    }
 }
 
 /// <summary>

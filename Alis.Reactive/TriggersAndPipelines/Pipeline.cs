@@ -38,14 +38,7 @@ public sealed class Pipeline<TModel>
     /// <returns>The component.</returns>
     public TComponent Component<TComponent>(string id)
         where TComponent : Component, new()
-    {
-        var component = new TComponent();
-        var vendor = component.Vendor;
-        _writer.Content.Uses(vendor.Name, vendor.Grammar);
-        _writer.Content.Declares(id, new ElementLocator(id, vendor.Name));
-        component.Reach(new Reached(new ObjExpression(id), _writer));
-        return component;
-    }
+        => Reaches(new TComponent(), id);
 
     /// <summary>Reaches an app-level object on the element its declaration fixes, to read, set, call and listen to its declared members.</summary>
     /// <remarks>An element the page lacks, or a member its object lacks, stops the pipeline that reaches it.</remarks>
@@ -53,7 +46,20 @@ public sealed class Pipeline<TModel>
     /// <returns>The object.</returns>
     public TComponent Component<TComponent>()
         where TComponent : Component, IAppLevelComponent, new()
-        => throw new NotImplementedException();
+    {
+        var component = new TComponent();
+        return Reaches(component, component.DefaultId);
+    }
+
+    private TComponent Reaches<TComponent>(TComponent component, string id)
+        where TComponent : Component
+    {
+        var vendor = component.Vendor;
+        _writer.Content.Uses(vendor.Name, vendor.Grammar);
+        _writer.Content.Declares(id, new ElementLocator(id, vendor.Name));
+        component.Reach(new Reached(new ObjExpression(id), _writer));
+        return component;
+    }
 
     /// <summary>Reaches a plugin the page registers, to read, set, call and listen to its declared members.</summary>
     /// <typeparam name="TPlugin">The plugin's declaration.</typeparam>

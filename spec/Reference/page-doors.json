@@ -629,9 +629,7 @@
   "M17.F1 X11.2 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Shell/CarePlanDrawer.cshtml",
@@ -1627,9 +1625,7 @@
   },
   "M25.F1 M25.X1 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Care/Shell/ShiftNotes.cshtml",
@@ -1639,8 +1635,7 @@
   },
   "M25.F1 M25.X2 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "TriggersAndPipelines"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Care/Shell/WideDrawer.cshtml",
@@ -1660,8 +1655,7 @@
   },
   "M25.F4 M25.X12 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "TriggersAndPipelines"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Care/Shell/FamilyDischarge.cshtml",
@@ -1672,8 +1666,7 @@
   },
   "M25.F4 M25.X5 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "TriggersAndPipelines"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Care/Shell/FamilyNotice.cshtml",
@@ -1683,8 +1676,7 @@
   "M25.F4 M25.X6 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Shell/DischargeNote.cshtml",
@@ -1693,8 +1685,7 @@
   },
   "M25.F4 M25.X7 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "TriggersAndPipelines"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Care/Shell/DischargeDesk.cshtml",
@@ -1703,8 +1694,7 @@
   },
   "M25.F4 X17.6 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "TriggersAndPipelines"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Care/Shell/WardDischarge.cshtml",
@@ -1713,8 +1703,7 @@
   },
   "M25.F4 X17.7 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "TriggersAndPipelines"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Care/Shell/DrawerDischarge.cshtml",
@@ -1724,8 +1713,7 @@
   },
   "M25.F4 X17.8 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "TriggersAndPipelines"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Care/Shell/DischargeIntake.cshtml",
@@ -3561,8 +3549,7 @@
   },
   "cell lane.confirm": {
     "modules": [
-      "NativeAppLevelObjects",
-      "TriggersAndPipelines"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Bench/Lanes/LaneConfirm.cshtml",
