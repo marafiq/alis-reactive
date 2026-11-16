@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ServerCheckedKinDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Kin desk";
+    var plan = Html.ReactivePlan<ServerCheckedKinDesk>();
+}
+<h1>Kin desk</h1>
+@using (var desk = Html.BeginRequestForm(plan, "kin-desk"))
+{
+    <fieldset>
+        <legend>Next of kin</legend>
+        @Html.EditorFor(m => m.NextOfKin, "/Care/Admission/KinDeskContact.cshtml")
+    </fieldset>
+    @(Html.NativeButton("save-kin", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<ServerCheckedKinDesk>(CareEndpoints.ServerCheckedKinDeskDesks, request => request.Form(desk.Form))
+        .Validate<ServerCheckedKinDeskRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("kin-status").Text.Set(saved.Body))
+        .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))
+}
+<p>Kin: <span id="kin-status">Not saved</span></p>
+@Html.RenderPlan(plan)

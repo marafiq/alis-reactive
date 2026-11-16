@@ -27,7 +27,7 @@ public sealed class ArrivalIntakeRules : ReactiveValidator<ArrivalIntake>
     public ArrivalIntakeRules()
     {
         RuleFor(intake => intake.Status).NotEmpty();
-        RuleFor(intake => intake.Name).NotEmpty().WithMessage("Name the resident.");
+        RuleFor(intake => intake.Name).MinimumLength(2).WithMessage("Write the resident's full name.");
     }
 }
 

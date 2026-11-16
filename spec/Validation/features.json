@@ -1419,11 +1419,11 @@
         },
         {
           "for": "X16.6",
-          "page": "An intake page whose intake container holds a Name input, with Save intake sending the container and Mark arrived sending no container and setting Status to Arrived; the model starts Name at Unnamed; the validator holds RuleFor(i => i.Status).NotEmpty() and RuleFor(i => i.Name).NotEmpty().WithMessage(\"Name the resident.\"); the page writes the endpoint's answer, the name and the status, comma separated, into status.",
-          "gesture": "Clear Name and click Mark arrived.",
-          "outcome": "status reads Unnamed, Arrived, and no \"Name the resident.\" shows.",
-          "opposite": "Clicking Save intake with Name cleared shows \"Name the resident.\" beside Name, status stays as it was, and no request is sent.",
-          "defect": "The check reads the container's inputs although the request does not send them, so the cleared Name fails and Mark arrived sends nothing."
+          "page": "An intake page whose intake container holds a Name input, with Save intake sending the container and Mark arrived sending no container and setting Status to Arrived; the model starts Name at Unnamed; the validator holds RuleFor(i => i.Status).NotEmpty() and RuleFor(i => i.Name).MinimumLength(2).WithMessage(\"Write the resident's full name.\"); the page writes the endpoint's answer, the name and the status, comma separated, into status.",
+          "gesture": "Type A in Name and click Mark arrived.",
+          "outcome": "status reads Unnamed, Arrived, and no \"Write the resident's full name.\" shows.",
+          "opposite": "Clicking Save intake with A in Name shows \"Write the resident's full name.\" beside Name, status stays as it was, and no request is sent.",
+          "defect": "The check reads the container's inputs although the request does not send them, so the typed A fails and Mark arrived sends nothing."
         }
       ],
       "verdicts": [

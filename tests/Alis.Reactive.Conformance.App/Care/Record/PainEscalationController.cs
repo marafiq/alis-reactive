@@ -15,8 +15,4 @@ public sealed record PainEscalation(string Resident, int Pain);
 public static class PainEscalations
 {
     public static readonly AppEvent Assess = AppEvent.Declare();
-
-    public static readonly AppEvent NurseFree = AppEvent.Declare();
-
-    public static readonly AppEvent NurseBusy = AppEvent.Declare();
 }

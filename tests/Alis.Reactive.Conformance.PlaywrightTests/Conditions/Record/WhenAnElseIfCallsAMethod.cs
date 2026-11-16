@@ -29,7 +29,7 @@ public sealed class WhenAnElseIfCallsAMethod(string host) : ConformanceFixture(h
         await Expect(doctorCalls).ToHaveTextAsync("0");
 
         await pain.FillAsync("5");
-        await escalated.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Free", Exact = true }).ClickAsync();
+        await escalated.Page.GetByRole(AriaRole.Region, new PageGetByRoleOptions { Name = "Nurse", Exact = true }).GetByRole(AriaRole.Button, new LocatorGetByRoleOptions { Name = "Free", Exact = true }).ClickAsync();
         await assess.ClickAsync();
         await Expect(escalated.Page.Locator("#escalation")).ToHaveTextAsync("Nurse");
         await Expect(nurseCalls).ToHaveTextAsync("1");
@@ -37,7 +37,7 @@ public sealed class WhenAnElseIfCallsAMethod(string host) : ConformanceFixture(h
 
         var armed = await escalated.Arm(RunGate.Settle);
         await pain.FillAsync("5");
-        await escalated.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Busy", Exact = true }).ClickAsync();
+        await escalated.Page.GetByRole(AriaRole.Region, new PageGetByRoleOptions { Name = "Nurse", Exact = true }).GetByRole(AriaRole.Button, new LocatorGetByRoleOptions { Name = "Busy", Exact = true }).ClickAsync();
         await assess.ClickAsync();
         var held = await armed.Held();
         await Expect(escalated.Page.Locator("#escalation")).ToHaveTextAsync("Nurse");
@@ -50,7 +50,7 @@ public sealed class WhenAnElseIfCallsAMethod(string host) : ConformanceFixture(h
         await declined.Page.GotoAsync(CarePages.PainEscalation);
         var armedAgain = await declined.Arm(RunGate.Settle);
         await declined.Page.GetByRole(AriaRole.Textbox, new PageGetByRoleOptions { Name = "Pain", Exact = true }).FillAsync("5");
-        await declined.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Busy", Exact = true }).ClickAsync();
+        await declined.Page.GetByRole(AriaRole.Region, new PageGetByRoleOptions { Name = "Nurse", Exact = true }).GetByRole(AriaRole.Button, new LocatorGetByRoleOptions { Name = "Busy", Exact = true }).ClickAsync();
         await declined.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Assess", Exact = true }).ClickAsync();
         var heldAgain = await armedAgain.Held();
         await heldAgain.Release();

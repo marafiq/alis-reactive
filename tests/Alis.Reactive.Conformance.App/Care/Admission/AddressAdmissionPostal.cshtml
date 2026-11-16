@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model AddressAdmission
+@{
+    var plan = Html.ReactivePlan<AddressAdmission>();
+}
+<fieldset>
+    <legend>Postal address</legend>
+    @(Html.InputField(plan, m => m.Address.Street, options => options.Label("Street")).NativeTextBox())
+</fieldset>
+@Html.RenderPlan(plan)

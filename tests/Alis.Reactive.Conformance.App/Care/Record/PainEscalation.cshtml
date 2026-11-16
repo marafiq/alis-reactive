@@ -14,8 +14,6 @@
 <section aria-label="Nurse">
     <h2>Nurse</h2>
     @(plan.ConformanceComponent("nurse", new ConformanceStart { Text = "Nurse on the floor" }))
-    <button type="button" @Html.Raises(plan, PainEscalations.NurseFree)>Free</button>
-    <button type="button" @Html.Raises(plan, PainEscalations.NurseBusy)>Busy</button>
 </section>
 <section aria-label="Doctor">
     <h2>Doctor</h2>
@@ -35,8 +33,4 @@
             .Else(pipeline => pipeline.Element("escalation").Text.Set("Wait"))));
 }
 <p>Plan: <span id="escalation"></span></p>
-@{
-    Html.On(plan, trigger => trigger.CustomEvent(PainEscalations.NurseFree, pipeline => pipeline.Component<ConformanceComponent>("nurse").Count.Set(1)));
-    Html.On(plan, trigger => trigger.CustomEvent(PainEscalations.NurseBusy, pipeline => pipeline.Component<ConformanceComponent>("nurse").Count.Set(0)));
-}
 @Html.RenderPlan(plan)

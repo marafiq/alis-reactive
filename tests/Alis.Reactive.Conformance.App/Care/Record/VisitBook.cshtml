@@ -1,0 +1,36 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitBook
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visit book";
+    var plan = Html.ReactivePlan<VisitBook>();
+}
+<h1>Visit book</h1>
+<button type="button" @Html.Raises(plan, VisitBookButtons.ShowTheVisits)>Show the visits</button>
+<p>First visit: <span id="first-visit">-</span></p>
+<p>Second visit: <span id="second-visit">-</span></p>
+@using (var book = Html.BeginRequestContainer(plan, "visit-book"))
+{
+    <fieldset>
+        <legend>Next visit</legend>
+        @(Html.InputField(plan, m => m.Starts, options => options.Label("Starts")).NativeTextBox())
+    </fieldset>
+    <button type="button" @Html.Raises(plan, VisitBookButtons.Book)>Book</button>
+    Html.On(plan, trigger => trigger
+        .CustomEvent(VisitBookButtons.ShowTheVisits, pipeline => pipeline
+            .Get(VisitBookEndpoints.Visits)
+            .OnSuccess<VisitBookVisits>((visits, pipeline) =>
+            {
+                pipeline.Element("first-visit").Text.Set(visits.Body.Read(both => both.First.Starts));
+                pipeline.Element("second-visit").Text.Set(visits.Body.Read(both => both.Second.Starts));
+            }))
+        .CustomEvent(VisitBookButtons.Book, pipeline => pipeline
+            .Post<VisitBook>(VisitBookEndpoints.Bookings, request => request.Inputs(book.Container))
+            .OnSuccess(Content.Text, (booked, pipeline) => pipeline.Element("booked").Text.Set(booked.Body))));
+}
+<p>Booked: <span id="booked"></span></p>
+@Html.RenderPlan(plan)

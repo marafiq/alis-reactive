@@ -62,6 +62,8 @@ public sealed class Seed
 
     public bool? BedsDropTheirConnection { get; set; }
 
+    public bool? SummaryDropsItsConnection { get; set; }
+
     public bool? ComponentHoldsNoRecords { get; set; }
 
     public string? ComponentStartsPlace { get; set; }
@@ -137,6 +139,8 @@ public sealed class Seed
     public static Seed TheItemEndpointRefuses() => new() { ItemRefuses = true };
 
     public static Seed TheBedsEndpointDropsItsConnection() => new() { BedsDropTheirConnection = true };
+
+    public static Seed TheSummaryEndpointDropsItsConnection() => new() { SummaryDropsItsConnection = true };
 
     public static Seed TheComponentHoldsNoRecords() => new() { ComponentHoldsNoRecords = true };
 

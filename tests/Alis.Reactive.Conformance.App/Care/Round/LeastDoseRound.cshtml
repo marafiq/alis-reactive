@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LeastDoseRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LeastDoseRound>();
+}
+<h1>Medication round</h1>
+@using (var round = Html.BeginRequestForm(plan, "least-dose-round"))
+{
+    <fieldset>
+        <legend>Least dose</legend>
+        @(Html.InputField(plan, m => m.Least, options => options.Label("Least")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>First dose</legend>
+        @(Html.InputField(plan, m => m.Amounts[0], options => options.Label("Amount")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>Second dose</legend>
+        @(Html.InputField(plan, m => m.Amounts[1], options => options.Label("Amount")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-round", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<LeastDoseRound>(CareEndpoints.LeastDoseRounds, request => request.Form(round.Form))
+        .Validate<LeastDoseRoundRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))
+        .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))
+}
+<p>Saved: <span id="saved"></span></p>
+@Html.RenderPlan(plan)

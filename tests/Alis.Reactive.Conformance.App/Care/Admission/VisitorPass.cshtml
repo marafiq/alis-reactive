@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitorPass
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Arrivals";
+    var plan = Html.ReactivePlan<VisitorPass>();
+}
+<h1>Arrivals</h1>
+@using (var arrival = Html.BeginRequestForm(plan, "arrival"))
+{
+    @(Html.InputField(plan, m => m.Visitor, options => options.Label("Visitor")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Pass, options => options.Label("Pass").Hidden()).NativeTextBox())
+    @(Html.NativeButton("sign-in", "Sign in").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<VisitorPass>(VisitorPassEndpoints.SignIns, request => request.Form(arrival.Form))
+        .Validate<VisitorPassRules>()
+        .OnSuccess(Content.Text, (signedIn, pipeline) => pipeline.Element("signed-in").Text.Set(signedIn.Body))))
+}
+<p>Signed in with: <span id="signed-in"></span></p>
+@Html.RenderPlan(plan)

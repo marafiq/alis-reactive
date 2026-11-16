@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RepeatDoseOrder
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Repeat dose order";
+    var plan = Html.ReactivePlan<RepeatDoseOrder>();
+}
+<h1>Repeat dose order</h1>
+@using (var order = Html.BeginRequestContainer(plan, "repeat-dose-order"))
+{
+    <fieldset>
+        <legend>Doses</legend>
+        @(Html.InputField(plan, m => m.Doses, options => options.Label("Doses")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-order", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<RepeatDoseOrder>(RepeatDoseOrderEndpoints.Orders, request => request.Inputs(order.Container))
+        .Validate<RepeatDoseOrderRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("order-status").Text.Set(saved.Body))))
+}
+<p>Order: <span id="order-status">Not saved</span></p>
+@Html.RenderPlan(plan)

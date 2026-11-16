@@ -155,6 +155,16 @@ internal static class AppHost
             .Add<Care.EarlyCareRotaRules>()
             .Add<Care.RoundDosingRules>()
             .Add<Care.SupplyCountRules>()
+            .Add<Care.DoseOrderingRules>()
+            .Add<Care.RepeatDoseOrderRules>()
+            .Add<Care.ShiftPlanRules>()
+            .Add<Care.LeastDoseRoundRules>()
+            .Add<Care.VisitorPassRules>()
+            .Add<Care.CareLevelChoiceRules>()
+            .Add<Care.KinDeskRules>()
+            .Add<Care.ServerCheckedKinDeskRules>()
+            .Add<Care.WardSignInRules>()
+            .Add<Care.AddressAdmissionRules>()
             .Add<Refusals.VisitValidator>());
 
     private static void WriteEnumNames(JsonSerializerOptions json) => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));

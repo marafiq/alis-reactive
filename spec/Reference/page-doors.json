@@ -534,6 +534,20 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M15.F1 X3.3 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/DoseOrdering.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M15.F1 X3.4 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/RepeatDoseOrder.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M15.F1 X3.5 0": {
     "modules": [],
     "views": [
@@ -552,6 +566,13 @@
     "modules": [],
     "views": [
       "/Care/Record/ResidentAccount.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M15.F1 X3.9 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/VisitBook.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -1953,11 +1974,25 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M4.F1 X6.27 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/CarersOnDuty.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M4.F1 X6.28 0": {
     "modules": [],
     "views": [
       "/Refusals/ArrayLambdas/DosesSortedByTheirMilligrams.cshtml",
       "/Refusals/ArrayLambdas/DosesSortedByTheirStatus.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M4.F1 X6.29 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/ResidentTimeline.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -2622,6 +2657,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F2 X10.3 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/ResidentSummaryCard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F2 X10.4 0": {
     "modules": [],
     "views": [
@@ -2648,6 +2690,20 @@
     "views": [
       "/Care/Residents/CensusRetried.cshtml",
       "/Care/Residents/CensusRetriedOnce.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M7.F1 M7.X1 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/VisitorPass.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M7.F1 M7.X3 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/CareLevelChoice.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -2720,6 +2776,15 @@
     "modules": [],
     "views": [
       "/Care/Admission/Reception.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M7.F2 X14.8 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/KinDesk.cshtml",
+      "/Care/Admission/KinDeskCheckedOnTheServer.cshtml",
+      "/Care/Admission/KinDeskContact.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -2803,10 +2868,31 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M8.F1 X16.27 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/ShiftPlan.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F1 X16.39 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LeastDoseRound.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M8.F1 X16.9 0": {
     "modules": [],
     "views": [
       "/Care/Admission/HouseholdContacts.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F2 X16.8 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/WardSignIn.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -3022,6 +3108,15 @@
     "views": [
       "/Care/Record/FallWatch.cshtml",
       "/Care/Record/FallWatchCard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M9.F2 X12.3 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/AddressAdmission.cshtml",
+      "/Care/Admission/AddressAdmissionHome.cshtml",
+      "/Care/Admission/AddressAdmissionPostal.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
