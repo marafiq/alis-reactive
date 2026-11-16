@@ -1119,8 +1119,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `pipeline.Component<TComponent>()` beside the reach by id; and `plan.Component<TComponent>()`, which returns a
   `ReactiveComponent<TComponent, TModel>`, a handler type beside the plugin's, since the line names none and an
   app-level object's element is the layout's, so the view writes no markup for it. Each constrains its declaration
-  to a component that is an app-level object. Both doors throw until U24 builds them, as the plan's plugin door does,
-  though the reach by id is built, since no test yet proves the reach with no id. The owner can overrule it.
+  to a component that is an app-level object. U22 builds both from M25.D6 with module tests of the plans they write,
+  and their browser tests land in U24 with the objects they reach (the lead, 2026-11-16). The owner can overrule it.
 - The lead, 2026-11-12, declaring N17.5, the argument kind that hands a declared method the abort signal of its
   block (D17.11), which NativeConfirm's ask and FusionConfirm's need (M25.N4, M23.F2). No line gives its form, and
   neither `spec/api`, the POC, main nor the redesign compiles one: a search of each one's C# for a signal argument
@@ -1741,6 +1741,32 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   form keeps the app's `RespectRequiredConstructorParameters` (`Alis.Reactive/PathsAndWire/AppJson.cs`), since the
   setting says what the data must hold, not how a value is written: a constructor parameter live data lacks stops a
   read through its holder, as the server's binding refuses it (D4.2, X4.10).
+- The lead, 2026-11-16, deciding U22's forms no line writes, by the line of 2026-11-15 above, from a Fable designer's
+  design read at the source. (1) U22 builds `plan.Component`, `ReactiveComponent`'s four `Reactive` and
+  `pipeline.Component` from M25.D6, and the antiforgery filter from D9.22, each proven by module tests of what it
+  writes; their browser tests land where check.py lands them. (2) `Rows<TModel, TRow>`'s members are fixed by a
+  designer from D17.15 and N17.12 before U22 builds them, proven by a module test whose helper the test project writes
+  on the public surface, as an app's would be. (3) A net48 app registers its JSON options with a startup call
+  AddReactiveJson(json => ...) on a class JsonServices in `RenderingAndDelivery`, beside the four startup calls; a
+  view reads them through MVC's resolver and is refused where it finds none, by an X line worded with the twin's
+  piece. N10.6 is this.JsonResponse(body), an extension of the action's `Controller` in a net48 file
+  JsonResponses.Net48.cs of `RequestsAndResponses`, which writes the body under those options. (4) The twin links the
+  app's views and models; a controller of a page placed on net48 has a file beside it named for its host, Net48, which
+  the twin alone compiles and the app's project leaves out; the twin holds its own layouts, which link with
+  Url.AppendVersion. (5) Visual Studio's MSBuild builds the fresh MVC 5 app (`msbuild /restore` after the
+  setup-msbuild action, pinned by its SHA), the one form a run has proven; the twin is SDK-style on net48 and builds
+  with `dotnet build`. (6) A script delivery.sh beside the others is the delivery proof's one command: it packs at a
+  version of the run's own, builds the fresh net10 app from the packs, and runs WhenAConsumerAppIsBuilt and the
+  browser tests under consumerNet10; `scripts/check.sh` leaves WhenAConsumerAppIsBuilt out by name. (7) A fixture
+  under two hosts carries each host as the category of its own instance. (8) One harness door opens a person's page
+  with JavaScript off. (9) M19.X2 keeps the redesign's message whole, the physical path among it, since that path
+  tells a developer where the server looked; its promise reads the message whole, the physical path built from the
+  folder the harness serves the twin from (the designer recommended dropping the path). (10) As the design writes
+  them: M19.N1's parameter is appRelativeUrl, what it holds; the net48 copy target is packed in the package's build
+  and buildTransitive folders for net48; a fresh app and the twin take the run's version through a NuGet config of
+  their own that maps the AlisReactive ids to the packs' folder and keeps the restored packages under the app's own
+  obj folder, beside an empty `Directory.Build.targets`; the twin's resolver wraps the one MVC starts with;
+  verify-net48 sets the runner's zone to UTC before the twin starts. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -1124,7 +1124,7 @@ door (D10.21) and are U24's. Module 23's FusionToast and FusionConfirm are decla
 M23.N2), each confirm's `Ask` on N17.5's argument and `ConfirmAsks.tla`. The validator grammar Q16's Doors keep is
 declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1). M25.N6 is declared:
 `IAppLevelComponent` in `Vendors` (P4), `pipeline.Component<TComponent>()` and `plan.Component<TComponent>()`, whose
-handlers are a `ReactiveComponent<TComponent, TModel>`, each a signature until U24. N17.5's argument kind, the abort
+handlers are a `ReactiveComponent<TComponent, TModel>`, each a signature until U22. N17.5's argument kind, the abort
 signal a declared method receives, is declared as the lead proposes it, `AbortSignal()` beside `Answer`, a signature
 until U8; the confirm's asks are `ConfirmAsks.tla`'s, TLC green with each mutant killed. An element's text and HTML are
 an `ElementContent`, whose `Set` takes a source of any type (M5.N1, D7.3), its `Hidden`, `Show()` and `Hide()` are

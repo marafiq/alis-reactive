@@ -219,7 +219,7 @@
         {
           "id": "M19.X5",
           "rung": "behavior",
-          "defect": "A fresh app on the packed packages, wired by README.md's steps alone, renders its page and never boots its plan: on net10 AlisReactive's package carries its runtime as no static web asset, so ~/_content/AlisReactive/js/alis-reactive.js answers 404, a path the conformance app, which takes the shipped projects, never reads; on net48 the classic MVC 5 project imports no build target from its PackageReference, or README.md's steps leave out one it needs (the runtime's link, Views/Web.config's namespaces, the binding redirects System.Text.Json 10.0.12 needs), which the twin's own startup supplies."
+          "defect": "A fresh app on the packed packages, wired by README.md's steps alone, renders its page and never boots its plan: on net10 AlisReactive's package carries its runtime as no static web asset, so ~/_content/AlisReactive/js/alis-reactive.js answers 404, a path the conformance app, which takes the shipped projects, never reads; on net48 the classic MVC 5 project imports no build target from its PackageReference, or README.md's steps leave out one it needs (the runtime's link, Views/Web.config's namespaces, the binding redirects System.Text.Json 10.0.15 needs), which the twin's own startup supplies."
         }
       ],
       "promises": [
@@ -243,7 +243,7 @@
           "for": "M19.X2",
           "page": "A net48 wards index with the link Open the ward, to a ward page whose layout links ~/Content/AlisReactive/js/alis-reactive.jss with Url.AppendVersion, a path at which no file is, and whose plan's load step writes North into ward-name.",
           "gesture": "On the wards index, click Open the ward.",
-          "outcome": "The ward page is refused where the view renders with the message that begins \"No file is at ~/Content/AlisReactive/js/alis-reactive.jss\" and names Content\\{PackageId}\\ and the build.",
+          "outcome": "The ward page is refused where the view renders with the message \"No file is at ~/Content/AlisReactive/js/alis-reactive.jss (<folder>\\Content\\AlisReactive\\js\\alis-reactive.jss). A package's build copies its browser files into Content\\{PackageId}\\; build the app before it serves a page.\", read whole, <folder> being the folder the harness serves the twin from.",
           "opposite": "With the layout linking ~/Content/AlisReactive/js/alis-reactive.js, the ward page renders, and its load step writes North into ward-name.",
           "defect": "The URL is written with no check, so the ward page renders, its runtime never loads, and its load step writes nothing, with no word of the path."
         },
