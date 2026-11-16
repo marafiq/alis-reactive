@@ -90,6 +90,137 @@ public sealed class PopulatedHomeCardRules : ReactiveValidator<PopulatedHomeCard
     public PopulatedHomeCardRules() => RuleFor(card => card.Lead.Name).NotEmpty().WithMessage("Lead name is required.");
 }
 
+public sealed class SignedHomeCard
+{
+    [JsonConverter(typeof(LeadSignature))]
+    public Lead Lead { get; set; } = new() { Name = "Ruth" };
+}
+
+public sealed class LeadSignature : JsonConverter<Lead>
+{
+    public override Lead Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => new() { Name = reader.GetString() };
+
+    public override void Write(Utf8JsonWriter writer, Lead value, JsonSerializerOptions options) => writer.WriteStringValue(value.Name);
+}
+
+public sealed class SignedLeadNameRules : ReactiveValidator<SignedHomeCard>
+{
+    public SignedLeadNameRules() => RuleFor(card => card.Lead.Name).NotEmpty().WithMessage("Lead name is required.");
+}
+
+public sealed class SignedLeadNameServerRules : ReactiveValidator<SignedHomeCard>
+{
+    public SignedLeadNameServerRules() => RuleFor(card => card.Lead.Name).NotEmpty().WithMessage("Lead name is required.").ServerOnly();
+}
+
+public sealed class LeadRules : ReactiveValidator<Lead>
+{
+    public LeadRules() => RuleFor(lead => lead.Name).NotEmpty().WithMessage("Name the lead.");
+}
+
+public sealed class IncludedLeadRules : ReactiveValidator<Lead>
+{
+    public IncludedLeadRules() => Include(new LeadRules());
+}
+
+public sealed class ServerLeadRules : ReactiveValidator<Lead>
+{
+    public ServerLeadRules() => RuleFor(lead => lead.Name).NotEmpty().WithMessage("Name the lead.").ServerOnly();
+}
+
+public sealed class SignedLeadRules : ReactiveValidator<SignedHomeCard>
+{
+    public SignedLeadRules() => RuleFor(card => card.Lead).SetValidator(new LeadRules());
+}
+
+public sealed class SignedLeadChildRules : ReactiveValidator<SignedHomeCard>
+{
+    public SignedLeadChildRules() => RuleFor(card => card.Lead).ChildRules(lead => lead.RuleFor(l => l.Name).NotEmpty().WithMessage("Name the lead."));
+}
+
+public sealed class SignedIncludedLeadRules : ReactiveValidator<SignedHomeCard>
+{
+    public SignedIncludedLeadRules() => RuleFor(card => card.Lead).SetValidator(new IncludedLeadRules());
+}
+
+public sealed class SignedServerLeadRules : ReactiveValidator<SignedHomeCard>
+{
+    public SignedServerLeadRules() => RuleFor(card => card.Lead).SetValidator(new ServerLeadRules());
+}
+
+public sealed class HomeLeadRules : ReactiveValidator<HomeCard>
+{
+    public HomeLeadRules() => RuleFor(card => card.Lead).SetValidator(new LeadRules());
+}
+
+public sealed class HomeLeadChildRules : ReactiveValidator<HomeCard>
+{
+    public HomeLeadChildRules() => RuleFor(card => card.Lead).ChildRules(lead => lead.RuleFor(l => l.Name).NotEmpty().WithMessage("Name the lead."));
+}
+
+public sealed class HomeIncludedLeadRules : ReactiveValidator<HomeCard>
+{
+    public HomeIncludedLeadRules() => RuleFor(card => card.Lead).SetValidator(new IncludedLeadRules());
+}
+
+public sealed class Household
+{
+    public List<string> Phones { get; set; } = [];
+}
+
+public sealed class HouseholdCard
+{
+    public Household Household { get; set; } = new();
+}
+
+public sealed class SignedHouseholdCard
+{
+    [JsonConverter(typeof(HouseholdSignature))]
+    public Household Household { get; set; } = new();
+}
+
+public sealed class HouseholdSignature : JsonConverter<Household>
+{
+    public override Household Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => new() { Phones = [.. (reader.GetString() ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)] };
+
+    public override void Write(Utf8JsonWriter writer, Household value, JsonSerializerOptions options) => writer.WriteStringValue(string.Join(",", value.Phones));
+}
+
+public sealed class HouseholdPhonesRules : ReactiveValidator<HouseholdCard>
+{
+    public HouseholdPhonesRules() => RuleForEach(card => card.Household.Phones).NotEmpty().WithMessage("Give each phone.");
+}
+
+public sealed class SignedHouseholdPhonesRules : ReactiveValidator<SignedHouseholdCard>
+{
+    public SignedHouseholdPhonesRules() => RuleForEach(card => card.Household.Phones).NotEmpty().WithMessage("Give each phone.");
+}
+
+public sealed class LeadCard
+{
+    public string? Resident { get; set; }
+    public Lead Lead { get; set; } = new() { Name = "Ruth" };
+}
+
+public sealed class SignedLeadCard
+{
+    public string? Resident { get; set; }
+
+    [JsonConverter(typeof(LeadSignature))]
+    public Lead Lead { get; set; } = new() { Name = "Ruth" };
+}
+
+public sealed class LeadCardRules : ReactiveValidator<LeadCard>
+{
+    public LeadCardRules() => RuleFor(card => card.Resident).NotEqual(c => c.Lead.Name).WithMessage("The lead is someone other than the resident.");
+}
+
+public sealed class SignedLeadCardRules : ReactiveValidator<SignedLeadCard>
+{
+    public SignedLeadCardRules() => RuleFor(card => card.Resident).NotEqual(c => c.Lead.Name).WithMessage("The lead is someone other than the resident.");
+}
+
 public sealed class RoundCard
 {
     public string? Ward { get; set; }
@@ -106,6 +237,29 @@ public sealed class RoundCardRules : ReactiveValidator<RoundCard>
         RuleFor(card => card.Staff).LessThanOrEqualTo(card => card.Beds).WithMessage("No more staff than beds.");
         RuleFor(card => card.Ward).NotEmpty().ServerOnly();
     }
+}
+
+public sealed class StaffedRoundRules : ReactiveValidator<RoundCard>
+{
+    public StaffedRoundRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(card => card.Beds).WithMessage("No more staff than beds.");
+}
+
+public sealed class HiddenBedsCard
+{
+    [JsonIgnore]
+    public int Beds { get; set; }
+
+    public int Staff { get; set; }
+}
+
+public sealed class HiddenBedsRules : ReactiveValidator<HiddenBedsCard>
+{
+    public HiddenBedsRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(card => card.Beds).WithMessage("No more staff than beds.");
+}
+
+public sealed class HiddenBedsBesideStaffRules : ReactiveValidator<HiddenBedsCard>
+{
+    public HiddenBedsBesideStaffRules() => RuleFor(card => card.Beds).GreaterThanOrEqualTo(card => card.Staff).WithMessage("A bed for each of the staff.");
 }
 
 public sealed class UnreadRoundRules : ReactiveValidator<RoundCard>
@@ -244,6 +398,19 @@ public sealed class OpenMedicationRound
 public sealed class OpenMedicationRoundRules : ReactiveValidator<OpenMedicationRound>
 {
     public OpenMedicationRoundRules() => RuleForEach(round => round.Amounts).GreaterThanOrEqualTo(round => round.Least).WithMessage("Give at least the least dose.");
+}
+
+public sealed class HiddenLeastRound
+{
+    [JsonIgnore]
+    public decimal Least { get; set; }
+
+    public List<decimal> Amounts { get; set; } = [];
+}
+
+public sealed class HiddenLeastRoundRules : ReactiveValidator<HiddenLeastRound>
+{
+    public HiddenLeastRoundRules() => RuleForEach(round => round.Amounts).GreaterThanOrEqualTo(round => round.Least).WithMessage("Give at least the least dose.");
 }
 
 public sealed class ChartedRound

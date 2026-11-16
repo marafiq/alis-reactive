@@ -18,6 +18,8 @@ internal sealed partial class MemberPath
         _links = links;
     }
 
+    internal static MemberPath Empty { get; } = new([]);
+
     internal string BindingName => string.Join(".", _links.Select(link => link.ClrName));
 
     internal partial IReadOnlyList<PathStep> BodyPath { get; }
@@ -31,6 +33,8 @@ internal sealed partial class MemberPath
     internal IReadOnlyList<DataStep> DataSteps() => DataStarts.Steps([.. _links.Select(link => link.Written)]);
 
     internal WrittenMember Member => _links[_links.Count - 1].Written;
+
+    internal MemberPath Then(MemberPath past) => new([.. _links, .. past._links]);
 
     internal void RefuseAReadPastItsOwnConverter(string read)
     {

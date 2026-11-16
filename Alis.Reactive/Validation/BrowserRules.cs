@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
@@ -62,13 +63,14 @@ internal sealed class BrowserScope<T>
 {
     private readonly ValidationRun _selection;
 
-    internal BrowserScope(ValidationRun selection, AppJson json, HeldForm form, BrowserScalars scalars, IReadOnlyList<RegistrationStep> path, string prefix, bool each, Func<T> start)
+    internal BrowserScope(ValidationRun selection, AppJson json, HeldForm form, BrowserScalars scalars, IReadOnlyList<RegistrationStep> path, MemberPath holder, string prefix, bool each, Func<T> start)
     {
         _selection = selection;
         Json = json;
         Form = form;
         Scalars = scalars;
         Path = path;
+        Holder = holder;
         Prefix = prefix;
         Each = each;
         Start = start;
@@ -78,6 +80,7 @@ internal sealed class BrowserScope<T>
     internal HeldForm Form { get; }
     internal BrowserScalars Scalars { get; }
     internal IReadOnlyList<RegistrationStep> Path { get; }
+    internal MemberPath Holder { get; }
     internal string Prefix { get; }
     internal bool Each { get; }
     internal Func<T> Start { get; }
@@ -115,8 +118,8 @@ internal sealed class BrowserScope<T>
     internal BrowserMember<T, TValue> Member<TValue>(LambdaExpression member, string path, bool each, string displayName, Func<TValue> start)
         => new(this, member, path, each, displayName, start);
 
-    internal BrowserScope<TChild> Child<TChild>(IReadOnlyList<RegistrationStep> path, string prefix, bool each, Func<TChild> start)
-        => new(_selection, Json, Form, Scalars, path, prefix, each, start);
+    internal BrowserScope<TChild> Child<TChild>(IReadOnlyList<RegistrationStep> path, MemberPath holder, string prefix, bool each, Func<TChild> start)
+        => new(_selection, Json, Form, Scalars, path, holder, prefix, each, start);
 
     private static PlanExpression Term((FnExpression Read, bool Negated) condition)
         => condition.Negated ? new OpExpression(Operator.Not, [condition.Read.Body]) : condition.Read.Body;
@@ -145,7 +148,6 @@ internal sealed class BrowserMember<T, TValue>
     private readonly bool _each;
     private readonly string _displayName;
     private readonly Func<TValue> _start;
-    private IReadOnlyList<RegistrationStep> _fieldPath = [];
     private int _written;
 
     internal BrowserMember(BrowserScope<T> scope, LambdaExpression member, string path, bool each, string displayName, Func<TValue> start)
@@ -210,6 +212,8 @@ internal sealed class BrowserMember<T, TValue>
 
     internal BrowserTest ComparedWithMember<TPeer>(Comparison comparison, Expression<Func<T, TPeer>> peer, string peerName)
     {
+        RefuseAReadTheBrowserDoesNotHold(_member);
+        RefuseAReadTheBrowserDoesNotHold(peer);
         void Arguments(MessageArguments arguments) => arguments.With("ComparisonProperty", peerName);
         if (_each)
         {
@@ -267,15 +271,16 @@ internal sealed class BrowserMember<T, TValue>
     {
         if (tests.Count == 0) return;
         _written += tests.Count;
-        segments.Add(new RuleGroup([], ItemLambda.EveryItem(), [new RuleField(FieldPath(), [.. tests])], []));
+        segments.Add(new RuleGroup([], ItemLambda.EveryItem(), [new RuleField(FieldPath(ItsMemberPath()), [.. tests])], []));
         tests.Clear();
     }
 
     internal RuleGroup Child(ReactiveValidator<TValue> reactive)
     {
         _written++;
-        var path = FieldPath();
-        var scope = _scope.Child([.. _scope.Path, .. path], _scope.Prefix + _path + ".", _each || _scope.Each, ChildStart);
+        var members = ItsMemberPath();
+        var path = FieldPath(members);
+        var scope = _scope.Child([.. _scope.Path, .. path], _scope.Holder.Then(members), _scope.Prefix + _path + ".", _each || _scope.Each, ChildStart);
         return new RuleGroup(path, BrowserTerms.HoldsAValue, [], reactive.BrowserGroups(scope));
     }
 
@@ -305,14 +310,23 @@ internal sealed class BrowserMember<T, TValue>
         return start ?? JsonSerializer.Deserialize<TValue>("{}", Contracts.Binding(_scope.Json.App))!;
     }
 
-    private IReadOnlyList<RegistrationStep> FieldPath()
+    private MemberPath ItsMemberPath()
     {
-        if (_fieldPath.Count > 0) return _fieldPath;
-        var body = Unconverted(_member.Body);
-        if (!MemberPath.TryOf(body, _member.Parameters[0], _member, _scope.Json.App, out var members))
+        if (!ReadsAsWritten(_member, _scope.Json.App, out var members))
             throw new InvalidOperationException($"The rule of '{Printed.Of(_member)}' checks no member of the model, and the browser's rule names the member it checks by its path; write the rule for a member, as RuleFor(x => x.Member) or RuleForEach(x => x.Items) does, or mark the rule .ServerOnly().");
-        _fieldPath = _each ? [.. members.BodyPath, EachRegistrationStep.Instance] : [.. members.BodyPath];
-        return _fieldPath;
+        return members;
+    }
+
+    private IReadOnlyList<RegistrationStep> FieldPath(MemberPath members) => _each ? [.. members.BodyPath, EachRegistrationStep.Instance] : [.. members.BodyPath];
+
+    private void RefuseAReadTheBrowserDoesNotHold(LambdaExpression read) => ReadsAsWritten(read, _scope.Form.DataOptions, out _);
+
+    private bool ReadsAsWritten(LambdaExpression read, JsonSerializerOptions options, [NotNullWhen(true)] out MemberPath? members)
+    {
+        var body = Unconverted(read.Body);
+        if (!MemberPath.TryOf(body, read.Parameters[0], read, options, out members)) return false;
+        _scope.Holder.Then(members).RefuseAReadPastItsOwnConverter(Printed.Of(body));
+        return true;
     }
 
     private HeldForm DatesJudgedBy => HeldForm.App(_scope.Json, _scope.Form.RendersUnder);

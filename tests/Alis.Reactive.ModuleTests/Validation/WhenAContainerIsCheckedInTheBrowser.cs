@@ -295,6 +295,67 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
     }
 
     [Test]
+    public void a_rule_whose_path_reads_past_a_member_its_own_converter_writes_is_refused_naming_the_path_as_its_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<SignedHomeCard>(validation => validation.Add<SignedLeadNameRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'card.Lead.Name' reads past 'card.Lead', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'card.Lead' itself, or read past it on the server."));
+        Assert.That(RulesOf<HomeCard>(validation => validation.Add<HomeCardRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["lead","name"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"not","args":[{"kind":"op","op":"nullOrEmpty","args":[{"kind":"op","op":"trim","args":[{"kind":"ref","name":"item1"}]}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Lead name is required."}]}],"groups":[]}]}"""));
+        Assert.That(() => PlanOf<SignedHouseholdCard>(validation => validation.Add<SignedHouseholdPhonesRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'card.Household.Phones' reads past 'card.Household', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'card.Household' itself, or read past it on the server."));
+        Assert.That(RulesOf<HouseholdCard>(validation => validation.Add<HouseholdPhonesRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["household","phones",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"not","args":[{"kind":"op","op":"nullOrEmpty","args":[{"kind":"op","op":"trim","args":[{"kind":"ref","name":"item1"}]}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give each phone."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_nested_rule_under_a_member_its_own_converter_writes_is_refused_naming_the_holder_as_its_validator_wrote_it()
+    {
+        const string leadNamed = """{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":["lead"],"when":{"kind":"fn","params":["value"],"body":{"kind":"op","op":"neq","args":[{"kind":"ref","name":"value"},{"kind":"lit","value":null}]}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["name"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"not","args":[{"kind":"op","op":"nullOrEmpty","args":[{"kind":"op","op":"trim","args":[{"kind":"ref","name":"item1"}]}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Name the lead."}]}],"groups":[]}]}]}""";
+        Assert.That(() => PlanOf<SignedHomeCard>(validation => validation.Add<SignedLeadRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'lead.Name' reads past 'card.Lead', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'card.Lead' itself, or read past it on the server."));
+        Assert.That(RulesOf<HomeCard>(validation => validation.Add<HomeLeadRules>()), Is.EqualTo(leadNamed));
+        Assert.That(() => PlanOf<SignedHomeCard>(validation => validation.Add<SignedLeadChildRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'l.Name' reads past 'card.Lead', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'card.Lead' itself, or read past it on the server."));
+        Assert.That(RulesOf<HomeCard>(validation => validation.Add<HomeLeadChildRules>()), Is.EqualTo(leadNamed));
+        Assert.That(() => PlanOf<SignedHomeCard>(validation => validation.Add<SignedIncludedLeadRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'lead.Name' reads past 'card.Lead', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'card.Lead' itself, or read past it on the server."));
+        Assert.That(RulesOf<HomeCard>(validation => validation.Add<HomeIncludedLeadRules>()), Is.EqualTo(leadNamed));
+    }
+
+    [Test]
+    public void a_rule_marked_server_only_past_a_member_its_own_converter_writes_is_the_servers_and_is_not_refused()
+    {
+        Assert.That(RulesOf<SignedHomeCard>(validation => validation.Add<SignedLeadNameServerRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[]}"""));
+        Assert.That(Verdict(new SignedLeadNameServerRules().Validate(new SignedHomeCard { Lead = new Lead { Name = "" } })), Is.EqualTo(new[] { ("Lead.Name", "Lead name is required.") }));
+        Assert.That(RulesOf<SignedHomeCard>(validation => validation.Add<SignedServerLeadRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":["lead"],"when":{"kind":"fn","params":["value"],"body":{"kind":"op","op":"neq","args":[{"kind":"ref","name":"value"},{"kind":"lit","value":null}]}},"fields":[],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_peer_the_apps_options_do_not_write_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<HiddenBedsCard>(validation => validation.Add<HiddenBedsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'card => card.Beds' reads a member of 'HiddenBedsCard' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<RoundCard>(validation => validation.Add<StaffedRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"lte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"data","path":[{"name":"beds","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"No more staff than beds."}]}],"groups":[]}]}"""));
+        Assert.That(() => PlanOf<HiddenLeastRound>(validation => validation.Add<HiddenLeastRoundRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'round => round.Least' reads a member of 'HiddenLeastRound' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<MedicationRound>(validation => validation.Add<MedicationRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"ref","name":"value"},{"kind":"data","path":[{"name":"least","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give at least the least dose."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_member_the_apps_options_do_not_write_compared_with_its_peer_is_refused_naming_the_member_as_the_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<HiddenBedsCard>(validation => validation.Add<HiddenBedsBesideStaffRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'card => card.Beds' reads a member of 'HiddenBedsCard' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<RoundCard>(validation => validation.Add<StaffedRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"lte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"data","path":[{"name":"beds","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"No more staff than beds."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_peer_that_reads_past_a_member_its_own_converter_writes_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<SignedLeadCard>(validation => validation.Add<SignedLeadCardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'c.Lead.Name' reads past 'c.Lead', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'c.Lead' itself, or read past it on the server."));
+        Assert.That(RulesOf<LeadCard>(validation => validation.Add<LeadCardRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["resident"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"neq","args":[{"kind":"data","path":[{"name":"resident","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item1"}},{"kind":"data","path":[{"name":"lead","requires":[],"absent":{"kind":"start","value":"Ruth"}},{"name":"name","requires":[],"absent":{"kind":"start","value":""}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"The lead is someone other than the resident."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
     public void a_container_whose_model_has_no_registered_validator_is_refused_where_the_view_renders()
         => Assert.That(() => PlanOf<Supplies>(validation => validation.Add<DeputyCardRules>()),
             Throws.InvalidOperationException.With.Message.EqualTo("Validate(container) checks container 'intake' by the validator registered for Supplies, and none is registered: register one with services.AddReactiveFluentValidation(validation => validation.Add<TValidator>())."));

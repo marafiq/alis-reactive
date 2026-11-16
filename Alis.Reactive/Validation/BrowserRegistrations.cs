@@ -22,7 +22,7 @@ internal static partial class BrowserRegistrations
         var scalars = new BrowserScalars(json);
         var selection = new ValidationRun(true, CancellationToken.None, ruleSet, [], flags);
         var binding = Contracts.Binding(json.App);
-        var scope = new BrowserScope<T>(selection, json, HeldForm.Live(json, rendersUnder), scalars, [], "", false, () => JsonSerializer.Deserialize<T>("{}", binding)!);
+        var scope = new BrowserScope<T>(selection, json, HeldForm.Live(json, rendersUnder), scalars, [], MemberPath.Empty, "", false, () => JsonSerializer.Deserialize<T>("{}", binding)!);
         var rules = new RuleGroup([], ItemLambda.EveryItem(), [], validator.BrowserGroups(scope));
         var objects = new List<BoundObject>();
         var lists = new List<BoundList>();
