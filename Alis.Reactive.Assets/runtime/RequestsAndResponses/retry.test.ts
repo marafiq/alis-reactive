@@ -12,7 +12,7 @@ const send: Send = {
 const routes = { success: { kind: "json", do: [] }, statuses: [], otherwise: { kind: "json", do: [] } } as const;
 const response = (status: number, headers: Readonly<Record<string, string>> = {}) => new Response("{}", { status, headers: { "Content-Type": "application/json", ...headers } });
 const prepared = (changes: Partial<Send> = {}) => prepare({ ...send, ...changes }, { kind: "clock" }, culture);
-const run = (request = prepared(), signal = new AbortController().signal) => attempt(request, routes, signal, "https://care.example/");
+const run = (request = prepared(), signal = new AbortController().signal) => attempt(request, routes, signal, "https://care.example/").then(answer => answer.reply);
 const fetches = () => {
   const fetch = vi.fn<typeof globalThis.fetch>();
   vi.stubGlobal("fetch", fetch);

@@ -3,7 +3,18 @@ import type { PreparedRequest } from "./request";
 import { Retry, waitToRetry } from "./retry";
 
 type Routes = Pick<RequestStatement, "success" | "statuses" | "otherwise">;
-type Decoded = { readonly kind: "body"; readonly body: ResponseBody } | { readonly kind: "content" } | { readonly kind: "network" };
+type Decoded =
+  | { readonly kind: "body"; readonly body: ResponseBody }
+  | { readonly kind: "file"; readonly file: Blob; readonly name: string }
+  | { readonly kind: "content" }
+  | { readonly kind: "network" };
+
+export interface Answer {
+  readonly reply: HttpResponse;
+  readonly saveDownload: () => void;
+}
+
+const dispositionParameter = /;\s*([^\s;=]+)\s*=\s*(?:"((?:[^"\\]|\\.)*)"|([^\s;]*))/gu;
 
 export function routeFor(reply: HttpResponse, routes: Routes): Route {
   switch (reply.outcome) {
@@ -22,46 +33,61 @@ export function routeFor(reply: HttpResponse, routes: Routes): Route {
   }
 }
 
-export async function attempt(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string): Promise<HttpResponse> {
+export async function attempt(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string): Promise<Answer> {
   const retry = new Retry(request.retry, request.method);
   let sent = 1;
   for (;;) {
     signal.throwIfAborted();
-    const reply = await sendOnce(request, routes, signal, pageUrl);
+    const answer = await sendOnce(request, routes, signal, pageUrl);
     signal.throwIfAborted();
-    const wait = retry.next(reply, sent);
-    if (wait === undefined) return reply;
+    const wait = retry.next(answer.reply, sent);
+    if (wait === undefined) return answer;
     await waitToRetry(wait, signal);
     signal.throwIfAborted();
-    if (!retry.withinBudget(0)) return reply;
+    if (!retry.withinBudget(0)) return answer;
     sent += 1;
   }
 }
 
-async function sendOnce(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string): Promise<HttpResponse> {
+async function sendOnce(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string): Promise<Answer> {
   let response: Response;
   try {
     response = await fetch(request.url, { method: request.method, headers: request.headers, body: request.body, redirect: "follow", signal });
   } catch {
-    return networkFailure(request);
+    return answered(networkFailure(request));
   }
   const status = statusOf(response, request.respondedJson);
   const reply: HttpResponse = {
     status, outcome: status >= 200 && status < 300 ? "ok" : "status",
     headers: response.headers, request: request.request, inputs: request.inputs, body: { kind: "none" },
   };
-  if (response.redirected && new URL(response.url).origin !== new URL(pageUrl).origin) return { ...reply, outcome: "redirect" };
-  const decoded = await readBody(response, routeFor(reply, routes).kind);
+  if (response.redirected && new URL(response.url).origin !== new URL(pageUrl).origin) return answered({ ...reply, outcome: "redirect" });
+  const decoded = await readBody(response, routeFor(reply, routes).kind, new URL(request.url, pageUrl));
   switch (decoded.kind) {
     case "body":
-      return { ...reply, body: decoded.body };
+      return answered({ ...reply, body: decoded.body });
+    case "file":
+      return {
+        reply: { ...reply, body: { kind: "file", value: { name: decoded.name, size: decoded.file.size, type: decoded.file.type } } },
+        saveDownload: () => {
+          saveAs(decoded.file, decoded.name);
+        },
+      };
     case "content":
-      return { ...reply, outcome: reply.outcome === "ok" ? "content" : "status" };
+      return answered({ ...reply, outcome: reply.outcome === "ok" ? "content" : "status" });
     case "network":
-      return networkFailure(request);
+      return answered(networkFailure(request));
     default:
       return assertNever(decoded);
   }
+}
+
+function answered(reply: HttpResponse): Answer {
+  return { reply, saveDownload: savesNothing };
+}
+
+function savesNothing(): void {
+  return undefined;
 }
 
 function networkFailure(request: PreparedRequest): HttpResponse {
@@ -85,12 +111,20 @@ function statusOf(response: Response, respondedJson: boolean): number {
   throw notBuilt("an X-Responded-JSON header without an HTTP status: D10.7 states only Katana's JSON status");
 }
 
-async function readBody(response: Response, kind: SuccessBody): Promise<Decoded> {
+async function readBody(response: Response, kind: SuccessBody, url: URL): Promise<Decoded> {
   switch (kind) {
     case "none":
       return { kind: "body", body: { kind: "none" } };
-    case "file":
-      throw notBuilt("a file response: U18's download");
+    case "file": {
+      const name = fileName(response.headers.get("Content-Disposition"), url);
+      let file: Blob;
+      try {
+        file = await response.blob();
+      } catch {
+        return { kind: "network" };
+      }
+      return { kind: "file", file, name };
+    }
     case "json":
     case "text":
     case "html": {
@@ -152,4 +186,50 @@ function charset(contentType: string | null): string {
   if (contentType === null) return "utf-8";
   const found = /;\s*charset\s*=\s*(?:"([^"]*)"|([^;\s]*))/iu.exec(contentType);
   return found === null ? "utf-8" : found[1] ?? found[2] ?? "";
+}
+
+function fileName(disposition: string | null, url: URL): string {
+  const named = disposition === null ? "" : nameIn(disposition);
+  if (named !== "") return named;
+  const segment = url.pathname.slice(url.pathname.lastIndexOf("/") + 1);
+  if (segment === "") throw new Error("The file that '" + url.pathname + "' answered has no name: its Content-Disposition names none, and its path ends with no segment.");
+  return decodedSegment(segment);
+}
+
+function nameIn(disposition: string): string {
+  const parameters = new Map<string, string>();
+  for (const found of disposition.matchAll(dispositionParameter)) {
+    const name = (found[1] ?? "").toLowerCase();
+    const quoted = found[2];
+    if (!parameters.has(name)) parameters.set(name, quoted === undefined ? found[3] ?? "" : quoted.replace(/\\(.)/gu, "$1"));
+  }
+  const extended = extendedValue(parameters.get("filename*") ?? "");
+  return extended === "" ? parameters.get("filename") ?? "" : extended;
+}
+
+function extendedValue(value: string): string {
+  const parts = value.split("'");
+  if (parts.length !== 3 || parts[0]?.toLowerCase() !== "utf-8") return "";
+  try {
+    return decodeURIComponent(parts[2] ?? "");
+  } catch {
+    return "";
+  }
+}
+
+function decodedSegment(segment: string): string {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
+}
+
+function saveAs(file: Blob, name: string): void {
+  const address = URL.createObjectURL(file);
+  const link = document.createElement("a");
+  link.href = address;
+  link.download = name;
+  link.click();
+  URL.revokeObjectURL(address);
 }

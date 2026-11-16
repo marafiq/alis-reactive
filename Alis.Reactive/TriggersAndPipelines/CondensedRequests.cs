@@ -242,10 +242,11 @@ public static class CondensedRequests
         => request.PlacedInput(member, input);
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
+    /// <remarks>The download takes the name the answer's <c>Content-Disposition</c> gives, its <c>filename*</c> before its <c>filename</c>, and the last segment of the request's path when it gives neither.</remarks>
     /// <param name="request">The request.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static GetRequest<TModel, TRequest, Response<TRequest, ResponseFile>> Download<TModel, TRequest>(this GetRequest<TModel, TRequest> request)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.File, (_, _) => { });
 
     /// <summary>Runs a pipeline when the server answers 2xx, without reading the body.</summary>
     /// <param name="request">The request.</param>
@@ -270,10 +271,11 @@ public static class CondensedRequests
         => throw new NotImplementedException();
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
+    /// <remarks>The download takes the name the answer's <c>Content-Disposition</c> gives, its <c>filename*</c> before its <c>filename</c>, and the last segment of the request's path when it gives neither.</remarks>
     /// <param name="request">The request.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static OptionsRequest<TModel, TRequest, Response<TRequest, ResponseFile>> Download<TModel, TRequest>(this OptionsRequest<TModel, TRequest> request)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.File, (_, _) => { });
 
     /// <summary>Runs a pipeline when the server answers 2xx, without reading the body.</summary>
     /// <param name="request">The request.</param>
@@ -291,10 +293,11 @@ public static class CondensedRequests
         => throw new NotImplementedException();
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
+    /// <remarks>The download takes the name the answer's <c>Content-Disposition</c> gives, its <c>filename*</c> before its <c>filename</c>, and the last segment of the request's path when it gives neither.</remarks>
     /// <param name="request">The request.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static PostRequest<TModel, TRequest, Response<TRequest, ResponseFile>> Download<TModel, TRequest>(this PostRequest<TModel, TRequest> request)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.File, (_, _) => { });
 
     /// <summary>Runs a pipeline when the server answers 2xx, without reading the body.</summary>
     /// <param name="request">The request.</param>
@@ -312,10 +315,11 @@ public static class CondensedRequests
         => throw new NotImplementedException();
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
+    /// <remarks>The download takes the name the answer's <c>Content-Disposition</c> gives, its <c>filename*</c> before its <c>filename</c>, and the last segment of the request's path when it gives neither.</remarks>
     /// <param name="request">The request.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static PutRequest<TModel, TRequest, Response<TRequest, ResponseFile>> Download<TModel, TRequest>(this PutRequest<TModel, TRequest> request)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.File, (_, _) => { });
 
     /// <summary>Runs a pipeline when the server answers 2xx, without reading the body.</summary>
     /// <param name="request">The request.</param>
@@ -333,10 +337,11 @@ public static class CondensedRequests
         => throw new NotImplementedException();
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
+    /// <remarks>The download takes the name the answer's <c>Content-Disposition</c> gives, its <c>filename*</c> before its <c>filename</c>, and the last segment of the request's path when it gives neither.</remarks>
     /// <param name="request">The request.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static DeleteRequest<TModel, TRequest, Response<TRequest, ResponseFile>> Download<TModel, TRequest>(this DeleteRequest<TModel, TRequest> request)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.File, (_, _) => { });
 
     /// <summary>Reaches the page's notice, to show a text as a success, an error, a warning or information.</summary>
     /// <param name="pipeline">The pipeline the step is written in.</param>

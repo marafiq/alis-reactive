@@ -2470,9 +2470,7 @@
     ]
   },
   "M6.F2 M6.X3 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/ResidentExports.cshtml",
       "/Shared/_Layout.cshtml"

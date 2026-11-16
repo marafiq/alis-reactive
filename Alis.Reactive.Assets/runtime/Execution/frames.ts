@@ -1,5 +1,5 @@
-import { attempt, prepare, routeFor } from "../RequestsAndResponses/index";
-import type { HttpResponse, HttpSend, RequestStatement, Statement } from "../Schema/index";
+import { attempt, prepare, routeFor, type Answer } from "../RequestsAndResponses/index";
+import type { HttpSend, RequestStatement, Statement } from "../Schema/index";
 import { heldOrNull, value, type Read } from "../ValuesAndSources/index";
 import { bind, under, type Context } from "./context";
 import { evaluate } from "./expressions";
@@ -25,7 +25,7 @@ type RequestState =
   | { readonly kind: "check" }
   | { readonly kind: "loading" | "guard"; readonly send: HttpSend }
   | { readonly kind: "attempt"; readonly request: ReturnType<typeof prepare> }
-  | { readonly kind: "route"; readonly request: ReturnType<typeof prepare>; readonly reply: HttpResponse }
+  | { readonly kind: "route"; readonly request: ReturnType<typeof prepare>; readonly answer: Answer }
   | { readonly kind: "finally"; readonly after: AfterRequest }
   | AfterRequest;
 
@@ -144,14 +144,15 @@ export class RequestFrame {
           kind: "waits",
           on: attempt(state.request, this.#statement, this.#context.signal, location.href),
           settled: read => {
-            this.#state = { kind: "route", request: state.request, reply: heldOrNull(read) as HttpResponse };
+            this.#state = { kind: "route", request: state.request, answer: heldOrNull(read) as Answer };
           },
         };
       case "route": {
-        const reply = state.reply;
+        const reply = state.answer.reply;
         if (reply.outcome !== "ok" && reply.outcome !== "status") {
           console.error("Request '" + state.request.method + " " + state.request.url + "' ended with " + reply.outcome + ".");
         }
+        state.answer.saveDownload();
         const context = bind(this.#context, this.#statement.reply, value(reply));
         this.#owed = this.#loaded;
         this.#state = { kind: "finally", after: reply.outcome === "ok" ? { kind: "chained", context } : { kind: "after" } };

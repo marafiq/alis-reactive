@@ -48,7 +48,7 @@ describe("when Guard looks up the request's contracts, D10.21 uses the plugin bo
     const find = vi.fn();
     const request = prepare(send(none, []), { kind: "clock" }, culture, captureBusy(none), find);
     vi.stubGlobal("fetch", vi.fn<typeof globalThis.fetch>().mockResolvedValue(new Response(null, { status: 204 })));
-    const reply = await attempt(request, routes, new AbortController().signal, "https://care.example/");
+    const { reply } = await attempt(request, routes, new AbortController().signal, "https://care.example/");
     request.releaseBusy();
     expect([reply.status, reply.outcome]).toStrictEqual([204, "ok"]);
     expect(find.mock.calls).toStrictEqual([]);
