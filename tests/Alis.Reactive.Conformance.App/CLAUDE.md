@@ -129,6 +129,11 @@ its views.
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.
+- A page the twin alone serves, placed under net48 alone in `spec/Reference/app.json`, sits in its screen's folder as
+  a ".Net48.cs" controller and ".Net48.cshtml" views (`Care/Shell/NoticesController.Net48.cs`), which this project
+  leaves out of its Compile and Content items by the one glob "**/*.Net48.*" and the twin compiles. A page both
+  hosts serve keeps its models in a file of their own beside its controller (`Refusals/RequestsAndResponses/RoundsBoard.cs`),
+  which the twin links with the page's views and its own ".Net48.cs" controller.
 - `World/WorldData.cs` keeps a world's gates by action and endpoint: an endpoint's filter reaches its gate with
   its own address, and takes the first hold not yet held that names it before one that names none; a second arm at
   one action and endpoint queues a hold behind the first, and the arm's answer numbers it. An MVC action a test holds at the

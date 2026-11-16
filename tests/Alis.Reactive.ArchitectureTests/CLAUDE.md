@@ -45,7 +45,9 @@ expects none.
   accepted one as literals. The core's own contract is held by the first step of `scripts/check.sh`.
 - `WhenAPagesDoorsAreRead` runs `scripts/page-doors.cs` over the assemblies each case compiles, an app, its tests and a
   framework with doors built and not built, and expects the exit, each refusal's own line and the table as one literal.
-  A fixture under a fresh app's host is read by none of the app's pages, and the table leaves it out. The conformance
+  A fixture under a fresh app's host is read by none of the app's pages, and the table leaves it out; so does a
+  fixture under net48 alone whose route no action of the app answers, a page the twin alone holds, while one the app
+  answers keeps its entry. The conformance
   app's own table is held by `scripts/check.sh`'s step after its build.
 - `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` run the browser runner's two readers, the selection and the
   result, over the tables and TRX files their cases write, and expect each refusal's own line; a selection names the

@@ -145,6 +145,7 @@ Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Name.get -> string
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Render<TComponent>(System.Web.IHtmlString! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.ValueJson.get -> string!
 Alis.Reactive.RenderingAndDelivery.InputFields
+Alis.Reactive.RenderingAndDelivery.JsonServices
 Alis.Reactive.RenderingAndDelivery.MemberPartials
 Alis.Reactive.RenderingAndDelivery.PlanHtml
 Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>
@@ -192,6 +193,7 @@ Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>
 Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>.Declare<TPlugin, TObject, TArgs>(System.Func<TPlugin!, Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>!>!>!, TObject!>! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Func<TArgs!, Alis.Reactive.Declarations.ReadOnly<TRow>!>! row, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.RowEntries<TRow>!
 Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>.DeclareLink<TPlugin, TObject, TArgs>(System.Func<TPlugin!, Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>!>!>!, TObject!>! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Func<TArgs!, Alis.Reactive.Declarations.ReadOnly<TRow>!>! row, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.RowLinkEntries<TRow>!
 Alis.Reactive.RenderingAndDelivery.TracingServices
+Alis.Reactive.RenderingAndDelivery.UrlVersionExtensions
 Alis.Reactive.RenderingAndDelivery.ValidateAntiForgeryHeaderAttribute
 Alis.Reactive.RenderingAndDelivery.ValidateAntiForgeryHeaderAttribute.OnAuthorization(System.Web.Mvc.AuthorizationContext! filterContext) -> void
 Alis.Reactive.RenderingAndDelivery.ValidateAntiForgeryHeaderAttribute.ValidateAntiForgeryHeaderAttribute() -> void
@@ -215,6 +217,7 @@ Alis.Reactive.RequestsAndResponses.Failure<TError>.Headers.get -> Alis.Reactive.
 Alis.Reactive.RequestsAndResponses.Failure<TError>.Outcome.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.RequestsAndResponses.FailureOutcome!>!
 Alis.Reactive.RequestsAndResponses.Failure<TError>.Status.get -> Alis.Reactive.Declarations.ReadOnly<int>!
 Alis.Reactive.RequestsAndResponses.FailureOutcome
+Alis.Reactive.RequestsAndResponses.JsonResponses
 Alis.Reactive.RequestsAndResponses.Markup
 Alis.Reactive.RequestsAndResponses.NoContent
 Alis.Reactive.RequestsAndResponses.Notice
@@ -800,6 +803,7 @@ static Alis.Reactive.InputsAndIds.IdGenerator.For<TModel, TProp>(System.Linq.Exp
 static Alis.Reactive.RenderingAndDelivery.ClassNameServices.AddReactiveClassNames(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.InputsAndIds.ReactiveClassNames!>! names) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
 static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member, System.Action<Alis.Reactive.InputsAndIds.InputFieldOptions!>! options) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
+static Alis.Reactive.RenderingAndDelivery.JsonServices.AddReactiveJson(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<System.Text.Json.JsonSerializerOptions!>! json) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RenderingAndDelivery.MemberPartials.PartialFor<TModel, TMember>(this System.Web.Mvc.HtmlHelper<TModel>! html, System.Linq.Expressions.Expression<System.Func<TModel, TMember>!>! member) -> System.Web.Mvc.MvcHtmlString!
 static Alis.Reactive.RenderingAndDelivery.MemberPartials.PartialFor<TModel, TMember>(this System.Web.Mvc.HtmlHelper<TModel>! html, System.Linq.Expressions.Expression<System.Func<TModel, TMember>!>! member, string! viewName) -> System.Web.Mvc.MvcHtmlString!
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.On<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Action<Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!>! trigger) -> void
@@ -813,6 +817,7 @@ static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestForm<TModel>
 static Alis.Reactive.RenderingAndDelivery.RequestServices.AddReactiveRequests(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.TriggersAndPipelines.RequestDefaults!>! requests) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RenderingAndDelivery.RequestTimeZone.RendersUnder(this System.Web.HttpContextBase! context, System.TimeZoneInfo! timeZone) -> void
 static Alis.Reactive.RenderingAndDelivery.TracingServices.AddReactiveTracing(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Tracing.ReactiveTracing!>! tracing) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Alis.Reactive.RenderingAndDelivery.UrlVersionExtensions.AppendVersion(this System.Web.Mvc.UrlHelper! url, string! appRelativeUrl) -> string!
 static Alis.Reactive.RenderingAndDelivery.ValidationServices.AddReactiveFluentValidation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Validation.ReactiveFluentValidationBuilder!>! validators) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RequestsAndResponses.Content.File.get -> Alis.Reactive.RequestsAndResponses.SuccessContent<Alis.Reactive.RequestsAndResponses.ResponseFile!>!
 static Alis.Reactive.RequestsAndResponses.Content.Html.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<Alis.Reactive.RequestsAndResponses.Markup!>!
@@ -820,6 +825,7 @@ static Alis.Reactive.RequestsAndResponses.Content.Json<TBody>() -> Alis.Reactive
 static Alis.Reactive.RequestsAndResponses.Content.None.get -> Alis.Reactive.RequestsAndResponses.NoContent!
 static Alis.Reactive.RequestsAndResponses.Content.Text.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<string!>!
 static Alis.Reactive.RequestsAndResponses.ErrorResponses.ToErrorResponse(this Alis.Reactive.Validation.ValidationResult! result) -> System.Web.Mvc.ActionResult!
+static Alis.Reactive.RequestsAndResponses.JsonResponses.JsonResponse<TBody>(this System.Web.Mvc.Controller! controller, TBody body) -> System.Web.Mvc.ActionResult!
 static Alis.Reactive.TriggersAndPipelines.AppEvent.Declare(string? name = null, string! declaredBy = "") -> Alis.Reactive.TriggersAndPipelines.AppEvent!
 static Alis.Reactive.TriggersAndPipelines.AppEvent.Declare<TPayload>(string? name = null, string! declaredBy = "") -> Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>!
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!

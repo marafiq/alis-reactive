@@ -84,6 +84,10 @@ public sealed class Seed
 
     public bool? RenderUnrecorded { get; set; }
 
+    public string? Notice { get; set; }
+
+    public bool? ResolverLeftUnset { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed Carer(string name) => new Seed().AndCarer(name);
@@ -161,6 +165,10 @@ public sealed class Seed
     public static Seed TheBindingsWhole() => new() { BindingsWhole = true };
 
     public static Seed TheRenderIsNotRecorded() => new() { RenderUnrecorded = true };
+
+    public static Seed TheNotice(string text) => new() { Notice = text };
+
+    public static Seed TheResolverLeftUnset() => new() { ResolverLeftUnset = true };
 
     public Seed AndCarer(string name)
     {

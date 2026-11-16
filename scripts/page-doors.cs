@@ -9,7 +9,7 @@ using System.Text.Json;
 if (args.Length != 3)
 {
     Console.Error.WriteLine("usage: dotnet run scripts/page-doors.cs -- <the app's assembly> <its Playwright tests' assembly> <the table to write>");
-    Console.Error.WriteLine("Reads a Release build of an app and its Playwright tests, the framework's assemblies beside the app's, and writes to the table, for each test's promise, the views its pages render and the modules of the framework's members those views call that throw NotImplementedException, the doors not built. A test whose fixture runs under a fresh app's host opens that app's own pages, which the app read here does not hold, and is not read.");
+    Console.Error.WriteLine("Reads a Release build of an app and its Playwright tests, the framework's assemblies beside the app's, and writes to the table, for each test's promise, the views its pages render and the modules of the framework's members those views call that throw NotImplementedException, the doors not built. A test whose fixture runs under a fresh app's host opens that app's own pages, which the app read here does not hold, and is not read; nor is one whose fixture runs under net48 alone and names no route the app answers, a page the twin alone holds.");
     return 2;
 }
 
@@ -30,13 +30,13 @@ var pages = new Pages(app, framework);
 var problems = new List<string>();
 var landed = new SortedDictionary<string, Landing>(StringComparer.Ordinal);
 
-foreach (var (promise, method) in Promised.Tests(tests))
+foreach (var (promise, method, theTwinsAlone) in Promised.Tests(tests))
 {
     var reached = Walk.From(tests, [method], type => !Meta.NamespaceOf(tests.Reader, type).StartsWith(Promised.Harness, StringComparison.Ordinal), null);
     var opened = pages.Opened(reached.Strings);
     if (opened.Count == 0)
     {
-        problems.Add($"{promise}: its test names no route an action of the app answers a GET on, so no page of it is read");
+        if (!theTwinsAlone) problems.Add($"{promise}: its test names no route an action of the app answers a GET on, so no page of it is read");
         continue;
     }
     var landing = pages.Read(promise, opened, reached.Strings);
@@ -426,12 +426,15 @@ internal static class Promised
     private const string Mark = "Alis.Reactive.Conformance.World.FailsForAttribute";
     private const string Category = "NUnit.Framework.CategoryAttribute";
 
+    private const string TheTwinsHost = "net48";
+
     private static readonly string[] HostsOfAFreshApp = ["consumerNet10", "consumerNet48"];
 
-    public static IEnumerable<(string Promise, MethodDefinitionHandle Method)> Tests(Loaded tests)
+    public static IEnumerable<(string Promise, MethodDefinitionHandle Method, bool TheTwinsAlone)> Tests(Loaded tests)
     {
         foreach (var typeHandle in tests.Reader.TypeDefinitions.Where(type => !Meta.NamespaceOf(tests.Reader, type).StartsWith(Harness, StringComparison.Ordinal) && !RunsOnAFreshApp(tests.Reader, type)))
         {
+            var theTwinsAlone = HostsOf(tests.Reader, typeHandle) is [TheTwinsHost];
             foreach (var methodHandle in tests.Reader.GetTypeDefinition(typeHandle).GetMethods())
             {
                 foreach (var attributeHandle in tests.Reader.GetMethodDefinition(methodHandle).GetCustomAttributes())
@@ -440,14 +443,17 @@ internal static class Promised
                     if (Meta.AttributeName(tests.Reader, attribute) != Mark) continue;
                     var value = tests.Reader.GetBlobReader(attribute.Value);
                     value.ReadUInt16();
-                    yield return (value.ReadSerializedString() ?? "", methodHandle);
+                    yield return (value.ReadSerializedString() ?? "", methodHandle, theTwinsAlone);
                 }
             }
         }
     }
 
     private static bool RunsOnAFreshApp(MetadataReader reader, TypeDefinitionHandle type)
-        => reader.GetTypeDefinition(type).GetCustomAttributes()
+        => HostsOf(reader, type).Any(host => HostsOfAFreshApp.Contains(host));
+
+    private static string?[] HostsOf(MetadataReader reader, TypeDefinitionHandle type)
+        => [.. reader.GetTypeDefinition(type).GetCustomAttributes()
             .Select(reader.GetCustomAttribute)
             .Where(attribute => Meta.AttributeName(reader, attribute) == Category)
             .Select(attribute =>
@@ -455,8 +461,7 @@ internal static class Promised
                 var value = reader.GetBlobReader(attribute.Value);
                 value.ReadUInt16();
                 return value.ReadSerializedString();
-            })
-            .Any(host => HostsOfAFreshApp.Contains(host));
+            })];
 }
 
 internal static class Meta

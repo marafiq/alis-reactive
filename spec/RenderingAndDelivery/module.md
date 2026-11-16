@@ -29,7 +29,8 @@ This module owns the redesign's `UrlVersionExtensions` and holds M19.D1 to M19.D
 
 Each name is gate 2's; each door is the capability it carries.
 
-- `M19.N1` kept: the redesign's `Url.AppendVersion(contentPath)` on net48, `UrlVersionExtensions`, which writes the
+- `M19.N1` kept: the redesign's `Url.AppendVersion` on net48, `UrlVersionExtensions`, its parameter named
+  `appRelativeUrl` where the redesign's is `contentPath`, which writes the
   URL of a file under `~/Content/{PackageId}/` with the file's content hash as `v`, the hash net10's own
   `asp-append-version` writes (M19.D1). On net10 the core adds no door: a view writes ASP.NET Core's
   `asp-append-version="true"` on `~/_content/{PackageId}/`, the platform's own, and a framework door beside it would

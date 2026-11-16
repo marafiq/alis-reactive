@@ -439,6 +439,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | .NET SDK | 11.0.100 (`global.json`, rollForward disable) | compile, test, pack, for net48 and net10.0; the net10 hosts run on the 10.0 runtime, 10.0.15, which CI installs with SDK 10.0.404, that line's latest, beside the pinned one |
 | NuGet | the SDK's, 11.0.100's; `Directory.Packages.props`, lock files restored locked in CI, `nuget.config` with nuget.org alone | restore; a finding of its audit fails the restore, and so does a second source on a machine, which central package management refuses (NU1507) |
 | net48 references | System.Text.Json 10.0.15, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.15, System.Diagnostics.DiagnosticSource 10.0.15, Microsoft.AspNet.Mvc 5.3.0 | the core's net48 dependencies (2.9), restored together at these exact versions; net10 takes the first three from the framework reference; held on the 10.0 line, the net10 host's, so both hosts run one line of System.Text.Json (each one's latest is 11.0.0) |
+| net48 twin | Microsoft.Extensions.DependencyInjection 10.0.15, Microsoft.CodeDom.Providers.DotNetCompilerPlatform 4.1.0 | the twin's container, which MVC's resolver is set over, held on the 10.0 line with the net48 references (the latest is 11.0.0); and the compiler MVC 5 compiles the twin's views with when IIS serves them |
 | net48 build | PolySharp 1.17.0, Microsoft.NETFramework.ReferenceAssemblies 1.0.3, both private | the attributes C# 14's features need on net48, written as source, and the reference assemblies a build on any OS compiles against |
 | MSBuild SDK | Microsoft.Build.NoTargets 3.7.134 | the Assets project |
 | Node | 26.13.0 (`.node-version`) | esbuild, tsc, eslint, node probes |
@@ -467,7 +468,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 A pin is the latest stable version of its package or tool on the day its unit lands it (the owner, 2026-11-11), looked
 up at its own registry and proven by a restore or an install and a run. A pin below the latest names what holds it in
 its row, and the holds are this table's and no other: Syncfusion's, the owner's; the analyzers' Roslyn floor; the 10.0
-line for what runs in a host (the net48 references, the Pkcs pin, the hub's client); TypeScript, by typescript-eslint's
+line for what runs in a host (the net48 references, the twin's container, the Pkcs pin, the hub's client); TypeScript, by typescript-eslint's
 peer range; Microsoft.AspNetCore.Mvc.Testing, by net10.0. Each hold is the owner's to lift. `.github/dependabot.yml`
 proposes every newer stable version each week, majors among them, of every NuGet and npm package, every action, the SDK
 and the Playwright image, and ignores this table's holds and nothing else; `scripts/doctor.sh --latest`, which the
@@ -622,6 +623,12 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
   page that only reacts, a `@using` per module namespace a view uses, the links.
   A fresh MVC 5 app: PackageReference (packages.config retires, section 3), the startup calls and the resolver in
   `Application_Start`, the namespaces in `Views/Web.config`, the links.
+- The twin, `tests/Alis.Reactive.Conformance.App.Net48`, is an SDK-style net48 project outside the solution, built on
+  the packed packages at the version PACKAGE_VERSION names. It links the world contract and the conformance app's
+  net48 files, each ".Net48.cs" controller and ".Net48.cshtml" view under the app's screen folders and the models
+  and views a page both hosts serve shares, which the app's own project leaves out by the one glob "**/*.Net48.*";
+  its build lays the site out under the folder `tests/Alis.Reactive.Conformance.World/TwinSite.cs` names, the one the
+  harness serves from IIS on Windows.
 - The delivery tests run on both fresh apps: app.json's placements on its `fresh` screen under the hosts consumerNet10
   and consumerNet48, apps that README.md's steps alone wire on the packed packages, each booting its plan (M19.X5); and
   WhenAConsumerAppIsBuilt, whose cases hold that git lists no file a build wrote into either app (M19.D2), that a file an
@@ -961,7 +968,9 @@ module of each of its screen parts and the unit that holds the module of each do
 `[FailsFor]` through the pages it opens, the links it clicks by their text, each view's layout, partials and slot
 loads, and the app's code those views run, to each member of the framework they call whose body throws
 `NotImplementedException`, and it writes each test's views and the modules of those members to
-`spec/Reference/page-doors.json`, refusing a test whose pages it cannot read, a link a test names whose address it
+`spec/Reference/page-doors.json`, refusing a test whose pages it cannot read, save one whose fixture runs under a
+fresh app's host or under net48 alone with no route the app answers, a page the twin alone holds, which it leaves
+out, and refusing a link a test names whose address it
 cannot read and a door it cannot place in a module, each held by a case of WhenAPagesDoorsAreRead over small
 assemblies the case compiles. `scripts/check.sh` alone writes that
 table, after its build, and fails when it differs from the tracked one, so a test lands by the doors the committed

@@ -1,0 +1,16 @@
+@using Alis.Reactive.RenderingAndDelivery
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <main>
+        @RenderBody()
+    </main>
+    <script src="@Url.AppendVersion("~/js/alis-reactive-conformance.js")"></script>
+    <script src="@Url.AppendVersion("~/Content/AlisReactive/js/alis-reactive.js")"></script>
+</body>
+</html>

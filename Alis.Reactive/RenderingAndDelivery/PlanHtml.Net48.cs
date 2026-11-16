@@ -1,10 +1,10 @@
 #if NET48
 using System;
 using System.Linq;
-using System.Text.Json;
 using System.Web;
 using System.Web.Mvc;
 using Alis.Reactive.PathsAndWire;
+using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.Tracing;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.Validation;
@@ -23,7 +23,7 @@ public static class PlanHtml
     /// </remarks>
     /// <returns>The plan.</returns>
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
-        => ViewPlans.Open<TModel>(RequestTimeZone.Of(html.ViewContext.HttpContext), new AppJson(TheOptionsTheAppRegisters),
+        => ViewPlans.Open<TModel>(RequestTimeZone.Of(html.ViewContext.HttpContext), new AppJson(() => RegisteredJson.ReadBy(ViewPaths.Of(html))),
             () => html.ViewData.TemplateInfo.HtmlFieldPrefix,
             text => html.ViewData.TemplateInfo.GetFullHtmlFieldName(text),
             HtmlHelper.GenerateIdFromName,
@@ -83,7 +83,5 @@ public static class PlanHtml
     public static IHtmlString RenderPlan<TModel>(this HtmlHelper html, ReactivePlan<TModel> plan)
         => new HtmlString(ViewPlans.ScriptOf(plan, html.ViewData.TemplateInfo.HtmlFieldPrefix, () => ViewPaths.Of(html),
             () => (DependencyResolver.Current.GetService<ReactiveTracing>() ?? new ReactiveTracing()).Console));
-
-    private static JsonSerializerOptions TheOptionsTheAppRegisters() => throw new NotImplementedException();
 }
 #endif

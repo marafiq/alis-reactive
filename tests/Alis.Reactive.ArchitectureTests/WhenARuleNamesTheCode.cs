@@ -21,7 +21,7 @@ public class WhenARuleNamesTheCode
     private static readonly string[] WhatTheRulesForbid =
         ["page.evaluate()", "writes_a_let_statement", "set_prop_mutation_writes_value_to_ej2_instance"];
     private static readonly string[] VendorTypes = ["EmitType"];
-    private static readonly string[] PlatformMembers = ["Application_Start", "FlagsAttribute", "CallerArgumentExpression"];
+    private static readonly string[] PlatformMembers = ["FlagsAttribute", "CallerArgumentExpression"];
     private static readonly string[] NotInTheRepo =
         [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. PlatformMembers];
 

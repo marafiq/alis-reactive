@@ -15,6 +15,7 @@ public sealed class WhenAnMvc5RequestRendersWithNoResolverSet(string host) : Con
     public async Task the_page_is_refused_where_it_renders_naming_the_startup_call_and_the_resolver()
     {
         var noResolver = await NewWorld();
+        await noResolver.Seed(Seed.TheResolverLeftUnset());
         await noResolver.Page.GotoAsync(RefusalPages.RoundsBoard);
         await Expect(noResolver.Page.GetByRole(AriaRole.Heading, new PageGetByRoleOptions
         {

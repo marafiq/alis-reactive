@@ -185,31 +185,42 @@ public class WhenAPagesDoorsAreRead
 
     [AcceptedCase]
     public void a_test_under_a_fresh_apps_host_is_read_by_none_of_the_apps_pages()
-        => Assert.That(Read(AnEastWard, Naming("/wards/east") + """
-
-           namespace NUnit.Framework
-           {
-               [System.AttributeUsage(System.AttributeTargets.Class)]
-               public sealed class CategoryAttribute(string name) : System.Attribute
-               {
-                   public string Name { get; } = name;
-               }
-           }
-
-           namespace Care.Tests
-           {
-               [NUnit.Framework.Category("consumerNet10")]
-               public sealed class WhenAFreshAppOpens
-               {
-                   [Alis.Reactive.Conformance.World.FailsFor("M19.F1 M19.X5 0")]
-                   public string[] the_home_page_boots() => ["/"];
-               }
-           }
-           """), Is.EqualTo(
+        => Assert.That(Read(AnEastWard, Naming("/wards/east") + UnderTheHost("consumerNet10", ("M19.F1 M19.X5 0", "/"))), Is.EqualTo(
             """
             exit 0
             {
               "M1.F1 X1.1 0": {
+                "modules": [
+                  "Wards"
+                ],
+                "views": [
+                  "/Wards/East.cshtml"
+                ]
+              }
+            }
+
+            """));
+
+    [RefusedCase]
+    public void a_test_under_net10_whose_route_the_app_does_not_answer_is_refused()
+        => Assert.That(Read(AnEastWard, Naming("/wards/east") + UnderTheHost("net10", ("M19.F1 M19.X1 0", "/wards/west"))), Is.EqualTo(
+            "exit 1\n[page-doors] M19.F1 M19.X1 0: its test names no route an action of the app answers a GET on, so no page of it is read\n"));
+
+    [AcceptedCase]
+    public void a_test_under_net48_alone_is_left_out_where_no_route_answers_it_and_read_where_one_does()
+        => Assert.That(Read(AnEastWard, Naming("/wards/east") + UnderTheHost("net48", ("M19.F1 M19.X1 0", "/wards/west"), ("M6.F1 X10.28 1", "/wards/east"))), Is.EqualTo(
+            """
+            exit 0
+            {
+              "M1.F1 X1.1 0": {
+                "modules": [
+                  "Wards"
+                ],
+                "views": [
+                  "/Wards/East.cshtml"
+                ]
+              },
+              "M6.F1 X10.28 1": {
                 "modules": [
                   "Wards"
                 ],
@@ -322,6 +333,29 @@ public class WhenAPagesDoorsAreRead
                }
            }
            """.Replace("NAMED", string.Join(", ", named.Select(text => "\"" + text + "\"")), StringComparison.Ordinal);
+
+    private static string UnderTheHost(string host, params (string Promise, string Named)[] tests)
+        => """
+
+           namespace NUnit.Framework
+           {
+               [System.AttributeUsage(System.AttributeTargets.Class)]
+               public sealed class CategoryAttribute(string name) : System.Attribute
+               {
+                   public string Name { get; } = name;
+               }
+           }
+
+           namespace Care.Tests
+           {
+               [NUnit.Framework.Category("HOST")]
+               public sealed class WhenAWardOpensOnOneHost
+               {
+           TESTS
+               }
+           }
+           """.Replace("HOST", host, StringComparison.Ordinal).Replace("TESTS", string.Join("\n", tests.Select((test, index) =>
+            $"        [Alis.Reactive.Conformance.World.FailsFor(\"{test.Promise}\")]\n        public string[] the_ward_opens_{index}() => [\"{test.Named}\"];")), StringComparison.Ordinal);
 
     private static string Read(string app, string tests, string builtAgainst = TheFramework)
     {

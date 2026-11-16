@@ -25,4 +25,8 @@ public static partial class CarePages
     public const string DischargeDesk = Shell + "discharge-desk";
 
     public const string FamilyDischarge = Shell + "family-discharge";
+
+    public const string Notices = Shell + "notices";
+
+    public const string TheWorldsNotice = Shell + "the-worlds-notice";
 }
