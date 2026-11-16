@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.TriggersAndPipelines;
@@ -358,21 +359,18 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
     }
 
     [Test]
-    public void a_peer_the_apps_options_do_not_write_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    public void a_peer_the_apps_options_do_not_write_reads_its_start_as_the_endpoint_binds_it()
     {
-        Assert.That(() => PlanOf<HiddenBedsCard>(validation => validation.Add<HiddenBedsRules>()),
-            Throws.InvalidOperationException.With.Message.EqualTo("'card => card.Beds' reads a member of 'HiddenBedsCard' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<HiddenBedsCard>(validation => validation.Add<HiddenBedsRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"lte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"lit","value":0}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"No more staff than beds."}]}],"groups":[]}]}"""));
         Assert.That(RulesOf<RoundCard>(validation => validation.Add<StaffedRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"lte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"data","path":[{"name":"beds","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"No more staff than beds."}]}],"groups":[]}]}"""));
-        Assert.That(() => PlanOf<HiddenLeastRound>(validation => validation.Add<HiddenLeastRoundRules>()),
-            Throws.InvalidOperationException.With.Message.EqualTo("'round => round.Least' reads a member of 'HiddenLeastRound' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<HiddenLeastRound>(validation => validation.Add<HiddenLeastRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"ref","name":"value"},{"kind":"lit","value":0}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give at least the least dose."}]}],"groups":[]}]}"""));
         Assert.That(RulesOf<MedicationRound>(validation => validation.Add<MedicationRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"ref","name":"value"},{"kind":"data","path":[{"name":"least","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give at least the least dose."}]}],"groups":[]}]}"""));
     }
 
     [Test]
-    public void a_member_the_apps_options_do_not_write_compared_with_its_peer_is_refused_naming_the_member_as_the_validator_wrote_it()
+    public void a_member_the_apps_options_do_not_write_compared_with_its_peer_reads_its_start_under_its_name_as_the_validator_wrote_it()
     {
-        Assert.That(() => PlanOf<HiddenBedsCard>(validation => validation.Add<HiddenBedsBesideStaffRules>()),
-            Throws.InvalidOperationException.With.Message.EqualTo("'card => card.Beds' reads a member of 'HiddenBedsCard' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<HiddenBedsCard>(validation => validation.Add<HiddenBedsBesideStaffRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["Beds"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"lit","value":0},{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"A bed for each of the staff."}]}],"groups":[]}]}"""));
         Assert.That(RulesOf<RoundCard>(validation => validation.Add<StaffedRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"lte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"data","path":[{"name":"beds","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"No more staff than beds."}]}],"groups":[]}]}"""));
     }
 
@@ -409,11 +407,25 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
     }
 
     [Test]
-    public void a_member_the_apps_options_do_not_write_inside_a_peers_computation_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    public void a_member_the_apps_options_do_not_write_inside_a_peers_computation_reads_its_start()
     {
-        Assert.That(() => PlanOf<HiddenOpenBedsCard>(validation => validation.Add<HiddenOpenBedsRules>()),
-            Throws.InvalidOperationException.With.Message.EqualTo("'c => (c.Beds ?? 0)' reads a member of 'HiddenOpenBedsCard' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<HiddenOpenBedsCard>(validation => validation.Add<HiddenOpenBedsRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"lte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"lit","value":0}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"No more staff than beds."}]}],"groups":[]}]}"""));
         Assert.That(RulesOf<OpenBedsCard>(validation => validation.Add<OpenBedsRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"lte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"op","op":"coalesce","args":[{"kind":"data","path":[{"name":"beds","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item1"}},{"kind":"lit","value":0}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"No more staff than beds."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_rule_over_a_member_the_apps_options_do_not_write_tests_its_start_under_its_condition()
+    {
+        Assert.That(RulesOf<HiddenBedsCard>(validation => validation.Add<HiddenBedsCountRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["Beds"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"eq","args":[{"kind":"lit","value":0},{"kind":"lit","value":4}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":false}},"message":"Four beds on the round."}]}],"groups":[]}]}"""));
+        Assert.That(RulesOf<RoundCard>(validation => validation.Add<RoundBedsCountRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["beds"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"eq","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":4}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"op","op":"gt","args":[{"kind":"data","path":[{"name":"beds","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"lit","value":0}]}},"message":"Four beds on the round."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_peer_that_reads_an_override_the_apps_options_leave_out_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<OverriddenBedsCard>(json => json.TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { LeaveOutTheOverriddenBeds } }, validation => validation.Add<OverriddenBedsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'card => card.Beds' reads a member of 'OverriddenBedsCard' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<OverriddenBedsCard>(validation => validation.Add<OverriddenBedsRules>()), Is.EqualTo(StaffBesideBeds));
     }
 
     [Test]
@@ -421,10 +433,9 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
         => Assert.That(RulesOf<RotaCard>(validation => validation.Add<RotaCardRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"get","path":["length"],"members":"requiredIfHeld","target":{"kind":"call","path":["filter"],"members":"requiredIfHeld","target":{"kind":"data","path":[{"name":"carers","requires":[],"absent":{"kind":"start","value":[]}}],"target":{"kind":"ref","name":"item1"}},"args":[{"kind":"fn","params":["item2"],"body":{"kind":"op","op":"neq","args":[{"kind":"data","path":[{"name":"name","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item2"}},{"kind":"lit","value":null}]}}]}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"A shift for each named carer."}]}],"groups":[]}]}"""));
 
     [Test]
-    public void a_member_the_apps_options_do_not_write_inside_the_peer_of_each_items_comparison_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    public void a_member_the_apps_options_do_not_write_inside_the_peer_of_each_items_comparison_reads_its_start()
     {
-        Assert.That(() => PlanOf<HiddenOpenLeastRound>(validation => validation.Add<HiddenOpenLeastRoundRules>()),
-            Throws.InvalidOperationException.With.Message.EqualTo("'r => (r.Least ?? 0)' reads a member of 'HiddenOpenLeastRound' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<HiddenOpenLeastRound>(validation => validation.Add<HiddenOpenLeastRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"ref","name":"value"},{"kind":"lit","value":0}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give at least the least dose."}]}],"groups":[]}]}"""));
         Assert.That(RulesOf<OpenMedicationRound>(validation => validation.Add<OpenLeastRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"ref","name":"value"},{"kind":"op","op":"coalesce","args":[{"kind":"data","path":[{"name":"least","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item1"}},{"kind":"lit","value":0}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give at least the least dose."}]}],"groups":[]}]}"""));
     }
 
@@ -482,6 +493,12 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
         var query = new QueryCollection(values.ToDictionary(value => value.Key, value => new StringValues(value.Value)));
         await controller.TryUpdateModelAsync(model, "", new QueryStringValueProvider(BindingSource.Query, query, CultureInfo.InvariantCulture));
         return Verdict(controller.Validate<TModel, TValidator>(model));
+    }
+
+    private static void LeaveOutTheOverriddenBeds(JsonTypeInfo type)
+    {
+        if (type.Type != typeof(OverriddenBedsCard)) return;
+        type.Properties.Remove(type.Properties.Single(member => member.Name == "beds"));
     }
 
     private static (string, string)[] Verdict(ValidationResult result) => [.. result.Errors.Select(error => (error.PropertyName, error.ErrorMessage))];

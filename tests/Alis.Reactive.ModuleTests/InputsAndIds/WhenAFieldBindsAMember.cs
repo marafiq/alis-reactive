@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Html;
@@ -44,6 +46,18 @@ public sealed class WhenAFieldBindsAMember
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
         Assert.That(json, Is.EqualTo(MoveInPlans.Head + "\"" + """Alis_Reactive_ModuleTests_InputsAndIds_Dose__Doses_1__Amount":{"name":"Doses[1].Amount","path":["doses",1,"amount"],"value":{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_Dose__Doses_1__Amount"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"fraction","text":"view","overflow":"nothing"}}},{"kind":"lit","value":0}]},"committed":"change","invalidClass":"alis-has-error","message":"Alis_Reactive_ModuleTests_InputsAndIds_Dose__Doses_1__Amount_message"},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Strength":{"name":"Strength","path":["strength"],"value":{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Strength"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"fraction","text":"view","overflow":"nothing"}}},{"kind":"lit","value":null}]},"committed":"change","invalidClass":"alis-has-error","message":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Strength_message"}},"containers":{}}},"Alis_Reactive_ModuleTests_InputsAndIds_Dose__Doses_1__Amount":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_Dose__Doses_1__Amount","vendor":"native"},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Strength":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Strength","vendor":"native"}""" + MoveInPlans.Tail));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
+    }
+
+    [Test]
+    public void an_input_over_a_member_the_apps_options_do_not_write_renders_and_joins_no_body()
+    {
+        var html = Views.Of(new WingMove());
+        var plan = html.ReactivePlan<WingMove>();
+        html.InputField(plan, m => m.Room).Render<IntakeBox>(new HtmlString("<input>"));
+        html.InputField(plan, m => m.Wing).Render<IntakeBox>(new HtmlString("<input>"));
+        using var json = JsonDocument.Parse(MoveInPlans.JsonOf(html.RenderPlan(plan)));
+        var inputs = json.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs");
+        Assert.That(inputs.EnumerateObject().Select(input => input.Name), Is.EqualTo(new[] { "Alis_Reactive_ModuleTests_InputsAndIds_WingMove__Room" }));
     }
 
     [Test]

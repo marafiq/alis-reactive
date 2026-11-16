@@ -66,6 +66,13 @@ internal sealed class WrittenMember
         return written is { Get: { } get } ? new WrittenMember(holder, written, get) : throw NotWritten(read, holder);
     }
 
+    internal static bool LeftOutByItsClass(MemberExpression access, JsonSerializerOptions options)
+    {
+        if (DeclaringClass(access) is not { } declaring) return false;
+        var declared = options.GetTypeInfo(declaring).Properties.FirstOrDefault(property => Equals(property.AttributeProvider, access.Member));
+        return declared is not { Get: not null };
+    }
+
     internal JsonSerializerOptions OwnForm()
     {
         var options = Holder.Options;

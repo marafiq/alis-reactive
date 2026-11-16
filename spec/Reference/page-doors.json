@@ -581,6 +581,14 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M16.F1 X18.6 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/WardPharmacyAdmission.cshtml",
+      "/Care/Admission/WardPharmacyAdmissionInItsContract.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M16.F1 X18.7 0": {
     "modules": [],
     "views": [

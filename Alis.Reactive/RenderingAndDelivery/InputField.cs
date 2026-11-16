@@ -50,7 +50,7 @@ public sealed partial class InputField<TModel, TValue>
         }
 
         var rendered = render();
-        ModelPlugin.Binds(_plan.Writer.Content, Id, _bound.Binding(rendered.Component.Input, _classNames.InvalidInput, _options.IsHidden));
+        if (_bound.JoinsTheBody) ModelPlugin.Binds(_plan.Writer.Content, Id, _bound.Binding(rendered.Component.Input, _classNames.InvalidInput, _options.IsHidden));
         return rendered;
     }
 

@@ -18,13 +18,14 @@ internal sealed partial class BoundInput
     private readonly Shape _shape;
     private readonly Schema.Expression _blank;
 
-    private BoundInput(string id, string name, IReadOnlyList<PathStep> path, Shape shape, Schema.Expression blank)
+    private BoundInput(string id, string name, IReadOnlyList<PathStep> path, Shape shape, Schema.Expression blank, bool joinsTheBody)
     {
         Id = id;
         Name = name;
         _path = path;
         _shape = shape;
         _blank = blank;
+        JoinsTheBody = joinsTheBody;
     }
 
     internal string Id { get; }
@@ -34,6 +35,8 @@ internal sealed partial class BoundInput
     internal string MessageId => Id + MessageOf;
 
     internal bool BindsAList => _shape is ArrayShape;
+
+    internal bool JoinsTheBody { get; }
 
     internal static BoundInput Of(MemberLambda lambda, MvcNames names, AppJson json, Func<JsonElement> positionStart)
     {
@@ -53,6 +56,7 @@ internal sealed partial class BoundInput
 
             var access = (MemberExpression)step.Node;
             if (holder.Kind != JsonTypeInfoKind.Object) throw NoBodyPath(lambda, step.Text, WrittenMember.DeclaringClass(access), holder);
+            if (WrittenMember.LeftOutByItsClass(access, app)) return InNoBody(lambda, names, live, positionStart());
             var member = WrittenMember.Of(access, holder, lambda.Lambda);
             sinceTheItem.Add(WrittenMember.Of(access, live.GetTypeInfo(holder.Type), lambda.Lambda));
             path.Add(new MemberStep(NameOf(member, step.Text)));
@@ -66,8 +70,11 @@ internal sealed partial class BoundInput
             blank = number.RootElement.Clone();
         }
 
-        return new BoundInput(lambda.Scope + "__" + names.IdOfTheName, names.Name, path, shape, new LitExpression(blank));
+        return new BoundInput(lambda.Scope + "__" + names.IdOfTheName, names.Name, path, shape, new LitExpression(blank), true);
     }
+
+    private static BoundInput InNoBody(MemberLambda lambda, MvcNames names, JsonSerializerOptions live, JsonElement blank)
+        => new(lambda.Scope + "__" + names.IdOfTheName, names.Name, [], InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank), new LitExpression(blank), false);
 
     internal InputBinding Binding(ComponentInput input, string invalidClass, bool hidden)
         => new(

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using Alis.Reactive.Conformance.App.World;
 using Alis.Reactive.Conformance.World;
 using Alis.Reactive.RenderingAndDelivery;
@@ -55,10 +56,18 @@ internal static class AppHost
                 WriteEnumNames(json);
                 json.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
                 json.RespectRequiredConstructorParameters = true;
+                json.TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { LeaveOutTheAdmissionsPharmacy } };
                 return;
             default:
                 throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.DefaultHooks} and {HostNames.Tracing}.");
         }
+    }
+
+    private static void LeaveOutTheAdmissionsPharmacy(JsonTypeInfo type)
+    {
+        if (type.Type != typeof(Care.WardAdmission)) return;
+        var pharmacy = JsonNamingPolicy.CamelCase.ConvertName(nameof(Care.WardAdmission.Pharmacy));
+        type.Properties.Remove(type.Properties.Single(member => member.Name == pharmacy));
     }
 
     internal static void AddRequests(string host, IServiceCollection services)
@@ -167,6 +176,8 @@ internal static class AppHost
             .Add<Care.ServerCheckedKinDeskRules>()
             .Add<Care.WardSignInRules>()
             .Add<Care.AddressAdmissionRules>()
+            .Add<Care.WardPharmacyAdmissionRules>()
+            .Add<Care.WardPharmacyAdmissionInItsContractRules>()
             .Add<Refusals.VisitValidator>());
 
     private static void WriteEnumNames(JsonSerializerOptions json) => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));

@@ -262,6 +262,33 @@ public sealed class HiddenBedsBesideStaffRules : ReactiveValidator<HiddenBedsCar
     public HiddenBedsBesideStaffRules() => RuleFor(card => card.Beds).GreaterThanOrEqualTo(card => card.Staff).WithMessage("A bed for each of the staff.");
 }
 
+public sealed class HiddenBedsCountRules : ReactiveValidator<HiddenBedsCard>
+{
+    public HiddenBedsCountRules() => RuleFor(card => card.Beds).Equal(4).WithMessage("Four beds on the round.").When(card => card.Beds > 0);
+}
+
+public sealed class RoundBedsCountRules : ReactiveValidator<RoundCard>
+{
+    public RoundBedsCountRules() => RuleFor(card => card.Beds).Equal(4).WithMessage("Four beds on the round.").When(card => card.Beds > 0);
+}
+
+public abstract class StaffedCard
+{
+    public abstract int Beds { get; set; }
+
+    public int Staff { get; set; }
+}
+
+public sealed class OverriddenBedsCard : StaffedCard
+{
+    public override int Beds { get; set; }
+}
+
+public sealed class OverriddenBedsRules : ReactiveValidator<OverriddenBedsCard>
+{
+    public OverriddenBedsRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(card => card.Beds).WithMessage("No more staff than beds.");
+}
+
 public sealed class BedsBesideStaffRules : ReactiveValidator<RoundCard>
 {
     public BedsBesideStaffRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(c => c.Beds).WithMessage("No more staff than beds.");

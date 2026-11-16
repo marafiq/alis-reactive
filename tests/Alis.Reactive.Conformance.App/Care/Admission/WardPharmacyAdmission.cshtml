@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardAdmission
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<WardAdmission>();
+}
+<h1>Admission</h1>
+@using (var admission = Html.BeginRequestContainer(plan, "admission"))
+{
+    @(Html.InputField(plan, m => m.GivenName, options => options.Label("Given name")).NativeTextBox())
+    <section aria-label="Ward placement">
+        @(Html.InputField(plan, m => m.Ward, options => options.Label("Ward")).NativeTextBox())
+    </section>
+    <section aria-label="Pharmacy choice">
+        @(Html.InputField(plan, m => m.Pharmacy, options => options.Label("Pharmacy")).NativeTextBox())
+    </section>
+    <button type="button" @Html.Raises(plan, WardPharmacyAdmissions.Admit)>Admit</button>
+    Html.On(plan, trigger => trigger.CustomEvent(WardPharmacyAdmissions.Admit, pipeline => pipeline
+        .Post<WardAdmission>(WardPharmacyAdmissionEndpoints.Admissions, request => request.Json(admission.Container, body => { }))
+        .Validate<WardPharmacyAdmissionRules>()
+        .OnSuccess(Content.Text, (admitted, pipeline) => pipeline.Element("admit-status").Text.Set(admitted.Body))));
+}
+<p>Admission: <span id="admit-status"></span></p>
+@Html.RenderPlan(plan)

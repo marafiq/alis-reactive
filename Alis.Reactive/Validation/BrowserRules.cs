@@ -86,6 +86,14 @@ internal sealed class BrowserScope<T>
 
     internal bool Selects(IReadOnlyList<string> sets, bool include) => _selection.Selects(sets, include);
 
+    internal bool ChecksALeftOutMember(LambdaExpression read) => IsTheModel && LeftOutMembers.Checks(read, Json.App);
+
+    internal TRead ReadingLeftOutMembersAsStarts<TRead>(TRead read)
+        where TRead : LambdaExpression
+        => IsTheModel ? LeftOutMembers.ReadAsStarts(read, Start(), Json.App) : read;
+
+    private bool IsTheModel => Prefix.Length == 0;
+
     internal FnExpression When(IReadOnlyList<RuleGuard<T>> guards)
     {
         if (guards.Count == 0) return ItemLambda.EveryItem();
@@ -126,7 +134,7 @@ internal sealed class BrowserScope<T>
     {
         try
         {
-            return ItemLambda.Of(condition, Form);
+            return ItemLambda.Of(ReadingLeftOutMembersAsStarts(condition), Form);
         }
         catch (InvalidOperationException refused)
         {
@@ -169,9 +177,10 @@ internal sealed class BrowserMember<T, TValue>
     {
         var when = _scope.When(guards);
         var message = Message(text, test);
-        if (!_stops) return new RuleTest(test.Check, when, message);
-        var check = PassingWhereAnEarlierFailed(test.Check);
-        _earlier.Add((test.Check, when));
+        var reads = ReadingItsStartWhereLeftOut(test.Check);
+        if (!_stops) return new RuleTest(reads, when, message);
+        var check = PassingWhereAnEarlierFailed(reads);
+        _earlier.Add((reads, when));
         return new RuleTest(check, when, message);
     }
 
@@ -233,20 +242,26 @@ internal sealed class BrowserMember<T, TValue>
 
     internal BrowserTest ComparedWithMember<TPeer>(Comparison comparison, Expression<Func<T, TPeer>> peer, string peerName)
     {
-        _ = ItsMemberPath();
-        RefuseAReadTheBrowserDoesNotHold(_member);
-        RefuseAReadTheBrowserDoesNotHold(peer);
+        if (!ChecksALeftOutMember)
+        {
+            _ = ItsMemberPath();
+            RefuseAReadTheBrowserDoesNotHold(_member);
+        }
+
+        var peerAsBound = _scope.ReadingLeftOutMembersAsStarts(peer);
+        RefuseAReadTheBrowserDoesNotHold(peerAsBound);
         void Arguments(MessageArguments arguments) => arguments.With("ComparisonProperty", peerName);
         if (_each)
         {
             var item = LinqExpression.Parameter(typeof(TValue), BrowserTerms.Value);
-            var itemBesidePeer = PassesBeside<TPeer>(comparison, item, peer.Body);
-            var test = ItemLambda.CheckingAnItemBesideItsHolder(itemBesidePeer, item, BrowserTerms.Value, peer, FormItIsHeldIn(), Term(comparison.Name), DatesJudgedBy);
+            var itemBesidePeer = PassesBeside<TPeer>(comparison, item, peerAsBound.Body);
+            var test = ItemLambda.CheckingAnItemBesideItsHolder(itemBesidePeer, item, BrowserTerms.Value, peerAsBound, FormItIsHeldIn(), Term(comparison.Name), DatesJudgedBy);
             return new BrowserTest(test, Arguments, ["ComparisonValue"], false);
         }
 
-        var memberBesidePeer = PassesBeside<TPeer>(comparison, Unconverted(_member.Body), peer.Body);
-        var read = ItemLambda.CheckingAMemberBesideItsPeer(memberBesidePeer, _member.Parameters[0], peer, _scope.Form, Term(comparison.Name), DatesJudgedBy);
+        var memberAsBound = _scope.ReadingLeftOutMembersAsStarts(_member);
+        var memberBesidePeer = PassesBeside<TPeer>(comparison, Unconverted(memberAsBound.Body), peerAsBound.Body);
+        var read = ItemLambda.CheckingAMemberBesideItsPeer(memberBesidePeer, memberAsBound.Parameters[0], peerAsBound, _scope.Form, Term(comparison.Name), DatesJudgedBy);
         return new BrowserTest(new FnExpression([BrowserTerms.Value, read.Params[0]], read.Body), Arguments, ["ComparisonValue"], false);
     }
 
@@ -301,7 +316,7 @@ internal sealed class BrowserMember<T, TValue>
     {
         if (tests.Count == 0) return;
         _written += tests.Count;
-        segments.Add(new RuleGroup([], ItemLambda.EveryItem(), [new RuleField(FieldPath(ItsMemberPath()), [.. tests])], []));
+        segments.Add(new RuleGroup([], ItemLambda.EveryItem(), [new RuleField(ChecksALeftOutMember ? [new MemberStep(_path)] : FieldPath(ItsMemberPath()), [.. tests])], []));
         tests.Clear();
     }
 
@@ -326,6 +341,11 @@ internal sealed class BrowserMember<T, TValue>
         if (_stops && _each)
             throw new InvalidOperationException($"The rule of '{_path}' stops at its first failing item (CascadeMode.Stop), and the browser checks every item, so it would show failures the endpoint never gives; mark the rule .ServerOnly().");
     }
+
+    private bool ChecksALeftOutMember => !_each && _scope.ChecksALeftOutMember(_member);
+
+    private FnExpression ReadingItsStartWhereLeftOut(FnExpression check)
+        => ChecksALeftOutMember ? new FnExpression(check.Params, PlanSubstitution.Applied(check, _scope.Form.Beside(_start()), new RefExpression(check.Params[1]))) : check;
 
     private FnExpression PassingWhereAnEarlierFailed(FnExpression check)
     {
@@ -396,6 +416,7 @@ internal sealed class BrowserMember<T, TValue>
 
     private HeldForm FormItIsHeldIn()
     {
+        if (ChecksALeftOutMember) return _scope.Form;
         var read = Unconverted(_member.Body);
         if (!MemberPath.TryOf(read, _member.Parameters[0], _member, _scope.Form.DataOptions, out var members) || !members.Member.HoldsItsOwnForm) return _scope.Form;
         return _scope.Form.WrittenBy(members.Member, Printed.Of(read));

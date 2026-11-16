@@ -26,6 +26,14 @@ public sealed class MoveIn
     public TimeSpan? Stay { get; set; }
 }
 
+public sealed class WingMove
+{
+    public string Room { get; set; } = "";
+
+    [JsonIgnore]
+    public string Wing { get; set; } = "East";
+}
+
 public enum Shift
 {
     Day,
