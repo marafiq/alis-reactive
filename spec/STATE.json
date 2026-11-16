@@ -13,13 +13,13 @@
     "app": {
       "counts": {
         "cells": 117,
-        "hosts": 19,
+        "hosts": 20,
         "placed": 469,
         "problems": 0,
         "rewrite": 0,
         "screens": 14
       },
-      "detail": "469 feature tests and 117 cell tests on 14 screens under 19 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
+      "detail": "469 feature tests and 117 cell tests on 14 screens under 20 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "bindings": {
@@ -37,11 +37,11 @@
         "cell": 55,
         "check": 4,
         "d_lines": 243,
-        "defect": 235,
+        "defect": 234,
         "delivery": 1,
         "invariant": 33,
         "meanings": 56,
-        "probe": 74,
+        "probe": 75,
         "uncarried": 0
       },
       "detail": "each of 243 D lines and 56 module meanings has at least one carrier that resolves: a defect naming it in an id group, or an invariant, probe or check it names, or a matrix cell or delivery test resting on it",
@@ -1596,14 +1596,14 @@
         "unrefused": 0
       },
       "detail": "247 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "21b17298125cde486f1fc81d95ac1b12d3684be7bdfcfb72d20f88e463dac12d",
+      "digest": "75f423bcb67196d3e496a610cbb824cf15865ab73c838bbc381798e59a0524d5",
       "pass": true
     },
     "probes": {
       "counts": {
         "browser": 121,
-        "facts": 390,
-        "net10": 122,
+        "facts": 391,
+        "net10": 123,
         "net48": 85,
         "node": 62
       },
@@ -4186,7 +4186,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "2f220dfe2065a59265a0113bbf8d7e534ed7bcd1",
+  "read_at_head": "0113ed6c076df02ab897604f34dcacd47caf77ab",
   "step": {
     "failing": [],
     "name": "End of session",
