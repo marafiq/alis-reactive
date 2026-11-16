@@ -7,10 +7,10 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class StayExtensionController : Controller
 {
     [HttpGet(CarePages.StayExtension)]
-    public IActionResult OfNights() => View("/Care/Admission/StayExtension.cshtml", new StayExtension { Section = StayExtensionEndpoints.NightsSection });
+    public IActionResult OfNights() => View("/Care/Admission/StayExtension.cshtml", new StayExtension(StayExtensionEndpoints.NightsSection));
 
     [HttpGet(CarePages.StayExtensionOfExtraNights)]
-    public IActionResult OfExtraNights() => View("/Care/Admission/StayExtension.cshtml", new StayExtension { Section = StayExtensionEndpoints.ExtraNightsSection });
+    public IActionResult OfExtraNights() => View("/Care/Admission/StayExtension.cshtml", new StayExtension(StayExtensionEndpoints.ExtraNightsSection));
 
     [HttpGet(StayExtensionEndpoints.NightsSection)]
     public IActionResult NightsSection() => PartialView("/Care/Admission/StayExtensionNights.cshtml", new StayExtensionSection());
@@ -19,11 +19,9 @@ public sealed class StayExtensionController : Controller
     public IActionResult ExtraNightsSection() => PartialView("/Care/Admission/StayExtensionExtraNights.cshtml", new StayExtensionSection());
 }
 
-public sealed class StayExtension
+public sealed record StayExtension(string Section)
 {
     public int Nights { get; set; }
-
-    public required string Section { get; init; }
 }
 
 public sealed class StayExtensionSection

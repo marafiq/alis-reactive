@@ -17,8 +17,8 @@ public sealed class WhenASlotsContentRendersAnIdThePageHolds(string host) : Conf
         var reception = await NewWorld();
         await reception.Page.GotoAsync(CarePages.ReceptionWithANameSection);
         await reception.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Load", Exact = true }).ClickAsync();
-        await reception.Page.Locator("#section").GetByRole(AriaRole.Textbox, new LocatorGetByRoleOptions { Name = "Name", Exact = true }).FillAsync("Ada");
-        await reception.Page.Locator("#section").GetByRole(AriaRole.Textbox, new LocatorGetByRoleOptions { Name = "Name", Exact = true }).PressAsync("Tab");
+        await reception.Page.Locator("#section").GetByRole(AriaRole.Textbox).FillAsync("Ada");
+        await reception.Page.Locator("#section").GetByRole(AriaRole.Textbox).PressAsync("Tab");
         await Expect(reception.Page.Locator("#section-note")).ToHaveTextAsync("");
         Assert.That(reception.ConsoleErrors, Has.Count.EqualTo(1));
 

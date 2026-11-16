@@ -12,20 +12,20 @@ export class Item {
     private readonly endpoint: string;
     private readonly changed: () => void;
     private heldValue: number;
-    private heldActive: boolean;
     private checks = 0;
     private readonly line: HTMLElement;
     private readonly checked: HTMLElement;
     optionalCount?: number;
     optionalScore?: number;
     readonly name: string;
+    active: boolean;
     constructor(start: ItemStart, view: ComponentView, request: RequestValue, endpoint: string, changed: () => void) {
         this.request = request;
         this.endpoint = endpoint;
         this.changed = changed;
         this.name = start.name;
         this.heldValue = start.value;
-        this.heldActive = start.active;
+        this.active = start.active;
         const own = new ComponentView(document.createElement("div"));
         view.element.append(own.element);
         this.line = own.status("Item " + start.name, start.name + ", not acted");
@@ -37,12 +37,11 @@ export class Item {
         if (start.lacksName)
             Reflect.deleteProperty(this, "name");
         if (start.lacksActive)
-            Object.defineProperty(this, "active", { value: undefined, configurable: true });
+            Reflect.deleteProperty(this, "active");
     }
     get value(): number { return this.heldValue; }
     set value(value: number) { this.heldValue = value; this.changed(); }
-    get active(): boolean { return this.heldActive; }
-    deactivate(): void { this.heldActive = false; }
+    deactivate(): void { this.active = false; }
     act(): void { this.line.textContent = this.name + ", acted"; }
     check(): boolean { this.checked.textContent = String(++this.checks); return this.active; }
     settle(): Promise<string> { return textAnswer(this.request, this.endpoint); }

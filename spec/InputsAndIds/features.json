@@ -541,7 +541,7 @@
           "gesture": "Click Load, then type Ada in the slot's input and press Tab.",
           "outcome": "The slot's note stays empty, and the console's one error names the id and both plans with their places.",
           "opposite": "A slot partial whose input binds Phone loads, and typing 0101 there and pressing Tab shows 0101 in its note.",
-          "defect": "The slot's plan starts beside the page's, so its handler runs and the note shows Ada while two live inputs hold one id."
+          "defect": "The slot's plan starts beside the page's while two live inputs hold one id, so its handler listens on the page's input, the first that holds the id, and the console shows no error."
         },
         {
           "for": "X14.8",

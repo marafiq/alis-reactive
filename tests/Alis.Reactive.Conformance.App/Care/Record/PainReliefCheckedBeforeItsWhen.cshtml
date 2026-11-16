@@ -20,15 +20,18 @@
     Html.On(plan, trigger => trigger.CustomEvent(PainReliefs.GiveParacetamol, pipeline =>
     {
         var onCall = pipeline.Component<ConformanceComponent>("care-panel").Check();
+        pipeline.Element("on-call").Text.Set(onCall);
         pipeline.When(relief.Container.Read(m => m.Pain).Lt(4).And(onCall))
             .Then(pipeline => pipeline.Element("relief-given").Text.Set("Paracetamol given"));
     }));
     Html.On(plan, trigger => trigger.CustomEvent(PainReliefs.CallTheDoctor, pipeline =>
     {
         var onCall = pipeline.Component<ConformanceComponent>("care-panel").Check();
+        pipeline.Element("on-call").Text.Set(onCall);
         pipeline.When(relief.Container.Read(m => m.Pain).Gte(4).Or(onCall))
             .Then(pipeline => pipeline.Element("relief-given").Text.Set("Doctor called"));
     }));
 }
+<p>Doctor on call: <span id="on-call"></span></p>
 <p>Relief: <span id="relief-given"></span></p>
 @Html.RenderPlan(plan)

@@ -19,7 +19,7 @@ public sealed class ShortStay
 
     public int Nights { get; set; } = 14;
 
-    public required bool AsksNights { get; init; }
+    public bool AsksNights { get; init; }
 }
 
 public static class ShortStays
