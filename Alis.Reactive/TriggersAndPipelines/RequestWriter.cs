@@ -331,7 +331,10 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
     private IReadOnlyList<string> BusyIds() => _busy == BusyChoice.Page ? [] : _busy == BusyChoice.Targets ? _busyIds : WrittenBySuccess();
 
     private IReadOnlyList<string> WrittenBySuccess()
-        => [.. _success.Do.Select(WrittenObject).OfType<ObjExpression>().Select(written => written.Id).Where(id => !id.StartsWith("$", StringComparison.Ordinal)).Distinct(StringComparer.Ordinal)];
+        => [.. _success.Do.Select(WrittenElement).OfType<string>().Distinct(StringComparer.Ordinal)];
+
+    private static string? WrittenElement(Statement statement)
+        => SlotPlugin.ElementLoadedBy(statement) ?? (WrittenObject(statement) is ObjExpression written && !written.Id.StartsWith("$", StringComparison.Ordinal) ? written.Id : null);
 
     private static Expression? WrittenObject(Statement statement) => statement switch
     {

@@ -48,7 +48,13 @@ public static class RequestSteps
     /// <param name="pipeline">The pipeline of a request's route.</param>
     /// <param name="elementId">The id of the element the HTML is loaded into.</param>
     /// <param name="html">The source of the HTML: the body of a reply read as HTML.</param>
-    public static void Into<TModel>(this Pipeline<TModel> pipeline, string elementId, ITypedSource<Markup> html) => throw new NotImplementedException();
+    public static void Into<TModel>(this Pipeline<TModel> pipeline, string elementId, ITypedSource<Markup> html)
+    {
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (html is null) throw new ArgumentNullException(nameof(html));
+        var writer = pipeline.Writer;
+        writer.Write(SlotPlugin.Loads(writer.Content, elementId, Sources.Of(html)));
+    }
 }
 
 /// <summary>

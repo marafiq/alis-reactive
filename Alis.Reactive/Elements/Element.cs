@@ -22,18 +22,18 @@ public sealed class Element : Component
     /// <summary>Gets the element's text, <c>textContent</c>: a source of it that a step also sets.</summary>
     /// <remarks>
     /// A value that cannot be read shows nothing when it is set. A set over an element that is or holds a slot a
-    /// plan still holds is refused where the view renders when the same plan loads that slot, and stops its
-    /// pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
+    /// plan still holds is refused where the view renders when the same plan loads or unloads that slot, and stops
+    /// its pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
     /// </remarks>
-    public ElementContent Text => new(this, "textContent", "insertAdjacentText", nameof(Text));
+    public ElementContent Text => new(this, "textContent", "insertAdjacentText", nameof(Text), "text");
 
     /// <summary>Gets the element's HTML, <c>innerHTML</c>: a source of it that a step also sets.</summary>
     /// <remarks>
     /// A value that cannot be read shows nothing when it is set. A set over an element that is or holds a slot a
-    /// plan still holds is refused where the view renders when the same plan loads that slot, and stops its
-    /// pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
+    /// plan still holds is refused where the view renders when the same plan loads or unloads that slot, and stops
+    /// its pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
     /// </remarks>
-    public ElementContent Html => new(this, "innerHTML", "insertAdjacentHTML", nameof(Html));
+    public ElementContent Html => new(this, "innerHTML", "insertAdjacentHTML", nameof(Html), "HTML");
 
     /// <summary>Gets the element's classes, <c>classList</c>.</summary>
     public ClassList Classes => LiveObject<ClassList>(name: "classList");
@@ -63,12 +63,14 @@ public sealed partial class ElementContent : ReadOnly<string?>
 
     private readonly string _addsBy;
     private readonly string _declaredBy;
+    private readonly string _contentName;
 
-    internal ElementContent(Element element, string member, string addsBy, string declaredBy)
+    internal ElementContent(Element element, string member, string addsBy, string declaredBy, string contentName)
         : base(element, member, optional: false)
     {
         _addsBy = addsBy;
         _declaredBy = declaredBy;
+        _contentName = contentName;
     }
 
     /// <summary>Sets the content to a text when the step runs.</summary>
@@ -119,7 +121,11 @@ public sealed partial class ElementContent : ReadOnly<string?>
     }
 
     private void Written(Expression value)
-        => Owner.Bound.Writer.Write(new SetStatement([Member], SetMembers.Required, true, Owner.Bound.Target, value));
+    {
+        var bound = Owner.Bound;
+        if (bound.Target is ObjExpression element) bound.Writer.Content.SetsContentOf(element.Id, _contentName);
+        bound.Writer.Write(new SetStatement([Member], SetMembers.Required, true, bound.Target, value));
+    }
 
     private void Added(Expression part)
     {

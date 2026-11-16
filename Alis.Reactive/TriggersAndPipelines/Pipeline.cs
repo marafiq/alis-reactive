@@ -275,7 +275,7 @@ public sealed class Pipeline<TModel>
 
     /// <summary>Unloads what a request loaded into an element: its plans stop, its components leave and the element empties.</summary>
     /// <param name="elementId">The id of the element a request loaded HTML into.</param>
-    public void Unload(string elementId) => throw new NotImplementedException();
+    public void Unload(string elementId) => _writer.Write(SlotPlugin.Unloads(_writer.Content, elementId ?? throw new ArgumentNullException(nameof(elementId))));
 
     /// <summary>Listens to an event of an object the pipeline reaches, such as a component an event's payload hands over, from this step on.</summary>
     /// <remarks>

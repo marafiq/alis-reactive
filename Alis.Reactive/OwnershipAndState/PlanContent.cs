@@ -25,6 +25,8 @@ internal sealed class PlanContent
     private readonly Dictionary<string, (string Listening, string Event, string HeardBy)> _heardPlugins = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, InputBinding> _inputs = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, Container> _containers = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _slots = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _contentSets = new(StringComparer.Ordinal);
     private readonly Func<string, (string Prefix, string Name, string Id)> _nameInput;
     private readonly Func<IServiceProvider> _services;
     private readonly Func<string> _pathBase;
@@ -129,6 +131,20 @@ internal sealed class PlanContent
 
     internal bool HasRendered(string elementId) => _renderedElements.Contains(elementId);
 
+    internal void LoadsOrUnloads(string elementId)
+    {
+        RefuseOnceRendered();
+        if (_contentSets.TryGetValue(elementId, out var content)) throw ContentOfASlot(elementId, content);
+        _slots.Add(elementId);
+    }
+
+    internal void SetsContentOf(string elementId, string content)
+    {
+        RefuseOnceRendered();
+        if (_slots.Contains(elementId)) throw ContentOfASlot(elementId, content);
+        if (!_contentSets.ContainsKey(elementId)) _contentSets.Add(elementId, content);
+    }
+
     internal void BindsInput(string inputId, InputBinding binding)
     {
         RefuseOnceRendered();
@@ -154,6 +170,10 @@ internal sealed class PlanContent
         _rendered = true;
         return new(_planId, _culture, _timeZone, traceOf(_calls), _vendors, _objects, _handlers);
     }
+
+    private static InvalidOperationException ContentOfASlot(string elementId, string content)
+        => new($"The plan sets the {content} of element '{elementId}', a slot this plan loads or unloads, so what the slot loaded would keep running under content it no longer shows. " +
+            $"Empty the slot with Unload(\"{elementId}\"), and write the {content} into an element beside it.");
 
     private void RefuseOnceRendered()
     {

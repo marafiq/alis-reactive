@@ -98,6 +98,22 @@ public sealed class WhenARequestShowsTheBusyIndicator
     }
 
     [Test]
+    public void the_element_its_success_route_loads_holds_it_in_its_place_and_an_element_it_unloads_does_not()
+    {
+        var plan = Rendered(pipeline => pipeline.Get("/beds").OnSuccess(Content.Html, (reply, pipeline) =>
+        {
+            pipeline.Unload("ward");
+            pipeline.Element("beds").Text.Set("Loaded");
+            pipeline.Into("bed-card", reply.Body);
+        }));
+        Assert.That(RequestPage.Send(plan, "busy").GetRawText(), Is.EqualTo(
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"targets"}},{"name":"values","value":{"kind":"list","items":[""" +
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"element"}},{"name":"id","value":{"kind":"lit","value":"beds"}}]},""" +
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"element"}},{"name":"id","value":{"kind":"lit","value":"bed-card"}}]}]}}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
     public void a_request_whose_route_writes_only_inside_a_condition_holds_the_page()
     {
         var plan = Rendered(pipeline => pipeline.Get("/beds").OnSuccess(Content.None, (reply, pipeline) =>

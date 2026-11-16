@@ -51,7 +51,7 @@ public static class CondensedRequests
     /// <param name="elementId">The id of the element the HTML is loaded into.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static GetRequest<TModel, TRequest, Response<TRequest, Markup>> Into<TModel, TRequest>(this GetRequest<TModel, TRequest> request, string elementId)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.Html, (reply, pipeline) => pipeline.Into(elementId, reply.Body));
 
     /// <summary>Sends a native form's submission set as the browser builds it: a GET's in its query, any other request's as multipart fields and files.</summary>
     /// <param name="request">The request's parts.</param>
@@ -268,7 +268,7 @@ public static class CondensedRequests
     /// <param name="elementId">The id of the element the HTML is loaded into.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static OptionsRequest<TModel, TRequest, Response<TRequest, Markup>> Into<TModel, TRequest>(this OptionsRequest<TModel, TRequest> request, string elementId)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.Html, (reply, pipeline) => pipeline.Into(elementId, reply.Body));
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
     /// <remarks>The download takes the name the answer's <c>Content-Disposition</c> gives, its <c>filename*</c> before its <c>filename</c>, and the last segment of the request's path when it gives neither.</remarks>
@@ -290,7 +290,7 @@ public static class CondensedRequests
     /// <param name="elementId">The id of the element the HTML is loaded into.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static PostRequest<TModel, TRequest, Response<TRequest, Markup>> Into<TModel, TRequest>(this PostRequest<TModel, TRequest> request, string elementId)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.Html, (reply, pipeline) => pipeline.Into(elementId, reply.Body));
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
     /// <remarks>The download takes the name the answer's <c>Content-Disposition</c> gives, its <c>filename*</c> before its <c>filename</c>, and the last segment of the request's path when it gives neither.</remarks>
@@ -312,7 +312,7 @@ public static class CondensedRequests
     /// <param name="elementId">The id of the element the HTML is loaded into.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static PutRequest<TModel, TRequest, Response<TRequest, Markup>> Into<TModel, TRequest>(this PutRequest<TModel, TRequest> request, string elementId)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.Html, (reply, pipeline) => pipeline.Into(elementId, reply.Body));
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
     /// <remarks>The download takes the name the answer's <c>Content-Disposition</c> gives, its <c>filename*</c> before its <c>filename</c>, and the last segment of the request's path when it gives neither.</remarks>
@@ -334,7 +334,7 @@ public static class CondensedRequests
     /// <param name="elementId">The id of the element the HTML is loaded into.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static DeleteRequest<TModel, TRequest, Response<TRequest, Markup>> Into<TModel, TRequest>(this DeleteRequest<TModel, TRequest> request, string elementId)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.Html, (reply, pipeline) => pipeline.Into(elementId, reply.Body));
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
     /// <remarks>The download takes the name the answer's <c>Content-Disposition</c> gives, its <c>filename*</c> before its <c>filename</c>, and the last segment of the request's path when it gives neither.</remarks>

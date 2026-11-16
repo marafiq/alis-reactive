@@ -1,8 +1,6 @@
 {
   "M1.F1 M1.X1 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/RoundBell.cshtml",
       "/Care/Record/RoundBoard.cshtml",
@@ -35,8 +33,7 @@
   },
   "M1.F1 X11.6 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/RoomChoice.cshtml",
@@ -220,9 +217,7 @@
     ]
   },
   "M12.F1 X12.10 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/PanelHandover.cshtml",
       "/Care/Record/PanelHandoverCard.cshtml",
@@ -230,9 +225,7 @@
     ]
   },
   "M12.F1 X12.16 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Vendors/ClockCard.cshtml",
       "/Bench/Vendors/ClockTicks.cshtml",
@@ -254,9 +247,7 @@
     ]
   },
   "M12.F1 X17.11 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Vendors/StoreCard.cshtml",
       "/Bench/Vendors/StoreUpdates.cshtml",
@@ -344,9 +335,7 @@
     ]
   },
   "M12.F2 X12.7 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/PanelReopening.cshtml",
       "/Care/Record/ReopenedPanel.cshtml",
@@ -669,8 +658,7 @@
   },
   "M18.F1 M18.X1 1": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Round/DoseStrengths.cshtml",
@@ -1561,8 +1549,7 @@
   "M25.F3 X17.36 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "RenderingAndDelivery"
     ],
     "views": [
       "/Care/Residents/ResidentDirectory.cshtml",
@@ -2194,9 +2181,7 @@
     ]
   },
   "M5.F1 M5.X5 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/HourLog.cshtml",
       "/Care/Record/HourLogEntry.cshtml",
@@ -2205,9 +2190,7 @@
     ]
   },
   "M5.F1 M5.X5 1": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/TurnChart.cshtml",
       "/Care/Record/TurnChartPlan.cshtml",
@@ -2216,9 +2199,7 @@
     ]
   },
   "M5.F1 M5.X5 2": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/MealCard.cshtml",
       "/Care/Record/MealCardMenu.cshtml",
@@ -2235,9 +2216,7 @@
     ]
   },
   "M5.F1 X12.12 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/NightNoteCard.cshtml",
       "/Care/Record/NotesDesk.cshtml",
@@ -2246,9 +2225,7 @@
     ]
   },
   "M5.F1 X12.12 1": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/ShiftTray.cshtml",
       "/Care/Record/ShiftTrayTools.cshtml",
@@ -2256,9 +2233,7 @@
     ]
   },
   "M5.F1 X12.12 2": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/TeamBoard.cshtml",
       "/Care/Record/TeamBoardTools.cshtml",
@@ -2266,9 +2241,7 @@
     ]
   },
   "M5.F1 X12.12 3": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/VisitDesk.cshtml",
       "/Care/Record/VisitDeskTools.cshtml",
@@ -2277,9 +2250,7 @@
     ]
   },
   "M5.F1 X12.12 4": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/NightLog.cshtml",
       "/Care/Record/NightLogEntry.cshtml",
@@ -2378,9 +2349,7 @@
     ]
   },
   "M6.F1 X9.17 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/VisitAdmit.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2527,8 +2496,7 @@
   },
   "M6.F2 X10.11 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/BadgeDesk.cshtml",
@@ -2714,8 +2682,7 @@
   },
   "M7.F2 X14.7 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/Reception.cshtml",
@@ -2745,8 +2712,7 @@
   },
   "M7.F3 X13.10 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/NotePreview.cshtml",
@@ -2768,8 +2734,7 @@
   },
   "M7.F3 X13.6 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/StayExtension.cshtml",
@@ -2787,8 +2752,7 @@
   },
   "M7.F3 X13.8 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/OvernightStay.cshtml",
@@ -2882,8 +2846,7 @@
   },
   "M8.F4 X12.4 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/RoomAdmission.cshtml",
@@ -2893,8 +2856,7 @@
   },
   "M8.F4 X13.3 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Round/RoundDosing.cshtml",
@@ -2904,8 +2866,7 @@
   },
   "M8.F4 X13.5 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/IntakeAndKin.cshtml",
@@ -2933,8 +2894,7 @@
   },
   "M8.F4 X16.17 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/ResidentContact.cshtml",
@@ -2954,8 +2914,7 @@
   },
   "M8.F4 X16.19 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/RoomSave.cshtml",
@@ -2974,8 +2933,7 @@
   },
   "M8.F4 X16.5 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/StateMoveIn.cshtml",
@@ -3003,9 +2961,7 @@
     ]
   },
   "M9.F2 M9.X2 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/StampedNote.cshtml",
       "/Care/Record/StampedNoteBoard.cshtml",
@@ -3014,9 +2970,7 @@
     ]
   },
   "M9.F2 M9.X3 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/StandingNote.cshtml",
       "/Care/Record/StandingNoteBoard.cshtml",
@@ -3025,9 +2979,7 @@
     ]
   },
   "M9.F2 M9.X4 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/Noticeboard.cshtml",
       "/Care/Record/NoticeboardNotice.cshtml",
@@ -3035,9 +2987,7 @@
     ]
   },
   "M9.F2 M9.X5 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/PinBoard.cshtml",
       "/Care/Record/PinBoardBoard.cshtml",
@@ -3046,9 +2996,7 @@
     ]
   },
   "M9.F2 X12.1 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/HallNotices.cshtml",
       "/Care/Record/HallNoticesBoard.cshtml",
@@ -3057,9 +3005,7 @@
     ]
   },
   "M9.F2 X12.11 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/PartialsAndSlots/PassDeskThatSetsItsSlotsText.cshtml",
       "/Refusals/PartialsAndSlots/PassDeskThatWritesBesideItsSlot.cshtml",
@@ -3068,9 +3014,7 @@
     ]
   },
   "M9.F2 X12.14 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/CarePanelCard.cshtml",
       "/Care/Record/CarePanelCardPulse.cshtml",
@@ -3078,9 +3022,7 @@
     ]
   },
   "M9.F2 X12.15 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/RadioWard.cshtml",
       "/Care/Record/RadioWardAdaCard.cshtml",
@@ -3090,9 +3032,7 @@
     ]
   },
   "M9.F2 X12.17 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/ShiftCard.cshtml",
       "/Care/Record/ShiftCardSheet.cshtml",
@@ -3100,9 +3040,7 @@
     ]
   },
   "M9.F2 X12.2 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/FallWatch.cshtml",
       "/Care/Record/FallWatchCard.cshtml",
@@ -3111,8 +3049,7 @@
   },
   "M9.F2 X12.8 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/MoveInResidentStep.cshtml",
@@ -3464,9 +3401,7 @@
     ]
   },
   "cell http.into": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpInto.cshtml",
       "/Bench/Http/HttpIntoCard.cshtml",
@@ -3526,9 +3461,7 @@
     ]
   },
   "cell lane.slot.load": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpIntoCard.cshtml",
       "/Bench/Lanes/LaneSlotLoad.cshtml",
@@ -3536,9 +3469,7 @@
     ]
   },
   "cell lane.slot.unloadListener": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Lanes/LaneListeningCard.cshtml",
       "/Bench/Lanes/LaneSlotUnloadListener.cshtml",
