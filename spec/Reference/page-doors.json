@@ -1589,18 +1589,14 @@
     ]
   },
   "M24.F4 M24.X4 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/VisitSchedule.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M24.F4 M24.X5 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/VisitWeek.cshtml",
       "/Shared/_Layout.cshtml"
@@ -1621,9 +1617,7 @@
     ]
   },
   "M24.F7 M24.X3 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/WingMove.cshtml",
       "/Shared/_Layout.cshtml"

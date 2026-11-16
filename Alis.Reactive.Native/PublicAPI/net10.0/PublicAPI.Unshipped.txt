@@ -116,7 +116,7 @@ Alis.Reactive.Native.NativeComponents.NativeCheckList.Changed.TimeStamp.get -> A
 Alis.Reactive.Native.NativeComponents.NativeCheckList.Changed.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
 Alis.Reactive.Native.NativeComponents.NativeCheckList.Focus() -> void
 Alis.Reactive.Native.NativeComponents.NativeCheckList.NativeCheckList() -> void
-Alis.Reactive.Native.NativeComponents.NativeCheckList.Value.get -> Alis.Reactive.Declarations.Property<string![]!>!
+Alis.Reactive.Native.NativeComponents.NativeCheckList.Value.get -> Alis.Reactive.Declarations.Property<System.Collections.Generic.IReadOnlyList<string!>!>!
 Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder
 Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder.CssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder!
 Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder.Items(System.Collections.Generic.IEnumerable<Alis.Reactive.Native.NativeComponents.CheckListItem!>! items) -> Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder!

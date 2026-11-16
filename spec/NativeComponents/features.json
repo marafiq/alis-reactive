@@ -726,7 +726,7 @@
         },
         {
           "line": "proposed",
-          "text": "NativeCheckList mirrors NativeCheckListElement, the type the Native package's check list code declares, an HTMLDivElement whose value is the checked boxes' values in the boxes' order, a list of text, and whose focus focuses the first box (M24.D2); it declares Value as Property<string[]>, Focus() and Change as Event<Changed>, Changed a class nested in it that mirrors lib.dom's Event, the type HTMLElementEventMap gives change, with Type, IsTrusted and TimeStamp (M24.D1), which each box raises and the list hears.",
+          "text": "NativeCheckList mirrors NativeCheckListElement, the type the Native package's check list code declares, an HTMLDivElement whose value is the checked boxes' values in the boxes' order, a list of text, and whose focus focuses the first box (M24.D2); it declares Value as Property<IReadOnlyList<string>>, Focus() and Change as Event<Changed>, Changed a class nested in it that mirrors lib.dom's Event, the type HTMLElementEventMap gives change, with Type, IsTrusted and TimeStamp (M24.D1), which each box raises and the list hears.",
           "doors": [
             "M24.N4",
             "N17.2",

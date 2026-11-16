@@ -53,7 +53,7 @@ Each name is gate 2's; each door is the capability it carries.
   `Change` as `Event<Changed>`, `Changed` nested in it and mirroring lib.dom's `Event`, an input whose `Checked`, committed by `Change`, a form sends (M7.N3). The render helpers
   `field.NativeCheckBox()` and `field.NativeCheckBox(build => ..)` over a member of bool render MVC's `CheckBoxFor`.
 - `M24.N4` kept: `NativeCheckList`, mirroring `NativeCheckListElement`, the type the Native package's check list code
-  declares (M24.D2): `Value` as `Property<string[]>`, `Focus()` and `Change` as `Event<Changed>`, `Changed` nested in it and mirroring lib.dom's `Event`, an
+  declares (M24.D2): `Value` as `Property<IReadOnlyList<string>>`, `Focus()` and `Change` as `Event<Changed>`, `Changed` nested in it and mirroring lib.dom's `Event`, an
   input. The render helpers `field.NativeCheckList()` and `field.NativeCheckList(build => ..)` take `Items(IEnumerable<CheckListItem>)`,
   the three `Option` overloads, `CssClass` and `OptionCssClass`; `CheckListItem` is the check list's own option, and
   main's `Items(IEnumerable<RadioButtonItem>)`, which takes the radio group's type, is renamed to it.

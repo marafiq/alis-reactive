@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.InputsAndIds;
 
@@ -11,10 +12,11 @@ namespace Alis.Reactive.Native.NativeComponents;
 /// of <see cref="Value"/> checks exactly the boxes whose values it holds, a write of nothing checks none, and a
 /// write raises no <see cref="Change"/>.
 /// </remarks>
+[Mirrors("NativeComponents/NativeCheckList/native-check-list", "NativeCheckListElement")]
 public sealed class NativeCheckList : NativeComponent, IInputComponent
 {
     /// <summary>Gets the checked boxes' values, in the boxes' order.</summary>
-    public Property<string[]> Value => Property<string[]>();
+    public Property<IReadOnlyList<string>> Value => Property<IReadOnlyList<string>>();
 
     /// <summary>Gets the event raised when a person checks or unchecks a box of the list.</summary>
     public Event<Changed> Change => Event<Changed>();
