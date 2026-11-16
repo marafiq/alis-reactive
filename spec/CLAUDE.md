@@ -1777,6 +1777,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   left out. The net48 table is CLDR release-49's, pinned by its SHA-256 and written again by `scripts/check.sh`,
   and README.md carries the Unicode License V3 notice. M18.X1's first promise runs under net10 and the twin, where
   section 2.9 of spec/REWRITE.md places it. The owner can overrule it.
+- The lead, 2026-11-16, on Rows' members, decision (2) of the line above, from a Fable designer's design read at the
+  source; N17.12 and D17.15 state them. The core writes an action's whole handler, one call of the helper's plugin
+  with the entries and one listen on what it returns, and the helper names three members by lambda, so no helper
+  writes another step there or leaves the listen out. `RowEntry` keeps D17.15's word. A link's address writes the
+  closed set of forms D17.15 names, since a date, an instant and a fraction need what the row alone does not hold. The
+  busy target of a component a payload holds is U18's, so U24 changes no line of the core.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

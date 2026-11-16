@@ -54,6 +54,7 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
         _parts = parts;
         _method = method;
         _argument = writer.NextBinding("argument");
+        RequestScopes.Sends(writer, _argument.Name, method, parts);
         _reply = writer.RequestReply();
         _enteredAfterAwait = writer.PathAwaited;
         _defaults = writer.Content.Services.GetRequiredService<RequestDefaults>();
@@ -368,6 +369,10 @@ internal static class RequestScopes
 
     internal static bool SentByADefault(BlockWriter writer) => Of(writer).DefaultDepth > 0;
 
+    internal static void Sends(BlockWriter writer, string argument, RequestMethod method, RequestPartsWriter parts) => Of(writer).Sent.Add(argument, (method, parts));
+
+    internal static (RequestMethod Method, RequestPartsWriter Parts) SentAs(BlockWriter writer, string argument) => Of(writer).Sent[argument];
+
     internal static TWritten InDefaults<TWritten>(BlockWriter writer, Func<TWritten> write)
     {
         var scope = Of(writer);
@@ -436,6 +441,8 @@ internal static class RequestScopes
         internal int DefaultDepth { get; set; }
 
         internal Stack<OpenRoute> Routes { get; } = new();
+
+        internal Dictionary<string, (RequestMethod Method, RequestPartsWriter Parts)> Sent { get; } = new(StringComparer.Ordinal);
     }
 
     private sealed class OpenRoute(RefExpression reply, string? containerId)

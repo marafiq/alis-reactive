@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.Json;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
@@ -18,7 +19,7 @@ internal sealed class PlanContent
     private readonly TimeZone _timeZone;
     private readonly SortedDictionary<string, Vendor> _vendors = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, Locator> _objects = new(StringComparer.Ordinal);
-    private readonly List<Handler> _handlers = [];
+    private readonly List<Func<Handler>> _handlers = [];
     private readonly List<(string File, int Line)> _calls = [];
     private readonly Dictionary<string, string> _vendorDefinitions = new(StringComparer.Ordinal);
     private readonly HashSet<string> _renderedElements = new(StringComparer.Ordinal);
@@ -124,9 +125,15 @@ internal sealed class PlanContent
         RefuseOnceRendered();
         if (_objects.TryGetValue(objectId, out var first) && first is ElementLocator previous && locator is ElementLocator next && previous.Vendor != next.Vendor)
             throw new InvalidOperationException($"Element '{objectId}' is named as a component of vendor '{previous.Vendor}' and as one of vendor '{next.Vendor}', but an element holds one component: name it by the declaration of the component its view renders.");
-        if (rendered && !_renderedElements.Add(objectId))
-            throw new InvalidOperationException($"Element '{objectId}' renders a second time in this plan: render each component once.");
+        if (rendered) RendersElement(objectId);
         _objects[objectId] = locator;
+    }
+
+    internal void RendersElement(string elementId)
+    {
+        RefuseOnceRendered();
+        if (!_renderedElements.Add(elementId))
+            throw new InvalidOperationException($"Element '{elementId}' renders a second time in this plan: render each component once.");
     }
 
     internal bool HasRendered(string elementId) => _renderedElements.Contains(elementId);
@@ -152,7 +159,9 @@ internal sealed class PlanContent
         _inputs[inputId] = binding;
     }
 
-    internal void Handles(Handler handler, string callerFile, int callerLine)
+    internal void Handles(Handler handler, string callerFile, int callerLine) => HandlesWhenRendered(() => handler, callerFile, callerLine);
+
+    internal void HandlesWhenRendered(Func<Handler> handler, string callerFile, int callerLine)
     {
         RefuseOnceRendered();
         _handlers.Add(handler);
@@ -168,7 +177,7 @@ internal sealed class PlanContent
         }
 
         _rendered = true;
-        return new(_planId, _culture, _timeZone, traceOf(_calls), _vendors, _objects, _handlers);
+        return new(_planId, _culture, _timeZone, traceOf(_calls), _vendors, _objects, _handlers.Select(handler => handler()).ToArray());
     }
 
     private static InvalidOperationException ContentOfASlot(string elementId, string content)

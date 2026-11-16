@@ -55,7 +55,7 @@ public sealed partial class ReactivePlan<TModel>
     /// <param name="rowsId">The id the list's row controls are numbered under.</param>
     /// <typeparam name="TRow">The type of a row.</typeparam>
     /// <returns>The rows.</returns>
-    public Rows<TModel, TRow> Rows<TRow>(string rowsId) => throw new NotImplementedException();
+    public Rows<TModel, TRow> Rows<TRow>(string rowsId) => new(Writer, rowsId ?? throw new ArgumentNullException(nameof(rowsId)));
 }
 
 /// <summary>
@@ -270,17 +270,5 @@ public sealed class ReactiveComponent<TComponent, TModel>
         var steps = _writer.Handler(() => pipeline(JsObject.Reaching<TArgs>(new Received(_writer)), new Pipeline<TModel>(_writer)));
         _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, policy.Grammar, steps), callerFile, callerLine);
         return this;
-    }
-}
-
-/// <summary>
-/// The rows of a grid-like list a view renders, on which a render helper declares its row actions.
-/// </summary>
-/// <typeparam name="TModel">The model of the view that renders the list.</typeparam>
-/// <typeparam name="TRow">The type of a row.</typeparam>
-public sealed class Rows<TModel, TRow>
-{
-    internal Rows()
-    {
     }
 }

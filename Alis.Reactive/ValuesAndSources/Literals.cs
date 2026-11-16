@@ -19,6 +19,7 @@ internal static class Literals
     private const string PastTheDigits = "a decimal of more than 15 significant digits";
 
     private static readonly ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions> NonFiniteNamed = new();
+    private static readonly ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions> LiveNamingNonFinite = new();
 
     internal static LitExpression Text(string? text) => new(JsonSerializer.SerializeToElement(text));
 
@@ -53,6 +54,17 @@ internal static class Literals
         var written = JsonSerializer.SerializeToElement(value, typeof(TValue), NonFiniteNamed.GetValue(live, NamingNonFinite));
         RefuseWithin(written, declared, false, member);
     }
+
+    internal static JsonElement Kept<TValue>(TValue value, JsonSerializerOptions live, string member, Func<JsonElement, JsonElement> cut)
+    {
+        RefuseWhereJavaScriptReadsAnother(value, member);
+        var checkedForm = JsonSerializer.SerializeToElement(value, typeof(TValue), NonFiniteNamed.GetValue(live, NamingNonFinite));
+        RefuseWithin(cut(checkedForm), live.GetTypeInfo(typeof(TValue)), false, member);
+        return cut(JsonSerializer.SerializeToElement(value, typeof(TValue), LiveWithNamedNonFinite(live)));
+    }
+
+    internal static JsonSerializerOptions LiveWithNamedNonFinite(JsonSerializerOptions live)
+        => LiveNamingNonFinite.GetValue(live, options => new(options) { NumberHandling = options.NumberHandling | JsonNumberHandling.AllowNamedFloatingPointLiterals });
 
     private static void RefuseWithin(JsonElement written, JsonTypeInfo declared, bool writtenByItsOwn, string path)
     {

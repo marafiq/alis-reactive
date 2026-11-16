@@ -4494,6 +4494,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     its payload's `Row`. The entries are one literal at the plan's end (D14.7), so
     the plan grows by one entry per control and holds no member the block does not read. The handler is written once
     per action, where both lines write a whole plan per link.
+  - Of each path the block reads past the payload's row member, an entry holds each step's member and the names its
+    `requires` lists, so a read stops nowhere it would not stop on the whole row; a row the block passes whole is held
+    whole, and a row it reads nothing of is `{}`.
   - The action's handler starts on load (D11.6), calls its helper's plugin with the entries, and listens to the one
     object it returns (D12.8): one listen per action, released with its plan's owner, so rows in a slot leave with
     it. Its policy is the handler's across its rows (D11.7): `overlap` by default, `replace` so the row clicked last
@@ -4504,6 +4507,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     D9.23), so a new tab, a middle click or a copied link opens what the click loads. An unmodified primary click
     raises the action and prevents the navigation; a modified or middle click stays the browser's. What another
     script did with the click is not read (`defaultPrevented`), since the runtime infers no intent from the page.
+  - A link's address writes a text, a boolean, a whole number, an enum by its name and a written value, each as the
+    request writes it. A date, an instant, a fraction, flags or a list in its route or query is refused where the
+    action is declared, the cure a button or the value as text the view formats.
   - Native's browser code, the plugin `native-row-actions`, finds each control by `getElementById` and raises
     `activated` with its entry's row and its element. The core reads no data attribute and walks no DOM.
   - Compiler rules: a row of another type does not compile (`RowOfAnotherType` in `spec/api/refused.sh`), nor a render
@@ -4566,7 +4572,13 @@ plans (Q19).
 - `N17.12` new: `plan.Rows<TRow>(rowsId)` and `Rows<TModel, TRow>` in the core; `RowActivated<TRow>`, `RowAction<TModel,
   TRow>.Render(row, text)`, `NativeActionButton(action)` and `NativeActionLink(action)` in Alis.Reactive.Native, with
   the plugin `native-row-actions` (D17.15). They replace main's `NativeActionLink` with its serializer and id generator,
-  and the redesign's `NativeActionLink`, `NativeActionLinkRequest` and `NativeActionLinkConfirm`; their forms go to gate 2.
+    and the redesign's `NativeActionLink`, `NativeActionLinkRequest` and `NativeActionLinkConfirm`. The core's members,
+  the lead's form: `Rows<TModel, TRow>.Declare`, for a button, and `DeclareLink`, for a link, each take the helper's
+  plugin method that receives the entries, the event of the object it returns, the payload's member that holds the
+  row, the policy and the block, and return what each row renders through: `RowEntries<TRow>.Add(row)`, the control's
+  id, and `RowLinkEntries<TRow>.Add(row)`, a `RowLink` holding the id and the address. The plugin receives each entry
+  as a `RowEntry<TRow>`, its id and its row. Native's four doors keep their declared forms and take the caller's file
+  and line, as `Reactive` does, for the handler's source (D20.7).
 - `N17.11` new: `Plugin(string name, EventListening events)` and `EventListening` (`EventTarget`, `CallbackProperties`,
   `Methods`, `ReturnedUnsubscriber`; `PluginEvents` until POC 14d gave it a second holder, `EventedObject`), `p.Plugin<TPlugin>()`, `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`
   (D17.14); their forms go to gate 2. They replace the redesign's `ReactivePlan.RegisterPlugin<TPlugin>()`, so a plugin

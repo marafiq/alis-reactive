@@ -1651,8 +1651,7 @@
   },
   "M25.F3 X17.36 0": {
     "modules": [
-      "NativeAppLevelObjects",
-      "RenderingAndDelivery"
+      "NativeAppLevelObjects"
     ],
     "views": [
       "/Care/Residents/ResidentDirectory.cshtml",

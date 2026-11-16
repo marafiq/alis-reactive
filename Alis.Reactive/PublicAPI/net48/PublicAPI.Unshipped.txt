@@ -177,7 +177,19 @@ Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>.Dispose() -> void
 Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>.Form.get -> Alis.Reactive.RequestsAndResponses.RequestForm<TModel>!
 Alis.Reactive.RenderingAndDelivery.RequestServices
 Alis.Reactive.RenderingAndDelivery.RequestTimeZone
+Alis.Reactive.RenderingAndDelivery.RowEntries<TRow>
+Alis.Reactive.RenderingAndDelivery.RowEntries<TRow>.Add(TRow row) -> string!
+Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>
+Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>.Id.get -> string!
+Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>.Row.get -> TRow
+Alis.Reactive.RenderingAndDelivery.RowLink
+Alis.Reactive.RenderingAndDelivery.RowLink.Address.get -> string!
+Alis.Reactive.RenderingAndDelivery.RowLink.Id.get -> string!
+Alis.Reactive.RenderingAndDelivery.RowLinkEntries<TRow>
+Alis.Reactive.RenderingAndDelivery.RowLinkEntries<TRow>.Add(TRow row) -> Alis.Reactive.RenderingAndDelivery.RowLink!
 Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>
+Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>.Declare<TPlugin, TObject, TArgs>(System.Func<TPlugin!, Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>!>!>!, TObject!>! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Func<TArgs!, Alis.Reactive.Declarations.ReadOnly<TRow>!>! row, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.RowEntries<TRow>!
+Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>.DeclareLink<TPlugin, TObject, TArgs>(System.Func<TPlugin!, Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>!>!>!, TObject!>! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Func<TArgs!, Alis.Reactive.Declarations.ReadOnly<TRow>!>! row, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.RowLinkEntries<TRow>!
 Alis.Reactive.RenderingAndDelivery.TracingServices
 Alis.Reactive.RenderingAndDelivery.ValidateAntiForgeryHeaderAttribute
 Alis.Reactive.RenderingAndDelivery.ValidateAntiForgeryHeaderAttribute.OnAuthorization(System.Web.Mvc.AuthorizationContext! filterContext) -> void

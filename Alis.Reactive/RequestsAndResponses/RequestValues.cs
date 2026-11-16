@@ -17,6 +17,12 @@ internal static class RequestValues
 {
     internal static (Expression Value, WireForm Form) Literal<TValue>(TValue value, BlockWriter writer, string member)
     {
+        var (held, form) = LiteralHeld(value, writer, member);
+        return (Held(held), form);
+    }
+
+    internal static (Expression Held, WireForm Form) LiteralHeld<TValue>(TValue value, BlockWriter writer, string member)
+    {
         var type = typeof(TValue);
         var contract = writer.Content.Json.LiveForm.GetTypeInfo(type);
         if (contract.IsList(out var item))
@@ -25,10 +31,10 @@ internal static class RequestValues
             var held = value is IEnumerable list
                 ? new ListExpression(list.Cast<object?>().Select(entry => LiteralValue(entry, item.Type, writer, member)).ToArray())
                 : (Expression)ContractRecord<ValueRead>.Literal<string?>(null);
-            return (Held(held), new ListWireForm(itemForm, ItemAbsence(item.Type)));
+            return (held, new ListWireForm(itemForm, ItemAbsence(item.Type)));
         }
 
-        return (Held(LiteralValue(value, type, writer, member)), LiteralForm(type));
+        return (LiteralValue(value, type, writer, member), LiteralForm(type));
     }
 
     internal static (Expression Value, WireForm Form, RefExpression Captured) Source<TValue>(ITypedSource<TValue> source, BlockWriter writer, string member, Action<Statement> capture)

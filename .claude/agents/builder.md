@@ -34,6 +34,8 @@ names. Read these whole, before anything else:
 - Write only inside your worktree. Run no git command but `git status`, `git diff`, `git show`, `git grep` and
   `git add -N` into a private index, a file in your worktree's obj folder that git's index variable names, for the
   rules test; never commit, stash, push or reset, and never touch another worktree.
+- In zsh, git grep takes its options before the pattern, since one after it is read as a revision, and reads no \b;
+  a separator line is quoted, echo "----", since zsh expands an unquoted word that starts with =.
 - Read no secret and no file that holds a credential, a machine's NuGet or npm configuration among them; list no user
   secrets.
 - Run no command your brief does not name, and no `scripts/check.sh`, TLC, package install or restore unless it

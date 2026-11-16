@@ -21,6 +21,7 @@ internal sealed class RequestPartsWriter
     private readonly BlockWriter _writer;
     private readonly RequestUrlParts _url;
     private readonly List<Expression> _query = [];
+    private readonly List<SentMember> _sent = [];
     private readonly List<Statement> _captures = [];
     private readonly List<Expression> _headers = [];
     private readonly Dictionary<string, Expression> _path = new(StringComparer.OrdinalIgnoreCase);
@@ -63,6 +64,18 @@ internal sealed class RequestPartsWriter
 
     internal bool SendsAContainer => ContainerId is not null;
 
+    internal string Url => _url.Url;
+
+    internal IReadOnlyList<RequestUrlParts.Part> UrlParts => _url.Parts;
+
+    internal string OwnQuery => _url.Query;
+
+    internal IReadOnlyList<SentMember> SentMembers => _sent;
+
+    internal bool SendsAHeader => _headers.Count > 0;
+
+    internal bool SendsAnInput => _individual.Count > 0;
+
     internal int Sends(int stage, string containerId, string model) => Contains(stage, containerId, ModelPlugin.Sends(_writer.Content, containerId, model));
 
     internal int Submits(int stage, string formId, string model) => Contains(stage, formId, ModelPlugin.Submits(_writer.Content, formId, model));
@@ -89,8 +102,8 @@ internal sealed class RequestPartsWriter
     {
         if (SentByAnInput(member)) return Skipped(stage);
         Open(stage);
-        var sent = RequestValues.Literal(value, _writer, member.ToString());
-        Add(member, (sent.Value, sent.Form), path);
+        var (held, form) = RequestValues.LiteralHeld(value, _writer, member.ToString());
+        Add(member, (RequestValues.Held(held), form), path, held);
         if (path) _pathJson.Add(() => (JsonNames(member), JsonBodyValues.Literal(value, _writer, member)));
         return _stage;
     }
@@ -100,7 +113,7 @@ internal sealed class RequestPartsWriter
         if (SentByAnInput(member)) return Skipped(stage);
         Open(stage);
         var sent = RequestValues.Source(value, _writer, member.ToString(), _captures.Add);
-        Add(member, (sent.Value, sent.Form), path);
+        Add(member, (sent.Value, sent.Form), path, Sources.Of(value));
         if (path) _pathJson.Add(() => (JsonNames(member), JsonBodyValues.Captured<TValue>(sent.Captured, Sources.FormOf(value), _writer, member)));
         return _stage;
     }
@@ -365,9 +378,10 @@ internal sealed class RequestPartsWriter
         return _stage;
     }
 
-    private void Add(LambdaExpression member, (Expression Value, WireForm Form) sent, bool path)
+    private void Add(LambdaExpression member, (Expression Value, WireForm Form) sent, bool path, Expression read)
     {
         var named = Named(member);
+        var sentMember = new SentMember(member.ToString(), named.Name, path, member.ReturnType, sent.Form, read);
         if (path)
         {
             if (!named.TopLevel || !_url.Has(named.Name))
@@ -382,11 +396,13 @@ internal sealed class RequestPartsWriter
             _pathFields.Add(pathField);
             Checks(pathField, member, sent.Value);
             var pathJsonAt = _pathJson.Count;
+            _sent.Add(sentMember);
             _setMembers[named.Name] = () =>
             {
                 _path.Remove(named.Name);
                 _pathFields.Remove(pathField);
                 if (pathJsonAt < _pathJson.Count) _pathJson.RemoveAt(pathJsonAt);
+                _sent.Remove(sentMember);
             };
             return;
         }
@@ -394,7 +410,12 @@ internal sealed class RequestPartsWriter
         var queried = FieldRecord(member, named, sent);
         _query.Add(queried);
         Checks(queried, member, sent.Value);
-        _setMembers[named.Name] = () => _query.Remove(queried);
+        _sent.Add(sentMember);
+        _setMembers[named.Name] = () =>
+        {
+            _query.Remove(queried);
+            _sent.Remove(sentMember);
+        };
     }
 
     private void AddField(LambdaExpression member, (Expression Value, WireForm Form) sent)
@@ -467,6 +488,23 @@ internal sealed class RequestPartsWriter
         if (stage != _stage) throw new InvalidOperationException("A request's parts stage is already used; write its parts in one chain.");
         _stage++;
     }
+}
+
+internal sealed class SentMember(string written, string name, bool inPath, Type valueType, WireForm form, Expression read)
+{
+    internal string Written { get; } = written;
+
+    internal string Name { get; } = name;
+
+    internal bool InPath { get; } = inPath;
+
+    internal Type ValueType { get; } = valueType;
+
+    internal WireForm Form { get; } = form;
+
+    internal WhenNothing WhenNothing => RequestValues.Absence(ValueType);
+
+    internal Expression Read { get; } = read;
 }
 
 internal sealed class SendDefaults(IReadOnlyList<(string Name, string Value)> headers, RecordExpression retry, RecordExpression busy, ListExpression contracts)

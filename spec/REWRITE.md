@@ -1307,6 +1307,10 @@ Features: M8.F1, M8.F2, M8.F3, M8.F4
 ### U18. Requests and responses
 Features: M6.F1, M6.F2
 
+D10.21's busy target of a component a payload holds, a row action's control among them, read when the request starts,
+is written here by the request writer and proven by a module test of the plan it writes; X17.38's browser test stays
+U24's, which builds Native's row actions on the core as this unit leaves it.
+
 The request door's XML doc names MVC's binding of a parameter prefix and of a parameter named like its type's member (C25).
 
 `Pass<TDeclared, TSource>` writes its source at `TDeclared` (DESIGN's argument bullet under D17.5). Until the app's form lands here,
