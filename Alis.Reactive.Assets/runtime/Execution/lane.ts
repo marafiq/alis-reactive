@@ -21,7 +21,6 @@ export class Lane {
 
   raise(context: Raised): void {
     if (this.#disposed) return;
-    this.#inFlight = this.#inFlight.filter((run) => run.status !== "ended");
     switch (this.#policy) {
       case "overlap":
         this.#begins(context);
@@ -65,6 +64,9 @@ export class Lane {
   #begins(context: Raised): void {
     const run = Run.ofAHandler(this.#block, { ...context, owner: this.#owner });
     this.#inFlight.push(run);
+    run.afterItEnds(() => {
+      this.#inFlight = this.#inFlight.filter((inFlight) => inFlight !== run);
+    });
     run.begin();
   }
 }

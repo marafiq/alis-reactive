@@ -109,6 +109,10 @@ export class Run {
     this.#afterItReturns.push(returned);
   }
 
+  afterItEnds(ended: () => void): void {
+    this.#afterItEnds.push(ended);
+  }
+
   ofALayer(): AbortSignal {
     const layer = new AbortController();
     if (this.#cut === "dispose") layer.abort();

@@ -239,3 +239,38 @@ describe("when a block runs Parallel, its join keeps Lanes.tla's invariants", ()
     expect(chart.lines).toStrictEqual(["residents shown", "staff shown", "allergies shown", "Board ready"]);
   });
 });
+
+describe("when a run ends, what its raise handed is the page's to collect, by Ownership.tla's Collect", () => {
+  test("an ended run leaves its lane, and a run in flight keeps what its raise handed", async () => {
+    const collect = collector();
+    const endedLane = new Lane("overlap", [charts(text("ran"))], aRoundsOwner);
+    const waitingLane = new Lane("overlap", aRound, aRoundsOwner);
+    const ended = handedTo(endedLane);
+    const waiting = handedTo(waitingLane);
+
+    await everyPromiseJobRan();
+    collect();
+
+    expect(ended.deref()).toBeUndefined();
+    expect(waiting.deref()).toBeDefined();
+    endedLane.dispose();
+    waitingLane.dispose();
+  });
+});
+
+function handedTo(lane: Lane): WeakRef<object> {
+  const peer = { name: "the first peer" };
+  lane.raise(raisedWith({ chart: new Chart(), peer, settle: gate().held, starts: "start", ends: "end" }));
+  return new WeakRef(peer);
+}
+
+function collector(): () => void {
+  const host = Reflect.get(globalThis, "process") as {
+    getBuiltinModule(name: "v8"): { setFlagsFromString(flags: string): void };
+    getBuiltinModule(name: "vm"): { runInNewContext(source: string): unknown };
+  };
+  host.getBuiltinModule("v8").setFlagsFromString("--expose-gc");
+  const collect = host.getBuiltinModule("vm").runInNewContext("gc");
+  if (typeof collect !== "function") throw new Error("V8 did not expose collection.");
+  return () => { Reflect.apply(collect, undefined, []); };
+}
