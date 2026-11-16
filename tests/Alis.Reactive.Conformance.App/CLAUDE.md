@@ -12,7 +12,9 @@ its views.
   sets the JSON options that definition gives it: net10's camel-case members and enum names, and for each of
   numbersAsText, dateConverter, snakeCase, pascalCase and enumsAsNumbers, those options with the one change its
   definition names; jsonContract's are net10's that ignore a member holding its default and respect required
-  constructor parameters, and its resolver lands with the page that reads an admission's pharmacy. An app started under no host, or under one it does not serve, stops and names the hosts it serves.
+  constructor parameters, and its resolver lands with the page that reads an admission's pharmacy. Every host's
+  startup names the flags enums its pages read, as net10's definition names them, in `AppHost.cs`: the conformance
+  library's `CareDays` and the care rota's `CareDays` and `RotaDays`. An app started under no host, or under one it does not serve, stops and names the hosts it serves.
   The harness passes the host a fixture runs under, `scripts/run.sh` passes net10, and the page sweep sets it. What
   else a host's definition names lands with the door or the page that needs it.
 - A request names the culture the app binds and renders it under in its query "culture": "en-US", "de-DE",
@@ -77,7 +79,7 @@ its views.
   screen's own layout, `Care/Record/_ScriptedLayout.cshtml`, which links the scripts the page names before the
   framework's: the bench's
   sits on the same row of the table, so each keeps its own. `Bench/Validation/` holds the validation cells: their
-  forms, their validators (`Bench/Validation/ValidationRules.cs`, not registered until U17 builds the startup call;
+  forms, their validators (`Bench/Validation/ValidationRules.cs`, not registered until the request's check reads them, D16.2;
   a request names its validator by `Validate<TValidator>()`) and the form endpoints, which answer what they bound;
   a page groups each field it checks in a fieldset or a region that names it, the scope a test reads its message
   in.

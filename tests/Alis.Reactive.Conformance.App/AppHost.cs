@@ -61,6 +61,9 @@ internal static class AppHost
         }
     }
 
+    internal static void AddValidation(IServiceCollection services)
+        => services.AddReactiveFluentValidation(validators => validators.Flags<Components.CareDays>().Flags<Care.CareDays>().Flags<Care.RotaDays>());
+
     private static void WriteEnumNames(JsonSerializerOptions json) => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 
     private sealed class DayFirstDates : JsonConverter<DateTime>
