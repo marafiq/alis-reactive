@@ -1,4 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.ModuleTests.Validation;
@@ -217,4 +222,83 @@ public sealed class CountedZerosRules : ReactiveValidator<DoseCard>
 public sealed class EmptyRoundsRules : ReactiveValidator<DoseCard>
 {
     public EmptyRoundsRules() => RuleFor(card => card.Rounds).NotEmpty();
+}
+
+public sealed class MedicationRound
+{
+    public decimal Least { get; set; }
+    public List<decimal> Amounts { get; set; } = [];
+}
+
+public sealed class MedicationRoundRules : ReactiveValidator<MedicationRound>
+{
+    public MedicationRoundRules() => RuleForEach(round => round.Amounts).GreaterThanOrEqualTo(round => round.Least).WithMessage("Give at least the least dose.");
+}
+
+public sealed class OpenMedicationRound
+{
+    public decimal? Least { get; set; }
+    public List<decimal> Amounts { get; set; } = [];
+}
+
+public sealed class OpenMedicationRoundRules : ReactiveValidator<OpenMedicationRound>
+{
+    public OpenMedicationRoundRules() => RuleForEach(round => round.Amounts).GreaterThanOrEqualTo(round => round.Least).WithMessage("Give at least the least dose.");
+}
+
+public sealed class ChartedRound
+{
+    public decimal Least { get; set; }
+
+    [JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
+    public List<decimal> Amounts { get; set; } = [];
+}
+
+public sealed class ChartedRoundRules : ReactiveValidator<ChartedRound>
+{
+    public ChartedRoundRules() => RuleForEach(round => round.Amounts).GreaterThanOrEqualTo(round => round.Least).WithMessage("Give at least the least dose.");
+}
+
+public sealed class SealedRound
+{
+    public decimal? Least { get; set; }
+
+    [JsonConverter(typeof(AmountsText))]
+    public List<decimal> Amounts { get; set; } = [];
+}
+
+public sealed class SealedRoundRules : ReactiveValidator<SealedRound>
+{
+    public SealedRoundRules() => RuleForEach(round => round.Amounts).GreaterThanOrEqualTo(round => round.Least).WithMessage("Give at least the least dose.");
+}
+
+public sealed class AmountsText : JsonConverter<List<decimal>>
+{
+    public override List<decimal> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => [.. (reader.GetString() ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(amount => decimal.Parse(amount, CultureInfo.InvariantCulture))];
+
+    public override void Write(Utf8JsonWriter writer, List<decimal> value, JsonSerializerOptions options)
+        => writer.WriteStringValue(string.Join(",", value.Select(amount => amount.ToString(CultureInfo.InvariantCulture))));
+}
+
+public sealed class Visit
+{
+    public DateTime At { get; set; }
+}
+
+public sealed class VisitRules : ReactiveValidator<Visit>
+{
+    public VisitRules() => RuleFor(v => v.At).GreaterThan(new DateTime(2026, 11, 1)).WithMessage("Book a visit after November 1.");
+}
+
+public sealed class ArrivedVisitRules : ReactiveValidator<Visit>
+{
+    public ArrivedVisitRules() => RuleFor(v => v.At).NotEmpty().WithMessage("Give the visit's day.");
+}
+
+public sealed class DayText : JsonConverter<DateTime>
+{
+    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => DateTime.ParseExact(reader.GetString() ?? "01.01.0001", "dd.MM.yyyy", CultureInfo.InvariantCulture);
+
+    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options) => writer.WriteStringValue(value.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture));
 }

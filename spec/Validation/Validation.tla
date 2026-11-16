@@ -5,38 +5,70 @@ CONSTANT Mutant
 
 Mutants == {"none", "ConditionReadsNothing", "ObjectStartFromModel", "NullHolderReadsNothing", "ChildRulesOverNull",
             "PopulateIgnored", "EmptyTextStaysText", "ReadsUnsentInputs", "RunsEveryRegistration", "TypedTextLeftOut",
-            "FailureUnderAnotherName"}
+            "FailureUnderAnotherName", "PeerReadFromTheItem"}
 
 ASSUME Mutant \in Mutants
 
 Inputs == {"absent", "x", "empty"}
 
+Checks == {"item"}
+
+ItemValues == {"none", "low", "high"}
+
 VARIABLES host, format, handling, sendsForm, nInput, nBeside, nStart,
           leadStart, leadStartName, leadTypeName, leadPhoneInput, leadNameInput,
-          itemsStart, itemTypeName, row, rowName, countText, otherRegistered
+          itemsStart, itemTypeName, row, rowName, countText, otherRegistered,
+          plane, check, typed, start, peer
 
 vars == <<host, format, handling, sendsForm, nInput, nBeside, nStart, leadStart, leadStartName, leadTypeName,
-          leadPhoneInput, leadNameInput, itemsStart, itemTypeName, row, rowName, countText, otherRegistered>>
+          leadPhoneInput, leadNameInput, itemsStart, itemTypeName, row, rowName, countText, otherRegistered,
+          plane, check, typed, start, peer>>
 
 Init ==
-    /\ host \in {"net10", "net48"}
     /\ format \in {"form", "json"}
-    /\ handling \in {"replace", "populate"}
     /\ sendsForm \in BOOLEAN
-    /\ nInput \in Inputs
-    /\ nBeside \in BOOLEAN
-    /\ nStart \in {"x", "none"}
-    /\ leadStart \in {"object", "null"}
-    /\ leadStartName \in {"x", "none"}
-    /\ leadTypeName \in {"x", "none"}
-    /\ leadPhoneInput \in BOOLEAN
-    /\ leadNameInput \in Inputs
-    /\ itemsStart \in {"empty", "seeded"}
-    /\ itemTypeName \in {"x", "none"}
-    /\ row \in BOOLEAN
-    /\ rowName \in Inputs
-    /\ countText \in {"5", "12a"}
-    /\ otherRegistered \in BOOLEAN
+    /\ \/ /\ plane = "binding"
+          /\ host \in {"net10", "net48"}
+          /\ handling \in {"replace", "populate"}
+          /\ nInput \in Inputs
+          /\ nBeside \in BOOLEAN
+          /\ nStart \in {"x", "none"}
+          /\ leadStart \in {"object", "null"}
+          /\ leadStartName \in {"x", "none"}
+          /\ leadTypeName \in {"x", "none"}
+          /\ leadPhoneInput \in BOOLEAN
+          /\ leadNameInput \in Inputs
+          /\ itemsStart \in {"empty", "seeded"}
+          /\ itemTypeName \in {"x", "none"}
+          /\ row \in BOOLEAN
+          /\ rowName \in Inputs
+          /\ countText \in {"5", "12a"}
+          /\ otherRegistered \in BOOLEAN
+          /\ check = "item"
+          /\ typed = "none"
+          /\ start = "none"
+          /\ peer = "none"
+       \/ /\ plane = "check"
+          /\ host = "net10"
+          /\ handling = "replace"
+          /\ nInput = "x"
+          /\ nBeside = FALSE
+          /\ nStart = "x"
+          /\ leadStart = "object"
+          /\ leadStartName = "x"
+          /\ leadTypeName = "x"
+          /\ leadPhoneInput = FALSE
+          /\ leadNameInput = "x"
+          /\ itemsStart = "empty"
+          /\ itemTypeName = "x"
+          /\ row = FALSE
+          /\ rowName = "x"
+          /\ countText = "5"
+          /\ otherRegistered = FALSE
+          /\ check \in Checks
+          /\ typed \in ItemValues
+          /\ start \in ItemValues
+          /\ peer \in {"none", "mid"}
 
 Next == UNCHANGED vars
 
@@ -122,6 +154,16 @@ BrowserFails ==
     \cup (IF BrowserCountRefused THEN {"count"} ELSE {})
     \cup (IF BrowserRunsOther THEN {"other"} ELSE {})
 
+Held == IF sendsForm THEN Bound(typed) ELSE start
+
+AtLeast(value, least) == value = "none" \/ (least = "mid" /\ value = "high")
+
+ServerPasses == CASE check = "item" -> AtLeast(Held, peer)
+
+BrowserPeer == IF Mutant = "PeerReadFromTheItem" THEN "none" ELSE peer
+
+BrowserPasses == CASE check = "item" -> AtLeast(Held, BrowserPeer)
+
 ConditionAgrees == BrowserLeadPresent = ServerLeadPresent
 
 ObjectStartAgrees == (LeadSent /\ leadStart = "object") => BrowserLeadName = ServerLeadName
@@ -140,9 +182,13 @@ OnlyTheNamedValidator == ~BrowserRunsOther
 
 NoTypedValueLost == BrowserCountRefused = ServerCountRefused
 
-Agreement == BrowserFails = ServerFails
+ItemPeerAgrees == (plane = "check" /\ check = "item") => BrowserPasses = ServerPasses
+
+Agreement == BrowserFails = ServerFails /\ (plane = "check" => BrowserPasses = ServerPasses)
 
 ReachPopulatedList == ~(AppendsList /\ itemsStart = "seeded" /\ ItemsSent /\ Len(BrowserItems) = 2 /\ Agreement)
+
+ReachAnItemBelowItsPeer == ~(plane = "check" /\ check = "item" /\ Held = "low" /\ peer = "mid" /\ ~ServerPasses /\ Agreement)
 
 ReachConditionOnStart == ~(~LeadSent /\ leadStart = "object" /\ ~NSent /\ nStart = "none" /\ "n" \notin BrowserFails /\ Agreement)
 

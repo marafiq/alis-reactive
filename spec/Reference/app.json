@@ -591,7 +591,7 @@
         {
           "id": "doseInputs",
           "kind": "nativeSlice",
-          "role": "the round's NativeTextBox and NativeCheckBox inputs: the dose form's Strength, Count, Code, Amount, Starts and Length fields, the Doses box and the test box",
+          "role": "the round's NativeTextBox and NativeCheckBox inputs: the dose form's Strength, Count, Code, Amount, Least, Starts and Length fields, the Doses box and the test box",
           "module": "NativeComponents"
         },
         {
@@ -7272,6 +7272,23 @@
     {
       "feature": "M8.F1",
       "for": "X16.27",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "doseInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F1",
+      "for": "X16.39",
       "index": 0,
       "screen": "round",
       "hosts": [

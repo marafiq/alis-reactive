@@ -3861,6 +3861,11 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     written in the member's form and keyed as the member (D7.7).
   - A null member passes an ordering and a range, fails `Equal` and passes `NotEqual`, as FluentValidation's
     comparison checks read it (`probe:fv-date-comparisons`), where a condition holds no ordering with null (D8.9).
+  - Over each item of a list (`RuleForEach`), the other member is read from the model the validator checks, which
+    the browser's test is handed beside the item, so an item is compared with its peer as the endpoint compares it,
+    under the same null rules (X16.39).
+  - A check whose comparison the list's lambda refuses is refused with the lambda's own message, its term the
+    rule's check as the validator writes it, as `'RuleFor(v => v.At).GreaterThan'` (X6.40 to X6.43, X6.57).
   - A text the member's type cannot hold fails first, with the binder's message (D16.7). A date or a time a converter
     writes is refused, the app's options' (X6.57) and the member's own (X6.43).
   - Both lines read a date in a check as a `Date`'s `getTime`, to the millisecond, and leave a `TimeOnly` and a
@@ -4111,6 +4116,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   the browser's rule names the member it checks by its path; write the rule for a member, as RuleFor(x => x.Member)
   or RuleForEach(x => x.Items) does, or mark the rule .ServerOnly().", `{read}` the rule's lambda as the validator
   writes it. At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.39` behavior (D16.16): of a round's amounts 5 and 4 under `RuleForEach(r => r.Amounts)
+  .GreaterThanOrEqualTo(r => r.Least)` with a least of 5, the second fails in the browser before sending, as the
+  endpoint answers; the least is read from the round, not from the amount.
 
 ## Q17. Vendors and inversion
 

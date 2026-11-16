@@ -191,6 +191,45 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
             Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'card => card.Ward.Trim()' checks no member of the model, and the browser's rule names the member it checks by its path; write the rule for a member, as RuleFor(x => x.Member) or RuleForEach(x => x.Items) does, or mark the rule .ServerOnly()."));
 
     [Test]
+    public void each_item_is_compared_with_the_member_its_validators_model_holds_beside_it()
+    {
+        Assert.That(RulesOf<MedicationRound>(validation => validation.Add<MedicationRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"ref","name":"value"},{"kind":"data","path":[{"name":"least","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give at least the least dose."}]}],"groups":[]}]}"""));
+        Assert.That(RulesOf<OpenMedicationRound>(validation => validation.Add<OpenMedicationRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"and","args":[{"kind":"op","op":"not","args":[{"kind":"op","op":"eq","args":[{"kind":"data","path":[{"name":"least","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item1"}},{"kind":"lit","value":null}]}]},{"kind":"op","op":"gte","args":[{"kind":"ref","name":"value"},{"kind":"data","path":[{"name":"least","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item1"}}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give at least the least dose."}]}],"groups":[]}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(PlanOf<OpenMedicationRound>(validation => validation.Add<OpenMedicationRoundRules>())), Is.Empty);
+    }
+
+    [Test]
+    public async Task the_endpoint_fails_an_item_below_its_peer_and_every_item_beside_a_null_peer()
+    {
+        Assert.That(await ServerVerdict<MedicationRound, MedicationRoundRules>(("Least", "5"), ("Amounts[0]", "4")), Is.EqualTo(new[] { ("Amounts[0]", "Give at least the least dose.") }));
+        Assert.That(await ServerVerdict<MedicationRound, MedicationRoundRules>(("Least", "5"), ("Amounts[0]", "5")), Is.Empty);
+        Assert.That(await ServerVerdict<MedicationRound, MedicationRoundRules>(("Least", "5"), ("Amounts[0]", "6")), Is.Empty);
+        Assert.That(await ServerVerdict<MedicationRound, MedicationRoundRules>(("Least", "5"), ("Amounts[0]", "5"), ("Amounts[1]", "4")), Is.EqualTo(new[] { ("Amounts[1]", "Give at least the least dose.") }));
+        Assert.That(await ServerVerdict<OpenMedicationRound, OpenMedicationRoundRules>(("Least", "5"), ("Amounts[0]", "4")), Is.EqualTo(new[] { ("Amounts[0]", "Give at least the least dose.") }));
+        Assert.That(await ServerVerdict<OpenMedicationRound, OpenMedicationRoundRules>(("Least", "5"), ("Amounts[0]", "6")), Is.Empty);
+        Assert.That(await ServerVerdict<OpenMedicationRound, OpenMedicationRoundRules>(("Amounts[0]", "6")), Is.EqualTo(new[] { ("Amounts[0]", "Give at least the least dose.") }));
+    }
+
+    [Test]
+    public void a_check_that_compares_a_date_the_apps_json_options_convert_is_refused_naming_the_rules_check()
+    {
+        Assert.That(() => PlanOf<Visit>(json => json.Converters.Add(new DayText()), validation => validation.Add<VisitRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(v => v.At).GreaterThan' compares a DateTime the app's JSON options write by a converter of their own, whose text the browser cannot read as the value .NET holds; compare it on the server."));
+        Assert.That(() => PlanOf<Visit>(json => json.Converters.Add(new DayText()), validation => validation.Add<ArrivedVisitRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(v => v.At).NotEmpty' compares a DateTime the app's JSON options write by a converter of their own, whose text the browser cannot read as the value .NET holds; compare it on the server."));
+        Assert.That(RulesOf<Visit>(validation => validation.Add<VisitRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["at"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"gt","args":[{"kind":"op","op":"dateKey","args":[{"kind":"ref","name":"item1"}]},{"kind":"op","op":"dateKey","args":[{"kind":"lit","value":"2026-11-01T00:00:00"}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Book a visit after November 1."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void an_item_its_lists_own_json_writes_compared_with_a_member_is_refused_naming_the_rules_check()
+    {
+        Assert.That(() => PlanOf<ChartedRound>(validation => validation.Add<ChartedRoundRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleForEach(round => round.Amounts).GreaterThanOrEqualTo' compares two members, and its own JSON number handling writes 'round.Amounts' unlike JavaScript's value, so the browser does not compare them as .NET does; compare them on the server."));
+        Assert.That(() => PlanOf<SealedRound>(validation => validation.Add<SealedRoundRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleForEach(round => round.Amounts).GreaterThanOrEqualTo' compares two members, and its own JSON converter writes 'round.Amounts' unlike JavaScript's value, so the browser does not compare them as .NET does; compare them on the server."));
+    }
+
+    [Test]
     public void a_container_whose_model_has_no_registered_validator_is_refused_where_the_view_renders()
         => Assert.That(() => PlanOf<Supplies>(validation => validation.Add<DeputyCardRules>()),
             Throws.InvalidOperationException.With.Message.EqualTo("Validate(container) checks container 'intake' by the validator registered for Supplies, and none is registered: register one with services.AddReactiveFluentValidation(validation => validation.Add<TValidator>())."));
@@ -208,9 +247,11 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
         return plan.RootElement.GetProperty("rules").GetRawText();
     }
 
-    private static string PlanOf<TModel>(Action<ReactiveFluentValidationBuilder> validators) where TModel : new()
+    private static string PlanOf<TModel>(Action<ReactiveFluentValidationBuilder> validators) where TModel : new() => PlanOf<TModel>(_ => { }, validators);
+
+    private static string PlanOf<TModel>(Action<JsonSerializerOptions> appJson, Action<ReactiveFluentValidationBuilder> validators) where TModel : new()
     {
-        var html = Views.Of(new TModel(), _ => { }, services => services.AddReactiveFluentValidation(validators));
+        var html = Views.Of(new TModel(), appJson, services => services.AddReactiveFluentValidation(validators));
         var plan = html.ReactivePlan<TModel>();
         html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Validate(pipeline.Container<TModel>("intake"))));
         return Views.TextOf(html.RenderPlan(plan))["<script type=\"application/json\" data-reactive-plan>".Length..^"</script>".Length];

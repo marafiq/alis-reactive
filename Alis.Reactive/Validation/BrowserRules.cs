@@ -164,9 +164,9 @@ internal sealed class BrowserMember<T, TValue>
 
     internal FnExpression When(IReadOnlyList<RuleGuard<T>> guards) => _scope.When(guards);
 
-    internal BrowserTest Tests(LambdaExpression passes, Action<MessageArguments> arguments)
+    internal BrowserTest Tests(LambdaExpression passes, string check, Action<MessageArguments> arguments)
     {
-        var read = Translated(passes);
+        var read = Translated(passes, check);
         return new BrowserTest(new FnExpression([read.Params[0], BrowserTerms.Instance], read.Body), arguments, [], false);
     }
 
@@ -177,12 +177,13 @@ internal sealed class BrowserMember<T, TValue>
     {
         if (default(TValue) is not null) return TestsTheValue(_ => new LitExpression(JsonSerializer.SerializeToElement(true)), NoArguments);
         var value = LinqExpression.Parameter(typeof(TValue), BrowserTerms.Value);
-        return Tests(LinqExpression.Lambda(LinqExpression.NotEqual(value, LinqExpression.Constant(null, typeof(TValue))), value), NoArguments);
+        return Tests(LinqExpression.Lambda(LinqExpression.NotEqual(value, LinqExpression.Constant(null, typeof(TValue))), value), nameof(RuleBuilderExtensions.NotNull), NoArguments);
     }
 
     internal BrowserTest Emptiness(bool empty)
     {
-        if (typeof(TValue) == typeof(string)) return Tests(empty ? Blank : NotBlank, NoArguments);
+        var check = empty ? nameof(RuleBuilderExtensions.Empty) : nameof(RuleBuilderExtensions.NotEmpty);
+        if (typeof(TValue) == typeof(string)) return Tests(empty ? Blank : NotBlank, check, NoArguments);
         var contract = _scope.Json.LiveForm.GetTypeInfo(typeof(TValue));
         if (contract.IsDictionary(out _, out _))
             throw new InvalidOperationException($"The rule of '{_path}' checks whether a dictionary is empty, and the browser's rules count a list's items, not a dictionary's entries; mark the rule .ServerOnly().");
@@ -191,7 +192,7 @@ internal sealed class BrowserMember<T, TValue>
         var held = LinqExpression.Parameter(typeof(TValue), BrowserTerms.Value);
         var start = LinqExpression.Constant(default(TValue), typeof(TValue));
         var test = empty ? LinqExpression.Equal(held, start) : LinqExpression.NotEqual(held, start);
-        return Tests(LinqExpression.Lambda(test, held), NoArguments);
+        return Tests(LinqExpression.Lambda(test, held), check, NoArguments);
     }
 
     internal BrowserTest Compared(Comparison comparison, object? other)
@@ -200,23 +201,24 @@ internal sealed class BrowserMember<T, TValue>
         var value = LinqExpression.Parameter(typeof(TValue), BrowserTerms.Value);
         var test = Binary(comparison.Node, value, LinqExpression.Constant(other, typeof(TValue)));
         var passes = comparison.Orders && default(TValue) is null ? LinqExpression.OrElse(IsNull(value), test) : test;
-        return Tests(LinqExpression.Lambda(passes, value), arguments => arguments.With("ComparisonValue", other).With("ComparisonProperty", ""));
+        return Tests(LinqExpression.Lambda(passes, value), comparison.Name, arguments => arguments.With("ComparisonValue", other).With("ComparisonProperty", ""));
     }
 
     internal BrowserTest ComparedWithMember<TPeer>(Comparison comparison, Expression<Func<T, TPeer>> peer, string peerName)
     {
+        void Arguments(MessageArguments arguments) => arguments.With("ComparisonProperty", peerName);
         if (_each)
-            throw new NotImplementedException($"'{_path}' compares each item with another member, and a rule's test reads the item and its holder, not the model above it: a comparison of an item with a member has no browser form yet; mark the rule .ServerOnly().");
+        {
+            var item = LinqExpression.Parameter(typeof(TValue), BrowserTerms.Value);
+            var itemBesidePeer = LinqExpression.Lambda(PassesBeside<TPeer>(comparison, item, peer.Body), item, peer.Parameters[0]);
+            var test = ItemLambda.CheckingAnItemBesideItsHolder(itemBesidePeer, BrowserTerms.Value, ItemsForm(), Term(comparison.Name), DatesJudgedBy);
+            return new BrowserTest(test, Arguments, ["ComparisonValue"], false);
+        }
+
         var instance = _member.Parameters[0];
-        var left = Unconverted(_member.Body);
         var right = new ParameterSwap(peer.Parameters[0], instance).Visit(peer.Body);
-        if (Nullable.GetUnderlyingType(left.Type) == right.Type) right = LinqExpression.Convert(right, left.Type);
-        if (Nullable.GetUnderlyingType(right.Type) == left.Type) left = LinqExpression.Convert(left, right.Type);
-        var test = Binary(comparison.Node, left, right);
-        var otherHeld = default(TPeer) is null ? LinqExpression.AndAlso(LinqExpression.Not(IsNull(right)), test) : test;
-        var passes = !comparison.Orders ? test : default(TValue) is null ? LinqExpression.OrElse(IsNull(left), otherHeld) : otherHeld;
-        var read = Translated(LinqExpression.Lambda(passes, instance));
-        return new BrowserTest(new FnExpression([BrowserTerms.Value, read.Params[0]], read.Body), arguments => arguments.With("ComparisonProperty", peerName), ["ComparisonValue"], false);
+        var read = Translated(LinqExpression.Lambda(PassesBeside<TPeer>(comparison, Unconverted(_member.Body), right), instance), comparison.Name);
+        return new BrowserTest(new FnExpression([BrowserTerms.Value, read.Params[0]], read.Body), Arguments, ["ComparisonValue"], false);
     }
 
     internal BrowserTest Between(object? from, object? to, bool inclusive, Action<MessageArguments> arguments)
@@ -226,7 +228,7 @@ internal sealed class BrowserMember<T, TValue>
         var high = Binary(inclusive ? ExpressionType.LessThanOrEqual : ExpressionType.LessThan, value, LinqExpression.Constant(to, typeof(TValue)));
         var inside = LinqExpression.AndAlso(low, high);
         var passes = default(TValue) is null ? LinqExpression.OrElse(IsNull(value), inside) : inside;
-        return Tests(LinqExpression.Lambda(passes, value), arguments);
+        return Tests(LinqExpression.Lambda(passes, value), inclusive ? nameof(RuleBuilderExtensions.InclusiveBetween) : nameof(RuleBuilderExtensions.ExclusiveBetween), arguments);
     }
 
     internal BrowserTest InEnum(IEnumerable<object> values)
@@ -235,7 +237,7 @@ internal sealed class BrowserMember<T, TValue>
         var named = values.Select(declared => (LinqExpression)LinqExpression.Equal(value, LinqExpression.Constant(declared, typeof(TValue)))).ToList();
         var declaredOne = named.Count == 0 ? LinqExpression.Constant(false) : named.Skip(1).Aggregate(named[0], LinqExpression.OrElse);
         var passes = default(TValue) is null ? LinqExpression.OrElse(IsNull(value), declaredOne) : declaredOne;
-        var read = Translated(LinqExpression.Lambda(passes, value));
+        var read = Translated(LinqExpression.Lambda(passes, value), nameof(RuleBuilderExtensions.IsInEnum));
         return new BrowserTest(new FnExpression([read.Params[0], BrowserTerms.Instance], read.Body), NoArguments, [], true);
     }
 
@@ -307,16 +309,27 @@ internal sealed class BrowserMember<T, TValue>
         return _fieldPath;
     }
 
-    private FnExpression Translated(LambdaExpression passes)
+    private HeldForm DatesJudgedBy => HeldForm.App(_scope.Json, _scope.Form.RendersUnder);
+
+    private FnExpression Translated(LambdaExpression passes, string check) => ItemLambda.Checking(passes, _scope.Form, Term(check), DatesJudgedBy);
+
+    private string Term(string check)
+        => (_each ? nameof(ReactiveValidator<T>.RuleForEach) : nameof(ReactiveValidator<T>.RuleFor)) + "(" + Printed.Of(_member) + ")." + check;
+
+    private HeldForm ItemsForm()
     {
-        try
-        {
-            return ItemLambda.Of(passes, _scope.Form);
-        }
-        catch (InvalidOperationException refused)
-        {
-            throw new InvalidOperationException($"The rule of '{_path}' has no browser form: {refused.Message} Mark the rule .ServerOnly() to keep it on the server.", refused);
-        }
+        var list = Unconverted(_member.Body);
+        if (!MemberPath.TryOf(list, _member.Parameters[0], _member, _scope.Form.DataOptions, out var members) || !members.Member.HoldsItsOwnForm) return _scope.Form;
+        return _scope.Form.WrittenBy(members.Member, Printed.Of(list));
+    }
+
+    private LinqExpression PassesBeside<TPeer>(Comparison comparison, LinqExpression left, LinqExpression right)
+    {
+        if (Nullable.GetUnderlyingType(left.Type) == right.Type) right = LinqExpression.Convert(right, left.Type);
+        if (Nullable.GetUnderlyingType(right.Type) == left.Type) left = LinqExpression.Convert(left, right.Type);
+        var test = Binary(comparison.Node, left, right);
+        var otherHeld = default(TPeer) is null ? LinqExpression.AndAlso(LinqExpression.Not(IsNull(right)), test) : test;
+        return !comparison.Orders ? test : default(TValue) is null ? LinqExpression.OrElse(IsNull(left), otherHeld) : otherHeld;
     }
 
     private LinqExpression Binary(ExpressionType node, LinqExpression left, LinqExpression right)

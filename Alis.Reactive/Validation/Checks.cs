@@ -43,12 +43,14 @@ internal sealed class LengthCheck<T> : Check<T, string?>
 {
     private readonly int _minimum;
     private readonly int _maximum;
+    private readonly string _name;
 
-    internal LengthCheck(int minimum, int maximum, string template)
+    internal LengthCheck(int minimum, int maximum, string template, string name)
     {
         if (maximum != -1 && maximum < minimum) throw new ArgumentOutOfRangeException("max", "Max should be larger than min.");
         _minimum = minimum;
         _maximum = maximum;
+        _name = name;
         Template = template;
     }
 
@@ -67,7 +69,7 @@ internal sealed class LengthCheck<T> : Check<T, string?>
         Expression<Func<string?, bool>> passes = maximum == -1
             ? value => value == null || value.Length >= minimum
             : value => value == null || value.Length >= minimum && value.Length <= maximum;
-        return member.Tests(passes, arguments => arguments.With("MinLength", minimum).With("MaxLength", maximum));
+        return member.Tests(passes, _name, arguments => arguments.With("MinLength", minimum).With("MaxLength", maximum));
     }
 }
 
@@ -127,27 +129,29 @@ internal static class TextChecks
 internal sealed class Comparison
 {
     private readonly Func<object?, object?, bool> _passes;
-    private Comparison(string template, ExpressionType node, bool orders, Func<object?, object?, bool> passes)
+    private Comparison(string name, string template, ExpressionType node, bool orders, Func<object?, object?, bool> passes)
     {
+        Name = name;
         Template = template;
         Node = node;
         Orders = orders;
         _passes = passes;
     }
 
+    internal string Name { get; }
     internal string Template { get; }
     internal ExpressionType Node { get; }
     internal bool Orders { get; }
     internal bool Passes(object? value, object? other) => _passes(value, other);
-    internal static Comparison Equal { get; } = new(Templates.Equal, ExpressionType.Equal, false, Equals);
-    internal static Comparison NotEqual { get; } = new(Templates.NotEqual, ExpressionType.NotEqual, false, (value, other) => !Equals(value, other));
-    internal static Comparison GreaterThan { get; } = Ordered(Templates.GreaterThan, ExpressionType.GreaterThan, order => order > 0);
-    internal static Comparison GreaterThanOrEqual { get; } = Ordered(Templates.GreaterThanOrEqual, ExpressionType.GreaterThanOrEqual, order => order >= 0);
-    internal static Comparison LessThan { get; } = Ordered(Templates.LessThan, ExpressionType.LessThan, order => order < 0);
-    internal static Comparison LessThanOrEqual { get; } = Ordered(Templates.LessThanOrEqual, ExpressionType.LessThanOrEqual, order => order <= 0);
+    internal static Comparison Equal { get; } = new(nameof(RuleBuilderExtensions.Equal), Templates.Equal, ExpressionType.Equal, false, Equals);
+    internal static Comparison NotEqual { get; } = new(nameof(RuleBuilderExtensions.NotEqual), Templates.NotEqual, ExpressionType.NotEqual, false, (value, other) => !Equals(value, other));
+    internal static Comparison GreaterThan { get; } = Ordered(nameof(RuleBuilderExtensions.GreaterThan), Templates.GreaterThan, ExpressionType.GreaterThan, order => order > 0);
+    internal static Comparison GreaterThanOrEqual { get; } = Ordered(nameof(RuleBuilderExtensions.GreaterThanOrEqualTo), Templates.GreaterThanOrEqual, ExpressionType.GreaterThanOrEqual, order => order >= 0);
+    internal static Comparison LessThan { get; } = Ordered(nameof(RuleBuilderExtensions.LessThan), Templates.LessThan, ExpressionType.LessThan, order => order < 0);
+    internal static Comparison LessThanOrEqual { get; } = Ordered(nameof(RuleBuilderExtensions.LessThanOrEqualTo), Templates.LessThanOrEqual, ExpressionType.LessThanOrEqual, order => order <= 0);
 
-    private static Comparison Ordered(string template, ExpressionType node, Func<int, bool> accepts)
-        => new(template, node, true, (value, other) => value is null || other is not null && accepts(Comparer.Default.Compare(value, other)));
+    private static Comparison Ordered(string name, string template, ExpressionType node, Func<int, bool> accepts)
+        => new(name, template, node, true, (value, other) => value is null || other is not null && accepts(Comparer.Default.Compare(value, other)));
 }
 
 internal sealed class CompareCheck<T, TValue, TPeer>(Comparison comparison, Func<T, TPeer> read, string displayName, Func<BrowserMember<T, TValue>, BrowserTest> browser) : Check<T, TValue>

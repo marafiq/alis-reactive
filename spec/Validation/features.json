@@ -138,7 +138,8 @@
         "core:Q16",
         "core:Q8",
         "Validation.tla:ConditionAgrees",
-        "Schema.tla:DatesComparedByKey"
+        "Schema.tla:DatesComparedByKey",
+        "Validation.tla:ItemPeerAgrees"
       ],
       "defects": [
         {
@@ -200,6 +201,10 @@
         {
           "id": "X16.27",
           "rung": "behavior"
+        },
+        {
+          "id": "X16.39",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -234,6 +239,14 @@
           "outcome": "After the first Save both messages show beside their inputs, saved stays empty and no request is sent; after the second no message shows and saved reads none, 23:00:00.",
           "opposite": "Starts 07:00 and Length 23:00:00 show 07:00, 23:00:00 in saved with no message.",
           "defect": "Neither member has a browser rule, as the redesign leaves a TimeOnly and a TimeSpan to the server, so the first Save is sent and the messages come back in a 400; or the length orders as text, 1.02:00:00 before 23:00:00, and its message never shows; or the empty Starts, a null, fails the ordering in the browser while the endpoint saves it."
+        },
+        {
+          "for": "X16.39",
+          "page": "A medication round page whose round form holds a Least number input and two Amount rows under a validator with RuleForEach(r => r.Amounts).GreaterThanOrEqualTo(r => r.Least).WithMessage(\"Give at least the least dose.\"); Save posts the form and the page writes the endpoint's answer, the amounts comma separated, into saved.",
+          "gesture": "Type 5 in Least, 5 in the first Amount and 4 in the second, and click Save.",
+          "outcome": "\"Give at least the least dose.\" shows beside the second Amount alone, saved stays empty and no request is sent.",
+          "opposite": "Least 5 with amounts 5 and 6 shows 5, 6 in saved with no message.",
+          "defect": "The rule reads the least at the amount's own path, where a number holds none, so both rows fail; or an item compared with another member stays the server's, so the first Save is sent and the message comes back in a 400."
         }
       ],
       "verdicts": [

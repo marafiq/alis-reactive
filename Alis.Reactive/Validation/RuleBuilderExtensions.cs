@@ -32,26 +32,26 @@ public static class RuleBuilderExtensions
     /// <param name="rule">The rule.</param>
     /// <param name="minimum">The fewest characters the text holds.</param>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> MinimumLength<T>(this IRuleBuilder<T, string?> rule, int minimum) => Add(rule, new LengthCheck<T>(minimum, -1, Templates.MinimumLength));
+    public static IRuleBuilderOptions<T, string?> MinimumLength<T>(this IRuleBuilder<T, string?> rule, int minimum) => Add(rule, new LengthCheck<T>(minimum, -1, Templates.MinimumLength, nameof(MinimumLength)));
 
     /// <summary>Requires a text of at most a number of characters.</summary>
     /// <param name="rule">The rule.</param>
     /// <param name="maximum">The most characters the text holds.</param>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> MaximumLength<T>(this IRuleBuilder<T, string?> rule, int maximum) => Add(rule, new LengthCheck<T>(0, maximum, Templates.MaximumLength));
+    public static IRuleBuilderOptions<T, string?> MaximumLength<T>(this IRuleBuilder<T, string?> rule, int maximum) => Add(rule, new LengthCheck<T>(0, maximum, Templates.MaximumLength, nameof(MaximumLength)));
 
     /// <summary>Requires a text whose count of characters is within two bounds.</summary>
     /// <param name="rule">The rule.</param>
     /// <param name="minimum">The fewest characters the text holds.</param>
     /// <param name="maximum">The most characters the text holds.</param>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> Length<T>(this IRuleBuilder<T, string?> rule, int minimum, int maximum) => Add(rule, new LengthCheck<T>(minimum, maximum, Templates.Length));
+    public static IRuleBuilderOptions<T, string?> Length<T>(this IRuleBuilder<T, string?> rule, int minimum, int maximum) => Add(rule, new LengthCheck<T>(minimum, maximum, Templates.Length, nameof(Length)));
 
     /// <summary>Requires a text of an exact number of characters.</summary>
     /// <param name="rule">The rule.</param>
     /// <param name="length">The characters the text holds.</param>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> Length<T>(this IRuleBuilder<T, string?> rule, int length) => Add(rule, new LengthCheck<T>(length, length, Templates.ExactLength));
+    public static IRuleBuilderOptions<T, string?> Length<T>(this IRuleBuilder<T, string?> rule, int length) => Add(rule, new LengthCheck<T>(length, length, Templates.ExactLength, nameof(Length)));
 
     /// <summary>Requires a text the regular expression matches.</summary>
     /// <remarks>
