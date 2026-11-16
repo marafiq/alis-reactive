@@ -13,13 +13,18 @@ internal sealed class HeldForm
 {
     private readonly AppJson _json;
     private readonly JsonSerializerOptions _baseOptions;
-    private readonly bool _fromApp;
+    private static readonly Func<Expression, Expression[]> KeyedAlone = operand => [operand];
 
-    private HeldForm(AppJson json, CultureInfo rendersUnder, JsonSerializerOptions baseOptions, bool fromApp, OwnWriting? own, string? readTheAppsConverterWrites)
+    private readonly bool _fromApp;
+    private readonly Func<Expression, Expression[]> _keyArguments;
+
+    private HeldForm(AppJson json, CultureInfo rendersUnder, JsonSerializerOptions baseOptions, bool fromApp, OwnWriting? own, string? readTheAppsConverterWrites,
+        Func<Expression, Expression[]> keyArguments)
     {
         _json = json;
         _baseOptions = baseOptions;
         _fromApp = fromApp;
+        _keyArguments = keyArguments;
         RendersUnder = rendersUnder;
         Own = own;
         ReadTheAppsConverterWrites = readTheAppsConverterWrites;
@@ -33,7 +38,7 @@ internal sealed class HeldForm
 
     internal HeldForm Computed => Live(_json, RendersUnder);
 
-    internal HeldForm Base => Own is null ? this : new(_json, RendersUnder, _baseOptions, _fromApp, null, null);
+    internal HeldForm Base => Own is null ? this : new(_json, RendersUnder, _baseOptions, _fromApp, null, null, KeyedAlone);
 
     internal string BaseFormName => _fromApp ? "the app's options" : "JavaScript's value";
 
@@ -46,13 +51,18 @@ internal sealed class HeldForm
     internal bool HoldsAListItsConverterWrites
         => Own is { Member: { HasItsOwnConverter: true } member } && member.Contract.Kind is JsonTypeInfoKind.Enumerable or JsonTypeInfoKind.Dictionary;
 
-    internal static HeldForm Live(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.LiveForm, false, own: null, null);
+    internal static HeldForm Live(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.LiveForm, false, own: null, null, KeyedAlone);
 
-    internal static HeldForm App(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.App, true, null, null);
+    internal static HeldForm PageText(AppJson json, CultureInfo rendersUnder, Expression read, LitExpression start)
+        => new(json, rendersUnder, json.LiveForm, false, own: null, null, operand => ReferenceEquals(operand, read) ? [operand, start] : [operand]);
 
-    internal HeldForm WrittenBy(WrittenMember member, string read) => new(_json, RendersUnder, _baseOptions, _fromApp, new OwnWriting(member, read), null);
+    internal static HeldForm App(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.App, true, null, null, KeyedAlone);
 
-    internal HeldForm ReadAs(string read, Type type) => WritesByAConverterOfTheApps(type) ? new(_json, RendersUnder, _baseOptions, _fromApp, Own, read) : this;
+    internal HeldForm WrittenBy(WrittenMember member, string read) => new(_json, RendersUnder, _baseOptions, _fromApp, new OwnWriting(member, read), null, KeyedAlone);
+
+    internal HeldForm ReadAs(string read, Type type) => WritesByAConverterOfTheApps(type) ? new(_json, RendersUnder, _baseOptions, _fromApp, Own, read, KeyedAlone) : this;
+
+    internal Expression[] KeyArguments(Expression operand) => _keyArguments(operand);
 
     internal bool WritesByAConverterOfTheApps(Type type)
     {

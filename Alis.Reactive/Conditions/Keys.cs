@@ -24,8 +24,8 @@ internal static partial class Keys
     internal static Expression Of(Type type, Expression operand, HeldForm form)
     {
         if (IsDateOrTime(type) && form.ReadTheAppsConverterWrites is { } read) throw ComparesADateTheAppsConverterWrites(read, type);
-        if (DateTimes.Contains(type)) return new OpExpression(form.KeyOfADateTime, [operand]);
-        return OfType.TryGetValue(type, out var key) ? new OpExpression(key, [operand]) : operand;
+        if (DateTimes.Contains(type)) return new OpExpression(form.KeyOfADateTime, form.KeyArguments(operand));
+        return OfType.TryGetValue(type, out var key) ? new OpExpression(key, form.KeyArguments(operand)) : operand;
     }
 
     internal static bool WrittenByAConverterOfTheApps(Type type, HeldForm form) => IsDateOrTime(type) && form.WritesByAConverterOfTheApps(type);

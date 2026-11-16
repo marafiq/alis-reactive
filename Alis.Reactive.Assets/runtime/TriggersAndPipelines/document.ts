@@ -1,3 +1,5 @@
+import { queried, routed, type PageAddress } from "../ValuesAndSources/index";
+
 type Listener = (...args: unknown[]) => void;
 
 export interface MarkedAttribute {
@@ -13,10 +15,12 @@ const namesApart = " ";
 
 export class DocumentPlugin {
   readonly #events: EventTarget;
+  readonly #address: PageAddress;
   readonly #waitingForTheStart: Listener[] = [];
 
-  constructor(events: EventTarget) {
+  constructor(events: EventTarget, address: PageAddress) {
     this.#events = events;
+    this.#address = address;
   }
 
   addEventListener(event: string, listener: Listener): void {
@@ -35,6 +39,14 @@ export class DocumentPlugin {
 
   dispatch(appEvent: string, detail: unknown): void {
     this.#events.dispatchEvent(new CustomEvent(appEvent, { detail }));
+  }
+
+  query(key: string): string | null {
+    return queried(this.#address, key);
+  }
+
+  segment(template: readonly string[], place: number): string {
+    return routed(this.#address, template, place);
   }
 
   started(): void {

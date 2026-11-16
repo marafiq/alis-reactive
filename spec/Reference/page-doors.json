@@ -813,30 +813,21 @@
     ]
   },
   "M2.F2 M2.X1 0": {
-    "modules": [
-      "RequestsAndResponses",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/Chart.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M2.F2 M2.X2 0": {
-    "modules": [
-      "RequestsAndResponses",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/WardBeds.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M2.F2 M2.X3 0": {
-    "modules": [
-      "RequestsAndResponses",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/WardOnFile.cshtml",
       "/Shared/_Layout.cshtml"
@@ -1756,20 +1747,14 @@
     ]
   },
   "M3.F1 X8.27 2": {
-    "modules": [
-      "RequestsAndResponses",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/Shift.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M3.F1 X8.27 3": {
-    "modules": [
-      "RequestsAndResponses",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/HandoverDesk.cshtml",
       "/Care/Admission/NoonStart.cshtml",

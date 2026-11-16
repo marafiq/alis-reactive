@@ -15,7 +15,7 @@ declare global {
 }
 
 export function boot(): void {
-  const documentPlugin = new DocumentPlugin(document);
+  const documentPlugin = new DocumentPlugin(document, location);
   raisesOnClick(document, documentPlugin);
   provide("alis.document", () => documentPlugin);
   provide("alis.model", () => pageInputs);

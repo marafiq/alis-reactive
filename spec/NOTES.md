@@ -1563,3 +1563,5 @@
   Six builders at a time, three of Codex and three Opus agents at xhigh from `.claude/agents/builder.md`, each in its own worktree (root CLAUDE.md); progress is units closed.
 - 2026-11-15 the owner's yes to the lead's recommendation on P8: the live form keeps the app's RespectRequiredConstructorParameters, as D4.2 and schema.md's `requires` already state; P8's line in spec/CLAUDE.md and D7.7 now say so.
   Evidence: X4.10's browser test passes with the setting carried, its opposite with the option off writing the count; the owner's words, verbatim, in spec/CLAUDE.md's line of 2026-11-15.
+- 2026-11-15 lead, U9's M2.F2: the page's URL is read through `alis.document`'s `query` and `segment` (schema.md), and its numbers take the `invariant` number text, an integer's text read whole.
+  So `?beds=2.0` and `?beds=1e3` read 2 and 1000 where both hosts bind an int with `NumberStyles.Integer` and keep its start, and net10's group separator in a fraction reads nothing; a number text of the binders' own is a grammar case, the owner's.

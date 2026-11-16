@@ -29,6 +29,8 @@ interface NumberStyle {
 
 const invariantFloat: NumberStyle = { decimal: ".", group: ",", decimalPoint: true, thousands: false, exponent: true, whole: false };
 
+const invariantInteger: NumberStyle = { ...invariantFloat, whole: true };
+
 const earliestInstant = -62_135_596_800_000;
 
 const latestInstant = 253_402_300_799_999;
@@ -128,9 +130,20 @@ function styleOf(shape: NumberShape, culture: Culture): NumberStyle {
     case "view":
       return viewStyle(shape.of, culture);
     case "invariant":
-      return invariantFloat;
+      return invariantStyle(shape.of);
     default:
       return assertNever(shape.text);
+  }
+}
+
+function invariantStyle(of: NumberOf): NumberStyle {
+  switch (of) {
+    case "integer":
+      return invariantInteger;
+    case "fraction":
+      return invariantFloat;
+    default:
+      return assertNever(of);
   }
 }
 

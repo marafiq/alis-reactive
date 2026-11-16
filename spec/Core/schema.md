@@ -125,6 +125,13 @@ The page lacking the container's element, no live plan rendering that container 
 inputs inside it under one scalar binding name (D13.4) each stop the pipeline. A container read is a `data` read over
 it (N13.1, D13.3), and `Live.body` is that call.
 
+`alis.document`'s `query`, called with a member's binding name (D2.5), returns the first value of the page's query
+whose key matches it ignoring case, as both hosts bind the query, and null where no key does. Its `segment`, called
+with the template's segments after the app's path base, a placeholder written in braces, and a placeholder's place,
+returns that segment of the page's path, decoded; a path that does not match the template, its literal segments
+compared ignoring case, stops the pipeline. Each reads the page's address when it is called. A page URL member is the
+`coalesce` of the `as` of its text with a `lit` of the member's start (N10.7, D9.18).
+
 ## Plugin data
 
 | Kind | Carries | Holds | Meaning |
@@ -327,7 +334,7 @@ and nothing where it holds null (D6.14).
 | Kind | Carries | Holds | Converts |
 |------|---------|-------|----------|
 | `string` | `date`: `none`, `date` or `instant`; `negativeZero`: text | | yes: C# states the source's declared date type and the text its number type writes for negative zero on this host under the view's culture; a list takes its leaf item's facts (D3.4, D3.11) |
-| `number` | `of`: `integer` or `fraction`; `text`: `view` or `invariant`; `overflow`: `nothing` or `infinity` | | yes: C# states whether this host binds text past the double's range for the member's .NET type; a text under the view's culture with the culture's number text for `of`, or under the invariant culture with `NumberStyles.Float` (D3.11) |
+| `number` | `of`: `integer` or `fraction`; `text`: `view` or `invariant`; `overflow`: `nothing` or `infinity` | | yes: C# states whether this host binds text past the double's range for the member's .NET type; a text under the view's culture with the culture's number text for `of`, or under the invariant culture with `NumberStyles.Float`, an integer's text read whole as `int.Parse` reads it (D3.11) |
 | `boolean` | | | yes |
 | `date` | | | yes |
 | `instant` | `from`: `none`, `date` or `instant` | | yes: the source's declared date type; `none` admits text alone, `date` reads a Date's wall at the view's zone, and `instant` keeps its moment (D3.12) |

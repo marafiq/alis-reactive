@@ -19,7 +19,7 @@ internal static class ViewPlans
     private const string ScriptClose = "</script>";
 
     internal static ReactivePlan<TModel> Open<TModel>(AppJson json, Func<string> prefix, Func<string, string> fullName, Func<string, string> id, Func<string> view, Func<Type, bool> namesFlags,
-        Func<IServiceProvider> services, Func<PageAntiforgery> antiforgery)
+        Func<IServiceProvider> services, Func<PageAntiforgery> antiforgery, Func<string> pathBase)
     {
         var startPrefix = prefix();
         var content = new PlanContent(IdOf<TModel>(), CultureInfo.CurrentCulture, ClockTimeZone.Instance, json, text =>
@@ -28,7 +28,7 @@ internal static class ViewPlans
             var name = fullName(text);
             FieldPrefixes.RefuseAMoveAfterThePlanStarted(startPrefix, now, view, name);
             return (now, name, id(name));
-        }, namesFlags, services, antiforgery);
+        }, namesFlags, services, antiforgery, pathBase);
         return new(new BlockWriter(content), startPrefix);
     }
 

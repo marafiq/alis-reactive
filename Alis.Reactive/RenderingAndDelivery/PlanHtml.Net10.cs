@@ -32,7 +32,8 @@ public static class PlanHtml
             () => ViewPaths.Of(html),
             type => html.ViewContext.HttpContext.RequestServices.GetService<ValidatorCatalog>()?.Flags.Contains(type) == true,
             () => html.ViewContext.HttpContext.RequestServices,
-            () => RequestAntiforgery.Of(html.ViewContext.HttpContext));
+            () => RequestAntiforgery.Of(html.ViewContext.HttpContext),
+            () => html.ViewContext.HttpContext.Request.PathBase.Value ?? "");
 
     /// <summary>Handles a trigger in the view's plan.</summary>
     /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>

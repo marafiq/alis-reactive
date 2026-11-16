@@ -7,6 +7,7 @@ using Alis.Reactive.InputsAndIds;
 using Alis.Reactive.Plugins;
 using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.Schema;
+using Alis.Reactive.TypeKnowledge;
 using Alis.Reactive.ValuesAndSources;
 using Alis.Reactive.Vendors;
 
@@ -215,13 +216,20 @@ public sealed class Pipeline<TModel>
     /// <summary>Reaches the page's own URL, read as the action that rendered the page bound it.</summary>
     /// <typeparam name="TPage">The type the page's action binds its URL to.</typeparam>
     /// <returns>The URL, whose members are sources.</returns>
-    public PageUrl<TPage> PageUrl<TPage>() => throw new NotImplementedException();
+    public PageUrl<TPage> PageUrl<TPage>() => UrlOf<TPage>(PageTemplate.None);
 
     /// <summary>Reaches the page's own URL, read by a template that names the members its path holds.</summary>
     /// <param name="template">The page's route, with a placeholder in braces for each member its path holds.</param>
     /// <typeparam name="TPage">The type the page's action binds its URL to.</typeparam>
     /// <returns>The URL, whose members are sources.</returns>
-    public PageUrl<TPage> PageUrl<TPage>(string template) => throw new NotImplementedException();
+    public PageUrl<TPage> PageUrl<TPage>(string template)
+        => UrlOf<TPage>(PageTemplate.Of(template, _writer.Content.PathBase, PageMembers.Of<TPage>(), ClassNames.AsCSharpWritesIt(typeof(TPage))));
+
+    private PageUrl<TPage> UrlOf<TPage>(PageTemplate template)
+    {
+        var plan = _writer.Content;
+        return new(plan, template, key => DocumentPlugin.QueryText(plan, key), place => DocumentPlugin.SegmentText(plan, template.Segments, place));
+    }
 
     /// <summary>Names a request container another view rendered, by its element's id.</summary>
     /// <param name="containerId">The id of the container's element.</param>

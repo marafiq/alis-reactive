@@ -255,6 +255,14 @@ describe("as(expr, number)", () => {
     expect(as("1.5 kg", invariantNumber)).toStrictEqual(none);
   });
 
+  test("an integer's text under the invariant culture reads as int.Parse reads it with NumberStyles.Float: a fraction of zeros or an exponent that lands on a whole number, and no other fraction (D3.11)", () => {
+    const invariantInteger: Shape = { kind: "number", of: "integer", text: "invariant", overflow: "nothing" };
+    expect(as("2.0", invariantInteger)).toStrictEqual({ kind: "value", value: 2 });
+    expect(as("1e3", invariantInteger)).toStrictEqual({ kind: "value", value: 1000 });
+    expect(as("2.5", invariantInteger)).toStrictEqual(none);
+    expect(as("1,000", invariantInteger)).toStrictEqual(none);
+  });
+
   test("a boolean converts to 1 or 0", () => {
     expect(as(true, integer)).toStrictEqual({ kind: "value", value: 1 });
     expect(as(false, integer)).toStrictEqual({ kind: "value", value: 0 });
