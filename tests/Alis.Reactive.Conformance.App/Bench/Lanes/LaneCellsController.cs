@@ -13,6 +13,12 @@ public sealed class LaneCellsController : Controller
     [HttpGet(BenchPages.LaneSlotUnloadListener)]
     public IActionResult LaneSlotUnloadListener() => View("/Bench/Lanes/LaneSlotUnloadListener.cshtml", TheWorldsBoard());
 
+    [HttpGet(BenchPages.LaneSlotHostDestroyed)]
+    public IActionResult LaneSlotHostDestroyed() => View("/Bench/Lanes/LaneSlotHostDestroyed.cshtml", TheWorldsBoard());
+
+    [HttpGet(LaneCards.ComponentCard)]
+    public IActionResult ComponentCard() => PartialView("/Bench/Lanes/LaneComponentCard.cshtml", new LaneComponentCard("The card listens to its own component.", "a-1", ["a-1", "a-2"]));
+
     [HttpGet(BenchPages.LaneConfirm)]
     public IActionResult LaneConfirm() => View("/Bench/Lanes/LaneConfirm.cshtml", TheWorldsBoard());
 
@@ -26,9 +32,18 @@ public sealed record LaneBoard(string Text, string Value, IReadOnlyList<string> 
 
 public sealed record LaneCard(string Note);
 
+public sealed record LaneComponentCard(string Note, string Value, IReadOnlyList<string> Codes);
+
+public static class LaneCards
+{
+    public const string ComponentCard = BenchPages.Area + "lanes/cards/component";
+}
+
 public static class LaneCells
 {
     public static readonly AppEvent CloseCard = AppEvent.Declare();
+
+    public static readonly AppEvent OpenCard = AppEvent.Declare();
 
     public static readonly AppEvent Move = AppEvent.Declare();
 }

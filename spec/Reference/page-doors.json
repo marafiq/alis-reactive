@@ -232,6 +232,14 @@
       "/Bench/Vendors/_ScriptedLayout.cshtml"
     ]
   },
+  "M12.F1 X12.18 0": {
+    "modules": [],
+    "views": [
+      "/Bench/Vendors/CollectedPeer.cshtml",
+      "/Bench/Vendors/CollectedPeerHolder.cshtml",
+      "/Bench/Vendors/_ScriptedLayout.cshtml"
+    ]
+  },
   "M12.F1 X12.9 0": {
     "modules": [],
     "views": [
@@ -319,6 +327,67 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M12.F1 X17.49 0": {
+    "modules": [],
+    "views": [
+      "/Bench/Vendors/CallbackCard.cshtml",
+      "/Bench/Vendors/CallbackListeners.cshtml",
+      "/Bench/Vendors/ListeningCallbacksCard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M12.F1 X17.49 1": {
+    "modules": [],
+    "views": [
+      "/Bench/Vendors/CallbackHolder.cshtml",
+      "/Bench/Vendors/CallbackHolderCard.cshtml",
+      "/Bench/Vendors/CallbackHolderInner.cshtml",
+      "/Bench/Vendors/_ScriptedLayout.cshtml"
+    ]
+  },
+  "M12.F1 X17.49 2": {
+    "modules": [],
+    "views": [
+      "/Bench/Vendors/CallbackHolder.cshtml",
+      "/Bench/Vendors/CallbackHolderCard.cshtml",
+      "/Bench/Vendors/CallbackHolderInner.cshtml",
+      "/Bench/Vendors/_ScriptedLayout.cshtml"
+    ]
+  },
+  "M12.F1 X17.50 0": {
+    "modules": [],
+    "views": [
+      "/Bench/Vendors/CallbackScript.cshtml",
+      "/Bench/Vendors/ListeningCallbacksCard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M12.F1 X17.50 1": {
+    "modules": [],
+    "views": [
+      "/Bench/Vendors/CallbackHolder.cshtml",
+      "/Bench/Vendors/CallbackHolderCard.cshtml",
+      "/Bench/Vendors/CallbackHolderInner.cshtml",
+      "/Bench/Vendors/_ScriptedLayout.cshtml"
+    ]
+  },
+  "M12.F1 X17.51 0": {
+    "modules": [],
+    "views": [
+      "/Bench/Vendors/FrozenCallbacks.cshtml",
+      "/Bench/Vendors/FrozenCallbacksNotes.cshtml",
+      "/Bench/Vendors/ListeningCallbacksCard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M12.F1 X17.52 0": {
+    "modules": [],
+    "views": [
+      "/Bench/Vendors/ListeningCallbacksCard.cshtml",
+      "/Bench/Vendors/RestartedCallbacks.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M12.F2 M12.X2 0": {
     "modules": [],
     "views": [
@@ -332,6 +401,22 @@
     "views": [
       "/Bench/Vendors/ComponentBuilt.cshtml",
       "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M12.F2 X12.13 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/BedMonitor.cshtml",
+      "/Care/Record/BedMonitorCard.cshtml",
+      "/Care/Record/_ScriptedLayout.cshtml"
+    ]
+  },
+  "M12.F2 X12.13 1": {
+    "modules": [],
+    "views": [
+      "/Bench/Vendors/RestartedComponent.cshtml",
+      "/Bench/Vendors/RestartedComponentHolder.cshtml",
+      "/Bench/Vendors/_ScriptedLayout.cshtml"
     ]
   },
   "M12.F2 X12.7 0": {
@@ -3481,6 +3566,14 @@
     ],
     "views": [
       "/Bench/Lanes/LaneConfirm.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "cell lane.slot.hostDestroyed": {
+    "modules": [],
+    "views": [
+      "/Bench/Lanes/LaneComponentCard.cshtml",
+      "/Bench/Lanes/LaneSlotHostDestroyed.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

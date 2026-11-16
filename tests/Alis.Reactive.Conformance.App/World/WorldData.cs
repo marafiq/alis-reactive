@@ -124,6 +124,8 @@ internal sealed class WorldData
 
     internal IReadOnlyCollection<string> SecondOriginLog => _secondOriginLog;
 
+    internal HostOrders HostOrders { get; } = new();
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
@@ -199,6 +201,7 @@ internal sealed class WorldData
         var holds = _gates.SelectMany(gate => HoldsOf(gate.Value).Select(hold => (gate.Key.Gate, gate.Key.At, Hold: hold))).ToList();
         var parked = holds.Where(armed => armed.Hold.IsParked).Select(armed => Named(armed.Gate, armed.At)).Order(StringComparer.Ordinal).ToList();
         foreach (var armed in holds) armed.Hold.EndWithItsWorld();
+        HostOrders.End();
         return parked;
     }
 

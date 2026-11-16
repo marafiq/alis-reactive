@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RestartedCallbacksBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<RestartedCallbacksBoard>();
+}
+<h1>The bench</h1>
+<h2>@Model.Caption</h2>
+@(plan.ConformanceCallbacks("callbacks", new CallbacksStart { OwnNamesGeneration = true }))
+<button type="button" @Html.Raises(plan, RestartedCallbacksButtons.OpenTheCard)>Open the card</button>
+<button type="button" @Html.Raises(plan, RestartedCallbacksButtons.CloseTheCard)>Close the card</button>
+<section id="card" aria-label="Card"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(RestartedCallbacksButtons.OpenTheCard, pipeline => pipeline.Get(VendorSlotCards.Card).Into("card"))
+        .CustomEvent(RestartedCallbacksButtons.CloseTheCard, pipeline => pipeline.Unload("card")));
+}
+@Html.RenderPlan(plan)

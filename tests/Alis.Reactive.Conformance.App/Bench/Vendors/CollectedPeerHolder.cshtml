@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CollectedPeerHolder
+@{
+    var plan = Html.ReactivePlan<CollectedPeerHolder>();
+}
+<p>@Model.Note</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Listen(
+        pipeline.Component<ConformanceComponent>("conformance"),
+        component => component.Raised,
+        (raised, pipeline) => pipeline.Listen(
+            raised.Peer,
+            peer => peer.Change,
+            (change, pipeline) => pipeline.Element("heard").Text.Set(pipeline.Plugin<PageTally>().AddOne())))));
+}
+@Html.RenderPlan(plan)

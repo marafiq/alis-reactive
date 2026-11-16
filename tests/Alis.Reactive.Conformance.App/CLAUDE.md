@@ -30,7 +30,13 @@ its views.
   no host of `spec/Reference/app.json` runs it.
 - The World area (`World/`) scopes data, gates and caches to a test's world by the cookie `"world"`, in Development
   alone. A document's request that carries no world gets a new one, so a person runs the app as a test does; any
-  other request with no world gets none.
+  other request with no world gets none. Its host endpoints stand for a component's host (`World/HostOrders.cs`):
+  `Components/component-host.ts`, on every page the conformance script runs, waits for an element's id at
+  `WorldEndpoints.HostOrders`, restarts the component the conformance library mounted there, destroying the object,
+  emptying the element and building a new object from the element's start one generation on, and reports to
+  `WorldEndpoints.HostDone`, an empty report when the element holds the new object and the sentence of what failed
+  otherwise; `TestWorld.Restart` posts the order to `WorldEndpoints.HostRestart`, which answers when the report comes,
+  409 with its sentence when it names a failure, and the world's end answers a waiting page with no order.
 - `Components/` holds the conformance library (`spec/Reference/native.json`), a folder for each component with its
   declaration, its payloads, its live objects and the data classes its members name; what several components
   reach sits in `Components/` itself. Its busy indicator and its notice are no declarations

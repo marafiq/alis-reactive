@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Encodings.Web;
+using System.Text.Json;
 using Alis.Reactive.Conformance.App.Components;
 using Alis.Reactive.Conformance.World;
 using Microsoft.Extensions.Caching.Distributed;
@@ -59,6 +60,16 @@ internal static class WorldArea
         });
         app.MapPost(WorldEndpoints.ReleaseGate, (GateOrder order, CurrentWorld world)
             => world.Data.Release(order) ? Results.Ok() : Results.Conflict($"The gate {WorldData.Named(order.Gate, order.At)} holds no request in this world."));
+        app.MapPost(WorldEndpoints.HostOrders, async (CurrentWorld world, HttpContext context)
+            => await world.Data.HostOrders.Next(context.RequestAborted) is { } elementId ? Results.Text(elementId) : Results.NoContent());
+        app.MapPost(WorldEndpoints.HostRestart, async (RestartOrder order, CurrentWorld world, HttpContext context)
+            => await world.Data.HostOrders.Restart(order.ElementId, context.RequestAborted) is { Length: > 0 } report ? Results.Text(report, statusCode: StatusCodes.Status409Conflict) : Results.Ok());
+        app.MapPost(WorldEndpoints.HostDone, async (CurrentWorld world, HttpRequest request) =>
+        {
+            using var body = new StreamReader(request.Body);
+            return world.Data.HostOrders.Done(await body.ReadToEndAsync()) ? Results.Ok() : Results.Text("No restart is in work in this world.", statusCode: StatusCodes.Status409Conflict);
+        });
+        app.MapGet(WorldPages.Host, () => Results.Content(HostPage(), Html));
         app.MapGet(WorldPages.Records, (CurrentWorld world) => Results.Content(RecordsPage(world.Data), Html));
         app.MapGet(WorldPages.Word, () => Results.Content(WordPage(), Html));
         app.MapGet(WorldPages.Words, () => Results.Content(WordsPage(), Html));
@@ -114,6 +125,11 @@ internal static class WorldArea
 
     private static string RecordsPage(WorldData world)
         => Page("Residents", "<h1>Residents</h1><ul>" + string.Concat(world.Residents.Select(resident => $"<li>{Text(resident)}</li>")) + "</ul>");
+
+    private static string HostPage()
+        => Page("The host",
+            $"<section id=\"callbacks\" data-conformance-callbacks=\"{Text(JsonSerializer.Serialize(new CallbacksStart { OwnNamesGeneration = true }))}\"></section>"
+            + "<script src=\"/js/alis-reactive-conformance.js\"></script><script src=\"/_content/AlisReactive/js/alis-reactive.js\"></script>");
 
     private static string WordPage()
         => Page("The word", $"<a href=\"{WorldEndpoints.WordAnswer}\" target=\"answer\">Read the word</a><iframe id=\"answer\" name=\"answer\" title=\"The word's answer\"></iframe>");

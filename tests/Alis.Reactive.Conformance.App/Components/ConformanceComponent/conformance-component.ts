@@ -9,6 +9,7 @@ import type { BindingStart, ConformanceStart, ItemStart, RaiseStart, StartsStart
 interface ComponentElement extends HTMLElement {
     conformanceComponent?: ConformanceComponent;
 }
+const removals = { called: 0 };
 export class ConformanceComponent extends ComponentEvents {
     readonly element: ComponentElement;
     private readonly start: ConformanceStart;
@@ -32,6 +33,8 @@ export class ConformanceComponent extends ComponentEvents {
     private readonly logList: HTMLUListElement;
     private readonly currentItem: Item | null;
     private peer: ConformancePeer | null = null;
+    private readonly firstPeer: WeakRef<ConformancePeer>;
+    private readonly offCalls: HTMLElement | null;
     private readonly box: HTMLInputElement;
     enabled: boolean;
     private heldDay = new Date(2026, 10, 9, 9);
@@ -94,7 +97,9 @@ export class ConformanceComponent extends ComponentEvents {
         this.draw();
         this.controls();
         this.versions();
-        this.ownPeer();
+        this.firstPeer = new WeakRef(this.ownPeer());
+        this.offCalls = start.offCalls === null ? null : offCallsLine(start.offCalls);
+        this.showOffCalls();
         element.conformanceComponent = this;
     }
     get text(): string { return this.heldText; }
@@ -125,6 +130,7 @@ export class ConformanceComponent extends ComponentEvents {
     get readOnlyCount(): number { return this.count; }
     get calls(): number { return this.methodCalls; }
     get isDestroyed(): boolean { return this.destroyed; }
+    get firstPeerState(): string { return this.firstPeer.deref() === undefined ? "collected" : "alive"; }
     set writeOnlyText(value: string) { this.view.status("Write-only", "Written " + value); }
     ping(): void { this.called(); this.showPing(); }
     total(): number { this.called(); return this.count; }
@@ -219,9 +225,15 @@ export class ConformanceComponent extends ComponentEvents {
         delete this.element.conformanceComponent;
     }
     override removeEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: boolean | EventListenerOptions): void {
+        removals.called += 1;
+        this.showOffCalls();
         if (this.destroyed)
             throw new Error("The component was destroyed before its listener was removed.");
         super.removeEventListener(type, callback, options);
+    }
+    private showOffCalls(): void {
+        if (this.offCalls !== null)
+            this.offCalls.textContent = String(removals.called);
     }
     private inItsCode(record: TakenRecord): string { return String(record.name) + " in " + record.code; }
     private called(): void { this.view.status("Calls", String(++this.methodCalls)); }
@@ -442,6 +454,12 @@ mountComponents("data-conformance-component", (element, value) => {
     }
     return () => { lifetime.abort(); component?.destroy(); };
 });
+function offCallsLine(id: string): HTMLElement {
+    const line = document.getElementById(id);
+    if (line === null)
+        throw new Error("No element shows the count of removeEventListener calls: " + id);
+    return line;
+}
 function withPendingCount(binding: BindingData): BindingData {
     const count: unknown = Reflect.get(binding, "count");
     return Object.assign({}, binding, { count: Promise.resolve(count) });

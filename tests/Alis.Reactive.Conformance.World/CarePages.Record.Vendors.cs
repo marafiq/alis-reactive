@@ -4,4 +4,5 @@ public static partial class CarePages
 {
     public const string PanelHandover = Record + "panel-handover";
     public const string PanelReopening = Record + "panel-reopening";
+    public const string BedMonitor = Record + "bed-monitor";
 }

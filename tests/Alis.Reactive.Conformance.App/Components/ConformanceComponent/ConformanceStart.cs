@@ -75,6 +75,9 @@ public sealed class ConformanceStart
     [JsonPropertyName("builtBy")]
     public string? BuiltBy { get; init; }
 
+    [JsonPropertyName("offCalls")]
+    public string? OffCalls { get; init; }
+
     [JsonPropertyName("settleEndpoint")]
     public string SettleEndpoint { get; init; } = WorldEndpoints.Settle;
 

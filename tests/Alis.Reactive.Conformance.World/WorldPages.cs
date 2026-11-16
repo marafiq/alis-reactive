@@ -13,6 +13,7 @@ public static class WorldPages
     public const string WordSlip = "/world/word-slip";
     public const string ZoneSlip = "/world/zone-slip";
     public const string Collector = "/world/collector";
+    public const string Host = "/world/host";
     public const string Echo = "/world/echo";
     public const string SecondOriginLog = "/world/second-origin/log";
 }

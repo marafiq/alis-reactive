@@ -10,7 +10,7 @@
 }
 <h1>The bench</h1>
 <h2>@Model.Caption</h2>
-@(plan.ConformanceCallbacks("callbacks")
+@(plan.ConformanceCallbacks("callbacks", new CallbacksStart())
     .Reactive(callbacks => callbacks.OnRaised, (raised, pipeline) => pipeline.Element("raised-room").Text.Set(raised.Room)))
 @(plan.ConformanceStore("store")
     .Reactive(store => store.Posted, (posted, pipeline) => pipeline.Element("posted-message").Text.Set(posted.Message)))

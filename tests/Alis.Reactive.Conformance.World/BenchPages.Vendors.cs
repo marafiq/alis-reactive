@@ -20,4 +20,11 @@ public static partial class BenchPages
     public const string VendorsBroughtComponent = Vendors + "brought-component";
     public const string VendorsComponentBuiltLate = Vendors + "component-built/late";
     public const string VendorsComponentBuiltOnMount = Vendors + "component-built/on-mount";
+    public const string VendorsCallbackListeners = Vendors + "callback-listeners";
+    public const string VendorsCallbackHolder = Vendors + "callback-holder";
+    public const string VendorsCallbackScript = Vendors + "callback-script";
+    public const string VendorsFrozenCallbacks = Vendors + "frozen-callbacks";
+    public const string VendorsRestartedCallbacks = Vendors + "restarted-callbacks";
+    public const string VendorsRestartedComponent = Vendors + "restarted-component";
+    public const string VendorsCollectedPeer = Vendors + "collected-peer";
 }

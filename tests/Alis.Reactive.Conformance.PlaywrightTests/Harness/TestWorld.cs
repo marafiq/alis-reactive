@@ -42,6 +42,16 @@ public sealed class TestWorld
         where TGate : struct, Enum
         => Arm(new GateOrder { Gate = GateName.Of(gate), At = endpoint });
 
+    public async Task Restart(string elementId)
+    {
+        using var answer = await _harness.PostAsJsonAsync(WorldEndpoints.HostRestart, new RestartOrder { ElementId = elementId });
+        if (answer.StatusCode == System.Net.HttpStatusCode.Conflict)
+            throw new InvalidOperationException("The host did not restart the component at '" + elementId + "': " + await answer.Content.ReadAsStringAsync());
+        answer.EnsureSuccessStatusCode();
+    }
+
+    public Task CollectGarbage() => Page.RequestGCAsync();
+
     public Task InstallTheClock() => Page.Clock.InstallAsync(new ClockInstallOptions { TimeDate = ClockStart });
 
     public Task HoldTheClock() => Page.Clock.PauseAtAsync(ClockStart.AddHours(1));

@@ -507,6 +507,41 @@ describe("when the listening API differs, the step follows the declaration", () 
   });
 });
 
+describe("when a listen reaches its object by the element's id, its stop names that element", () => {
+  const located = { ...listened({ kind: "located", id: "pump" }), listen: { kind: "assignment" } } as const;
+
+  test("a refused listen names the element, its vendor and the event, and adds no release", () => {
+    const owner = new Card();
+    const feed = Object.freeze({ posted: null });
+    const element = { current: feed };
+
+    expect(() => { listenTo(located, context(owner, { feed, chart: new Chart() }), () => element); })
+      .toThrow(expect.objectContaining({ name: "Stop", message: "The listen to 'posted' on the element 'pump-element' of the vendor 'feed' did not start: The object refused the callback property 'posted'." }));
+    expect(owner.removals).toStrictEqual([]);
+  });
+
+  test("a refused removal names the element, its vendor and the event", () => {
+    const owner = new Card();
+    const feed: { posted: Listener | null } = { posted: null };
+    const element = { current: feed };
+    listenTo(located, context(owner, { feed, chart: new Chart() }), () => element);
+    Object.freeze(feed);
+
+    expect(() => { owner.release(); })
+      .toThrow(expect.objectContaining({ name: "Stop", message: "The listen to 'posted' on the element 'pump-element' of the vendor 'feed' was not removed: The object refused the callback property 'posted'." }));
+  });
+
+  test("a listen on an object a payload holds keeps the vendor's sentence", () => {
+    const owner = new Card();
+    const element: { current: object | null } = { current: null };
+    const feed = Object.freeze({ posted: null, host: element });
+    element.current = feed;
+
+    expect(() => { listenTo({ ...located, release: { kind: "held", vendor: "feed", element: ["host"] } }, context(owner, { feed, chart: new Chart() }), noElement); })
+      .toThrow(expect.objectContaining({ name: "Stop", message: "The object refused the callback property 'posted'." }));
+  });
+});
+
 function vendorRemover(removed: string[]): () => void {
   return () => { removed.push("the vendor's remover"); };
 }

@@ -22,6 +22,7 @@ export interface ConformanceStart {
     raises: RaiseStart[];
     records: RecordStart[];
     builtBy: string | null;
+    offCalls: string | null;
     settleEndpoint: string;
     countEndpoint: string;
     itemEndpoint: string;

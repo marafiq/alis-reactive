@@ -1,3 +1,8 @@
+import { restarts } from "./component-host";
+interface Mounted {
+    readonly destroy: () => void;
+    readonly generation: number;
+}
 export class ComponentView {
     readonly element: HTMLElement | ShadowRoot;
     readonly lifetime = new AbortController();
@@ -41,8 +46,8 @@ export class ComponentView {
         return input;
     }
 }
-export function mountComponents(marker: string, build: (element: HTMLElement, start: unknown) => () => void): void {
-    mountMarked(marker, (element) => build(element, startOf(element, marker)));
+export function mountComponents(marker: string, build: (element: HTMLElement, start: unknown, generation: number) => () => void): void {
+    mountMarked(marker, (element, generation) => build(element, startOf(element, marker), generation));
 }
 function startOf(element: HTMLElement, marker: string): unknown {
     const text = element.getAttribute(marker);
@@ -50,8 +55,8 @@ function startOf(element: HTMLElement, marker: string): unknown {
         throw new Error("The component start is missing: " + marker);
     return JSON.parse(text);
 }
-export function mountMarked(marker: string, build: (element: HTMLElement) => () => void): void {
-    const mounted = new WeakMap<HTMLElement, () => void>();
+export function mountMarked(marker: string, build: (element: HTMLElement, generation: number) => () => void): void {
+    const mounted = new WeakMap<HTMLElement, Mounted>();
     function rootOf(event: Event): HTMLElement {
         if (!(event instanceof CustomEvent))
             throw new Error("A component lifecycle event must be a CustomEvent.");
@@ -65,13 +70,24 @@ export function mountMarked(marker: string, build: (element: HTMLElement) => () 
         for (const element of rootOf(event).querySelectorAll<HTMLElement>("[" + marker + "]")) {
             if (mounted.has(element))
                 continue;
-            mounted.set(element, build(element));
+            mounted.set(element, { destroy: build(element, 1), generation: 1 });
         }
     });
     document.addEventListener("alis:unmount", (event) => {
         for (const element of rootOf(event).querySelectorAll<HTMLElement>("[" + marker + "]")) {
-            mounted.get(element)?.();
+            mounted.get(element)?.destroy();
             mounted.delete(element);
         }
+    });
+    restarts((element) => {
+        const record = mounted.get(element);
+        if (record === undefined)
+            return false;
+        mounted.delete(element);
+        record.destroy();
+        element.replaceChildren();
+        const generation = record.generation + 1;
+        mounted.set(element, { destroy: build(element, generation), generation });
+        return true;
     });
 }

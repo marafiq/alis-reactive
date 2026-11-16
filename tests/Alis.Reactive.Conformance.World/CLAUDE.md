@@ -12,8 +12,8 @@ references no Alis.Reactive assembly, so a test that compiles against it cannot 
 - A seed is written through the typed builders of `Seed.cs`, and `ComponentVersion.cs` names the builds of the
   conformance component a seed chooses from; an endpoint and a page of the World area are named once,
   in `WorldEndpoints.cs` and `WorldPages.cs`, and `GateOrder.cs` carries a hold's action and, where it names one, its
-  endpoint; a bench cell's page is named for its cell in a part of `BenchPages`
-  for its family (`BenchPages.Properties.cs`), and an endpoint its page calls in `BenchEndpoints.cs`; a refusal route's page is named in `RefusalPages.cs`, under the
+  endpoint, and `RestartOrder.cs` the id of the element whose component the host restarts; a bench cell's page is
+  named for its cell in a part of `BenchPages` for its family (`BenchPages.Properties.cs`), and an endpoint its page calls in `BenchEndpoints.cs`; a refusal route's page is named in `RefusalPages.cs`, under the
   area's root that file names, by which the sweep of the app's pages knows a page that refuses by design.
 - A page's culture is part of its address, never world state: `RefusalPages.ArrayLambdas.Culture.cs` names the carer
   directory under the German phonebook sort and under German, one route with two queries.

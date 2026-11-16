@@ -1,5 +1,5 @@
 import type { Owner } from "../OwnershipAndState/index";
-import { assertNever, type ElementLocator, type ListenStatement, type Release } from "../Schema/index";
+import { assertNever, type ElementLocator, type ListenStatement, type LocatedRelease, type Release } from "../Schema/index";
 import { got, Stop, value } from "../ValuesAndSources/index";
 import { subscribe, type Listener, type Unsubscribe } from "../Vendors/index";
 import { bind, isAnObject, type Context } from "./context";
@@ -9,7 +9,19 @@ import { elementOf, heldBy, type ElementFor, type StillHeld } from "./objects";
 
 const listened = new WeakMap<Owner, WeakMap<ListenStatement, WeakSet<object>>>();
 
+type Told = (stopped: Stop, outcome: string) => Stop;
+
 export function listenTo(statement: ListenStatement, context: Context, elementFor: ElementFor): void {
+  const told = toldOf(statement, context);
+  try {
+    listens(statement, context, elementFor, told);
+  } catch (stopped) {
+    if (!(stopped instanceof Stop)) throw stopped;
+    throw told(stopped, "did not start");
+  }
+}
+
+function listens(statement: ListenStatement, context: Context, elementFor: ElementFor, told: Told): void {
   const read = evaluate(statement.object, context);
   if (read.kind === "nothing" || !isAnObject(read.value)) throw new Stop("The object that raises '" + statement.event + "' is not on the page.");
   const object = read.value;
@@ -20,7 +32,33 @@ export function listenTo(statement: ListenStatement, context: Context, elementFo
   objects.add(object);
   const weak = new WeakRef(hearing);
   context.owner.runs(ends(weak));
-  context.owner.listens(releases(weak, new WeakRef(object), stillHeld, remover(hearing, statement.listen.kind === "returned")));
+  context.owner.listens(releases(weak, new WeakRef(object), stillHeld, telling(remover(hearing, statement.listen.kind === "returned"), told)));
+}
+
+function toldOf(statement: ListenStatement, context: Context): Told {
+  const release = statement.release;
+  switch (release.kind) {
+    case "living":
+    case "held":
+      return (stopped) => stopped;
+    case "located": {
+      const locator = locatorOf(release, context);
+      return (stopped, outcome) => new Stop("The listen to '" + statement.event + "' on the element '" + locator.id + "' of the vendor '" + locator.vendor + "' " + outcome + ": " + stopped.reason);
+    }
+    default:
+      return assertNever(release);
+  }
+}
+
+function telling(remove: Unsubscribe, told: Told): Unsubscribe {
+  return () => {
+    try {
+      remove();
+    } catch (stopped) {
+      if (!(stopped instanceof Stop)) throw stopped;
+      throw told(stopped, "was not removed");
+    }
+  };
 }
 
 function objectsOf(statement: ListenStatement, owner: Owner): WeakSet<object> {
@@ -95,10 +133,14 @@ function releaseOf(release: Release, object: object, context: Context, elementFo
       return heldBy(element.value, release.vendor, context);
     }
     case "located": {
-      const locator = context.plan.objects[release.id] as ElementLocator;
+      const locator = locatorOf(release, context);
       return heldBy(elementOf(locator.id, elementFor), locator.vendor, context);
     }
     default:
       return assertNever(release);
   }
+}
+
+function locatorOf(release: LocatedRelease, context: Context): ElementLocator {
+  return context.plan.objects[release.id] as ElementLocator;
 }

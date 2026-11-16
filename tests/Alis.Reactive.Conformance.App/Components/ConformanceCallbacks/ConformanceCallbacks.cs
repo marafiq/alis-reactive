@@ -1,4 +1,5 @@
 using Alis.Reactive.Declarations;
+using Alis.Reactive.ValuesAndSources;
 using Alis.Reactive.Vendors;
 
 namespace Alis.Reactive.Conformance.App.Components;
@@ -13,4 +14,6 @@ public sealed class ConformanceCallbacks : Component
     public Event<RaisedRoom> OnRaised => Event<RaisedRoom>();
 
     public Event<SearchArgs> OnSearch => Event<SearchArgs>();
+
+    public void Append(Arg<string> text) => Method([text]);
 }

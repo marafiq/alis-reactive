@@ -10,7 +10,7 @@
     string[] names = [.. Model.Names];
 }
 <h1>The bench</h1>
-@(plan.ConformanceCallbacks("callbacks")
+@(plan.ConformanceCallbacks("callbacks", new CallbacksStart())
     .Reactive(callbacks => callbacks.OnSearch, (search, pipeline) =>
     {
         pipeline.Element("searched-for").Text.Set(search.Query);

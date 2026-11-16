@@ -60,6 +60,8 @@ public sealed class ConformanceComponent : Component, IInputComponent
 
     public ReadOnly<bool> IsDestroyed => ReadOnly<bool>();
 
+    public ReadOnly<string> FirstPeerState => ReadOnly<string>();
+
     public WriteOnly<string> WriteOnlyText => WriteOnly<string>();
 
     public Outer Outer => LiveObject<Outer>();
