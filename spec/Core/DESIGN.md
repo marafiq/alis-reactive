@@ -3823,7 +3823,11 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     (`probe:core-flags-split-agrees`);
   - `Url()`: an http or https URL by the standards, parsed by `System.Uri` on the server and by the URL Standard's
     `URL` in the browser, scheme `http` or `https`. The two parsers agree on every probe row, where today's browser
-    pattern disagrees with the server on two (`probe:core-uri-absolute`, `probe:whatwg-url-http`, `probe:js-url-pattern`).
+    pattern disagrees with the server on two (`probe:core-uri-absolute`, `probe:whatwg-url-http`,
+    `probe:js-url-pattern`). They part on texts outside those rows, 30 of 112 in U17's design: a numeric host that is
+    no dotted IPv4 (`http://256.256.256.256`, which `System.Uri` alone takes), a host written in Unicode, userinfo and
+    a zone id among them. Such a text is not supported (the owner, 2026-11-16): the browser's verdict stands before
+    the request is sent and the server's when the endpoint checks it.
 
   The browser patterns of today's checks leave (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:150-152`), and so
   does the expression that reads a developer's pattern for .NET-only syntax (`Alis.Reactive/Validation/Checks.cs:149-151`).

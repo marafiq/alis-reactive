@@ -1803,6 +1803,27 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   inputs it sent before it shows its own, and a check that passes shows no notice. D10.18's structured copy is what a
   vendor or an app's plugin receives; the runtime's own plugins read what the run holds, so the run's record of each
   input it sent keeps the table's entry, which Ownership.tla models by its generation. The owner can overrule it.
+- The owner, 2026-11-16, answering the lead's asks, verbatim: "1- Validation overal vision is super clear, so 1 must
+  work accordingly. That is the support validation on both side written once on server side with validation module. 2-
+  The IP address is lower prirority, land 99% with not supported noted. Goal is to support what browser support since
+  literally that is why we are sending to back to server wiht our module. 3- Go with more stable and high quality
+  solution with enums,its been discussed many times at this point. 4- sending -- think about user perspective, there
+  could be cases when a default needs to send, if amodel is there, send it i would say that will cover any defaults.
+  5- one refrelection read is fine. 6- priority is to ship core all modules so its high quality, and stable." Read by
+  the lead: (1) the five check operators join the closed list, emailAddress, creditCard, url, precisionScale and
+  inFlags, so a rule written once on the server runs in the browser too (U17); (2) Url() takes no shape test: the
+  browser checks by the URL Standard's parser and the server by System.Uri, and a text they part on is not supported,
+  noted in D16.10; (3) the JSON body's enum node is built (U18); (5) MemberInfo, read in
+  TypeKnowledge/WrittenMember.cs to name a payload member as C# writes it, joins the owner's list of type-information
+  reads (U20); (6) the core's modules ship first, each high quality and stable, and Fusion's units after them. (4),
+  asked again with three use cases, the owner answered, verbatim: "i think it makes sense to not send anything if
+  condition is false, server has to handle that correctly, its correct rule." So N10.4 stands as D10.16 and
+  Request.tla state it: a part a failed condition guards is left out and the endpoint binds its own default, and each
+  sent part gains the schema field its condition needs (U18); a page that must send a value either way writes it with
+  Choose. On CascadeMode.Stop in the browser, explained with its example, verbatim: "yes, i am ok with your
+  recommondation. nice one": the browser honours Stop, each later check of the rule passing where an earlier one
+  failed, written into its fn with no schema change, and X16.34's refusal of a Stop rule's later checks leaves with it
+  (U17, its own piece).
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
