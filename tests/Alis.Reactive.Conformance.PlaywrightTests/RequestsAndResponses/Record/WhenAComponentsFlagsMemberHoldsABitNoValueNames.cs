@@ -20,7 +20,7 @@ public sealed class WhenAComponentsFlagsMemberHoldsABitNoValueNames(string host)
         await unnamedBit.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Send care", Exact = true }).ClickAsync();
         await Expect(unnamedBit.Page.Locator("#care-log")).ToHaveTextAsync("-");
         Assert.That(unnamedBit.ConsoleErrors, Has.Count.EqualTo(1));
-        Assert.That(unnamedBit.ConsoleErrors.Single(), Does.Contain("r => r.Care").And.Contain("129"));
+        Assert.That(unnamedBit.ConsoleErrors.Single(), Is.EqualTo("The request's member 'Care' holds 129, which its flags rows cannot split."));
 
         var mondayAndTheWeekend = await NewWorld();
         await mondayAndTheWeekend.Page.GotoAsync(CarePages.PanelDaysHold);

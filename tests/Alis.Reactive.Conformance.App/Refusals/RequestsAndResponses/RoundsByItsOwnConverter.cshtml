@@ -1,4 +1,3 @@
-@using Alis.Reactive.Conformance.App.Components
 @using Alis.Reactive.Conformance.App.Refusals
 @using Alis.Reactive.Conformance.World
 @using Alis.Reactive.RequestsAndResponses
@@ -11,12 +10,12 @@
     var plan = Html.ReactivePlan<StaffingRounds>();
 }
 <h1>@Model.Ward rounds by staffing</h1>
-@(plan.ConformanceComponent("staffing", new ConformanceStart()))
 <p id="rounds"></p>
 <button type="button" @Html.Raises(plan, StaffingRoundEvents.Find)>Find rounds</button>
 @{
-    Html.On(plan, trigger => trigger.CustomEvent(StaffingRoundEvents.Find, pipeline => pipeline
-        .Get<RoundsOfCodedStaffing>(RefusalEndpoints.StaffingRounds, request => request.Set(r => r.Choice, pipeline.Component<ConformanceComponent>("staffing").Choice))
-        .OnSuccess(Content.Text, (found, pipeline) => pipeline.Element("rounds").Text.Set(found.Body))));
+    Html.On(plan, trigger => trigger.CustomEvent(StaffingRoundEvents.Find, pipeline => pipeline.Get(RequestsAndResponsesEndpoints.CodedStaffing)
+        .OnSuccess<CodedStaffingOfTheRound>((staffing, pipeline) => pipeline
+            .Get<RoundsOfStaffing>(RefusalEndpoints.StaffingRounds, request => request.Set(r => r.Choice, staffing.Body.Read(coded => coded.Choice)))
+            .OnSuccess(Content.Text, (found, pipeline) => pipeline.Element("rounds").Text.Set(found.Body)))));
 }
 @Html.RenderPlan(plan)

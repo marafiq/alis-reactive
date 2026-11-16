@@ -20,6 +20,7 @@ public sealed class WhenAComponentHoldsAFormNoValueOfItsEnumIsHeldAs(string host
         await medium.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Find staff", Exact = true }).ClickAsync();
         await Expect(medium.Page.Locator("#search-log")).ToHaveTextAsync("-");
         Assert.That(medium.ConsoleErrors, Has.Count.EqualTo(1));
+        Assert.That(medium.ConsoleErrors.Single(), Is.EqualTo("The request's member 'Choice' holds \"medium\"; its enum forms are \"low\", \"high\"."));
 
         var high = await NewWorld();
         await high.Page.GotoAsync(CarePages.StaffSearchLogged);

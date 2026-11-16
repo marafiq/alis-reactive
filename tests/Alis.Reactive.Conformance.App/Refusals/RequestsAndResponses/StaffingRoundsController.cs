@@ -17,20 +17,24 @@ public sealed class StaffingRoundsController : Controller
     [HttpGet(RefusalPages.RoundsByItsName)]
     public IActionResult ByItsName() => View("/Refusals/RequestsAndResponses/RoundsByItsName.cshtml", new StaffingRounds("North"));
 
+    [HttpGet(RequestsAndResponsesEndpoints.CodedStaffing)]
+    public IActionResult CodedStaffing() => Json(new CodedStaffingOfTheRound(Choice.Minimum));
+
+    [HttpGet(RequestsAndResponsesEndpoints.Staffing)]
+    public IActionResult Staffing() => Json(new StaffingOfTheRound(Choice.Minimum));
+
     [HttpGet(RefusalEndpoints.StaffingRounds)]
     public IActionResult Rounds(RoundsOfStaffing query) => Content($"Rounds at {query.Choice} staffing", PlainText);
 }
 
 public sealed record StaffingRounds(string Ward);
 
+public sealed record CodedStaffingOfTheRound([property: JsonConverter(typeof(ChoiceAsItsCode))] Choice Choice);
+
+public sealed record StaffingOfTheRound(Choice Choice);
+
 public sealed class RoundsOfStaffing
 {
-    public Choice Choice { get; set; }
-}
-
-public sealed class RoundsOfCodedStaffing
-{
-    [JsonConverter(typeof(ChoiceAsItsCode))]
     public Choice Choice { get; set; }
 }
 

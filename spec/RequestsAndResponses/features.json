@@ -503,7 +503,7 @@
           "for": "X9.19",
           "page": "The dose scanner, the round's ConformanceComponent, whose own Hold medium button sets its Choice to medium, a form no value of the Choice enum is held as, sets r => r.Choice of a GET whose step after writes Sent into the log.",
           "gesture": "Click the scanner's Hold medium, then Find staff.",
-          "outcome": "The network log holds no request, the log keeps its dash, and the console names r => r.Choice and the forms low and high.",
+          "outcome": "The network log holds no request, the log keeps its dash, and the console holds one error, \"The request's member 'Choice' holds \"medium\"; its enum forms are \"low\", \"high\".\"",
           "opposite": "With high held, the URL holds Choice=Maximum and the log reads Sent.",
           "defect": "The unknown form sent, so the URL holds Choice=medium; or the request skipped with the pipeline going on, so the log reads Sent."
         },
@@ -517,10 +517,10 @@
         },
         {
           "for": "X9.21",
-          "page": "A refusal view whose GET sets r => r.Choice from a ConformanceComponent's Choice, where the request's Choice member carries its own converter that writes Minimum as {\"code\":0}.",
+          "page": "A refusal view whose GET sets r => r.Choice from the Choice of a response body, a member that carries its own converter, which writes Minimum as {\"code\":0}.",
           "gesture": "Open the page.",
           "outcome": "The page is refused where it renders with \"'r => r.Choice' holds Minimum as {\\\"code\\\":0} under its own JSON converter, and a request sends one text or number per member; send a member written as text or a number.\"",
-          "opposite": "With the converter removed, the page renders and the component's Low sends Choice=Minimum.",
+          "opposite": "With the converter removed, the page renders and the body's Choice, held as low, sends Choice=Minimum.",
           "defect": "The page renders and sends Choice=[object Object]."
         },
         {
@@ -567,7 +567,7 @@
           "for": "X9.25",
           "page": "The care panel, the resident record's ConformanceComponent, whose own Hold 129 button sets its Days to 129, Mon with the bit 128 that no value of the flags enum names, and whose Days sets r => r.Care of a GET whose step after writes Sent.",
           "gesture": "Click the care panel's Hold 129, then Send care.",
-          "outcome": "The network log holds no request, the log keeps its dash, and the console names r => r.Care and 129.",
+          "outcome": "The network log holds no request, the log keeps its dash, and the console holds one error, \"The request's member 'Care' holds 129, which its flags rows cannot split.\"",
           "opposite": "With 97 held, the URL holds Care=Mon%2C+Weekend and the log reads Sent.",
           "defect": "The value sent as 129 or as Mon alone, so the network log holds the GET; or the pipeline going on, so the log reads Sent."
         },

@@ -2048,7 +2048,7 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   "'r => r.Ward' holds EastWing and EastAnnex in one form, \"east\", under the app's options, so the browser cannot tell
   which one it holds; give one of them a JsonStringEnumMemberName of its own."
 - `X9.21` refusal: an enum whose held form writes a value as an object is refused where the view renders with
-  "'r => r.Shift' holds Day as {\"code\":0} under its own JSON converter, and a request sends one text or number per
+  "'r => r.Choice' holds Minimum as {\"code\":0} under its own JSON converter, and a request sends one text or number per
   member; send a member written as text or a number."
 - `X9.22` refusal: a literal its enum does not name is refused where the view renders with "'r => r.Shift' is set to
   5, which no value of its enum names: net10 refuses it and MVC 5 binds it, so the hosts bind it apart; set a value
