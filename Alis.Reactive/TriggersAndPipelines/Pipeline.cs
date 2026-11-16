@@ -113,6 +113,12 @@ public sealed class Pipeline<TModel>
     public GetRequest<TModel, NoModel> Get(string url) => Get<NoModel>(url, request => { });
 
     /// <summary>Sends a GET request whose members fill the URL's placeholders and its query.</summary>
+    /// <remarks>
+    /// A member in the query goes under its own name, with no parameter prefix, as MVC binds a query. The action's
+    /// parameter binds it unless the parameter names a prefix, as <c>[Bind(Prefix = "...")]</c> and .NET 10's
+    /// <c>[FromQuery(Name = "...")]</c> do, or is named like a member of its type, such as <c>name</c> of a type with a
+    /// <c>Name</c>: such a parameter binds none of the members.
+    /// </remarks>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
@@ -126,6 +132,12 @@ public sealed class Pipeline<TModel>
     public HeadRequest<TModel, NoModel> Head(string url) => Head<NoModel>(url, request => { });
 
     /// <summary>Sends a HEAD request whose members fill the URL's placeholders and its query.</summary>
+    /// <remarks>
+    /// A member in the query goes under its own name, with no parameter prefix, as MVC binds a query. The action's
+    /// parameter binds it unless the parameter names a prefix, as <c>[Bind(Prefix = "...")]</c> and .NET 10's
+    /// <c>[FromQuery(Name = "...")]</c> do, or is named like a member of its type, such as <c>name</c> of a type with a
+    /// <c>Name</c>: such a parameter binds none of the members.
+    /// </remarks>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
@@ -139,6 +151,12 @@ public sealed class Pipeline<TModel>
     public OptionsRequest<TModel, NoModel> Options(string url) => Options<NoModel>(url, request => { });
 
     /// <summary>Sends an OPTIONS request whose members fill the URL's placeholders and its query.</summary>
+    /// <remarks>
+    /// A member in the query goes under its own name, with no parameter prefix, as MVC binds a query. The action's
+    /// parameter binds it unless the parameter names a prefix, as <c>[Bind(Prefix = "...")]</c> and .NET 10's
+    /// <c>[FromQuery(Name = "...")]</c> do, or is named like a member of its type, such as <c>name</c> of a type with a
+    /// <c>Name</c>: such a parameter binds none of the members.
+    /// </remarks>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
@@ -152,6 +170,12 @@ public sealed class Pipeline<TModel>
     public PostRequest<TModel, NoModel> Post(string url) => Post<NoModel>(url, request => { });
 
     /// <summary>Sends a POST request whose members fill the URL's placeholders, its query and its body.</summary>
+    /// <remarks>
+    /// A member in the query or a form body goes under its own name, with no parameter prefix, as MVC binds them. The
+    /// action's parameter binds it unless the parameter names a prefix, as <c>[Bind(Prefix = "...")]</c> and .NET 10's
+    /// <c>[FromQuery(Name = "...")]</c> do, or is named like a member of its type, such as <c>name</c> of a type with a
+    /// <c>Name</c>: such a parameter binds none of the members.
+    /// </remarks>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
@@ -165,6 +189,12 @@ public sealed class Pipeline<TModel>
     public PutRequest<TModel, NoModel> Put(string url) => Put<NoModel>(url, request => { });
 
     /// <summary>Sends a PUT request whose members fill the URL's placeholders, its query and its body.</summary>
+    /// <remarks>
+    /// A member in the query or a form body goes under its own name, with no parameter prefix, as MVC binds them. The
+    /// action's parameter binds it unless the parameter names a prefix, as <c>[Bind(Prefix = "...")]</c> and .NET 10's
+    /// <c>[FromQuery(Name = "...")]</c> do, or is named like a member of its type, such as <c>name</c> of a type with a
+    /// <c>Name</c>: such a parameter binds none of the members.
+    /// </remarks>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
@@ -178,6 +208,12 @@ public sealed class Pipeline<TModel>
     public DeleteRequest<TModel, NoModel> Delete(string url) => Delete<NoModel>(url, request => { });
 
     /// <summary>Sends a DELETE request whose members fill the URL's placeholders, its query and its body.</summary>
+    /// <remarks>
+    /// A member in the query or a form body goes under its own name, with no parameter prefix, as MVC binds them. The
+    /// action's parameter binds it unless the parameter names a prefix, as <c>[Bind(Prefix = "...")]</c> and .NET 10's
+    /// <c>[FromQuery(Name = "...")]</c> do, or is named like a member of its type, such as <c>name</c> of a type with a
+    /// <c>Name</c>: such a parameter binds none of the members.
+    /// </remarks>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>

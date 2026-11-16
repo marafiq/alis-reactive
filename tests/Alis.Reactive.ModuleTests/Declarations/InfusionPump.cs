@@ -186,6 +186,11 @@ public sealed class ScheduledOrder : InfusionOrder
     public DateTime ReviewedAt { get; set; }
 }
 
+public sealed class InfusionReview
+{
+    public ScheduledOrder Order { get; init; } = new();
+}
+
 public sealed class PumpPanel : JsObject
 {
     public Property<string?> Caption => Property<string?>();

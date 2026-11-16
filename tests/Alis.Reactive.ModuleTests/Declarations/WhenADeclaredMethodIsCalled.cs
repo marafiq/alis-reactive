@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.ValuesAndSources;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace Alis.Reactive.ModuleTests.Declarations;
@@ -290,6 +291,22 @@ public sealed class WhenADeclaredMethodIsCalled
 
         Assert.That(rendered, Is.EqualTo(ScriptOpen + Reviews + ScriptClose));
         Assert.That(PlanSchema.ProblemsOf(Reviews), Is.Empty);
+    }
+
+    [Test]
+    public void pass_keeps_a_derived_replys_date_as_the_app_writes_it_since_it_writes_at_the_declared_type()
+    {
+        var html = Views.Of(new Infusion("North"), _ => { }, services => services.AddReactiveRequests(requests => requests.NoAntiforgery()));
+        var plan = html.ReactivePlan<Infusion>();
+        html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get("/infusions/review")
+            .OnSuccess<InfusionReview>((reply, pipeline) => pipeline.Component<InfusionPump>("pump").Review(reply.Body.Read(body => body.Order)))));
+
+        var rendered = Views.TextOf(html.RenderPlan(plan))[ScriptOpen.Length..^ScriptClose.Length];
+        var success = JsonDocument.Parse(rendered).RootElement.GetProperty("handlers")[0].GetProperty("do")[0].GetProperty("success");
+
+        Assert.That(success.GetRawText(), Is.EqualTo(
+            """{"kind":"json","do":[{"kind":"do","await":false,"expr":{"kind":"call","path":["review"],"members":"required","target":{"kind":"obj","id":"pump"},"args":[{"kind":"data","path":[{"name":"order","requires":[],"absent":{"kind":"start","value":{"reviewedAt":"0001-01-01T00:00:00","drug":"saline"}}}],"target":{"kind":"get","path":["value"],"members":"optional","target":{"kind":"get","path":["body"],"members":"required","target":{"kind":"ref","name":"reply1"}}}}]}}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(rendered), Is.Empty);
     }
 
     [Test]
