@@ -63,7 +63,8 @@ its views.
   world names, `ComponentVersion` of the world contract, one of the versions `spec/Reference/native.json` lists, and its endpoint members name the endpoints of
   `World/WorldArea.cs` its methods await, each at the settle gate and answering as a seed says: a 500, a count or the
   check's answer. A page's layout is `Shared/_Layout.cshtml`, which
-  links the framework's script, unless the page renders something of its own beside its body, as the ward's does. A
+  links the conformance library's script, then Native's bundle and the framework's script, unless the page renders
+  something of its own beside its body, as the ward's does. A
   layout whose pages send a request renders `Html.ConformanceBusy()` and `Html.ConformanceNotice()` after its body,
   since the host's request defaults name both contracts and a request whose page lacks either stops before it sends
   (D10.21); the shell's layout renders the Native ones in their place, and the page of X10.20 takes

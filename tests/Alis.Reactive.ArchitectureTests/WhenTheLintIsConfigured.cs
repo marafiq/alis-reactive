@@ -102,6 +102,14 @@ public class WhenTheLintIsConfigured
     public void a_nested_slice_that_imports_its_parent_row_by_its_own_relative_path_is_accepted()
         => AssertAccepted("rows/nested/left/reads-its-parent.accepted.ts");
 
+    [RefusedCase]
+    public void a_nested_slice_that_names_a_folder_of_its_parent_row_in_place_of_its_file_is_refused()
+        => AssertRefused("rows/nested/left/reads-a-folder-of-its-parent-row.refused.ts", RestrictedImport, line: 1);
+
+    [AcceptedCase]
+    public void a_nested_slice_that_imports_a_file_of_its_parent_row_named_like_a_folder_beside_it_is_accepted()
+        => AssertAccepted("rows/nested/left/reads-a-file-of-its-parent-row-named-like-a-folder.accepted.ts");
+
     [AcceptedCase]
     public void a_nested_slice_that_imports_its_own_file_is_accepted()
         => AssertAccepted("rows/nested/left/reads-its-own-file.accepted.ts");

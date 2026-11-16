@@ -1,0 +1,1 @@
+export { beds } from "../right";

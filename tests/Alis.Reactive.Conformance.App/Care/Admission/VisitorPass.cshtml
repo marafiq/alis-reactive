@@ -13,7 +13,7 @@
 @using (var arrival = Html.BeginRequestForm(plan, "arrival"))
 {
     @(Html.InputField(plan, m => m.Visitor, options => options.Label("Visitor")).NativeTextBox())
-    @(Html.InputField(plan, m => m.Pass, options => options.Label("Pass").Hidden()).NativeTextBox())
+    @(Html.NativeHiddenField(plan, m => m.Pass))
     @(Html.NativeButton("sign-in", "Sign in").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
         .Post<VisitorPass>(VisitorPassEndpoints.SignIns, request => request.Form(arrival.Form))
         .Validate<VisitorPassRules>()

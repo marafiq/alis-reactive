@@ -12,7 +12,10 @@ no other consumer.
 - A declaration mirrors the object's typed API member for member, by its JavaScript names. A slice needs no change
   to the core's runtime: one that seems to need it means the plan is missing information.
 - The slice's browser code is held to the strictest lint and TypeScript options of `spec/REWRITE.md` section 2.7,
-  with no exemption.
+  with no exemption. It reaches the page through `native.ts`, the bundle's entry, which calls each slice's mount;
+  `NativeComponents/mounted.ts`, the tree's first row, mounts a slice once on each element its marker names, on
+  `alis:mount`. `build.mjs` writes the bundle, alis-reactive-native.js, which git ignores, and the conformance app's
+  layout links it before the framework's script.
 - A slice's tests prove only what its declaration adds: its members' names and shapes, its browser facts and its
   own defects.
 - A file compiles for both hosts or for one, by the core's rule (`Alis.Reactive/CLAUDE.md`).
@@ -34,5 +37,8 @@ no other consumer.
 
 ```bash
 dotnet build Alis.Reactive.Native -c Release
+npx tsc -b Alis.Reactive.Native
+npx eslint Alis.Reactive.Native --max-warnings 0
+node build.mjs
 scripts/check.sh --no-spec
 ```

@@ -1,7 +1,9 @@
 #if NET48
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Web.Mvc;
+using System.Web.Mvc.Html;
 using Alis.Reactive.RenderingAndDelivery;
 
 namespace Alis.Reactive.Native.NativeComponents;
@@ -18,6 +20,10 @@ public static class NativeHiddenFieldHtml
     /// <param name="member">The member the field binds, as a member path.</param>
     /// <returns>The rendered hidden field, which writes its markup where the view puts it.</returns>
     public static Rendered<NativeHiddenField, TModel> NativeHiddenField<TModel, TValue>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan, Expression<Func<TModel, TValue>> member)
-        => throw new NotImplementedException();
+    {
+        var field = html.InputField(plan, member, options => options.Hidden());
+        var attributes = new Dictionary<string, object> { ["id"] = field.Id, ["data-native-hidden-field"] = "" };
+        return field.Render<NativeHiddenField>(field.Html.HiddenFor(field.Member, attributes));
+    }
 }
 #endif

@@ -1,5 +1,6 @@
 #if NET10_0_OR_GREATER
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,6 +19,10 @@ public static class NativeHiddenFieldHtml
     /// <param name="member">The member the field binds, as a member path.</param>
     /// <returns>The rendered hidden field, which writes its markup where the view puts it.</returns>
     public static Rendered<NativeHiddenField, TModel> NativeHiddenField<TModel, TValue>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, Expression<Func<TModel, TValue>> member)
-        => throw new NotImplementedException();
+    {
+        var field = html.InputField(plan, member, options => options.Hidden());
+        var attributes = new Dictionary<string, object> { ["id"] = field.Id, ["data-native-hidden-field"] = "" };
+        return field.Render<NativeHiddenField>(field.Html.HiddenFor(field.Member, attributes));
+    }
 }
 #endif

@@ -17,5 +17,6 @@ tests/Alis.Reactive.ArchitectureTests/LintCases/written/
 Alis.Reactive.Assets/runtime/Execution/written-*.ts
 Alis.Reactive/wwwroot/js/alis-reactive.js
 Alis.Reactive.OpenTelemetry/wwwroot/js/alis-reactive-opentelemetry.js
+Alis.Reactive.Native/wwwroot/js/alis-reactive-native.js
 tests/Alis.Reactive.Conformance.App/wwwroot/js/
 *.tsbuildinfo

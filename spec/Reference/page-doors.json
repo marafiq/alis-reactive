@@ -1598,9 +1598,7 @@
     ]
   },
   "M24.F6 M24.X2 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/IntakeBed.cshtml",
       "/Shared/_Layout.cshtml"
