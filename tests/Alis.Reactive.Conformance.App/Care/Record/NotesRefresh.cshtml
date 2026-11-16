@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NotesRefresh
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Notes";
+    var plan = Html.ReactivePlan<NotesRefresh>();
+}
+<h1>Notes of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, NotesRefreshes.Refresh)>Refresh notes</button>
+<button type="button" @Html.Raises(plan, NotesRefreshes.RefreshByFetch)>Refresh by fetch</button>
+<p>Requested with: <span id="notes-echo"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(NotesRefreshes.Refresh, pipeline => pipeline
+        .Get(NotesRefreshEndpoints.Notes)
+        .OnSuccess(Content.Text, (refreshed, pipeline) => pipeline.Element("notes-echo").Text.Set(refreshed.Body))));
+    Html.On(plan, trigger => trigger.CustomEvent(NotesRefreshes.RefreshByFetch, pipeline => pipeline
+        .Get<NoModel>(NotesRefreshEndpoints.Notes, request => request.Header("x-requested-with", "Fetch"))
+        .OnSuccess(Content.Text, (refreshed, pipeline) => pipeline.Element("notes-echo").Text.Set(refreshed.Body))));
+}
+@Html.RenderPlan(plan)

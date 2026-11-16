@@ -6,4 +6,6 @@ public static partial class RefusalPages
     public const string RoundsByItsName = Area + "requests-and-responses/rounds/by-its-name";
     public const string ShiftNoValueNames = Area + "requests-and-responses/shifts/no-value-names";
     public const string ShiftAValueNames = Area + "requests-and-responses/shifts/a-value-names";
+    public const string IntakeFiling = Area + "requests-and-responses/intake-filing";
+    public const string RoundsBoard = Area + "requests-and-responses/rounds-board";
 }

@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionApplication
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Application";
+    var plan = Html.ReactivePlan<AdmissionApplication>();
+}
+<h1>Apply for a place</h1>
+@using (var application = Html.BeginRequestForm(plan, "admission-application"))
+{
+    <fieldset>
+        <legend>Applicant</legend>
+        @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    </fieldset>
+    <button type="button" @Html.Raises(plan, AdmissionApplications.Apply)>Apply</button>
+    Html.On(plan, trigger => trigger.CustomEvent(AdmissionApplications.Apply, pipeline => pipeline
+        .Post<AdmissionApplication>(AdmissionApplicationEndpoints.Applications, request => request.Header(AdmissionApplicationEndpoints.ApplicantHeader, application.Form.Read(m => m.Name)))
+        .WhileLoading(pipeline => pipeline.Element("application-status").Text.Set("Sending"))
+        .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("application-status").Text.Set(received.Body))
+        .OnError((failed, pipeline) => pipeline.Element("application-status").Text.Set("Not received"))
+        .Finally(pipeline => pipeline.Element("application-closed").Text.Set("Closed"))));
+}
+<p>Status: <span id="application-status">Not sent</span></p>
+<p>Application: <span id="application-closed">Open</span></p>
+@Html.RenderPlan(plan)

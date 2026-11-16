@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The rounds";
+    var plan = Html.ReactivePlan<RoundsBoard>();
+}
+<h1>Rounds of the @Model.Ward ward</h1>
+<button type="button" @Html.Raises(plan, RoundsBoards.Load)>Load</button>
+<p id="rounds"></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RoundsBoards.Load, pipeline => pipeline
+        .Get(RefusalEndpoints.Rounds)
+        .OnSuccess(Content.Text, (loaded, pipeline) => pipeline.Element("rounds").Text.Set(loaded.Body))));
+}
+@Html.RenderPlan(plan)

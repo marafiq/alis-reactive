@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model IntakeDocuments
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission documents";
+    var plan = Html.ReactivePlan<IntakeDocuments>();
+}
+<h1>Admission: documents</h1>
+@using (var intake = Html.BeginRequestForm(plan, "intake-documents"))
+{
+    <fieldset>
+        <legend>Resident</legend>
+        @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>First document</legend>
+        <label>File <input type="file" name="Documents[0].File"></label>
+        <label>Caption <input type="text" name="Documents[0].Caption"></label>
+    </fieldset>
+    <fieldset>
+        <legend>Second document</legend>
+        <label>File <input type="file" name="Documents[1].File"></label>
+        <label>Caption <input type="text" name="Documents[1].Caption"></label>
+    </fieldset>
+    <button type="button" @Html.Raises(plan, IntakeDocumentSaves.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(IntakeDocumentSaves.Save, pipeline => pipeline
+        .Post<IntakeDocuments>(IntakeDocumentsEndpoints.Saves, request => request.Form(intake.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+<p>Saved: <span id="saved">-</span></p>
+@Html.RenderPlan(plan)

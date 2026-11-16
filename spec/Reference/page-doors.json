@@ -2269,6 +2269,20 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F1 X10.28 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/RequestsAndResponses/RoundsBoard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X10.28 1": {
+    "modules": [],
+    "views": [
+      "/Refusals/RequestsAndResponses/RoundsBoard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F1 X9.10 0": {
     "modules": [
       "NativeComponents"
@@ -2284,6 +2298,15 @@
     ],
     "views": [
       "/Care/Residents/ResidentSearch.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.13 0": {
+    "modules": [
+      "NativeComponents"
+    ],
+    "views": [
+      "/Care/Admission/AdmissionApplication.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -2372,6 +2395,30 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F1 X9.26 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/RequestsAndResponses/IntakeFiling.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.27 0": {
+    "modules": [
+      "NativeComponents",
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Admission/IntakeDocuments.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.28 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/NotesRefresh.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F1 X9.8 0": {
     "modules": [],
     "views": [
@@ -2448,6 +2495,16 @@
     "views": [
       "/Care/Admission/BedCommit.cshtml",
       "/Care/Admission/BedCommitWithAConflictRoute.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F2 X10.4 0": {
+    "modules": [
+      "NativeComponents",
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Admission/QuickAdmission.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

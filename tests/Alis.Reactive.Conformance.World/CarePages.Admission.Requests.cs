@@ -10,4 +10,7 @@ public static partial class CarePages
     public const string BadgeDesk = Admission + "badge-desk";
     public const string BedCommit = Admission + "bed-commit";
     public const string BedCommitWithAConflictRoute = Admission + "bed-commit/conflict-route";
+    public const string AdmissionApplication = Admission + "admission-application";
+    public const string IntakeDocuments = Admission + "intake-documents";
+    public const string QuickAdmission = Admission + "quick-admission";
 }

@@ -31,4 +31,16 @@ public static class Hosts
     public const string JsonContractName = HostNames.JsonContract;
 
     public static readonly string[] JsonContract = [JsonContractName];
+
+    public const string NoRequestsName = HostNames.NoRequests;
+
+    public static readonly string[] NoRequests = [NoRequestsName];
+
+    public const string NoAntiforgeryChoiceName = HostNames.NoAntiforgeryChoice;
+
+    public static readonly string[] NoAntiforgeryChoice = [NoAntiforgeryChoiceName];
+
+    public const string Net48Name = HostNames.Net48;
+
+    public static readonly string[] Net48 = [Net48Name];
 }
