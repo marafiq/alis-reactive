@@ -15,7 +15,7 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "| AlisReactive.OpenTelemetry | net48, net10.0 | none | `build/net48` copy | `alis-reactive-opentelemetry.js`, its bundle holding 2.7's OpenTelemetry pins | AlisReactive at the same version, exactly |\n",
+    "old": "| AlisReactive.OpenTelemetry | net48, net10.0 | none | `build/net48` and `buildTransitive/net48` copy | `alis-reactive-opentelemetry.js`, its bundle holding 2.7's OpenTelemetry pins | AlisReactive at the same version, exactly |\n",
     "new": ""
    }
   ],
@@ -136,8 +136,8 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "| AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |\n| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |",
-    "new": "| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |\n| AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |"
+    "old": "| AlisReactive.Native | net48, net10.0 | none | `build/net48` and `buildTransitive/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |\n| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` and `buildTransitive/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |",
+    "new": "| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` and `buildTransitive/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |\n| AlisReactive.Native | net48, net10.0 | none | `build/net48` and `buildTransitive/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |"
    }
   ],
   "expect": null
