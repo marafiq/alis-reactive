@@ -1,6 +1,9 @@
 import type { Owner } from "../OwnershipAndState/index";
-import { assertNever, notBuilt, type CheckedBody, type Expression, type FnExpression, type FormCheck, type PathStep, type PlanDocument, type Registration, type RegistrationStep, type RuleGroup, type SentInput } from "../Schema/index";
-import { Stop } from "../ValuesAndSources/index";
+import {
+  assertNever, notBuilt, type CheckedBody, type Expression, type FnExpression, type FormCheck, type FormPlace, type InputEntry, type PathStep, type PlanDocument, type Registration,
+  type RegistrationStep, type RuleGroup, type SentInput,
+} from "../Schema/index";
+import { called, Stop, value } from "../ValuesAndSources/index";
 
 type Apply = (fn: FnExpression, args: readonly unknown[]) => unknown;
 type TypedText = (input: SentInput) => string | null;
@@ -10,6 +13,22 @@ export interface Failure {
   readonly name: string;
   readonly message: string;
 }
+
+export interface InputsTable {
+  typedText(input: SentInput): string | null;
+  holds(entry: InputEntry): boolean;
+  summaryOf(containerId: string): string;
+}
+
+export interface Places {
+  showMessage(entry: InputEntry, message: string): void;
+  clearMessage(entry: InputEntry): void;
+  showSummary(summaryId: string, messages: readonly string[]): void;
+  notice(): unknown;
+}
+
+const noticeKind = "error";
+const notAProblem = "The body ShowValidationErrors shows is no validation problem, {\"errors\": {\"<binding name>\": [\"message\"]}}.";
 
 interface Carried {
   readonly registration: Registration;
@@ -22,11 +41,13 @@ interface Reached {
 }
 
 export class PageForms {
-  readonly #typedText: TypedText;
+  readonly #table: InputsTable;
+  readonly #places: Places;
   readonly #carried = new Map<string, Carried[]>();
 
-  constructor(typedText: TypedText) {
-    this.#typedText = typedText;
+  constructor(table: InputsTable, places: Places) {
+    this.#table = table;
+    this.#places = places;
   }
 
   join(plan: PlanDocument, owner: Owner, apply: Apply): void {
@@ -42,7 +63,37 @@ export class PageForms {
   validate(check: FormCheck): readonly Failure[] {
     const [carried] = this.#carried.get(check.registration) ?? [];
     if (carried === undefined) throw new Stop("No live plan carries the rules of '" + check.registration + "'.");
-    return new Run(carried, check, this.#typedText).failures();
+    const failures = new Run(carried, check, input => this.#table.typedText(input)).failures();
+    this.#show(failures, check.inputs, check.place);
+    return failures;
+  }
+
+  showErrors(problem: unknown, inputs: readonly SentInput[], place: FormPlace): void {
+    this.#show(failuresOf(problem), inputs, place);
+  }
+
+  #show(failures: readonly Failure[], inputs: readonly SentInput[], place: FormPlace): void {
+    const atTheirInputs = inputs.filter(input => input.entry.binding.message !== "" && this.#table.holds(input.entry));
+    for (const input of atTheirInputs) this.#places.clearMessage(input.entry);
+    this.#summarize(failures.map(failure => failure.message), place);
+    for (const input of atTheirInputs) {
+      const failure = failures.find(failed => failed.name === input.name);
+      if (failure !== undefined) this.#places.showMessage(input.entry, failure.message);
+    }
+  }
+
+  #summarize(messages: readonly string[], place: FormPlace): void {
+    const destination = place.destination;
+    switch (destination.kind) {
+      case "summary":
+        this.#places.showSummary(this.#table.summaryOf(destination.containerId), messages);
+        return;
+      case "notice":
+        if (messages.length > 0) called(value(this.#places.notice()), ["show"], "required", () => [messages.join(destination.separator), noticeKind], "value");
+        return;
+      default:
+        assertNever(destination);
+    }
   }
 
   #drop(key: string, carried: Carried): void {
@@ -131,6 +182,17 @@ class Run {
   }
 }
 
+function failuresOf(problem: unknown): readonly Failure[] {
+  const errors: unknown = isHolder(problem) ? Reflect.get(problem, "errors") : undefined;
+  if (!isHolder(errors)) throw new Stop(notAProblem);
+  return Object.entries(errors).flatMap(([name, held]: [string, unknown]) => {
+    if (!Array.isArray(held)) throw new Stop(notAProblem);
+    const messages: readonly unknown[] = held;
+    if (!messages.every((message): message is string => typeof message === "string")) throw new Stop(notAProblem);
+    return messages.map(message => ({ name, message }));
+  });
+}
+
 function checkedBody(registration: Registration, body: CheckedBody): unknown {
   switch (body.format) {
     case "none":
@@ -193,5 +255,9 @@ function same(one: readonly PathStep[], other: readonly PathStep[]): boolean {
 }
 
 function isHolder(value: unknown): value is object {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value) && !isAWholeValue(value);
+}
+
+function isAWholeValue(value: object): boolean {
+  return value instanceof Date || value instanceof Blob;
 }

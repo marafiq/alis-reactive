@@ -1797,6 +1797,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   flags enum by the boxes. The shape is the live form's writing of the member's type, so a converter the member
   names, which D7.7 keeps in the live form, does not reach it; no page binds such a member, and the first that does
   decides it. The owner can overrule it.
+- The lead, 2026-11-16, deciding the forms of M8.F4 no line wrote, from its builder's reading of MVC and the redesign
+  at the source: a binding name's first message shows at its input, as MVC's ValidationMessageFor shows a key's first
+  error, and every message in the summary, a list hidden while it holds none; each check clears the messages of the
+  inputs it sent before it shows its own, and a check that passes shows no notice. D10.18's structured copy is what a
+  vendor or an app's plugin receives; the runtime's own plugins read what the run holds, so the run's record of each
+  input it sent keeps the table's entry, which Ownership.tla models by its generation. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -237,6 +237,31 @@ describe("when a check reads what a container sends", () => {
   });
 });
 
+describe("when an answer shows where a request's failures go", () => {
+  test("InlineOnlyAtTheSentInput: the table holds an entry sent until its input leaves, and a load under the same id is another entry", () => {
+    const inputs = page();
+    const slot = new Visit();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    inputs.join(plan({ slot: field("Room", ["room"], literal("B-12")) }, {}, "RoomCard"), slot, "in slot 'room'", literalValue);
+    const [own, room] = inputs.captured("intake", "Admission").inputs;
+    if (own === undefined || room === undefined) throw new Error("The container sends two inputs.");
+    expect([inputs.holds(own.entry), inputs.holds(room.entry)]).toStrictEqual([true, true]);
+    slot.release();
+    expect(inputs.holds(room.entry)).toBe(false);
+    inputs.join(plan({ slot: field("Room", ["room"], literal("B-12")) }, {}, "RoomCard"), new Visit(), "in slot 'room'", literalValue);
+    expect([inputs.holds(own.entry), inputs.holds(room.entry)]).toStrictEqual([true, false]);
+  });
+
+  test("FailureReachesSummary: a container's summary is the element its live rendering names", () => {
+    const inputs = page();
+    const owner = new Visit();
+    inputs.join(plan({}, intake), owner, "on the page", literalValue);
+    expect(inputs.summaryOf("intake")).toBe("intake_summary");
+    owner.release();
+    expect(() => inputs.summaryOf("intake")).toThrow(/^No live plan renders container 'intake', whose summary shows the request's failures\.$/);
+  });
+});
+
 describe("when a request captures what it sends", () => {
   test("RecordsAMissingContainer: a container whose element the page lacks is recorded missing, not stopped at the read", () => {
     const inputs = page(new Map());

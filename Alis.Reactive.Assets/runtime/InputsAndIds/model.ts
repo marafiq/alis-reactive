@@ -1,6 +1,6 @@
 import type { Owner } from "../OwnershipAndState/index";
 import {
-  assertNever, notBuilt, type AsExpression, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type ModelPluginData, type OpExpression, type PathStep,
+  assertNever, notBuilt, type AsExpression, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type InputEntry, type ModelPluginData, type OpExpression, type PathStep,
   type PlanDocument, type SentInput, type SentInputs, type ValueRead,
 } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
@@ -160,6 +160,17 @@ export class PageInputs {
       default:
         return assertNever(container);
     }
+  }
+
+  holds(entry: InputEntry): boolean {
+    return this.#inputs.get(entry.id)?.binding === entry.binding;
+  }
+
+  summaryOf(containerId: string): string {
+    const renderings = this.#containers.get(containerId);
+    const [rendering] = renderings === undefined ? [] : renderings.values();
+    if (rendering === undefined) throw new Stop("No live plan renders container '" + containerId + "', whose summary shows the request's failures.");
+    return rendering.summary;
   }
 
   typedText(sent: SentInput): string | null {

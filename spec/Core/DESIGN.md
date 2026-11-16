@@ -2139,8 +2139,8 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   status 400, written by a framework door: on net10 MVC's `ValidationProblemDetails`
   (`probe:core-validation-problem-shape`), on net48 the same JSON with `TrySkipIisCustomErrors` set, the switch
   System.Web gives a response that keeps its own error body under IIS (`probe:systemweb-try-skip-iis-custom-errors`).
-  The browser reads that body only and shows it as it shows its own verdict (D16.13): every message in the
-  request's summary place, and each also at the input the request sent under its key.
+  The browser reads that body only and shows it as it shows its own verdict (D16.13): every message in the request's
+  summary place, and the first of each key's messages also at the input the request sent under that key.
 - D10.9 `Chained` runs after the first request's success route and its `Finally`, only on success, and reads the
   first response's data.
 - D10.10 `Parallel` sends its requests at once. Each runs its own route as its response arrives, a stop in one
@@ -2229,7 +2229,10 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
     A `Parallel`'s requests start in one turn and send what the page held then.
   - A response's data belongs to its run. The plan has no door that writes into it, and the generated contract types
     it read-only, so the runtime's own code cannot write into it either. A step that hands it, or any data value, to a
-    vendor or a plugin (a `set` or a call argument) hands a structured copy (`probe:js-structured-clone-separate`).
+    vendor or to a plugin an app registers (a `set` or a call argument) hands a structured copy
+    (`probe:js-structured-clone-separate`). The runtime's own plugins, `alis.document`, `alis.model`, `alis.form` and
+    `alis.slot`, read what the run holds, so the run's record of each input it sent reaches the check with the table's
+    own entries.
   - The run records, as it sends, each input it sent: the binding name it sent it under and the entry the inputs
     table held for it (D13.1). An answer shows a message inline only at an entry the table still holds, so an input
     that left with its slot, or one a reload of its slot mounted again under the same id, shows nothing inline, and
@@ -3833,12 +3836,15 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   each check of D16.10 and each condition of D16.8 (`Validation.tla:Agreement`).
 - D16.13 A message's place is carried in the plan, never read from the page (B5).
   - C# writes each input's message element id beside the input's id, so the `_error` id convention leaves.
-  - Every failure of a check, the browser's verdict and the server's 400 alike, shows in the request's summary
-    place: the summary of the container it sends (D13.6), else the notice (D10.21), one notice of kind error whose
-    text joins the messages by the separator the plan carries, a space, since each message is a sentence. A request
-    whose summary place is the notice names the `notice` contract (D10.21).
-  - A failure also shows at the message element of the framework input the request sent under its binding name
-    (D10.18): an input inside its container, or its `Input`. A `Set` member, and a control of a native form's
+  - Every failure of a check, the browser's verdict and the server's 400 alike, shows in the request's summary place:
+    the summary of the container it sends (D13.6), else the notice (D10.21), one notice of kind error whose text joins
+    the messages by the separator the plan carries, a space, since each message is a sentence. A request whose summary
+    place is the notice names the `notice` contract (D10.21). The summary lists the messages, one item each, and is
+    hidden while it holds none; a check that passes shows no notice. Each check replaces what its places show: it
+    clears the message of each input it sent, then shows its own failures.
+  - The first failure of each binding name also shows at the message element of the framework input the request sent
+    under that name (D10.18), as MVC's ValidationMessageFor shows the first error of its key: an input inside its
+    container, or its `Input`. A `Set` member, and a control of a native form's
     submission set that is no framework input, have no message element, so their failures show in the summary place
     only. An input that left the page before the answer shows nothing inline.
   - Both are MVC's own pattern: a validation summary that holds property errors, and a message for each field.

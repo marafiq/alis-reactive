@@ -6,10 +6,48 @@ type Owner = Parameters<PageForms["join"]>[1];
 type Fn = Parameters<Parameters<PageForms["join"]>[2]>[0];
 type Check = Parameters<PageForms["validate"]>[0];
 type Sent = Check["inputs"][number];
+type Entry = Sent["entry"];
+type Place = Check["place"];
 type Form = Extract<Extract<Plan["objects"][string], { kind: "plugin" }>["data"], { kind: "form" }>;
 type Registration = Form["registration"];
 type Group = Registration["rules"];
 type Format = Check["body"]["format"];
+type Table = ConstructorParameters<typeof PageForms>[0];
+type Places = ConstructorParameters<typeof PageForms>[1];
+
+class InputsTable implements Table {
+  readonly #typed: Record<string, string>;
+  readonly #held = new Map<string, Entry>();
+  readonly #summaries: Record<string, string>;
+
+  constructor(typed: Record<string, string> = {}, summaries: Record<string, string> = { intake: "intake_summary" }) {
+    this.#typed = typed;
+    this.#summaries = summaries;
+  }
+
+  typedText(input: Sent): string | null { return this.#typed[input.name] ?? null; }
+  holds(entry: Entry): boolean { return this.#held.get(entry.id)?.binding === entry.binding; }
+  hold(...inputs: Sent[]): void { for (const input of inputs) this.#held.set(input.entry.id, input.entry); }
+  summaryOf(containerId: string): string {
+    const summary = this.#summaries[containerId];
+    if (summary === undefined) throw new Error("No live plan renders container '" + containerId + "'.");
+    return summary;
+  }
+}
+
+class Page implements Places {
+  readonly messages = new Map<string, string>();
+  readonly summaries = new Map<string, readonly string[]>();
+  readonly notices: [unknown, unknown][] = [];
+
+  showMessage(entry: Entry, message: string): void { this.messages.set(entry.binding.message, message); }
+  clearMessage(entry: Entry): void { this.messages.delete(entry.binding.message); }
+  showSummary(summaryId: string, messages: readonly string[]): void { this.summaries.set(summaryId, messages); }
+  notice(): unknown { return { show: (text: unknown, kind: unknown) => { this.notices.push([text, kind]); } }; }
+}
+
+const inTheSummary: Place = { destination: { kind: "summary", containerId: "intake" } };
+const atTheNotice: Place = { destination: { kind: "notice", separator: " " } };
 
 class Visit implements Owner {
   readonly drops: (() => void)[] = [];
@@ -90,19 +128,29 @@ function plan(registrations: Registration[]): Plan {
   };
 }
 
-function sent(name: string, path: Sent["entry"]["binding"]["path"]): Sent {
-  const value: Sent["entry"]["binding"]["value"] = { kind: "lit", value: null };
-  return { name, entry: { id: "input_" + name, binding: { name, path, value, committed: "change", invalidClass: "invalid", message: "" } } };
+function sent(name: string, path: Entry["binding"]["path"], message = ""): Sent {
+  const value: Entry["binding"]["value"] = { kind: "lit", value: null };
+  return { name, entry: { id: "input_" + name, binding: { name, path, value, committed: "change", invalidClass: "invalid", message } } };
 }
 
-function check(validator: string, value: unknown, inputs: Sent[] = [], format: Format = "urlEncoded"): Check {
-  return { registration: validator + ":default", body: { format, value }, inputs, place: { destination: { kind: "summary", containerId: "intake" } } };
+function shown(name: string, path: Entry["binding"]["path"]): Sent {
+  return sent(name, path, "input_" + name + "_message");
+}
+
+function check(validator: string, value: unknown, inputs: Sent[] = [], format: Format = "urlEncoded", place: Place = inTheSummary): Check {
+  return { registration: validator + ":default", body: { format, value }, inputs, place };
 }
 
 function forms(registrations: Registration[], typed: Record<string, string> = {}): PageForms {
-  const page = new PageForms(input => typed[input.name] ?? null);
+  const page = new PageForms(new InputsTable(typed), new Page());
   page.join(plan(registrations), new Visit(), read);
   return page;
+}
+
+function placed(registrations: Registration[], table: InputsTable, page: Page): PageForms {
+  const placing = new PageForms(table, page);
+  placing.join(plan(registrations), new Visit(), read);
+  return placing;
 }
 
 describe("when alis.form checks the body a container sends", () => {
@@ -180,14 +228,130 @@ describe("when alis.form checks the body a container sends", () => {
   });
 
   test("OnlyTheNamedValidator: a registration leaves with the plan that carried it", () => {
-    const page = new PageForms(() => null);
+    const page = new PageForms(new InputsTable(), new Page());
     const owner = new Visit();
     page.join(plan([supplies]), owner, read);
     owner.release();
     expect(() => page.validate(check("Supplies", {}))).toThrow(/^No live plan carries the rules of 'Supplies:default'\.$/);
   });
 
+  test("Agreement: a date and a file the body sends are checked as the values they hold, never as holders of members", () => {
+    const visit: Registration = {
+      validator: "Visit", ruleSet: "default", start: { at: "0001-01-01T00:00:00", letter: null },
+      scalars: [], objects: [], lists: [],
+      rules: group([
+        field(["at"], "Book a visit after November 1.", fn(value => value instanceof Date && value.getTime() > new Date(2026, 10, 1).getTime())),
+        field(["letter"], "Attach the letter.", fn(value => value instanceof File)),
+      ]),
+    };
+    const letter = new File(["Dear Ann"], "letter.txt", { type: "text/plain" });
+    for (const format of ["multipart", "json"] as const) {
+      const page = forms([visit]);
+      expect(page.validate(check("Visit", { at: new Date(2026, 10, 2), letter }, [], format))).toStrictEqual([]);
+      expect(page.validate(check("Visit", { at: new Date(2026, 9, 27), letter }, [], format))).toStrictEqual([{ name: "", message: "Book a visit after November 1." }]);
+    }
+  });
+
   test("A body with no members is checked on the model's start", () => {
     expect(forms([supplies]).validate(check("Supplies", null, [], "none"))).toStrictEqual([{ name: "", message: "'Count' must be greater than '0'." }]);
+  });
+});
+
+describe("when alis.form shows a check's failures where the plan places them", () => {
+  const name = (): Sent => shown("Name", ["name"]);
+  const carer = (): Sent => shown("Carers[0].Name", ["carers", 0, "name"]);
+  const room = (): Sent => shown("Room", ["room"]);
+  const refused = { type: "https://tools.ietf.org/html/rfc9110#section-15.5.1", title: "One or more validation errors occurred.", status: 400, errors: { Name: ["Name is taken", "Pick another name"], Room: ["Room is full"], Bed: ["Choose a bed."] } };
+
+  test("FailureReachesSummary: every failure shows in the summary of the container the request sends, one no input sent among them", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    const nameInput = name();
+    table.hold(nameInput);
+    placed([intakeCard("replace")], table, page).validate(check("IntakeCard", { name: "", carers: [{}] }, [nameInput]));
+    expect(Object.fromEntries(page.summaries)).toStrictEqual({ intake_summary: ["Name the resident.", "Name the carer."] });
+    expect(page.notices).toStrictEqual([]);
+  });
+
+  test("FailureReachesSummary: a request that sends no container shows its failures in one notice of kind error, its messages joined by the plan's separator", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    const nameInput = name();
+    table.hold(nameInput);
+    placed([intakeCard("replace")], table, page).validate(check("IntakeCard", { name: "", carers: [{}] }, [nameInput], "urlEncoded", atTheNotice));
+    expect(page.notices).toStrictEqual([["Name the resident. Name the carer.", "error"]]);
+    expect(Object.fromEntries(page.summaries)).toStrictEqual({});
+  });
+
+  test("InlineOnlyAtTheSentInput: a failure shows at the message element of the input sent under its binding name, and beside no other", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    const [nameInput, carerInput, status] = [name(), carer(), shown("Status", ["status"])];
+    table.hold(nameInput, carerInput, status);
+    placed([intakeCard("replace")], table, page).validate(check("IntakeCard", { name: "", status: "", carers: [{ name: "" }] }, [nameInput, status, carerInput]));
+    expect(Object.fromEntries(page.messages)).toStrictEqual({ input_Name_message: "Name the resident.", "input_Carers[0].Name_message": "Name the carer." });
+  });
+
+  test("InlineOnlyAtTheSentInput: an input whose binding names no message element shows its failure in the summary only", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    const ward = sent("Ward", ["ward"]);
+    table.hold(ward);
+    placed([wardCard], table, page).validate(check("WardCard", { ward: "" }, [ward]));
+    expect(Object.fromEntries(page.messages)).toStrictEqual({});
+    expect(Object.fromEntries(page.summaries)).toStrictEqual({ intake_summary: ["'Ward' must not be empty."] });
+  });
+
+  test("A check that passes clears the messages of the inputs it sent, empties its summary and shows no notice", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    const nameInput = name();
+    table.hold(nameInput);
+    const forms = placed([intakeCard("replace")], table, page);
+    forms.validate(check("IntakeCard", { name: "" }, [nameInput]));
+    forms.validate(check("IntakeCard", { name: "" }, [nameInput], "urlEncoded", atTheNotice));
+    forms.validate(check("IntakeCard", { name: "Ann" }, [nameInput]));
+    forms.validate(check("IntakeCard", { name: "Ann" }, [nameInput], "urlEncoded", atTheNotice));
+    expect(Object.fromEntries(page.messages)).toStrictEqual({});
+    expect(Object.fromEntries(page.summaries)).toStrictEqual({ intake_summary: [] });
+    expect(page.notices).toStrictEqual([["Name the resident.", "error"]]);
+  });
+
+  test("ShowsFailures: a server's 400 shows as the browser's verdict, every message in the summary and the first of each key at the input sent under it", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    const [nameInput, roomInput] = [name(), room()];
+    table.hold(nameInput, roomInput);
+    new PageForms(table, page).showErrors(refused, [nameInput, roomInput], inTheSummary);
+    expect(Object.fromEntries(page.messages)).toStrictEqual({ input_Name_message: "Name is taken", input_Room_message: "Room is full" });
+    expect(Object.fromEntries(page.summaries)).toStrictEqual({ intake_summary: ["Name is taken", "Pick another name", "Room is full", "Choose a bed."] });
+  });
+
+  test("ShowsFailures: a server's 400 for a request that sends no container shows in one notice of kind error", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    const roomInput = room();
+    table.hold(roomInput);
+    new PageForms(table, page).showErrors(refused, [roomInput], atTheNotice);
+    expect(page.notices).toStrictEqual([["Name is taken Pick another name Room is full Choose a bed.", "error"]]);
+    expect(Object.fromEntries(page.messages)).toStrictEqual({ input_Room_message: "Room is full" });
+  });
+
+  test("InlineOnlyAtTheSentInput: an input the table no longer holds as it was sent, left or loaded again, shows nothing inline, and the summary shows every message", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    const [nameInput, roomInput] = [name(), room()];
+    table.hold(room());
+    new PageForms(table, page).showErrors(refused, [nameInput, roomInput], inTheSummary);
+    expect(Object.fromEntries(page.messages)).toStrictEqual({});
+    expect(Object.fromEntries(page.summaries)).toStrictEqual({ intake_summary: ["Name is taken", "Pick another name", "Room is full", "Choose a bed."] });
+  });
+
+  test("A body that is no validation problem stops the route that shows it", () => {
+    const page = new PageForms(new InputsTable(), new Page());
+    expect(() => { page.showErrors({ title: "Bad Request" }, [], inTheSummary); })
+      .toThrow(/^The body ShowValidationErrors shows is no validation problem, \{"errors": \{"<binding name>": \["message"\]\}\}\.$/);
+    expect(() => { page.showErrors({ errors: { Name: "Name is taken" } }, [], inTheSummary); })
+      .toThrow(/^The body ShowValidationErrors shows is no validation problem, \{"errors": \{"<binding name>": \["message"\]\}\}\.$/);
   });
 });
