@@ -1,5 +1,4 @@
 #if NET48
-using System;
 using System.Web;
 using System.Web.Mvc;
 
@@ -17,13 +16,23 @@ public static class NativeButtonHtml
     /// <param name="text">The button's text.</param>
     /// <returns>The button's builder, which writes its markup where the view puts it.</returns>
     public static NativeButtonBuilder<TModel> NativeButton<TModel>(this HtmlHelper<TModel> html, string id, string text)
-        => throw new NotImplementedException();
+        => new(id, text);
 }
 
 public sealed partial class NativeButtonBuilder<TModel> : IHtmlString
 {
     /// <summary>Returns the button's markup.</summary>
     /// <returns>The markup, encoded as HTML.</returns>
-    public string ToHtmlString() => throw new NotImplementedException();
+    public string ToHtmlString() => Element().ToString(TagRenderMode.Normal);
+
+    private TagBuilder Element()
+    {
+        var button = new TagBuilder("button");
+        button.MergeAttribute("id", _id);
+        button.MergeAttribute("type", "button");
+        if (_hasCssClass) button.AddCssClass(_cssClass);
+        button.SetInnerText(_text);
+        return button;
+    }
 }
 #endif

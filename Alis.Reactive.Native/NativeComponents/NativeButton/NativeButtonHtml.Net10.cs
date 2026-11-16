@@ -1,5 +1,4 @@
 #if NET10_0_OR_GREATER
-using System;
 using System.IO;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
@@ -19,7 +18,7 @@ public static class NativeButtonHtml
     /// <param name="text">The button's text.</param>
     /// <returns>The button's builder, which writes its markup where the view puts it.</returns>
     public static NativeButtonBuilder<TModel> NativeButton<TModel>(this IHtmlHelper<TModel> html, string id, string text)
-        => throw new NotImplementedException();
+        => new(id, text);
 }
 
 public sealed partial class NativeButtonBuilder<TModel> : IHtmlContent
@@ -27,6 +26,16 @@ public sealed partial class NativeButtonBuilder<TModel> : IHtmlContent
     /// <summary>Writes the button's markup.</summary>
     /// <param name="writer">The writer of the view.</param>
     /// <param name="encoder">The encoder of the view.</param>
-    public void WriteTo(TextWriter writer, HtmlEncoder encoder) => throw new NotImplementedException();
+    public void WriteTo(TextWriter writer, HtmlEncoder encoder) => Element().WriteTo(writer, encoder);
+
+    private TagBuilder Element()
+    {
+        var button = new TagBuilder("button");
+        button.MergeAttribute("id", _id);
+        button.MergeAttribute("type", "button");
+        if (_hasCssClass) button.AddCssClass(_cssClass);
+        button.InnerHtml.Append(_text);
+        return button;
+    }
 }
 #endif

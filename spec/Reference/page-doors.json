@@ -535,18 +535,14 @@
     ]
   },
   "M15.F1 X3.5 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/StrengthIntake.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M15.F1 X3.6 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/IntakeAssessment.cshtml",
       "/Shared/_Layout.cshtml"
@@ -1538,9 +1534,7 @@
     ]
   },
   "M24.F2 M24.X6 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/BedsideRecord.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2145,9 +2139,7 @@
     ]
   },
   "M4.F1 X6.57 2": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/ArrayLambdas/BookedVisits.cshtml",
       "/Refusals/ArrayLambdas/VisitBooking.cshtml",
@@ -2279,9 +2271,7 @@
     ]
   },
   "M5.F1 M5.X5 3": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/NightChecks.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2734,9 +2724,7 @@
     ]
   },
   "M7.F3 M7.X6 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/KinCards.cshtml",
       "/Care/Admission/KinCopyCard.cshtml",
@@ -2801,18 +2789,14 @@
     ]
   },
   "M8.F1 X16.10 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/RoomNumbering.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M8.F1 X16.22 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/CareRota.cshtml",
       "/Care/Record/EarlyCareRota.cshtml",
@@ -2820,27 +2804,21 @@
     ]
   },
   "M8.F1 X16.9 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/HouseholdContacts.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M8.F3 X16.2 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/HomeLead.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M8.F3 X16.3 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/DeputyAppointment.cshtml",
       "/Care/Admission/DeputyNamelessAppointment.cshtml",
@@ -2848,18 +2826,14 @@
     ]
   },
   "M8.F3 X16.4 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/SupplyCount.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M8.F3 X16.6 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/ArrivalIntake.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2881,9 +2855,7 @@
     ]
   },
   "M8.F4 X13.3 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/RoundDosing.cshtml",
       "/Care/Round/RoundDosingAddedDose.cshtml",
@@ -2899,18 +2871,14 @@
     ]
   },
   "M8.F4 X16.15 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/BedAssignment.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M8.F4 X16.16 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/WardAssignment.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2925,9 +2893,7 @@
     ]
   },
   "M8.F4 X16.18 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/SupplyCodes.cshtml",
       "/Care/Round/SupplyCodesBound.cshtml",
@@ -2959,18 +2925,14 @@
     ]
   },
   "M8.F4 X16.7 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/CarePlan.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M8.F4 X8.3 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/VisitorSignIn.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3724,27 +3686,21 @@
     ]
   },
   "cell validation.listItem": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Validation/EntriesForm.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell validation.live": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Validation/CodeForm.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell validation.prefix": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Validation/EntryCode.cshtml",
       "/Bench/Validation/FirstEntryForm.cshtml",
@@ -3752,18 +3708,14 @@
     ]
   },
   "cell validation.rule": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Validation/CodeForm.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell validation.summary": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Validation/CodeForm.cshtml",
       "/Shared/_Layout.cshtml"
