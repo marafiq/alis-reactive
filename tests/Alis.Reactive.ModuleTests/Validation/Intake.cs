@@ -262,6 +262,114 @@ public sealed class HiddenBedsBesideStaffRules : ReactiveValidator<HiddenBedsCar
     public HiddenBedsBesideStaffRules() => RuleFor(card => card.Beds).GreaterThanOrEqualTo(card => card.Staff).WithMessage("A bed for each of the staff.");
 }
 
+public sealed class BedsBesideStaffRules : ReactiveValidator<RoundCard>
+{
+    public BedsBesideStaffRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(c => c.Beds).WithMessage("No more staff than beds.");
+}
+
+public sealed class CountedBedsCard
+{
+    [JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
+    public int Beds { get; set; }
+
+    public int Staff { get; set; }
+}
+
+public sealed class CountedBedsRules : ReactiveValidator<CountedBedsCard>
+{
+    public CountedBedsRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(c => c.Beds).WithMessage("No more staff than beds.");
+}
+
+public sealed class HashedBedsRules : ReactiveValidator<RoundCard>
+{
+    public HashedBedsRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(c => c.Beds.GetHashCode()).WithMessage("No more staff than beds.");
+}
+
+public sealed class WingCard
+{
+    public long Beds { get; set; }
+    public int Staff { get; set; }
+}
+
+public sealed class WingCardRules : ReactiveValidator<WingCard>
+{
+    public WingCardRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(c => (int)c.Beds).WithMessage("No more staff than beds.");
+}
+
+public sealed class SmallWingCard
+{
+    public short Beds { get; set; }
+    public int Staff { get; set; }
+}
+
+public sealed class SmallWingCardRules : ReactiveValidator<SmallWingCard>
+{
+    public SmallWingCardRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(c => (int)c.Beds).WithMessage("No more staff than beds.");
+}
+
+public sealed class OpenBedsCard
+{
+    public int? Beds { get; set; }
+    public int Staff { get; set; }
+}
+
+public sealed class OpenBedsRules : ReactiveValidator<OpenBedsCard>
+{
+    public OpenBedsRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(c => c.Beds ?? 0).WithMessage("No more staff than beds.");
+}
+
+public sealed class HiddenOpenBedsCard
+{
+    [JsonIgnore]
+    public int? Beds { get; set; }
+
+    public int Staff { get; set; }
+}
+
+public sealed class HiddenOpenBedsRules : ReactiveValidator<HiddenOpenBedsCard>
+{
+    public HiddenOpenBedsRules() => RuleFor(card => card.Staff).LessThanOrEqualTo(c => c.Beds ?? 0).WithMessage("No more staff than beds.");
+}
+
+public sealed class HiddenOpenBedsBesideStaffRules : ReactiveValidator<HiddenOpenBedsCard>
+{
+    public HiddenOpenBedsBesideStaffRules() => RuleFor(card => card.Beds ?? 0).GreaterThanOrEqualTo(c => c.Staff).WithMessage("A bed for each of the staff.");
+}
+
+public sealed class OpenBedsBesideStaffRules : ReactiveValidator<OpenBedsCard>
+{
+    public OpenBedsBesideStaffRules() => RuleFor(card => card.Beds ?? 0).GreaterThanOrEqualTo(c => c.Staff).WithMessage("A bed for each of the staff.");
+}
+
+public sealed class HiddenOpenLeastRound
+{
+    [JsonIgnore]
+    public decimal? Least { get; set; }
+
+    public List<decimal> Amounts { get; set; } = [];
+}
+
+public sealed class HiddenOpenLeastRoundRules : ReactiveValidator<HiddenOpenLeastRound>
+{
+    public HiddenOpenLeastRoundRules() => RuleForEach(round => round.Amounts).GreaterThanOrEqualTo(r => r.Least ?? 0).WithMessage("Give at least the least dose.");
+}
+
+public sealed class OpenLeastRoundRules : ReactiveValidator<OpenMedicationRound>
+{
+    public OpenLeastRoundRules() => RuleForEach(round => round.Amounts).GreaterThanOrEqualTo(r => r.Least ?? 0).WithMessage("Give at least the least dose.");
+}
+
+public sealed class RotaCard
+{
+    public int Staff { get; set; }
+    public List<Carer> Carers { get; set; } = [];
+}
+
+public sealed class RotaCardRules : ReactiveValidator<RotaCard>
+{
+    public RotaCardRules() => RuleFor(card => card.Staff).GreaterThanOrEqualTo(c => c.Carers.Count(carer => carer.Name != null)).WithMessage("A shift for each named carer.");
+}
+
 public sealed class UnreadRoundRules : ReactiveValidator<RoundCard>
 {
     public UnreadRoundRules() => RuleFor(card => card.Ward).NotEmpty().When(card => card.Ward!.GetHashCode() > 0);

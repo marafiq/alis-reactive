@@ -54,16 +54,20 @@ internal sealed class ItemLambda
     internal static FnExpression Checking(LambdaExpression test, HeldForm valueForm, string term, HeldForm datesJudgedBy)
         => new ItemLambda(test, [], [], valueForm, new RuleCheck(term, test.Parameters[0]), datesJudgedBy).Fn(test, body => body);
 
-    internal static FnExpression CheckingAMemberBesideItsPeer(LambdaExpression test, HeldForm form, string term, HeldForm datesJudgedBy)
-        => new ItemLambda(test, [], [], form, new RuleCheck(term, null), datesJudgedBy).Fn(test, body => body);
-
-    internal static FnExpression CheckingAnItemBesideItsHolder(LambdaExpression test, string itemName, HeldForm itemsForm, string term, HeldForm datesJudgedBy)
+    internal static FnExpression CheckingAMemberBesideItsPeer(LinqExpression test, ParameterExpression member, LambdaExpression peer, HeldForm form, string term, HeldForm datesJudgedBy)
     {
-        var item = test.Parameters[0];
-        var holder = test.Parameters[1];
+        var checkedModel = Item + "1";
+        var items = new Dictionary<ParameterExpression, string> { [member] = checkedModel, [peer.Parameters[0]] = checkedModel };
+        var read = new ItemLambda(peer, items, [], form, new RuleCheck(term, null), datesJudgedBy);
+        return new FnExpression([checkedModel], read.Term(test));
+    }
+
+    internal static FnExpression CheckingAnItemBesideItsHolder(LinqExpression test, ParameterExpression item, string itemName, LambdaExpression peer, HeldForm itemsForm, string term, HeldForm datesJudgedBy)
+    {
+        var holder = peer.Parameters[0];
         var holderName = Item + "1";
-        var read = new ItemLambda(test, new Dictionary<ParameterExpression, string> { [item] = itemName, [holder] = holderName }, [holder], itemsForm, new RuleCheck(term, item), datesJudgedBy);
-        return new FnExpression([itemName, holderName], read.Term(test.Body));
+        var read = new ItemLambda(peer, new Dictionary<ParameterExpression, string> { [item] = itemName, [holder] = holderName }, [holder], itemsForm, new RuleCheck(term, item), datesJudgedBy);
+        return new FnExpression([itemName, holderName], read.Term(test));
     }
 
     internal static InvalidOperationException WrittenUnlikeItsBase(string named, WrittenMember written, HeldForm form)
@@ -101,7 +105,9 @@ internal sealed class ItemLambda
 
     private HeldForm FormRootedAt(ParameterExpression root) => _heldInTheBase.Contains(root) ? _form.Base : _form;
 
-    private string NextItem => Item + (_items.Count + 1).ToString(CultureInfo.InvariantCulture);
+    private string NextDepth => (new HashSet<string>(_items.Values).Count + 1).ToString(CultureInfo.InvariantCulture);
+
+    private string NextItem => Item + NextDepth;
 
     private FnExpression Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped) => Fn(lambda, shaped, takenAsHeld: _ => false).Function;
 
@@ -117,7 +123,7 @@ internal sealed class ItemLambda
 
     private FnExpression Sort(LambdaExpression key, Operator comparison, bool descending)
     {
-        var depth = (_items.Count + 1).ToString(CultureInfo.InvariantCulture);
+        var depth = NextDepth;
         var left = Left + depth;
         var right = Right + depth;
         var leftKey = KeyOf(key, left);

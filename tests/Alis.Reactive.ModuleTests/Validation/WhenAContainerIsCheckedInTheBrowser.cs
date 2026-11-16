@@ -20,6 +20,8 @@ namespace Alis.Reactive.ModuleTests.Validation;
 [SetCulture("en-US")]
 public sealed class WhenAContainerIsCheckedInTheBrowser
 {
+    private const string StaffBesideBeds = """{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"lte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"data","path":[{"name":"beds","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"No more staff than beds."}]}],"groups":[]}]}""";
+
     private const string Supplies = """{"validator":"Alis.Reactive.ModuleTests.Validation.SuppliesRules","ruleSet":"default","start":{"count":0},"scalars":[{"path":["count"],"shape":{"kind":"number","of":"integer","text":"view","overflow":"nothing"},"before":"The value \u0027","after":"\u0027 is not valid for Count."}],"objects":[],"lists":[],"rules":{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["count"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"gt","args":[{"kind":"ref","name":"item1"},{"kind":"lit","value":0}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"\u0027Count\u0027 must be greater than \u00270\u0027."}]}],"groups":[]}]}}""";
 
     [Test]
@@ -353,6 +355,59 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
         Assert.That(() => PlanOf<SignedLeadCard>(validation => validation.Add<SignedLeadCardRules>()),
             Throws.InvalidOperationException.With.Message.EqualTo("'c.Lead.Name' reads past 'c.Lead', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'c.Lead' itself, or read past it on the server."));
         Assert.That(RulesOf<LeadCard>(validation => validation.Add<LeadCardRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["resident"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"neq","args":[{"kind":"data","path":[{"name":"resident","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item1"}},{"kind":"data","path":[{"name":"lead","requires":[],"absent":{"kind":"start","value":"Ruth"}},{"name":"name","requires":[],"absent":{"kind":"start","value":""}}],"target":{"kind":"ref","name":"item1"}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"The lead is someone other than the resident."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_peer_its_own_number_handling_writes_beside_the_rules_member_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<CountedBedsCard>(validation => validation.Add<CountedBedsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'RuleFor(card => card.Staff).LessThanOrEqualTo' compares two members, and its own JSON number handling writes 'c.Beds' unlike JavaScript's value, so the browser does not compare them as .NET does; compare them on the server."));
+        Assert.That(RulesOf<RoundCard>(validation => validation.Add<BedsBesideStaffRules>()), Is.EqualTo(StaffBesideBeds));
+    }
+
+    [Test]
+    public void a_peer_cast_to_a_narrower_number_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<WingCard>(validation => validation.Add<WingCardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'(int)c.Beds' casts a number to a narrower one, which changes the value as C# computes it and not as the browser does; compare the member itself."));
+        Assert.That(RulesOf<SmallWingCard>(validation => validation.Add<SmallWingCardRules>()), Is.EqualTo(StaffBesideBeds));
+    }
+
+    [Test]
+    public void a_peer_with_no_browser_form_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<HashedBedsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'c.Beds.GetHashCode()' has no browser form in a list's lambda; use a member the framework translates, or move the work to the server."));
+        Assert.That(RulesOf<RoundCard>(validation => validation.Add<BedsBesideStaffRules>()), Is.EqualTo(StaffBesideBeds));
+    }
+
+    [Test]
+    public void a_member_the_apps_options_do_not_write_inside_a_peers_computation_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<HiddenOpenBedsCard>(validation => validation.Add<HiddenOpenBedsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'c => (c.Beds ?? 0)' reads a member of 'HiddenOpenBedsCard' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<OpenBedsCard>(validation => validation.Add<OpenBedsRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"lte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"op","op":"coalesce","args":[{"kind":"data","path":[{"name":"beds","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item1"}},{"kind":"lit","value":0}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"No more staff than beds."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_lambda_inside_a_peer_names_its_item_one_level_below_the_checked_model()
+        => Assert.That(RulesOf<RotaCard>(validation => validation.Add<RotaCardRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["staff"],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"data","path":[{"name":"staff","requires":[],"absent":{"kind":"start","value":0}}],"target":{"kind":"ref","name":"item1"}},{"kind":"get","path":["length"],"members":"requiredIfHeld","target":{"kind":"call","path":["filter"],"members":"requiredIfHeld","target":{"kind":"data","path":[{"name":"carers","requires":[],"absent":{"kind":"start","value":[]}}],"target":{"kind":"ref","name":"item1"}},"args":[{"kind":"fn","params":["item2"],"body":{"kind":"op","op":"neq","args":[{"kind":"data","path":[{"name":"name","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item2"}},{"kind":"lit","value":null}]}}]}}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"A shift for each named carer."}]}],"groups":[]}]}"""));
+
+    [Test]
+    public void a_member_the_apps_options_do_not_write_inside_the_peer_of_each_items_comparison_is_refused_naming_the_peer_as_the_validator_wrote_it()
+    {
+        Assert.That(() => PlanOf<HiddenOpenLeastRound>(validation => validation.Add<HiddenOpenLeastRoundRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("'r => (r.Least ?? 0)' reads a member of 'HiddenOpenLeastRound' that the app's JSON options do not write, so the browser never holds it."));
+        Assert.That(RulesOf<OpenMedicationRound>(validation => validation.Add<OpenLeastRoundRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["amounts",{"kind":"each"}],"tests":[{"check":{"kind":"fn","params":["value","item1"],"body":{"kind":"op","op":"gte","args":[{"kind":"ref","name":"value"},{"kind":"op","op":"coalesce","args":[{"kind":"data","path":[{"name":"least","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"ref","name":"item1"}},{"kind":"lit","value":0}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"Give at least the least dose."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_rule_over_no_member_path_beside_a_peer_is_refused_as_a_rule_over_no_member_path_whatever_member_it_reads()
+    {
+        Assert.That(() => PlanOf<HiddenOpenBedsCard>(validation => validation.Add<HiddenOpenBedsBesideStaffRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'card => (card.Beds ?? 0)' checks no member of the model, and the browser's rule names the member it checks by its path; write the rule for a member, as RuleFor(x => x.Member) or RuleForEach(x => x.Items) does, or mark the rule .ServerOnly()."));
+        Assert.That(() => PlanOf<OpenBedsCard>(validation => validation.Add<OpenBedsBesideStaffRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'card => (card.Beds ?? 0)' checks no member of the model, and the browser's rule names the member it checks by its path; write the rule for a member, as RuleFor(x => x.Member) or RuleForEach(x => x.Items) does, or mark the rule .ServerOnly()."));
     }
 
     [Test]

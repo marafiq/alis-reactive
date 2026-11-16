@@ -212,21 +212,20 @@ internal sealed class BrowserMember<T, TValue>
 
     internal BrowserTest ComparedWithMember<TPeer>(Comparison comparison, Expression<Func<T, TPeer>> peer, string peerName)
     {
+        _ = ItsMemberPath();
         RefuseAReadTheBrowserDoesNotHold(_member);
         RefuseAReadTheBrowserDoesNotHold(peer);
         void Arguments(MessageArguments arguments) => arguments.With("ComparisonProperty", peerName);
         if (_each)
         {
             var item = LinqExpression.Parameter(typeof(TValue), BrowserTerms.Value);
-            var itemBesidePeer = LinqExpression.Lambda(PassesBeside<TPeer>(comparison, item, peer.Body), item, peer.Parameters[0]);
-            var test = ItemLambda.CheckingAnItemBesideItsHolder(itemBesidePeer, BrowserTerms.Value, FormItIsHeldIn(), Term(comparison.Name), DatesJudgedBy);
+            var itemBesidePeer = PassesBeside<TPeer>(comparison, item, peer.Body);
+            var test = ItemLambda.CheckingAnItemBesideItsHolder(itemBesidePeer, item, BrowserTerms.Value, peer, FormItIsHeldIn(), Term(comparison.Name), DatesJudgedBy);
             return new BrowserTest(test, Arguments, ["ComparisonValue"], false);
         }
 
-        var instance = _member.Parameters[0];
-        var right = new ParameterSwap(peer.Parameters[0], instance).Visit(peer.Body);
-        var memberBesidePeer = LinqExpression.Lambda(PassesBeside<TPeer>(comparison, Unconverted(_member.Body), right), instance);
-        var read = ItemLambda.CheckingAMemberBesideItsPeer(memberBesidePeer, _scope.Form, Term(comparison.Name), DatesJudgedBy);
+        var memberBesidePeer = PassesBeside<TPeer>(comparison, Unconverted(_member.Body), peer.Body);
+        var read = ItemLambda.CheckingAMemberBesideItsPeer(memberBesidePeer, _member.Parameters[0], peer, _scope.Form, Term(comparison.Name), DatesJudgedBy);
         return new BrowserTest(new FnExpression([BrowserTerms.Value, read.Params[0]], read.Body), Arguments, ["ComparisonValue"], false);
     }
 
@@ -399,10 +398,5 @@ internal sealed class BrowserMember<T, TValue>
             yield return text.Substring(at, end + 1 - at);
             at = end + 2;
         }
-    }
-
-    private sealed class ParameterSwap(ParameterExpression from, ParameterExpression to) : ExpressionVisitor
-    {
-        protected override LinqExpression VisitParameter(ParameterExpression node) => node == from ? to : node;
     }
 }
