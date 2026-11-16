@@ -20,4 +20,7 @@ public static class WorldEndpoints
     public const string Check = "/world/check";
     public const string SessionRenew = "/world/session/renew";
     public const string SessionFlush = "/world/session/flush";
+    public const string CollectorTraces = "/world/collector/v1/traces";
+    public const string CollectorLines = "/world/collector/lines";
+    public const string PharmacyStock = "/world/pharmacy/stock";
 }

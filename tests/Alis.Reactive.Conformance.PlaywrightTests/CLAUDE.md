@@ -110,6 +110,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   gate before it opens the page and reads the page's own heading before it waits for the hold, so a page that does not
   render fails at that line and not at the hold's wait, which no measured wait bounds (the lead's correction of a
   fork, 2026-11-14).
+- A tracing test (`Tracing/`) reads the spans on the collector's page, `WorldPages.Collector`, after its page's last
+  outcome shows, by its list items as a whole array of literals, then the echo, `WorldPages.Echo`, whose lines name
+  the spans the collector holds, so the echo is read after the collector's lines stand.
 - `Harness/measured.json` holds what 20 green runs measured: the budget of one test, four times the slowest test,
   and the two waits, each four times the slowest step of its kind, a navigation's and every other step's. The runner
   writes it (`--measure`) and fails a run that holds a test over the budget. `Harness/Waits.cs` sets the waits on

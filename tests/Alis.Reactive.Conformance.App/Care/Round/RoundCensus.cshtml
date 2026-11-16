@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundCensus
+@{
+    Layout = "/Care/Round/_TracedLayout.cshtml";
+    ViewData["Title"] = "Census";
+    var plan = Html.ReactivePlan<RoundCensus>();
+}
+<h1>Census of the @Model.Ward ward</h1>
+<button type="button" @Html.Raises(plan, RoundCensusEvents.Load)>Load census</button>
+<p>Census: <span id="census">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RoundCensusEvents.Load, pipeline => pipeline.Get(CareEndpoints.RoundCensusCount)
+        .OnSuccess(Content.Json<WardCount>(), (census, pipeline) => pipeline.Element("census").Text.Set(census.Body.Read(counted => counted.Count)))));
+}
+@Html.RenderPlan(plan)

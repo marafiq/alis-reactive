@@ -13,5 +13,6 @@ public static class HostNames
     public const string NoAntiforgeryChoice = "noAntiforgeryChoice";
     public const string SiteHeader = "siteHeader";
     public const string DefaultHooks = "defaultHooks";
+    public const string Tracing = "tracing";
     public const string Net48 = "net48";
 }

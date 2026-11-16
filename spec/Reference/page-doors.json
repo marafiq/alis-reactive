@@ -1644,6 +1644,34 @@
       "/Care/Shell/_ShellLayout.cshtml"
     ]
   },
+  "M26.F2 X20.3 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/BedFinder.cshtml",
+      "/Care/Round/_TracedLayout.cshtml"
+    ]
+  },
+  "M26.F3 X20.2 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/RoundCensus.cshtml",
+      "/Care/Round/_TracedLayout.cshtml"
+    ]
+  },
+  "M26.F3 X20.4 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/PharmacyCheck.cshtml",
+      "/Care/Round/_TracedLayout.cshtml"
+    ]
+  },
+  "M26.F3 X20.7 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/RoundCensus.cshtml",
+      "/Care/Round/_TracedLayout.cshtml"
+    ]
+  },
   "M3.F1 M3.X1 0": {
     "modules": [],
     "views": [

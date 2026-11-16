@@ -11,6 +11,9 @@ internal sealed class WorldData
     private readonly ConcurrentQueue<string> _carers = new();
     private readonly ConcurrentDictionary<(string Gate, string At), List<WorldGate>> _gates = new();
     private readonly ConcurrentDictionary<string, ConcurrentQueue<int>> _answers = new(StringComparer.Ordinal);
+    private readonly ConcurrentQueue<CollectedSpan> _spans = new();
+    private readonly ConcurrentQueue<HeardAttempt> _attempts = new();
+    private readonly ConcurrentQueue<string> _secondOriginLog = new();
     private volatile string _word = "";
     private volatile string _componentText = "Alpha";
     private volatile string _componentOuterText = "Gamma";
@@ -43,6 +46,7 @@ internal sealed class WorldData
     private volatile string? _bindingsBetaStarted;
     private volatile string? _bindingStarted;
     private volatile bool _bindingsWhole;
+    private volatile bool _renderUnrecorded;
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
@@ -112,6 +116,14 @@ internal sealed class WorldData
 
     internal bool BindingsWhole => _bindingsWhole;
 
+    internal bool RenderUnrecorded => _renderUnrecorded;
+
+    internal IReadOnlyCollection<CollectedSpan> Spans => _spans;
+
+    internal IReadOnlyCollection<HeardAttempt> Attempts => _attempts;
+
+    internal IReadOnlyCollection<string> SecondOriginLog => _secondOriginLog;
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
@@ -149,7 +161,14 @@ internal sealed class WorldData
         if (seed.BindingsBetaStarted is { } betaStarted) _bindingsBetaStarted = betaStarted;
         if (seed.BindingStarted is { } bindingStarted) _bindingStarted = bindingStarted;
         if (seed.BindingsWhole is { } bindingsWhole) _bindingsWhole = bindingsWhole;
+        if (seed.RenderUnrecorded is { } renderUnrecorded) _renderUnrecorded = renderUnrecorded;
     }
+
+    internal void Collected(CollectedSpan span) => _spans.Enqueue(span);
+
+    internal void Heard(string? traceparent, string? baggage) => _attempts.Enqueue(new HeardAttempt(traceparent, baggage));
+
+    internal void SecondOriginReceived(string line) => _secondOriginLog.Enqueue(line);
 
     internal int NextAnswer(string endpoint) => _answers.TryGetValue(endpoint, out var statuses) && statuses.TryDequeue(out var status) ? status : StatusCodes.Status200OK;
 

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Encodings.Web;
 using Alis.Reactive.Conformance.App.Components;
 using Alis.Reactive.Conformance.World;
@@ -20,13 +21,21 @@ internal static class WorldArea
         services.AddSingleton<IDistributedCache>(provider => new WorldCache(
             new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions())),
             provider.GetRequiredService<IHttpContextAccessor>()));
+        services.AddSingleton<CollectorChanges>();
+        services.AddSingleton<ExportedActivities>();
+        services.AddSingleton<Collector>();
+        services.AddSingleton<SecondOrigin>();
     }
 
     internal static void UseWorld(this WebApplication app)
         => app.Use(async (context, next) =>
         {
             if (WorldOf(context) is { } key)
+            {
                 context.RequestServices.GetRequiredService<CurrentWorld>().Open(key, context.RequestServices.GetRequiredService<Worlds>().Of(key));
+                Activity.Current?.SetTag(WorldKey.Tag, key);
+            }
+
             await next(context);
         });
 
@@ -83,7 +92,7 @@ internal static class WorldArea
     private static ValueTask<object?> AtTheSettleGate(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
         => AtTheGate(GateName.Of(RunGate.Settle), context, next);
 
-    private static async ValueTask<object?> AtTheGate(string gate, EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+    internal static async ValueTask<object?> AtTheGate(string gate, EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
         var http = context.HttpContext;
         await http.RequestServices.GetRequiredService<CurrentWorld>().Data.Reach(gate, http.Request.Path);
@@ -100,7 +109,7 @@ internal static class WorldArea
         return key;
     }
 
-    private static bool IsADocuments(HttpRequest request)
+    internal static bool IsADocuments(HttpRequest request)
         => string.Equals(request.Headers[DocumentHeader].ToString(), "document", StringComparison.Ordinal);
 
     private static string RecordsPage(WorldData world)

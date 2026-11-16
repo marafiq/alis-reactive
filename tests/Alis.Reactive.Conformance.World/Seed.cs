@@ -80,6 +80,8 @@ public sealed class Seed
 
     public bool? BindingsWhole { get; set; }
 
+    public bool? RenderUnrecorded { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed Carer(string name) => new Seed().AndCarer(name);
@@ -153,6 +155,8 @@ public sealed class Seed
     public static Seed TheBindingsStarted(string started) => new() { BindingStarted = started };
 
     public static Seed TheBindingsWhole() => new() { BindingsWhole = true };
+
+    public static Seed TheRenderIsNotRecorded() => new() { RenderUnrecorded = true };
 
     public Seed AndCarer(string name)
     {

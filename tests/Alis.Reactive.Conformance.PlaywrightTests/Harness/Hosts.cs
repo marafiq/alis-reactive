@@ -48,6 +48,10 @@ public static class Hosts
 
     public static readonly string[] DefaultHooks = [DefaultHooksName];
 
+    public const string TracingName = HostNames.Tracing;
+
+    public static readonly string[] Tracing = [TracingName];
+
     public const string Net48Name = HostNames.Net48;
 
     public static readonly string[] Net48 = [Net48Name];

@@ -25,6 +25,7 @@ public sealed class Program
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(cookie => cookie.LoginPath = SessionNotesEndpoints.SignIn);
         if (builder.Environment.IsDevelopment()) builder.Services.AddWorld();
+        AppHost.AddTracing(host, builder);
 
         var app = builder.Build();
         app.UseRequestCultures();
@@ -35,6 +36,7 @@ public sealed class Program
         }
 
         app.UseStaticFiles();
+        AppHost.UseTracing(host, app);
         app.MapControllers();
         if (app.Configuration[TestHost] is { } testHost) StopWith(testHost, app.Lifetime);
         app.Run();

@@ -116,11 +116,20 @@ its views.
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.
 - `World/WorldData.cs` keeps a world's gates by action and endpoint: an endpoint's filter reaches its gate with
-  its own address, and takes the hold that names it before one that names none. An MVC action a test holds at the
+  its own address, and takes the first hold not yet held that names it before one that names none; a second arm at
+  one action and endpoint queues a hold behind the first, and the arm's answer numbers it. An MVC action a test holds at the
   answer gate carries the filter `World/AtTheAnswerGateAttribute.cs`, which reaches the gate with the action's own
   address (`World/WordDeskController.cs`); another gate gets its filter with the first page whose test holds it.
   The word slip, an action of the same controller, writes the world's word with MVC's JSON options, which the host
   sets, since the World area's minimal endpoints write with the HTTP options, which no host sets.
+- The host `tracing` (`AppHost.cs`, `World/CollectorArea.cs`) exports the page's spans through the OpenTelemetry
+  adapter and the server's activities of the source Alis.Reactive to `World/Collector.cs`, which keeps them by
+  world. `World/RendersSampler.cs` records a request that carries no traceparent only when it renders a page of a
+  world whose seed leaves its render recorded, so every fetch follows its own header's flag. The host listens on
+  two addresses, and the second is another origin (`World/SecondOrigin.cs`) that allows the page's origin and the
+  trace headers by CORS and logs each request it receives. The collector's page lists a world's spans as a tree,
+  a line a span with its outcome, status and resend count, and redraws as spans arrive (`World/collector.ts`); the
+  echo page lists each attempt's traceparent by the span it names, and baggage.
 - `World/WorldCache.cs` is the app's distributed cache in Development, each key under its world, and
   `World/CachedRounds.cs` is the fragment a seed puts there, as a release of the framework rendered it.
 - The app holds no static a request can change, since every world shares a static: none that can be assigned, and
