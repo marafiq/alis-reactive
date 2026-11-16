@@ -237,6 +237,42 @@ describe("when a check reads what a container sends", () => {
   });
 });
 
+describe("when an input is checked live", () => {
+  const live = (validator: string, body: string): Containers[string]["live"][number] => ({ validator, ruleSet: "default", body: literal(body) });
+  const nights = field("Nights", ["nights"], literal(5));
+  const room = field("Room", ["room"], literal("B-12"));
+  const held: Inputs = { own: nights, second: room };
+  const sentOwn = { name: "Nights", entry: { id: "own", binding: nights } };
+  const sentSecond = { name: "Room", entry: { id: "second", binding: room } };
+
+  test("each container that holds the input gives its live check over its own inputs, and a container that does not hold it gives none", () => {
+    const inputs = page(new Map([["intake", new Set(["own", "second"])], ["kin", new Set(["own"])], ["ward", new Set(["second"])], ["bare", new Set(["own"])]]));
+    inputs.join(plan(held, {
+      intake: { model: "Admission", kind: "form", summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
+      kin: { model: "Admission", kind: "element", summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
+      ward: { model: "Admission", kind: "element", summary: "ward_summary", live: [live("WardRules", "the ward's body")] },
+      bare: { model: "Admission", kind: "element", summary: "bare_summary", live: [] },
+    }), new Visit(), "on the page", literalValue);
+    expect(inputs.liveChecksOf("own")).toStrictEqual([
+      { registration: "AdmissionRules:default", body: "the intake's body", inputs: [sentOwn, sentSecond] },
+      { registration: "KinRules:default", body: "the kin's body", inputs: [sentOwn] },
+    ]);
+  });
+
+  test("a container whose element the page lacks gives no live check, and a released one gives none", () => {
+    const inputs = page(new Map([["kin", new Set(["own"])]]));
+    const owner = new Visit();
+    inputs.join(plan(held, {
+      intake: { model: "Admission", kind: "form", summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
+      kin: { model: "Admission", kind: "element", summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
+    }), owner, "on the page", literalValue);
+    expect(inputs.liveChecksOf("own")).toStrictEqual([{ registration: "KinRules:default", body: "the kin's body", inputs: [sentOwn] }]);
+    owner.release();
+    expect(inputs.liveChecksOf("own")).toStrictEqual([]);
+    expect(inputs.entries()).toStrictEqual([]);
+  });
+});
+
 describe("when an answer shows where a request's failures go", () => {
   test("InlineOnlyAtTheSentInput: the table holds an entry sent until its input leaves, and a load under the same id is another entry", () => {
     const inputs = page();

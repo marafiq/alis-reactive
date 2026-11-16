@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Alis.Reactive.OwnershipAndState;
 using Alis.Reactive.Schema;
 using Alis.Reactive.Vendors;
@@ -15,9 +16,9 @@ internal static class ModelPlugin
         plan.BindsInput(inputId, binding);
         DeclaredIn(plan);
     }
-    internal static void Contains(PlanContent plan, string id, ContainerKind kind, string summary)
+    internal static void Contains(PlanContent plan, string id, ContainerKind kind, string summary, IReadOnlyList<Live> live)
     {
-        plan.RendersContainer(id, new Container(plan.Model, kind, summary, []));
+        plan.RendersContainer(id, new Container(plan.Model, kind, summary, live));
         DeclaredIn(plan);
     }
 

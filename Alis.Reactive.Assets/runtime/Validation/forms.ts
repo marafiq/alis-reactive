@@ -1,3 +1,4 @@
+import type { LiveCheck } from "../InputsAndIds/index";
 import type { Owner } from "../OwnershipAndState/index";
 import {
   assertNever, notBuilt, type CheckedBody, type Expression, type FnExpression, type FormCheck, type FormPlace, type InputEntry, type PathStep, type PlanDocument, type Registration,
@@ -18,6 +19,7 @@ export interface InputsTable {
   typedText(input: SentInput): string | null;
   holds(entry: InputEntry): boolean;
   summaryOf(containerId: string): string;
+  liveChecksOf(inputId: string): readonly LiveCheck[];
 }
 
 export interface Places {
@@ -63,9 +65,29 @@ export class PageForms {
   validate(check: FormCheck): readonly Failure[] {
     const [carried] = this.#carried.get(check.registration) ?? [];
     if (carried === undefined) throw new Stop("No live plan carries the rules of '" + check.registration + "'.");
-    const failures = new Run(carried, check, input => this.#table.typedText(input)).failures();
+    const failures = new Run(carried, check.body, check.inputs, input => this.#table.typedText(input)).failures();
     this.#show(failures, check.inputs, check.place);
     return failures;
+  }
+
+  clear(entry: InputEntry): void {
+    if (entry.binding.message === "") return;
+    this.#places.clearMessage(entry);
+  }
+
+  checkLive(entry: InputEntry): void {
+    if (entry.binding.message === "") return;
+    const checks = this.#table.liveChecksOf(entry.id);
+    if (checks.length === 0) return;
+    const [first] = checks.flatMap(check => this.#liveFailures(check)).filter(failure => failure.name === entry.binding.name);
+    this.#places.clearMessage(entry);
+    if (first !== undefined) this.#places.showMessage(entry, first.message);
+  }
+
+  #liveFailures(check: LiveCheck): readonly Failure[] {
+    const [carried] = this.#carried.get(check.registration) ?? [];
+    if (carried === undefined) throw new Stop("No live plan carries the rules of '" + check.registration + "'.");
+    return new Run(carried, check.body, check.inputs, input => this.#table.typedText(input)).failures();
   }
 
   showErrors(problem: unknown, inputs: readonly SentInput[], place: FormPlace): void {
@@ -106,21 +128,23 @@ export class PageForms {
 class Run {
   readonly #registration: Registration;
   readonly #apply: Apply;
-  readonly #check: FormCheck;
+  readonly #body: CheckedBody;
+  readonly #inputs: readonly SentInput[];
   readonly #typedText: TypedText;
   readonly #failures: Failure[] = [];
   readonly #refused: (readonly PathStep[])[] = [];
 
-  constructor(carried: Carried, check: FormCheck, typedText: TypedText) {
+  constructor(carried: Carried, body: CheckedBody, inputs: readonly SentInput[], typedText: TypedText) {
     this.#registration = carried.registration;
     this.#apply = carried.apply;
-    this.#check = check;
+    this.#body = body;
+    this.#inputs = inputs;
     this.#typedText = typedText;
   }
 
   failures(): readonly Failure[] {
-    for (const input of this.#check.inputs) this.#typed(input);
-    this.#group(this.#registration.rules, { value: checkedBody(this.#registration, this.#check.body), path: [] });
+    for (const input of this.#inputs) this.#typed(input);
+    this.#group(this.#registration.rules, { value: checkedBody(this.#registration, this.#body), path: [] });
     return this.#failures;
   }
 
@@ -178,7 +202,7 @@ class Run {
   }
 
   #nameOf(path: readonly PathStep[]): string {
-    return this.#check.inputs.find(input => same(input.entry.binding.path, path))?.name ?? "";
+    return this.#inputs.find(input => same(input.entry.binding.path, path))?.name ?? "";
   }
 }
 

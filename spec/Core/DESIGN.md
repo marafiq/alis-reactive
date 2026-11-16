@@ -3071,10 +3071,12 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - D12.6 A hub or a stream is held by every owner whose plans name it. The connection opens at the first hold
   and closes at the last release, and its retry offer goes with it. A step reaches only a held connection
   (`Ownership.tla:HubKeptWhileHeld`).
-- D12.7 Live validation is one capture-phase listener per page. An input an event reaches is checked by the
-  live checks of the containers that hold it (D16.15). Nothing is wired per element, so nothing per element
-  is released. A registration and a container leave with their plan's owner, so a slot's own checks leave with
-  the slot. What a check reads for a member whose input is gone is Q16's.
+- D12.7 Live validation is one capture-phase listener per page, which hears typing and blur. An input an event
+  reaches is checked by the live checks of the containers that hold it (D16.15). A component commits its value by
+  its own event, which raises no DOM event (M7.X3), so each input's commit is heard through its own object by its
+  vendor's listening, added when its plan starts and removed at its owner's release as a handler's listener is
+  (D12.5); nothing else is wired per element. A registration and a container leave with their plan's owner, so a
+  slot's own checks leave with the slot. What a check reads for a member whose input is gone is Q16's.
 - D12.8 An event of a live object a pipeline reaches (an object an event's payload holds, an object a method
   returns, an item of a list) is listened to by a step written in that pipeline, `listen`, with a vendor's
   listening, a payload declaration and a policy, as a handler has. Its listener:
@@ -3901,9 +3903,13 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   A registration carries the starts of D16.6 once. `$model.sentValueOf` and `$model.sends` leave, since every
   read is a `get` over one checked body (B3), and the form plugin's argument is a typed contract (D9.1).
 - D16.15 Live validation is D12.7's, per container. A container's block carries its live check: its model's
-  registered validator under the default rule set, the rule set the block names, or none (the form goes to gate 2).
-  Typing clears an input's message, and blur and the input's commit check the input's member under the live check of
-  each container that holds it, each over its own container's inputs; a message two of them give shows once.
+  registered validator under the default rule set, the rule set the block names, or none (the form goes to gate 2);
+  a bare block carries the first, and the door that names a rule set or none is declared with the first view that
+  names one. Typing clears an input's message, and blur and the input's commit check the input's member under the
+  live check of each container that holds it, each over its own container's inputs, a checked body C# writes as form
+  data, as a check with no request sends it (D16.6); a message two of them give shows once. A live check shows at
+  the input's message element alone, its member's first failure as a request's check shows it there (D16.13), and
+  changes no summary and no notice.
 - D16.16 A check that compares a member with a fixed value or another member (`Equal`, `NotEqual`, `GreaterThan`,
   `GreaterThanOrEqualTo`, `LessThan`, `LessThanOrEqualTo`, `InclusiveBetween`, `ExclusiveBetween`) compares a date or a
   time (`DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly`, `TimeSpan`, each nullable too) as .NET does, to the tick,
@@ -4175,6 +4181,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `X16.40` behavior (D16.5): "north" under `RuleFor(a => a.Ward).Cascade(CascadeMode.Stop).MaximumLength(3)` and a
   `Matches("^[A-Z]*$")` after it fails the length alone in the browser before sending, as the endpoint answers, and
   "abc" fails the pattern alone.
+- `X16.41` behavior (D16.15): a live container holding a Name input and a Phone input, each member with its own rule
+  and message: leaving Name with A shows Name's message beside it and not Phone's; leaving Phone empty then shows
+  Phone's as well.
 
 ## Q17. Vendors and inversion
 

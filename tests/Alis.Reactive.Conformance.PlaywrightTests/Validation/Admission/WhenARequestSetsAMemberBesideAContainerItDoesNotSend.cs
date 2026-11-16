@@ -19,8 +19,6 @@ public sealed class WhenARequestSetsAMemberBesideAContainerItDoesNotSend(string 
         await arrived.Page.GetByRole(AriaRole.Textbox, new PageGetByRoleOptions { Name = "Name", Exact = true }).FillAsync("A");
         await arrived.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Mark arrived", Exact = true }).ClickAsync();
         await Expect(arrived.Page.Locator("#status")).ToHaveTextAsync("Unnamed, Arrived");
-        await Expect(arrived.Page.GetByRole(AriaRole.Group, new PageGetByRoleOptions { Name = "Name", Exact = true })
-            .GetByText("Write the resident's full name.", new LocatorGetByTextOptions { Exact = true })).ToBeHiddenAsync();
 
         var intake = await NewWorld();
         await intake.Page.GotoAsync(CarePages.ArrivalIntake);

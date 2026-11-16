@@ -7767,6 +7767,22 @@
       ]
     },
     {
+      "feature": "M8.F4",
+      "for": "X16.41",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M2.F1",
       "for": "X7.5",
       "index": 0,

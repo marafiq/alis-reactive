@@ -1434,7 +1434,7 @@
           "for": "X16.6",
           "page": "An intake page whose intake container holds a Name input, with Save intake sending the container and Mark arrived sending no container and setting Status to Arrived; the model starts Name at Unnamed; the validator holds RuleFor(i => i.Status).NotEmpty() and RuleFor(i => i.Name).MinimumLength(2).WithMessage(\"Write the resident's full name.\"); the page writes the endpoint's answer, the name and the status, comma separated, into status.",
           "gesture": "Type A in Name and click Mark arrived.",
-          "outcome": "status reads Unnamed, Arrived, and no \"Write the resident's full name.\" shows.",
+          "outcome": "status reads Unnamed, Arrived.",
           "opposite": "Clicking Save intake with A in Name shows \"Write the resident's full name.\" beside Name, status stays as it was, and no request is sent.",
           "defect": "The check reads the container's inputs although the request does not send them, so the typed A fails and Mark arrived sends nothing."
         }
@@ -2173,6 +2173,10 @@
         {
           "id": "X16.21",
           "rung": "analyzer"
+        },
+        {
+          "id": "X16.41",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -2284,6 +2288,14 @@
           "outcome": "\"Name is required.\" shows once.",
           "opposite": "Typing Ann and pressing Tab shows no message.",
           "defect": "Each container checks the blur and both write the message, so it shows twice."
+        },
+        {
+          "for": "X16.41",
+          "page": "An admission page whose live form container holds a Name input and a Phone input, each in a fieldset of its own, checked live by the page's validator, which holds RuleFor(k => k.Name).MinimumLength(2).WithMessage(\"Write the kin's full name.\") and RuleFor(k => k.Phone).NotEmpty().WithMessage(\"Give the kin's phone number.\").",
+          "gesture": "Type A in Name and press Tab.",
+          "outcome": "\"Write the kin's full name.\" shows beside Name, and \"Give the kin's phone number.\" does not show beside Phone.",
+          "opposite": "Pressing Tab again, leaving Phone empty, shows \"Give the kin's phone number.\" beside Phone as well.",
+          "defect": "Blur checks every member of the container, so \"Give the kin's phone number.\" shows when Name is left."
         }
       ],
       "verdicts": []

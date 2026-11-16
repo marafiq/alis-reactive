@@ -1,6 +1,6 @@
 import { pageInputs } from "../InputsAndIds/index";
 import { holdSlots, placeOf, slotsNamedBy, type Owner } from "../OwnershipAndState/index";
-import { assertNever, type Expression, type FnExpression, type Handler, type Locator, type PlanDocument, type Trace } from "../Schema/index";
+import { assertNever, type Expression, type FnExpression, type Handler, type InputBinding, type Locator, type PathStep, type PlanDocument, type Trace } from "../Schema/index";
 import type { Traced } from "../Tracing/index";
 import { pageForms } from "../Validation/index";
 import { got, heldOrNull, Stop, value } from "../ValuesAndSources/index";
@@ -9,6 +9,8 @@ import { bind, isAnObject, within, type Context } from "./context";
 import { applied, evaluate } from "./expressions";
 import { Lane } from "./lane";
 import { heldBy, located, locatorOf, type ElementFor, type Located, type PluginFor } from "./objects";
+
+type Heard = (...args: unknown[]) => void;
 
 const payloadName = "e";
 const argumentsName = "arguments";
@@ -39,33 +41,53 @@ export function start(plan: PlanDocument, owner: Owner, elementFor: ElementFor, 
       boot.event("alis.error", {});
     }
   }
+  for (const [inputId, binding] of inputsOf(plan)) {
+    try {
+      hears(context, inputId, [], binding.committed, elementFor, pluginFor, () => { pageForms.checkLive({ id: inputId, binding }); });
+    } catch (stopped) {
+      if (!(stopped instanceof Stop)) throw stopped;
+      console.error("The commit of input '" + inputId + "' is not heard: " + stopped.reason);
+      boot.event("alis.error", {});
+    }
+  }
   boot.end("completed");
 }
 
 function listen(handler: Handler, context: Context, elementFor: ElementFor, pluginFor: PluginFor): void {
-  const source = located(context, handler.on, elementFor, pluginFor);
-  const raiser = got(value(source.object), handler.path, "required");
-  if (raiser.kind === "nothing" || !isAnObject(raiser.value)) throw new Stop("The object that raises '" + handler.event + "' is not on the page.");
-  const stillHeld = stillHeldOf(source, context);
   const lane = new Lane(handler.policy, handler.do, context.owner);
-  const heard = { released: false };
-  const unsubscribe = subscribe(raiser.value, source.listen, handler.event, (...args: unknown[]) => {
-    if (heard.released) return;
+  hears(context, handler.on, handler.path, handler.event, elementFor, pluginFor, (...args: unknown[]) => {
+    const payload = got(value(args), handler.payload, handler.members);
+    lane.raise(bind(bind(context, payloadName, payload), argumentsName, value(args)));
+  });
+  context.owner.runs(() => {
+    lane.dispose();
+  });
+}
+
+function hears(context: Context, on: string, path: readonly PathStep[], event: string, elementFor: ElementFor, pluginFor: PluginFor, heard: Heard): void {
+  const source = located(context, on, elementFor, pluginFor);
+  const raiser = got(value(source.object), path, "required");
+  if (raiser.kind === "nothing" || !isAnObject(raiser.value)) throw new Stop("The object that raises '" + event + "' is not on the page.");
+  const stillHeld = stillHeldOf(source, context);
+  const released = { released: false };
+  const unsubscribe = subscribe(raiser.value, source.listen, event, (...args: unknown[]) => {
+    if (released.released) return;
     try {
-      const payload = got(value(args), handler.payload, handler.members);
-      lane.raise(bind(bind(context, payloadName, payload), argumentsName, value(args)));
+      heard(...args);
     } catch (stopped) {
       if (!(stopped instanceof Stop)) throw stopped;
       console.error(stopped.reason);
     }
   });
-  context.owner.runs(() => {
-    lane.dispose();
-  });
   context.owner.listens(() => {
-    heard.released = true;
+    released.released = true;
     if (stillHeld()) unsubscribe();
   });
+}
+
+function inputsOf(plan: PlanDocument): [string, InputBinding][] {
+  return Object.values(plan.objects).flatMap(locator =>
+    locator.kind === "plugin" && locator.name === "alis.model" && locator.data.kind === "model" ? Object.entries(locator.data.inputs) : []);
 }
 
 function stillHeldOf(source: Located, context: Context): () => boolean {

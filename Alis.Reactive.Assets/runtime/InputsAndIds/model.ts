@@ -1,6 +1,6 @@
 import type { Owner } from "../OwnershipAndState/index";
 import {
-  assertNever, notBuilt, type AsExpression, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type InputEntry, type ModelPluginData, type OpExpression, type PathStep,
+  assertNever, notBuilt, type AsExpression, type CheckedBody as CheckedForm, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type InputEntry, type ModelPluginData, type OpExpression, type PathStep,
   type PlanDocument, type SentInput, type SentInputs, type ValueRead,
 } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
@@ -39,6 +39,12 @@ interface Contribution {
 interface Input {
   readonly binding: InputBinding;
   readonly contribution: Contribution;
+}
+
+export interface LiveCheck {
+  readonly registration: string;
+  readonly body: CheckedForm;
+  readonly inputs: readonly SentInput[];
 }
 
 export interface CapturedContainer {
@@ -107,7 +113,22 @@ export class PageInputs {
     const [first] = inputs;
     const body = first !== undefined && typeof first[1].binding.path[0] === "number" ? [] : {};
     for (const [, input] of inputs) write(body, input.binding.path, input.contribution.read(input.binding.value));
-    return { kind: "captured", id: containerId, body, inputs: inputs.map(([id, input]) => ({ name: input.binding.name, entry: { id, binding: input.binding } })) };
+    return { kind: "captured", id: containerId, body, inputs: inputs.map(sentInput) };
+  }
+
+  liveChecksOf(inputId: string): readonly LiveCheck[] {
+    return [...this.#containers].flatMap(([containerId, renderings]) => {
+      const inside = this.#inside(containerId);
+      if (inside === null) return [];
+      if (!inside(inputId)) return [];
+      const inputs = [...this.#inputs].filter(([id]) => inside(id)).map(sentInput);
+      return [...renderings].flatMap(([contribution, container]) => container.live.map(live =>
+        ({ registration: live.validator + ":" + live.ruleSet, body: contribution.read(live.body) as CheckedForm, inputs })));
+    });
+  }
+
+  entries(): readonly InputEntry[] {
+    return [...this.#inputs].map(([id, input]) => ({ id, binding: input.binding }));
   }
 
   sends(containerId: string, modelKey: string): ContainerCapture {
@@ -192,6 +213,10 @@ export class PageInputs {
       if (renderings?.size === 0) this.#containers.delete(id);
     }
   }
+}
+
+function sentInput([id, input]: readonly [string, Input]): SentInput {
+  return { name: input.binding.name, entry: { id, binding: input.binding } };
 }
 
 const notCoalesced = "a typed text read through a binding whose value is not coalesce(as(read, shape), blank): the contract types InputBinding.value as any expression, though C# writes that form (N3.3)";

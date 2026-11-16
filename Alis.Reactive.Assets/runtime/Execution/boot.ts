@@ -5,7 +5,7 @@ import { plugin, provide, readQueue, type PluginRegistration } from "../Plugins/
 import type { PlanDocument } from "../Schema/index";
 import { tracing } from "../Tracing/index";
 import { DocumentPlugin, raisesOnClick } from "../TriggersAndPipelines/index";
-import { pageForms } from "../Validation/index";
+import { checksLive, pageForms } from "../Validation/index";
 import { elementById } from "./objects";
 import { scriptsOtherThanPlansWithin } from "./plan-scripts";
 import { planReadsWithin, plansWithin } from "./plans";
@@ -48,6 +48,7 @@ function runsScripts(container: HTMLElement): void {
 export function boot(): void {
   const documentPlugin = new DocumentPlugin(document, location);
   raisesOnClick(document, documentPlugin);
+  checksLive(document);
   const slots = new Slots<HTMLElement, DocumentFragment>({
     elementById,
     parsed,

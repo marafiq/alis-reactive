@@ -396,6 +396,25 @@ function startedOn(ward: Ward, bell: Bell): WeakRef<Host> {
   return new WeakRef(element);
 }
 
+describe("when a plan binds an input", () => {
+  test("the input's commit is heard through its own object until its plan's owner releases it", () => {
+    const ward = new Ward();
+    const picker = new Bell();
+    start(withInput("first", "first"), ward, elementsOf(aPicker(picker)), deskOf(new Bell()), untraced);
+    expect([...(picker.listeners.get("change") ?? [])]).toHaveLength(1);
+    ward.release();
+    expect([picker.removed, [...(picker.listeners.get("change") ?? [])]]).toStrictEqual([["change"], []]);
+  });
+
+  test("an input whose element the page lacks is not heard, and the console says why", () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const ward = new Ward();
+    start(withInput("first", "first"), ward, elementsOf(new Map()), deskOf(new Bell()), untraced);
+    expect(logged.mock.calls).toStrictEqual([["The commit of input 'repeated' is not heard: No element has the id 'repeated'."]]);
+    ward.release();
+  });
+});
+
 describe("when a plan contributes an input already held on the page", () => {
   test("R14.6 starts none of the conflicting plan's handlers and logs one complete error", () => {
     const first = new Ward();
@@ -404,8 +423,8 @@ describe("when a plan contributes an input already held on the page", () => {
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
     const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    start(withInput("first", "first"), first, elementsOf(new Map()), deskOf(desk), untraced);
-    start(withInput("second", "second"), second, elementsOf(new Map()), deskOf(desk), untraced);
+    start(withInput("first", "first"), first, elementsOf(aPicker()), deskOf(desk), untraced);
+    start(withInput("second", "second"), second, elementsOf(aPicker()), deskOf(desk), untraced);
     desk.raise("first", { text: "first heard" }, note);
     desk.raise("second", { text: "second heard" }, note);
     second.release();
@@ -413,16 +432,20 @@ describe("when a plan contributes an input already held on the page", () => {
     expect(lines).toStrictEqual(["first heard"]);
     expect(logged.mock.calls).toStrictEqual([["Input 'repeated' is already held by plan 'first' on the page; plan 'second' on the page did not start."]]);
     first.release();
-    start(withInput("third", "third"), second, elementsOf(new Map()), deskOf(desk), untraced);
+    start(withInput("third", "third"), second, elementsOf(aPicker()), deskOf(desk), untraced);
     desk.raise("third", { text: "after release" }, note);
     expect(lines).toStrictEqual(["first heard", "after release"]);
     second.release();
   });
 });
 
+function aPicker(picker = new Bell()): ReadonlyMap<string, object> {
+  return new Map([["repeated", { current: picker }]]);
+}
+
 function withInput(planId: string, event: string): Plan {
   const plan = planOf(handler("desk", event));
-  return { ...plan, planId, objects: { ...plan.objects, $model: {
+  return { ...plan, planId, objects: { ...plan.objects, repeated: { kind: "element", id: "repeated", vendor: "bell" }, $model: {
     kind: "plugin", name: "alis.model", key: "", listen: onAndOff, data: {
       kind: "model", containers: {}, inputs: {
         repeated: { name: "Nights", path: ["nights"], value: { kind: "lit", value: 5 }, committed: "change", invalidClass: "invalid", message: "" },
@@ -535,9 +558,9 @@ describe("when a traced plan boots, its boot is a span that records no value (D2
     const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
     const spans = new Spans();
     const first = new Ward();
-    start(withInput("first", "first"), first, elementsOf(new Map()), deskOf(new Bell()), untraced);
+    start(withInput("first", "first"), first, elementsOf(aPicker()), deskOf(new Bell()), untraced);
 
-    start(withInput("second", "second"), new Ward(), elementsOf(new Map()), deskOf(new Bell()), spans.traceOf);
+    start(withInput("second", "second"), new Ward(), elementsOf(aPicker()), deskOf(new Bell()), spans.traceOf);
 
     expect([spans.recorded, logged.mock.calls]).toStrictEqual([
       ["alis.boot starts {\"alis.plan_id\":\"second\"}", "alis.boot alis.stop {}", "alis.boot stopped"],

@@ -145,6 +145,7 @@ internal static class AppHost
             .Add<Care.IntakeAssessmentRules>()
             .Add<Care.QuickAdmissionRules>()
             .Add<Care.ResidentAdmissionRules>()
+            .Add<Care.NextOfKinAdmissionRules>()
             .Add<Care.RoomAdmissionRules>()
             .Add<Care.RoomNumberingRules>()
             .Add<Care.StateMoveInTexasRules>()

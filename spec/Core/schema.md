@@ -123,7 +123,7 @@ sends, built when it is called: each framework input of the page's input table w
 element, under its `InputBinding.path`, its value its `InputBinding.value` evaluated in the plan that contributed it.
 The page lacking the container's element, no live plan rendering that container for that model (D14.8), and two
 inputs inside it under one scalar binding name (D13.4) each stop the pipeline. A container read is a `data` read over
-it (N13.1, D13.3), and `Live.body` is that call.
+it (N13.1, D13.3), and `Live.body`'s `value` is that call.
 
 `alis.document`'s `query`, called with a member's binding name (D2.5), returns the first value of the page's query
 whose key matches it ignoring case, as both hosts bind the query, and null where no key does. Its `segment`, called
@@ -158,8 +158,9 @@ Its shape and list flag of 65fdf118d leave into `value`.
 - `summary`: its summary element's id (D13.6);
 - `live`: none, or the `Live` its inputs are checked by (D16.15).
 
-`Live` carries `validator` and `ruleSet`, the check live validation runs (D16.15), and `body`, an expression
-that reads the container's inputs as the container sends them (D16.5).
+`Live` carries `validator` and `ruleSet`, the check live validation runs (D16.15), and `body`, a record the runtime
+reads as a check's `CheckedBody`: its `format`, form data, and its `value`, the read of the container's inputs as
+the container sends them (D16.5).
 
 `Registration` is one validator's rules under one rule set, for every check by them in its plan (D16.2). It carries:
 - `validator`: the validator's key;

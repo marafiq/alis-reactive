@@ -14,11 +14,13 @@ type Group = Registration["rules"];
 type Format = Check["body"]["format"];
 type Table = ConstructorParameters<typeof PageForms>[0];
 type Places = ConstructorParameters<typeof PageForms>[1];
+type LiveCheck = ReturnType<Table["liveChecksOf"]>[number];
 
 class InputsTable implements Table {
   readonly #typed: Record<string, string>;
   readonly #held = new Map<string, Entry>();
   readonly #summaries: Record<string, string>;
+  readonly #live = new Map<string, readonly LiveCheck[]>();
 
   constructor(typed: Record<string, string> = {}, summaries: Record<string, string> = { intake: "intake_summary" }) {
     this.#typed = typed;
@@ -28,6 +30,8 @@ class InputsTable implements Table {
   typedText(input: Sent): string | null { return this.#typed[input.name] ?? null; }
   holds(entry: Entry): boolean { return this.#held.get(entry.id)?.binding === entry.binding; }
   hold(...inputs: Sent[]): void { for (const input of inputs) this.#held.set(input.entry.id, input.entry); }
+  liveChecksOf(inputId: string): readonly LiveCheck[] { return this.#live.get(inputId) ?? []; }
+  checksLive(inputId: string, ...checks: LiveCheck[]): void { this.#live.set(inputId, checks); }
   summaryOf(containerId: string): string {
     const summary = this.#summaries[containerId];
     if (summary === undefined) throw new Error("No live plan renders container '" + containerId + "'.");
@@ -353,5 +357,69 @@ describe("when alis.form shows a check's failures where the plan places them", (
       .toThrow(/^The body ShowValidationErrors shows is no validation problem, \{"errors": \{"<binding name>": \["message"\]\}\}\.$/);
     expect(() => { page.showErrors({ errors: { Name: "Name is taken" } }, [], inTheSummary); })
       .toThrow(/^The body ShowValidationErrors shows is no validation problem, \{"errors": \{"<binding name>": \["message"\]\}\}\.$/);
+  });
+});
+
+describe("when an input is checked live", () => {
+  const admission: Registration = {
+    validator: "Admission", ruleSet: "default", start: { name: null, room: null },
+    scalars: [], objects: [], lists: [],
+    rules: group([field(["name"], "Name is required."), field(["room"], "Pick a room.")]),
+  };
+  const ward: Registration = {
+    validator: "Ward", ruleSet: "default", start: { name: null },
+    scalars: [], objects: [], lists: [],
+    rules: group([field(["name"], "Name the resident on the ward.")]),
+  };
+  const nameInput = shown("Name", ["name"]);
+  const roomInput = shown("Room", ["room"]);
+  const live = (validator: string, value: object, inputs: Sent[] = [nameInput, roomInput]): LiveCheck => ({ registration: validator + ":default", body: { format: "urlEncoded", value }, inputs });
+
+  test("a live check shows the first failure of the input's own member at its input, once when two containers give it, and leaves the other members and the summary", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    page.showMessage(roomInput.entry, "Earlier");
+    table.checksLive(nameInput.entry.id, live("Admission", { name: "", room: "" }), live("Admission", { name: "", room: "" }));
+    placed([admission], table, page).checkLive(nameInput.entry);
+    expect(Object.fromEntries(page.messages)).toStrictEqual({ input_Room_message: "Earlier", input_Name_message: "Name is required." });
+    expect(Object.fromEntries(page.summaries)).toStrictEqual({});
+  });
+
+  test("two containers that give the member two messages show the first container's at its input", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    table.checksLive(nameInput.entry.id, live("Ward", { name: "" }, [nameInput]), live("Admission", { name: "", room: "Oak" }));
+    placed([admission, ward], table, page).checkLive(nameInput.entry);
+    expect(Object.fromEntries(page.messages)).toStrictEqual({ input_Name_message: "Name the resident on the ward." });
+  });
+
+  test("a live check the member passes clears its message", () => {
+    const table = new InputsTable();
+    const page = new Page();
+    page.showMessage(nameInput.entry, "Name is required.");
+    table.checksLive(nameInput.entry.id, live("Admission", { name: "Ann", room: "" }));
+    placed([admission], table, page).checkLive(nameInput.entry);
+    expect(Object.fromEntries(page.messages)).toStrictEqual({});
+  });
+
+  test("an input no live container holds keeps the message a request showed", () => {
+    const page = new Page();
+    page.showMessage(nameInput.entry, "Name is required.");
+    placed([admission], new InputsTable(), page).checkLive(nameInput.entry);
+    expect(Object.fromEntries(page.messages)).toStrictEqual({ input_Name_message: "Name is required." });
+  });
+
+  test("typing clears the input's message and no other", () => {
+    const page = new Page();
+    page.showMessage(nameInput.entry, "Name is required.");
+    page.showMessage(roomInput.entry, "Pick a room.");
+    placed([admission], new InputsTable(), page).clear(nameInput.entry);
+    expect(Object.fromEntries(page.messages)).toStrictEqual({ input_Room_message: "Pick a room." });
+  });
+
+  test("a live check whose rules no live plan carries stops", () => {
+    const table = new InputsTable();
+    table.checksLive(nameInput.entry.id, live("Admission", { name: "" }));
+    expect(() => { placed([], table, new Page()).checkLive(nameInput.entry); }).toThrow(/^No live plan carries the rules of 'Admission:default'\.$/);
   });
 });

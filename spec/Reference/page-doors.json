@@ -3012,6 +3012,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M8.F4 X16.41 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/NextOfKinAdmission.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M8.F4 X16.5 0": {
     "modules": [],
     "views": [
