@@ -142,7 +142,7 @@ export class RequestFrame {
       case "attempt":
         return {
           kind: "waits",
-          on: attempt(state.request, this.#statement, this.#context.signal, location.href),
+          on: attempt(state.request, this.#statement, this.#context.signal, location.href, this.#context.trace.send()),
           settled: read => {
             this.#state = { kind: "route", request: state.request, answer: heldOrNull(read) as Answer };
           },

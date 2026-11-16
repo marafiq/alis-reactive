@@ -57,6 +57,14 @@ describe("when a bodyless request reaches Guard, its wire follows D9 and schema.
     expect(prepared.request).toStrictEqual({ Ward: "Éast !'()*", Id: 7, Term: "a b+c&d", Beds: 12.5, Open: false });
   });
 
+  test("RouteTemplate: an attempt is named by its path's template, each placeholder by its name, with neither its origin nor its query (D20.4, D20.5)", () => {
+    const ward: Send["url"]["parts"][number] = { kind: "member", name: "Ward", value: { kind: "held", value: "East" }, form: { kind: "text" } };
+    const onThePage = prepare({ ...get(), url: { parts: [{ kind: "text", text: "/Wards/" }, ward], query: "fixed=a" } }, clock, enUs);
+    const elsewhere = prepare({ ...get(), url: { parts: [{ kind: "text", text: "https://pharmacy.example:8443/Stock/" }, ward], query: "" } }, clock, enUs);
+    const bare = prepare({ ...get(), url: { parts: [{ kind: "text", text: "https://pharmacy.example" }], query: "" } }, clock, enUs);
+    expect([onThePage.template, elsewhere.template, bare.template]).toStrictEqual(["/Wards/{Ward}", "/Stock/{Ward}", "/"]);
+  });
+
   test("NothingBindsAsDeclared: leave omits a field, empty writes an empty field, and held null follows the same policy", () => {
     const missing: Field = { name: "Beds", path: ["Beds"], value: { kind: "nothing" }, form: { kind: "number" }, whenNothing: "leave" };
     const send = get([

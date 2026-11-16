@@ -13,6 +13,7 @@ export { Submission };
 export interface PreparedRequest {
   readonly method: HttpSend["method"];
   readonly url: string;
+  readonly template: string;
   readonly headers: Headers;
   readonly body: BodyInit | null;
   readonly request: object;
@@ -27,6 +28,7 @@ export function prepare(send: HttpSend, zone: TimeZone, culture: Culture, busy: 
   for (const contract of send.contracts) contracts.set(contract, findPlugin(contract, ""));
   const request = {};
   const path = send.url.parts.map(part => pathText(part, zone, request)).join("");
+  const template = routeTemplate(send.url.parts);
   const query = new URLSearchParams();
   appendFields(query, send.query.fields, zone, invariantPlace, request);
   appendInputs(query, send.query.inputs, zone, invariantPlace, request);
@@ -41,7 +43,7 @@ export function prepare(send: HttpSend, zone: TimeZone, culture: Culture, busy: 
   const body = bodyOf(send.body, headers, { zone, place: formDataPlace(culture), request, token: field });
   const inputs = [...sentInputs(send.query.inputs), ...sentInputs(send.body.kind === "none" ? noInputs : send.body.inputs)];
   const releaseBusy = busy.hold(contracts.get("busy"));
-  return { method: send.method, url, headers, body, request, inputs, respondedJson: send.respondedJson, retry: send.retry, releaseBusy };
+  return { method: send.method, url, template, headers, body, request, inputs, respondedJson: send.respondedJson, retry: send.retry, releaseBusy };
 }
 
 interface FormWriting {
@@ -266,6 +268,25 @@ function sentInputs(capture: SentInputs): readonly SentInput[] {
     }
   }
   return inputs;
+}
+
+function routeTemplate(parts: readonly PathPart[]): string {
+  const written = parts.map(templateText).join("");
+  const origin = /^https?:\/\/[^/]*/iu.exec(written);
+  if (origin === null) return written;
+  const path = written.slice(origin[0].length);
+  return path === "" ? "/" : path;
+}
+
+function templateText(part: PathPart): string {
+  switch (part.kind) {
+    case "text":
+      return part.text;
+    case "member":
+      return "{" + part.name + "}";
+    default:
+      return assertNever(part);
+  }
 }
 
 function pathText(part: PathPart, zone: TimeZone, request: object): string {

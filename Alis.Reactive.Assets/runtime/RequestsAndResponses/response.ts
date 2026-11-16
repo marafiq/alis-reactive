@@ -1,4 +1,5 @@
 import { assertNever, notBuilt, type HttpResponse, type RequestStatement, type ResponseBody, type Route, type SuccessBody } from "../Schema/index";
+import { isThePagesOrigin, type Attempting, type Sending, type TraceHeaders } from "../Tracing/index";
 import type { PreparedRequest } from "./request";
 import { Retry, waitToRetry } from "./retry";
 
@@ -33,39 +34,55 @@ export function routeFor(reply: HttpResponse, routes: Routes): Route {
   }
 }
 
-export async function attempt(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string): Promise<Answer> {
+export async function attempt(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string, sending: Sending): Promise<Answer> {
   const retry = new Retry(request.retry, request.method);
+  const toThePagesOrigin = isThePagesOrigin(request.url, pageUrl);
   let sent = 1;
   for (;;) {
     signal.throwIfAborted();
-    const answer = await sendOnce(request, routes, signal, pageUrl);
+    const attempting = sending.attempt(toThePagesOrigin, request.method, request.template);
+    const answer = await sendOnce(request, routes, signal, pageUrl, attempting.headers);
     signal.throwIfAborted();
+    attemptAnswered(attempting, answer.reply);
     const wait = retry.next(answer.reply, sent);
-    if (wait === undefined) return answer;
+    if (wait === undefined) return sendEnded(sending, answer);
     await waitToRetry(wait, signal);
     signal.throwIfAborted();
-    if (!retry.withinBudget(0)) return answer;
+    if (!retry.withinBudget(0)) return sendEnded(sending, answer);
     sent += 1;
   }
 }
 
-async function sendOnce(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string): Promise<Answer> {
+function attemptAnswered(attempting: Attempting, reply: HttpResponse): void {
+  if (reply.outcome === "network") {
+    attempting.end("completed");
+    return;
+  }
+  attempting.answered(reply.status);
+}
+
+function sendEnded(sending: Sending, answer: Answer): Answer {
+  sending.end("completed");
+  return answer;
+}
+
+async function sendOnce(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string, trace: TraceHeaders): Promise<Answer> {
   let response: Response;
   try {
-    response = await fetch(request.url, { method: request.method, headers: request.headers, body: request.body, redirect: "follow", signal });
+    response = await fetch(request.url, { method: request.method, headers: traced(request.headers, trace), body: request.body, redirect: "follow", signal });
   } catch {
-    return answered(networkFailure(request));
+    return answerOf(networkFailure(request));
   }
   const status = statusOf(response, request.respondedJson);
   const reply: HttpResponse = {
     status, outcome: status >= 200 && status < 300 ? "ok" : "status",
     headers: response.headers, request: request.request, inputs: request.inputs, body: { kind: "none" },
   };
-  if (response.redirected && new URL(response.url).origin !== new URL(pageUrl).origin) return answered({ ...reply, outcome: "redirect" });
+  if (response.redirected && new URL(response.url).origin !== new URL(pageUrl).origin) return answerOf({ ...reply, outcome: "redirect" });
   const decoded = await readBody(response, routeFor(reply, routes).kind, new URL(request.url, pageUrl));
   switch (decoded.kind) {
     case "body":
-      return answered({ ...reply, body: decoded.body });
+      return answerOf({ ...reply, body: decoded.body });
     case "file":
       return {
         reply: { ...reply, body: { kind: "file", value: { name: decoded.name, size: decoded.file.size, type: decoded.file.type } } },
@@ -74,15 +91,23 @@ async function sendOnce(request: PreparedRequest, routes: Routes, signal: AbortS
         },
       };
     case "content":
-      return answered({ ...reply, outcome: reply.outcome === "ok" ? "content" : "status" });
+      return answerOf({ ...reply, outcome: reply.outcome === "ok" ? "content" : "status" });
     case "network":
-      return answered(networkFailure(request));
+      return answerOf(networkFailure(request));
     default:
       return assertNever(decoded);
   }
 }
 
-function answered(reply: HttpResponse): Answer {
+function traced(headers: Headers, trace: TraceHeaders): Headers {
+  const entries = Object.entries(trace);
+  if (entries.length === 0) return headers;
+  const sent = new Headers(headers);
+  for (const [name, value] of entries) sent.set(name, value);
+  return sent;
+}
+
+function answerOf(reply: HttpResponse): Answer {
   return { reply, saveDownload: savesNothing };
 }
 

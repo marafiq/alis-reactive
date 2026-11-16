@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { attempt, captureBusy, prepare } from "./index";
 
+const untraced: Parameters<typeof attempt>[4] = {
+  attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }),
+  end: () => undefined,
+};
 type Send = Parameters<typeof prepare>[0];
 const culture = { name: "en-US", collation: "en-US", decimal: ".", group: ",", integer: { group: false, exponent: false }, fraction: { group: true, exponent: true } };
 const send: Send = {
@@ -12,7 +16,7 @@ const send: Send = {
 const routes = { success: { kind: "json", do: [] }, statuses: [], otherwise: { kind: "json", do: [] } } as const;
 const response = (status: number, headers: Readonly<Record<string, string>> = {}) => new Response("{}", { status, headers: { "Content-Type": "application/json", ...headers } });
 const prepared = (changes: Partial<Send> = {}) => prepare({ ...send, ...changes }, { kind: "clock" }, culture);
-const run = (request = prepared(), signal = new AbortController().signal) => attempt(request, routes, signal, "https://care.example/").then(answer => answer.reply);
+const run = (request = prepared(), signal = new AbortController().signal) => attempt(request, routes, signal, "https://care.example/", untraced).then(answer => answer.reply);
 const fetches = () => {
   const fetch = vi.fn<typeof globalThis.fetch>();
   vi.stubGlobal("fetch", fetch);
@@ -24,6 +28,53 @@ beforeEach(() => {
   vi.spyOn(Math, "random").mockReturnValue(0.5);
 });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+
+const tracing = (calls: string[]): Parameters<typeof attempt>[4] => ({
+  attempt: (toThePagesOrigin, method, template) => {
+    const attempt = calls.filter(call => call.startsWith("attempt")).length + 1;
+    calls.push("attempt " + String(attempt) + " " + (toThePagesOrigin ? "home " : "away ") + method + " " + template);
+    return {
+      headers: { traceparent: "span of attempt " + String(attempt) },
+      answered: status => { calls.push("answered " + String(status)); },
+      end: outcome => { calls.push("attempt ended " + outcome); },
+    };
+  },
+  end: outcome => { calls.push("send " + outcome); },
+});
+const traceparents = (fetch: ReturnType<typeof fetches>) => fetch.mock.calls.map(call => new Headers(call[1]?.headers).get("traceparent"));
+
+describe("when a send is traced, Tracing.tla's Attempt and Respond order its spans", () => {
+  test("TracedAttempts: each attempt opens its span by method and template and sends its own headers, records its status as answered, and the send ends after its last", async () => {
+    const calls: string[] = [];
+    const fetch = fetches().mockResolvedValueOnce(response(503)).mockResolvedValueOnce(response(200));
+    const pending = attempt(prepared(), routes, new AbortController().signal, "https://care.example/", tracing(calls));
+    await vi.advanceTimersByTimeAsync(2000);
+    expect((await pending).reply.status).toBe(200);
+    expect(calls).toStrictEqual(["attempt 1 home GET /Residents", "answered 503", "attempt 2 home GET /Residents", "answered 200", "send completed"]);
+    expect(traceparents(fetch)).toStrictEqual(["span of attempt 1", "span of attempt 2"]);
+  });
+
+  test("AwayAndUnanswered: an attempt to another origin is told so, and one the network fails ends with no status", async () => {
+    const calls: string[] = [];
+    fetches().mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    const away = prepared({ url: { parts: [{ kind: "text", text: "https://pharmacy.example/Stock" }], query: "" }, retry: { kind: "none" } });
+    const reply = await attempt(away, routes, new AbortController().signal, "https://care.example/", tracing(calls)).then(answer => answer.reply);
+    expect([reply.status, reply.outcome]).toStrictEqual([0, "network"]);
+    expect(calls).toStrictEqual(["attempt 1 away GET /Stock", "attempt ended completed", "send completed"]);
+  });
+
+  test("CutInFlight: an attempt the page gives up records no answer and leaves its send to the run's end", async () => {
+    const calls: string[] = [];
+    fetches().mockImplementation((_, init) => new Promise((_resolve, reject) => {
+      init?.signal?.addEventListener("abort", () => { reject(new DOMException("The operation was aborted.", "AbortError")); });
+    }));
+    const cut = new AbortController();
+    const pending = attempt(prepared(), routes, cut.signal, "https://care.example/", tracing(calls));
+    cut.abort();
+    await expect(pending).rejects.toThrow("This operation was aborted");
+    expect(calls).toStrictEqual(["attempt 1 home GET /Residents"]);
+  });
+});
 
 describe("when a standard policy runs, D10.14 and Request.tla bound every attempt", () => {
   test("EveryStandardAttempt: exponential waits precede sends two, three and four, then the last failure is returned", async () => {
