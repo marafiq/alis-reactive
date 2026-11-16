@@ -1,4 +1,6 @@
 using Alis.Reactive.Conformance.World;
+using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace Alis.Reactive.Conformance.PlaywrightTests.Harness;
 
@@ -55,4 +57,21 @@ public static class Hosts
     public const string Net48Name = HostNames.Net48;
 
     public static readonly string[] Net48 = [Net48Name];
+
+    public const string ConsumerNet10Name = HostNames.ConsumerNet10;
+
+    public static readonly string[] ConsumerNet10 = [ConsumerNet10Name];
+
+    public const string ConsumerNet48Name = HostNames.ConsumerNet48;
+
+    public static readonly string[] ConsumerNet48 = [ConsumerNet48Name];
+
+    public static readonly TestFixtureData[] Net10AndNet48 = [Under(Net10Name), Under(Net48Name)];
+
+    private static TestFixtureData Under(string host)
+    {
+        var instance = new TestFixtureData(host);
+        instance.Properties.Add(PropertyNames.Category, host);
+        return instance;
+    }
 }

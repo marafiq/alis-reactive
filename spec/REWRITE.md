@@ -731,7 +731,7 @@ alone.
   `SuggestedFilename`; and what the harness collected of the page's requests, console and uncaught errors.
 
 The project's `Harness/` takes besides: `Playwright.CreateAsync`, `Chromium`, `LaunchAsync`, `NewContextAsync` with its
-locale and time zone, `NewPageAsync`, `AddCookiesAsync`, `CloseAsync`, `SetDefaultTimeout`,
+locale, time zone and `JavaScriptEnabled`, `NewPageAsync`, `AddCookiesAsync`, `CloseAsync`, `SetDefaultTimeout`,
 `SetDefaultNavigationTimeout`, `Assertions.SetDefaultExpectTimeout`, a context's `Tracing` with its `StartAsync` and
 `StopAsync`, which a measured run records its steps with (2.5), the page's events `Request`, `Console`, `PageError`,
 `Download`, `Popup` and `Close`,

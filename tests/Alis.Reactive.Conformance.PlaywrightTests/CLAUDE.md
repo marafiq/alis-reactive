@@ -27,6 +27,10 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   the fixture keeps the hosts its placement lists (`Harness/WhenAWorldOpensUnderAnotherHost.cs`). A world whose
   browser runs in the zone a promise names opens by `NewWorldInZone`, the zone a constant of `Zones`; every other
   world's browser runs in America/Los_Angeles (`Harness/WhenAWorldOpensInAnotherZone.cs`).
+  A fixture placed under two hosts takes `Hosts.Net10AndNet48`, whose data carries each host as the category of its
+  own instance, and carries no `[Category]` of its own
+  (`Validation/Admission/WhenARoomNumberIsCheckedByItsPattern.cs`). A case with JavaScript off opens its page by
+  `NewPersonWithJavaScriptOff`, a person's context with no world.
 - A test names the server's culture in its page's address, a constant of the world contract, and the browser's
   locale stays "en-US"; a culture's opposite case opens a second world at the other culture's address
   (`ArrayLambdas/Refusals/WhenATextKeyIsOrderedUnderAnAlternateSort.cs`).

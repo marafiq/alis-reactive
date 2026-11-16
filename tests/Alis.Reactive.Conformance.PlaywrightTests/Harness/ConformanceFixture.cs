@@ -26,9 +26,13 @@ public abstract class ConformanceFixture(string host)
         return world;
     }
 
-    protected async Task<IPage> NewPerson()
+    protected Task<IPage> NewPerson() => OpenPerson(javaScriptEnabled: true);
+
+    protected Task<IPage> NewPersonWithJavaScriptOff() => OpenPerson(javaScriptEnabled: false);
+
+    private async Task<IPage> OpenPerson(bool javaScriptEnabled)
     {
-        var context = await TestWorld.NewContext(await ConformanceHost.Of(host), Zones.LosAngeles);
+        var context = await TestWorld.NewContext(await ConformanceHost.Of(host), Zones.LosAngeles, javaScriptEnabled);
         _people.GetOrAdd(TestContext.CurrentContext.Test.ID, _ => []).Add(context);
         var page = await context.NewPageAsync();
         Watch(page);
