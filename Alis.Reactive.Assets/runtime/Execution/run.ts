@@ -1,3 +1,4 @@
+import type { Owner } from "../OwnershipAndState/index";
 import type { Statement } from "../Schema/index";
 import type { Attributes, EventName, SpanOutcome, Traced } from "../Tracing/index";
 import { Stop, value, type Read } from "../ValuesAndSources/index";
@@ -39,6 +40,17 @@ function outcomeOf(cause: Cut): SpanOutcome {
   return cause === "replace" ? "replaced" : "disposed";
 }
 
+const inTheirStep: Run[] = [];
+
+export function cutsRunsInTheirStep(owners: readonly Owner[], returned: () => void): boolean {
+  const ending = inTheirStep.filter((run) => owners.includes(run.owner));
+  const [outermost] = ending;
+  if (outermost === undefined) return false;
+  for (const run of ending) run.cut("dispose");
+  outermost.afterItReturns(returned);
+  return true;
+}
+
 export class Run {
   readonly #block: Block;
   readonly #context: Context;
@@ -73,6 +85,10 @@ export class Run {
     return this.#status;
   }
 
+  get owner(): Owner {
+    return this.#context.owner;
+  }
+
   begin(): void {
     this.#frames.push(BlockFrame.of(this.#block, this.#context));
     this.#drive();
@@ -102,9 +118,14 @@ export class Run {
 
   #drive(): void {
     this.#status = "running";
-    while (this.#isRunning()) {
-      this.#steps();
-      for (const cause of this.#cutsInItsStep.splice(0)) this.#lands(cause);
+    inTheirStep.push(this);
+    try {
+      while (this.#isRunning()) {
+        this.#steps();
+        for (const cause of this.#cutsInItsStep.splice(0)) this.#lands(cause);
+      }
+    } finally {
+      inTheirStep.pop();
     }
     for (const returned of this.#afterItReturns.splice(0)) returned();
   }

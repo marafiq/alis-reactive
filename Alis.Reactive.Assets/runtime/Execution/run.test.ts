@@ -1,13 +1,21 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { Lane } from "./index";
+import { cutsRunsInTheirStep, Lane } from "./index";
 
-const aRoundsOwner: ConstructorParameters<typeof Lane>[2] = {
-  runs: () => undefined,
-  mounts: () => undefined,
-  listens: () => undefined,
-  holds: () => undefined,
-  registers: () => undefined,
-};
+type AnOwner = ConstructorParameters<typeof Lane>[2];
+
+function anOwner(): AnOwner {
+  return {
+    runs: () => undefined,
+    mounts: () => undefined,
+    listens: () => undefined,
+    holds: () => undefined,
+    registers: () => undefined,
+  };
+}
+
+const aRoundsOwner = anOwner();
+const theCard = anOwner();
+const thePage = anOwner();
 
 type Block = ConstructorParameters<typeof Lane>[1];
 type Step = Block[number];
@@ -133,6 +141,28 @@ function tracedWith(spans: Spans, bound: Readonly<Record<string, unknown>>): Rai
   return { ...raisedWith(bound), trace: spans.root };
 }
 
+function endsOn(chart: Chart, whose: string, bound: Readonly<Record<string, unknown>>): Raised {
+  const ended: Raised["trace"] = {
+    ...untraced,
+    end: (outcome) => {
+      chart.lines.push(whose + " ended " + outcome);
+    },
+  };
+  return { ...raisedWith(bound), trace: { ...untraced, run: () => ended } };
+}
+
+function aSlotEnding(owner: AnOwner, chart: Chart, waited: boolean[]): { readonly unload: () => void } {
+  return {
+    unload: () => {
+      waited.push(
+        cutsRunsInTheirStep([owner], () => {
+          chart.lines.push("the slot released");
+        }),
+      );
+    },
+  };
+}
+
 function everyPromiseJobRan(): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, 0);
@@ -150,6 +180,7 @@ const charts = (value: Source): Step => ({ kind: "set", path: ["line"], members:
 const chartsItsSignal: Step = { kind: "set", path: ["signal"], members: "required", content: false, target: named("chart"), value: { kind: "signal" } };
 const rings: Step = { kind: "set", path: ["rung"], members: "required", content: false, target: named("bell"), value: text("the handler") };
 const awaits = (name: string): Step => ({ kind: "do", await: true, expr: named(name) });
+const unloads: Step = { kind: "do", await: false, expr: calls("slot", "unload") };
 const stops = (reason: string): Step => ({ kind: "stop", reason });
 const when = (name: string, then: Block, otherwise: Block): Step => ({ kind: "if", when: named(name), then, else: otherwise });
 const layer = (whileLoading: Block, last: Block): Layer => ({ whileLoading, finally: last });
@@ -615,5 +646,107 @@ describe("when a block reads its abort signal (D11.12)", () => {
     expect(chart.signals.map((signal) => signal.aborted)).toStrictEqual([false, false]);
     lane.dispose();
     expect(chart.signals.map((signal) => signal.aborted)).toStrictEqual([true, true]);
+  });
+});
+
+describe("when a release ends the runs of its owners that are in their own step (D12.4, D11.11)", () => {
+  test("NothingRunsAfterAnAbort, DisposedRunNeverWaits: a run whose own step unloads its owner's slot runs no step after it, runs each loaded Finally layer once, innermost first and to its first awaited step, ends, and then the release runs", async () => {
+    const chart = new Chart();
+    const flush = gate();
+    const waited: boolean[] = [];
+    const beds = request(
+      layer([], [charts(text("the inner defaults' Finally"))]),
+      layer([], [charts(text("the inner Finally starts")), awaits("flush"), charts(text("the inner Finally flushed"))]),
+      layer([unloads, charts(text("after the unload"))], []),
+    );
+    const lane = new Lane("overlap", [
+      request(
+        layer([], [charts(text("the outer defaults' Finally"))]),
+        layer([], [charts(text("the outer Finally"))]),
+        layer([beds, charts(text("after beds"))], []),
+      ),
+      charts(text("after admission")),
+    ], theCard);
+
+    lane.raise(endsOn(chart, "the card's run", { chart, flush: flush.held, slot: aSlotEnding(theCard, chart, waited) }));
+    flush.opens(null);
+    await everyPromiseJobRan();
+
+    expect([chart.lines, waited]).toStrictEqual([
+      ["the inner Finally starts", "the inner defaults' Finally", "the outer Finally", "the outer defaults' Finally", "the card's run ended disposed", "the slot released"],
+      [true],
+    ]);
+  });
+
+  test("FinallyRunsBeforeRelease: a release asked inside two runs of its owner, the inner one asking, waits until the outermost has run its Finally and ended", () => {
+    const chart = new Chart();
+    const waited: boolean[] = [];
+    const inner = new Lane("overlap", [
+      request(layer([], [charts(text("the inner Finally"))]), layer([unloads, charts(text("the inner run after its unload"))], [])),
+    ], theCard);
+    const bell = new Bell(() => {
+      inner.raise(endsOn(chart, "the inner run", { chart, slot: aSlotEnding(theCard, chart, waited) }));
+    });
+    const outer = new Lane("overlap", [
+      request(layer([], [charts(text("the outer Finally"))]), layer([rings, charts(text("the outer run after its ring"))], [])),
+    ], theCard);
+
+    outer.raise(endsOn(chart, "the outer run", { chart, bell }));
+
+    expect([chart.lines, waited]).toStrictEqual([
+      ["the inner Finally", "the inner run ended disposed", "the outer Finally", "the outer run ended disposed", "the slot released"],
+      [true],
+    ]);
+  });
+
+  test("a card's step raises an event the page's handler hears by unloading the card: the page's run is not cut and goes on, and the card's run ends at its step's return before the release", () => {
+    const chart = new Chart();
+    const waited: boolean[] = [];
+    const pageHandler = new Lane("overlap", [unloads, charts(text("the page goes on"))], thePage);
+    const bell = new Bell(() => {
+      pageHandler.raise(raisedWith({ chart, slot: aSlotEnding(theCard, chart, waited) }));
+    });
+    const cardHandler = new Lane("overlap", [
+      request(layer([], [charts(text("the card's Finally"))]), layer([rings, charts(text("the card after its ring"))], [])),
+      charts(text("the card after its request")),
+    ], theCard);
+
+    cardHandler.raise(endsOn(chart, "the card's run", { chart, bell }));
+
+    expect([chart.lines, waited]).toStrictEqual([["the page goes on", "the card's Finally", "the card's run ended disposed", "the slot released"], [true]]);
+  });
+
+  test("a release whose owners have no run in its own step is told so and calls nothing back, and a run of its owner that waits goes on", async () => {
+    const chart = new Chart();
+    const settle = gate();
+    const waited: boolean[] = [];
+    const cardHandler = new Lane("overlap", [awaits("settle"), charts(text("the card goes on"))], theCard);
+    const pageHandler = new Lane("overlap", [unloads, charts(text("the page goes on"))], thePage);
+    cardHandler.raise(raisedWith({ chart, settle: settle.held }));
+
+    pageHandler.raise(raisedWith({ chart, slot: aSlotEnding(theCard, chart, waited) }));
+    settle.opens(null);
+    await everyPromiseJobRan();
+
+    expect([chart.lines, waited]).toStrictEqual([["the page goes on", "the card goes on"], [false]]);
+  });
+
+  test("a run whose step threw past it is in its own step no more", () => {
+    const chart = new Chart();
+    const waited: boolean[] = [];
+    const cardHandler = new Lane("overlap", [{ kind: "do", await: false, expr: calls("desk", "jam") }, charts(text("the card goes on"))], theCard);
+    const pageHandler = new Lane("overlap", [unloads, charts(text("the page goes on"))], thePage);
+    const desk = {
+      jam: () => {
+        throw new Error("The desk jammed.");
+      },
+    };
+
+    expect(() => {
+      cardHandler.raise(raisedWith({ chart, desk }));
+    }).toThrow("The desk jammed.");
+    pageHandler.raise(raisedWith({ chart, slot: aSlotEnding(theCard, chart, waited) }));
+
+    expect([chart.lines, waited]).toStrictEqual([["the page goes on"], [false]]);
   });
 });

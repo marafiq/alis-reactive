@@ -12,6 +12,8 @@ export interface Thrown {
   readonly error: unknown;
 }
 
+export type AnnouncesUnmount = (root: Placed) => void;
+
 interface LiveSlot {
   readonly container: Placed;
   readonly owner: Holdings;
@@ -21,19 +23,22 @@ const liveSlots = new Map<string, LiveSlot>();
 
 export const page: Owner = new Holdings();
 
-export function slotOwner(container: Placed): Owner {
+export function slotOwner(container: Placed, announcesUnmount: AnnouncesUnmount): Owner {
   const live = liveSlots.get(container.id);
   if (live !== undefined) return live.owner;
   const owner = new Holdings();
   liveSlots.set(container.id, { container, owner });
   holdSlots([container.id], owner);
+  owner.mounts(() => {
+    announcesUnmount(container);
+  });
   return owner;
 }
 
-export function ownerAround(placed: Placed, named: ReadonlySet<string>): Owner {
+export function ownerAround(placed: Placed, named: ReadonlySet<string>, announcesUnmount: AnnouncesUnmount): Owner {
   const held = heldSlots();
   const innermost = elementsAround(placed).find((around) => named.has(around.id) || held.has(around.id));
-  return innermost === undefined ? page : slotOwner(innermost);
+  return innermost === undefined ? page : slotOwner(innermost, announcesUnmount);
 }
 
 export function placeOf(owner: Owner): string {
@@ -41,10 +46,18 @@ export function placeOf(owner: Owner): string {
   return slot === undefined ? "on the page" : "in slot '" + slot.container.id + "'";
 }
 
+export function ownersEndedBy(container: Placed): Owner[] {
+  return leavingWith(container).map((slot) => slot.owner);
+}
+
 export function releaseSlot(container: Placed): Thrown[] {
-  const leaving = [...insideInnermostFirst(container), ...liveAt(container)];
+  const leaving = leavingWith(container);
   for (const slot of leaving) liveSlots.delete(slot.container.id);
   return leaving.flatMap((slot) => slot.owner.release().map((thrown) => ({ slot: slot.container.id, ...thrown })));
+}
+
+function leavingWith(container: Placed): LiveSlot[] {
+  return [...insideInnermostFirst(container), ...liveAt(container)];
 }
 
 function insideInnermostFirst(container: Placed): LiveSlot[] {

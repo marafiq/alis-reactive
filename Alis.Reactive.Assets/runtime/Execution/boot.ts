@@ -24,6 +24,11 @@ export function boot(): void {
   document.dispatchEvent(new CustomEvent("alis:mount", { detail: { root: document.body } }));
   const found = plansWithin(document);
   const named = new Set(found.flatMap(({ plan }) => slotsNamedBy(plan)));
-  for (const { plan, script } of found) start(plan, ownerAround(script, named), elementById, plugin, (trace) => tracing.planTrace(trace));
+  for (const { plan, script } of found) {
+    const owner = ownerAround(script, named, (root) => {
+      document.dispatchEvent(new CustomEvent("alis:unmount", { detail: { root } }));
+    });
+    start(plan, owner, elementById, plugin, (trace) => tracing.planTrace(trace));
+  }
   documentPlugin.started();
 }

@@ -8,6 +8,7 @@ async function aPage() {
 const body = { id: "", parentElement: null };
 const card = { id: "card", parentElement: body };
 const notes = { id: "notes", parentElement: body };
+const unheard = (): void => undefined;
 
 const eventTargets = { kind: "method", subscribe: "addEventListener", unsubscribe: "removeEventListener" } as const;
 const none = { kind: "none" } as const;
@@ -48,7 +49,7 @@ describe("when slots are held", () => {
   test("a slot a card's plan names is held from the plan's start, though nothing is loaded into it", async () => {
     const { heldSlots, holdSlots, slotOwner } = await aPage();
 
-    holdSlots(["notes"], slotOwner(card));
+    holdSlots(["notes"], slotOwner(card, unheard));
 
     expect(heldSlots()).toStrictEqual(new Set(["card", "notes"]));
   });
@@ -56,7 +57,7 @@ describe("when slots are held", () => {
   test("an emptied slot stays held while the page's plan names it", async () => {
     const { heldSlots, holdSlots, page, releaseSlot, slotOwner } = await aPage();
     holdSlots(["card"], page);
-    slotOwner(card);
+    slotOwner(card, unheard);
 
     releaseSlot(card);
 
@@ -66,8 +67,8 @@ describe("when slots are held", () => {
   test("notes a closed card loaded stay held", async () => {
     const { heldSlots, holdSlots, page, releaseSlot, slotOwner } = await aPage();
     holdSlots(["card"], page);
-    holdSlots(["notes"], slotOwner(card));
-    slotOwner(notes);
+    holdSlots(["notes"], slotOwner(card, unheard));
+    slotOwner(notes, unheard);
 
     releaseSlot(card);
 
@@ -77,8 +78,8 @@ describe("when slots are held", () => {
   test("notes a closed card loaded are held no more once the notes slot is released", async () => {
     const { heldSlots, holdSlots, page, releaseSlot, slotOwner } = await aPage();
     holdSlots(["card"], page);
-    holdSlots(["notes"], slotOwner(card));
-    slotOwner(notes);
+    holdSlots(["notes"], slotOwner(card, unheard));
+    slotOwner(notes, unheard);
 
     releaseSlot(card);
     releaseSlot(notes);
@@ -89,7 +90,7 @@ describe("when slots are held", () => {
   test("a slot only a closed card named, with nothing loaded into it, is held no more", async () => {
     const { heldSlots, holdSlots, page, releaseSlot, slotOwner } = await aPage();
     holdSlots(["card"], page);
-    holdSlots(["notes"], slotOwner(card));
+    holdSlots(["notes"], slotOwner(card, unheard));
 
     releaseSlot(card);
 
