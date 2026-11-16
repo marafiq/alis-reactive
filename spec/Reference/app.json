@@ -11071,6 +11071,29 @@
         "net10"
       ],
       "harness": []
+    },
+    {
+      "fixture": "WhenTheHostRestartsAComponent",
+      "test": "the_element_holds_a_new_object_when_the_restart_returns",
+      "unit": "U21",
+      "page": "The world's host page, a page of the app's World area with no plan on it: a ConformanceCallbacks at the id callbacks whose own function names its generation, which the conformance library's script builds on alis:mount.",
+      "gesture": "Click Raise room 7, restart the object at callbacks through the harness, then click Raise room 7.",
+      "outcome": "Before the restart the log's one line reads own 1, and after it the log's one line reads own 2: when the restart returned, the host script had destroyed the first object, emptied its element and built the second there.",
+      "opposite": "In a world with no restart, the second Raise room 7 writes a second line, and the log reads own 1 twice.",
+      "defect": "The restart returns before the page's script has done it, or the script builds no new object, so the second click reaches the first object and the log reads own 1 twice; or the script leaves the first object's controls beside the second's, so two buttons are named Raise room 7 and the click is refused.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": [
+        "restart"
+      ],
+      "held": [
+        {
+          "verb": "restart",
+          "action": "CallbackProperty.tla:Restart",
+          "on": "the ConformanceCallbacks object at conformanceCallbacks"
+        }
+      ]
     }
   ]
 }

@@ -302,13 +302,14 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
 - **The world.** Each test makes a key and sets it as the cookie `world` on its own browser context before it opens a
   page; every request, stream and hub negotiation carries it. The app's world middleware, in Development only, scopes
   data, gates, hub groups, stream filters and caches to the key; a document request with none gets a new world, so a
-  person can run the app. Teardown ends the world and fails any gate still parked. The World area serves five pages of its own for the harness's tests, app.json's `harnessTests`, which use no framework door: a records page listing the
+  person can run the app. Teardown ends the world and fails any gate still parked. The World area serves six pages of its own for the harness's tests, app.json's `harnessTests`, which use no framework door: a records page listing the
   world's residents as text the server writes, a word page whose link opens, in the page's frame, an endpoint that
   answers with the word the world's seed holds, a words page whose two links open, each in a frame of its own,
-  two endpoints that answer with that word at one gate, which a test holds at each by naming the endpoint, and a
-  word desk whose link opens an MVC action that answers with that word, its filter at the answer gate, and a
+  two endpoints that answer with that word at one gate, which a test holds at each by naming the endpoint, a
+  word desk whose link opens an MVC action that answers with that word, its filter at the answer gate, a
   word slip, a page an MVC action writes, which shows the world's word and the count of its letters as the app's
-  JSON options write them.
+  JSON options write them, and a host page holding a ConformanceCallbacks whose own function names its generation,
+  which the restart's own test restarts.
 - **The verbs** are app.json's: seed, gate, push, drop, refuse, reopen, restart, clock, gc. A placement lists its
   verbs and its held steps, each held step with the TLA+ action it holds, and check_app refuses a verb with no step.
   Gates are generated from the `Next` of each spec a held step names into the world contract (`Gates.g.cs`, one enum

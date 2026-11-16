@@ -1096,5 +1096,6 @@ public static class Promises
         public const string WhenAWorldOpensInAnotherZone_its_browser_reads_an_instant_on_the_clock_of_the_zone_the_test_names = "harness WhenAWorldOpensInAnotherZone.its_browser_reads_an_instant_on_the_clock_of_the_zone_the_test_names";
         public const string WhenAPageNamesItsCulture_the_page_renders_under_the_culture_its_address_names = "harness WhenAPageNamesItsCulture.the_page_renders_under_the_culture_its_address_names";
         public const string WhenAPageNamesItsCulture_an_address_that_names_a_culture_the_app_does_not_serve_is_answered_with_the_cultures_it_serves = "harness WhenAPageNamesItsCulture.an_address_that_names_a_culture_the_app_does_not_serve_is_answered_with_the_cultures_it_serves";
+        public const string WhenTheHostRestartsAComponent_the_element_holds_a_new_object_when_the_restart_returns = "harness WhenTheHostRestartsAComponent.the_element_holds_a_new_object_when_the_restart_returns";
     }
 }

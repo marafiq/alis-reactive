@@ -200,7 +200,9 @@ slip is about you invented so you can avoid accountability about mistakes").
   reads it, and every spec file, D line and TLA+ action it cites is found at that SHA by a command before it goes out
   (the lead's mistake, 2026-11-14); it reads no secret or file that holds a credential, runs no git command beyond
   its own worktree and branch, and runs no command its brief does not name (the lead's correction of a fork,
-  2026-11-13).
+  2026-11-13). A brief that runs TLC caps it at two workers, and an agent's TLC pauses while a landing's browser run
+  runs, whose budgets were measured on a quiet Mac (the lead's mistake, 2026-11-16: TLC on every core pushed four
+  tests over their first navigation's budget).
 - An agent starts from a definition of `.claude/agents/`, which carries the harness its kind of task meets and the
   reply it returns: `.claude/agents/designer.md` for a complex task or a critical decision, on the latest Fable model
   at xhigh, `.claude/agents/page-writer.md` for pages and their tests, and `.claude/agents/builder.md` for a piece

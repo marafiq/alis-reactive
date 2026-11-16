@@ -504,7 +504,7 @@ proposed column says `added`.
 | trace | off | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 | trace | on | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 
-Today 33 kinds, proposed 51: nineteen added, one removed (`try`, whose `finally` a `request`'s layers carry).
+Today 33 kinds, proposed 52: twenty added, one removed (`try`, whose `finally` a `request`'s layers carry).
 
 Today, each shape has two handlers: the conversion switch and the switch that picks a default by shape, `bound`
 (`Alis.Reactive.Assets/runtime/grammar/shape.ts:31-45`). That second switch leaves, because the browser chooses
