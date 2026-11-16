@@ -1,3 +1,4 @@
+import { heldSlotsAtOrIn } from "../OwnershipAndState/index";
 import {
   assertNever,
   type DoStatement,
@@ -101,9 +102,21 @@ function holds(when: Read): boolean {
 function write(statement: SetStatement, context: Context): void {
   const holder = got(evaluate(statement.target, context), statement.path.slice(0, -1), statement.members);
   for (const member of statement.path.slice(-1)) {
-    const written = Reflect.set(holderOf(holder, member, statement.members), member, heldOrNull(evaluate(statement.value, context)));
+    const object = holderOf(holder, member, statement.members);
+    if (statement.content) requireNoHeldSlotAtOrIn(object);
+    const written = Reflect.set(object, member, heldOrNull(evaluate(statement.value, context)));
     if (!written) throw new Stop("The member '" + String(member) + "' refused the write.");
   }
+}
+
+function requireNoHeldSlotAtOrIn(element: object): void {
+  const [first] = heldSlotsAtOrIn(element, elementById);
+  if (first === undefined) return;
+  throw new Stop(
+    "The step sets the content of an element that is or holds the slot '" +
+      first +
+      "', which a live plan names or whose content has a live owner, so what the slot loaded would keep running under content it no longer shows. Write the content into an element beside the slot.",
+  );
 }
 
 function holderOf(holder: Read, member: PathStep, members: SetMembers): object {

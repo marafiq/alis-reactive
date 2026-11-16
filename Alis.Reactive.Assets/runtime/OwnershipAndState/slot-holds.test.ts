@@ -97,3 +97,105 @@ describe("when slots are held", () => {
     expect(heldSlots()).toStrictEqual(new Set(["card"]));
   });
 });
+
+interface Spot {
+  readonly id: string;
+  readonly parentElement: Spot | null;
+  compareDocumentPosition(other: Spot): number;
+}
+
+const preceding = 2;
+const following = 4;
+const inDocumentOrder: Spot[] = [];
+
+function placed(id: string, parentElement: Spot | null): Spot {
+  const spot: Spot = {
+    id,
+    parentElement,
+    compareDocumentPosition: (other) => (inDocumentOrder.indexOf(other) > inDocumentOrder.indexOf(spot) ? following : preceding),
+  };
+  inDocumentOrder.push(spot);
+  return spot;
+}
+
+const theBody = placed("", null);
+const noticeboard = placed("noticeboard", theBody);
+const board = placed("board", theBody);
+const boardTools = placed("board-tools", board);
+const toolsHeading = placed("tools-heading", boardTools);
+const rounds = placed("rounds", theBody);
+const morning = placed("morning", rounds);
+placed("morning-notes", morning);
+placed("evening", rounds);
+const deskCard = placed("desk-card", theBody);
+const visitNote = placed("visit-note", theBody);
+
+const byId = (id: string): Spot | null => inDocumentOrder.find((spot) => spot.id === id) ?? null;
+
+describe("when a step writes the content of an element, the held slots at or inside it are read in document order (R14.7)", () => {
+  test("AStepOverANamedSlotThatHoldsContentStops: a slot a live plan names, holding what a load put there, is held at its own element", async () => {
+    const { heldSlotsAtOrIn, holdSlots, page, slotOwner } = await aPage();
+    holdSlots(["desk-card"], page);
+    slotOwner(deskCard, unheard);
+
+    expect(heldSlotsAtOrIn(deskCard, byId)).toStrictEqual(["desk-card"]);
+  });
+
+  test("AStepOverANamedSlotThatHoldsNoneStops: a slot an open card's plan names, with nothing loaded into it, is held at its own element", async () => {
+    const { heldSlotsAtOrIn, holdSlots, page, slotOwner } = await aPage();
+    holdSlots(["desk-card"], page);
+    holdSlots(["visit-note"], slotOwner(deskCard, unheard));
+
+    expect(heldSlotsAtOrIn(visitNote, byId)).toStrictEqual(["visit-note"]);
+  });
+
+  test("AStepOverContentInASlotNoPlanNamesStops: what a closed card loaded into a slot outside it holds that slot at its element", async () => {
+    const { heldSlotsAtOrIn, holdSlots, page, releaseSlot, slotOwner } = await aPage();
+    holdSlots(["desk-card"], page);
+    holdSlots(["visit-note"], slotOwner(deskCard, unheard));
+    slotOwner(visitNote, unheard);
+
+    releaseSlot(deskCard);
+
+    expect(heldSlotsAtOrIn(visitNote, byId)).toStrictEqual(["visit-note"]);
+  });
+
+  test("OnlyAHeldSlotStopsAStep: once the plan that named a slot left and its content was released, nothing holds it at its element", async () => {
+    const { heldSlotsAtOrIn, holdSlots, page, releaseSlot, slotOwner } = await aPage();
+    holdSlots(["desk-card"], page);
+    holdSlots(["visit-note"], slotOwner(deskCard, unheard));
+    slotOwner(visitNote, unheard);
+
+    releaseSlot(deskCard);
+    releaseSlot(visitNote);
+
+    expect(heldSlotsAtOrIn(visitNote, byId)).toStrictEqual([]);
+  });
+
+  test("AStepOverAnElementHoldingAHeldSlotStops: an element that holds a held slot names it, though the element is no slot", async () => {
+    const { heldSlotsAtOrIn, holdSlots, page } = await aPage();
+    holdSlots(["board-tools"], page);
+
+    expect(heldSlotsAtOrIn(board, byId)).toStrictEqual(["board-tools"]);
+  });
+
+  test("an element that holds several held slots names them in document order, an outer slot before the slots inside it, whatever order they were held in", async () => {
+    const { heldSlotsAtOrIn, holdSlots, page } = await aPage();
+    holdSlots(["evening"], page);
+    holdSlots(["morning-notes"], page);
+    holdSlots(["morning"], page);
+
+    expect(heldSlotsAtOrIn(rounds, byId)).toStrictEqual(["morning", "morning-notes", "evening"]);
+  });
+
+  test("OnlyAHeldSlotStopsAStep: an element beside a held slot, or inside its content, holds none, and a held slot the page lacks is at no element", async () => {
+    const { heldSlotsAtOrIn, holdSlots, page } = await aPage();
+    holdSlots(["board-tools", "gone-with-its-card"], page);
+
+    expect([heldSlotsAtOrIn(noticeboard, byId), heldSlotsAtOrIn(toolsHeading, byId), heldSlotsAtOrIn(theBody, byId)]).toStrictEqual([
+      [],
+      [],
+      ["board-tools"],
+    ]);
+  });
+});
