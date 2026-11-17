@@ -1517,9 +1517,7 @@
     ]
   },
   "M21.F48 M21.X1029 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/ProfileNote.cshtml",
       "/Shared/_FusionLayout.cshtml"
