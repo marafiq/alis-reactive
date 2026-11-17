@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Execution;
 using Alis.Reactive.OwnershipAndState;
@@ -329,16 +330,38 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
     private RecordExpression BusyRecord()
     {
         if (!HoldsBusy) return new ContractRecord<NoneBusy>().Set(busy => busy.Kind, "none").Written;
-        var ids = BusyIds();
-        if (ids.Count == 0) return new ContractRecord<PageBusy>().Set(busy => busy.Kind, "page").Written;
-        return new ContractRecord<TargetsBusy>().Set(busy => busy.Kind, "targets").Set(busy => busy.Values, new ListExpression([.. ids.Select(id =>
-            new ContractRecord<ElementBusyTarget>().Set(target => target.Kind, "element").Set(target => target.Id, id).Written)])).Written;
+        var targets = BusyTargets();
+        if (targets.Count == 0) return new ContractRecord<PageBusy>().Set(busy => busy.Kind, "page").Written;
+        return new ContractRecord<TargetsBusy>().Set(busy => busy.Kind, "targets").Set(busy => busy.Values, new ListExpression([.. targets])).Written;
     }
 
-    private IReadOnlyList<string> BusyIds() => _busy == BusyChoice.Page ? [] : _busy == BusyChoice.Targets ? _busyIds : WrittenBySuccess();
+    private IReadOnlyList<Expression> BusyTargets()
+        => _busy == BusyChoice.Page ? [] : _busy == BusyChoice.Targets ? [.. _busyIds.Select(ElementTarget)] : WrittenBySuccess();
 
-    private IReadOnlyList<string> WrittenBySuccess()
-        => [.. _success.Do.Select(WrittenElement).OfType<string>().Distinct(StringComparer.Ordinal)];
+    private IReadOnlyList<Expression> WrittenBySuccess()
+    {
+        var boundOnceTheRequestStarts = new HashSet<string>(_success.Do.OfType<LetStatement>().Select(let => let.Name).Append(_reply.Name).Append(_argument.Name), StringComparer.Ordinal);
+        var written = new Dictionary<string, Expression>(StringComparer.Ordinal);
+        foreach (var statement in _success.Do)
+        {
+            var (key, target) = TargetWrittenBy(statement, boundOnceTheRequestStarts);
+            if (key is not null && !written.ContainsKey(key)) written.Add(key, target!);
+        }
+
+        return [.. written.Values];
+    }
+
+    private static (string? Key, Expression? Target) TargetWrittenBy(Statement statement, HashSet<string> boundOnceTheRequestStarts)
+    {
+        if (WrittenElement(statement) is { } id) return (id, ElementTarget(id));
+        if (statement is not SetStatement { Content: true } content || Root(content.Target) is not RefExpression holder) return (null, null);
+        var readWhenTheRequestStarts = !boundOnceTheRequestStarts.Contains(holder.Name);
+        if (!readWhenTheRequestStarts) return (null, null);
+        return ("$" + JsonSerializer.Serialize(content.Target, PlanJson.Options), new ContractRecord<ComponentBusyTarget>().Set(target => target.Kind, "component").Set(target => target.Value, RequestValues.Held(content.Target)).Written);
+    }
+
+    private static RecordExpression ElementTarget(string id)
+        => new ContractRecord<ElementBusyTarget>().Set(target => target.Kind, "element").Set(target => target.Id, id).Written;
 
     private static string? WrittenElement(Statement statement)
         => SlotPlugin.ElementLoadedBy(statement) ?? (WrittenObject(statement) is ObjExpression written && !written.Id.StartsWith("$", StringComparison.Ordinal) ? written.Id : null);

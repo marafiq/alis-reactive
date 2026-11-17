@@ -109,8 +109,8 @@ internal static class JsonBodyValues
         {
             if (position.Key != items.Count)
             {
-                throw new NotImplementedException(
-                    $"The request sets a member at position {position.Key} of a list in its JSON body and none at position {items.Count}, and no line states what a JSON body sends at a position the request leaves out; set a member at each position from 0, or send the list whole.");
+                throw new InvalidOperationException(
+                    $"The request sets a member at position {position.Key} of a list in its JSON body and none at position {items.Count}, and a JSON list holds an item at every position before its last, which the endpoint binds as an item the request never set; set a member at each position from 0, or send the list whole.");
             }
 
             var nested = Past(position);

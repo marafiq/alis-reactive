@@ -42,6 +42,8 @@ Terms used throughout:
   object (`Alis.Reactive.Assets/runtime/plugins/model.ts:156-162`, `assignAt`). So the grammar keeps the index step:
   an input's body path is a list of path steps (`spec/Core/schema.md` S5, `InputBinding`'s `path`), and a list item's
   inputs reach a JSON body at their position (X14.10).
+  A JSON body's `guarded` and `enums` paths reach into a body already built, so a list position there is the member
+  step of its digits, `"0"`, which reaches the item as its index does (X9.30, X9.31).
 - D1.6 The MVC binding name is one function of a CLR member path, `BindingName`: member names joined by
   `.`, and an index written `[n]` directly after the step before it, as MVC's own
   `CreateSubPropertyName` and `CreateSubIndexName` write them. It is computed only in C#
@@ -198,6 +200,8 @@ Terms used throughout:
   - A `DateTime` is a local date and time with no offset. Both hosts bind that text as an Unspecified
     `DateTime`, the same wall time on any server clock (`probe:core-form-date-kind`, `probe:mvc5-datetime-parse`).
   - A `DateTimeOffset` is an RFC 3339 date-time with its offset, `Z` at zero.
+    An instant whose zone's offset that day holds seconds, a local mean time from before the zone took a standard
+    offset, stops the request that sends it, since no RFC 3339 offset writes seconds.
   - In form data a `DateTime` and a `DateOnly` are sent with their time, `2026-10-27T00:00:00` at midnight, never as the
     day alone (gate 2's G0), since both hosts bind form values under the request's culture (D3.7). The day alone binds
     in that culture's calendar, th-TH's 2026-10-27 as 1483-10-27, and a date with its time binds Gregorian under every
@@ -1690,6 +1694,9 @@ Terms used throughout:
 - D9.7 A JSON body is one object. Its member names are Q2's, its nesting follows Q1's steps, and a dictionary
   entry is a member named by its key. A JSON request that sets nothing sends `{}`, because on net10 a request
   with no body answers 415 or binds null by the endpoint parameter's nullability (`probe:core-frombody-no-body`).
+  A list in a JSON body holds an item at each position from 0 to the last one the request sets: a request that sets a
+  position and none before it is refused where the view renders, since whatever the list held there the endpoint
+  would bind as an item the request never set.
 - D9.8 Form data is multipart, written by the browser: an ordered list of parts, each a name and either text or a file
   with its name and media type. A field is named by its binding name, a list sends one part per item, a number
   carries the decimal separator of the view's culture (D3.7) and a file is sent as the file. Fields and files go in
@@ -1826,6 +1833,8 @@ Terms used throughout:
   request with no body, a JSON, URL-encoded or text body
   is refused by an analyzer; a file input a request sends in a GET or a JSON body stops the request when it is sent
   (`Request.tla:FileOnlyInFormData`).
+  A whole body of file shape that reads nothing or holds no file stops the request, since an empty body is what an
+  empty file sends.
 - D9.17 A block holds one request at its own level. A request in a block inside it (a branch, a route, `Finally`,
   a `Parallel` branch) is that block's, and requests in nested blocks run one after another, each after the one
   before it settles (D11.5). ALIS008 keeps refusing a second request in one block, retargeted to the verbs of
@@ -2086,6 +2095,12 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `X9.29` behavior (D9.13): a JSON body whose member a reply's read sets, its enum held as its own converter writes it,
   sends that value in the form its endpoint binds, and a held form no value of the enum is held as stops the request,
   naming the member and the forms its enum is held as.
+- `X9.30` behavior (D9.13, D1.9): a JSON body that sets an enum past a list position from a reply's read sends it
+  inside its item, in the form its endpoint binds, and a held form no value of the enum is held as stops the request,
+  naming the member and the forms its enum is held as.
+- `X9.31` behavior (D10.16): a JSON body member past a list position under a parts condition is sent in its item
+  when the condition holds; when it fails the item keeps its place without it, and the endpoint binds the member's
+  start.
 
 ## Q10. The request's flow and its response
 
@@ -2212,6 +2227,10 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
     the member as the endpoint binds it (Q16). A header the defaults configure is sent where the request's own
     header of its name is left out (D9.12).
     A part whose condition fails is never sent as nothing, which a nullable member would bind as null.
+    A member past a list position in a JSON body takes a condition as any member does: when it fails the member
+    leaves its item, which keeps its place, and a holder that is a list position is never left out, since a JSON list
+    leaves out no position and the items after it would move into its place. A list position itself set under a
+    condition is refused where the view renders, for the same reason (X9.31).
   - A chained request whose condition fails is not sent, and the steps after the first request run. A
     parallel branch whose condition fails sends nothing and settles at once.
   - The check takes no condition. The server checks by the same validator on every request, so a browser
@@ -2290,7 +2309,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
     the browser infers nothing: each element and component its success route writes outside any condition (a text, an
     HTML, a class, a component's member or method, a component a payload holds among them, such as a row action's
     control, read when the request starts), the element its `Into(elementId)` loads and the element of the
-    container its `Form` or `Inputs` sends. An `Input`, a notice, a plugin, a dispatch and a step inside a branch add
+    container its `Form` or `Inputs` sends.
+    A payload object that is no element holds no target, since busy is aria-busy on an element (X17.38, X11.8).
+    An `Input`, a notice, a plugin, a dispatch and a step inside a branch add
     none, and a request whose route
     writes nothing so holds the page's own target, an indicator with no element. On the full form `Busy(elementId, ..)`
     names the targets in place of those, `Busy()` names the page, and `NoBusy()` holds none. The cost is said plainly: a

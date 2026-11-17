@@ -427,6 +427,14 @@
         {
           "id": "X9.29",
           "rung": "behavior"
+        },
+        {
+          "id": "X9.30",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.31",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -646,6 +654,22 @@
           "outcome": "The POST's body is {\"status\":\"missed\"}, the form the app's JSON options write, and the answer reads Bound Missed.",
           "opposite": "On Ben Okafor's chart, whose status the endpoint writes as Skipped, a form no value of the enum is held as, the POST stops: the sending line reads Finished, the answer keeps its dash, and the console holds one error, \"The request's member 'Status' holds \"Skipped\"; its enum forms are \"Due\", \"Given\", \"Missed\".\"",
           "defect": "The held form sent, so the body is {\"status\":\"Missed\"}; or the unknown form sent, so the answer reads a status the endpoint did not receive."
+        },
+        {
+          "for": "X9.30",
+          "page": "A dose lines page whose Send the doses button GETs a resident's chart, whose Status its own JSON converter writes as Missed, and in its success route POSTs, in a JSON body, r => r.Doses[0].Status from that read and r => r.Doses[0].Note as Late under a parts condition that holds when the chart reads late, writing Finished in its Finally; the endpoint answers Bound, then the status and the note it bound in the first dose, a note starting at unnoted.",
+          "gesture": "Click Send the doses on Ada Hart's dose lines, whose chart does not read late.",
+          "outcome": "The POST's body is {\"doses\":[{\"status\":\"missed\"}]}, the status in the form the app's JSON options write inside the item at position 0, and the answer reads Bound Missed unnoted.",
+          "opposite": "On Ben Okafor's dose lines, whose status the endpoint writes as Skipped, a form no value of the enum is held as, the POST stops: the sending line reads Finished, the answer keeps its dash, and the console holds one error, \"The request's member 'Doses[0].Status' holds \"Skipped\"; its enum forms are \"Due\", \"Given\", \"Missed\".\"",
+          "defect": "The enum's list position written as an object's member, so the body is {\"doses\":{\"0\":{\"status\":\"missed\"}}} and the endpoint binds no dose; or the held form sent, so the body's status is Missed."
+        },
+        {
+          "for": "X9.31",
+          "page": "The dose lines page of X9.30.",
+          "gesture": "Click Send the doses on Cleo Banks's dose lines, whose chart reads late.",
+          "outcome": "The POST's body is {\"doses\":[{\"status\":\"missed\",\"note\":\"Late\"}]} and the answer reads Bound Missed Late.",
+          "opposite": "On Ada Hart's dose lines, whose chart does not read late, the POST's body is {\"doses\":[{\"status\":\"missed\"}]}: the note leaves its item, which keeps its place, and the answer reads Bound Missed unnoted.",
+          "defect": "The condition's list position written as an object's member, so the body is {\"doses\":{\"0\":{\"status\":\"missed\"}}}; or the item left out with its note, so the body is {\"doses\":[null]} and the endpoint binds no dose."
         }
       ],
       "verdicts": [

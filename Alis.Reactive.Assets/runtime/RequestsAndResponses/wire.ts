@@ -1,4 +1,4 @@
-import { assertNever, notBuilt, type Culture, type FlagValue, type ItemWhenNothing, type JsonForm, type ScalarWireForm, type SentField, type TimeZone, type ValueRead } from "../Schema/index";
+import { assertNever, type Culture, type FlagValue, type ItemWhenNothing, type JsonForm, type ScalarWireForm, type SentField, type TimeZone, type ValueRead } from "../Schema/index";
 import { flagNames, flagRows } from "../Conditions/index";
 import { Stop } from "../ValuesAndSources/index";
 
@@ -181,7 +181,7 @@ function dateText(value: Date): string {
 function instantText(value: Date, zone: TimeZone): string {
   switch (zone.kind) {
     case "clock":
-      return dayText(value) + timeText(value) + offsetText(-value.getTimezoneOffset());
+      return dayText(value) + timeText(value) + offsetText(-value.getTimezoneOffset(), "the browser's clock");
     case "zone":
       return zonedInstant(value, zone.id);
     default:
@@ -206,12 +206,12 @@ function zonedInstant(value: Date, zone: string): string {
   const east = (wall.getTime() - value.getTime()) / 60_000;
   const fraction = value.getMilliseconds() === 0 ? "" : "." + digits(value.getMilliseconds(), 3);
   return digits(year, 4) + "-" + part("month").padStart(2, "0") + "-" + part("day").padStart(2, "0") +
-    "T" + part("hour").padStart(2, "0") + ":" + part("minute").padStart(2, "0") + ":" + part("second").padStart(2, "0") + fraction + offsetText(east);
+    "T" + part("hour").padStart(2, "0") + ":" + part("minute").padStart(2, "0") + ":" + part("second").padStart(2, "0") + fraction + offsetText(east, "time zone '" + zone + "'");
 }
 
-function offsetText(east: number): string {
+function offsetText(east: number, where: string): string {
   if (east === 0) return "Z";
-  if (!Number.isInteger(east)) throw notBuilt("an instant with an offset containing seconds: DateWire states minute offsets");
+  if (!Number.isInteger(east)) throw new Stop("The request's instant falls at an offset with seconds in " + where + ", which no RFC 3339 offset writes.");
   const magnitude = Math.abs(east);
   return (east < 0 ? "-" : "+") + digits(Math.floor(magnitude / 60)) + ":" + digits(magnitude % 60);
 }

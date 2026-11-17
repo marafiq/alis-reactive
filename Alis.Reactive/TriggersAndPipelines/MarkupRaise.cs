@@ -24,7 +24,7 @@ internal static class MarkupRaise
     internal static string Of<TPayload>(AppEvent<TPayload> appEvent, TPayload payload, AppJson json)
     {
         var contract = json.LiveForm.GetTypeInfo(typeof(TPayload));
-        if (contract.Kind != JsonTypeInfoKind.Object) throw new NotImplementedException();
+        if (contract.Kind != JsonTypeInfoKind.Object) throw HasNoMembers(contract);
         var carried = contract.Properties.Where(member => member.Get is not null).ToList();
         foreach (var member in carried) RefuseWhatNoAttributeCarries(contract, member);
         var written = JsonSerializer.SerializeToElement(payload, contract);
@@ -40,7 +40,7 @@ internal static class MarkupRaise
                 continue;
             }
 
-            attributes.Append(' ').Append(MemberAttribute).Append(InAnAttributesName(member.Name)).Append(Quoted(TextOf(held)));
+            attributes.Append(' ').Append(MemberAttribute).Append(InAnAttributesName(member.Name)).Append(Quoted(TextOf(contract, member, held)));
         }
 
         return attributes.Append(' ').Append(NullAttribute).Append(Quoted(string.Join(NamesApart.ToString(), holdingNull))).ToString();
@@ -53,6 +53,10 @@ internal static class MarkupRaise
         if (payload.Options.GetTypeInfo(member.PropertyType).Kind != JsonTypeInfoKind.None) throw HoldsARecordOrAList(payload, member);
         if (!IsCarriedBack(member.Name)) throw NamedSoNoAttributeCarriesIt(payload, member);
     }
+
+    private static InvalidOperationException HasNoMembers(JsonTypeInfo payload)
+        => new($"The payload '{ClassNames.AsCSharpWritesIt(payload.Type)}' has no members, and markup carries the payload it raises as one attribute per member, so a payload it carries is a class with members. "
+            + "Raise a payload that is text, a number or a list from a pipeline, with p.Dispatch.");
 
     private static InvalidOperationException HoldsARecordOrAList(JsonTypeInfo payload, JsonPropertyInfo member)
         => new($"'{AsCSharpNamesIt(payload, member)}' is a {ClassNames.AsCSharpWritesIt(member.PropertyType)}, and markup carries each member of the payload it raises as the text of one "
@@ -84,10 +88,10 @@ internal static class MarkupRaise
         return name.ToString();
     }
 
-    private static string TextOf(JsonElement held) => held.ValueKind switch
+    private static string TextOf(JsonTypeInfo payload, JsonPropertyInfo member, JsonElement held) => held.ValueKind switch
     {
         JsonValueKind.String => held.ToString(),
-        JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False => held.GetRawText(),
-        _ => throw new NotImplementedException(),
+        JsonValueKind.Object or JsonValueKind.Array => throw HoldsARecordOrAList(payload, member),
+        _ => held.GetRawText(),
     };
 }

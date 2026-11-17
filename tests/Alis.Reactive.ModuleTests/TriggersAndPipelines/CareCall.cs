@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Plugins;
@@ -77,6 +78,39 @@ public static class CareEvents
     public static readonly AppEvent<SignedRound> RoundSigned = AppEvent.Declare<SignedRound>();
 
     public static readonly AppEvent<HandoverNotes> HandedOver = AppEvent.Declare<HandoverNotes>();
+
+    public static readonly AppEvent<int> BedsCounted = AppEvent.Declare<int>();
+
+    public static readonly AppEvent<List<string>> NotesRead = AppEvent.Declare<List<string>>();
+
+    public static readonly AppEvent<BedMoved> BedMoved = AppEvent.Declare<BedMoved>();
+}
+
+public sealed class BedMoved
+{
+    public int Room { get; set; }
+
+    public BedSpot Spot { get; set; }
+}
+
+[JsonConverter(typeof(BedSpotAsARecord))]
+public readonly record struct BedSpot(string Ward, int Bed);
+
+public sealed class BedSpotAsARecord : JsonConverter<BedSpot>
+{
+    public override BedSpot Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        using var spot = JsonDocument.ParseValue(ref reader);
+        return new BedSpot(spot.RootElement.GetProperty("ward").GetString()!, spot.RootElement.GetProperty("bed").GetInt32());
+    }
+
+    public override void Write(Utf8JsonWriter writer, BedSpot value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        writer.WriteString("ward", value.Ward);
+        writer.WriteNumber("bed", value.Bed);
+        writer.WriteEndObject();
+    }
 }
 
 public sealed class CareDesk : Plugin

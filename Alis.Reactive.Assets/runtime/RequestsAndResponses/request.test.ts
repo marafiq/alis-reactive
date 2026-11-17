@@ -130,10 +130,11 @@ describe("when a bodyless request reaches Guard, its wire follows D9 and schema.
     expect(prepare(send, { kind: "zone", id: "UTC" }, enUs).url).toBe("/Residents?At=2026-01-12T00%3A00%3A00Z&Day=2026-01-12");
   });
 
-  test("HistoricalInstantWaitsForAForm: an offset containing seconds has no invented wire form", () => {
+  test("HistoricalInstantStops: an instant whose zone's offset that day holds seconds stops the request, since no RFC 3339 offset writes it", () => {
     const send = get([field("At", new Date("1900-01-01T00:00:00Z"), { kind: "instant" })]);
     expect(() => prepare(send, { kind: "zone", id: "Europe/Paris" }, enUs))
-      .toThrow("This page cannot run an instant with an offset containing seconds: DateWire states minute offsets yet: the framework's code for it is not built.");
+      .toThrow("The request's instant falls at an offset with seconds in time zone 'Europe/Paris', which no RFC 3339 offset writes.");
+    expect(prepare(get([field("At", new Date("1912-01-01T00:00:00Z"), { kind: "instant" })]), { kind: "zone", id: "Europe/Paris" }, enUs).url).toBe("/Residents?At=1912-01-01T00%3A00%3A00Z");
   });
 
   test("SentMembersUseTheirPaths: the request snapshot nests fields, keeps own names and does not share a sent list", () => {
@@ -312,10 +313,19 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
     expect((prepare(post(multipart([{ kind: "file", name: "Photo", value: { kind: "held", value: [photo] }, when: true }])), clock, enUs).body as FormData).get("Photo")).toBe(photo);
   });
 
-  test("TextBodyIsOneValue: a text is the whole body, and a text or file that reads nothing names what waits on a line", async () => {
+  test("TextBodyIsOneValue: a text is the whole body, and a text that reads nothing names what waits on a line", async () => {
     expect(await sent(prepare(post({ kind: "text", value: { kind: "held", value: "Night round done" }, inputs: emptyInputs }), clock, enUs).body)).toBe("Night round done");
     expect(() => prepare(post({ kind: "text", value: { kind: "nothing" }, inputs: emptyInputs }), clock, enUs)).toThrow("a text body that reads nothing");
-    expect(() => prepare(post({ kind: "file", value: { kind: "nothing" }, inputs: emptyInputs }), clock, enUs)).toThrow("a file body that reads nothing");
+  });
+
+  test("EnumThroughAListPosition: an enum past a list position is written in its endpoint's form inside its item", async () => {
+    const shift: Extract<Body, { kind: "json" }>["enums"][number] = { name: "Items[1].Shift", path: ["items", "1", "shift"], form: { kind: "enum", values: [{ held: 1, sent: "day" }, { held: 2, sent: "night" }] } };
+    expect(await sent(prepare(post(json({ items: [{ shift: 1 }, { shift: 2 }] }, [shift])), clock, enUs).body)).toBe('{"items":[{"shift":1},{"shift":"night"}]}');
+  });
+
+  test("FileBodyHoldsAFile: a file body that reads nothing or holds null stops the request, as one that holds no file does", () => {
+    expect(() => prepare(post({ kind: "file", value: { kind: "nothing" }, inputs: emptyInputs }), clock, enUs)).toThrow("The request's file body must hold a file.");
+    expect(() => prepare(post({ kind: "file", value: { kind: "held", value: null }, inputs: emptyInputs }), clock, enUs)).toThrow("The request's file body must hold a file.");
   });
 
   test("AntiforgeryTakesItsPlace: the header place sets the header, and the field place sets the one field of a URL-encoded or multipart body", async () => {
@@ -422,6 +432,16 @@ describe("when a part's condition reads false, D10.16 leaves the part out as if 
     })).body;
     expect(body.kind === "json" ? body.value : body.kind).toEqual({ ward: "North", contact: { phone: "0113" } });
     expect(value).toEqual({ ward: "North", note: "late", address: { city: "Leeds" }, contact: { phone: "0113" } });
+  });
+
+  test("FailedConditionThroughAListPosition: a member of a list item leaves its item, which keeps its place in its list", () => {
+    const body = sentParts(post({
+      kind: "json",
+      value: { items: [{ name: "Aspirin", shift: 1 }, { name: "Saline", shift: 2 }] },
+      guarded: [{ path: ["items", "0", "name"], when: false }, { path: ["items", "1", "name"], when: true }],
+      enums: [], inputs: emptyInputs,
+    })).body;
+    expect(body.kind === "json" ? body.value : body.kind).toStrictEqual({ items: [{ shift: 1 }, { name: "Saline", shift: 2 }] });
   });
 
   test("LeftOutInputIsNotRecorded: an input whose condition failed is neither looked up nor among the inputs the request sent", () => {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Alis.Reactive.TriggersAndPipelines;
 using NUnit.Framework;
 
@@ -79,10 +80,10 @@ public sealed class WhenARequestMemberIsReachedThroughAPositionOrAKey
     }
 
     [Test]
-    public void a_json_body_that_sets_a_list_position_and_none_before_it_is_refused_as_not_built()
+    public void a_json_body_that_sets_a_list_position_and_none_before_it_is_refused_where_the_view_renders()
         => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Items[1].Name, "Aspirin")))),
-            Throws.InstanceOf<NotImplementedException>().With.Message.EqualTo(
-                "The request sets a member at position 1 of a list in its JSON body and none at position 0, and no line states what a JSON body sends at a position the request leaves out; set a member at each position from 0, or send the list whole."));
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "The request sets a member at position 1 of a list in its JSON body and none at position 0, and a JSON list holds an item at every position before its last, which the endpoint binds as an item the request never set; set a member at each position from 0, or send the list whole."));
 
     [Test]
     public void a_json_body_list_position_set_from_a_value_left_out_when_it_reads_nothing_is_refused_as_not_built()
@@ -95,24 +96,54 @@ public sealed class WhenARequestMemberIsReachedThroughAPositionOrAKey
                 "The request sets position 0 of a list in its JSON body from a value the body leaves out when it reads nothing, and no line states what a list sends at a position that reads nothing; set it from a literal, or send the list whole."));
 
     [Test]
-    public void a_json_body_member_past_a_list_position_under_a_parts_condition_is_refused_as_not_built()
+    public void a_json_body_member_past_a_list_position_under_a_parts_condition_is_guarded_by_its_path_with_the_position_as_its_digits()
+    {
+        var plan = RequestPage.Rendered(pipeline =>
+        {
+            var desk = pipeline.Component<PartsDesk>("desk");
+            pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Items[0].Shift, RequestShift.Day)
+                .When(desk.Urgent).Then(urgent => urgent.Set(r => r.Items[0].Name, "Aspirin"))));
+        });
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "guarded").GetRawText(), Is.EqualTo(
+            """{"kind":"list","items":[{"kind":"record","fields":[{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"items"},{"kind":"lit","value":"0"},{"kind":"lit","value":"name"}]}},{"name":"when","value":{"kind":"ref","name":"partCondition1"}}]}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
+    public void a_json_body_list_item_whose_every_member_a_condition_guards_keeps_its_position_and_its_list_is_the_holder_left_out()
+    {
+        var plan = RequestPage.Rendered(pipeline =>
+        {
+            var desk = pipeline.Component<PartsDesk>("desk");
+            pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.When(desk.Urgent).Then(urgent => urgent.Set(r => r.Items[0].Name, "Aspirin"))));
+        });
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "guarded").GetRawText(), Is.EqualTo(
+            """{"kind":"list","items":[""" +
+            """{"kind":"record","fields":[{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"items"}]}},{"name":"when","value":{"kind":"ref","name":"partCondition1"}}]},""" +
+            """{"kind":"record","fields":[{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"items"},{"kind":"lit","value":"0"},{"kind":"lit","value":"name"}]}},{"name":"when","value":{"kind":"ref","name":"partCondition1"}}]}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
+    public void a_json_body_list_position_itself_under_a_parts_condition_is_refused_where_the_view_renders()
         => Assert.That(() => RequestPage.Rendered(pipeline =>
             {
                 var desk = pipeline.Component<PartsDesk>("desk");
-                pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.When(desk.Urgent).Then(urgent => urgent.Set(r => r.Items[0].Name, "Aspirin"))));
+                pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Counts[0], 2).When(desk.Urgent).Then(urgent => urgent.Set(r => r.Counts[1], 3))));
             }),
-            Throws.InstanceOf<NotImplementedException>().With.Message.EqualTo(
-                "'Items[0].Name' is set past a list position under a condition on the request's parts, and a JSON body leaves out a part whose condition fails by its member path, which no node of the plan carries through a list yet; set it with no condition, or send it in form data."));
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'Counts[1]' is a position of a list in the request's JSON body set under a condition on its parts, and a JSON list leaves out no position: the items after it would move into its place. Set the list's items with no condition, or set a member of the item under the condition."));
 
     [Test]
-    public void a_json_body_enum_past_a_list_position_read_from_a_source_is_refused_as_not_built()
-        => Assert.That(() => RequestPage.Rendered(pipeline =>
-            {
-                var panel = pipeline.Component<SearchPanel>("panel");
-                pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Items[0].Shift, panel.Shift)));
-            }),
-            Throws.InstanceOf<NotImplementedException>().With.Message.EqualTo(
-                "'Items[0].Shift' is set past a list position from an enum a source reads, and a JSON body writes that enum in its endpoint's form by its member path, which no node of the plan carries through a list yet; set it from a literal, or send it in form data."));
+    public void a_json_body_enum_past_a_list_position_read_from_a_source_is_sent_by_its_path_with_the_position_as_its_digits()
+    {
+        var plan = RequestPage.Rendered(
+            pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Items[0].Shift, pipeline.Component<SearchPanel>("panel").Shift))),
+            json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "enums").GetRawText(), Is.EqualTo(
+            """{"kind":"list","items":[{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"Items[0].Shift"}},{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"items"},{"kind":"lit","value":"0"},{"kind":"lit","value":"shift"}]}},{"name":"form","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"enum"}},{"name":"values","value":{"kind":"list","items":[{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":0}},{"name":"sent","value":{"kind":"lit","value":"none"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":1}},{"name":"sent","value":{"kind":"lit","value":"day"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":2}},{"name":"sent","value":{"kind":"lit","value":"night"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":3}},{"name":"sent","value":{"kind":"lit","value":"both"}}]}]}}]}}]}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
 
     private static JsonElement QueryField(string plan) => RequestPage.Field(RequestPage.Send(plan, "query"), "fields").GetProperty("items")[0];
 }

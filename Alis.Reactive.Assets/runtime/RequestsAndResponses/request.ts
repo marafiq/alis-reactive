@@ -86,10 +86,14 @@ function partSent(part: MultipartPart): boolean {
 function without(holder: unknown, path: readonly string[]): unknown {
   const [step, ...past] = path;
   if (step === undefined || typeof holder !== "object" || holder === null || !Object.hasOwn(holder, step)) return holder;
-  const copy: Record<string, unknown> = { ...holder };
+  const copy = shallowCopy(holder);
   if (past.length === 0) Reflect.deleteProperty(copy, step);
-  else copy[step] = without(Reflect.get(holder, step), past);
+  else Reflect.set(copy, step, without(Reflect.get(holder, step), past));
   return copy;
+}
+
+function shallowCopy(holder: object): object {
+  return Array.isArray(holder) ? [...(holder as readonly unknown[])] : { ...holder };
 }
 
 function withEnum(holder: unknown, member: SentEnum): unknown {
@@ -100,7 +104,9 @@ function replaced(holder: unknown, path: readonly string[], replace: (held: unkn
   const [step, ...past] = path;
   if (step === undefined) return replace(holder);
   if (typeof holder !== "object" || holder === null || !Object.hasOwn(holder, step)) return holder;
-  return { ...holder, [step]: replaced(Reflect.get(holder, step), past, replace) };
+  const copy = shallowCopy(holder);
+  Reflect.set(copy, step, replaced(Reflect.get(holder, step), past, replace));
+  return copy;
 }
 
 interface FormWriting {
@@ -144,7 +150,6 @@ function bodyOf(body: SentBody, headers: Headers, writing: FormWriting): BodyIni
     }
     case "file": {
       const file = held(body.value);
-      if (file === undefined || file === null) throw notBuilt("a file body that reads nothing: no line states what such a request sends");
       if (!(file instanceof Blob)) throw new Stop("The request's file body must hold a file.");
       return file;
     }
@@ -234,13 +239,13 @@ function readAt(holder: unknown, path: readonly PathStep[]): unknown {
   return current;
 }
 
-const unconverted = "an input whose binding value is not coalesce(as(read, shape), blank): its wire form is read from that shape (N3.3)";
+const unconverted = "The plan's input binding value is not coalesce(as(read, shape), blank), the one form C# writes it in.";
 
 function convertedShape(binding: InputBinding): Shape {
   const value: Expression = binding.value;
-  if (value.kind !== "op" || value.op !== "coalesce") throw notBuilt(unconverted);
+  if (value.kind !== "op" || value.op !== "coalesce") throw new Error(unconverted);
   const [converted] = value.args;
-  if (converted?.kind !== "as") throw notBuilt(unconverted);
+  if (converted?.kind !== "as") throw new Error(unconverted);
   return converted.shape.kind === "nullable" ? converted.shape.inner : converted.shape;
 }
 

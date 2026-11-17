@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseLinesDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose lines";
+    var plan = Html.ReactivePlan<DoseLinesDesk>();
+}
+<h1>Dose lines of @Model.Resident</h1>
+<p>Answer: <span id="bound">-</span></p>
+<p>Sending: <span id="sending">Open</span></p>
+<button type="button" @Html.Raises(plan, DoseLines.Send)>Send the doses</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DoseLines.Send, pipeline => pipeline.Get(Model.Chart)
+        .OnSuccess<DoseLinesReply>((found, pipeline) => pipeline
+            .Post<DoseLinesSent>(DoseLines.Bound, request => request.Json(body => body.Set(r => r.Doses[0].Status, found.Body.Read(reply => reply.Chart.Status))
+                .When(found.Body.Read(reply => reply.Chart.Late)).Then(late => late.Set(r => r.Doses[0].Note, "Late"))))
+            .OnSuccess(Content.Text, (bound, pipeline) => pipeline.Element("bound").Text.Set(bound.Body))
+            .Finally(pipeline => pipeline.Element("sending").Text.Set("Finished")))));
+}
+@Html.RenderPlan(plan)

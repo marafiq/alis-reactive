@@ -428,7 +428,8 @@ internal sealed class RequestPartsWriter
         var holders = new List<IReadOnlyList<JsonStep>>();
         foreach (var holder in guarded.SelectMany(names => Enumerable.Range(1, names.Count - 1).Select(length => names.Take(length).ToArray())))
         {
-            if (!holders.Any(known => known.SequenceEqual(holder))) holders.Add(holder);
+            var aListItemKeepsItsPosition = holder[^1].IsIndex;
+            if (!aListItemKeepsItsPosition && !holders.Any(known => known.SequenceEqual(holder))) holders.Add(holder);
         }
 
         foreach (var holder in holders)
@@ -515,17 +516,10 @@ internal sealed class RequestPartsWriter
     {
         var named = Named(member).Name;
         var entry = (BodySteps(member), leaf);
-        var pastAPosition = entry.Item1.Any(step => step.IsIndex);
-        if (pastAPosition && leaf.Enums.Count > 0)
+        if (_guards.Count > 0 && entry.Item1[^1].IsIndex)
         {
-            throw new NotImplementedException(
-                $"'{member.Name}' is set past a list position from an enum a source reads, and a JSON body writes that enum in its endpoint's form by its member path, which no node of the plan carries through a list yet; set it from a literal, or send it in form data.");
-        }
-
-        if (_guards.Count > 0 && pastAPosition)
-        {
-            throw new NotImplementedException(
-                $"'{member.Name}' is set past a list position under a condition on the request's parts, and a JSON body leaves out a part whose condition fails by its member path, which no node of the plan carries through a list yet; set it with no condition, or send it in form data.");
+            throw new InvalidOperationException(
+                $"'{member.Name}' is a position of a list in the request's JSON body set under a condition on its parts, and a JSON list leaves out no position: the items after it would move into its place. Set the list's items with no condition, or set a member of the item under the condition.");
         }
 
         _jsonMembers.Add(named);

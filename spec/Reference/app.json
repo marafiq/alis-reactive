@@ -8697,6 +8697,38 @@
       ]
     },
     {
+      "feature": "M6.F1",
+      "for": "X9.30",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.31",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M10.F2",
       "for": "X21.13",
       "index": 0,

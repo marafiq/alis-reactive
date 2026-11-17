@@ -19,6 +19,9 @@ public static partial class CarePages
     public const string StaffRosterWithEveryShiftFilled = Round + "staff-roster/every-shift-filled";
     public const string ChartStatusOfAMissedDose = Round + "chart-status/missed-dose";
     public const string ChartStatusOfASkippedDose = Round + "chart-status/skipped-dose";
+    public const string DoseLinesOfAMissedDose = Round + "dose-lines/missed-dose";
+    public const string DoseLinesOfALateMissedDose = Round + "dose-lines/late-missed-dose";
+    public const string DoseLinesOfASkippedDose = Round + "dose-lines/skipped-dose";
     public const string SupplyRound = Round + "supplies";
     public const string OrderStart = Round + "order-start";
     public const string NurseCall = Round + "nurse-call";

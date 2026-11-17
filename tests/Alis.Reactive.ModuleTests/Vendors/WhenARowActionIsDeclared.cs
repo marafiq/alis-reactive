@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
+using System.Text.Json;
 using Alis.Reactive.Conditions;
 using Alis.Reactive.RenderingAndDelivery;
+using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -112,6 +115,26 @@ public sealed class WhenARowActionIsDeclared
             """{"kind":"set","path":["textContent"],"members":"required","content":true,"target":{"kind":"obj","id":"room"},"value":{"kind":"as","expr":{"kind":"data","path":[{"name":"room","requires":[],"absent":{"kind":"nothing"}},{"name":"number","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"get","path":["row"],"members":"required","target":{"kind":"ref","name":"listenPayload1"}}}""" + ShownAsText + "}" +
             """]},"statuses":[],"otherwise":{"kind":"none","do":[]},"chained":[]}""" +
             "]}]}]}"));
+        Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
+    }
+
+    [Test]
+    public void the_control_a_rows_activation_holds_its_success_route_writes_holds_it_read_from_the_payload_when_the_request_starts()
+    {
+        var html = Views.Of(new Ward("North"), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery().ShowBusy()));
+        var plan = html.ReactivePlan<Ward>();
+        plan.Rows<ResidentRow>("residents").WardButton(HandlerPolicy.Overlap, (chosen, pipeline) => pipeline.Post("/residents/discharge")
+            .OnSuccess(Content.None, (reply, pipeline) =>
+            {
+                chosen.Element.Text.Set("Discharged");
+                pipeline.Element("status").Text.Set("Discharged");
+            })).Render(new ResidentRow(1, "Ada", "North", new ResidentRoom("12", 1)), "Discharge");
+        var json = BellPlans.JsonOf(html.RenderPlan(plan));
+        Assert.That(Busy(json), Is.EqualTo(
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"targets"}},{"name":"values","value":{"kind":"list","items":[""" +
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"component"}},{"name":"value","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},""" +
+            """{"name":"value","value":{"kind":"get","path":["element"],"members":"required","target":{"kind":"ref","name":"listenPayload1"}}}]}}]},""" +
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"element"}},{"name":"id","value":{"kind":"lit","value":"status"}}]}]}}]}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 
@@ -327,5 +350,17 @@ public sealed class WhenARowActionIsDeclared
         Assert.That(() => aSectionsRow(), Throws.InvalidOperationException.With.Message.EqualTo(
             "A door takes the plan of 'Alis.Reactive.ModuleTests.Vendors.Ward' after it rendered, so the page never runs what the door writes; " +
             "write every door above Html.RenderPlan, and where a @section holds one, render the plan in a section the layout renders after it."));
+    }
+
+    private static string Busy(string plan)
+        => RequestIn(JsonDocument.Parse(plan).RootElement)!.Value.GetProperty("send").GetProperty("fields").EnumerateArray()
+            .Single(field => field.GetProperty("name").GetString() == "busy").GetProperty("value").GetRawText();
+
+    private static JsonElement? RequestIn(JsonElement node)
+    {
+        if (node.ValueKind == JsonValueKind.Array) return node.EnumerateArray().Select(RequestIn).FirstOrDefault(found => found is not null);
+        if (node.ValueKind != JsonValueKind.Object) return null;
+        if (node.TryGetProperty("kind", out var kind) && kind.ValueKind == JsonValueKind.String && kind.GetString() == "request") return node;
+        return node.EnumerateObject().Select(member => RequestIn(member.Value)).FirstOrDefault(found => found is not null);
     }
 }

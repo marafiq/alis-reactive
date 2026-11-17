@@ -131,6 +131,57 @@ public sealed class WhenMarkupRaisesAnAppEvent
     }
 
     [Test]
+    public void a_payload_that_is_text_a_number_or_a_list_is_refused_naming_its_class_and_dispatch()
+    {
+        var counting = Views.Of(new CareCall("North"));
+        var countingPlan = counting.ReactivePlan<CareCall>();
+        var reading = Views.Of(new CareCall("North"));
+        var readingPlan = reading.ReactivePlan<CareCall>();
+
+        Action counted = () =>
+        {
+            counting.Raises(countingPlan, CareEvents.BedsCounted, 4);
+            counting.RenderPlan(countingPlan);
+        };
+        Action read = () =>
+        {
+            reading.Raises(readingPlan, CareEvents.NotesRead, ["Fluids at seven"]);
+            reading.RenderPlan(readingPlan);
+        };
+
+        Assert.That(
+            () => counted(),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "The payload 'int' has no members, and markup carries the payload it raises as one attribute per member, so a payload it carries is a class with members. "
+                + "Raise a payload that is text, a number or a list from a pipeline, with p.Dispatch."));
+        Assert.That(
+            () => read(),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "The payload 'List<string>' has no members, and markup carries the payload it raises as one attribute per member, so a payload it carries is a class with members. "
+                + "Raise a payload that is text, a number or a list from a pipeline, with p.Dispatch."));
+    }
+
+    [Test]
+    public void a_member_its_own_json_converter_writes_as_a_record_is_refused_as_a_record_is()
+    {
+        var html = Views.Of(new CareCall("North"));
+        var plan = html.ReactivePlan<CareCall>();
+
+        Action theView = () =>
+        {
+            html.Raises(plan, CareEvents.BedMoved, new BedMoved { Room = 3, Spot = new BedSpot("North", 4) });
+            html.RenderPlan(plan);
+        };
+
+        Assert.That(
+            () => theView(),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'BedMoved.Spot' is a BedSpot, and markup carries each member of the payload it raises as the text of one attribute, "
+                + "so a member it carries is text, a number, a bool, a date, a Guid or an enum. "
+                + "Raise a payload that holds a record or a list from a pipeline, with p.Dispatch."));
+    }
+
+    [Test]
     public void a_payload_of_null_whose_type_names_a_member_so_no_attribute_carries_it_back_is_refused_naming_the_member_its_name_and_dispatch()
     {
         var html = Views.Of(new CareCall("North"));
