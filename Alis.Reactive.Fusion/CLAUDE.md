@@ -13,6 +13,13 @@ pinned at one version for NuGet and npm together (`scripts/pin-syncfusion.mjs`);
   concrete type, or a browser probe under `spec/probes/` pins what the browser hands or takes. A member the vendor
   marks private is a gap to name, never a door.
 - A slice's tests prove only what its declaration adds, and no test of a core module runs through a Fusion slice.
+- A slice's browser code is held to the runtime's strict compiler options and typed lint. It reaches the page
+  through `fusion.ts`, the bundle's entry, which calls each slice's mount, and reaches the core only as an app's code
+  does, on `alis:mount`; `FusionComponents/mounted.ts`, the tree's first row, mounts a slice once on each element its
+  marker names. `build.mjs` writes the bundle, alis-reactive-fusion.js, which git ignores, and the Fusion layout
+  links it after EJ2's script manager and before the framework's script. A component EJ2 gives no MVC 5 builder is
+  built there from the start its render helper writes: the smart text area's code,
+  `FusionComponents/FusionSmartTextArea/fusion-smart-text-area.ts`.
 - A file compiles for both hosts or for one, by the core's rule (`Alis.Reactive/CLAUDE.md`).
 - U3 declares a slice with the first view that holds its component; U25 builds the package and the reference, and U26
   the other slices. The declaration is written member for member from its line of `spec/FusionComponents/module.md`, and

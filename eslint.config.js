@@ -10,6 +10,7 @@ const sliceTables = [
   "tests/Alis.Reactive.ArchitectureTests/LintCases/rows",
   "tests/Alis.Reactive.ArchitectureTests/LintCases/package",
   "Alis.Reactive.Native",
+  "Alis.Reactive.Fusion",
 ];
 
 const beyondItsModulesIndex = "^(\\.\\./|\\./(?!index(\\.ts)?$))";

@@ -43,6 +43,15 @@ await build({
 });
 
 await build({
+  entryPoints: ["Alis.Reactive.Fusion/fusion.ts"],
+  outfile: "Alis.Reactive.Fusion/wwwroot/js/alis-reactive-fusion.js",
+  bundle: true,
+  format: "iife",
+  target: "es2022",
+  logLevel: "info",
+});
+
+await build({
   entryPoints: ["Alis.Reactive.Fusion/FusionTemplates/fusion-templates.ts"],
   outfile: "Alis.Reactive.Fusion/wwwroot/js/alis-reactive-fusion-templates.js",
   bundle: true,

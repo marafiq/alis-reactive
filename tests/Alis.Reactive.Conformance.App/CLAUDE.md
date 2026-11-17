@@ -125,8 +125,8 @@ its views.
   page reads is a response body of the page's own endpoint, named beside its controller
   (`Care/Residents/ResidentsEndpoints.cs`) unless a test names it. A Fusion screen's page takes
   `Shared/_FusionLayout.cshtml`, which links EJ2's Bootstrap 5.3 theme in its head and, after the body, EJ2's
-  script, EJ2's script manager, then the conformance script, Native's bundle and the framework's, in section 2.5's
-  order (`Care/AdmissionClinical/AllergyIntake.cshtml`); `build.mjs` copies the script and the theme from
+  script, Fusion's templates script, EJ2's script manager, Fusion's bundle, then the conformance script, Native's
+  bundle and the framework's, in section 2.5's order (`Care/AdmissionClinical/AllergyIntake.cshtml`); `build.mjs` copies the script and the theme from
   "@syncfusion/ej2" into the app's wwwroot, where git ignores them, and a partial a request loads ends with EJ2's
   script manager, which the slot runs (`Care/AdmissionClinical/AllergyCard.cshtml`). `AppHost.cs` registers
   Syncfusion's licence when the configuration holds "SYNCFUSION_LICENSE_KEY". A page that reads a value a
