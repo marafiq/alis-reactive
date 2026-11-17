@@ -13,13 +13,13 @@
     "app": {
       "counts": {
         "cells": 117,
-        "hosts": 20,
+        "hosts": 21,
         "placed": 478,
         "problems": 0,
         "rewrite": 0,
         "screens": 14
       },
-      "detail": "478 feature tests and 117 cell tests on 14 screens under 20 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
+      "detail": "478 feature tests and 117 cell tests on 14 screens under 21 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "bindings": {
@@ -1668,7 +1668,7 @@
         "unrefused": 0
       },
       "detail": "247 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "4eb1d590f568638acd0341fddbb90a92b3e4b423eec0d4413a9cd3ef11a2f099",
+      "digest": "e87d6b775d4eabf0411bcbb03a066c51ac34cc996ef94f59fa7878468a815a2a",
       "pass": true
     },
     "probes": {
@@ -4357,7 +4357,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "7eecb5aab7573fae1ae91cdb9be4bd7b6f3654d3",
+  "read_at_head": "39a2e55ccb9e599e501fd38ab109cc1c789fb581",
   "step": {
     "failing": [],
     "name": "End of session",
