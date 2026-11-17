@@ -1461,9 +1461,7 @@
     ]
   },
   "M21.F44 M21.X1025 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/VisitActions.cshtml",
       "/Shared/_FusionLayout.cshtml"
