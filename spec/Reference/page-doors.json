@@ -652,9 +652,7 @@
     ]
   },
   "M17.F1 X11.2 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/CarePlanDrawer.cshtml",
       "/Care/Shell/CarePlanForm.cshtml",
@@ -1695,9 +1693,7 @@
     ]
   },
   "M25.F1 M25.X1 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/ShiftNotes.cshtml",
       "/Care/Shell/ShiftNotesList.cshtml",
@@ -1705,9 +1701,7 @@
     ]
   },
   "M25.F1 M25.X2 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/WideDrawer.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
@@ -1724,9 +1718,7 @@
     ]
   },
   "M25.F4 M25.X12 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/FamilyDischarge.cshtml",
       "/Care/Shell/FamilyDischargePanel.cshtml",
@@ -1735,45 +1727,35 @@
     ]
   },
   "M25.F4 M25.X5 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/FamilyNotice.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
     ]
   },
   "M25.F4 M25.X6 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/DischargeNote.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
     ]
   },
   "M25.F4 M25.X7 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/DischargeDesk.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
     ]
   },
   "M25.F4 X17.6 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/WardDischarge.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
     ]
   },
   "M25.F4 X17.7 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/DrawerDischarge.cshtml",
       "/Care/Shell/DrawerDischargeNotes.cshtml",
@@ -1781,9 +1763,7 @@
     ]
   },
   "M25.F4 X17.8 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/DischargeIntake.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
@@ -3647,9 +3627,7 @@
     ]
   },
   "cell lane.confirm": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Lanes/LaneConfirm.cshtml",
       "/Shared/_Layout.cshtml"
