@@ -29,3 +29,12 @@ export function mountsTheElement<TElement extends Element>(id: string, kind: new
     mount(element);
   });
 }
+
+export function providesPlugin(name: string, instance: object): void {
+  const queue: unknown = Reflect.get(window, "__alisPlugins");
+  if (Array.isArray(queue)) {
+    queue.push({ name, instance });
+    return;
+  }
+  Reflect.set(window, "__alisPlugins", [{ name, instance }]);
+}

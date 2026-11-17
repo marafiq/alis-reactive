@@ -56,6 +56,8 @@ public sealed class TestWorld
 
     public Task HoldTheClock() => Page.Clock.PauseAtAsync(ClockStart.AddHours(1));
 
+    public Task RunTheClockFor(TimeSpan run) => Page.Clock.RunForAsync((long)run.TotalMilliseconds);
+
     public async Task RunTheClockUntilItSends(string endpoint, int requests)
     {
         var run = TimeSpan.Zero;

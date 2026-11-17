@@ -1716,13 +1716,65 @@
       "/Care/Shell/_ShellLayout.cshtml"
     ]
   },
+  "M25.F2 M25.X3 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/WardPanels.cshtml",
+      "/Care/Shell/_ShellLayout.cshtml"
+    ]
+  },
+  "M25.F3 M25.X4 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/GuardedResidentLinks.cshtml",
+      "/Care/Residents/ResidentPanel.cshtml",
+      "/Care/Residents/_ScriptedLayout.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M25.F3 X17.33 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/ResidentDischarges.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M25.F3 X17.34 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/ResidentLinks.cshtml",
+      "/Care/Residents/ResidentPanel.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M25.F3 X17.35 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/ResidentKeys.cshtml",
+      "/Care/Residents/ResidentPanel.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M25.F3 X17.36 0": {
-    "modules": [
-      "NativeAppLevelObjects"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/ResidentDirectory.cshtml",
       "/Care/Residents/ResidentPanel.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M25.F3 X17.37 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/DischargeList.cshtml",
+      "/Care/Residents/DischargeListRows.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M25.F3 X17.38 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/BusyDischarges.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -1775,6 +1827,27 @@
     "modules": [],
     "views": [
       "/Care/Shell/DischargeIntake.cshtml",
+      "/Care/Shell/_ShellLayout.cshtml"
+    ]
+  },
+  "M25.F5 M25.X8 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/WetBedNote.cshtml",
+      "/Care/Shell/_ShellLayout.cshtml"
+    ]
+  },
+  "M25.F5 M25.X9 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/RoundNotices.cshtml",
+      "/Care/Shell/_ShellLayout.cshtml"
+    ]
+  },
+  "M25.F5 X17.9 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/DoseToasts.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
     ]
   },

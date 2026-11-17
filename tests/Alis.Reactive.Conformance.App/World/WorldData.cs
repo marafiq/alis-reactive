@@ -48,6 +48,7 @@ internal sealed class WorldData
     private volatile string? _bindingStarted;
     private volatile bool _bindingsWhole;
     private volatile bool _renderUnrecorded;
+    private int _discharges;
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
@@ -175,6 +176,8 @@ internal sealed class WorldData
     internal void Heard(string? traceparent, string? baggage) => _attempts.Enqueue(new HeardAttempt(traceparent, baggage));
 
     internal void SecondOriginReceived(string line) => _secondOriginLog.Enqueue(line);
+
+    internal int Discharged() => Interlocked.Increment(ref _discharges);
 
     internal int NextAnswer(string endpoint) => _answers.TryGetValue(endpoint, out var statuses) && statuses.TryDequeue(out var status) ? status : StatusCodes.Status200OK;
 

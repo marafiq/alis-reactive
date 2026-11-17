@@ -12,4 +12,6 @@ public static class ResidentsScripts
     public const string ServingStationWithAPagedList = Root + "serving-station-with-a-paged-list.js";
 
     public const string RosterRounds = Root + "roster-rounds.js";
+
+    public const string EveryClickPrevented = Root + "every-click-prevented.js";
 }

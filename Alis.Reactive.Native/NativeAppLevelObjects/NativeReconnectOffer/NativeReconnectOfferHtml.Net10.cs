@@ -16,6 +16,25 @@ public static class NativeReconnectOfferHtml
     /// <param name="text">The text the offer shows when live updates stopped.</param>
     /// <param name="retry">The text of the button that reconnects.</param>
     /// <returns>The offer's markup.</returns>
-    public static IHtmlContent NativeReconnectOffer(this IHtmlHelper html, string text, string retry) => throw new NotImplementedException();
+    public static IHtmlContent NativeReconnectOffer(this IHtmlHelper html, string text, string retry)
+    {
+        if (text is null) throw new ArgumentNullException(nameof(text));
+        if (retry is null) throw new ArgumentNullException(nameof(retry));
+        var message = new TagBuilder("p");
+        message.InnerHtml.Append(text);
+        var button = new TagBuilder("button");
+        button.MergeAttribute("type", "button");
+        button.AddCssClass("alis-reconnect__retry");
+        button.InnerHtml.Append(retry);
+        var offer = new TagBuilder("div");
+        offer.MergeAttribute("id", "alis-reconnect");
+        offer.AddCssClass("alis-reconnect");
+        offer.MergeAttribute("role", "alert");
+        offer.MergeAttribute("hidden", "hidden");
+        offer.MergeAttribute("data-native-reconnect-offer", "");
+        offer.InnerHtml.AppendHtml(message);
+        offer.InnerHtml.AppendHtml(button);
+        return offer;
+    }
 }
 #endif

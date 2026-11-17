@@ -16,7 +16,7 @@ public sealed class ResidentDirectoryController : Controller
     [HttpGet(CarePages.ResidentPanels)]
     public IActionResult Panels() => View("/Care/Residents/ResidentPanels.cshtml", new ResidentPanels(TheResidents()));
 
-    [HttpGet(CareEndpoints.ResidentPanel)]
+    [HttpGet("/Residents/{residentId:int}")]
     public async Task<IActionResult> Panel(ResidentPanelQuery query)
     {
         await World.Reach(GateName.Of(LanesGate.Respond), Request.Path);

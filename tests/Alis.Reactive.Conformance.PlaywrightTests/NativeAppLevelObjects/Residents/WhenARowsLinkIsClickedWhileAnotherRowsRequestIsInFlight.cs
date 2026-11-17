@@ -22,6 +22,7 @@ public sealed class WhenARowsLinkIsClickedWhileAnotherRowsRequestIsInFlight(stri
         await replaced.Page.GetByRole(AriaRole.Link, new PageGetByRoleOptions { Name = "Bea", Exact = true }).ClickAsync();
         await Expect(replaced.Page.Locator("#resident-detail").GetByRole(AriaRole.Heading)).ToHaveTextAsync("Bea");
         await held.Release();
+        await Expect(replaced.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: none");
         await Expect(replaced.Page.Locator("#resident-detail").GetByRole(AriaRole.Heading)).ToHaveTextAsync("Bea");
 
         var overlapped = await NewWorld();

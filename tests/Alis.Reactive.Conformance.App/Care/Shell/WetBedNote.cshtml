@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WetBedNote
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Night report";
+    var plan = Html.ReactivePlan<WetBedNote>();
+}
+<h1>Night report</h1>
+@using (var report = Html.BeginRequestContainer(plan, "night-report"))
+{
+    @(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, ShiftNoticeButtons.Report)>Report</button>
+    Html.On(plan, trigger => trigger.CustomEvent(ShiftNoticeButtons.Report, pipeline => pipeline.Notice().Warning(report.Container.Read(m => m.Note))));
+}
+@Html.RenderPlan(plan)

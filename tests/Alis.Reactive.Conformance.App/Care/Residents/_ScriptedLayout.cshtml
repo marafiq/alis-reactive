@@ -15,6 +15,7 @@
     @Html.ConformanceBusy()
     @Html.ConformanceNotice()
     <script src="~/js/alis-reactive-conformance.js" asp-append-version="true"></script>
+    <script src="~/_content/AlisReactive.Native/js/alis-reactive-native.js" asp-append-version="true"></script>
     @foreach (var script in Model.Scripts)
     {
         <script src="@script"></script>

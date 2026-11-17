@@ -15,6 +15,21 @@ public static class NativeLoaderHtml
     /// <param name="html">The layout's HTML helper.</param>
     /// <param name="text">The text the page's indicator shows.</param>
     /// <returns>The indicator's markup.</returns>
-    public static IHtmlString NativeLoader(this HtmlHelper html, string text) => throw new NotImplementedException();
+    public static IHtmlString NativeLoader(this HtmlHelper html, string text)
+    {
+        if (text is null) throw new ArgumentNullException(nameof(text));
+        var message = new TagBuilder("p");
+        message.MergeAttribute("id", "alis-loader-message");
+        message.AddCssClass("alis-loader__message");
+        message.SetInnerText(text);
+        var indicator = new TagBuilder("div");
+        indicator.MergeAttribute("id", "alis-loader");
+        indicator.AddCssClass("alis-loader");
+        indicator.MergeAttribute("role", "status");
+        indicator.MergeAttribute("hidden", "hidden");
+        indicator.MergeAttribute("data-native-loader", "");
+        indicator.InnerHtml = message.ToString(TagRenderMode.Normal);
+        return MvcHtmlString.Create(indicator.ToString(TagRenderMode.Normal));
+    }
 }
 #endif
