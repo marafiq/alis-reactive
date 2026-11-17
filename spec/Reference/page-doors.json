@@ -1366,9 +1366,7 @@
     ]
   },
   "M21.F35 M21.X1021 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/ReportSending.cshtml",
       "/Shared/_FusionLayout.cshtml"
