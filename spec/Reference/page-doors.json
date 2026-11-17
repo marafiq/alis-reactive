@@ -1163,9 +1163,7 @@
     ]
   },
   "M21.F17 M21.X1010 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/FirstVisit.cshtml",
       "/Shared/_FusionLayout.cshtml"
