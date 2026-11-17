@@ -1147,9 +1147,7 @@
     ]
   },
   "M21.F15 M21.X1008 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/ArrivalDay.cshtml",
       "/Shared/_FusionLayout.cshtml"
