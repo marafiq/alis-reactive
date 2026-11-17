@@ -148,8 +148,10 @@ jobs:
           path: nupkgs
       - name: The twin, built against the packs with warnings as errors
         run: dotnet build tests/Alis.Reactive.Conformance.App.Net48 -c Release -warnaserror
+      - name: Visual Studio's MSBuild, which builds a classic MVC 5 project
+        uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3.0.0
       - name: The fresh MVC 5 app, built against the packs with warnings as errors
-        run: dotnet build tests/Alis.Reactive.Consumer.Net48 -c Release -warnaserror
+        run: msbuild tests/Alis.Reactive.Consumer.Net48/Alis.Reactive.Consumer.Net48.csproj -restore -p:Configuration=Release -warnaserror
       - name: What a build wrote into the fresh app, and the analyzers that reach it
         run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt"
       - name: The tests under the twin
@@ -182,7 +184,7 @@ jobs:
       - name: The fresh net10 app, restored from the packs and built with warnings as errors
         run: dotnet build tests/Alis.Reactive.Consumer.Net10 -c Release -warnaserror
       - name: What a build wrote into the fresh app, the analyzers that reach it and the browser files it serves
-        run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt"
+        run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt&FullyQualifiedName!~fresh_net48_app"
       - name: The tests under the fresh net10 app
         run: scripts/playwright.sh --all --host consumerNet10
       - name: The run's folder

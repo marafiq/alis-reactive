@@ -55,9 +55,11 @@ expects none.
   hold what the real tools write: a fixture in the namespace of its first folder, as ALIS011 holds every test,
   beside the folder `scripts/list-tests.cs` reads from the assembly's portable PDB (the lead's mistake, 2026-11-13).
 - `WhenAConsumerAppIsBuilt` builds small apps its cases write on the packs in nupkgs/, each restored by its own
-  nuget.config into its own obj/, and builds the fresh net10 app, `tests/Alis.Reactive.Consumer.Net10`, whose build
-  writes no file git lists and whose static web assets serve each package's browser file under _content/<PackageId>/js/;
-  `scripts/check.sh` leaves it out and `scripts/delivery.sh` runs it.
+  nuget.config into its own obj/, and builds the two fresh apps: `tests/Alis.Reactive.Consumer.Net10`, whose build
+  writes no file git lists and whose static web assets serve each package's browser file under _content/<PackageId>/js/,
+  and `tests/Alis.Reactive.Consumer.Net48`, a classic MVC 5 project only Visual Studio's MSBuild compiles, whose build
+  writes no file git lists. `scripts/check.sh` leaves it out, `scripts/delivery.sh` runs it but the fresh MVC 5 app's
+  test, and CI's Windows job runs it whole.
 - `WhenADocShowsAnExample` reads each example of README.md, every fence but bash and text, and refuses one found whole
   in no view a browser test opens, as `spec/Reference/page-doors.json` lists them, and in no fresh app's tracked file.
 

@@ -101,6 +101,113 @@ app.Run();
 
 A page that only reacts in the browser needs no startup call of the framework's.
 
+## ASP.NET MVC 5 on .NET Framework 4.8
+
+### How do you add Alis.Reactive to an MVC 5 app?
+
+The package reaches an MVC 5 app through PackageReference, which brings its build files and the rules the compiler
+checks your code by. Visual Studio's MVC 5 template restores by `packages.config`, and NuGet's migrator refuses an
+ASP.NET project, so you move the project by hand. In its `.csproj`, name the restore style in the first
+`PropertyGroup`:
+
+```xml
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+```
+
+Write a `PackageReference` for each package you installed yourself, since the packages they depend on come with them,
+then remove each `Reference` whose `HintPath` points into `packages\` and delete `packages.config`:
+
+```xml
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="4.1.0" />
+```
+
+Then add the package, and the container your startup builds, in the Package Manager Console:
+
+```text
+Install-Package AlisReactive
+Install-Package Microsoft.Extensions.DependencyInjection -Version 10.0.15
+```
+
+Visual Studio builds the project, and so does its MSBuild with `msbuild /restore`. The .NET SDK's `dotnet build`
+restores a classic MVC 5 project's packages and does not compile against them.
+
+### What does the app's startup need?
+
+A view reads the app's JSON options through MVC's resolver, on a page that only reacts too. `Application_Start` in
+`Global.asax.cs` registers them with `AddReactiveJson` and sets MVC's resolver over the container:
+
+```csharp
+        protected void Application_Start()
+        {
+            var services = new ServiceCollection();
+            services.AddReactiveJson(json => { });
+            DependencyResolver.SetResolver(new ContainerResolver(DependencyResolver.Current, services.BuildServiceProvider()));
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+        }
+```
+
+`AddReactiveJson` sets the options your app writes its data with, starting from camel-case names as ASP.NET Core MVC
+does, and `json => { }` keeps them. `Global.asax.cs` names `Alis.Reactive.RenderingAndDelivery` and
+`Microsoft.Extensions.DependencyInjection`. The resolver is your app's own class: it asks the container first and MVC's
+own resolver for everything else.
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Alis.Reactive.Consumer.Net48
+{
+    public class ContainerResolver : IDependencyResolver
+    {
+        private readonly IDependencyResolver _mvc;
+        private readonly IServiceProvider _container;
+
+        public ContainerResolver(IDependencyResolver mvc, IServiceProvider container)
+        {
+            _mvc = mvc;
+            _container = container;
+        }
+
+        public object GetService(Type serviceType) => _container.GetService(serviceType) ?? _mvc.GetService(serviceType);
+
+        public IEnumerable<object> GetServices(Type serviceType) => _container.GetServices(serviceType).Concat(_mvc.GetServices(serviceType));
+    }
+}
+```
+
+### Which namespaces do the views name?
+
+`Views/Web.config` names them once for every view, in its `namespaces`:
+
+```xml
+        <add namespace="Alis.Reactive.RenderingAndDelivery" />
+        <add namespace="Alis.Reactive.TriggersAndPipelines" />
+```
+
+The home page above then needs no `@using`: its plan, its trigger and `Html.RenderPlan(plan)` are written the same way.
+
+### How does the browser get the framework's script?
+
+The package's build copies its browser files into your app's `Content\AlisReactive\`, beside a `.gitignore` holding
+`*`, so git lists none of them. Your layout links the script after the page's content, as the last script of the
+page:
+
+```cshtml
+    <script src="@Url.AppendVersion("~/Content/AlisReactive/js/alis-reactive.js")"></script>
+```
+
+`Url.AppendVersion` adds the hash of the file's content to its address, as `asp-append-version` does on .NET 10, so a
+new release's file gets a new address.
+
+### When does a mistake in a view show?
+
+MVC 5 compiles a view the first time it renders, not when the app builds. A view that opens its plan and never writes
+it with `Html.RenderPlan(plan)` shows a page whose triggers do nothing, the first time you open it.
+
 ## This branch
 
 This branch rewrites the framework from its specification. The design is in `spec/`, and `spec/REWRITE.md` lists

@@ -33,8 +33,9 @@ Show small code (3-5 lines) that answers one question. Never dump big JSON blobs
 
 A code example in the docs is copied whole from a view a Playwright test runs, never written for the page: the view,
 its controller and its model exist in the conformance app, and the test that opens it passes; or it is copied whole
-from a file of a fresh app (`tests/Alis.Reactive.Consumer.Net10`), which README's steps wire and M19.X5's test opens.
-`WhenADocShowsAnExample` refuses an example of README.md found whole in neither.
+from a file of a fresh app (`tests/Alis.Reactive.Consumer.Net10`, `tests/Alis.Reactive.Consumer.Net48`), which
+README's steps wire and M19.X5's test opens. `WhenADocShowsAnExample` refuses an example of README.md found whole in
+neither.
 
 "If you get anything wrong in terms of syntax or explanation, users will not use it. It will never come back."
 

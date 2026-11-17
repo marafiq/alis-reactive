@@ -11,6 +11,7 @@ public class WhenAConsumerAppIsBuilt
 {
     private const string Packs = "nupkgs";
     private const string FreshNet10App = "tests/Alis.Reactive.Consumer.Net10";
+    private const string FreshNet48App = "tests/Alis.Reactive.Consumer.Net48";
     private const string BrowserFiles = "staticwebassets/";
     private const string Listening = "Now listening on: ";
     private const string Core = "AlisReactive";
@@ -51,6 +52,19 @@ public class WhenAConsumerAppIsBuilt
 
         Assert.That(
             Listed(app).Except(before).Select(path => $"git lists {path}, which a build of {FreshNet10App} wrote: a package writes only into the app's bin/ and obj/"),
+            Is.Empty);
+    }
+
+    [Test]
+    public void git_lists_no_file_a_build_of_the_fresh_net48_app_wrote()
+    {
+        var app = Path.Combine(Repository.Root, FreshNet48App);
+        var before = Listed(app);
+
+        BuiltByVisualStudiosMsBuildOnThePacks(app);
+
+        Assert.That(
+            Listed(app).Except(before).Select(path => $"git lists {path}, which a build of {FreshNet48App} wrote: a package writes only into the folder it owns, Content/<PackageId>/, beside a .gitignore holding *"),
             Is.Empty);
     }
 
@@ -247,6 +261,12 @@ public class WhenAConsumerAppIsBuilt
     {
         var (output, exitCode) = Dotnet(app, "build", "-c", "Release", "-warnaserror", "--no-incremental", "-p:PACKAGE_VERSION=" + ThePacksVersion());
         if (exitCode != 0) throw new InvalidOperationException($"{FreshNet10App} did not build on the packs in {Packs}/:\n{output}");
+    }
+
+    private static void BuiltByVisualStudiosMsBuildOnThePacks(string app)
+    {
+        var (output, exitCode) = Run(app, "msbuild", ["/restore", "/t:Rebuild", "/p:Configuration=Release", "/warnaserror", "/p:PACKAGE_VERSION=" + ThePacksVersion(), "-tl:off", "-nologo", "-nodeReuse:false"]);
+        if (exitCode != 0) throw new InvalidOperationException($"{FreshNet48App} did not build on the packs in {Packs}/ by Visual Studio's MSBuild:\n{output}");
     }
 
     private static IReadOnlyList<(string Address, byte[] Bytes)> BrowserFilesOfThePacksItRestores(string app)

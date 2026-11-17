@@ -1,0 +1,9 @@
+@{
+    ViewData["Title"] = "Home";
+    var plan = Html.ReactivePlan<dynamic>();
+}
+<p id="consumer-status">Not booted</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("consumer-status").Text.Set("Booted")));
+}
+@Html.RenderPlan(plan)
