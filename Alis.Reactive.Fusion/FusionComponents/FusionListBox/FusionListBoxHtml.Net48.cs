@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
 using Alis.Reactive.RenderingAndDelivery;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -20,7 +21,7 @@ public static class FusionListBoxHtml
     /// <param name="build">What the view sets on the box.</param>
     /// <returns>The rendered box, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionListBox<TValue>, TModel> FusionListBox<TModel, TValue>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<ListBoxBuilder> build)
-        => throw new NotImplementedException();
+        => Rendered<TModel, TValue>(plan, elementId, html.EJS().ListBox(elementId), build);
 
     /// <summary>Renders a list box under the id the view gives it over the items the view hands it.</summary>
     /// <remarks>
@@ -34,6 +35,12 @@ public static class FusionListBoxHtml
     /// <param name="build">What the view sets on the box.</param>
     /// <returns>The rendered box, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionListBox<TValue>, TModel> FusionListBox<TModel, TValue, TItem>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, IReadOnlyList<TItem> items, Action<ListBoxBuilder> build)
-        => throw new NotImplementedException();
+        => Rendered<TModel, TValue>(plan, elementId, html.EJS().ListBox(elementId).DataSource(FusionData.AsWritten(plan.Json(items ?? throw new ArgumentNullException(nameof(items))))), build);
+
+    private static Rendered<FusionListBox<TValue>, TModel> Rendered<TModel, TValue>(ReactivePlan<TModel> plan, string elementId, ListBoxBuilder list, Action<ListBoxBuilder> build)
+    {
+        (build ?? throw new ArgumentNullException(nameof(build)))(list);
+        return plan.Render<FusionListBox<TValue>>(elementId, list.Render());
+    }
 }
 #endif
