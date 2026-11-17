@@ -21,11 +21,13 @@ internal sealed class WorldStream
 {
     private readonly Lock _gate = new();
     private readonly List<Channel<Pushed>> _open = [];
+    private readonly ConcurrentQueue<string> _traceparents = new();
     private Admission _admission = Admission.Open;
     private TaskCompletionSource _reopened = Signal();
     private TaskCompletionSource _changed = Signal();
     private int _accepted;
     private int _refused;
+    private int _answered;
     private bool _nextHeld;
 
     internal int Accepted
@@ -34,6 +36,13 @@ internal sealed class WorldStream
         {
             lock (_gate) return _accepted;
         }
+    }
+
+    internal string FirstTraceparent => _traceparents.TryPeek(out var first) ? first : "none";
+
+    internal void Records(string traceparent)
+    {
+        if (traceparent.Length > 0) _traceparents.Enqueue(traceparent);
     }
 
     internal async Task<int?> Admits(CancellationToken stopped)
@@ -45,10 +54,13 @@ internal sealed class WorldStream
             {
                 case Admission.Refused:
                     _refused += 1;
+                    _answered += 1;
                     Changed();
                     return null;
                 case Admission.Open:
                     _accepted += 1;
+                    _answered += 1;
+                    Changed();
                     return _accepted;
             }
 
@@ -62,6 +74,8 @@ internal sealed class WorldStream
         {
             _nextHeld = false;
             _accepted += 1;
+            _answered += 1;
+            Changed();
             return _accepted;
         }
     }
@@ -140,6 +154,8 @@ internal sealed class WorldStream
     internal Task HoldsTheNext(CancellationToken stopped) => Until(() => _nextHeld, stopped);
 
     internal Task HasRefused(int connections, CancellationToken stopped) => Until(() => _refused >= connections, stopped);
+
+    internal Task HasAnswered(int connections, CancellationToken stopped) => Until(() => _answered >= connections, stopped);
 
     internal void End()
     {

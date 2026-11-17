@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@inject LiveLayout Live
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <main>
+        @RenderBody()
+    </main>
+    @Html.ConformanceBusy()
+    @Html.ConformanceNotice()
+    @if (Live.RendersTheReconnectOffer)
+    {
+        @Html.NativeReconnectOffer("Live updates stopped.", retry: "Reconnect")
+    }
+    <script src="~/js/alis-reactive-conformance.js" asp-append-version="true"></script>
+    <script src="~/_content/AlisReactive.Native/js/alis-reactive-native.js" asp-append-version="true"></script>
+    <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
+</body>
+</html>

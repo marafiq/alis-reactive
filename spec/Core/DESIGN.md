@@ -5409,8 +5409,8 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
     named by its `event:` field and its `data:` is JSON. The browser reconnects by itself after the server's `retry:`,
     sending `Last-Event-ID` with the last `id:` it saw.
   - SignalR, by ASP.NET Core SignalR's protocol through `@microsoft/signalr`, pinned, the one realtime dependency. Its
-    module is its own asset, which the view links only when a plan names a hub, so a page with no hub ships no
-    SignalR client.
+    module is its own asset, whose versioned URL a hub's plugin data carries, and the core loads it once, when the
+    first plan that names a hub starts, so a page with no hub ships no SignalR client (the owner, 2026-11-17).
 - D21.2 Realtime is net10's alone (the owner, 2026-11-06: "Let's drop real time from .NET 4.8"). Its doors are on
   net10's public surface only, so a net48 view that writes a stream, a hub or a message trigger does not compile.
   - Server-sent events come from the app's own endpoint through ASP.NET Core 10's `TypedResults.ServerSentEvents`.
@@ -5492,8 +5492,8 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
     (`node_modules/@microsoft/signalr/dist/esm/HubConnection.js:717`), so a test runs them on Playwright's clock (X21.13).
 
 **Schema nodes.** The plugins `alis.stream` and `alis.hub`, their plugin data `stream` (new) and `hub`, each carrying
-`offer` (D21.11), a hub's `waits` (D21.13), the contract plugin `reconnect`, `Handler` for message and lifecycle triggers, and `call` for a hub's
-invoke and send.
+`offer` (D21.11), a hub's `waits` (D21.13) and `client` (D21.1), the contract plugin `reconnect`, `Handler` for message
+and lifecycle triggers, and `call` for a hub's invoke and send.
 
 **Checker.**
 - `Ownership.tla:HubKeptWhileHeld`
@@ -5513,7 +5513,7 @@ invoke and send.
 - `N21.6` new: every realtime door under net10's PublicAPI text only, behind the host split, none on net48's.
 - `N21.3` new: the plugin data `stream` (D21.6).
 - `N21.4` new: the lifecycle triggers `reconnecting`, `reconnected` and `closed` on a stream and a hub (D21.5).
-- `N21.5` new: the hub's module as its own asset, linked when a plan names a hub (D21.1).
+- `N21.5` new: the hub's module as its own asset, which the core loads from the URL the plan carries (D21.1).
 - `N21.7` new: the reconnect contract, the plugin `reconnect` with `show(retry)` and `hide()`, a Native component
   declaring it, and the startup choice on net10's realtime configuration, `services.AddReactiveRealtime(live =>
   live.ShowReconnect())` or `NoReconnectOffer()`, a `Hosting` door beside `AddReactiveRequests` (D21.11).

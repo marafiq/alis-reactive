@@ -33,5 +33,6 @@ public static class WorldEndpoints
     public const string StreamNextHeld = "/world/streams/next-held";
     public const string StreamRefuse = "/world/streams/refuse";
     public const string StreamRefused = "/world/streams/refused";
+    public const string StreamAnswered = "/world/streams/answered";
     public const string StreamReopen = "/world/streams/reopen";
 }

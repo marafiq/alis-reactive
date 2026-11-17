@@ -1,12 +1,9 @@
 import type { Owner } from "../OwnershipAndState/index";
 import { assertNever, type Locator, type PlanDocument } from "../Schema/index";
-import type { Attributes } from "../Tracing/index";
+import { streamPlugin, type ConnectionState, type ReconnectOffer } from "./connections";
 
-const streamPlugin = "alis.stream";
 const connecting = 0;
 const closed = 2;
-
-export type ConnectionState = "connecting" | "open" | "reconnecting" | "closed";
 
 type Listener = (...args: unknown[]) => void;
 
@@ -20,14 +17,8 @@ export interface MessageSource {
   close(): void;
 }
 
-export interface ReconnectContract {
-  show(retry: () => void): void;
-  hide(): void;
-}
-
 export interface StreamPorts {
   readonly opens: (url: string) => MessageSource;
-  readonly reconnect: () => ReconnectContract;
   readonly logs: (error: string) => void;
 }
 
@@ -186,10 +177,11 @@ interface Held {
 export class Streams {
   readonly ports: StreamPorts;
   readonly #held = new Map<string, Held>();
-  readonly #offered = new Set<LiveStream>();
+  readonly #offer: ReconnectOffer;
 
-  constructor(ports: StreamPorts) {
+  constructor(ports: StreamPorts, offer: ReconnectOffer) {
     this.ports = ports;
+    this.#offer = offer;
   }
 
   of(url: string): LiveStream {
@@ -203,10 +195,7 @@ export class Streams {
   }
 
   counts(stream: LiveStream): void {
-    const before = this.#offered.size;
-    if (stream.offers && (stream.gaveUp || (this.#offered.has(stream) && stream.state === "reconnecting"))) this.#offered.add(stream);
-    else this.#offered.delete(stream);
-    this.#tells(before);
+    this.#offer.counts(stream, stream.offers && (stream.gaveUp || (this.#offer.holds(stream) && stream.state === "reconnecting")));
   }
 
   #holds(hold: StreamHold, owner: Owner): void {
@@ -223,7 +212,7 @@ export class Streams {
   #opens(stream: LiveStream, hold: StreamHold): void {
     if (hold.offer) {
       try {
-        this.ports.reconnect();
+        this.#offer.contract();
       } catch (error) {
         this.ports.logs("The stream '" + hold.url + "' did not open: " + (error instanceof Error ? error.message : "its reconnect offer is missing"));
         return;
@@ -237,32 +226,7 @@ export class Streams {
     if (held.holders > 0) return;
     this.#held.delete(url);
     held.stream.releases();
-    const before = this.#offered.size;
-    this.#offered.delete(held.stream);
-    this.#tells(before);
-  }
-
-  #tells(before: number): void {
-    const after = this.#offered.size;
-    if (before === 0 && after > 0) this.ports.reconnect().show(() => {
-      this.#retries();
-    });
-    if (before > 0 && after === 0) this.ports.reconnect().hide();
-  }
-
-  #retries(): void {
-    for (const stream of [...this.#offered]) stream.retries();
-  }
-}
-
-export function transportOf(locator: Locator): Attributes {
-  switch (locator.kind) {
-    case "plugin":
-      return locator.name === streamPlugin ? { "alis.transport": "server-sent events" } : {};
-    case "element":
-      return {};
-    default:
-      return assertNever(locator);
+    this.#offer.withdraws(held.stream);
   }
 }
 
@@ -275,19 +239,4 @@ function streamsNamedAt(locator: Locator): StreamHold[] {
     default:
       return assertNever(locator);
   }
-}
-
-export function reconnectContract(found: unknown): ReconnectContract {
-  if (typeof found !== "object" || found === null) throw new Error("The plugin 'reconnect' is no object.");
-  const show: unknown = Reflect.get(found, "show");
-  const hide: unknown = Reflect.get(found, "hide");
-  if (typeof show !== "function" || typeof hide !== "function") throw new Error("The plugin 'reconnect' has no show(retry) and hide().");
-  return {
-    show: (retry) => {
-      Reflect.apply(show, found, [retry]);
-    },
-    hide: () => {
-      Reflect.apply(hide, found, []);
-    },
-  };
 }

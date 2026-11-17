@@ -79,6 +79,8 @@ internal static class WorldArea
         app.MapPost(WorldEndpoints.StreamRefuse, (StreamOrder order, CurrentWorld world) => world.Data.Streams.Of(order.Stream).Refuse());
         app.MapPost(WorldEndpoints.StreamRefused, async (StreamOrder order, CurrentWorld world, HttpContext context)
             => await world.Data.Streams.Of(order.Stream).HasRefused(order.Count, context.RequestAborted));
+        app.MapPost(WorldEndpoints.StreamAnswered, async (StreamOrder order, CurrentWorld world, HttpContext context)
+            => await world.Data.Streams.Of(order.Stream).HasAnswered(order.Count, context.RequestAborted));
         app.MapPost(WorldEndpoints.StreamReopen, (StreamOrder order, CurrentWorld world) => world.Data.Streams.Of(order.Stream).Reopen());
         app.MapPost(WorldEndpoints.FinallySettle, () => Results.NoContent())
             .AddEndpointFilter((context, next) => AtTheGate(GateName.Of(RealtimeGate.DefaultFinally), context, next));

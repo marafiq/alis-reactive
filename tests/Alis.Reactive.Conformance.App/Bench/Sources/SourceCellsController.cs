@@ -21,6 +21,9 @@ public sealed class SourceCellsController : Controller
     [HttpGet(BenchPages.SourceMethodArgument)]
     public IActionResult SourceMethodArgument() => View("/Bench/Sources/SourceMethodArgument.cshtml", TheWorldsBoard());
 
+    [HttpGet(BenchPages.SourceHubArgument)]
+    public IActionResult SourceHubArgument() => View("/Bench/Sources/SourceHubArgument.cshtml", TheWorldsBoard());
+
     [HttpGet(BenchPages.SourcePluginArgument)]
     public IActionResult SourcePluginArgument() => View("/Bench/Sources/SourcePluginArgument.cshtml", new ScriptedBoard(TheWorldsBoard(), [SourcesScripts.PageLog]));
 

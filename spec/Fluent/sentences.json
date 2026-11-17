@@ -250,6 +250,10 @@
       "N10.7",
       "D10.11"
     ],
+    "Invoke": [
+      "D21.12",
+      "N21.8"
+    ],
     "Json": [
       "N10.7",
       "N17.10",
@@ -489,6 +493,10 @@
       "N6.1",
       "D6.16"
     ],
+    "Send": [
+      "D21.12",
+      "N21.8"
+    ],
     "Set": [
       "D7.3",
       "N7.6",
@@ -602,6 +610,14 @@
       },
       {
         "position": "PluginArgument",
+        "source": "IfNull",
+        "reason": "N18.14",
+        "errors": [
+          "CS8620"
+        ]
+      },
+      {
+        "position": "HubArgument",
         "source": "IfNull",
         "reason": "N18.14",
         "errors": [

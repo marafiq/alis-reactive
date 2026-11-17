@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveRound
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveRound>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+<p>Last status: <span id="page-status"></span></p>
+<button type="button" @Html.Raises(plan, LiveLineButtons.OpenAdasCard)>Open Ada's card</button>
+<button type="button" @Html.Raises(plan, LiveLineButtons.OpenBensCard)>Open Ben's card</button>
+<button type="button" @Html.Raises(plan, LiveLineButtons.CloseAdasCard)>Close Ada's card</button>
+<div id="ada-slot"></div>
+<div id="ben-slot"></div>
+@{
+    Html.On(plan, trigger => trigger
+        .SignalR(WardLine.Live, line => line.StatusChanged, (status, pipeline) => pipeline.Element("page-status").Text.Set(status.Read(s => s.Resident)))
+        .CustomEvent(LiveLineButtons.OpenAdasCard, pipeline => pipeline.Get(CareEndpoints.AdasStatusCard).Into("ada-slot"))
+        .CustomEvent(LiveLineButtons.OpenBensCard, pipeline => pipeline.Get(CareEndpoints.BensStatusCard).Into("ben-slot"))
+        .CustomEvent(LiveLineButtons.CloseAdasCard, pipeline => pipeline.Unload("ada-slot")));
+}
+@Html.RenderPlan(plan)

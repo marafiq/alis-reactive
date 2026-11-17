@@ -1105,11 +1105,22 @@
         },
         "offer": {
           "type": "boolean"
+        },
+        "waits": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "client": {
+          "type": "string"
         }
       },
       "required": [
         "kind",
-        "offer"
+        "offer",
+        "waits",
+        "client"
       ],
       "additionalProperties": false
     },

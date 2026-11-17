@@ -15,4 +15,13 @@ public static partial class CareEndpoints
     public const string LiveList = Live + "list";
     public const string BedCard = Live + "bed-card";
     public const string BoardCard = Live + "board-card";
+    public const string WardLine = Live + "ward-line";
+    public const string RoundFeed = Live + "round-feed";
+    public const string BedLine = Live + "bed-line";
+    public const string Line = Live + "line";
+    public const string NurseLine = Live + "nurse-line";
+    public const string AdasStatusCard = Live + "status-card/ada";
+    public const string BensStatusCard = Live + "status-card/ben";
+    public const string BedLineCard = Live + "bed-line-card";
+    public const string LineCard = Live + "line-card";
 }

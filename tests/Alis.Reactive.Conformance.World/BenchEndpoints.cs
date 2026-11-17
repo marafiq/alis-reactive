@@ -3,6 +3,8 @@ namespace Alis.Reactive.Conformance.World;
 public static class BenchEndpoints
 {
     public const string Items = "/items";
+    public const string Hub = "/hub";
+    public const string Stream = "/stream";
     public const string Item = "/item";
     public const string GroupNotes = "/groups/{group}/notes";
     public const string Notes = "/notes";
