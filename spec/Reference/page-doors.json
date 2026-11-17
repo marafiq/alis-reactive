@@ -1493,9 +1493,7 @@
     ]
   },
   "M21.F46 M21.X1027 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/BedRails.cshtml",
       "/Shared/_FusionLayout.cshtml"
