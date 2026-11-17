@@ -949,3 +949,34 @@ static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Redirect -> Al
 static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Status -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
 static readonly Alis.Reactive.TriggersAndPipelines.AntiforgeryIn.FormField -> Alis.Reactive.TriggersAndPipelines.AntiforgeryIn!
 static readonly Alis.Reactive.TriggersAndPipelines.AntiforgeryIn.Header -> Alis.Reactive.TriggersAndPipelines.AntiforgeryIn!
+Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.ConnectionState.Closed = 3 -> Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.ConnectionState.Connecting = 0 -> Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.ConnectionState.Open = 1 -> Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.ConnectionState.Reconnecting = 2 -> Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.RealtimeChoices
+Alis.Reactive.Realtime.RealtimeChoices.NoReconnectOffer() -> Alis.Reactive.Realtime.RealtimeChoices!
+Alis.Reactive.Realtime.RealtimeChoices.ReconnectionInterval(System.TimeSpan wait) -> Alis.Reactive.Realtime.RealtimeChoices!
+Alis.Reactive.Realtime.RealtimeChoices.ShowReconnect() -> Alis.Reactive.Realtime.RealtimeChoices!
+Alis.Reactive.Realtime.ServerEvent<TMessage>
+Alis.Reactive.Realtime.ServerEvent<TMessage>.Of(TMessage message) -> Alis.Reactive.Realtime.ServerMessage!
+Alis.Reactive.Realtime.ServerEvents
+Alis.Reactive.Realtime.ServerMessage
+Alis.Reactive.Realtime.ServerPushSource<TStream>
+Alis.Reactive.Realtime.ServerPushStream
+Alis.Reactive.Realtime.ServerPushStream.Close() -> void
+Alis.Reactive.Realtime.ServerPushStream.Closed.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.ServerPushStream.Message<TMessage>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Realtime.ServerEvent<TMessage>!
+Alis.Reactive.Realtime.ServerPushStream.Reconnected.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.ServerPushStream.Reconnecting.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.ServerPushStream.ServerPushStream() -> void
+Alis.Reactive.Realtime.ServerPushStream.State.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Realtime.ConnectionState>!
+Alis.Reactive.RenderingAndDelivery.RealtimeServices
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Stream<TStream>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream) -> TStream!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream, TMessage>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Realtime.ServerEvent<TMessage>!>! message, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream, TMessage>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Realtime.ServerEvent<TMessage>!>! message, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Declarations.Event!>! lifecycle, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Declarations.Event!>! lifecycle, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+static Alis.Reactive.Realtime.ServerEvents.Write(Microsoft.AspNetCore.Http.HttpContext! context, System.Collections.Generic.IAsyncEnumerable<Alis.Reactive.Realtime.ServerMessage!>! messages) -> Microsoft.AspNetCore.Http.HttpResults.ServerSentEventsResult<string!>!
+static Alis.Reactive.Realtime.ServerPushStream.At<TStream>(string! url) -> Alis.Reactive.Realtime.ServerPushSource<TStream!>!
+static Alis.Reactive.RenderingAndDelivery.RealtimeServices.AddReactiveRealtime(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Realtime.RealtimeChoices!>! live) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

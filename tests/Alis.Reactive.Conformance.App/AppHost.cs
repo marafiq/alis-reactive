@@ -36,6 +36,9 @@ internal static class AppHost
             case HostNames.DefaultHooks:
             case HostNames.Tracing:
             case HostNames.TracingSinkThrows:
+            case HostNames.RealtimeNoOffer:
+            case HostNames.NoReconnectComponent:
+            case HostNames.NoReconnectOffer:
                 WriteEnumNames(json);
                 return;
             case HostNames.NumbersAsText:
@@ -63,7 +66,7 @@ internal static class AppHost
                 json.TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { LeaveOutTheAdmissionsPharmacy } };
                 return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks}, {HostNames.Tracing} and {HostNames.TracingSinkThrows}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks}, {HostNames.Tracing}, {HostNames.TracingSinkThrows}, {HostNames.RealtimeNoOffer}, {HostNames.NoReconnectComponent} and {HostNames.NoReconnectOffer}.");
         }
     }
 
@@ -115,6 +118,23 @@ internal static class AppHost
         .OnError(401, Content.None, (expired, pipeline) => pipeline.Notice().Warning("Your session has ended."))
         .OnError((failed, pipeline) => pipeline.Notice().Error("The request failed."))
         .Retry(3, TimeSpan.FromSeconds(2));
+
+    internal static void AddRealtime(string host, IServiceCollection services)
+    {
+        services.AddSingleton(new Components.LiveLayout(host != HostNames.NoReconnectComponent));
+        switch (host)
+        {
+            case HostNames.RealtimeNoOffer:
+                services.AddReactiveRealtime(live => live.ReconnectionInterval(Components.LiveStreams.Reconnection));
+                return;
+            case HostNames.NoReconnectOffer:
+                services.AddReactiveRealtime(live => live.NoReconnectOffer().ReconnectionInterval(Components.LiveStreams.Reconnection));
+                return;
+            default:
+                services.AddReactiveRealtime(live => live.ShowReconnect().ReconnectionInterval(Components.LiveStreams.Reconnection));
+                return;
+        }
+    }
 
     internal static void AddClassNames(string host, IServiceCollection services)
     {

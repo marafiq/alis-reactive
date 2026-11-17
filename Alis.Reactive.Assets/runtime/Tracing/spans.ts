@@ -70,6 +70,7 @@ export interface Sending {
 
 export interface Traced {
   handler(index: number, event: string): Traced;
+  heardOn(attributes: Attributes): Traced;
   run(): Traced;
   span(name: SpanName, attributes: Attributes): Traced;
   send(): Sending;

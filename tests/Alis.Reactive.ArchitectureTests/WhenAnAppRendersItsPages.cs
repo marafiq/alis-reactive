@@ -290,7 +290,7 @@ public class WhenAnAppRendersItsPages
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, address);
         request.Headers.Add(WhatTheRequestIsFor, ADocument);
-        using var answer = await browser.SendAsync(request);
+        using var answer = await browser.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
         var thrown = watched.TakeWhatWasThrown();
         if (answer.Content.Headers.ContentType?.MediaType != Html) return new Answer((int)answer.StatusCode, thrown, [], []);

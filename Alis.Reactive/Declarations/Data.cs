@@ -22,14 +22,20 @@ public sealed class Data<T> : TypedSource<T>
     private readonly BlockWriter _writer;
 
     internal Data(BlockWriter writer)
+        : this(writer, HeldForm.Live(writer.Content.Json, writer.Content.RendersUnder))
+    {
+    }
+
+    internal Data(BlockWriter writer, HeldForm form)
     {
         _writer = writer;
         Expression = new Received(writer).Target;
+        Form = form;
     }
 
     internal override Schema.Expression Expression { get; }
 
-    internal override HeldForm Form => HeldForm.Live(_writer.Content.Json, _writer.Content.RendersUnder);
+    internal override HeldForm Form { get; }
 
     /// <summary>Reads a member of the data, as <c>x =&gt; x.Pager.Number</c>.</summary>
     /// <typeparam name="TResult">The type of the member.</typeparam>

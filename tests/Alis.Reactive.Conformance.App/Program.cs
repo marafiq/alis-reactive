@@ -23,6 +23,7 @@ public sealed class Program
         AppHost.AddRequests(host, builder.Services);
         AppHost.AddValidation(builder.Services);
         AppHost.AddClassNames(host, builder.Services);
+        AppHost.AddRealtime(host, builder.Services);
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(cookie => cookie.LoginPath = SessionNotesEndpoints.SignIn);
         if (builder.Environment.IsDevelopment()) builder.Services.AddWorld();

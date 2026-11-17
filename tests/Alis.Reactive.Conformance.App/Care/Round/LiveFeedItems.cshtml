@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveRound
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveRound>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+@(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner", SettleEndpoint = WorldEndpoints.FinallySettle }))
+<button type="button" @Html.Raises(plan, LiveRoundButtons.Load)>Load</button>
+<p>Item: <span id="item-status"></span></p>
+<p>List: <span id="list-status"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .ServerPush(Feed.Live, feed => feed.Item, (item, pipeline) => pipeline
+            .Post<SavedItem>(CareEndpoints.LiveItems, request => request.Json(body => body.Set(saved => saved.Name, item.Read(i => i.Name))))
+            .Busy()
+            .OnSuccess(Content.Json<SavedItem>(), (saved, pipeline) => pipeline.Element("item-status").Text.Set("saved"))
+            .Finally(pipeline => pipeline.Component<ConformanceComponent>("scanner").Settle()))
+        .CustomEvent(LiveRoundButtons.Load, pipeline => pipeline.Get(CareEndpoints.LiveList)
+            .Busy()
+            .OnSuccess(Content.Json<SavedItem>(), (listed, pipeline) => pipeline.Element("list-status").Text.Set("loaded"))));
+}
+@Html.RenderPlan(plan)

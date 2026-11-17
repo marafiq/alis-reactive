@@ -98,6 +98,102 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M10.F1 M10.X4 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveAlerts.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.1 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveBulletins.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.10 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveBedCard.cshtml",
+      "/Care/Round/LiveOffer.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.11 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/Realtime/ActivityBoard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M10.F1 X21.12 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/RecordCard.cshtml",
+      "/Care/Round/LiveNews.cshtml",
+      "/Care/Round/_LiveLayout.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M10.F1 X21.15 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveBulletins.cshtml",
+      "/Care/Round/_LiveTracedLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.2 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveBoardCard.cshtml",
+      "/Care/Round/LiveWardCard.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.3 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveNews.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.8 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveDoses.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.8 1": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveFeed.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.8 2": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveFeedItems.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.8 3": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveFeedItems.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F1 X21.9 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveBedCard.cshtml",
+      "/Care/Round/LiveOffer.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
   "M11.F1 M11.X1 0": {
     "modules": [],
     "views": [
@@ -1849,6 +1945,14 @@
     "views": [
       "/Care/Shell/DoseToasts.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
+    ]
+  },
+  "M25.F7 M25.X11 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveBedCard.cshtml",
+      "/Care/Round/LiveOffer.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
     ]
   },
   "M26.F1 X20.1 0": {

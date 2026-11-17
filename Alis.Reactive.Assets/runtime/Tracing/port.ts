@@ -219,6 +219,10 @@ class Recorded implements Traced {
     return new Recorded(this.#plan, "root", { "alis.event": event, "code.file.path": source.view, "code.line.number": source.line });
   }
 
+  heardOn(attributes: Attributes): Traced {
+    return new Recorded(this.#plan, this.#current, { ...this.#runAttributes, ...attributes });
+  }
+
   run(): Traced {
     return new Recorded(this.#plan, this.#plan.started("alis.run", this.#runAttributes), {});
   }
@@ -306,6 +310,10 @@ class Unrecorded implements Traced {
   }
 
   handler(): Traced {
+    return this;
+  }
+
+  heardOn(): Traced {
     return this;
   }
 

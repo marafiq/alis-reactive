@@ -115,6 +115,11 @@
       "framework": "net10"
     },
     {
+      "id": "noReconnectOffer",
+      "what": "AddReactiveRealtime choosing NoReconnectOffer()",
+      "framework": "net10"
+    },
+    {
       "id": "noRequests",
       "what": "an app that never calls AddReactiveRequests",
       "framework": "net10"

@@ -5393,8 +5393,8 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 - D21.7 Authentication is the page's own: a stream and a hub send the page's cookies, and the server authorizes each
   connection and each hub method. A bearer token is not sent: `EventSource` sends no header, and SignalR puts a
   token in the URL for WebSockets and server-sent events. 1.0 has no token door (gate 1, C26).
-- D21.8 Tracing (Q20): a run a message starts is a child of the plan's trace context and records its transport and
-  event. The server span that sent the message is not linked, since neither wire carries a trace context per
+- D21.8 Tracing (Q20): a run a message starts is a child of the plan's trace context and records its transport,
+  `alis.transport` ("server-sent events" for a stream), and its event. The server span that sent the message is not linked, since neither wire carries a trace context per
   message. A hub invoke does not join the server's hub activity either: `@microsoft/signalr` 10.0.11 sends no trace
   header by long polling or on its WebSocket upgrade, and its invocation message holds only arguments, invocationId,
   target and type on both transports (`probe:signalr-requests-carry-no-trace-context`,

@@ -69,6 +69,19 @@ internal static class WorldArea
             using var body = new StreamReader(request.Body);
             return world.Data.HostOrders.Done(await body.ReadToEndAsync()) ? Results.Ok() : Results.Text("No restart is in work in this world.", statusCode: StatusCodes.Status409Conflict);
         });
+        app.MapPost(WorldEndpoints.StreamPush, (StreamOrder order, CurrentWorld world)
+            => new StreamOrder { Stream = order.Stream, Event = order.Event, Data = order.Data, Count = world.Data.Streams.Of(order.Stream).Push(order.Event, order.Data) });
+        app.MapPost(WorldEndpoints.StreamOpen, async (StreamOrder order, CurrentWorld world, HttpContext context)
+            => await world.Data.Streams.Of(order.Stream).Holds(order.Count, context.RequestAborted));
+        app.MapPost(WorldEndpoints.StreamDrop, (StreamOrder order, CurrentWorld world) => world.Data.Streams.Of(order.Stream).Drop());
+        app.MapPost(WorldEndpoints.StreamNextHeld, async (StreamOrder order, CurrentWorld world, HttpContext context)
+            => await world.Data.Streams.Of(order.Stream).HoldsTheNext(context.RequestAborted));
+        app.MapPost(WorldEndpoints.StreamRefuse, (StreamOrder order, CurrentWorld world) => world.Data.Streams.Of(order.Stream).Refuse());
+        app.MapPost(WorldEndpoints.StreamRefused, async (StreamOrder order, CurrentWorld world, HttpContext context)
+            => await world.Data.Streams.Of(order.Stream).HasRefused(order.Count, context.RequestAborted));
+        app.MapPost(WorldEndpoints.StreamReopen, (StreamOrder order, CurrentWorld world) => world.Data.Streams.Of(order.Stream).Reopen());
+        app.MapPost(WorldEndpoints.FinallySettle, () => Results.NoContent())
+            .AddEndpointFilter((context, next) => AtTheGate(GateName.Of(RealtimeGate.DefaultFinally), context, next));
         app.MapGet(WorldPages.Host, () => Results.Content(HostPage(), Html));
         app.MapGet(WorldPages.Records, (CurrentWorld world) => Results.Content(RecordsPage(world.Data), Html));
         app.MapGet(WorldPages.Word, () => Results.Content(WordPage(), Html));

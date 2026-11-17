@@ -70,6 +70,18 @@ public static class Hosts
 
     public static readonly string[] TracingSinkThrows = [TracingSinkThrowsName];
 
+    public const string RealtimeNoOfferName = HostNames.RealtimeNoOffer;
+
+    public static readonly string[] RealtimeNoOffer = [RealtimeNoOfferName];
+
+    public const string NoReconnectComponentName = HostNames.NoReconnectComponent;
+
+    public static readonly string[] NoReconnectComponent = [NoReconnectComponentName];
+
+    public const string NoReconnectOfferName = HostNames.NoReconnectOffer;
+
+    public static readonly string[] NoReconnectOffer = [NoReconnectOfferName];
+
     public const string Net48Name = HostNames.Net48;
 
     public static readonly string[] Net48 = [Net48Name];

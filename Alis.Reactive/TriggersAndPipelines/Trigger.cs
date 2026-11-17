@@ -11,7 +11,7 @@ namespace Alis.Reactive.TriggersAndPipelines;
 /// What starts a pipeline of a view's plan: a view names it in <c>Html.On(plan, trigger =&gt; ..)</c>.
 /// </summary>
 /// <typeparam name="TModel">The model of the view that writes the plan.</typeparam>
-public sealed class Trigger<TModel>
+public sealed partial class Trigger<TModel>
 {
     private readonly BlockWriter _writer;
 

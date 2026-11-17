@@ -96,6 +96,7 @@ type Traced = ReturnType<TraceOf>;
 
 const quiet: Traced = {
   handler: () => quiet,
+  heardOn: () => quiet,
   run: () => quiet,
   span: () => quiet,
   send: () => ({ attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }), end: () => undefined }),
@@ -116,6 +117,7 @@ class Spans {
         this.recorded.push("handler " + String(index) + " " + event);
         return quiet;
       },
+      heardOn: () => quiet,
       run: () => quiet,
       span: (child, attributes) => {
         this.recorded.push(child + " starts " + JSON.stringify(attributes));

@@ -14,6 +14,7 @@ public sealed class TestWorld
     private readonly IBrowserContext _context;
     private readonly ConcurrentQueue<string> _consoleErrors = new();
     private readonly ConcurrentQueue<Uri> _sent = new();
+    private readonly ConcurrentDictionary<string, int> _reached = new(StringComparer.Ordinal);
 
     private TestWorld(HttpClient harness, IBrowserContext context, IPage page)
     {
@@ -49,6 +50,38 @@ public sealed class TestWorld
             throw new InvalidOperationException("The host did not restart the component at '" + elementId + "': " + await answer.Content.ReadAsStringAsync());
         answer.EnsureSuccessStatusCode();
     }
+
+    [Gesture]
+    public async Task Push(string stream, string type, string data)
+    {
+        using var answer = await _harness.PostAsJsonAsync(WorldEndpoints.StreamPush, new StreamOrder { Stream = stream, Event = type, Data = data });
+        answer.EnsureSuccessStatusCode();
+        _reached[stream] = (await answer.Content.ReadFromJsonAsync<StreamOrder>())!.Count;
+    }
+
+    [BesideThePage]
+    public int Reached(string stream) => _reached[stream];
+
+    public Task Opened(string stream) => Connections(stream, 1);
+
+    public Task Closed(string stream) => Connections(stream, 0);
+
+    [Gesture]
+    public async Task<DroppedStream> Drop(string stream)
+    {
+        (await _harness.PostAsJsonAsync(WorldEndpoints.StreamDrop, new StreamOrder { Stream = stream })).EnsureSuccessStatusCode();
+        return new DroppedStream(_harness, stream);
+    }
+
+    [Gesture]
+    public async Task<RefusedStream> Refuse(string stream)
+    {
+        (await _harness.PostAsJsonAsync(WorldEndpoints.StreamRefuse, new StreamOrder { Stream = stream })).EnsureSuccessStatusCode();
+        return new RefusedStream(_harness, stream);
+    }
+
+    private async Task Connections(string stream, int count)
+        => (await _harness.PostAsJsonAsync(WorldEndpoints.StreamOpen, new StreamOrder { Stream = stream, Count = count })).EnsureSuccessStatusCode();
 
     public Task CollectGarbage() => Page.RequestGCAsync();
 

@@ -21,7 +21,7 @@ namespace Alis.Reactive.TriggersAndPipelines;
 /// meets something the page lacks, such as an element or a required member, stops the pipeline there.
 /// </remarks>
 /// <typeparam name="TModel">The model of the view that writes the pipeline.</typeparam>
-public sealed class Pipeline<TModel>
+public sealed partial class Pipeline<TModel>
 {
     private readonly BlockWriter _writer;
 

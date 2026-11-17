@@ -13,6 +13,7 @@ const owner: ConstructorParameters<typeof Lane>[2] = {
 };
 const untraced: Raised["trace"] = {
   handler: () => untraced,
+  heardOn: () => untraced,
   run: () => untraced,
   span: () => untraced,
   send: () => ({ attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }), end: () => undefined }),

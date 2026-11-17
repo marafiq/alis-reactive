@@ -26,4 +26,12 @@ public static class WorldEndpoints
     public const string CollectorTraces = "/world/collector/v1/traces";
     public const string CollectorLines = "/world/collector/lines";
     public const string PharmacyStock = "/world/pharmacy/stock";
+    public const string FinallySettle = "/world/settle/finally";
+    public const string StreamPush = "/world/streams/push";
+    public const string StreamOpen = "/world/streams/open";
+    public const string StreamDrop = "/world/streams/drop";
+    public const string StreamNextHeld = "/world/streams/next-held";
+    public const string StreamRefuse = "/world/streams/refuse";
+    public const string StreamRefused = "/world/streams/refused";
+    public const string StreamReopen = "/world/streams/reopen";
 }

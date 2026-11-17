@@ -8,6 +8,7 @@ type Listener = (...args: unknown[]) => void;
 
 const untraced: Context["trace"] = {
   handler: () => untraced,
+  heardOn: () => untraced,
   run: () => untraced,
   span: () => untraced,
   send: () => ({ attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }), end: () => undefined }),

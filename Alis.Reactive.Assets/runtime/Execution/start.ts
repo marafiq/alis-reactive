@@ -2,6 +2,7 @@ import { pageInputs } from "../InputsAndIds/index";
 import { holdSlots, placeOf, slotsNamedBy, type Owner } from "../OwnershipAndState/index";
 import { assertNever, type Expression, type FnExpression, type Handler, type InputBinding, type Locator, type PathStep, type PlanDocument, type Trace } from "../Schema/index";
 import type { Traced } from "../Tracing/index";
+import { transportOf } from "../Realtime/index";
 import { pageForms } from "../Validation/index";
 import { got, heldOrNull, Stop, value } from "../ValuesAndSources/index";
 import { subscribe } from "../Vendors/index";
@@ -34,7 +35,7 @@ export function start(plan: PlanDocument, owner: Owner, elementFor: ElementFor, 
   holdSlots(slotsNamedBy(plan), owner);
   for (const [index, handler] of plan.handlers.entries()) {
     try {
-      listen(handler, within(context, traced.handler(index, handler.event)), elementFor, pluginFor);
+      listen(handler, within(context, traced.handler(index, handler.event).heardOn(transportOf(locatorOf(context, handler.on)))), elementFor, pluginFor);
     } catch (stopped) {
       if (!(stopped instanceof Stop)) throw stopped;
       console.error("The handler of '" + handler.event + "' on " + named(locatorOf(context, handler.on)) + " did not start: " + stopped.reason);

@@ -2,6 +2,7 @@ import { pageInputs } from "../InputsAndIds/index";
 import { slotsNamedBy, type Owner, type Placed } from "../OwnershipAndState/index";
 import { Slots } from "../PartialsAndSlots/index";
 import { plugin, provide, readQueue, type PluginRegistration } from "../Plugins/index";
+import { reconnectContract, Streams } from "../Realtime/index";
 import type { PlanDocument } from "../Schema/index";
 import { tracing } from "../Tracing/index";
 import { DocumentPlugin, raisesOnClick } from "../TriggersAndPipelines/index";
@@ -26,8 +27,11 @@ function announces(event: Announced): (root: Placed) => void {
   };
 }
 
-function starts(plan: PlanDocument, owner: Owner): void {
-  start(plan, owner, elementById, plugin, (trace) => tracing.planTrace(trace));
+function startsWith(streams: Streams): (plan: PlanDocument, owner: Owner) => void {
+  return (plan, owner) => {
+    streams.holds(plan, owner);
+    start(plan, owner, elementById, plugin, (trace) => tracing.planTrace(trace));
+  };
 }
 
 function parsed(html: string): DocumentFragment {
@@ -46,6 +50,14 @@ function runsScripts(container: HTMLElement): void {
 }
 
 export function boot(): void {
+  const streams = new Streams({
+    opens: (url) => new EventSource(url),
+    reconnect: () => reconnectContract(plugin("reconnect", "")),
+    logs: (error) => {
+      console.error(error);
+    },
+  });
+  const starts = startsWith(streams);
   const documentPlugin = new DocumentPlugin(document, location);
   raisesOnClick(document, documentPlugin);
   checksLive(document);
@@ -75,6 +87,7 @@ export function boot(): void {
   provide("alis.model", () => pageInputs);
   provide("alis.form", () => pageForms);
   provide("alis.slot", (key) => slots.of(key));
+  provide("alis.stream", (key) => streams.of(key));
   readQueue(window.__alisPlugins ??= []);
   announces("alis:mount")(document.body);
   const found = plansWithin(document);
