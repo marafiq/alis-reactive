@@ -9009,12 +9009,12 @@
     {
      "id": "M21.X209",
      "rung": "refusal",
-     "defect": "A grid's edited rows sent in a JSON body under app JSON options that add a DateTime converter: the live form holds a date as the browser's Date while the endpoint reads it through the app's converter, so a row's date binds a value it was not, or the request answers 400. The rewrite refuses it where the view renders (D9.7)."
+     "defect": "A grid's edited rows sent in a JSON body under app JSON options that add a DateTime converter: the live form holds a date as the browser's Date while the endpoint reads it through the app's converter, so a row's date binds a value it was not, or the request answers 400. The rewrite refuses it where the view renders (D9.7): \"'r => r.Changed' holds 'dueOn', which a JSON converter of the app's writes\"."
     },
     {
      "id": "M21.X210",
      "rung": "refusal",
-     "defect": "A grid's edited rows sent in a JSON body under app JSON options whose string enum converter reads no number: the live form holds an enum as its number, which the endpoint refuses, so saving the rows answers 400. The rewrite refuses it where the view renders (D9.7)."
+     "defect": "A grid's edited rows sent in a JSON body under app JSON options whose string enum converter reads no number: the live form holds an enum as its number, which the endpoint refuses, so saving the rows answers 400. The rewrite refuses it where the view renders (D9.7): \"'r => r.Changed' holds 'status', whose enum a live object holds as 0 for Due\"."
     }
    ],
    "promises": [
