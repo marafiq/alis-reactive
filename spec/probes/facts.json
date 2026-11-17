@@ -3474,9 +3474,9 @@
       "source": "spec/probes/ej2-template-m22.mjs",
       "proof": {
         "feature": "M22.F2",
-        "page": "A ward page with two FusionGrids rendered in this order: Residents, whose Band column is When(m => m.Age < 90, ..), and Rooms, whose Spare column is When(m => 2 < m.Beds, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")), over rooms of 3 beds and 1 bed.",
-        "gesture": "Open the page.",
-        "outcome": "Both grids show their rows; the room of 3 beds shows spare and the room of 1 bed shows full."
+        "page": "A ward page with two FusionMultiSelects: Residents, whose item template is Span(m => m.Name), Text(\" \") and When(m => m.Age < 90, then: t => t.Span(\"under 90\"), @else: e => e.Span(\"90 and over\")), over residents aged 84 and 93, and Rooms, whose item template is Span(m => m.Room), Text(\" \") and When(m => m.Beds > 2, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")), over rooms of 3 beds and 1 bed.",
+        "gesture": "Open the Residents box, then the Rooms box, so the Rooms list compiles its template after the Residents list's condition ends on a number.",
+        "outcome": "The Residents list shows Ann under 90 and Bo 90 and over; the Rooms list then shows North 1 spare and North 2 full."
       }
     },
     {
@@ -3489,9 +3489,9 @@
       "source": "spec/probes/ej2-template-m22.mjs",
       "proof": {
         "feature": "M22.F2",
-        "page": "A ward page with two FusionGrids rendered in this order: Residents, whose Band column is When(m => m.Age < 90, ..), and Rooms, whose Spare column is When(m => 2 < m.Beds, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")), over rooms of 3 beds and 1 bed.",
-        "gesture": "Open the page.",
-        "outcome": "Both grids show their rows; the room of 3 beds shows spare and the room of 1 bed shows full."
+        "page": "A ward page with two FusionMultiSelects: Residents, whose item template is Span(m => m.Name), Text(\" \") and When(m => m.Age < 90, then: t => t.Span(\"under 90\"), @else: e => e.Span(\"90 and over\")), over residents aged 84 and 93, and Rooms, whose item template is Span(m => m.Room), Text(\" \") and When(m => 2 < m.Beds, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")), over rooms of 3 beds and 1 bed.",
+        "gesture": "Open the Residents box, then the Rooms box, so the Rooms list compiles its template after the Residents list's condition ends on a number.",
+        "outcome": "The Residents list shows Ann under 90 and Bo 90 and over; the Rooms list then shows North 1 spare and North 2 full."
       }
     },
     {

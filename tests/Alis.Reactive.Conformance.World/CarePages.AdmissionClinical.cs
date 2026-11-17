@@ -99,4 +99,12 @@ public static partial class CarePages
     public const string ResidentPreview = AdmissionClinical + "resident-preview";
 
     public const string ResidentPreviewInCamelCase = AdmissionClinical + "resident-preview/camel-case";
+
+    public const string AllergyLabels = AdmissionClinical + "allergy-labels";
+
+    public const string AllergyLabelsReadRaw = AdmissionClinical + "allergy-labels/raw";
+
+    public const string AllergySeverities = AdmissionClinical + "allergy-severities";
+
+    public const string AllergySeveritiesOfAModeratePenicillin = AdmissionClinical + "allergy-severities/moderate";
 }

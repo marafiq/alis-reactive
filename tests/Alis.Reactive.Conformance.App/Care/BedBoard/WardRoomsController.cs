@@ -16,7 +16,16 @@ public sealed class WardRoomsController : Controller
         [new WardRoom("North 1", 3), new WardRoom("North 2", 1)]);
 }
 
-public sealed record WardRooms(IReadOnlyList<AgedResident> Residents, IReadOnlyList<WardRoom> Rooms);
+public sealed class WardRooms(IReadOnlyList<AgedResident> residents, IReadOnlyList<WardRoom> rooms)
+{
+    public IReadOnlyList<AgedResident> Residents { get; } = residents;
+
+    public IReadOnlyList<WardRoom> Rooms { get; } = rooms;
+
+    public string[]? ResidentNames { get; set; }
+
+    public string[]? RoomNames { get; set; }
+}
 
 public sealed record AgedResident(string Name, int Age);
 

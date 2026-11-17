@@ -631,11 +631,11 @@
         },
         {
           "for": "M22.X2",
-          "page": "A ward page with two grids rendered in this order: Residents, whose Band column is When(m => m.Age < 90, then: t => t.Span(\"under 90\"), @else: e => e.Span(\"90 and over\")), and Rooms, whose Spare column is When(m => 2 < m.Beds, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")), over rooms of 3 beds and 1 bed.",
-          "gesture": "Open the page.",
-          "outcome": "Both grids show their rows; the Rooms grid's room of 3 beds shows spare and the room of 1 bed shows full.",
-          "opposite": "The Rooms grid's condition written m => m.Beds > 2: the same cells.",
-          "defect": "A writer that keeps the authored order writes 2 < beds after the Residents grid's condition ends on 90, so the Rooms grid renders no row (probe:ej2-grid-template-constant-first)."
+          "page": "A ward page with two FusionMultiSelects: Residents, whose item template is Span(m => m.Name), Text(\" \") and When(m => m.Age < 90, then: t => t.Span(\"under 90\"), @else: e => e.Span(\"90 and over\")), over residents aged 84 and 93, and Rooms, whose item template is Span(m => m.Room), Text(\" \") and When(m => 2 < m.Beds, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")), over rooms of 3 beds and 1 bed.",
+          "gesture": "Open the Residents box, then the Rooms box, so the Rooms list compiles its template after the Residents list's condition ends on a number.",
+          "outcome": "The Residents list shows Ann under 90 and Bo 90 and over; the Rooms list then shows North 1 spare and North 2 full.",
+          "opposite": "The Rooms box's condition written m => m.Beds > 2: the same items.",
+          "defect": "A writer that keeps the authored order writes 2<beds after the Residents list's condition ends on 90, so the Rooms list shows no item (probe:ej2-grid-template-constant-first)."
         },
         {
           "for": "M22.X5",

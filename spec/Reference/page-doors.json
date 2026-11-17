@@ -1572,45 +1572,35 @@
     ]
   },
   "M22.F1 M22.X3 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/ResidentWards.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M22.F1 X15.1 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/ResidentNames.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M22.F1 X15.2 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/ResidentCities.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M22.F1 X15.5 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/ResidentRoster.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M22.F2 M22.X1 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/FusionTemplates/RiskBoard.cshtml",
       "/Refusals/FusionTemplates/RiskBoardByAWholeScore.cshtml",
@@ -1618,9 +1608,7 @@
     ]
   },
   "M22.F2 M22.X2 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/WardRooms.cshtml",
       "/Care/BedBoard/WardRoomsBedsFirst.cshtml",
@@ -1628,9 +1616,7 @@
     ]
   },
   "M22.F2 M22.X4 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/FusionTemplates/ContactBoard.cshtml",
       "/Refusals/FusionTemplates/ContactBoardByMultipliedContacts.cshtml",
@@ -1638,27 +1624,21 @@
     ]
   },
   "M22.F2 M22.X5 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/SpareBeds.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M22.F2 X15.3 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/ResidentStatuses.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M22.F3 X15.4 0": {
-    "modules": [
-      "FusionTemplates"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/WingReview.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -4236,6 +4216,21 @@
     "modules": [],
     "views": [
       "/Care/AdmissionClinical/HintChange.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own template.conditional": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergySeverities.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own template.render": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergyLabels.cshtml",
+      "/Care/AdmissionClinical/AllergyLabelsReadRaw.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },

@@ -251,6 +251,11 @@
           "id": "census",
           "kind": "fusion",
           "role": "the ward census, FusionPivotView"
+        },
+        {
+          "id": "roomPicker",
+          "kind": "fusion",
+          "role": "the ward's room pickers, two FusionMultiSelect with their item templates"
         }
       ]
     },
@@ -3887,7 +3892,7 @@
         "net10"
       ],
       "parts": [
-        "grid"
+        "roomPicker"
       ],
       "harness": [
         "seed"
