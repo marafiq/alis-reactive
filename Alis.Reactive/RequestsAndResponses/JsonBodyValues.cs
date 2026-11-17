@@ -156,16 +156,15 @@ internal static class JsonBodyValues
         var appWritesItItself = json.App.Converters.Any(converter => converter.CanConvert(scalar.Type));
         if (appWritesItItself || !form.WritesAsAScalar(scalar.Type))
         {
-            if (form.IsTheAppsOwn && !LiveShapes.Converts(held, out _)) return captured;
             if (form.IsTheAppsOwn && !appWritesItItself) return InTheBodysForm<TValue>(captured, form, held, writer.Content.RendersUnder, member);
+            if (form.IsTheAppsOwn && !LiveShapes.Converts(held, out _)) return captured;
             if (appWritesItItself)
             {
                 throw new InvalidOperationException(
                     $"'{member}' holds what a JSON converter of the app's writes, and a JSON body sends a member in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or send it in form data.");
             }
 
-            throw new InvalidOperationException(
-                $"'{member}' holds an object as a live object holds it, and a JSON body sends an object as the app's JSON options write it, which the browser cannot read from a live object; set it from a literal, or from JSON the server writes.");
+            return AsALiveObjectHoldsIt<TValue>(captured, form, writer, member);
         }
 
         var live = form.IntoLive<TValue>(captured);
@@ -177,23 +176,32 @@ internal static class JsonBodyValues
     private static Expression InTheBodysForm<TValue>(Expression captured, HeldForm form, JsonTypeInfo held, CultureInfo culture, string member)
     {
         var live = form.IntoLive<TValue>(captured);
-        return DatesAsText(held, culture, member, []) is { } texts ? new AsExpression(live, texts) : live;
+        return DatesAsText(held, culture, member, [], (_, _, _) => { }) is { } texts ? new AsExpression(live, texts) : live;
     }
 
-    private static Shape? DatesAsText(JsonTypeInfo type, CultureInfo culture, string member, HashSet<JsonTypeInfo> path)
+    private static Expression AsALiveObjectHoldsIt<TValue>(Expression captured, HeldForm form, BlockWriter writer, string member)
+    {
+        var endpoint = writer.Content.Json.App.GetTypeInfo(typeof(TValue));
+        var texts = DatesAsText(endpoint, writer.Content.RendersUnder, member, [], (holder, property, held) => RefuseWhatALiveObjectHoldsApart(holder, property, held, form, writer.Content.Json, member));
+        return texts is null ? captured : new AsExpression(captured, texts);
+    }
+
+    private static Shape? DatesAsText(JsonTypeInfo type, CultureInfo culture, string member, HashSet<JsonTypeInfo> path, Action<JsonTypeInfo, JsonPropertyInfo, JsonTypeInfo> refuse)
     {
         if (IsADate(type)) return ConversionShapes.TextOf(type, culture);
         if (!path.Add(type)) return null;
         try
         {
-            if (type.IsList(out var item)) return DatesAsText(item, culture, member, path) is { } itemTexts ? new ArrayShape(itemTexts) : null;
+            if (type.IsList(out var item)) return DatesAsText(item, culture, member, path, refuse) is { } itemTexts ? new ArrayShape(itemTexts) : null;
             if (type.Kind != JsonTypeInfoKind.Object) return null;
             var fields = new Dictionary<string, FieldConversion>(StringComparer.Ordinal);
             foreach (var property in type.Properties.Where(property => property.Get is not null))
             {
                 var held = type.Options.GetTypeInfo(property.PropertyType);
                 RefuseAWritingTheLiveFormMisreads(type, property, held, member);
-                if (DatesAsText(held, culture, member, path) is not { } texts) continue;
+                RefuseANameItsEndpointBindsOtherwise(type, property, member);
+                refuse(type, property, held);
+                if (DatesAsText(held, culture, member, path, refuse) is not { } texts) continue;
                 fields[property.Name] = new FieldConversion(texts, ConversionShapes.NothingOf(held));
             }
 
@@ -217,6 +225,39 @@ internal static class JsonBodyValues
         if (writesIt is null) return;
         throw new InvalidOperationException(
             $"'{member}' holds '{property.Name}', which {writesIt} writes, and a JSON body sends it in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or set its other members.");
+    }
+
+    private static void RefuseANameItsEndpointBindsOtherwise(JsonTypeInfo holder, JsonPropertyInfo property, string member)
+    {
+        if (MemberPath.BoundUnderAnotherName(holder, property) is not { } declared) return;
+        throw new InvalidOperationException(
+            $"'{member}' holds '{property.Name}', which MVC 5 binds by its C# name {declared}, and a JSON body sends an object's members by their JSON names; give it a JSON name that differs from {declared} by case alone.");
+    }
+
+    private static void RefuseWhatALiveObjectHoldsApart(JsonTypeInfo holder, JsonPropertyInfo property, JsonTypeInfo held, HeldForm form, AppJson json, string member)
+    {
+        var scalar = held.IsList(out var item) ? item : held;
+        if (property.CustomConverter is not null || IsADate(scalar)) return;
+        if (RequestValues.IsEnum(scalar.Type))
+        {
+            RefuseAnEnumItsEndpointReadsApart(property, Nullable.GetUnderlyingType(scalar.Type) ?? scalar.Type, form, json, member);
+            return;
+        }
+
+        if (!holder.Options.Converters.Any(converter => converter.CanConvert(scalar.Type))) return;
+        throw new InvalidOperationException(
+            $"'{member}' holds '{property.Name}', which a JSON converter of the app's writes, and a JSON body sends it in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or set its other members.");
+    }
+
+    private static void RefuseAnEnumItsEndpointReadsApart(JsonPropertyInfo property, Type enumeration, HeldForm form, AppJson json, string member)
+    {
+        foreach (Enum value in Enum.GetValues(enumeration))
+        {
+            var held = form.Beside(value, enumeration).Value;
+            if (EnumEndpoints.ReadsAsHeld(value, held, enumeration, json)) continue;
+            throw new InvalidOperationException(
+                $"'{member}' holds '{property.Name}', whose enum a live object holds as {held.GetRawText()} for {value}, a form its endpoint does not read as {value}; let the endpoint read the form the live object holds, or send the rows from JSON the server writes.");
+        }
     }
 
     private static bool IsADate(JsonTypeInfo type) => type is JsonTypeInfo<DateTime> or JsonTypeInfo<DateTime?> or JsonTypeInfo<DateTimeOffset> or JsonTypeInfo<DateTimeOffset?>;

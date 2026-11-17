@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Alis.Reactive.Schema;
 using Alis.Reactive.TypeKnowledge;
 
@@ -68,6 +69,8 @@ internal sealed partial class MemberPath
     }
 
     internal static partial string BodyName(WrittenMember written, string clrName);
+
+    internal static partial string? BoundUnderAnotherName(JsonTypeInfo holder, JsonPropertyInfo member);
 
     private static InvalidOperationException NoItemsMember(LambdaExpression member)
         => new($"'{member}' is not one member of the item, so the component would name a field its data does not hold; name one member, such as item => item.Name.");

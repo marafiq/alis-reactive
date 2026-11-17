@@ -1305,6 +1305,27 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F23 M21.X208 0": {
+    "modules": [],
+    "views": [
+      "/Care/BedBoard/ChargeCorrections.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F23 M21.X209 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionComponents/ChargeBatch.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F23 M21.X210 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionComponents/ChargeBatch.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F24 M21.X1015 0": {
     "modules": [],
     "views": [

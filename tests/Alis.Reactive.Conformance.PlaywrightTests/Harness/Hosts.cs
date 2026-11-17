@@ -30,6 +30,10 @@ public static class Hosts
 
     public static readonly string[] EnumsAsNumbers = [EnumsAsNumbersName];
 
+    public const string EnumNamesAloneName = HostNames.EnumNamesAlone;
+
+    public static readonly string[] EnumNamesAlone = [EnumNamesAloneName];
+
     public const string JsonContractName = HostNames.JsonContract;
 
     public static readonly string[] JsonContract = [JsonContractName];

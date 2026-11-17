@@ -4288,6 +4288,87 @@
         "gesture": "Click Show band.",
         "outcome": "band-shown reads #ff0000ff."
       }
+    },
+    {
+      "id": "core-frombody-row-enum-number",
+      "statement": "A [FromBody] row's enum sent as its number binds under an options-added JsonStringEnumConverter that allows integers, and binds nothing under one whose allowIntegerValues is false.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-frombody-row-enum-number: a row's enum sent as its number under an options-added JsonStringEnumConverter binds Rows=[Ada Paid] | with allowIntegerValues false binds nothing (errors $.rows[0].status)",
+      "source": "spec/probes/AspNetCoreBinding/RowsProbes.cs"
+    },
+    {
+      "id": "core-frombody-row-unmapped-member",
+      "statement": "A [FromBody] row's member its class lacks is skipped under the default options and refuses the body under UnmappedMemberHandling.Disallow.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-frombody-row-unmapped-member: a row member its class lacks, under the default options, binds Rows=[Ada Paid] | under UnmappedMemberHandling.Disallow binds nothing (errors $.rows[0].held)",
+      "source": "spec/probes/AspNetCoreBinding/RowsProbes.cs"
+    },
+    {
+      "id": "ej2-grid-batch-row-start",
+      "statement": "EJ2 33.1.47's DataUtil.parse.isJson, which its builder wraps a grid's data in, holds a date the plan writes as wall-time text as a Date at that local time.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-grid-batch-rows.mjs",
+      "expect": "ej2-grid-batch-row-start: the builder's isJson holds dueOn as a Date at 2026-11-10T08:00:00.000Z",
+      "source": "spec/probes/ej2-grid-batch-rows.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A charge corrections page whose FusionGrid, rendered by Html.FusionGrid over Ada due 11/10/2026 at 12.5 and Rose due 11/11/2026 at 40, edits in batch, and whose Save corrections button POSTs in a JSON body r => r.Changed from the grid's GetBatchChanges<CorrectedCharge>().ChangedRecords; the endpoint answers, for each row it bound, Saved, the name, due and the date and time it bound, at and the amount, and the status, or No charges changed.",
+        "gesture": "Double-click Rose's Due on cell, type 11/20/2026, press Enter, then click Save corrections.",
+        "outcome": "The POST's body is {\"changed\":[{\"residentId\":\"R-102\",\"name\":\"Rose\",\"dueOn\":\"2026-11-20\",\"amount\":40,\"status\":1}]} and the answer reads Saved Rose due 2026-11-20T00:00 at 40 Paid."
+      }
+    },
+    {
+      "id": "ej2-grid-batch-row-number-edit",
+      "statement": "After a batch edit of a number cell typed key by key, EJ2 33.1.47's Grid hands its changed row as a plain object of the row's own members, its number a number and its date a Date.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-grid-batch-rows.mjs",
+      "expect": "ej2-grid-batch-row-number-edit: after Amount is typed 20.25, added 0, deleted 0, changed [plain {amount:number 20.25,dueOn:Date 2026-11-10T08:00:00.000Z,name:string \"Ada\",residentId:number 1}]",
+      "source": "spec/probes/ej2-grid-batch-rows.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A charge corrections page whose FusionGrid, rendered by Html.FusionGrid over Ada due 11/10/2026 at 12.5 and Rose due 11/11/2026 at 40, edits in batch, and whose Save corrections button POSTs in a JSON body r => r.Changed from the grid's GetBatchChanges<CorrectedCharge>().ChangedRecords; the endpoint answers, for each row it bound, Saved, the name, due and the date and time it bound, at and the amount, and the status, or No charges changed.",
+        "gesture": "Double-click Rose's Due on cell, type 11/20/2026, press Enter, then click Save corrections.",
+        "outcome": "The POST's body is {\"changed\":[{\"residentId\":\"R-102\",\"name\":\"Rose\",\"dueOn\":\"2026-11-20\",\"amount\":40,\"status\":1}]} and the answer reads Saved Rose due 2026-11-20T00:00 at 40 Paid."
+      }
+    },
+    {
+      "id": "ej2-grid-batch-row-date-edit",
+      "statement": "After a batch edit of a date cell, EJ2 33.1.47's Grid holds the typed date in the changed row as a Date at local midnight, beside the rows changed before it.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-grid-batch-rows.mjs",
+      "expect": "ej2-grid-batch-row-date-edit: after Rose's Due on is typed 11/20/2026, added 0, deleted 0, changed [plain {amount:number 20.25,dueOn:Date 2026-11-10T08:00:00.000Z,name:string \"Ada\",residentId:number 1} plain {amount:number 40,dueOn:Date 2026-11-20T08:00:00.000Z,name:string \"Rose\",residentId:number 2}]",
+      "source": "spec/probes/ej2-grid-batch-rows.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A charge corrections page whose FusionGrid, rendered by Html.FusionGrid over Ada due 11/10/2026 at 12.5 and Rose due 11/11/2026 at 40, edits in batch, and whose Save corrections button POSTs in a JSON body r => r.Changed from the grid's GetBatchChanges<CorrectedCharge>().ChangedRecords; the endpoint answers, for each row it bound, Saved, the name, due and the date and time it bound, at and the amount, and the status, or No charges changed.",
+        "gesture": "Double-click Rose's Due on cell, type 11/20/2026, press Enter, then click Save corrections.",
+        "outcome": "The POST's body is {\"changed\":[{\"residentId\":\"R-102\",\"name\":\"Rose\",\"dueOn\":\"2026-11-20\",\"amount\":40,\"status\":1}]} and the answer reads Saved Rose due 2026-11-20T00:00 at 40 Paid."
+      }
+    },
+    {
+      "id": "mvc5-json-number-int",
+      "statement": "MVC 5's JSON reader reads a whole number that fits an Int32 as an int.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/JavaScriptObjectDeserializer.cs.txt",
+      "expect": "if (Int32.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out n)) {",
+      "source": "spec/probes/referencesource/JavaScriptObjectDeserializer.cs.txt:237"
+    },
+    {
+      "id": "mvc5-enum-from-int",
+      "statement": "MVC 5 binds an enum from an int by Enum.ToObject.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt",
+      "expect": "return Enum.ToObject(destinationType, (int)value);",
+      "source": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:99"
     }
   ]
 }

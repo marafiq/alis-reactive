@@ -69,6 +69,9 @@ internal static class AppHost
                 return;
             case HostNames.EnumsAsNumbers:
                 return;
+            case HostNames.EnumNamesAlone:
+                json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
+                return;
             case HostNames.JsonContract:
                 WriteEnumNames(json);
                 json.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
@@ -76,7 +79,7 @@ internal static class AppHost
                 json.TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { LeaveOutTheAdmissionsPharmacy } };
                 return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks}, {HostNames.Tracing}, {HostNames.TracingSinkThrows}, {HostNames.RealtimeNoOffer}, {HostNames.NoReconnectComponent} and {HostNames.NoReconnectOffer}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.EnumNamesAlone}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks}, {HostNames.Tracing}, {HostNames.TracingSinkThrows}, {HostNames.RealtimeNoOffer}, {HostNames.NoReconnectComponent} and {HostNames.NoReconnectOffer}.");
         }
     }
 

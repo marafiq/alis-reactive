@@ -9000,6 +9000,21 @@
      "id": "M21.X207",
      "rung": "analyzer",
      "defect": "The redesign's FusionGridSortDirection and FusionGridTextFilterOperator carry no string converter (Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:270, :280 at 65fdf118d), and a JsonStringEnumMemberName holds only under one, so in the live form (D7.7) sortColumn receives 0 where SortDirection is 'Ascending' | 'Descending' (@syncfusion/ej2-grids/src/grid/base/enum.d.ts:40). The vendor contract analyzer's type check (N17.2) refuses an enum against the vendor's literal union by ALIS037 (X17.46), and the rewrite's enums carry System.Text.Json's string enum converter. Main writes both as text by hand (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridQueryExtensions.cs:153-164 at 623dd4a27)."
+    },
+    {
+     "id": "M21.X208",
+     "rung": "behavior",
+     "defect": "Main sends a grid's edited rows in a POST (Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/Billing.cshtml:215 at aecb617b4, g.Include(grid.BatchChanges<..>(), \"batchChanges\")) and the redesign sets them into a [FromBody] request (Billing.cshtml:160 at 65fdf118d), while the rewrite refused rows a live object holds where the view renders, so no door sent the rows a person edits in the grid. The rewrite sends them as the grid holds them, each date as its wire text (D9.7)."
+    },
+    {
+     "id": "M21.X209",
+     "rung": "refusal",
+     "defect": "A grid's edited rows sent in a JSON body under app JSON options that add a DateTime converter: the live form holds a date as the browser's Date while the endpoint reads it through the app's converter, so a row's date binds a value it was not, or the request answers 400. The rewrite refuses it where the view renders (D9.7)."
+    },
+    {
+     "id": "M21.X210",
+     "rung": "refusal",
+     "defect": "A grid's edited rows sent in a JSON body under app JSON options whose string enum converter reads no number: the live form holds an enum as its number, which the endpoint refuses, so saving the rows answers 400. The rewrite refuses it where the view renders (D9.7)."
     }
    ],
    "promises": [
@@ -9090,6 +9105,30 @@
      "outcome": "The Room column shows East 1 and East 2.",
      "opposite": "A Ward column bound to a member with no JsonPropertyName shows the ward of each row too.",
      "defect": "EJ2 writes the handed rows through Newtonsoft as roomNumber while the column names room, so the Room column shows two empty cells."
+    },
+    {
+     "for": "M21.X208",
+     "page": "A charge corrections page whose FusionGrid, rendered by Html.FusionGrid over Ada due 11/10/2026 at 12.5 and Rose due 11/11/2026 at 40, edits in batch, and whose Save corrections button POSTs in a JSON body r => r.Changed from the grid's GetBatchChanges<CorrectedCharge>().ChangedRecords; the endpoint answers, for each row it bound, Saved, the name, due and the date and time it bound, at and the amount, and the status, or No charges changed.",
+     "gesture": "Double-click Rose's Due on cell, type 11/20/2026, press Enter, then click Save corrections.",
+     "outcome": "The POST's body is {\"changed\":[{\"residentId\":\"R-102\",\"name\":\"Rose\",\"dueOn\":\"2026-11-20\",\"amount\":40,\"status\":1}]} and the answer reads Saved Rose due 2026-11-20T00:00 at 40 Paid.",
+     "opposite": "Click Save corrections with no cell edited: the POST's body is {\"changed\":[]} and the answer reads No charges changed.",
+     "defect": "The rows sent as the grid holds them, so the date goes as its instant in UTC, 2026-11-20T08:00:00.000Z, and the answer reads Saved Rose due 2026-11-20T08:00 at 40 Paid; or the view refused where it renders, as it was before rows a live object holds were sent."
+    },
+    {
+     "for": "M21.X209",
+     "page": "A charge batch page whose FusionGrid of Ada, due 11/10/2026 with the status Due, edits in batch, and whose Save the batch button POSTs in a JSON body r => r.Changed from the grid's GetBatchChanges<BatchCharge>().ChangedRecords; the endpoint answers Saved and the names it bound, or No charges changed, opened under app JSON options that add a DateTime converter.",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with InvalidOperationException: 'r => r.Changed' holds 'dueOn', which a JSON converter of the app's writes, and a JSON body sends it in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or set its other members.",
+     "opposite": "Under net10's options the page renders, and Save the batch with no cell edited answers No charges changed.",
+     "defect": "The rows sent as the grid holds them while the endpoint reads a date through the app's converter, so a row's date binds a value it was not, or saving the rows answers 400."
+    },
+    {
+     "for": "M21.X210",
+     "page": "A charge batch page whose FusionGrid of Ada, due 11/10/2026 with the status Due, edits in batch, and whose Save the batch button POSTs in a JSON body r => r.Changed from the grid's GetBatchChanges<BatchCharge>().ChangedRecords; the endpoint answers Saved and the names it bound, or No charges changed, opened under app JSON options whose string enum converter reads no number.",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with InvalidOperationException: 'r => r.Changed' holds 'status', whose enum a live object holds as 0 for Due, a form its endpoint does not read as Due; let the endpoint read the form the live object holds, or send the rows from JSON the server writes.",
+     "opposite": "Under net10's options the page renders, and Save the batch with no cell edited answers No charges changed.",
+     "defect": "The rows sent with each status as its number, which the endpoint refuses, so saving the rows answers 400."
     }
    ],
    "verdicts": [

@@ -85,6 +85,11 @@
       "framework": "net10"
     },
     {
+      "id": "enumNamesAlone",
+      "what": "the app's JSON options write enum names and read no enum number",
+      "framework": "net10"
+    },
+    {
       "id": "classNames",
       "what": "AddReactiveClassNames with Bootstrap's invalid-feedback and is-invalid",
       "framework": "net10"
@@ -256,6 +261,11 @@
           "id": "roomPicker",
           "kind": "fusion",
           "role": "the ward's room pickers, two FusionMultiSelect with their item templates"
+        },
+        {
+          "id": "billingEndpoint",
+          "kind": "endpoint",
+          "role": "the bed board's endpoints: the charge corrections a batch-edited grid saves"
         }
       ]
     },
@@ -3512,6 +3522,52 @@
       ],
       "parts": [
         "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X208",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid",
+        "billingEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X209",
+      "index": 0,
+      "screen": "fusion-refusals",
+      "hosts": [
+        "dateConverter"
+      ],
+      "parts": [
+        "refusalFusion"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X210",
+      "index": 0,
+      "screen": "fusion-refusals",
+      "hosts": [
+        "enumNamesAlone"
+      ],
+      "parts": [
+        "refusalFusion"
       ],
       "harness": [
         "seed"

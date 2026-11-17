@@ -119,8 +119,8 @@ Terms used throughout:
   values by property name and ignores `JsonPropertyName` (`probe:core-query-object-json-name`). A member net10
   binds under another name (`[FromQuery(Name)]`, `[BindProperty(Name)]`, `[ModelBinder(Name)]`) binds nothing
   under its CLR name, and a `[BindNever]` member binds under none (`probe:core-query-member-names`); MVC 5 renames
-  no member (`probe:mvc5-member-key-clr-name`). So a key is the member's C# path on both hosts, and a request that
-  sends a member bound under another name is refused where the view renders (D9.20).
+  no member (`probe:mvc5-member-key-clr-name`). So a key is the member's C# path on both hosts, and a member net10
+  binds under another name binds nothing a request sends under its C# path (D9.20).
 - D2.6 A data member read from a response body or a pushed message is named as the endpoint writes it: the
   System.Text.Json contract name under the app's JSON options. On net10 those are MVC's `JsonOptions`. On
   net48 they are the options the app registers with the framework, which the framework's JSON door writes
@@ -1711,9 +1711,20 @@ Terms used throughout:
   a literal, or the list sent whole.
   A member is sent in the form its endpoint binds, so a source whose writing the browser cannot read into that form is
   refused where the view renders, each with its cure: a member read from a member its own JSON converter writes, and a
-  value a JSON converter of the app's writes, set from a literal or sent in form data; an object a live object holds,
-  set from a literal or from JSON the server writes; and an object from the server's JSON one of whose dates or numbers
-  its own or the app's converter writes, set from a literal, or by its other members.
+  value a JSON converter of the app's writes, set from a literal or sent in form data; and an object from the server's
+  JSON one of whose dates or numbers its own or the app's converter writes, set from a literal, or by its other members.
+  An object or a list of objects a live object holds, a grid's edited rows among them, is sent as the live object holds
+  it, each date as its wire text and every other member as held, a number as the JSON number System.Text.Json reads
+  under every number handling (`probe:ej2-grid-batch-row-date-edit`, `probe:core-frombody-row-unmapped-member`).
+  Refused where the view renders, each with its cure: a member of it a JSON converter of the app's writes, and a date or
+  a number written as text that its own converter writes, set from a literal or by its other members; and an enum its
+  endpoint does not read in the form the live object holds, on net10 a number the app's options refuse
+  (`probe:core-frombody-row-enum-number`) and on net48 a form other than a number or the value's C# name
+  (`probe:mvc5-json-number-int`, `probe:mvc5-enum-from-int`, `probe:mvc5-enum-name-ignores-case`), cured by an endpoint
+  that reads that form or by the rows from JSON the server writes. On net48 a member of an object a JSON body sends
+  whole, whoever wrote it, whose JSON name differs from its C# name past case is refused where the view renders, since
+  MVC 5 binds a JSON body by C# names ignoring case (`probe:mvc5-json-binds-through-binder`,
+  `probe:mvc5-json-value-provider-case`); its cure, a JSON name that differs from the C# name by case alone.
 - D9.8 Form data is multipart, written by the browser: an ordered list of parts, each a name and either text or a file
   with its name and media type. A field is named by its binding name, a list sends one part per item, a number
   carries the decimal separator of the view's culture (D3.7) and a file is sent as the file. Fields and files go in
@@ -1870,39 +1881,22 @@ Terms used throughout:
   runs a request after another succeeds, `Parallel` sends them at once, and a request in `Finally` runs after every
   outcome.
 - D9.18 `pipeline.PageUrl<TPage>()` (N10.7) reads the page's own URL. It is a source (Q7), not a part of the request (M2.X1, M2.X3).
-- D9.19 A member whose source holds an object or a list of objects is sent in a query or in form data as its
-  fields, each keyed by its C# path (`Address.City`, `Lines[0].Name`, and a list of scalars inside an item as the
-  repeated `Lines[0].Beds`) and read from the source by its JSON name (D2.6), as the binder reads them
-  (`probe:core-form-binds-indexed-name`, `probe:core-query-object-fields`, `probe:core-query-list-of-objects`,
-  `probe:mvc5-sub-property-name`, `probe:mvc5-sub-index-name`); in a JSON body it is nested (D9.7). A field that reads
-  nothing follows D9.10, and a list of objects is indexed from 0 with no gap. An object's fields are the members the
-  generated table lists (D9.20); a field the app's JSON options do not write is never in the browser and is left out,
-  so the endpoint binds its start. A type that holds itself, at any depth, is refused where the view renders, since
-  its keys have no bound. A component's member, a method's result, a page URL member, a hidden input and a literal
-  fill a member the same way (Q7).
-- D9.20 What an endpoint binds is read at build, never at run time (D18.1). A source generator in the analyzers
-  package walks the complex parameters of each controller action and every type reachable from them, and writes,
-  for each type, the members the binder fills by their C# name as typed lambdas, and for each enum its values, in C#
-  7.3 syntax, so it compiles in an MVC 5 app at any language version the owner assumes (C# 8). The app hands the
-  tables to the framework with one startup call, the same on both hosts (the owner, 2026-11-07). The actions are the public methods of a net10
-  `Microsoft.AspNetCore.Mvc.ControllerBase` and of a net48 `System.Web.Mvc.Controller`, less `[NonAction]`; a net10
-  parameter bound `[FromBody]`, `[FromServices]`, `[FromKeyedServices]` or `[FromHeader]` is not walked, nor a complex
-  parameter with no binding attribute under `[ApiController]` on its class, a base class or its assembly, which net10
-  infers `[FromBody]`. The core names each field by its lambda's expression text (D2.5) and reads it by `JsonPath`
-  (D2.6), and reads a list item's type from the lambda's type argument, never from a type's members.
-  - Two assemblies whose controllers reach one type each write its table. A second table is accepted when it lists the
-    same fields with the same marks, and any difference is refused where a view first reads the type, naming it.
-  - A request type with no table is refused where the view renders, naming its cause and cure.
-  - A list member is sent only when declared `List<T>`, the one declared type both binders fill whatever it starts
-    with: net10 binds nothing into a read-only list a member starts with (`probe:core-query-read-only-lists`), and
-    MVC 5 creates a `List<T>` only for `IEnumerable<>`, `ICollection<>` and `IList<>` and clears the collection a
-    member starts with, which an array refuses (`probe:mvc5-list-interfaces-created`,
-    `probe:mvc5-repeated-keys-new-collection`, `probe:mvc5-list-cleared-and-refilled`).
-  - The table marks a member of another list type, a member net10 binds under another name and a `[BindNever]`
-    member (`probe:core-query-member-names`). Refused where the view renders, each naming its cure: a request type
-    the table lacks (no action takes it or a type that holds it), a set of a marked member, and an object sent whose
-    type holds a marked list or a renamed member. A `[BindNever]` field of a sent object is left out, since the
-    endpoint binds it under no name.
+- D9.19 A request sends each member the view names by its lambda, typed by it (the owner, 2026-11-07). In a query or
+  in form data a member is keyed by its lambda's C# path (`Address.City`, `Lines[0].Name`, a list of scalars as one
+  key per item), as the binder reads it (`probe:core-form-binds-indexed-name`, `probe:core-query-object-fields`,
+  `probe:core-query-list-of-objects`, `probe:mvc5-sub-property-name`, `probe:mvc5-sub-index-name`), and a source that
+  holds an object or a nested list is refused where the view renders, its cure its scalar members by their paths or a
+  JSON body; in a JSON body the member's value is nested whole (D9.7). A field that reads nothing follows D9.10. A
+  component's member, a method's result, a page URL member, a hidden input and a literal fill a member the same way
+  (Q7).
+- D9.20 What an endpoint binds is the request type the view names, read where the view renders from the member
+  lambdas it writes: no generator, table or run-time reflection serves a request, and the core reads no controller
+  action (the owner, 2026-11-07). A query or form key is the member's C# path and a JSON body's member is named by
+  D2.4, so a member net10 binds under another name or under none (`[FromQuery(Name)]`, `[BindProperty(Name)]`,
+  `[BindNever]`, `probe:core-query-member-names`) binds nothing the request sends, and a list member binds as each
+  host's binder fills its declared type (`probe:core-query-read-only-lists`, `probe:mvc5-list-interfaces-created`,
+  `probe:mvc5-repeated-keys-new-collection`, `probe:mvc5-list-cleared-and-refilled`): the request type is the
+  developer's to write as its endpoint binds it, as a query's names are (the owner, 2026-11-07).
   - The keys carry no parameter prefix. A parameter with no binding name binds them when no key is named like it
     (`probe:core-query-parameter-prefix`, `probe:mvc5-prefix-exact-key`); a parameter that names a prefix
     (`[Bind(Prefix)]`, net10's `[FromQuery(Name)]`) binds only prefixed keys (`probe:core-query-bind-prefix`,

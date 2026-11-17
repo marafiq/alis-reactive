@@ -15,6 +15,13 @@ internal static partial class EnumEndpoints
 {
     internal static partial JsonElement Sent(Enum value, Type enumeration, AppJson json) => JsonSerializer.SerializeToElement(value.ToString(), PlanJson.Options);
 
+    internal static partial bool ReadsAsHeld(Enum value, JsonElement held, Type enumeration, AppJson json) => held.ValueKind switch
+    {
+        JsonValueKind.Number => held.TryGetInt32(out var number) && Equals(Enum.ToObject(enumeration, number), value),
+        JsonValueKind.String => string.Equals(held.GetString(), value.ToString(), StringComparison.OrdinalIgnoreCase),
+        _ => false,
+    };
+
     internal static partial JsonElement Literal<TValue>(TValue value, AppJson json)
     {
         var written = JsonSerializer.SerializeToElement(value, json.BodyForm);

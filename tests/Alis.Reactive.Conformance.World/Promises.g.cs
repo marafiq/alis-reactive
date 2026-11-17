@@ -651,6 +651,9 @@ public static class Promises
         public const string M21_X205_0 = "M21.F23 M21.X205 0";
         public const string M21_X205_1 = "M21.F23 M21.X205 1";
         public const string M21_X206_0 = "M21.F23 M21.X206 0";
+        public const string M21_X208_0 = "M21.F23 M21.X208 0";
+        public const string M21_X209_0 = "M21.F23 M21.X209 0";
+        public const string M21_X210_0 = "M21.F23 M21.X210 0";
     }
 
     public static class M21_F24

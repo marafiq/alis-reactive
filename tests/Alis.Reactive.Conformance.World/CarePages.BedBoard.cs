@@ -8,6 +8,8 @@ public static partial class CarePages
 
     public const string StatusCorrections = BedBoard + "status-corrections";
 
+    public const string ChargeCorrections = BedBoard + "charge-corrections";
+
     public const string StatusCorrectionDialog = BedBoard + "status-correction-dialog";
 
     public const string RoomBeds = BedBoard + "room-beds";

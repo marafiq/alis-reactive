@@ -26,7 +26,8 @@ each host sends. Module 6 of `spec/CLAUDE.md`.
   D10.3).
 - Q16: a request's check reads the body it sends, and the server's verdict shows as the browser's does (D10.2,
   D10.8, D16.13).
-- Q18: what an endpoint binds is read at build, with no run-time reflection (D9.20).
+- Q18: what an endpoint binds is the request type the view names by its member lambdas, with no generator and no
+  run-time reflection (D9.20).
 
 ## Boundaries
 

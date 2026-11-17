@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Grids
+@model ChargeCorrections
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Charge corrections";
+    var plan = Html.ReactivePlan<ChargeCorrections>();
+    var columns = FusionGridColumns.Of<CorrectedCharge>();
+}
+<h1>Charge corrections</h1>
+@(Html.FusionGrid(plan, "charge-corrections", Model.Charges, build => build
+    .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(c => c.ResidentId), HeaderText = "Resident id", IsPrimaryKey = true, Visible = false },
+        new() { Field = columns.Field(c => c.Name), HeaderText = "Resident", AllowEditing = false },
+        new() { Field = columns.Field(c => c.DueOn), HeaderText = "Due on", Type = "date", Format = "yMd", EditType = "datepickeredit" },
+        new() { Field = columns.Field(c => c.Amount), HeaderText = "Amount", EditType = "numericedit" },
+    })))
+<p>Saved: <span id="saved">-</span></p>
+<button type="button" @Html.Raises(plan, ChargeCorrectionEvents.Save)>Save corrections</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ChargeCorrectionEvents.Save, pipeline => pipeline
+        .Post<SavedCharges>(ChargeCorrectionEvents.Saved, request => request.Json(body => body.Set(r => r.Changed, pipeline.Component<FusionGrid>("charge-corrections").GetBatchChanges<CorrectedCharge>().ChangedRecords)))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

@@ -10,8 +10,8 @@ its views.
   its controllers and models as they read an app's.
 - The app starts under the host its argument `--host` names, a host of `spec/Reference/app.json`, and `AppHost.cs`
   sets the JSON options that definition gives it: net10's camel-case members and enum names, and for each of
-  numbersAsText, dateConverter, snakeCase, pascalCase and enumsAsNumbers, those options with the one change its
-  definition names; jsonContract's are net10's that ignore a member holding its default and respect required
+  numbersAsText, dateConverter, snakeCase, pascalCase, enumsAsNumbers and enumNamesAlone, those options with the one
+  change its definition names; jsonContract's are net10's that ignore a member holding its default and respect required
   constructor parameters, and its resolver lands with the page that reads an admission's pharmacy; siteHeader's
   request defaults are net10's with the app's header Care-Site beside them, antiforgeryField's send the antiforgery
   token in a form field where net10's send it in a header, noShowValidationErrors's are net10's without

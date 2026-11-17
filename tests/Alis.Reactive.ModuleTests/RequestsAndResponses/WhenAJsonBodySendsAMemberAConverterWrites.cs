@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Declarations;
@@ -32,13 +33,45 @@ public sealed class WhenAJsonBodySendsAMemberAConverterWrites
     }
 
     [Test]
-    public void an_object_read_from_a_live_object_is_refused_and_one_read_from_the_servers_json_is_sent()
+    public void rows_a_live_object_holds_are_sent_as_held_with_each_date_as_its_wire_text()
     {
-        Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<SearchRequest>("/notes", request => request.Json(body => body.Set(r => r.Address, pipeline.Component<SearchPanel>("panel").Address)))),
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<BilledSave>("/billing", request => request.Json(body => body.Set(r => r.Changed, pipeline.Component<BillingPanel>("billing").Changed))));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "value").GetRawText(), Is.EqualTo(
+            """{"kind":"as","expr":{"kind":"record","fields":[{"name":"changed","value":{"kind":"as","expr":{"kind":"ref","name":"requestValue1"},"shape":{"kind":"array","item":{"kind":"object","fields":{"dueOn":{"shape":{"kind":"string","date":"date","negativeZero":"0"},"nothing":"omit"}}}}}}]},"shape":{"kind":"object","fields":{"changed":{"shape":{"kind":"array","item":{"kind":"object","fields":{}}},"nothing":"omit"}}}}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
+    public void rows_a_live_object_holds_whose_date_a_converter_of_the_apps_writes_are_refused_and_rows_under_the_apps_default_options_are_sent()
+    {
+        Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<BilledSave>("/billing", request => request.Json(body => body.Set(r => r.Changed, pipeline.Component<BillingPanel>("billing").Changed))),
+                json => json.Converters.Add(new DayConverter())),
             Throws.InvalidOperationException.With.Message.EqualTo(
-                "'r => r.Address' holds an object as a live object holds it, and a JSON body sends an object as the app's JSON options write it, which the browser cannot read from a live object; set it from a literal, or from JSON the server writes."));
-        var sent = RequestPage.Rendered(pipeline => pipeline.Get("/notes/address")
-            .OnSuccess<SearchAddress>((found, pipeline) => pipeline.Post<SearchRequest>("/notes", request => request.Json(body => body.Set(r => r.Address, found.Body)))));
+                "'r => r.Changed' holds 'dueOn', which a JSON converter of the app's writes, and a JSON body sends it in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or set its other members."));
+        var sent = RequestPage.Rendered(pipeline => pipeline.Post<BilledSave>("/billing", request => request.Json(body => body.Set(r => r.Changed, pipeline.Component<BillingPanel>("billing").Changed))));
+        Assert.That(PlanSchema.ProblemsOf(sent), Is.Empty);
+    }
+
+    [Test]
+    public void rows_a_live_object_holds_whose_amount_a_converter_of_the_apps_writes_are_refused_and_rows_under_the_apps_default_options_are_sent()
+    {
+        Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<BilledSave>("/billing", request => request.Json(body => body.Set(r => r.Changed, pipeline.Component<BillingPanel>("billing").Changed))),
+                json => json.Converters.Add(new CentsConverter())),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'r => r.Changed' holds 'amount', which a JSON converter of the app's writes, and a JSON body sends it in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or set its other members."));
+        var sent = RequestPage.Rendered(pipeline => pipeline.Post<BilledSave>("/billing", request => request.Json(body => body.Set(r => r.Changed, pipeline.Component<BillingPanel>("billing").Changed))));
+        Assert.That(PlanSchema.ProblemsOf(sent), Is.Empty);
+    }
+
+    [Test]
+    public void rows_a_live_object_holds_whose_enum_number_the_endpoint_does_not_read_are_refused_and_rows_whose_number_it_reads_are_sent()
+    {
+        Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<BilledSave>("/billing", request => request.Json(body => body.Set(r => r.Changed, pipeline.Component<BillingPanel>("billing").Changed))),
+                json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'r => r.Changed' holds 'status', whose enum a live object holds as 0 for Due, a form its endpoint does not read as Due; let the endpoint read the form the live object holds, or send the rows from JSON the server writes."));
+        var sent = RequestPage.Rendered(pipeline => pipeline.Post<BilledSave>("/billing", request => request.Json(body => body.Set(r => r.Changed, pipeline.Component<BillingPanel>("billing").Changed))),
+            json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
         Assert.That(PlanSchema.ProblemsOf(sent), Is.Empty);
     }
 
@@ -73,6 +106,42 @@ public sealed class WhenAJsonBodySendsAMemberAConverterWrites
             """{"kind":"list","items":[{"kind":"record","fields":[{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"code"}]}},{"name":"when","value":{"kind":"op","op":"or","args":[{"kind":"op","op":"eq","args":[{"kind":"ref","name":"requestValue1"},{"kind":"lit","value":null}]},{"kind":"op","op":"neq","args":[{"kind":"ref","name":"requestValue1"},{"kind":"lit","value":null}]}]}}]}]}"""));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
+}
+
+public sealed class BilledSave
+{
+    public IEnumerable<BilledRow> Changed { get; init; } = [];
+}
+
+public sealed class BilledRow
+{
+    public string Name { get; init; } = "";
+
+    public DateTime DueOn { get; init; }
+
+    public decimal Amount { get; init; }
+
+    public BillStatus Status { get; init; }
+}
+
+public sealed class CentsConverter : JsonConverter<decimal>
+{
+    public override decimal Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => reader.GetInt64() / 100m;
+
+    public override void Write(Utf8JsonWriter writer, decimal value, JsonSerializerOptions options) => writer.WriteNumberValue(decimal.ToInt64(value * 100m));
+}
+
+public enum BillStatus
+{
+    Due,
+    Paid,
+}
+
+public sealed class BillingPanel : Component
+{
+    public override ComponentVendor Vendor => ComponentVendor.Native;
+
+    public ReadOnly<IReadOnlyList<BilledRow>> Changed => ReadOnly<IReadOnlyList<BilledRow>>("changed");
 }
 
 public sealed class RoomChange
