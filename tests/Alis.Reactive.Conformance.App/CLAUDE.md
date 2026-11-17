@@ -155,6 +155,10 @@ its views.
   the lines of the spans whose name, attributes or events hold the text, beside a status that counts them, and the page
   redraws as spans arrive (`World/collector.ts`); the echo page lists each attempt's traceparent by the span it names,
   and baggage.
+- The host `tracingSinkThrows` is the host `tracing` with the app's own trace object where the adapter stands:
+  `AppHost.cs` registers the sink `Care/Round/TracedLayoutSink.cs` names for each host, and under this one
+  `Care/Round/_TracedLayout.cshtml` links `Care/Round/throwing-trace.ts`, which provides the plugin "trace" whose ended
+  throws on every span (M26.D1), in the place of the adapter's script.
 - `World/WorldCache.cs` is the app's distributed cache in Development, each key under its world, and
   `World/CachedRounds.cs` is the fragment a seed puts there, as a release of the framework rendered it.
 - The app holds no static a request can change, since every world shares a static: none that can be assigned, and

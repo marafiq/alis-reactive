@@ -17,6 +17,7 @@ public static class HostNames
     public const string ClassNames = "classNames";
     public const string DefaultHooks = "defaultHooks";
     public const string Tracing = "tracing";
+    public const string TracingSinkThrows = "tracingSinkThrows";
     public const string Net48 = "net48";
     public const string ConsumerNet10 = "consumerNet10";
     public const string ConsumerNet48 = "consumerNet48";

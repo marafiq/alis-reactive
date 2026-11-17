@@ -5252,8 +5252,9 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   in the trace. The trace context is the run's, as its blocks' abort signals are (Q11), and `HttpSend` carries none.
 - D20.4 The spans are closed: a plan's boot, a handler run, a send and each of its attempts, a `MethodAsync`, a
   `Confirm`, a hub invoke, each block of an `all`, and a slot's load and unload. A synchronous statement is no span: a
-  `stop` with its reason, a required member a holder lacks, a refused check and a boundary error are events on the span
-  that holds them. An attempt follows OpenTelemetry's HTTP client conventions: the method, the status, the resend count
+  `stop`, which a check that refused writes and no other C# does, a required member a holder lacks and a boundary error
+  are events on the span that holds them; the `stop` is recorded as `alis.refused` with its reason, and a pipeline the
+  page or its data halts against its declaration as `alis.stop`. An attempt follows OpenTelemetry's HTTP client conventions: the method, the status, the resend count
   and the URL as its route template. A send starts with its first attempt, after the request's `WhileLoading` and its
   guard (`Request.tla`'s `loading` and `guard`), so a request stopped or cut before it sends records no send, and a
   `MethodAsync` its `WhileLoading` awaits is a child of the handler run's span (`Tracing.tla`'s `Attempt`).

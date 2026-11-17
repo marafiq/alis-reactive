@@ -58,7 +58,7 @@ public sealed class WhenATracedRoundSavesADoseForAWard(string host) : Conformanc
         [
             Render,
             Render + " > alis.boot completed",
-            Run + " stopped event alis.stop alis.reason=The body 'POST " + CareEndpoints.WardDoses + "' sends fails the rules WardRoundDose is registered with.",
+            Run + " stopped event alis.refused alis.reason=The body 'POST " + CareEndpoints.WardDoses + "' sends fails the rules WardRoundDose is registered with.",
         ]);
     }
 }

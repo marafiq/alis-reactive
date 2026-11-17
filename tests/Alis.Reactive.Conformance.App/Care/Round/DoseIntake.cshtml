@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseIntake
+@{
+    Layout = "/Care/Round/_TracedLayout.cshtml";
+    ViewData["Title"] = "Dose intake";
+    var plan = Html.ReactivePlan<DoseIntake>();
+}
+<h1>Dose intake for @Model.Resident</h1>
+@using (var intake = Html.BeginRequestForm(plan, "intake"))
+{
+    <input type="hidden" name="Resident" value="@Model.Resident">
+    <input type="hidden" name="Medicine" value="@Model.Medicine">
+    <button type="button" @Html.Raises(plan, DoseIntakeEvents.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(DoseIntakeEvents.Save, pipeline => pipeline
+        .Post<DoseIntake>(CareEndpoints.DoseIntakeSaves, request => request.Form(intake.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("status").Text.Set(saved.Body))));
+}
+<p>Status: <span id="status"></span></p>
+@Html.RenderPlan(plan)

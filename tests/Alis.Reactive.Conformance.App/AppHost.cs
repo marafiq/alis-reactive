@@ -35,6 +35,7 @@ internal static class AppHost
             case HostNames.ClassNames:
             case HostNames.DefaultHooks:
             case HostNames.Tracing:
+            case HostNames.TracingSinkThrows:
                 WriteEnumNames(json);
                 return;
             case HostNames.NumbersAsText:
@@ -62,7 +63,7 @@ internal static class AppHost
                 json.TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { LeaveOutTheAdmissionsPharmacy } };
                 return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks} and {HostNames.Tracing}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks}, {HostNames.Tracing} and {HostNames.TracingSinkThrows}.");
         }
     }
 
@@ -127,7 +128,8 @@ internal static class AppHost
 
     internal static void AddTracing(string host, WebApplicationBuilder builder)
     {
-        if (host != HostNames.Tracing) return;
+        builder.Services.AddSingleton(host == HostNames.TracingSinkThrows ? Care.TracedLayoutSink.TheAppsThrowingObject : Care.TracedLayoutSink.TheOpenTelemetryAdapter);
+        if (!Traces(host)) return;
         if (!builder.Environment.IsDevelopment()) throw new InvalidOperationException("The tracing host exports to the World area's collector, which the app serves in Development alone.");
 
         var urls = builder.Configuration[Urls] ?? throw new InvalidOperationException("The tracing host adds a second port to the address --urls names.");
@@ -146,13 +148,15 @@ internal static class AppHost
 
     internal static void UseTracing(string host, WebApplication app)
     {
-        if (host != HostNames.Tracing) return;
+        if (!Traces(host)) return;
 
         app.UseRouting();
         app.UseSecondOrigin();
         app.UseCors();
         app.MapCollector();
     }
+
+    private static bool Traces(string host) => host is HostNames.Tracing or HostNames.TracingSinkThrows;
 
     internal static void AddValidation(IServiceCollection services)
         => services.AddReactiveFluentValidation(validators => validators

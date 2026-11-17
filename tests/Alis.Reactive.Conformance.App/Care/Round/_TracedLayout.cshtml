@@ -1,6 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
 @using Alis.Reactive.Conformance.App.Components
 @using Alis.Reactive.Conformance.World
 @using Alis.Reactive.OpenTelemetry.Tracing
+@inject TracedLayoutSink Sink
 <!doctype html>
 <html lang="en">
 <head>
@@ -15,7 +17,14 @@
     @Html.ConformanceBusy()
     @Html.ConformanceNotice()
     <script src="~/js/alis-reactive-conformance.js" asp-append-version="true"></script>
-    @Html.OpenTelemetryExporter($"{Context.Request.Scheme}://{Context.Request.Host}{WorldEndpoints.CollectorTraces}", "care-home")
+    @if (Sink == TracedLayoutSink.TheAppsThrowingObject)
+    {
+        <script src="~/js/care/round/throwing-trace.js" asp-append-version="true"></script>
+    }
+    else
+    {
+        @Html.OpenTelemetryExporter($"{Context.Request.Scheme}://{Context.Request.Host}{WorldEndpoints.CollectorTraces}", "care-home")
+    }
     <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
 </body>
 </html>

@@ -66,6 +66,10 @@ public static class Hosts
 
     public static readonly string[] Tracing = [TracingName];
 
+    public const string TracingSinkThrowsName = HostNames.TracingSinkThrows;
+
+    public static readonly string[] TracingSinkThrows = [TracingSinkThrowsName];
+
     public const string Net48Name = HostNames.Net48;
 
     public static readonly string[] Net48 = [Net48Name];

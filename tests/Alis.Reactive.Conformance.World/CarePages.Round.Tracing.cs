@@ -8,4 +8,5 @@ public static partial class CarePages
     public const string WardRound = Round + "wards/{Ward}/round";
     public const string TheNorthWardsRound = Round + "wards/North/round";
     public const string OrderCheck = Round + "order-check";
+    public const string DoseIntake = Round + "dose-intake";
 }

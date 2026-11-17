@@ -8,4 +8,5 @@ public static partial class CareEndpoints
     public const string WardDoses = "/care/round/wards/{Ward}/doses";
     public const string WardCensus = "/care/round/wards/{Ward}/census";
     public const string OrderCheckOrders = "/care/round/order-check/orders";
+    public const string DoseIntakeSaves = "/care/round/dose-intake/saves";
 }

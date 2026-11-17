@@ -641,7 +641,7 @@ describe("when a run is traced, each span it starts ends once with how it ended 
 
     expect(spans.recorded).toStrictEqual([
       "alis.run#1 starts {}",
-      "alis.run#1 alis.stop {\"alis.reason\":\"The bed is taken.\"}",
+      "alis.run#1 alis.refused {\"alis.reason\":\"The bed is taken.\"}",
       "alis.run#1 stopped",
     ]);
   });

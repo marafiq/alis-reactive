@@ -41,8 +41,8 @@ function rejected(error: unknown): string {
   return "An awaited step rejected, so its pipeline stops: " + messageOf(error);
 }
 
-function aStopStatement(reason: string): Recorded {
-  return { name: "alis.stop", attributes: { "alis.reason": reason } };
+function aRefusedCheck(reason: string): Recorded {
+  return { name: "alis.refused", attributes: { "alis.reason": reason } };
 }
 
 function outcomeOf(cause: Cut): SpanOutcome {
@@ -167,7 +167,7 @@ export class Run {
         this.#waits(outcome.on, outcome.settled);
         return;
       case "stops":
-        this.#stops(outcome.reason, aStopStatement(outcome.reason));
+        this.#stops(outcome.reason, aRefusedCheck(outcome.reason));
         return;
       case "halts":
         this.#stops(outcome.reason, aPageMismatch);

@@ -90,8 +90,8 @@
       "framework": "net10"
     },
     {
-      "id": "tracingExporterThrows",
-      "what": "the OpenTelemetry adapter with an exporter that throws on every span",
+      "id": "tracingSinkThrows",
+      "what": "the app's own trace object, registered under the contract name trace through the page's plugin queue, whose ended throws on every span (M26.D1)",
       "framework": "net10"
     },
     {
@@ -6988,11 +6988,12 @@
       "index": 0,
       "screen": "round",
       "hosts": [
-        "tracingExporterThrows"
+        "tracingSinkThrows"
       ],
       "parts": [
         "doses",
         "roundEndpoint",
+        "collector",
         "doseInputs"
       ],
       "harness": [

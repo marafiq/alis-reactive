@@ -1842,6 +1842,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   written by the C# that writes the stop, so the runtime records a refused check as the event alis.refused and a
   written stop as alis.stop, each with its reason (D20.4), and reads no reason's text to tell them apart; a grammar
   change, the owner's.
+- The lead, 2026-11-17, correcting the ask above, the lead's mistake: no door writes a stop on any line (spec/api,
+  spec/Fluent, main, the redesign); a check that refused writes every stop (FormChecks.cs, RequestChecks.cs), so a
+  cause would hold one value no plan varies. No grammar change landed and the yes is unused: the stop's row says a
+  check writes it, the runtime records it as alis.refused with its reason, and alis.stop names a pipeline the page or
+  its data halts (D20.4). A door that writes a stop from a view is a new production, asked with its use case.
 - The owner, 2026-11-17, answering the lead's two asks on request shapes, verbatim: "i will go with your calls."
   Read by the lead: a JSON list position set from a value the body leaves out when it reads nothing is refused
   where the view renders, as a gap before a set position is (D9.7), since the endpoint would bind an item the
