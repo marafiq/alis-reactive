@@ -2620,7 +2620,7 @@ def check_paths():
     held = rewrite_tree(text) | set(BACKTICKED_PATH.findall(kept_text))
     retired = [token.rstrip("/") for token in BACKTICKED_PATH.findall(retired_text)]
     files_line = tree_line(text, PATH_FILES)
-    judged = tree_entries("HEAD") | tree_entries(MAIN_TIP)
+    judged = tree_entries(git("write-tree")) | tree_entries(MAIN_TIP)
     problems = []
     for entry in sorted(judged):
         stem = entry.split("/")[-1].split(".")[0]
@@ -2632,7 +2632,7 @@ def check_paths():
             problems.append(f"{entry} is both kept by section 2 and retired by section 3")
         elif not keeps and not retires:
             problems.append(f"{entry} has no verdict: section 2 does not keep it and section 3 does not retire it")
-    detail = (f"each of {len(judged)} paths at HEAD and main's tip, down to {', '.join(PATH_EXPANDED[:6])} and .claude's folders, "
+    detail = (f"each of {len(judged)} paths of the staged tree and main's tip, down to {', '.join(PATH_EXPANDED[:6])} and .claude's folders, "
               "is kept by section 2 or retired by section 3, never both")
     return result(not problems, "; ".join(problems[:8]) or detail, paths=len(judged), problems=len(problems))
 
@@ -3377,7 +3377,7 @@ CHECKS = [
     ("carriers", "every D line and module meaning carried by a resolving defect, invariant, probe, check, cell or delivery test", check_carriers),
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
-    ("paths", "every path at HEAD and main's tip kept by REWRITE.md's section 2 or retired by its section 3, so the cut drops nothing by omission", check_paths),
+    ("paths", "every path of the staged tree and main's tip kept by REWRITE.md's section 2 or retired by its section 3, so the cut drops nothing by omission", check_paths),
     ("unit_proofs", "every rewrite unit proves something: a browser test lands in it, a module test reads a node its core features write, an analyzer case of its features, or a harness test", check_unit_proofs),
     ("names", "every module named alike in the module table, REWRITE.md's tree, SliceTree and TLA+ table, and spec/", check_names),
     ("rewrite_cites", "every cite REWRITE.md makes names its SHA and resolves there", check_rewrite_cites),

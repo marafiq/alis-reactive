@@ -165,7 +165,8 @@ tests/
                                               2.5), over the reader of the doors a test's pages call
                                               WhenAPagesDoorsAreRead (section 4), over the net48 time zone table
                                               WhenTheWindowsZoneTableIsWritten (section 2.7), over the lint's rules
-                                              WhenTheLintIsConfigured (section 2.7), and over the shipped packages
+                                              WhenTheLintIsConfigured (section 2.7), over npm's audit report
+                                              WhenThePackagesAreAudited (section 2.7), and over the shipped packages
                                               and their slice tables WhenAPackageShips (M20.D1), each rule with its
                                               refused and accepted cases, which WhenAnArchitectureTestIsWritten holds; over
                                               the shipped projects' files WhenCodeCompilesForBothHosts (2.2); over
