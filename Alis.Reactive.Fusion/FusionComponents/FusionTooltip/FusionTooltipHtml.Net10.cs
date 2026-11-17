@@ -2,6 +2,7 @@
 using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Popups;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -18,6 +19,13 @@ public static class FusionTooltipHtml
     /// <param name="build">What the view sets on the tooltip, its content and its target among them.</param>
     /// <returns>The rendered tooltip, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionTooltip, TModel> FusionTooltip<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<TooltipBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var tooltip = html.EJS().Tooltip(elementId);
+        build(tooltip);
+        return plan.Render<FusionTooltip>(elementId, tooltip.Render());
+    }
 }
 #endif

@@ -79,7 +79,8 @@ keeps (section 10); the modules and the owner's decisions are `spec/CLAUDE.md`'s
      principle, a closed rule or the scope goes to the owner as one line with its cost and its risk; no other does.
      The line opens with what already holds and the one thing a yes changes, then the lead's recommendation; code
      follows it (the owner, 2026-11-14: "you made it confusing for me").
-  4. Change one meaning in one commit, with every place that carries it.
+  4. Change one meaning in one commit, with every place that carries it. A batch of slices a builder finished
+     lands as one commit, each slice named in its message (the owner, 2026-11-17: "One commit per batch").
   5. Prove it on the rung that holds it, once. Behavior: a `scripts/playwright.sh` result line, the test first failing
      on its planted defect (`scripts/plant-defect.sh`). A rule (an analyzer, a test rule, a lint rule, an architecture
      test, a check): a refused case it reports by name and an accepted case one fact away, both kept in the repo.

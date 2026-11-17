@@ -2,6 +2,7 @@
 using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Popups;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -18,6 +19,13 @@ public static class FusionDialogHtml
     /// <param name="build">What the view sets on the dialog.</param>
     /// <returns>The rendered dialog, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionDialog, TModel> FusionDialog<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<DialogBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var dialog = html.EJS().Dialog(elementId);
+        build(dialog);
+        return plan.Render<FusionDialog>(elementId, dialog.Render());
+    }
 }
 #endif

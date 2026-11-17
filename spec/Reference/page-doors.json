@@ -1170,9 +1170,7 @@
     ]
   },
   "M21.F18 M21.X1011 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/DischargeChecklist.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1526,9 +1524,7 @@
     ]
   },
   "M21.F52 M21.X1033 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/AllergyTip.cshtml",
       "/Shared/_FusionLayout.cshtml"
