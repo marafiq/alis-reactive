@@ -10,6 +10,9 @@ using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.Tracing;
 using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
@@ -122,6 +125,8 @@ internal static class AppHost
     internal static void AddRealtime(string host, IServiceCollection services)
     {
         services.AddSingleton(new Components.LiveLayout(host != HostNames.NoReconnectComponent));
+        services.AddSignalR();
+        services.AddOptions<JsonHubProtocolOptions>().Configure<IOptions<JsonOptions>>((hub, mvc) => hub.PayloadSerializerOptions = mvc.Value.JsonSerializerOptions);
         switch (host)
         {
             case HostNames.RealtimeNoOffer:

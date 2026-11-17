@@ -10,12 +10,13 @@ import {
   type SetStatement,
   type Statement,
 } from "../Schema/index";
+import { callsAHub } from "../Realtime/index";
 import type { Attributes, Traced } from "../Tracing/index";
 import { got, heldOrNull, Stop, type Read } from "../ValuesAndSources/index";
 import { bind, isAnObject, type Context } from "./context";
 import { awaited, evaluate } from "./expressions";
 import { listenTo } from "./listen";
-import { elementById } from "./objects";
+import { elementById, locatorOf } from "./objects";
 
 export type Step =
   | { readonly kind: "completed"; readonly context: Context }
@@ -55,7 +56,7 @@ function done(statement: DoStatement, context: Context): Step {
     evaluate(statement.expr, context);
     return { kind: "completed", context };
   }
-  const method = context.trace.span("alis.method", methodOf(statement.expr));
+  const method = spanOf(statement.expr, context);
   return { kind: "wait", on: endsOnSettle(Promise.resolve(heldOrNull(awaited(statement.expr, context))), method), settled: () => context };
 }
 
@@ -63,7 +64,7 @@ function bound(statement: LetStatement, context: Context): Step {
   switch (statement.binds) {
     case "line": {
       if (!statement.await) return { kind: "completed", context: bind(context, statement.name, evaluate(statement.expr, context)) };
-      const method = context.trace.span("alis.method", methodOf(statement.expr));
+      const method = spanOf(statement.expr, context);
       return {
         kind: "wait",
         on: endsOnSettle(Promise.resolve(heldOrNull(awaited(statement.expr, context))), method),
@@ -75,6 +76,16 @@ function bound(statement: LetStatement, context: Context): Step {
     default:
       return assertNever(statement.binds);
   }
+}
+
+function spanOf(expr: Expression, context: Context): Traced {
+  if (expr.kind === "call" && expr.target.kind === "obj" && callsAHub(locatorOf(context, expr.target.id))) return context.trace.span("alis.hub", hubMethodOf(expr.args));
+  return context.trace.span("alis.method", methodOf(expr));
+}
+
+function hubMethodOf(args: readonly Expression[]): Attributes {
+  const [method] = args;
+  return method?.kind === "lit" && typeof method.value === "string" ? { "alis.method": method.value } : {};
 }
 
 function methodOf(expr: Expression): Attributes {

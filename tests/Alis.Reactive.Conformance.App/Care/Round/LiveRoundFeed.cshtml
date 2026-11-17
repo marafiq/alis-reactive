@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveRound
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveRound>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+<p>Last status: <span id="status-resident"></span></p>
+<p>Statuses: <span id="statuses">0</span></p>
+@{
+    Html.On(plan, trigger => trigger.SignalR(RoundFeed.Live, feed => feed.StatusChanged, (status, pipeline) =>
+    {
+        pipeline.Element("status-resident").Text.Set(status.Read(s => s.Resident));
+        pipeline.Element("statuses").Text.Set(pipeline.Plugin<RoundTally>().AddOne());
+    }));
+}
+@Html.RenderPlan(plan)

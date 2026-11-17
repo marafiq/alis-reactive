@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveLine
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveLine>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+<p>Ward bed line: <span id="page-line"></span></p>
+<button type="button" @Html.Raises(plan, LiveRoundButtons.OpenTheBedCard)>Open the bed card</button>
+<button type="button" @Html.Raises(plan, LiveRoundButtons.CloseTheBedCard)>Close the bed card</button>
+<div id="bed-slot"></div>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(LiveRoundButtons.OpenTheBedCard, pipeline => pipeline.Get(CareEndpoints.BedLineCard).Into("bed-slot"))
+        .CustomEvent(LiveRoundButtons.CloseTheBedCard, pipeline => pipeline.Unload("bed-slot")));
+    if (Model.PageNamesTheBedLine)
+    {
+        Html.On(plan, trigger => trigger.SignalR(BedLine.Live, line => line.Welcome, (welcome, pipeline) => pipeline.Element("page-line").Text.Set(welcome.Read(w => w.Accepted))));
+    }
+}
+@Html.RenderPlan(plan)

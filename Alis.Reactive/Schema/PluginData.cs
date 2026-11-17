@@ -27,12 +27,18 @@ internal sealed class NonePluginData : PluginData
 
 internal sealed class HubPluginData : PluginData
 {
-    internal HubPluginData(bool offer)
+    internal HubPluginData(bool offer, IReadOnlyList<int> waits, string client)
     {
         Offer = offer;
+        Waits = waits;
+        Client = client;
     }
 
     public bool Offer { get; }
+
+    public IReadOnlyList<int> Waits { get; }
+
+    public string Client { get; }
 }
 
 internal sealed class StreamPluginData : PluginData

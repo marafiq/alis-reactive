@@ -10,6 +10,7 @@ public sealed class TestWorld
     private static readonly DateTime ClockStart = new(2026, 1, 15, 12, 0, 0, DateTimeKind.Utc);
     private static readonly TimeSpan ClockStep = TimeSpan.FromMilliseconds(100);
     private static readonly TimeSpan RetryBudget = TimeSpan.FromSeconds(30);
+    private const string Negotiate = "/negotiate";
     private readonly HttpClient _harness;
     private readonly IBrowserContext _context;
     private readonly ConcurrentQueue<string> _consoleErrors = new();
@@ -91,6 +92,15 @@ public sealed class TestWorld
 
     public Task RunTheClockFor(TimeSpan run) => Page.Clock.RunForAsync((long)run.TotalMilliseconds);
 
+    public async Task RunTheClockFor(TimeSpan run, string hub)
+    {
+        for (var ran = TimeSpan.Zero; ran < run; ran += ClockStep)
+        {
+            await Answered(hub);
+            await Page.Clock.RunForAsync((long)ClockStep.TotalMilliseconds);
+        }
+    }
+
     public async Task RunTheClockUntilItSends(string endpoint, int requests)
     {
         var run = TimeSpan.Zero;
@@ -110,6 +120,9 @@ public sealed class TestWorld
         var armed = await answer.Content.ReadFromJsonAsync<GateOrder>();
         return new ArmedGate(_harness, armed!);
     }
+
+    private async Task Answered(string hub)
+        => (await _harness.PostAsJsonAsync(WorldEndpoints.StreamAnswered, new StreamOrder { Stream = hub, Count = SentTo(hub + Negotiate) })).EnsureSuccessStatusCode();
 
     private void Keep(IConsoleMessage message)
     {

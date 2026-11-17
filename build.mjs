@@ -23,6 +23,15 @@ await build({
 });
 
 await build({
+  entryPoints: ["Alis.Reactive.Assets/runtime/Realtime/hub-client.ts"],
+  outfile: "Alis.Reactive/wwwroot/js/alis-reactive-hub.js",
+  bundle: true,
+  format: "iife",
+  target: "es2022",
+  logLevel: "info",
+});
+
+await build({
   entryPoints: ["Alis.Reactive.OpenTelemetry/opentelemetry.ts"],
   outfile: "Alis.Reactive.OpenTelemetry/wwwroot/js/alis-reactive-opentelemetry.js",
   bundle: true,

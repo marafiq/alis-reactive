@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using Alis.Reactive.Conformance.App.Bench;
 using Alis.Reactive.Conformance.App.Care;
 using Alis.Reactive.Conformance.App.World;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -35,12 +36,15 @@ public sealed class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseWorld();
+            app.UseWorldLines();
             app.MapWorld();
         }
 
         app.UseStaticFiles();
         AppHost.UseTracing(host, app);
         app.MapControllers();
+        app.MapLiveLines();
+        app.MapBenchLine();
         if (app.Configuration[TestHost] is { } testHost) StopWith(testHost, app.Lifetime);
         app.Run();
     }

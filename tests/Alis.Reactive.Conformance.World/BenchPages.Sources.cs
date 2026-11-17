@@ -3,6 +3,7 @@ namespace Alis.Reactive.Conformance.World;
 public static partial class BenchPages
 {
     public const string SourcePropertySet = Area + "source.PropertySet";
+    public const string SourceHubArgument = Area + "source.HubArgument";
     public const string SourceWriteOnlySet = Area + "source.WriteOnlySet";
     public const string SourceElementText = Area + "source.ElementText";
     public const string SourceElementHtml = Area + "source.ElementHtml";
