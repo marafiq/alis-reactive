@@ -14,7 +14,7 @@ Runs every check that needs no browser, in order, and stops at the first that fa
      compared with the tracked Alis.Reactive/PathsAndWire/WindowsZones.g.Net48.cs
   3. npm ci when node_modules is missing, then npm audit by scripts/npm-audit.mjs, past the advisories it excuses
   4. the Syncfusion pin's agreement in NuGet, npm and the lock
-  5. tsc -b over the runtime, the OpenTelemetry adapter, the Native components, the Fusion templates and conformance app, eslint with --max-warnings 0,
+  5. tsc -b over the runtime, the OpenTelemetry adapter, the Native components, the Fusion components and templates and conformance app, eslint with --max-warnings 0,
      vitest over the runtime's pure tests, then the browser bundle
   6. dotnet restore in locked mode, then dotnet build -c Release, then the doors each browser test's pages call,
      written by scripts/page-doors.cs and compared with the tracked spec/Reference/page-doors.json
@@ -66,10 +66,10 @@ node scripts/npm-audit.mjs
 step "the Syncfusion pin"
 node scripts/pin-syncfusion.mjs --check
 
-step "tsc -b over the runtime, the OpenTelemetry adapter, the Native components, the Fusion templates and conformance app"
+step "tsc -b over the runtime, the OpenTelemetry adapter, the Native components, the Fusion components and templates and conformance app"
 node node_modules/typescript/bin/tsc -b Alis.Reactive.Assets Alis.Reactive.OpenTelemetry Alis.Reactive.Native Alis.Reactive.Fusion tests/Alis.Reactive.Conformance.App
 
-step "eslint over the runtime, the OpenTelemetry adapter, the Native components, the Fusion templates and conformance app"
+step "eslint over the runtime, the OpenTelemetry adapter, the Native components, the Fusion components and templates and conformance app"
 node node_modules/eslint/bin/eslint.js Alis.Reactive.Assets Alis.Reactive.OpenTelemetry Alis.Reactive.Native Alis.Reactive.Fusion tests/Alis.Reactive.Conformance.App --max-warnings 0
 
 step "vitest over the runtime's and the adapter's pure tests"

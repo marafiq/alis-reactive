@@ -1396,9 +1396,7 @@
     ]
   },
   "M21.F43 M21.X605 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/ShiftNote.cshtml",
       "/Shared/_FusionLayout.cshtml"
