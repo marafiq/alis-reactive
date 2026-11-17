@@ -1835,8 +1835,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   a value its own converter writes is shown by the server (D7.7). The owner can overrule it.
 - The owner, 2026-11-16, answering the lead's ask to name an array in a message as C# writes it, verbatim:
   "approved for change string[]". Read by the lead: Type.GetElementType, read in TypeKnowledge/ClassNames.cs, joins
-  the owner's list of type-information reads (U20), so a message names an array by its innermost element as C# writes
+  the owner's list of type-information reads (U4), so a message names an array by its innermost element as C# writes
   it, then each rank's brackets, the outermost first (D18.1); an id's scope keeps the array's Type.Name (D14.3).
+- The owner, 2026-11-17, answering the lead's ask to mark a refused check's stop in the plan, verbatim: "yes
+  approved". Read by the lead: the stop node carries its cause, a check that refused or a stop the view wrote,
+  written by the C# that writes the stop, so the runtime records a refused check as the event alis.refused and a
+  written stop as alis.stop, each with its reason (D20.4), and reads no reason's text to tell them apart; a grammar
+  change, the owner's.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
