@@ -1423,9 +1423,7 @@
     ]
   },
   "M21.F4 M21.X1001 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/CareSections.cshtml",
       "/Shared/_FusionLayout.cshtml"
