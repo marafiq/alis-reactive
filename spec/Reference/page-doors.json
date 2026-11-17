@@ -1273,9 +1273,7 @@
     ]
   },
   "M21.F25 M21.X1016 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/KinPhone.cshtml",
       "/Shared/_FusionLayout.cshtml"
