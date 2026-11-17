@@ -1,34 +1,57 @@
 using System.Diagnostics;
 using System.Globalization;
+using Alis.Reactive.Tracing;
 
 namespace Alis.Reactive.Conformance.App.World;
 
-internal sealed record CollectedSpan(string TraceId, string SpanId, string ParentId, string Scope, string Name, long StartUnixNanos, string? Outcome, int? Status, int? Resend)
+internal sealed record CollectedAttribute(string Key, string Value)
 {
-    private const string OutcomeKey = "alis.outcome";
-    private const string StatusKey = "http.response.status_code";
-    private const string ResendKey = "http.request.resend_count";
+    internal string Line => Key + "=" + Value;
+
+    internal bool Holds(string text) => Key.Contains(text, StringComparison.OrdinalIgnoreCase) || Value.Contains(text, StringComparison.OrdinalIgnoreCase);
+}
+
+internal sealed record CollectedEvent(string Name, IReadOnlyList<CollectedAttribute> Attributes)
+{
+    internal string Line => string.Join(' ', ["event " + Name, .. Attributes.Select(attribute => attribute.Line)]);
+
+    internal bool Holds(string text) => Name.Contains(text, StringComparison.OrdinalIgnoreCase) || Attributes.Any(attribute => attribute.Holds(text));
+}
+
+internal sealed record CollectedSpan(string TraceId, string SpanId, string ParentId, string Scope, string Name, long StartUnixNanos,
+    IReadOnlyList<CollectedAttribute> Attributes, IReadOnlyList<CollectedEvent> Events)
+{
     private const string NoParent = "";
     private const long NanosPerTick = 100;
 
-    internal string Facts => string.Join(' ', FactsHeld());
+    internal string Facts => string.Join(' ', [.. FactsHeld(), .. Events.Select(happened => happened.Line)]);
+
+    internal bool Holds(string text)
+        => Name.Contains(text, StringComparison.OrdinalIgnoreCase) || Attributes.Any(attribute => attribute.Holds(text)) || Events.Any(happened => happened.Holds(text));
 
     internal static CollectedSpan Of(OtlpSpan span, string scope)
         => new(span.TraceId, span.SpanId, span.ParentSpanId ?? NoParent, scope, span.Name, long.Parse(span.StartTimeUnixNano, CultureInfo.InvariantCulture),
-            TextOf(span, OutcomeKey), NumberOf(span, StatusKey), NumberOf(span, ResendKey));
+            [.. span.Attributes.Select(AttributeOf)], [.. span.Events.Select(happened => new CollectedEvent(happened.Name, [.. happened.Attributes.Select(AttributeOf)]))]);
 
     internal static CollectedSpan Of(Activity activity)
-        => new(activity.TraceId.ToHexString(), activity.SpanId.ToHexString(), activity.ParentSpanId.ToHexString(), activity.Source.Name, activity.OperationName,
-            (activity.StartTimeUtc - DateTime.UnixEpoch).Ticks * NanosPerTick, null, null, null);
+        => new(activity.TraceId.ToHexString(), activity.SpanId.ToHexString(), ListedParentOf(activity), activity.Source.Name, activity.OperationName,
+            (activity.StartTimeUtc - DateTime.UnixEpoch).Ticks * NanosPerTick,
+            [.. activity.TagObjects.Select(tag => new CollectedAttribute(tag.Key, Convert.ToString(tag.Value, CultureInfo.InvariantCulture) ?? ""))], []);
 
     private IEnumerable<string> FactsHeld()
+        => [.. Labeled("alis.outcome", ""), .. Labeled("http.response.status_code", ""), .. Labeled("http.request.resend_count", "resend "),
+            .. Labeled("alis.validator", "validator "), .. Labeled("alis.rule_set", "rule set "), .. Labeled("alis.failure_count", "failure count ")];
+
+    private IEnumerable<string> Labeled(string key, string label) => Attributes.Where(attribute => attribute.Key == key).Select(attribute => label + attribute.Value);
+
+    private static string ListedParentOf(Activity activity)
     {
-        if (Outcome is { } outcome) yield return outcome;
-        if (Status is { } status) yield return status.ToString(CultureInfo.InvariantCulture);
-        if (Resend is { } resend) yield return "resend " + resend.ToString(CultureInfo.InvariantCulture);
+        if (activity.Parent is not { } parent) return activity.ParentSpanId.ToHexString();
+        if (parent.Source.Name == ReactiveTracing.SourceName) return parent.SpanId.ToHexString();
+        return ListedParentOf(parent);
     }
 
-    private static string? TextOf(OtlpSpan span, string key) => span.Attributes.FirstOrDefault(attribute => attribute.Key == key)?.Value.StringValue;
-
-    private static int? NumberOf(OtlpSpan span, string key) => span.Attributes.FirstOrDefault(attribute => attribute.Key == key)?.Value.IntValue is { } number ? checked((int)number) : null;
+    private static CollectedAttribute AttributeOf(OtlpKeyValue attribute)
+        => new(attribute.Key, attribute.Value.StringValue ?? attribute.Value.IntValue?.ToString(CultureInfo.InvariantCulture)
+            ?? attribute.Value.BoolValue?.ToString(CultureInfo.InvariantCulture) ?? attribute.Value.DoubleValue?.ToString(CultureInfo.InvariantCulture) ?? "");
 }

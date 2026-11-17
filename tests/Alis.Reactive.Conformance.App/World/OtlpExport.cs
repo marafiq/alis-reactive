@@ -8,8 +8,10 @@ internal sealed record OtlpScopeSpans(OtlpScope Scope, IList<OtlpSpan> Spans);
 
 internal sealed record OtlpScope(string Name);
 
-internal sealed record OtlpSpan(string TraceId, string SpanId, string? ParentSpanId, string Name, string StartTimeUnixNano, IList<OtlpKeyValue> Attributes);
+internal sealed record OtlpSpan(string TraceId, string SpanId, string? ParentSpanId, string Name, string StartTimeUnixNano, IList<OtlpKeyValue> Attributes, IList<OtlpEvent> Events);
+
+internal sealed record OtlpEvent(string Name, IList<OtlpKeyValue> Attributes);
 
 internal sealed record OtlpKeyValue(string Key, OtlpAnyValue Value);
 
-internal sealed record OtlpAnyValue(string? StringValue, long? IntValue);
+internal sealed record OtlpAnyValue(string? StringValue, long? IntValue, bool? BoolValue, double? DoubleValue);

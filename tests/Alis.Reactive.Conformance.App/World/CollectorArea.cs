@@ -6,6 +6,8 @@ namespace Alis.Reactive.Conformance.App.World;
 internal static class CollectorArea
 {
     private const string Script = "/js/world/collector.js";
+    private const string Search = "search";
+    private const string SearchForm = "<form method=\"get\" action=\"" + WorldPages.Collector + "\"><label>Search <input type=\"search\" name=\"" + Search + "\"></label> <button>Search</button></form>";
 
     internal static void UseSecondOrigin(this WebApplication app)
         => app.Use(async (context, next) =>
@@ -36,10 +38,10 @@ internal static class CollectorArea
             changes.Changed();
             return Results.Ok();
         });
-        app.MapGet(WorldPages.Collector, (CurrentWorld world, Collector collector)
-            => Results.Content(WorldArea.Page("The collector", "<h1>Collector</h1><div id=\"spans\">" + collector.LinesOf(world.Key) + $"</div><script src=\"{Script}\"></script>"), WorldArea.Html));
+        app.MapGet(WorldPages.Collector, (CurrentWorld world, Collector collector, HttpRequest request)
+            => Results.Content(WorldArea.Page("The collector", "<h1>Collector</h1>" + SearchForm + "<div id=\"spans\">" + collector.LinesOf(world.Key, SearchOf(request)) + $"</div><script src=\"{Script}\"></script>"), WorldArea.Html));
         app.MapGet(WorldEndpoints.CollectorLines, (CurrentWorld world, Collector collector, CollectorChanges changes, HttpContext context)
-            => TypedResults.ServerSentEvents(LinesAsTheyChange(world.Key, collector, changes, context.RequestAborted)));
+            => TypedResults.ServerSentEvents(LinesAsTheyChange(world.Key, SearchOf(context.Request), collector, changes, context.RequestAborted)));
         app.MapGet(WorldPages.Echo, (CurrentWorld world, Collector collector)
             => Results.Content(WorldArea.Page("The echo", "<h1>Echo</h1>" + ListOf(world.Data.Attempts.Select((attempt, at) => EchoOf(attempt, at + 1, world.Key, collector)))), WorldArea.Html));
         app.MapGet(WorldPages.SecondOriginLog, (CurrentWorld world)
@@ -49,18 +51,20 @@ internal static class CollectorArea
             .AddEndpointFilter(AtTheRespondGate);
     }
 
-    private static async IAsyncEnumerable<string> LinesAsTheyChange(string world, Collector collector, CollectorChanges changes, [EnumeratorCancellation] CancellationToken stop)
+    private static async IAsyncEnumerable<string> LinesAsTheyChange(string world, string search, Collector collector, CollectorChanges changes, [EnumeratorCancellation] CancellationToken stop)
     {
         while (!stop.IsCancellationRequested)
         {
             var next = changes.Next;
-            yield return collector.LinesOf(world);
+            yield return collector.LinesOf(world, search);
             await next.WaitAsync(stop);
         }
     }
 
     private static string EchoOf(HeardAttempt attempt, int number, string world, Collector collector)
         => $"attempt {number}: {TraceEcho.Traceparent(attempt.Traceparent, world, collector)}, {TraceEcho.Baggage(attempt.Baggage)}";
+
+    private static string SearchOf(HttpRequest request) => request.Query[Search].ToString();
 
     private static string ListOf(IEnumerable<string> lines) => "<ol>" + string.Concat(lines.Select(line => "<li>" + WorldArea.Text(line) + "</li>")) + "</ol>";
 

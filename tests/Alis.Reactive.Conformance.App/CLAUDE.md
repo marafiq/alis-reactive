@@ -149,8 +149,12 @@ its views.
   world whose seed leaves its render recorded, so every fetch follows its own header's flag. The host listens on
   two addresses, and the second is another origin (`World/SecondOrigin.cs`) that allows the page's origin and the
   trace headers by CORS and logs each request it receives. The collector's page lists a world's spans as a tree,
-  a line a span with its outcome, status and resend count, and redraws as spans arrive (`World/collector.ts`); the
-  echo page lists each attempt's traceparent by the span it names, and baggage.
+  a line a span with its outcome, status and resend count, the validator, rule set and failure count of a check, and
+  each event with its attributes; a server activity sits under the nearest span it descends from through activities of
+  other sources, so an endpoint's check sits under the attempt it answered (`World/CollectedSpan.cs`). Its search lists
+  the lines of the spans whose name, attributes or events hold the text, beside a status that counts them, and the page
+  redraws as spans arrive (`World/collector.ts`); the echo page lists each attempt's traceparent by the span it names,
+  and baggage.
 - `World/WorldCache.cs` is the app's distributed cache in Development, each key under its world, and
   `World/CachedRounds.cs` is the fragment a seed puts there, as a release of the framework rendered it.
 - The app holds no static a request can change, since every world shares a static: none that can be assigned, and

@@ -1858,10 +1858,24 @@
       "/Care/Round/_TracedLayout.cshtml"
     ]
   },
+  "M26.F1 X20.9 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/OrderCheck.cshtml",
+      "/Care/Round/_TracedLayout.cshtml"
+    ]
+  },
   "M26.F2 X20.3 0": {
     "modules": [],
     "views": [
       "/Care/Round/BedFinder.cshtml",
+      "/Care/Round/_TracedLayout.cshtml"
+    ]
+  },
+  "M26.F2 X20.8 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/WardRound.cshtml",
       "/Care/Round/_TracedLayout.cshtml"
     ]
   },

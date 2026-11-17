@@ -190,6 +190,8 @@ internal static class AppHost
             .Add<Care.RepeatDoseOrderRules>()
             .Add<Care.ShiftPlanRules>()
             .Add<Care.LeastDoseRoundRules>()
+            .Add<Care.RoundValidator>()
+            .Add<Care.WardRoundDoseRules>()
             .Add<Care.VisitorPassRules>()
             .Add<Care.CareLevelChoiceRules>()
             .Add<Care.KinDeskRules>()
