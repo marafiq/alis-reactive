@@ -102,9 +102,15 @@ internal sealed partial class BoundInput
     private static PathStep PositionIn(MemberLambda lambda, MemberLambda.Step step, JsonTypeInfo holder) => holder.Kind switch
     {
         JsonTypeInfoKind.Enumerable => new IndexStep(int.Parse(step.Text, NumberStyles.None, CultureInfo.InvariantCulture)),
-        JsonTypeInfoKind.Dictionary => new MemberStep(step.Text),
+        JsonTypeInfoKind.Dictionary => EntryOf(step, holder),
         _ => throw NoBodyPath(lambda, "[" + step.Text + "]", holder.Type, holder),
     };
+
+    private static MemberStep EntryOf(MemberLambda.Step step, JsonTypeInfo holder)
+    {
+        if (holder.IsDictionary(out var key, out _)) DictionaryKeys.RefuseAKeyNamedApart(key);
+        return new MemberStep(step.Text);
+    }
 
     private static System.Linq.Expressions.Expression HolderOf(System.Linq.Expressions.Expression step) => step switch
     {

@@ -123,8 +123,8 @@ internal static class JsonBodyValues
     private static Expression ItemValue(JsonLeaf leaf, int position)
     {
         if (!leaf.LeftOutWhenNothing) return leaf.Value;
-        throw new NotImplementedException(
-            $"The request sets position {position} of a list in its JSON body from a value the body leaves out when it reads nothing, and no line states what a list sends at a position that reads nothing; set it from a literal, or send the list whole.");
+        throw new InvalidOperationException(
+            $"The request sets position {position} of a list in its JSON body from a value the body leaves out when it reads nothing, and a JSON list holds an item at every position, which the endpoint binds as an item the request never set; set it from a literal, or send the list whole.");
     }
 
     private static (IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)[] Past(IEnumerable<(IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)> named)
@@ -138,8 +138,8 @@ internal static class JsonBodyValues
         var scalar = item ?? held;
         if (form.Own is { } own)
         {
-            throw new NotImplementedException(
-                $"'{member}' is read from a member {own.Cause} writes, and a JSON body sends the form its endpoint binds, which no node of the plan carries yet; set it from a literal, or send it in form data.");
+            throw new InvalidOperationException(
+                $"'{member}' is read from a member {own.Cause} writes, and a JSON body sends a member in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or send it in form data.");
         }
 
         var appWritesItItself = json.App.Converters.Any(converter => converter.CanConvert(scalar.Type));
@@ -147,8 +147,14 @@ internal static class JsonBodyValues
         {
             if (form.IsTheAppsOwn && !LiveShapes.Converts(held, out _)) return captured;
             if (form.IsTheAppsOwn && !appWritesItItself) return InTheBodysForm<TValue>(captured, form, held, writer.Content.RendersUnder, member);
-            throw new NotImplementedException(
-                $"'{member}' holds what {form.BaseFormName} writes, and a JSON body sends it as the app's JSON options write it (D9.7, D9.19): no node of the plan carries that writing from this source yet; send it from the server's JSON, or set its scalar members.");
+            if (appWritesItItself)
+            {
+                throw new InvalidOperationException(
+                    $"'{member}' holds what a JSON converter of the app's writes, and a JSON body sends a member in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or send it in form data.");
+            }
+
+            throw new InvalidOperationException(
+                $"'{member}' holds an object as a live object holds it, and a JSON body sends an object as the app's JSON options write it, which the browser cannot read from a live object; set it from a literal, or from JSON the server writes.");
         }
 
         var live = form.IntoLive<TValue>(captured);
@@ -198,8 +204,8 @@ internal static class JsonBodyValues
             : holder.Options.Converters.Any(converter => converter.CanConvert(scalar.Type)) ? "a JSON converter of the app's"
             : null;
         if (writesIt is null) return;
-        throw new NotImplementedException(
-            $"'{member}' holds '{property.Name}', which {writesIt} writes, and a JSON body sends it in the form its endpoint binds (D9.7): no node of the plan reads that writing into it yet; set it from a literal, or set its other members.");
+        throw new InvalidOperationException(
+            $"'{member}' holds '{property.Name}', which {writesIt} writes, and a JSON body sends it in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or set its other members.");
     }
 
     private static bool IsADate(JsonTypeInfo type) => type is JsonTypeInfo<DateTime> or JsonTypeInfo<DateTime?> or JsonTypeInfo<DateTimeOffset> or JsonTypeInfo<DateTimeOffset?>;
@@ -213,7 +219,8 @@ internal static class JsonBodyValues
             JsonValueKind.True or JsonValueKind.False => BooleanShape.Instance,
             JsonValueKind.String => Texts,
             JsonValueKind.Object => Objects,
-            _ => throw new NotImplementedException($"'{member}' is a value type its JSON writes as a list, and a JSON body leaves out a member that reads nothing through a shape that keeps it, which no shape holds yet; set it from a literal."),
+            JsonValueKind.Array => new ArrayShape(AnyShape.Instance),
+            _ => throw new NotImplementedException($"'{member}' is a value type its JSON writes as null, and a JSON body leaves out a member that reads nothing through a shape that keeps it, which no shape holds yet; set it from a literal."),
         };
     }
 

@@ -313,9 +313,9 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
     expect((prepare(post(multipart([{ kind: "file", name: "Photo", value: { kind: "held", value: [photo] }, when: true }])), clock, enUs).body as FormData).get("Photo")).toBe(photo);
   });
 
-  test("TextBodyIsOneValue: a text is the whole body, and a text that reads nothing names what waits on a line", async () => {
+  test("TextBodyIsOneValue: a text is the whole body, and the empty text C# writes for one that reads nothing is sent empty", async () => {
     expect(await sent(prepare(post({ kind: "text", value: { kind: "held", value: "Night round done" }, inputs: emptyInputs }), clock, enUs).body)).toBe("Night round done");
-    expect(() => prepare(post({ kind: "text", value: { kind: "nothing" }, inputs: emptyInputs }), clock, enUs)).toThrow("a text body that reads nothing");
+    expect(await sent(prepare(post({ kind: "text", value: { kind: "held", value: "" }, inputs: emptyInputs }), clock, enUs).body)).toBe("");
   });
 
   test("EnumThroughAListPosition: an enum past a list position is written in its endpoint's form inside its item", async () => {

@@ -211,9 +211,10 @@ describe("when one Attempt reaches fetch, D10 chooses and decodes its answer", (
 });
 
 describe("when response metadata comes from the server boundary", () => {
-  test.each(["not JSON", '{}', '{"status":"401"}'])("UnstatedRespondedJson: %s has no invented fallback", async header => {
-    fetches(new Response("{}", { headers: { "Content-Type": "application/json", "X-Responded-JSON": header } }));
-    await expect(attempt(prepared({ ...get, respondedJson: true }), routes(), signal(), pageUrl, untraced)).rejects.toThrow("D10.7 states only Katana's JSON status");
+  test.each(["not JSON", '{}', '{"status":"401"}', '{"status":700}'])("UnstatedRespondedJson: %s keeps the response's own status", async header => {
+    fetches(new Response("{}", { status: 409, headers: { "Content-Type": "application/json", "X-Responded-JSON": header } }));
+    const { reply } = await attempt(prepared({ ...get, respondedJson: true }), routes(), signal(), pageUrl, untraced);
+    expect([reply.status, reply.outcome]).toStrictEqual([409, "status"]);
   });
 
   test("AbsentRespondedJson: net48 keeps the HTTP status when Katana writes no override", async () => {

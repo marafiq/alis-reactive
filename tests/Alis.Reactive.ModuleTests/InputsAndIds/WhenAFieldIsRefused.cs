@@ -113,6 +113,17 @@ public sealed class WhenAFieldIsRefused
     }
 
     [Test]
+    public void an_entry_of_a_dictionary_keyed_by_a_bool_is_refused_and_one_keyed_by_text_is_bound()
+    {
+        var html = Views.Of(new MoveIn { Settled = { [true] = 2 }, Rounds = { ["am"] = new Dose() } });
+        var plan = html.ReactivePlan<MoveIn>();
+        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Settled[true]), Throws.InvalidOperationException.With.Message.EqualTo(
+            "A dictionary keyed by bool cannot be sent: System.Text.Json and MVC's binding name write its keys apart, as true and True, so a JSON body and form data name one entry two ways; key it by text or a number."));
+        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Rounds["am"].Amount), Throws.Nothing);
+        html.RenderPlan(plan);
+    }
+
+    [Test]
     public void a_lambda_that_reads_a_value_the_view_holds_is_refused()
     {
         var html = Views.Of(new MoveIn());

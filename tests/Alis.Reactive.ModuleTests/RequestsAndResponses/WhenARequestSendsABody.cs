@@ -97,12 +97,34 @@ public sealed class WhenARequestSendsABody
     {
         Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<SearchRequest>("/notes", request => request.Json(body => body.Set(r => r.Id, 7)))
                 .OnSuccess(Content.None, (saved, pipeline) => pipeline.Element("id").Text.Set(saved.Request.Read(r => r.Id)))),
-            Throws.InstanceOf<NotImplementedException>().With.Message.EqualTo(
-                "'r => r.Id' is sent in the request's JSON body, and a reply reads a sent member back by its C# path, which the plan's JSON body does not carry (schema.md, HttpSend's json body: its value and inputs); " +
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'r => r.Id' is sent in the request's JSON body, and a reply reads back only a member the request sent in its path, query or form data; " +
                 "read the value from its source, or send the member in the path, query or form data."));
         var form = RequestPage.Rendered(pipeline => pipeline.Post<SearchRequest>("/notes", request => request.UrlEncoded(body => body.Set(r => r.Id, 7)))
             .OnSuccess(Content.None, (saved, pipeline) => pipeline.Element("id").Text.Set(saved.Request.Read(r => r.Id))));
         Assert.That(PlanSchema.ProblemsOf(form), Is.Empty);
+    }
+
+    [Test]
+    public void a_reply_refuses_to_read_back_the_whole_request_a_json_body_sends_and_reads_one_form_data_sends()
+    {
+        Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<NoteRequest>("/notes", request => request.Json(body => body.Set(r => r.Id, 7)))
+                .OnSuccess(Content.None, (saved, pipeline) => pipeline.Dispatch(SentNotes.Saved, saved.Request))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "The request, read whole, sends members in the request's JSON body, and a reply reads back only a member the request sent in its path, query or form data; " +
+                "read the value from its source, or send the member in the path, query or form data."));
+        var form = RequestPage.Rendered(pipeline => pipeline.Post<NoteRequest>("/notes", request => request.UrlEncoded(body => body.Set(r => r.Id, 7)))
+            .OnSuccess(Content.None, (saved, pipeline) => pipeline.Dispatch(SentNotes.Saved, saved.Request)));
+        Assert.That(PlanSchema.ProblemsOf(form), Is.Empty);
+    }
+
+    [Test]
+    public void a_text_body_read_from_a_source_sends_an_empty_text_where_the_source_reads_nothing_or_holds_null()
+    {
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<NoteRequest>("/notes", request => request.Text(pipeline.Component<SearchPanel>("panel").Name)));
+        Assert.That(RequestPage.Send(plan, "body").GetRawText(), Is.EqualTo(
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"text"}},{"name":"value","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"op","op":"coalesce","args":[{"kind":"ref","name":"requestValue1"},{"kind":"lit","value":""}]}}]}},{"name":"inputs","value":""" + NoInputs + "}]}"));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
 
     [Test]
@@ -323,6 +345,11 @@ public sealed class RotaRequest
 public sealed class RotaWeek
 {
     public RequestShift Monday { get; init; }
+}
+
+public static class SentNotes
+{
+    public static readonly AppEvent<NoteRequest> Saved = AppEvent.Declare<NoteRequest>();
 }
 
 public sealed class NoteRequest

@@ -144,7 +144,6 @@ function bodyOf(body: SentBody, headers: Headers, writing: FormWriting): BodyIni
     }
     case "text": {
       const text = held(body.value);
-      if (text === undefined || text === null) throw notBuilt("a text body that reads nothing: no line states what such a request sends");
       if (typeof text !== "string") throw new Stop("The request's text body must hold text.");
       return text;
     }

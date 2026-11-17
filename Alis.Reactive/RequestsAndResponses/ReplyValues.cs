@@ -73,7 +73,7 @@ internal sealed class SentRequestValue<TRequest>(JsObject reply, RequestPartsWri
         return new Computed<TResult>(new GetExpression(member.Path, PathMembers.Optional, base.Expression), Form);
     }
 
-    private static NotImplementedException JsonReadBack(string read)
-        => new($"{read} in the request's JSON body, and a reply reads a sent member back by its C# path, which the plan's JSON body does not carry (schema.md, HttpSend's json body: its value and inputs); " +
+    private static InvalidOperationException JsonReadBack(string read)
+        => new($"{read} in the request's JSON body, and a reply reads back only a member the request sent in its path, query or form data; " +
             "read the value from its source, or send the member in the path, query or form data.");
 }

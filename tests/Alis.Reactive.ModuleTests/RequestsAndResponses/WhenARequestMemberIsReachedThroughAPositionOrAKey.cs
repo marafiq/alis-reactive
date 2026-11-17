@@ -86,14 +86,43 @@ public sealed class WhenARequestMemberIsReachedThroughAPositionOrAKey
                 "The request sets a member at position 1 of a list in its JSON body and none at position 0, and a JSON list holds an item at every position before its last, which the endpoint binds as an item the request never set; set a member at each position from 0, or send the list whole."));
 
     [Test]
-    public void a_json_body_list_position_set_from_a_value_left_out_when_it_reads_nothing_is_refused_as_not_built()
-        => Assert.That(() => RequestPage.Rendered(pipeline =>
+    public void a_json_body_list_position_set_from_a_value_left_out_when_it_reads_nothing_is_refused_where_the_view_renders()
+    {
+        Assert.That(() => RequestPage.Rendered(pipeline =>
             {
                 var panel = pipeline.Component<SearchPanel>("panel");
                 pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Counts[0], panel.Count)));
             }),
-            Throws.InstanceOf<NotImplementedException>().With.Message.EqualTo(
-                "The request sets position 0 of a list in its JSON body from a value the body leaves out when it reads nothing, and no line states what a list sends at a position that reads nothing; set it from a literal, or send the list whole."));
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "The request sets position 0 of a list in its JSON body from a value the body leaves out when it reads nothing, and a JSON list holds an item at every position, which the endpoint binds as an item the request never set; set it from a literal, or send the list whole."));
+        var whole = RequestPage.Rendered(pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Counts, pipeline.Component<BodyDesk>("desk").Rooms))));
+        Assert.That(PlanSchema.ProblemsOf(whole), Is.Empty);
+    }
+
+    [Test]
+    public void a_dictionary_keyed_by_a_bool_is_refused_where_the_view_renders()
+        => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Settled[true], 2)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "A dictionary keyed by bool cannot be sent: System.Text.Json and MVC's binding name write its keys apart, as true and True, so a JSON body and form data name one entry two ways; key it by text or a number."));
+
+    [Test]
+    public void a_dictionary_keyed_by_a_date_is_refused_where_the_view_renders()
+        => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Get<WardOrder>("/orders", request => request.Query(r => r.Rounds[new DateTime(2026, 11, 17)], 2))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "A dictionary keyed by DateTime cannot be sent: System.Text.Json and MVC's binding name write its keys apart, as 2026-11-17T08:30:00 and 11/17/2026 08:30:00, so a JSON body and form data name one entry two ways; key it by text or a number."));
+
+    [Test]
+    public void a_dictionary_keyed_by_an_enum_the_apps_options_name_by_a_policy_is_refused_and_one_named_as_csharp_names_it_is_sent()
+    {
+        Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.ByShift[RequestShift.Day], 2))),
+                json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "A dictionary keyed by RequestShift cannot be sent: System.Text.Json and MVC's binding name write its keys apart, as none and None, so a JSON body and form data name one entry two ways; key it by text or a number."));
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.ByShift[RequestShift.Day], 2))));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "value").GetRawText(), Is.EqualTo(
+            """{"kind":"record","fields":[{"name":"byShift","value":{"kind":"record","fields":[{"name":"Day","value":{"kind":"lit","value":2}}]}}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
 
     [Test]
     public void a_json_body_member_past_a_list_position_under_a_parts_condition_is_guarded_by_its_path_with_the_position_as_its_digits()
@@ -159,6 +188,12 @@ public sealed class WardOrder
     public Dictionary<int, string> Shifts { get; init; } = [];
 
     public Dictionary<WardRoom, int> Rooms { get; init; } = [];
+
+    public Dictionary<bool, int> Settled { get; init; } = [];
+
+    public Dictionary<DateTime, int> Rounds { get; init; } = [];
+
+    public Dictionary<RequestShift, int> ByShift { get; init; } = [];
 }
 
 public sealed class OrderedItem

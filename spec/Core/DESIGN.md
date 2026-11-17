@@ -33,6 +33,11 @@ Terms used throughout:
 - D1.4 A dictionary entry is a member step whose name is the key's text as System.Text.Json writes the key
   as a property name. A dictionary whose key type System.Text.Json writes no property name for is refused
   where the view renders.
+  A key System.Text.Json and MVC's binding name write apart is refused where the view renders too, a request's member
+  and an input's alike, since a JSON body and form data would name one entry two ways: a `bool`, written `true` and
+  `True`, a `DateTime`, written in ISO 8601 and in the invariant culture's date text, and an enum the app's JSON options
+  name by a policy, one of whose values they write as text other than its C# name. A key both write alike, text, a
+  number or an enum named as C# names it, is sent.
 - D1.5 `each` appears only in a registration's paths (Q16, Q19). No read, write, call or subscription carries
   `each`; a projection over a list is `map` (Q6).
 - D1.9 On a read, a write or a call, an index step and a member step of the same digits reach the same item:
@@ -1697,6 +1702,13 @@ Terms used throughout:
   A list in a JSON body holds an item at each position from 0 to the last one the request sets: a request that sets a
   position and none before it is refused where the view renders, since whatever the list held there the endpoint
   would bind as an item the request never set.
+  So is a position set from a value the body leaves out when it reads nothing (D9.10), for the same reason; the cure is
+  a literal, or the list sent whole.
+  A member is sent in the form its endpoint binds, so a source whose writing the browser cannot read into that form is
+  refused where the view renders, each with its cure: a member read from a member its own JSON converter writes, and a
+  value a JSON converter of the app's writes, set from a literal or sent in form data; an object a live object holds,
+  set from a literal or from JSON the server writes; and an object from the server's JSON one of whose dates or numbers
+  its own or the app's converter writes, set from a literal, or by its other members.
 - D9.8 Form data is multipart, written by the browser: an ordered list of parts, each a name and either text or a file
   with its name and media type. A field is named by its binding name, a list sends one part per item, a number
   carries the decimal separator of the view's culture (D3.7) and a file is sent as the file. Fields and files go in
@@ -1730,6 +1742,8 @@ Terms used throughout:
   `probe:mvc5-empty-value-converts-null`, `probe:mvc5-null-sets-reference-member`), while net10 keeps the member's
   start, an instance included (`probe:core-query-object-empty-field`). Left out, it binds its start on both. A JSON
   `null` binds null over the start (`probe:core-json-null-object`).
+  A value type its own JSON converter writes as a list is kept as a list of any items in a JSON body and left out when
+  it reads nothing, as a list is (X9.32).
 
   A list item that reads nothing, in a query or form data, is sent by this closed table, which C# writes into the
   plan from the item type the app's JSON contract names (D18.2), a nullable enum among the nullable value types:
@@ -1891,6 +1905,8 @@ Terms used throughout:
   alone: net10 answers a multipart body to a URL-encoded action 415 (`probe:core-consumes-urlencoded`). Its fields are
   named and written as the query's (D9.23). A text body and a file body are one value each, read by the action
   from its body, since no binder on either host reads them.
+  A text body read from a source that reads nothing or holds null sends the empty text: C# writes it
+  `held(coalesce(source, ""))`, so the action reads an empty body (X9.33).
 - D9.22 Antiforgery is configuration every unsafe request to the page's origin carries, not a default: a request that
   takes no defaults (D10.12) still sends it, since the server refuses a POST without it. The app chooses its place, or
   `NoAntiforgery()`, once; a view that renders a POST, PUT or DELETE in an app that made no choice is refused, naming
@@ -2101,6 +2117,11 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `X9.31` behavior (D10.16): a JSON body member past a list position under a parts condition is sent in its item
   when the condition holds; when it fails the item keeps its place without it, and the endpoint binds the member's
   start.
+- `X9.32` behavior (D9.10): a JSON body member of a value type its own JSON converter writes as a list, set from a
+  reply's read, is sent as the list the server wrote, and left out when the read reads nothing, so the endpoint binds
+  its start.
+- `X9.33` behavior (D9.21): a text body read from a reply's member that holds null is sent as the empty text, and the
+  action reads an empty body.
 
 ## Q10. The request's flow and its response
 
@@ -2160,6 +2181,8 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - D10.7 On net48 the plan carries that a response's `X-Responded-JSON` status replaces its own, so Katana's
   answer to a request that sends `X-Requested-With` runs the route of the status it withheld
   (`probe:katana-ajax-redirect-is-200`).
+  A header that is not Katana's, text that is no JSON or JSON that holds no HTTP status from 100 to 599, leaves the
+  response its own status, so exactly one route runs (D10.5).
 - D10.8 A server's validation errors have one body on both hosts, `{"errors": {"<binding name>": ["message"]}}`,
   status 400, written by a framework door: on net10 MVC's `ValidationProblemDetails`
   (`probe:core-validation-problem-shape`), on net48 the same JSON with `TrySkipIisCustomErrors` set, the switch
@@ -2289,7 +2312,11 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   that reads nothing when the response lacks it; and its body by the route's kind (D10.6), whose members dot-walk as
   every data path does (Q1, Q2). Each is a source (Q7) in its route and in the block `Chained` runs (D10.9), and in
   every block inside them (D8.8); the steps after the request do not read it, since no door hands them the reply
-  (`ReplyOutsideItsRoute`, `Schema.tla:RefsReadTheirBlock`). A HEAD route reads the status and the headers, and an OPTIONS route reads its
+  (`ReplyOutsideItsRoute`, `Schema.tla:RefsReadTheirBlock`).
+  The reply reads back a member the request sent in its path, query or form data. The plan keeps no sent JSON body, so
+  a read of a member the request sent in its JSON body, or of the request whole when that body sends a member, is
+  refused where the view renders; the cure is the value read from its source, or the member sent in the path, query
+  or form data. A HEAD route reads the status and the headers, and an OPTIONS route reads its
   `Allow` header (`probe:core-options-reaches-action`).
 - D10.20 A file route saves the body as the browser's download, named by its `Content-Disposition`: the `filename*`
   of RFC 6266, section 4.3, before its `filename`, since MVC 5 writes a non-ASCII name as `filename*` alone

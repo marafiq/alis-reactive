@@ -2822,6 +2822,20 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F1 X9.32 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/BedSpotMove.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.33 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/NightHandover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F1 X9.8 0": {
     "modules": [],
     "views": [

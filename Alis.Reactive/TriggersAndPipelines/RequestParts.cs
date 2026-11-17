@@ -323,7 +323,7 @@ public sealed class BodyParts<TRequest>
     /// <returns>The request's parts, which take no member of a body.</returns>
     public WholeBodyParts<TRequest> Text(string text) => new(_parts, _parts.Text(_stage, text));
 
-    /// <summary>Sends the text a source reads when the request is sent as the whole body.</summary>
+    /// <summary>Sends the text a source reads when the request is sent as the whole body, or an empty body when the source reads nothing or holds null.</summary>
     /// <param name="text">The text sent as the whole body.</param>
     /// <returns>The request's parts, which take no member of a body.</returns>
     public WholeBodyParts<TRequest> Text(ITypedSource<string?> text) => new(_parts, _parts.Text(_stage, text));

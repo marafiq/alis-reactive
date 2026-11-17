@@ -139,7 +139,7 @@ internal sealed class RequestPartsWriter
     {
         Open(stage);
         _body = Body.Text;
-        _whole = RequestValues.Read(RequestValues.Captured(Sources.Of(text), _writer, Capture));
+        _whole = RequestValues.Held(new OpExpression(Operator.Coalesce, [RequestValues.Captured(Sources.Of(text), _writer, Capture), Literals.Text("")]));
         return _stage;
     }
 

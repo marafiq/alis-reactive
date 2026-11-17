@@ -22,6 +22,10 @@ public static partial class CarePages
     public const string DoseLinesOfAMissedDose = Round + "dose-lines/missed-dose";
     public const string DoseLinesOfALateMissedDose = Round + "dose-lines/late-missed-dose";
     public const string DoseLinesOfASkippedDose = Round + "dose-lines/skipped-dose";
+    public const string BedSpotMoveOfAPlacedBed = Round + "bed-spot-move/placed-bed";
+    public const string BedSpotMoveWithNoBed = Round + "bed-spot-move/no-bed";
+    public const string NightHandoverWithANote = Round + "night-handover/with-a-note";
+    public const string NightHandoverWithNoNote = Round + "night-handover/no-note";
     public const string SupplyRound = Round + "supplies";
     public const string OrderStart = Round + "order-start";
     public const string NurseCall = Round + "nurse-call";

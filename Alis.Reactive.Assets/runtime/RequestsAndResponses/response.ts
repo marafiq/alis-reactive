@@ -1,4 +1,4 @@
-import { assertNever, notBuilt, type HttpResponse, type RequestStatement, type ResponseBody, type Route, type SuccessBody } from "../Schema/index";
+import { assertNever, type HttpResponse, type RequestStatement, type ResponseBody, type Route, type SuccessBody } from "../Schema/index";
 import { isThePagesOrigin, type Attempting, type Sending, type TraceHeaders } from "../Tracing/index";
 import type { PreparedRequest } from "./request";
 import { Retry, waitToRetry } from "./retry";
@@ -127,13 +127,13 @@ function statusOf(response: Response, respondedJson: boolean): number {
   try {
     parsed = JSON.parse(header);
   } catch {
-    throw notBuilt("an invalid X-Responded-JSON header: D10.7 states only Katana's JSON status");
+    return response.status;
   }
   if (typeof parsed === "object" && parsed !== null && Object.hasOwn(parsed, "status")) {
     const status: unknown = Reflect.get(parsed, "status");
     if (typeof status === "number" && Number.isInteger(status) && status >= 100 && status <= 599) return status;
   }
-  throw notBuilt("an X-Responded-JSON header without an HTTP status: D10.7 states only Katana's JSON status");
+  return response.status;
 }
 
 async function readBody(response: Response, kind: SuccessBody, url: URL): Promise<Decoded> {

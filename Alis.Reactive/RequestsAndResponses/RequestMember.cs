@@ -78,8 +78,13 @@ internal sealed class RequestMember
         var node = read;
         while (node is not null)
         {
-            if (node is MethodCallExpression { Object: { } holder, Arguments.Count: 1 } && app.GetTypeInfo(holder.Type).IsDictionary(out var key, out _) && key.Kind != JsonTypeInfoKind.None)
-                throw new InvalidOperationException($"A dictionary keyed by {ClassNames.AsCSharpWritesIt(key.Type)} cannot be sent: System.Text.Json writes no property name for its keys; key it by text or a number.");
+            if (node is MethodCallExpression { Object: { } holder, Arguments.Count: 1 } && app.GetTypeInfo(holder.Type).IsDictionary(out var key, out _))
+            {
+                if (key.Kind != JsonTypeInfoKind.None)
+                    throw new InvalidOperationException($"A dictionary keyed by {ClassNames.AsCSharpWritesIt(key.Type)} cannot be sent: System.Text.Json writes no property name for its keys; key it by text or a number.");
+                DictionaryKeys.RefuseAKeyNamedApart(key);
+            }
+
             node = node switch
             {
                 MemberExpression access => access.Expression,
