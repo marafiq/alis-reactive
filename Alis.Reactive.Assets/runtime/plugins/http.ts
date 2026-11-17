@@ -48,7 +48,7 @@ const ROUTE_PLACEHOLDER = /\{(\w+)\}/g;
 
 // The path segments no value can fill: routing matches no empty one, and the browser drops "." and ".."
 // as it resolves the address.
-const UNCARRIED_SEGMENTS = new Set(["", ".", ".."]);
+const UNCARRIED_SEGMENTS = new Set([""]);
 
 export async function send(request: HttpRequest): Promise<HttpResponse> {
   const { url, init } = prepare(request);
