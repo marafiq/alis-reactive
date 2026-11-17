@@ -214,6 +214,7 @@ try
     await DateProbes.Run(new Uri(app.Urls.First()));
     FluentDateProbes.Run();
     await NamingProbes.Run();
+    await RowsProbes.Run();
     RenderProbes.Run(app.Services, app.Environment.WebRootPath);
     await ViewProbes.Run(client);
     await FusionProbes.Run(client);
