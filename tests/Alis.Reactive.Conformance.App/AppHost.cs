@@ -31,6 +31,8 @@ internal static class AppHost
             case HostNames.NoAntiforgeryChoice:
             case HostNames.SiteHeader:
             case HostNames.AntiforgeryField:
+            case HostNames.NoShowValidationErrors:
+            case HostNames.ClassNames:
             case HostNames.DefaultHooks:
             case HostNames.Tracing:
                 WriteEnumNames(json);
@@ -60,7 +62,7 @@ internal static class AppHost
                 json.TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { LeaveOutTheAdmissionsPharmacy } };
                 return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.DefaultHooks} and {HostNames.Tracing}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks} and {HostNames.Tracing}.");
         }
     }
 
@@ -86,6 +88,9 @@ internal static class AppHost
             case HostNames.AntiforgeryField:
                 services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.FormField));
                 return;
+            case HostNames.NoShowValidationErrors:
+                services.AddReactiveRequests(requests => TheRoutesAndRetry(requests.Antiforgery(AntiforgeryIn.Header).ShowBusy()));
+                return;
             case HostNames.DefaultHooks:
                 services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.Header)
                     .WhileLoading(pipeline => pipeline.Plugin<CareSession>().Renew())
@@ -102,13 +107,23 @@ internal static class AppHost
         }
     }
 
-    private static RequestDefaults TheDefaults(RequestDefaults requests, AntiforgeryIn place) => requests
-        .Antiforgery(place)
-        .ShowBusy()
-        .ShowValidationErrors()
+    private static RequestDefaults TheDefaults(RequestDefaults requests, AntiforgeryIn place)
+        => TheRoutesAndRetry(requests.Antiforgery(place).ShowBusy().ShowValidationErrors());
+
+    private static RequestDefaults TheRoutesAndRetry(RequestDefaults requests) => requests
         .OnError(401, Content.None, (expired, pipeline) => pipeline.Notice().Warning("Your session has ended."))
         .OnError((failed, pipeline) => pipeline.Notice().Error("The request failed."))
         .Retry(3, TimeSpan.FromSeconds(2));
+
+    internal static void AddClassNames(string host, IServiceCollection services)
+    {
+        if (host != HostNames.ClassNames) return;
+        services.AddReactiveClassNames(names =>
+        {
+            names.FieldMessage = "invalid-feedback";
+            names.InvalidInput = "is-invalid";
+        });
+    }
 
     internal static void AddTracing(string host, WebApplicationBuilder builder)
     {
@@ -157,6 +172,7 @@ internal static class AppHost
             .Add<Care.AdmissionWardRules>()
             .Add<Care.IntakeAssessmentRules>()
             .Add<Care.QuickAdmissionRules>()
+            .Add<Care.ResidentIntakeRules>()
             .Add<Care.ResidentAdmissionRules>()
             .Add<Care.NextOfKinAdmissionRules>()
             .Add<Care.RoomAdmissionRules>()

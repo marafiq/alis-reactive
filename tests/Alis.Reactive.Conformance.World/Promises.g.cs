@@ -845,6 +845,8 @@ public static class Promises
     {
         public const string M24_X4_0 = "M24.F4 M24.X4 0";
         public const string M24_X5_0 = "M24.F4 M24.X5 0";
+        public const string M24_X13_0 = "M24.F4 M24.X13 0";
+        public const string M24_X14_0 = "M24.F4 M24.X14 0";
     }
 
     public static class M24_F5
@@ -860,6 +862,8 @@ public static class Promises
     public static class M24_F7
     {
         public const string M24_X3_0 = "M24.F7 M24.X3 0";
+        public const string M24_X11_0 = "M24.F7 M24.X11 0";
+        public const string M24_X12_0 = "M24.F7 M24.X12 0";
     }
 
     public static class M24_F8

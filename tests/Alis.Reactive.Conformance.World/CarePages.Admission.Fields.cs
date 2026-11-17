@@ -9,4 +9,5 @@ public static partial class CarePages
     public const string KinDeskCheckedOnTheServer = KinDesk + "/checked-on-the-server";
     public const string WardSignIn = Admission + "ward-sign-in";
     public const string AddressAdmission = Admission + "address-admission";
+    public const string ResidentIntake = Admission + "resident-intake";
 }

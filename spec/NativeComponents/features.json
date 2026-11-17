@@ -860,6 +860,16 @@
           "id": "M24.X5",
           "rung": "behavior",
           "defect": "Both lines render the hidden comma list under the binding name beside a box of that name per option (Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:169 and :180 at 623dd4a27, Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:160 and :171 at 65fdf118d), so a form's own submission sends the joined text and each checked box (probe:dom-check-list-form-data): a member that holds a list binds three days for two checked boxes. The rewrite renders one carrier by the member's kind (M24.D2)."
+        },
+        {
+          "id": "M24.X13",
+          "rung": "behavior",
+          "defect": "A check list's Focus focuses its first box (NativeCheckList.Focus), whichever box is checked. The list's element is a div, which the DOM's own focus does not focus, so a list whose code defines no focus leaves the person on the button; one that focuses a checked box, as the radio group does, puts them on that box."
+        },
+        {
+          "id": "M24.X14",
+          "rung": "behavior",
+          "defect": "A check list over a member of text renders one carrier, the hidden input under the binding name that holds the checked values joined by commas, with the boxes nameless (M24.D2). A helper that names the boxes too sends each checked value before the joined text, and MVC binds a string from the first value the form sends, a box's."
         }
       ],
       "promises": [
@@ -878,6 +888,22 @@
           "outcome": "The page reads 2 days: Mon, Wed.",
           "opposite": "Check nothing and click Save: the page reads 0 days.",
           "defect": "On both lines the form sends Mon,Wed, Mon and Wed under VisitDays, and the page reads 3 days: Mon,Wed, Mon, Wed."
+        },
+        {
+          "for": "M24.X13",
+          "page": "A visit days page with a NativeCheckList over the model's VisitDays, a List<string>, options Mon, Tue and Wed, Wed checked from the model, and a Change days button whose click calls the list's Focus, reached by pipeline.Input(m => m.VisitDays).Component<NativeCheckList>().",
+          "gesture": "Click Change days.",
+          "outcome": "The Mon box, the list's first, holds the focus, though Wed is the box checked.",
+          "opposite": "Open the page and click nothing: the Wed box alone is checked, as the model starts it, and the Mon box does not hold the focus.",
+          "defect": "Focus is left to the DOM's own, which focuses nothing on the list's element, or focuses the checked box, Wed."
+        },
+        {
+          "for": "M24.X14",
+          "page": "A visit routine form with a NativeCheckList over the model's VisitDays, a string, options Mon, Tue and Wed, none checked, posted by the browser's own submission to an action that renders the text it bound.",
+          "gesture": "Check Mon and Wed and click Save.",
+          "outcome": "The page reads Visit days: Mon,Wed.",
+          "opposite": "Check nothing and click Save: the joined text is empty, which MVC binds as null, and the page reads No visit days.",
+          "defect": "The boxes carry the binding name too, so the form sends Mon and Wed before Mon,Wed under VisitDays, and the page reads Visit days: Mon."
         }
       ],
       "verdicts": [
@@ -1796,6 +1822,16 @@
           "id": "M24.X3",
           "rung": "behavior",
           "defect": "Main's radio group holds its value in a hidden input with no name (Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:162 at 623dd4a27), which SetValue writes (Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupExtensions.cs:31 at 623dd4a27), and only a click on a radio fills it (Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:196 at 623dd4a27): a write checks no radio, so the page shows the old choice and a form's own submission sends it, through the named radios, while the plan reads the new one. The rewrite's write checks the radio it names (M24.D4), as the redesign's code does (Alis.Reactive.Assets/components/native/radio-group.ts:10-18 at 65fdf118d)."
+        },
+        {
+          "id": "M24.X11",
+          "rung": "behavior",
+          "defect": "A radio group's write raises no change (M24.D4), as the DOM raises none on a script's write (M24.D1), while the hidden field's code raises change after a write that changes its value (M24.D3). A group whose setter raises change, on every write or as the hidden field's does, runs the page's Change handler for a pick the person never made."
+        },
+        {
+          "id": "M24.X12",
+          "rung": "behavior",
+          "defect": "A radio group's Focus focuses the checked radio, else the first (M24.D4). The group's input is hidden, so the DOM's own focus focuses nothing; a group that focuses the first radio always, or the checked one alone, puts the person on a radio they did not choose, or leaves them on the button when none is chosen."
         }
       ],
       "promises": [
@@ -1806,6 +1842,22 @@
           "outcome": "The Oak radio is checked and the Rose radio is not.",
           "opposite": "Click the Lily radio: the group's Change handler sets wing-echo's text to the group's Value, Lily, and Lily alone is checked.",
           "defect": "On main the write fills the unnamed hidden input alone: the Rose radio stays checked while the plan reads Oak."
+        },
+        {
+          "for": "M24.X11",
+          "page": "A wing transfer page with a NativeRadioGroup over the model's Wing, options Rose, Lily and Oak, Rose chosen from the model, whose Change handler sets wing-echo's text to the group's Value, and a Transfer to Oak button whose click sets the group's Value to Oak, reached by pipeline.Input(m => m.Wing).Component<NativeRadioGroup>(), then sets transfer-status's text to Transfer to Oak requested.",
+          "gesture": "Click Transfer to Oak.",
+          "outcome": "transfer-status reads Transfer to Oak requested, the Oak radio is checked, and wing-echo stays empty.",
+          "opposite": "Click the Lily radio: wing-echo reads Lily.",
+          "defect": "The group's setter raises change, as the hidden field's does after a write that changes its value, so wing-echo reads Oak."
+        },
+        {
+          "for": "M24.X12",
+          "page": "A wing change page with a NativeRadioGroup over the model's Wing, options Rose, Lily and Oak, Lily chosen from the model, and a Change wing button whose click calls the group's Focus, reached by pipeline.Input(m => m.Wing).Component<NativeRadioGroup>().",
+          "gesture": "Click Change wing.",
+          "outcome": "The Lily radio holds the focus.",
+          "opposite": "Opened for a model whose Wing is null, so no radio is chosen, the same click puts the focus on the Rose radio, the first.",
+          "defect": "Focus is left to the DOM's own, which focuses no radio, or always focuses Rose, the first radio, or focuses the chosen radio alone, so with none chosen the focus stays on the button."
         }
       ],
       "verdicts": [

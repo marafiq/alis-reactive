@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WingTransfer
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Wing transfer";
+    var plan = Html.ReactivePlan<WingTransfer>();
+}
+<h1>Wing transfer</h1>
+@(Html.InputField(plan, m => m.Wing, options => options.Label("Wing")).NativeRadioGroup(group => group.Option("Rose").Option("Lily").Option("Oak"))
+    .Reactive(group => group.Change, (changed, pipeline) => pipeline
+        .Element("wing-echo").Text.Set(pipeline.Input(m => m.Wing).Component<NativeRadioGroup>().Value)))
+<button type="button" @Html.Raises(plan, WingTransfers.TransferToOak)>Transfer to Oak</button>
+<p>Picked by hand: <span id="wing-echo"></span></p>
+<p id="transfer-status"></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WingTransfers.TransferToOak, pipeline =>
+    {
+        pipeline.Input(m => m.Wing).Component<NativeRadioGroup>().Value.Set("Oak");
+        pipeline.Element("transfer-status").Text.Set("Transfer to Oak requested");
+    }));
+}
+@Html.RenderPlan(plan)

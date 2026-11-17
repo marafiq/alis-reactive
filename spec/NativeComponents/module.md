@@ -115,6 +115,9 @@ The meanings `M24.D1` to `M24.D4` are in `spec/NativeComponents/features.json`, 
   `Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListExtensions.cs:34` at 623dd4a27); the redesign's code
   checks them (`Alis.Reactive.Assets/components/native/radio-group.ts:10-18`,
   `Alis.Reactive.Assets/components/native/check-list.ts:9-16` at 65fdf118d).
+- A radio group's write raises no change (M24.D4, M24.X11). Its Focus focuses the chosen radio, else the first (M24.D4,
+  M24.X12), and a check list's focuses its first box, whichever is checked (M24.X13).
+- A check list over a member of text sends its checked values as one joined text, its boxes nameless (M24.D2, M24.X14).
 - A check list sends each checked value once in a form's own submission (M24.D2, M24.X5). Both lines render the
   joined text under the binding name beside a box of that name per option
   (`Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:169`, `:180` at 623dd4a27,

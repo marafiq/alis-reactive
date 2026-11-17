@@ -17,4 +17,5 @@ public static partial class CarePages
     public const string AdmissionApplication = Admission + "admission-application";
     public const string IntakeDocuments = Admission + "intake-documents";
     public const string QuickAdmission = Admission + "quick-admission";
+    public const string AdmissionDesk = Admission + "admission-desk";
 }

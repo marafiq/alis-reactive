@@ -1617,6 +1617,20 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M24.F4 M24.X13 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/VisitDaysChange.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M24.F4 M24.X14 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/VisitRoutine.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M24.F4 M24.X4 0": {
     "modules": [],
     "views": [
@@ -1642,6 +1656,20 @@
     "modules": [],
     "views": [
       "/Care/Admission/IntakeBed.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M24.F7 M24.X11 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/WingTransfer.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M24.F7 M24.X12 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/WingChange.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -2642,6 +2670,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F2 X10.12 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/AdmissionDesk.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F2 X10.13 0": {
     "modules": [],
     "views": [
@@ -2765,6 +2800,13 @@
     "modules": [],
     "views": [
       "/Care/Admission/CareLevelChoice.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M7.F1 M7.X7 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/ResidentIntake.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

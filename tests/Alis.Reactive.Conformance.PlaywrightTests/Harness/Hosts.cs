@@ -50,6 +50,14 @@ public static class Hosts
 
     public static readonly string[] AntiforgeryField = [AntiforgeryFieldName];
 
+    public const string NoShowValidationErrorsName = HostNames.NoShowValidationErrors;
+
+    public static readonly string[] NoShowValidationErrors = [NoShowValidationErrorsName];
+
+    public const string ClassNamesName = HostNames.ClassNames;
+
+    public static readonly string[] ClassNames = [ClassNamesName];
+
     public const string DefaultHooksName = HostNames.DefaultHooks;
 
     public static readonly string[] DefaultHooks = [DefaultHooksName];

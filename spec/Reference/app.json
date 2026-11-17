@@ -135,6 +135,11 @@
       "framework": "net10"
     },
     {
+      "id": "noShowValidationErrors",
+      "what": "net10's request defaults without ShowValidationErrors(), so a 400 takes the catch-all",
+      "framework": "net10"
+    },
+    {
       "id": "fusionShell",
       "what": "a layout that renders FusionToast and FusionConfirmDialog in place of the Native ones",
       "framework": "net10"
@@ -4674,6 +4679,36 @@
       ]
     },
     {
+      "feature": "M24.F4",
+      "for": "M24.X13",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nativeInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F4",
+      "for": "M24.X14",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nativeInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M24.F6",
       "for": "M24.X2",
       "index": 0,
@@ -4691,6 +4726,36 @@
     {
       "feature": "M24.F7",
       "for": "M24.X3",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nativeInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F7",
+      "for": "M24.X11",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nativeInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F7",
+      "for": "M24.X12",
       "index": 0,
       "screen": "admission",
       "hosts": [
