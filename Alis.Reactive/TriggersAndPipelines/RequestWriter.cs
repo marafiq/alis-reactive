@@ -46,6 +46,7 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
     private bool _noDefaults;
     private bool _noRetry;
     private BusyChoice _busy = BusyChoice.Derived;
+    private (IReadOnlyList<Statement> Block, bool Awaited)? _defaultsLoading;
     private IReadOnlyList<string> _busyIds = [];
 
     private RequestWriter(BlockWriter writer, RequestPartsWriter parts, RequestMethod method, Func<RequestWriter<TModel>, IReadOnlyList<Statement>> defaultCheck)
@@ -135,7 +136,7 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
         Continue(stage);
         if (_hasLoading) throw new InvalidOperationException("WhileLoading is already written for this request; put its steps in one block.");
         _hasLoading = true;
-        _loading = _writer.Branch(_enteredAfterAwait, () => body(new Pipeline<TModel>(_writer))).Block;
+        _loading = _writer.Branch(LoadingEntersAwaited, () => body(new Pipeline<TModel>(_writer))).Block;
         return Changed();
     }
 
@@ -211,7 +212,7 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
 
     private Layer WriteDefaults()
     {
-        var loading = _writer.Branch(_enteredAfterAwait, () => _defaults.LoadingBlock(new Pipeline<NoModel>(_writer))).Block;
+        var loading = DefaultsLoading().Block;
         var @finally = _writer.Branch(true, () => _defaults.FinallyBlock(new Pipeline<NoModel>(_writer))).Block;
         foreach (var status in _defaults.Statuses)
         {
@@ -284,6 +285,11 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
             Check(), Layers(), _success, Statuses(), CatchAll(), _chained);
 
     private bool TakesDefaults => !_sentByADefault && !_noDefaults;
+
+    private bool LoadingEntersAwaited => _enteredAfterAwait || TakesDefaults && DefaultsLoading().Awaited;
+
+    private (IReadOnlyList<Statement> Block, bool Awaited) DefaultsLoading()
+        => _defaultsLoading ??= RequestScopes.InDefaults(_writer, () => _writer.Branch(_enteredAfterAwait, () => _defaults.LoadingBlock(new Pipeline<NoModel>(_writer))));
 
     private bool ChecksAtTheNotice => _check.Count > 0 && !_parts.SendsAContainer;
 

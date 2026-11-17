@@ -651,6 +651,15 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M17.F1 X11.18 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/Execution/DischargeDrawer.cshtml",
+      "/Refusals/Execution/_DrawerLayout.cshtml",
+      "/Refusals/Index/Index.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M17.F1 X11.2 0": {
     "modules": [],
     "views": [

@@ -51,6 +51,22 @@ public sealed class WhenARequestOwnsItsBlocks
         }), Throws.InvalidOperationException.With.Message.EqualTo(AfterAwait));
 
     [Test]
+    public void loading_after_the_defaults_loading_awaits_cannot_write_the_original_payload()
+        => Assert.That(() => WithPayload((raised, pipeline) => pipeline.Get("/staff").WhileLoading(pipeline => raised.Note.Set("Late")),
+                requests => requests.NoAntiforgery().WhileLoading(pipeline => pipeline.Component<RequestPanel>("request").Wait())),
+            Throws.InvalidOperationException.With.Message.EqualTo(AfterAwait));
+
+    [Test]
+    public void loading_after_the_defaults_loading_awaits_nothing_can_write_the_vendors_payload()
+    {
+        var plan = WithPayload((raised, pipeline) => pipeline.Get("/staff").WhileLoading(pipeline => raised.Note.Set("Loading")),
+            requests => requests.NoAntiforgery().WhileLoading(pipeline => pipeline.Element("status").Text.Set("Renewing")));
+        Assert.That(RequestPage.Request(plan).GetProperty("layers")[1].GetProperty("whileLoading").GetRawText(), Is.EqualTo(
+            """[{"kind":"set","path":["note"],"members":"required","content":false,"target":{"kind":"ref","name":"e"},"value":{"kind":"lit","value":"Loading"}}]"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
     public void a_listener_inside_chained_keeps_the_reply_it_captured()
     {
         var plan = RequestPage.Rendered(pipeline => pipeline.Get("/staff").OnSuccess(Content.Text, (reply, pipeline) => { })
@@ -128,8 +144,11 @@ public sealed class WhenARequestOwnsItsBlocks
     }
 
     private static string WithPayload(Action<RequestRaised, Pipeline<RequestDesk>> write)
+        => WithPayload(write, requests => requests.NoAntiforgery());
+
+    private static string WithPayload(Action<RequestRaised, Pipeline<RequestDesk>> write, Action<RequestDefaults> defaults)
     {
-        var html = Views.Of(new RequestDesk(), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
+        var html = Views.Of(new RequestDesk(), _ => { }, app => app.AddReactiveRequests(defaults));
         var plan = html.ReactivePlan<RequestDesk>();
         plan.Render<RequestPanel>("request", HtmlString.Empty).Reactive(panel => panel.Raised, write);
         var rendered = Views.TextOf(html.RenderPlan(plan));
