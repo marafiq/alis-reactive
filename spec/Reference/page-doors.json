@@ -1480,9 +1480,7 @@
     ]
   },
   "M21.F47 M21.X1028 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/CareTabs.cshtml",
       "/Shared/_FusionLayout.cshtml"
