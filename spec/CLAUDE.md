@@ -1842,6 +1842,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   written by the C# that writes the stop, so the runtime records a refused check as the event alis.refused and a
   written stop as alis.stop, each with its reason (D20.4), and reads no reason's text to tell them apart; a grammar
   change, the owner's.
+- The owner, 2026-11-17, answering the lead's two asks on request shapes, verbatim: "i will go with your calls."
+  Read by the lead: a JSON list position set from a value the body leaves out when it reads nothing is refused
+  where the view renders, as a gap before a set position is (D9.7), since the endpoint would bind an item the
+  request never set; the cure, a literal or the list sent whole. A reply's read of a member the request sent in its
+  JSON body is refused where the view renders with its cure, its source or the path, query or form data: neither
+  main's ResponseBuilder nor the redesign's has a door that reads a sent member back, so no feature is lost, and
+  the plan keeps no sent body (no grammar change).
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
