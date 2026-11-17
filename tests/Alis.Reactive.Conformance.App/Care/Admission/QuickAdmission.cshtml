@@ -1,4 +1,5 @@
 @using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
 @using Alis.Reactive.Native.NativeComponents
 @using Alis.Reactive.RenderingAndDelivery
 @using Alis.Reactive.TriggersAndPipelines
@@ -18,7 +19,7 @@
     <button type="button" @Html.Raises(plan, QuickAdmissions.Admit)>Admit</button>
     Html.On(plan, trigger => trigger.CustomEvent(QuickAdmissions.Admit, pipeline =>
     {
-        pipeline.Post<QuickAdmission>(QuickAdmissionEndpoints.Admissions, request => request.Form(admission.Form))
+        pipeline.Post<QuickAdmission>(CareEndpoints.QuickAdmissionAdmissions, request => request.Form(admission.Form))
             .Validate<QuickAdmissionRules>();
         pipeline.Element("admission-log").Text.Set("Sent");
     }));

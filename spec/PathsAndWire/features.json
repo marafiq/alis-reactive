@@ -374,9 +374,9 @@
           "for": "X2.4",
           "page": "A move-in view with a text box for the resident's own Name and the next-of-kin partial, rendered by Html.PartialFor(m => m.Kin, \"_NextOfKin\") under the prefix Kin, whose text box binds its model's Name; each box has its message element beside it. Save posts the move-in to an endpoint that answers 400 with the error key Kin.Name and the message \"Ada Lee lives here; name another next of kin.\" when the kin's name is Ada Lee, and otherwise answers Saved into move-in-status, which reads Not saved until then.",
           "gesture": "Type Sam Lee into the resident's Name, type Ada Lee into the next of kin's Name, and click Save.",
-          "outcome": "\"Ada Lee lives here; name another next of kin.\" shows beside the next of kin's Name, the resident's Name shows no message, and move-in-status keeps Not saved.",
+          "outcome": "\"Ada Lee lives here; name another next of kin.\" shows beside the next of kin's Name, whose id is Alis_Reactive_Conformance_App_Care_MoveInKin__Kin_Name, the resident's Name shows no message, and move-in-status keeps Not saved.",
           "opposite": "With the next of kin named Ben Lee, Save shows Saved in move-in-status and no message beside either box.",
-          "defect": "The four names drift under the prefix, as D2.3's evidence P1 records: the kin's box posts under Name, so the endpoint sees no Ada Lee under Kin.Name and answers Saved; or its id or message element lacks Kin, so the message for Kin.Name shows beside the resident's Name or at no input."
+          "defect": "The four names drift under the prefix, as D2.3's evidence P1 records: the kin's box posts under Name, so the endpoint sees no Ada Lee under Kin.Name and answers Saved; or its id lacks Kin, so the box holds another id; or its message element lacks Kin, so the message for Kin.Name shows at no input."
         },
         {
           "for": "X3.3",

@@ -20,7 +20,7 @@ public sealed class WhenASlotsContentRendersAnIdThePageHolds(string host) : Conf
         await reception.Page.Locator("#section").GetByRole(AriaRole.Textbox).FillAsync("Ada");
         await reception.Page.Locator("#section").GetByRole(AriaRole.Textbox).PressAsync("Tab");
         await Expect(reception.Page.Locator("#section-note")).ToHaveTextAsync("");
-        Assert.That(reception.ConsoleErrors, Has.Count.EqualTo(1));
+        Assert.That(reception.ConsoleErrors, Is.EqualTo(new[] { "Input 'Alis_Reactive_Conformance_App_Care_Reception__Name' is already held by plan 'Alis.Reactive.Conformance.App.Care.Reception' on the page; plan 'Alis.Reactive.Conformance.App.Care.Reception' in slot 'section' did not start." }));
 
         var phoneSection = await NewWorld();
         await phoneSection.Page.GotoAsync(CarePages.ReceptionWithAPhoneSection);

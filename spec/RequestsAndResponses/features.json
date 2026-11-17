@@ -595,9 +595,9 @@
           "for": "M6.X5",
           "page": "A photo badge whose HEAD goes to an action under [HttpHead] that answers 200 with an ETag header, its route of kind none writing the status and Headers.Get(\"ETag\") into texts; a second button sends HEAD to an action under [HttpGet] alone.",
           "gesture": "Click Check photo, then Check the other.",
-          "outcome": "The first writes 200 and the ETag \"v7\"; the second runs the route for 405 and writes 405.",
+          "outcome": "The first leaves as a HEAD with Accept */* and writes 200 and the ETag \"v7\"; the second runs the route for 405 and writes 405.",
           "opposite": "A GET to the first action writes 200 and the photo's size from its body.",
-          "defect": "The HEAD read as a JSON route, so the empty body runs the catch-all and no 200 shows; or HEAD answered as GET, so the second writes 200."
+          "defect": "The HEAD read as a JSON route, so it leaves asking for JSON with Accept application/json; or HEAD answered as GET, so the second writes 200."
         },
         {
           "for": "X9.26",
@@ -629,7 +629,7 @@
           "gesture": "Type Ada Byron as the name; choose consent.pdf, 1,024 bytes, with the caption Consent in the first row, and Überweisung.pdf, 2,048 bytes, with the caption Referral in the second; click Save.",
           "outcome": "saved reads Ada Byron; consent.pdf 1024 Consent; Überweisung.pdf 2048 Referral.",
           "opposite": "With the two rows' files exchanged, saved reads Ada Byron; Überweisung.pdf 2048 Consent; consent.pdf 1024 Referral.",
-          "defect": "The files sent as text or keyed by their input's id, so the endpoint binds no document; or the name past US-ASCII mangled, so the second document's name is not Überweisung.pdf; or a caption bound apart from its file, so the captions follow the order of the files and not their rows."
+          "defect": "The files sent as text or keyed by their input's id, so the endpoint binds no document; or the name past US-ASCII mangled, so the second document's name is not Überweisung.pdf."
         },
         {
           "for": "X9.28",

@@ -16,7 +16,11 @@ public sealed class WhenARequestIsAHead(string host) : ConformanceFixture(host)
     {
         var badge = await NewWorld();
         await badge.Page.GotoAsync(CarePages.PhotoBadge);
-        await badge.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Check photo", Exact = true }).ClickAsync();
+        var checkedPhoto = await badge.Page.RunAndWaitForRequestAsync(
+            () => badge.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Check photo", Exact = true }).ClickAsync(),
+            "**" + CareEndpoints.PhotoBadgePhoto);
+        Assert.That(checkedPhoto.Method, Is.EqualTo("HEAD"));
+        Assert.That(await checkedPhoto.HeaderValueAsync("accept"), Is.EqualTo("*/*"));
         await Expect(badge.Page.Locator("#photo-status")).ToHaveTextAsync("200");
         await Expect(badge.Page.Locator("#photo-version")).ToHaveTextAsync("\"v7\"");
         await badge.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Check the other", Exact = true }).ClickAsync();

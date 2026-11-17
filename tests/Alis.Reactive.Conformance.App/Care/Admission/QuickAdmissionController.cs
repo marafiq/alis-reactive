@@ -12,7 +12,7 @@ public sealed class QuickAdmissionController : Controller
     [HttpGet(CarePages.QuickAdmission)]
     public IActionResult OfAResident() => View("/Care/Admission/QuickAdmission.cshtml", new QuickAdmission());
 
-    [HttpPost(QuickAdmissionEndpoints.Admissions)]
+    [HttpPost(CareEndpoints.QuickAdmissionAdmissions)]
     public IActionResult Admit([FromForm] QuickAdmission admission) => Content($"Admitted {admission.Name}", PlainText);
 }
 
@@ -24,11 +24,6 @@ public sealed class QuickAdmission
 public sealed class QuickAdmissionRules : ReactiveValidator<QuickAdmission>
 {
     public QuickAdmissionRules() => RuleFor(admission => admission.Name).NotEmpty().WithMessage("Name the resident.");
-}
-
-public static class QuickAdmissionEndpoints
-{
-    public const string Admissions = CarePages.QuickAdmission + "/admissions";
 }
 
 public static class QuickAdmissions

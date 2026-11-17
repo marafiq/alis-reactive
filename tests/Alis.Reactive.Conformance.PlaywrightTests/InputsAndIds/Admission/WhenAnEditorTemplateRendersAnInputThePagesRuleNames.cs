@@ -19,6 +19,8 @@ public sealed class WhenAnEditorTemplateRendersAnInputThePagesRuleNames(string h
         await desk.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Save", Exact = true }).ClickAsync();
         await Expect(desk.Page.GetByRole(AriaRole.Group, new PageGetByRoleOptions { Name = "Next of kin", Exact = true })
             .GetByText("Name the next of kin.", new LocatorGetByTextOptions { Exact = true })).ToBeVisibleAsync();
+        await Expect(desk.Page.GetByRole(AriaRole.Group, new PageGetByRoleOptions { Name = "Next of kin", Exact = true })
+            .GetByRole(AriaRole.Textbox, new LocatorGetByRoleOptions { Name = "Name", Exact = true })).ToHaveIdAsync("Alis_Reactive_Conformance_App_Care_DeskKin__NextOfKin_Name");
         await Expect(desk.Page.Locator("#kin-status")).ToHaveTextAsync("Not saved");
         Assert.That(desk.SentTo(CareEndpoints.KinDeskDesks), Is.EqualTo(0));
         await desk.Page.GetByRole(AriaRole.Group, new PageGetByRoleOptions { Name = "Next of kin", Exact = true })

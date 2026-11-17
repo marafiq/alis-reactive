@@ -23,6 +23,7 @@ public sealed class WhenACascadesFirstAnswerArrivesAfterItsSecond(string host) :
         await Expect(replaced.Page.GetByRole(AriaRole.Region, new PageGetByRoleOptions { Name = "Rooms", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveTextAsync(new[] { "W1", "W2", "W3" });
         await held.Release();
+        await Expect(replaced.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: none");
         await Expect(replaced.Page.GetByRole(AriaRole.Region, new PageGetByRoleOptions { Name = "Rooms", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveTextAsync(new[] { "W1", "W2", "W3" });
 

@@ -9,7 +9,7 @@ public sealed class FreeBedController : Controller
     private const string EastFour = "east-4";
 
     [HttpGet(CarePages.FreeBedOnAFullWard)]
-    public IActionResult OnAFullWard() => View("/Care/Admission/FreeBed.cshtml", new FreeBedDesk("North ward", FreeBedEndpoints.NorthWardsFreeBeds));
+    public IActionResult OnAFullWard() => View("/Care/Admission/FreeBed.cshtml", new FreeBedDesk("North ward", CareEndpoints.FreeBedNorthWardsFreeBeds));
 
     [HttpGet(CarePages.FreeBedOnAWardWithABedFree)]
     public IActionResult OnAWardWithABedFree() => View("/Care/Admission/FreeBed.cshtml", new FreeBedDesk("East ward", FreeBedEndpoints.EastWardsFreeBeds));
@@ -17,7 +17,7 @@ public sealed class FreeBedController : Controller
     [HttpGet(CarePages.BedsOfTheEastWard)]
     public IActionResult BedsOfTheEastWard() => View("/Care/Admission/WardBeds.cshtml", new WardBeds("East ward", [EastFour]));
 
-    [HttpGet(FreeBedEndpoints.NorthWardsFreeBeds)]
+    [HttpGet(CareEndpoints.FreeBedNorthWardsFreeBeds)]
     public IActionResult NorthWardsFreeBed() => Json(new FreeBedAnswer(null));
 
     [HttpGet(FreeBedEndpoints.EastWardsFreeBeds)]
@@ -46,9 +46,7 @@ public static class FreeBedEndpoints
 {
     private const string Root = CarePages.Area + "admission/free-bed/";
 
-    private const string Beds = Root + "beds/";
-
-    public const string NorthWardsFreeBeds = Root + "north/beds/free";
+    private const string Beds = CareEndpoints.FreeBedBeds;
 
     public const string EastWardsFreeBeds = Root + "east/beds/free";
 

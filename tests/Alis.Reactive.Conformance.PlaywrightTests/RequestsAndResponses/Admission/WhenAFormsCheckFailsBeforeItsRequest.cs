@@ -19,12 +19,13 @@ public sealed class WhenAFormsCheckFailsBeforeItsRequest(string host) : Conforma
         await unnamed.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Admit", Exact = true }).ClickAsync();
         await Expect(unnamed.Page.GetByRole(AriaRole.Group, new PageGetByRoleOptions { Name = "Name", Exact = true })
             .GetByText("Name the resident.", new LocatorGetByTextOptions { Exact = true })).ToBeVisibleAsync();
+        Assert.That(unnamed.SentTo(CareEndpoints.QuickAdmissionAdmissions), Is.EqualTo(0));
         await Expect(unnamed.Page.Locator("#admission-log")).ToHaveTextAsync("-");
 
         var named = await NewWorld();
         await named.Page.GotoAsync(CarePages.QuickAdmission);
         await named.Page.GetByRole(AriaRole.Textbox, new PageGetByRoleOptions { Name = "Name", Exact = true }).FillAsync("Ada Hart");
-        var sent = await named.Page.RunAndWaitForRequestAsync(() => named.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Admit", Exact = true }).ClickAsync(), "**/care/admission/quick-admission/admissions");
+        var sent = await named.Page.RunAndWaitForRequestAsync(() => named.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Admit", Exact = true }).ClickAsync(), "**" + CareEndpoints.QuickAdmissionAdmissions);
         Assert.That(sent.Method, Is.EqualTo("POST"));
         await Expect(named.Page.Locator("#admission-log")).ToHaveTextAsync("Sent");
     }

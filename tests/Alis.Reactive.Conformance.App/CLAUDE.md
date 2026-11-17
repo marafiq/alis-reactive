@@ -13,8 +13,8 @@ its views.
   numbersAsText, dateConverter, snakeCase, pascalCase and enumsAsNumbers, those options with the one change its
   definition names; jsonContract's are net10's that ignore a member holding its default and respect required
   constructor parameters, and its resolver lands with the page that reads an admission's pharmacy; siteHeader's
-  request defaults are net10's with the app's header Care-Site beside them, and no host's defaults send
-  X-Requested-With (the owner, 2026-11-15). The app's cookie authentication answers a challenge as net10 does, 401 at
+  request defaults are net10's with the app's header Care-Site beside them, antiforgeryField's send the antiforgery
+  token in a form field where net10's send it in a header, and no host's defaults send X-Requested-With (the owner, 2026-11-15). The app's cookie authentication answers a challenge as net10 does, 401 at
   an API endpoint and a redirect to the record's sign-in page elsewhere (`Care/Record/SessionNotesController.cs`). Every host's
   startup names the flags enums its pages read, as net10's definition names them, in `AppHost.cs`: the conformance
   library's `CareDays` and the care rota's `CareDays` and `RotaDays`. An app started under no host, or under one it does not serve, stops and names the hosts it serves.

@@ -30,6 +30,7 @@ internal static class AppHost
             case HostNames.NoRequests:
             case HostNames.NoAntiforgeryChoice:
             case HostNames.SiteHeader:
+            case HostNames.AntiforgeryField:
             case HostNames.DefaultHooks:
             case HostNames.Tracing:
                 WriteEnumNames(json);
@@ -59,7 +60,7 @@ internal static class AppHost
                 json.TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { LeaveOutTheAdmissionsPharmacy } };
                 return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.DefaultHooks} and {HostNames.Tracing}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.DefaultHooks} and {HostNames.Tracing}.");
         }
     }
 
@@ -80,10 +81,13 @@ internal static class AppHost
                 services.AddReactiveRequests(requests => { });
                 return;
             case HostNames.SiteHeader:
-                services.AddReactiveRequests(requests => TheDefaults(requests).Header("Care-Site", "North"));
+                services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.Header).Header("Care-Site", "North"));
+                return;
+            case HostNames.AntiforgeryField:
+                services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.FormField));
                 return;
             case HostNames.DefaultHooks:
-                services.AddReactiveRequests(requests => TheDefaults(requests)
+                services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.Header)
                     .WhileLoading(pipeline => pipeline.Plugin<CareSession>().Renew())
                     .Finally(pipeline =>
                     {
@@ -93,13 +97,13 @@ internal static class AppHost
                     }));
                 return;
             default:
-                services.AddReactiveRequests(requests => TheDefaults(requests));
+                services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.Header));
                 return;
         }
     }
 
-    private static RequestDefaults TheDefaults(RequestDefaults requests) => requests
-        .Antiforgery(AntiforgeryIn.Header)
+    private static RequestDefaults TheDefaults(RequestDefaults requests, AntiforgeryIn place) => requests
+        .Antiforgery(place)
         .ShowBusy()
         .ShowValidationErrors()
         .OnError(401, Content.None, (expired, pipeline) => pipeline.Notice().Warning("Your session has ended."))

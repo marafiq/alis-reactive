@@ -130,6 +130,11 @@
       "framework": "net10"
     },
     {
+      "id": "antiforgeryField",
+      "what": "net10's request defaults with the antiforgery token in a form field, Antiforgery(AntiforgeryIn.FormField), in place of the header",
+      "framework": "net10"
+    },
+    {
       "id": "fusionShell",
       "what": "a layout that renders FusionToast and FusionConfirmDialog in place of the Native ones",
       "framework": "net10"
@@ -6055,7 +6060,7 @@
       "index": 0,
       "screen": "admission",
       "hosts": [
-        "net10"
+        "antiforgeryField"
       ],
       "parts": [
         "intakeForm",

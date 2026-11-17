@@ -46,6 +46,10 @@ public static class Hosts
 
     public static readonly string[] SiteHeader = [SiteHeaderName];
 
+    public const string AntiforgeryFieldName = HostNames.AntiforgeryField;
+
+    public static readonly string[] AntiforgeryField = [AntiforgeryFieldName];
+
     public const string DefaultHooksName = HostNames.DefaultHooks;
 
     public static readonly string[] DefaultHooks = [DefaultHooksName];

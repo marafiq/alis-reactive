@@ -2228,7 +2228,7 @@
           "gesture": "Click Texas and its Save with License empty; then click Massachusetts and its Save with Permit empty.",
           "outcome": "The first Save shows \"Give the Texas license.\" only; the second shows \"Give the Massachusetts permit.\" only; moved-in stays empty and no request is sent.",
           "opposite": "With License typed TX-1, the Texas Save shows TX-1 in moved-in.",
-          "defect": "The Texas registration stays after its partial unloads, or the browser runs every registration on the page, so the Massachusetts Save also shows \"Give the Texas license.\"."
+          "defect": "The browser keeps every registration a plan brought to the page, the unloaded Texas partial's among them, and runs them all at each Save, so the Massachusetts Save also shows \"Give the Texas license.\"."
         },
         {
           "for": "X16.7",

@@ -6,8 +6,8 @@ using static Microsoft.Playwright.Assertions;
 
 namespace Alis.Reactive.Conformance.PlaywrightTests.RequestsAndResponses;
 
-[TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10))]
-[Category(Hosts.Net10Name)]
+[TestFixtureSource(typeof(Hosts), nameof(Hosts.AntiforgeryField))]
+[Category(Hosts.AntiforgeryFieldName)]
 public sealed class WhenANativeFormIsSent(string host) : ConformanceFixture(host)
 {
     [Test]

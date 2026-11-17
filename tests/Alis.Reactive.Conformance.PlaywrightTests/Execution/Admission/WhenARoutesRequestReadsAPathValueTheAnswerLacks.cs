@@ -20,6 +20,8 @@ public sealed class WhenARoutesRequestReadsAPathValueTheAnswerLacks(string host)
         await Expect(full.Page.Locator("#bed-status")).ToHaveTextAsync("Closed");
         await Expect(full.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: none");
         await Expect(full.Page.Locator("#bed-name")).ToHaveTextAsync("");
+        Assert.That(full.SentTo(CareEndpoints.FreeBedNorthWardsFreeBeds), Is.EqualTo(1));
+        Assert.That(full.SentTo(CareEndpoints.FreeBedBeds), Is.EqualTo(0));
 
         var eastFourFree = await NewWorld();
         await eastFourFree.Page.GotoAsync(CarePages.FreeBedOnAWardWithABedFree);

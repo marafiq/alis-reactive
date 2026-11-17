@@ -11,8 +11,8 @@ public sealed class PhotoBadgeController : Controller
     [HttpGet(CarePages.PhotoBadge)]
     public IActionResult Badge() => View("/Care/Residents/PhotoBadge.cshtml", new PhotoBadge("Ada Hart"));
 
-    [HttpGet(PhotoBadgeEndpoints.Photo)]
-    [HttpHead(PhotoBadgeEndpoints.Photo)]
+    [HttpGet(CareEndpoints.PhotoBadgePhoto)]
+    [HttpHead(CareEndpoints.PhotoBadgePhoto)]
     public IActionResult Photo()
     {
         Response.Headers.ETag = TheSeventhVersion;
@@ -39,8 +39,6 @@ public static class PhotoBadges
 public static class PhotoBadgeEndpoints
 {
     private const string Root = CarePages.Area + "residents/photo-badge/";
-
-    public const string Photo = Root + "photo";
 
     public const string OtherPhoto = Root + "other-photo";
 }

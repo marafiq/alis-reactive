@@ -28,6 +28,7 @@ public sealed class WhenABranchAwaitsAMethod(string host) : ConformanceFixture(h
 
         var taken = await NewWorld();
         await taken.Page.GotoAsync(CarePages.RoomBooking);
+        await taken.Arm(RunGate.Settle);
         await taken.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Book", Exact = true }).ClickAsync();
         await Expect(taken.Page.Locator("#booking-summary")).ToHaveTextAsync("Open");
     }

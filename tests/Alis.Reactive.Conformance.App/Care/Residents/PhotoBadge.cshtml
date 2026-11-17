@@ -1,4 +1,5 @@
 @using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
 @using Alis.Reactive.RenderingAndDelivery
 @using Alis.Reactive.TriggersAndPipelines
 @model PhotoBadge
@@ -22,7 +23,7 @@
 <button type="button" @Html.Raises(plan, PhotoBadges.CheckTheOther)>Check the other</button>
 <button type="button" @Html.Raises(plan, PhotoBadges.LoadPhoto)>Load photo</button>
 @{
-    Html.On(plan, trigger => trigger.CustomEvent(PhotoBadges.CheckPhoto, pipeline => pipeline.Head(PhotoBadgeEndpoints.Photo)
+    Html.On(plan, trigger => trigger.CustomEvent(PhotoBadges.CheckPhoto, pipeline => pipeline.Head(CareEndpoints.PhotoBadgePhoto)
         .OnSuccess((photo, pipeline) =>
         {
             pipeline.Element("photo-status").Text.Set(photo.Status);
@@ -30,7 +31,7 @@
         })));
     Html.On(plan, trigger => trigger.CustomEvent(PhotoBadges.CheckTheOther, pipeline => pipeline.Head(PhotoBadgeEndpoints.OtherPhoto)
         .OnError(405, (refused, pipeline) => pipeline.Element("other-photo-status").Text.Set(refused.Status))));
-    Html.On(plan, trigger => trigger.CustomEvent(PhotoBadges.LoadPhoto, pipeline => pipeline.Get(PhotoBadgeEndpoints.Photo)
+    Html.On(plan, trigger => trigger.CustomEvent(PhotoBadges.LoadPhoto, pipeline => pipeline.Get(CareEndpoints.PhotoBadgePhoto)
         .OnSuccess<PhotoFacts>((photo, pipeline) =>
         {
             pipeline.Element("photo-status").Text.Set(photo.Status);

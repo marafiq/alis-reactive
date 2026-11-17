@@ -23,6 +23,8 @@ public sealed class WhenAPartialsInputAgreesOnItsFourNames(string host) : Confor
         await moveIn.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Save", Exact = true }).ClickAsync();
         await Expect(moveIn.Page.GetByRole(AriaRole.Region, new PageGetByRoleOptions { Name = "Next of kin", Exact = true })
             .GetByText("Ada Lee lives here; name another next of kin.", new LocatorGetByTextOptions { Exact = true })).ToBeVisibleAsync();
+        await Expect(moveIn.Page.GetByRole(AriaRole.Region, new PageGetByRoleOptions { Name = "Next of kin", Exact = true })
+            .GetByRole(AriaRole.Textbox, new LocatorGetByRoleOptions { Name = "Name", Exact = true })).ToHaveIdAsync("Alis_Reactive_Conformance_App_Care_MoveInKin__Kin_Name");
         await Expect(moveIn.Page.GetByRole(AriaRole.Region, new PageGetByRoleOptions { Name = "Resident", Exact = true })
             .GetByText("Ada Lee lives here; name another next of kin.", new LocatorGetByTextOptions { Exact = true })).ToHaveCountAsync(0);
         await Expect(moveIn.Page.Locator("#move-in-status")).ToHaveTextAsync("Not saved");

@@ -539,7 +539,7 @@
           "for": "X14.7",
           "page": "A reception page whose plan renders an input of Name; a Load button loads into a slot a partial whose own plan renders an input of Name of the page's model class, which takes the same id, and whose handler on that input's change writes its value into the slot's note.",
           "gesture": "Click Load, then type Ada in the slot's input and press Tab.",
-          "outcome": "The slot's note stays empty, and the console's one error names the id and both plans with their places.",
+          "outcome": "The slot's note stays empty, and the console's one error names the id and both plans with their places: Input 'Alis_Reactive_Conformance_App_Care_Reception__Name' is already held by plan 'Alis.Reactive.Conformance.App.Care.Reception' on the page; plan 'Alis.Reactive.Conformance.App.Care.Reception' in slot 'section' did not start.",
           "opposite": "A slot partial whose input binds Phone loads, and typing 0101 there and pressing Tab shows 0101 in its note.",
           "defect": "The slot's plan starts beside the page's while two live inputs hold one id, so its handler listens on the page's input, the first that holds the id, and the console shows no error."
         },
@@ -547,9 +547,9 @@
           "for": "X14.8",
           "page": "A desk page whose model holds NextOfKin and renders Html.EditorFor(m => m.NextOfKin); the template starts its own plan and renders an input of Name; the page's validator requires NextOfKin.Name with \"Name the next of kin.\", and the endpoint answers the same rule.",
           "gesture": "Click Save with the name empty; type Ada in the template's input and click Save again.",
-          "outcome": "After the first save \"Name the next of kin.\" shows beside the template's input and no request leaves the browser; after the second the message is gone and the page shows next of kin Ada.",
+          "outcome": "After the first save \"Name the next of kin.\" shows beside the template's input, whose id is Alis_Reactive_Conformance_App_Care_DeskKin__NextOfKin_Name, and no request leaves the browser; after the second the message is gone and the page shows next of kin Ada.",
           "opposite": "On a desk page whose rule on NextOfKin.Name runs on the server only, the first save posts, and the server's \"Name the next of kin.\" shows beside the template's input.",
-          "defect": "The template's input takes an id the page's rule does not name, so the rule checks no input and the empty save posts, or the message shows only in the summary.",
+          "defect": "The template's input takes an id without the template's prefix NextOfKin, so it holds another id; or a name without it, Name, which the page's rule on NextOfKin.Name does not read, so the rule checks no input and the empty save posts, or the message shows only in the summary.",
           "existing_test": "redesign WhenAPageEditsAMemberThroughItsTemplate.the_pages_rule_on_the_member_shows_its_message_beside_the_templates_field"
         },
         {

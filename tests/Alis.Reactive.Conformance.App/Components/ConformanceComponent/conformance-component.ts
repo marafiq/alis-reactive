@@ -118,7 +118,16 @@ export class ConformanceComponent extends ComponentEvents {
     get ratio(): number { return this.heldRatio; }
     set ratio(value: number) { this.heldRatio = value; this.view.status("Ratio", String(value)); }
     get nullableCount(): number | null { return this.heldNullableCount; }
-    set nullableCount(value: number | null) { this.heldNullableCount = value; this.view.status("Nullable count", value === null ? "none" : String(value)); }
+    set nullableCount(value: number | null) {
+        this.heldNullableCount = value;
+        const held: unknown = value;
+        if (held === null)
+            this.view.status("Nullable count", "none");
+        else if (typeof held === "number")
+            this.view.status("Nullable count", String(held));
+        else
+            this.view.status("Nullable count", "(" + typeof held + " " + JSON.stringify(held) + ")");
+    }
     get binding(): BindingData { return this.heldBinding; }
     set binding(value: BindingData) { this.heldBinding = this.start.bindingCountPending ? withPendingCount(value) : value; }
     get day(): Date { return this.heldDay; }
