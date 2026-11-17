@@ -1554,9 +1554,7 @@
     ]
   },
   "M21.F8 M21.X1004 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/DoseCard.cshtml",
       "/Shared/_FusionLayout.cshtml"
