@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { Streams, type MessageSource, type ReconnectContract } from "./index";
+import { ReconnectOffer, Streams, type MessageSource, type ReconnectContract } from "./index";
 
 type PlanDocument = Parameters<Streams["holds"]>[0];
 type Owner = Parameters<Streams["holds"]>[1];
@@ -108,11 +108,10 @@ function page() {
       sources.push([url, source]);
       return source;
     },
-    reconnect: () => contract,
     logs: (error) => {
       errors.push(error);
     },
-  });
+  }, new ReconnectOffer(() => contract));
   const latest = (url: string) => sources.filter(([at]) => at === url).map(([, source]) => source).at(-1) ?? new Source();
   const heard: string[] = [];
   const hears = (url: string, ...names: string[]) => {

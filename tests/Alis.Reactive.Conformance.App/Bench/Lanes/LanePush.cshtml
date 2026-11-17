@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LaneBoard
+@{
+    Layout = "/Bench/Lanes/_LiveLayout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<LaneBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, Options = Model.Codes }))
+@{
+    Html.On(plan, trigger => trigger.ServerPush(BenchFeed.Live, feed => feed.Renamed, (renamed, pipeline) => pipeline.Component<ConformanceComponent>("conformance").Text.Set(renamed.Read(r => r.Name))));
+}
+@Html.RenderPlan(plan)

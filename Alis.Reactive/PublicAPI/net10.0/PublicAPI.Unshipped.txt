@@ -974,12 +974,38 @@ Alis.Reactive.Realtime.ServerPushStream.Reconnected.get -> Alis.Reactive.Declara
 Alis.Reactive.Realtime.ServerPushStream.Reconnecting.get -> Alis.Reactive.Declarations.Event!
 Alis.Reactive.Realtime.ServerPushStream.ServerPushStream() -> void
 Alis.Reactive.Realtime.ServerPushStream.State.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Realtime.ConnectionState>!
+Alis.Reactive.Realtime.HubPush<TMessage>
+Alis.Reactive.Realtime.HubPush<TMessage>.SendAsync(Microsoft.AspNetCore.SignalR.IClientProxy! clients, TMessage message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Alis.Reactive.Realtime.HubReconnected
+Alis.Reactive.Realtime.HubReconnected.ConnectionId.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Realtime.HubReconnected.HubReconnected() -> void
+Alis.Reactive.Realtime.SignalRHub
+Alis.Reactive.Realtime.SignalRHub.Closed.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.SignalRHub.ConnectionId.get -> Alis.Reactive.Declarations.ReadOnly<string?>!
+Alis.Reactive.Realtime.SignalRHub.Invoke<TResult>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Realtime.SignalRHub.Invoke<TResult>(string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Realtime.SignalRHub.Push<TMessage>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Realtime.HubPush<TMessage>!
+Alis.Reactive.Realtime.SignalRHub.Reconnected.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Realtime.HubReconnected!>!
+Alis.Reactive.Realtime.SignalRHub.Reconnecting.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.SignalRHub.Send(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string! declaredBy = "") -> void
+Alis.Reactive.Realtime.SignalRHub.Send(string! declaredBy = "") -> void
+Alis.Reactive.Realtime.SignalRHub.SignalRHub() -> void
+Alis.Reactive.Realtime.SignalRHub.State.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Realtime.ConnectionState>!
+Alis.Reactive.Realtime.SignalRSource<THub>
 Alis.Reactive.RenderingAndDelivery.RealtimeServices
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Stream<TStream>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream) -> TStream!
 Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream, TMessage>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Realtime.ServerEvent<TMessage>!>! message, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
 Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream, TMessage>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Realtime.ServerEvent<TMessage>!>! message, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
 Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Declarations.Event!>! lifecycle, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
 Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Declarations.Event!>! lifecycle, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Hub<THub>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub) -> THub!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub, TArgs>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Declarations.Event<TArgs!>!>! lifecycle, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub, TArgs>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Declarations.Event<TArgs!>!>! lifecycle, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub, TMessage>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Realtime.HubPush<TMessage>!>! push, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub, TMessage>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Realtime.HubPush<TMessage>!>! push, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Declarations.Event!>! lifecycle, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Declarations.Event!>! lifecycle, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
 static Alis.Reactive.Realtime.ServerEvents.Write(Microsoft.AspNetCore.Http.HttpContext! context, System.Collections.Generic.IAsyncEnumerable<Alis.Reactive.Realtime.ServerMessage!>! messages) -> Microsoft.AspNetCore.Http.HttpResults.ServerSentEventsResult<string!>!
 static Alis.Reactive.Realtime.ServerPushStream.At<TStream>(string! url) -> Alis.Reactive.Realtime.ServerPushSource<TStream!>!
+static Alis.Reactive.Realtime.SignalRHub.At<THub>(string! url) -> Alis.Reactive.Realtime.SignalRSource<THub!>!
 static Alis.Reactive.RenderingAndDelivery.RealtimeServices.AddReactiveRealtime(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Realtime.RealtimeChoices!>! live) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

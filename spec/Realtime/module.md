@@ -20,9 +20,9 @@ of its own. Module 10 of `spec/CLAUDE.md`.
 - Q21: two transports, each by its own standard (D21.1), on net10 alone (D21.2, N21.6); one declaration per server
   event and per hub method (D21.3, N21.1, N21.2); what the framework did not produce is logged once and runs nothing
   (D21.4); the lifecycle triggers `reconnecting`, `reconnected` and `closed` on both transports (D21.5, N21.4); the
-  reconnect contract and the app's startup choice (D21.11, N21.7); the hub's client linked only when a plan names a
-  hub (D21.1, N21.5); each connection's waits stated in C# and carried: a stream's `retry:`, a hub's start and
-  reconnection waits (D21.13, N21.9).
+  reconnect contract and the app's startup choice (D21.11, N21.7); the hub's client loaded by the core from the URL
+  the plan carries, once, when the first plan that names a hub starts (D21.1, N21.5); each connection's waits stated
+  in C# and carried: a stream's `retry:`, a hub's start and reconnection waits (D21.13, N21.9).
 
 ## Boundaries
 

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Mvc.Testing.Handlers;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -348,7 +349,7 @@ public class WhenAnAppRendersItsPages
             .ToList();
 
     private static bool AnswersGet(RouteEndpoint endpoint)
-        => endpoint.Metadata.GetMetadata<IHttpMethodMetadata>() is not { } methods || methods.HttpMethods.Contains(HttpMethods.Get);
+        => endpoint.Metadata.GetMetadata<HubMetadata>() is null && (endpoint.Metadata.GetMetadata<IHttpMethodMetadata>() is not { } methods || methods.HttpMethods.Contains(HttpMethods.Get));
 
     private static string RouteOf(RouteEndpoint endpoint)
         => endpoint.RoutePattern.RawText ?? throw new InvalidOperationException($"The endpoint {endpoint.DisplayName} was mapped with no route text, so the sweep cannot open it.");

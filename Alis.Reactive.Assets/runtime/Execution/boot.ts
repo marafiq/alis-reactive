@@ -2,7 +2,7 @@ import { pageInputs } from "../InputsAndIds/index";
 import { slotsNamedBy, type Owner, type Placed } from "../OwnershipAndState/index";
 import { Slots } from "../PartialsAndSlots/index";
 import { plugin, provide, readQueue, type PluginRegistration } from "../Plugins/index";
-import { reconnectContract, Streams } from "../Realtime/index";
+import { hubClient, Hubs, reconnectContract, ReconnectOffer, Streams, type HubClient } from "../Realtime/index";
 import type { PlanDocument } from "../Schema/index";
 import { tracing } from "../Tracing/index";
 import { DocumentPlugin, raisesOnClick } from "../TriggersAndPipelines/index";
@@ -27,9 +27,10 @@ function announces(event: Announced): (root: Placed) => void {
   };
 }
 
-function startsWith(streams: Streams): (plan: PlanDocument, owner: Owner) => void {
+function startsWith(streams: Streams, hubs: Hubs): (plan: PlanDocument, owner: Owner) => void {
   return (plan, owner) => {
     streams.holds(plan, owner);
+    hubs.holds(plan, owner);
     start(plan, owner, elementById, plugin, (trace) => tracing.planTrace(trace));
   };
 }
@@ -49,15 +50,52 @@ function runsScripts(container: HTMLElement): void {
   }
 }
 
-export function boot(): void {
-  const streams = new Streams({
-    opens: (url) => new EventSource(url),
-    reconnect: () => reconnectContract(plugin("reconnect", "")),
-    logs: (error) => {
-      console.error(error);
-    },
+function loadsClient(asset: string): Promise<HubClient> {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = asset;
+    script.onload = () => {
+      try {
+        resolve(hubClient(plugin("alis.signalr", "")));
+      } catch (error) {
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    };
+    script.onerror = () => {
+      script.remove();
+      reject(new Error("the SignalR client '" + asset + "' did not load."));
+    };
+    document.head.append(script);
   });
-  const starts = startsWith(streams);
+}
+
+function clientsByAsset(): (asset: string) => Promise<HubClient> {
+  const loading = new Map<string, Promise<HubClient>>();
+  return (asset) => {
+    const client = loading.get(asset) ?? loadsClient(asset);
+    loading.set(asset, client);
+    client.catch(() => {
+      loading.delete(asset);
+    });
+    return client;
+  };
+}
+
+function logs(error: string): void {
+  console.error(error);
+}
+
+export function boot(): void {
+  const offer = new ReconnectOffer(() => reconnectContract(plugin("reconnect", "")));
+  const streams = new Streams({ opens: (url) => new EventSource(url), logs }, offer);
+  const hubs = new Hubs({
+    client: clientsByAsset(),
+    waits: (milliseconds) => new Promise((resolve) => {
+      setTimeout(resolve, milliseconds);
+    }),
+    logs,
+  }, offer);
+  const starts = startsWith(streams, hubs);
   const documentPlugin = new DocumentPlugin(document, location);
   raisesOnClick(document, documentPlugin);
   checksLive(document);
@@ -88,6 +126,7 @@ export function boot(): void {
   provide("alis.form", () => pageForms);
   provide("alis.slot", (key) => slots.of(key));
   provide("alis.stream", (key) => streams.of(key));
+  provide("alis.hub", (key) => hubs.of(key));
   readQueue(window.__alisPlugins ??= []);
   announces("alis:mount")(document.body);
   const found = plansWithin(document);

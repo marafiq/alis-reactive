@@ -1,6 +1,6 @@
 <Project>
   <ItemGroup>
-    <AlisReactiveBrowserFile Include="$(MSBuildThisFileDirectory)../../staticwebassets/**/*">
+    <AlisReactiveBrowserFile Include="$(MSBuildThisFileDirectory)../../staticwebassets/**/*" Exclude="$(MSBuildThisFileDirectory)../../staticwebassets/js/alis-reactive-hub.js">
       <PackageFolder>$(MSBuildProjectDirectory)/Content/$(MSBuildThisFileName)/</PackageFolder>
       <Shipped>%(FullPath)</Shipped>
       <Placed>$(MSBuildProjectDirectory)/Content/$(MSBuildThisFileName)/%(RecursiveDir)%(Filename)%(Extension)</Placed>

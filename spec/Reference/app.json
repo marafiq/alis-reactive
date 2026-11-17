@@ -5802,10 +5802,19 @@
       "parts": [
         "board",
         "nurseLine",
-        "doses"
+        "doses",
+        "roundEndpoint"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "push"
+      ],
+      "held": [
+        {
+          "verb": "push",
+          "action": "Realtime.tla:Message",
+          "on": "Alert on FacilityAlerts"
+        }
       ]
     },
     {

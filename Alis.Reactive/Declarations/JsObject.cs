@@ -372,6 +372,12 @@ public abstract class JsObject
         return reached;
     }
 
+    internal MethodResult<TResult> ResultAwaited<TResult>(IReadOnlyList<Arg> arguments, string name, string declaredBy)
+        => ResultOf<TResult>(arguments, true, name, false, declaredBy);
+
+    internal void CallAwaited(IReadOnlyList<Arg> arguments, string name, string declaredBy)
+        => Bound.Writer.Write(new DoStatement(true, Call(arguments, name, false, declaredBy)));
+
     private MethodResult<TResult> ResultOf<TResult>(IReadOnlyList<Arg> arguments, bool awaits, string? name, bool optional, string declaredBy)
     {
         var writer = Bound.Writer;

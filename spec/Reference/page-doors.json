@@ -143,6 +143,13 @@
       "/Care/Round/_LiveTracedLayout.cshtml"
     ]
   },
+  "M10.F1 X21.16 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveCallNurse.cshtml",
+      "/Care/Round/_LiveTracedLayout.cshtml"
+    ]
+  },
   "M10.F1 X21.2 0": {
     "modules": [],
     "views": [
@@ -191,6 +198,73 @@
     "views": [
       "/Care/Round/LiveBedCard.cshtml",
       "/Care/Round/LiveOffer.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F2 M10.X1 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveWardLine.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F2 M10.X2 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveWardLine.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F2 M10.X3 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveWardLine.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F2 X12.5 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveStatusBoard.cshtml",
+      "/Care/Round/LiveStatusCard.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F2 X12.6 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveBedLine.cshtml",
+      "/Care/Round/LiveBedLineCard.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F2 X12.6 1": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveLine.cshtml",
+      "/Care/Round/LiveLineCard.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F2 X21.13 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveNurseLine.cshtml",
+      "/Care/Round/_LiveLayout.cshtml"
+    ]
+  },
+  "M10.F2 X21.4 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveRoundFeed.cshtml",
+      "/Care/Round/_LiveTallyLayout.cshtml"
+    ]
+  },
+  "M10.F2 X21.5 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/LiveAlerts.cshtml",
+      "/Care/Round/LiveWardLine.cshtml",
       "/Care/Round/_LiveLayout.cshtml"
     ]
   },
@@ -3749,6 +3823,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "cell lane.push": {
+    "modules": [],
+    "views": [
+      "/Bench/Lanes/LanePush.cshtml",
+      "/Bench/Lanes/_LiveLayout.cshtml"
+    ]
+  },
   "cell lane.slot.hostDestroyed": {
     "modules": [],
     "views": [
@@ -3946,6 +4027,13 @@
     "views": [
       "/Bench/Sources/SourceHeader.cshtml",
       "/Shared/_Layout.cshtml"
+    ]
+  },
+  "cell source.HubArgument": {
+    "modules": [],
+    "views": [
+      "/Bench/Sources/SourceHubArgument.cshtml",
+      "/Bench/Sources/_LiveLayout.cshtml"
     ]
   },
   "cell source.MethodArgument": {

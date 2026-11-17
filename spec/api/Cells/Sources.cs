@@ -16,7 +16,7 @@ public static class Sources
 
     public static TypedSource<string?> MethodAsyncResult(CellBoard board) => board.DescribeLater();
 
-    public static TypedSource<string?> HubInvokeResult() => NoDoor.Source("N21.1, N21.8: no hub door");
+    public static TypedSource<string?> HubInvokeResult(CellHub hub) => hub.Describe();
 
     public static TypedSource<string?> PageUrlMember(PipelineVerbs<CellView> verbs) => verbs.PageUrl<CellPage>().Read(page => page.Wing);
 

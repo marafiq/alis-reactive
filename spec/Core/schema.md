@@ -137,8 +137,8 @@ compared ignoring case, stops the pipeline. Each reads the page's address when i
 | Kind | Carries | Holds | Meaning |
 |------|---------|-------|---------|
 | `none` | nothing | | the plugin contributes nothing to the owner: document, slot (its key is the container id, D12.1), an app's plugin |
-| `hub` | `offer`: whether the core shows the reconnect offer, the app's startup choice | | the owner holds the hub's connection while it lives (D12.6, D21.11) |
-| `stream` | `offer`: as a hub's | | the owner holds the stream's connection while it lives, as a hub's (D21.6, D21.11) |
+| `hub` | `offer`: whether the core shows the reconnect offer, the app's startup choice; `waits`: the milliseconds the client waits before each try of a first start and before each reconnection, written by the C# (D21.13); `client`: the versioned URL of SignalR's client, the core's own asset, which the core loads once, when the first plan that names a hub starts, and which provides the plugin `alis.signalr` the core alone reads (D21.1) | | the owner holds the hub's connection while it lives (D12.6, D21.11) |
+| `stream` | `offer`: whether the core shows the reconnect offer, the app's startup choice | | the owner holds the stream's connection while it lives, as a hub's (D21.6, D21.11) |
 | `model` | `inputs`: a map from input id to `InputBinding`; `containers`: a map from element id to `Container` | | the inputs and the request containers this plan renders, by id (D13.2, D14.3, D14.8) |
 | `form` | | `registration`: `Registration` | this plan's rules of one validator under one rule set, its key the validator's key and the rule set's name, so no element id meets it (D16.2) |
 
@@ -605,4 +605,4 @@ The diff beyond the kinds, each with the decision that makes it:
   N16.4);
 - the `json` body gains `enums`, each a `SentEnum` whose `JsonForm` is `enum`, `flags` or `list` (D9.13, the owner,
   2026-11-16);
-- plugin data `hub` and `stream` gain `offer` (D21.11).
+- plugin data `hub` and `stream` gain `offer` (D21.11), and `hub` gains `waits` (D21.13) and `client` (D21.1).

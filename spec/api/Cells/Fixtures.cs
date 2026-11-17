@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Alis.Reactive.Components;
+using Alis.Reactive.Realtime;
 using Alis.Reactive.Values;
 
 namespace Cells;
@@ -35,6 +36,13 @@ public sealed class CellPlugin : Plugin
     public ReadOnly<string?> Wing => ReadOnly<string?>();
 
     public void Mark(Arg<string?> text) => Method([text]);
+}
+
+public sealed class CellHub : SignalRHub
+{
+    public MethodResult<string?> Describe() => Invoke<string?>([]);
+
+    public void Mark(Arg<string?> text) => Send([text]);
 }
 
 public sealed class CellChanged : JsObject

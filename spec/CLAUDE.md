@@ -1856,6 +1856,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   JSON body is refused where the view renders with its cure, its source or the path, query or form data: neither
   main's ResponseBuilder nor the redesign's has a door that reads a sent member back, so no feature is lost, and
   the plan keeps no sent body (no grammar change).
+- The owner, 2026-11-17, answering the lead's ask on the hub's client, verbatim: "yes on hub.clinet." Read by the
+  lead: a hub's plugin data carries its `waits` (D21.13) and its `client`, the versioned URL of SignalR's client,
+  which the C# writes, and the core loads that client once, when the first plan that names a hub starts, where D21.1
+  said the view links it; a page whose plans name no hub loads no SignalR client (X21.5), and a load that fails is a
+  failed try of the hub's start (Realtime.tla's Connect); a grammar change, the owner's.
+- The owner, 2026-11-17, answering the lead's ask on a container's read of a member the app's JSON options leave
+  out, verbatim: "2-yes, if its ignored ofcourse. it can not be in plan." Read by the lead: such a read stays
+  refused where the view renders, and validation reads such a member from the field the form posts under its C#
+  name, never its value from the plan.
 - The owner, 2026-11-17, answering the lead's ask on GHSA-fc5q-39xc-vjpf, which failed every landing's
   npm audit with no patched version of picomatch published, verbatim: "Exempt by id (Recommended)". Read by the
   lead: `scripts/npm-audit.mjs` fails on every advisory but the ones it excuses by id, and excuses one only while

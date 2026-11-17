@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveRound
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveRound>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+<p>Nurse line: <span id="line-state"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .SignalR(NurseLine.Live, line => line.Welcome, (welcome, pipeline) => pipeline.Element("line-state").Text.Set("open"))
+        .SignalR(NurseLine.Live, line => line.Closed, pipeline => pipeline.Element("line-state").Text.Set("closed")));
+}
+@Html.RenderPlan(plan)

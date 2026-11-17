@@ -36,5 +36,5 @@ public static partial class Positions
 
     public static void PluginArgument(CellPlugin plugin, TypedSource<string?> value) => plugin.Mark(value);
 
-    public static void HubArgument(TypedSource<string?> value) => NoDoor.Position("N21.1, N21.8: no hub door");
+    public static void HubArgument(CellHub hub, TypedSource<string?> value) => hub.Mark(value);
 }

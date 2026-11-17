@@ -13,4 +13,12 @@ public static partial class CarePages
     public const string LiveFeed = LiveRound + "feed";
     public const string LiveFeedItems = LiveRound + "feed-items";
     public const string LiveBoardCard = LiveRound + "board-card";
+    public const string LiveWardLine = LiveRound + "ward-line";
+    public const string LiveRoundFeed = LiveRound + "round-feed";
+    public const string LiveStatusBoard = LiveRound + "status-board";
+    public const string LiveBedLine = LiveRound + "bed-line";
+    public const string LiveBedLineHeldByThePage = LiveRound + "bed-line-held-by-the-page";
+    public const string LiveLine = LiveRound + "line";
+    public const string LiveNurseLine = LiveRound + "nurse-line";
+    public const string LiveTracedNurseLine = LiveRound + "traced-nurse-line";
 }

@@ -276,6 +276,8 @@ export interface NonePluginData {
 export interface HubPluginData {
   readonly kind: "hub";
   readonly offer: boolean;
+  readonly waits: readonly number[];
+  readonly client: string;
 }
 
 export interface StreamPluginData {
