@@ -1333,6 +1333,13 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F24 M21.X1037 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/RoomMove.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F25 M21.X1016 0": {
     "modules": [],
     "views": [
@@ -1368,12 +1375,24 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F29 M21.X1034 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/StaffMention.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F29 M21.X510 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/NoteMention.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F3 M21.X1036 0": {
+    "modules": [],
+    "views": [
+      "/Care/Handover/MedicationAssistantStreamed.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
@@ -1448,6 +1467,13 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F38 M21.X1038 0": {
+    "modules": [],
+    "views": [
+      "/Care/Handover/SummarySending.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F39 M21.X306 0": {
     "modules": [],
     "views": [
@@ -1501,6 +1527,13 @@
     "modules": [],
     "views": [
       "/Care/RecordContacts/VisitActions.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F44 M21.X1035 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/VisitChoices.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },

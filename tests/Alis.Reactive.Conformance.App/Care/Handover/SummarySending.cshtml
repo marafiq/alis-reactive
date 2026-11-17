@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SummarySending
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Handover summary";
+    var plan = Html.ReactivePlan<SummarySending>();
+}
+<h1>Handover summary</h1>
+@using (var handover = Html.BeginRequestForm(plan, "handover"))
+{
+    <fieldset>
+        <legend>Summary</legend>
+        @(Html.InputField(plan, m => m.Summary, options => options.Label("Summary")).FusionRichTextEditor())
+    </fieldset>
+    <button type="button" @Html.Raises(plan, SummarySendings.Send)>Send</button>
+    Html.On(plan, trigger => trigger.CustomEvent(SummarySendings.Send, pipeline => pipeline
+        .Post<SummarySending>(SummarySendingEndpoints.Summaries, request => request.UrlEncoded(handover.Form, body => { }))
+        .OnSuccess(Content.Text, (sent, pipeline) => pipeline.Element("sent").Text.Set(sent.Body))));
+}
+<p id="sent">Not sent</p>
+@Html.RenderPlan(plan)

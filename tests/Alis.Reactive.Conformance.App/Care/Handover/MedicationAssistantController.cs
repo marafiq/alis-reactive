@@ -13,6 +13,9 @@ public sealed class MedicationAssistantController : Controller
     [HttpGet(CarePages.MedicationAssistantOnCall)]
     public IActionResult OnCall() => View("/Care/Handover/MedicationAssistantOnCall.cshtml", new MedicationAssistant("Morning round"));
 
+    [HttpGet(CarePages.MedicationAssistantStreamed)]
+    public IActionResult Streamed() => View("/Care/Handover/MedicationAssistantStreamed.cshtml", new MedicationAssistant("Morning round"));
+
     [HttpGet(MedicationAssistantEndpoints.OnCallAnswer)]
     public IActionResult OnCallAnswer() => Content("Check the chart, then call the pharmacist.", PlainText);
 }

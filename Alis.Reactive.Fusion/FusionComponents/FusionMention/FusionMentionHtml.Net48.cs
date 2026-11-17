@@ -1,8 +1,10 @@
 #if NET48
 using System;
 using System.Collections.Generic;
+using System.Web;
 using System.Web.Mvc;
 using Alis.Reactive.RenderingAndDelivery;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -17,7 +19,7 @@ public static partial class FusionMentionHtml
     /// <param name="build">What the view sets on the mention, the element it suggests in among them.</param>
     /// <returns>The rendered mention, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionMention<TValue>, TModel> FusionMention<TModel, TValue>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<MentionBuilder> build)
-        => throw new NotImplementedException();
+        => Rendered<TModel, TValue>(plan, elementId, Built(plan, html.EJS().Mention(HostOf(elementId)), build));
 
     /// <summary>Renders a mention under the id the view gives it over the items the view hands it.</summary>
     /// <remarks>
@@ -32,6 +34,13 @@ public static partial class FusionMentionHtml
     /// <param name="build">What the view sets on the mention, the element it suggests in among them.</param>
     /// <returns>The rendered mention, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionMention<TValue>, TModel> FusionMention<TModel, TValue, TItem>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, IReadOnlyList<TItem> items, Action<MentionBuilder> build)
-        => throw new NotImplementedException();
+        => Rendered<TModel, TValue>(plan, elementId, Built(plan, Items(plan, html.EJS().Mention(HostOf(elementId)), items), build));
+
+    private static Rendered<FusionMention<TValue>, TModel> Rendered<TModel, TValue>(ReactivePlan<TModel> plan, string elementId, MentionBuilder mention)
+    {
+        var bridge = new TagBuilder("span");
+        foreach (var attribute in BridgeAttributes(plan, elementId)) bridge.MergeAttribute(attribute.Key, attribute.Value);
+        return plan.Render<FusionMention<TValue>>(elementId, new HtmlString(bridge.ToString(TagRenderMode.Normal) + mention.Render().ToHtmlString()));
+    }
 }
 #endif

@@ -694,7 +694,7 @@
         {
           "id": "handoverEndpoint",
           "kind": "endpoint",
-          "role": "the handover endpoints: the assistant's answers"
+          "role": "the handover endpoints: the assistant's answers and the summary a form sends"
         },
         {
           "id": "doseButton",
@@ -3245,6 +3245,29 @@
       ]
     },
     {
+      "feature": "M21.F3",
+      "for": "M21.X1036",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "assistant"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the assistant's 15 ms stream timer"
+        }
+      ]
+    },
+    {
       "feature": "M21.F5",
       "for": "M21.X503",
       "index": 0,
@@ -3606,6 +3629,21 @@
     {
       "feature": "M21.F29",
       "for": "M21.X510",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "mention"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F29",
+      "for": "M21.X1034",
       "index": 0,
       "screen": "record-contacts",
       "hosts": [
@@ -9281,6 +9319,21 @@
       ]
     },
     {
+      "feature": "M21.F24",
+      "for": "M21.X1037",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "roomName"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F25",
       "for": "M21.X1016",
       "index": 0,
@@ -9401,6 +9454,22 @@
       ]
     },
     {
+      "feature": "M21.F38",
+      "for": "M21.X1038",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "handoverSummary",
+        "handoverEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F40",
       "for": "M21.X1024",
       "index": 0,
@@ -9418,6 +9487,21 @@
     {
       "feature": "M21.F44",
       "for": "M21.X1025",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "visitActions"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F44",
+      "for": "M21.X1035",
       "index": 0,
       "screen": "record-contacts",
       "hosts": [

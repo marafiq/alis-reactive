@@ -8,6 +8,8 @@ public static partial class CarePages
 
     public const string MedicationAssistantOnCall = Handover + "medication-assistant/on-call";
 
+    public const string MedicationAssistantStreamed = Handover + "medication-assistant/streamed";
+
     public const string RoundResidents = Handover + "round-residents";
 
     public const string RoundResidentsWithLena = Handover + "round-residents/with-lena";
@@ -47,4 +49,8 @@ public static partial class CarePages
     public const string HandoverSummaryWritten = Handover + "handover-summary/written";
 
     public const string HandoverSummaryBlank = Handover + "handover-summary/blank";
+
+    public const string SummarySendingWritten = Handover + "summary-sending/written";
+
+    public const string SummarySendingBlank = Handover + "summary-sending/blank";
 }

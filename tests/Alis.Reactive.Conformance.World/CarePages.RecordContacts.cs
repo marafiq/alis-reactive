@@ -30,6 +30,8 @@ public static partial class CarePages
 
     public const string ResidentRoomUnnamed = RecordContacts + "resident-room/unnamed";
 
+    public const string RoomMove = RecordContacts + "room-move";
+
     public const string KinHomePhone = RecordContacts + "kin-phone/home";
 
     public const string KinMobilePhone = RecordContacts + "kin-phone/mobile";
@@ -39,6 +41,8 @@ public static partial class CarePages
     public const string VisitActionsToBook = RecordContacts + "visit-actions/book";
 
     public const string VisitActionsToCancel = RecordContacts + "visit-actions/cancel";
+
+    public const string VisitChoices = RecordContacts + "visit-choices";
 
     public const string BedRailsUp = RecordContacts + "bed-rails/up";
 
