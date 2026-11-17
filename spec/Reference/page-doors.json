@@ -1526,9 +1526,7 @@
     ]
   },
   "M21.F49 M21.X1030 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/ProfileName.cshtml",
       "/Shared/_FusionLayout.cshtml"
