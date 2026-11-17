@@ -12,7 +12,7 @@ Runs every check that needs no browser, in order, and stops at the first that fa
   1. the plan contract, generated from the grammar and compared with the tracked plan.ts and plan.schema.json
   2. the net48 time zone table, written by scripts/windows-zones.cs from CLDR's windowsZones.xml at its pin and
      compared with the tracked Alis.Reactive/PathsAndWire/WindowsZones.g.Net48.cs
-  3. npm ci when node_modules is missing, then npm audit
+  3. npm ci when node_modules is missing, then npm audit by scripts/npm-audit.mjs, past the advisories it excuses
   4. the Syncfusion pin's agreement in NuGet, npm and the lock
   5. tsc -b over the runtime, the OpenTelemetry adapter, the Native components, the Fusion templates and conformance app, eslint with --max-warnings 0,
      vitest over the runtime's pure tests, then the browser bundle
@@ -61,7 +61,7 @@ fi
 
 step "npm audit"
 [ -d node_modules ] || npm ci
-npm audit
+node scripts/npm-audit.mjs
 
 step "the Syncfusion pin"
 node scripts/pin-syncfusion.mjs --check

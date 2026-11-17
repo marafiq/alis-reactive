@@ -60,6 +60,8 @@ expects none.
   and `tests/Alis.Reactive.Consumer.Net48`, a classic MVC 5 project only Visual Studio's MSBuild compiles, whose build
   writes no file git lists. `scripts/check.sh` leaves it out, `scripts/delivery.sh` runs it but the fresh MVC 5 app's
   test, and CI's Windows job runs it whole.
+- `WhenThePackagesAreAudited` runs `scripts/npm-audit.mjs` over the audit reports, locks and latest versions its
+  cases write, and expects the exit and each refusal's own line; the tracked tree's audit is `scripts/check.sh`'s step.
 - `WhenADocShowsAnExample` reads each example of README.md, every fence but bash and text, and refuses one found whole
   in no view a browser test opens, as `spec/Reference/page-doors.json` lists them, and in no fresh app's tracked file.
 

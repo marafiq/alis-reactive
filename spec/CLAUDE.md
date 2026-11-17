@@ -1854,6 +1854,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   JSON body is refused where the view renders with its cure, its source or the path, query or form data: neither
   main's ResponseBuilder nor the redesign's has a door that reads a sent member back, so no feature is lost, and
   the plan keeps no sent body (no grammar change).
+- The owner, 2026-11-17, answering the lead's ask on GHSA-fc5q-39xc-vjpf, which failed every landing's
+  npm audit with no patched version of picomatch published, verbatim: "Exempt by id (Recommended)". Read by the
+  lead: `scripts/npm-audit.mjs` fails on every advisory but the ones it excuses by id, and excuses one only while
+  the lock holds the latest published version of its package; once a newer version is published, or npm no
+  longer reports it, the check fails until the lock moves and the id leaves (`spec/REWRITE.md`, section 2.7).
+  An excused advisory is the owner's each time; `WhenThePackagesAreAudited` holds the rule.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

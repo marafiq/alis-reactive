@@ -477,7 +477,11 @@ proposes every newer stable version each week, majors among them, of every NuGet
 and the Playwright image, and ignores this table's holds and nothing else; `scripts/doctor.sh --latest`, which the
 nightly workflow runs, compares Node, Python, Java and TLC with their registries, which Dependabot does not read. A
 finding of NuGet's audit or of `npm audit` fails `scripts/check.sh`, and a package it names moves to its patched
-version by a pin or an override in this table.
+version by a pin or an override in this table. An advisory with no patched version is the owner's to excuse by its
+id, in `scripts/npm-audit.mjs`, and only while the lock holds the latest published version of its package: the check
+fails once a newer version is published, and once npm no longer reports the advisory. Excused: GHSA-fc5q-39xc-vjpf,
+picomatch's ReDoS through repeated extglobs, every version to 4.0.7, which reaches the repository only through vite,
+vitest and typescript-eslint, whose globs are the repository's own (the owner, 2026-11-17).
 
 The lint beyond its presets is closed. Each rule enforces one line of the spec, which names it, and a rule joins the
 list only with its line, in the unit that brings that line's code:
@@ -536,7 +540,8 @@ cases write on those packs and the fresh net10 app, then the browser tests under
 Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by the lock, exit 1 on a difference),
 `scripts/plant-defect.sh`, which runs its one test, refuses a verdict unless it passes, then plants one defect and
 reads the runner's result line for that test again, under the host its `--host` names, a fresh app's among them,
-`scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`, `scripts/install-git-hooks.sh`.
+`scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`, `scripts/install-git-hooks.sh`, `scripts/npm-audit.mjs`, which
+runs `npm audit` past the advisories the owner excuses.
 MSBuild never runs npm, and runs node only for the vendor contract a project opts into, whose target writes the
 table before the compiler reads it (D17.5, `Alis.Reactive.Analyzers/Vendors/VendorContract.targets`): `build.mjs` writes each bundle, the core's to
 `Alis.Reactive/wwwroot/js/alis-reactive.js`,
