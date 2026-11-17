@@ -2,6 +2,7 @@
 using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.InteractiveChat;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -19,6 +20,14 @@ public static class FusionAIAssistViewHtml
     /// <param name="build">What the view sets on the assist view.</param>
     /// <returns>The rendered assist view, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionAIAssistView, TModel> FusionAIAssistView<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<AIAssistViewBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var assistant = html.EJS().AIAssistView(elementId);
+        build(assistant);
+        assistant.EnableStreaming(false);
+        return plan.Render<FusionAIAssistView>(elementId, assistant.Render());
+    }
 }
 #endif

@@ -2,6 +2,7 @@
 using System;
 using System.Web.Mvc;
 using Alis.Reactive.RenderingAndDelivery;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -18,6 +19,13 @@ public static class FusionChipListHtml
     /// <param name="build">What the view sets on the list, its chips and selection among them.</param>
     /// <returns>The rendered list, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionChipList, TModel> FusionChipList<TModel>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<ChipListBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var chips = html.EJS().ChipList(elementId);
+        build(chips);
+        return plan.Render<FusionChipList>(elementId, chips.Render());
+    }
 }
 #endif

@@ -2,6 +2,7 @@
 using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -18,6 +19,13 @@ public static class FusionContextMenuHtml
     /// <param name="build">What the view sets on the menu, its items and target among them.</param>
     /// <returns>The rendered menu, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionContextMenu, TModel> FusionContextMenu<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<ContextMenuBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var menu = html.EJS().ContextMenu(elementId);
+        build(menu);
+        return plan.Render<FusionContextMenu>(elementId, menu.Render());
+    }
 }
 #endif

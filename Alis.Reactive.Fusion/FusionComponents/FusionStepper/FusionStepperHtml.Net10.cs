@@ -2,6 +2,7 @@
 using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -18,6 +19,13 @@ public static class FusionStepperHtml
     /// <param name="build">The stepper's steps, and what the view sets on it.</param>
     /// <returns>The rendered stepper, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionStepper, TModel> FusionStepper<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<StepperBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var stepper = html.EJS().Stepper(elementId);
+        build(stepper);
+        return plan.Render<FusionStepper>(elementId, stepper.Render());
+    }
 }
 #endif
