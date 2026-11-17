@@ -115,6 +115,17 @@ public sealed class WhenAFieldBindsAMember
     }
 
     [Test]
+    public void a_bool_key_is_a_member_of_the_body_path_as_system_text_json_and_mvcs_binding_name_both_write_it()
+    {
+        var html = Views.Of(new MoveIn { Settled = new() { [true] = 2 } });
+        var plan = html.ReactivePlan<MoveIn>();
+        MoveInPlans.Box(html, plan, m => m.Settled[true]);
+        var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
+        Assert.That(json, Is.EqualTo(MoveInPlans.Head + "\"" + """Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Settled_True_":{"name":"Settled[True]","path":["settled","True"],"value":{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Settled_True_"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}},{"kind":"lit","value":0}]},"committed":"change","invalidClass":"alis-has-error","message":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Settled_True__message"}},"containers":{}}},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Settled_True_":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Settled_True_","vendor":"native"}""" + MoveInPlans.Tail));
+        Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
+    }
+
+    [Test]
     public void a_blank_member_reads_the_start_the_endpoint_binds_whether_it_fills_its_holder_in_place_or_makes_a_new_one()
     {
         var html = Views.Of(new Arrival());

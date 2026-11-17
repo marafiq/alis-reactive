@@ -441,6 +441,10 @@ internal sealed class RequestPartsWriter
         }
 
         foreach (var names in guarded) yield return GuardedRecord(names, _jsonGuards[names]);
+        foreach (var (path, leaf) in _json)
+        {
+            foreach (var when in leaf.SentWhen) yield return GuardedRecord(path, when);
+        }
     }
 
     private static RecordExpression SentEnumRecord(string name, IReadOnlyList<JsonStep> path, JsonForm form)

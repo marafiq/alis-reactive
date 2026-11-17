@@ -22,6 +22,8 @@ public sealed class MoveIn
     public List<string> Items { get; set; } = [];
     public Dictionary<string, Dose> Rounds { get; set; } = [];
     public Dictionary<bool, int> Settled { get; set; } = [];
+    public Dictionary<DateTimeOffset, int> Visits { get; set; } = [];
+    public List<List<int>> Grid { get; set; } = [];
     public INamedVisitor Visitor { get; set; } = new Visitor();
     public Shift Shift { get; set; } = Shift.Night;
     public TimeSpan? Stay { get; set; }

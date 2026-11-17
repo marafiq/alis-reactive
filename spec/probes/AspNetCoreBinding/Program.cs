@@ -111,6 +111,13 @@ try
     Console.WriteLine("core-query-list-of-objects: Lines[0].Name=A&Lines[1].Name=B&Lines[1].Beds=1&Lines[1].Beds=2 binds " + await client.GetStringAsync("/q/lines?Lines%5B0%5D.Name=A&Lines%5B1%5D.Name=B&Lines%5B1%5D.Beds=1&Lines%5B1%5D.Beds=2"));
     Console.WriteLine("core-query-list-of-objects-gap: Lines[0].Name=A&Lines[2].Name=C binds " + await client.GetStringAsync("/q/lines?Lines%5B0%5D.Name=A&Lines%5B2%5D.Name=C") + " | Lines[1].Name=B binds " + await client.GetStringAsync("/q/lines?Lines%5B1%5D.Name=B"));
     Console.WriteLine("core-query-list-of-objects-empty-item: Lines[0].Name=A&Lines[1]=&Lines[2].Name=C binds " + await client.GetStringAsync("/q/lines?Lines%5B0%5D.Name=A&Lines%5B1%5D=&Lines%5B2%5D.Name=C"));
+    var keyNames = new Microsoft.AspNetCore.Mvc.ViewFeatures.ModelExpressionProvider(new EmptyModelMetadataProvider());
+    var camelKeys = new System.Text.Json.JsonSerializerOptions { DictionaryKeyPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
+    Console.WriteLine("core-bool-key-written-true: System.Text.Json writes the key true as " + System.Text.Json.JsonSerializer.Serialize(new Dictionary<bool, int> { [true] = 2 }) + ", and under a camel DictionaryKeyPolicy as " + System.Text.Json.JsonSerializer.Serialize(new Dictionary<bool, int> { [true] = 2 }, camelKeys) + "; MVC names it " + keyNames.GetExpressionText((ProbeKeyed keyed) => keyed.Settled[true]));
+    Console.WriteLine("core-bool-key-binds-either-case: JSON {\"settled\":{\"True\":2}} binds " + await Json(client, "/q/keyed-json", "{\"settled\":{\"True\":2}}") + " | {\"settled\":{\"true\":2}} binds " + await Json(client, "/q/keyed-json", "{\"settled\":{\"true\":2}}") + " | form Settled[True]=2 binds " + await Form(client, "/q/keyed-form", "Settled%5BTrue%5D=2") + " | Settled[true]=2 binds " + await Form(client, "/q/keyed-form", "Settled%5Btrue%5D=2"));
+    Console.WriteLine("core-dictionary-key-policy-on-write: a camel DictionaryKeyPolicy writes the key Morning as " + System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, string> { ["Morning"] = "x" }, camelKeys) + " and reads {\"Morning\":\"x\"} as the key " + System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>("{\"Morning\":\"x\"}", camelKeys)!.Keys.Single() + "; form Notes[Morning]=x binds " + await Form(client, "/q/keyed-form", "Notes%5BMorning%5D=x"));
+    Console.WriteLine("core-instant-key-written-apart: System.Text.Json writes a DateTimeOffset key as " + System.Text.Json.JsonSerializer.Serialize(new Dictionary<DateTimeOffset, int> { [new DateTimeOffset(2026, 11, 17, 8, 30, 0, TimeSpan.Zero)] = 1 }) + " and MVC names it " + keyNames.GetExpressionText((ProbeKeyed keyed) => keyed.Visits[new DateTimeOffset(2026, 11, 17, 8, 30, 0, TimeSpan.Zero)]));
+    Console.WriteLine("core-query-list-of-lists-gap: Grid[1]=3 binds " + await client.GetStringAsync("/q/grid?Grid%5B1%5D=3") + " | Grid[0]=1&Grid[1]=3 binds " + await client.GetStringAsync("/q/grid?Grid%5B0%5D=1&Grid%5B1%5D=3") + " | form Grid[1]=3 binds " + await Form(client, "/q/grid-form", "Grid%5B1%5D=3"));
     Console.WriteLine("core-query-read-only-lists: Held[0].Name=A&Bare=1&Bare=2&Handover.Beds=3 binds " + await client.GetStringAsync("/q/read-only?Held%5B0%5D.Name=A&Bare=1&Bare=2&Handover.Beds=3") + " | nothing sent binds " + await client.GetStringAsync("/q/read-only"));
     var named = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
     Console.WriteLine("core-query-enum-member-name: under a string converter System.Text.Json writes Night as " + System.Text.Json.JsonSerializer.Serialize(ProbeShift.Night, named) + "; Shift=Night binds " + await client.GetStringAsync("/q/shift?Shift=Night") + "; Shift=night-shift binds " + await client.GetStringAsync("/q/shift?Shift=night-shift") + "; Shift=night binds " + await client.GetStringAsync("/q/shift?Shift=night") + "; Shift=1 binds " + await client.GetStringAsync("/q/shift?Shift=1") + "; Shift=5 binds " + await client.GetStringAsync("/q/shift?Shift=5"));
@@ -827,8 +834,36 @@ public sealed class ProbeSearch
     public int Count { get; set; } = 5;
 }
 
+public sealed class ProbeKeyed
+{
+    public Dictionary<bool, int> Settled { get; set; } = [];
+
+    public Dictionary<string, string> Notes { get; set; } = [];
+
+    public Dictionary<DateTimeOffset, int> Visits { get; set; } = [];
+
+    public List<List<int>> Grid { get; set; } = [];
+}
+
 public sealed class QueryProbeController : ControllerBase
 {
+    [HttpPost("/q/keyed-json")]
+    public string KeyedJson([FromBody] ProbeKeyed keyed) => KeyedText(keyed) + Errors();
+
+    [HttpPost("/q/keyed-form")]
+    public string KeyedForm([FromForm] ProbeKeyed keyed) => KeyedText(keyed) + Errors();
+
+    [HttpGet("/q/grid")]
+    public string Grid(ProbeKeyed keyed) => GridText(keyed) + Errors();
+
+    [HttpPost("/q/grid-form")]
+    public string GridForm([FromForm] ProbeKeyed keyed) => GridText(keyed) + Errors();
+
+    private static string KeyedText(ProbeKeyed keyed)
+        => "Settled=[" + string.Join(",", keyed.Settled.Select(entry => entry.Key + ":" + entry.Value)) + "] Notes=[" + string.Join(",", keyed.Notes.Select(entry => entry.Key + ":" + entry.Value)) + "]";
+
+    private static string GridText(ProbeKeyed keyed) => "Grid=" + System.Text.Json.JsonSerializer.Serialize(keyed.Grid);
+
     [HttpGet("/q/handover")]
     public string Handover(HandoverQuery query) => HandoverText(query.Handover) + "; Kept " + HandoverText(query.Kept) + Errors();
 

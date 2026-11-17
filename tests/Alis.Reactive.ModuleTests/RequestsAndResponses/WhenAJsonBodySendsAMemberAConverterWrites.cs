@@ -62,6 +62,47 @@ public sealed class WhenAJsonBodySendsAMemberAConverterWrites
             """{"kind":"as","expr":{"kind":"record","fields":[{"name":"spot","value":{"kind":"ref","name":"requestValue1"}}]},"shape":{"kind":"object","fields":{"spot":{"shape":{"kind":"array","item":{"kind":"any"}},"nothing":"omit"}}}}"""));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
+
+    [Test]
+    public void a_value_its_converter_writes_as_null_for_its_default_is_sent_as_the_null_it_holds_and_left_out_when_it_reads_nothing()
+    {
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<RoomChange>("/rooms", request => request.Json(body => body.Set(r => r.Code, pipeline.Component<RoomPanel>("room").Code))));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "value").GetRawText(), Is.EqualTo(
+            """{"kind":"as","expr":{"kind":"record","fields":[{"name":"code","value":{"kind":"ref","name":"requestValue1"}}]},"shape":{"kind":"object","fields":{"code":{"shape":{"kind":"any"},"nothing":"omit"}}}}"""));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "guarded").GetRawText(), Is.EqualTo(
+            """{"kind":"list","items":[{"kind":"record","fields":[{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"code"}]}},{"name":"when","value":{"kind":"op","op":"or","args":[{"kind":"op","op":"eq","args":[{"kind":"ref","name":"requestValue1"},{"kind":"lit","value":null}]},{"kind":"op","op":"neq","args":[{"kind":"ref","name":"requestValue1"},{"kind":"lit","value":null}]}]}}]}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+}
+
+public sealed class RoomChange
+{
+    public RoomCode Code { get; init; } = new("A1");
+}
+
+[JsonConverter(typeof(RoomCodeAsText))]
+public readonly struct RoomCode(string text)
+{
+    public string? Text { get; } = text;
+}
+
+public sealed class RoomCodeAsText : JsonConverter<RoomCode>
+{
+    public override RoomCode Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => reader.TokenType == JsonTokenType.Null ? default : new RoomCode(reader.GetString()!);
+
+    public override void Write(Utf8JsonWriter writer, RoomCode value, JsonSerializerOptions options)
+    {
+        if (value.Text is null) writer.WriteNullValue();
+        else writer.WriteStringValue(value.Text);
+    }
+}
+
+public sealed class RoomPanel : Component
+{
+    public override ComponentVendor Vendor => ComponentVendor.Native;
+
+    public ReadOnly<RoomCode> Code => ReadOnly<RoomCode>("code");
 }
 
 public sealed class ShiftNote

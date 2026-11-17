@@ -100,16 +100,35 @@ public sealed class WhenARequestMemberIsReachedThroughAPositionOrAKey
     }
 
     [Test]
-    public void a_dictionary_keyed_by_a_bool_is_refused_where_the_view_renders()
-        => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Settled[true], 2)))),
-            Throws.InvalidOperationException.With.Message.EqualTo(
-                "A dictionary keyed by bool cannot be sent: System.Text.Json and MVC's binding name write its keys apart, as true and True, so a JSON body and form data name one entry two ways; key it by text or a number."));
+    public void a_json_body_names_a_bool_key_as_system_text_json_and_mvcs_binding_name_both_write_it()
+    {
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Settled[true], 2))));
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "value").GetRawText(), Is.EqualTo(
+            """{"kind":"record","fields":[{"name":"settled","value":{"kind":"record","fields":[{"name":"True","value":{"kind":"lit","value":2}}]}}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
+    public void a_json_body_names_a_text_key_by_its_text_whatever_the_apps_dictionary_key_policy()
+    {
+        var plan = RequestPage.Rendered(pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Beds["E4"], 2))),
+            json => json.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase);
+        Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "value").GetRawText(), Is.EqualTo(
+            """{"kind":"record","fields":[{"name":"beds","value":{"kind":"record","fields":[{"name":"E4","value":{"kind":"lit","value":2}}]}}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
 
     [Test]
     public void a_dictionary_keyed_by_a_date_is_refused_where_the_view_renders()
         => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Get<WardOrder>("/orders", request => request.Query(r => r.Rounds[new DateTime(2026, 11, 17)], 2))),
             Throws.InvalidOperationException.With.Message.EqualTo(
                 "A dictionary keyed by DateTime cannot be sent: System.Text.Json and MVC's binding name write its keys apart, as 2026-11-17T08:30:00 and 11/17/2026 08:30:00, so a JSON body and form data name one entry two ways; key it by text or a number."));
+
+    [Test]
+    public void a_dictionary_keyed_by_an_instant_is_refused_where_the_view_renders()
+        => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<WardOrder>("/orders", request => request.Json(body => body.Set(r => r.Visits[new DateTimeOffset(2026, 11, 17, 8, 30, 0, TimeSpan.Zero)], 2)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "A dictionary keyed by DateTimeOffset cannot be sent: System.Text.Json and MVC's binding name write its keys apart, as 2026-11-17T08:30:00+00:00 and 11/17/2026 08:30:00 +00:00, so a JSON body and form data name one entry two ways; key it by text or a number."));
 
     [Test]
     public void a_dictionary_keyed_by_an_enum_the_apps_options_name_by_a_policy_is_refused_and_one_named_as_csharp_names_it_is_sent()
@@ -192,6 +211,8 @@ public sealed class WardOrder
     public Dictionary<bool, int> Settled { get; init; } = [];
 
     public Dictionary<DateTime, int> Rounds { get; init; } = [];
+
+    public Dictionary<DateTimeOffset, int> Visits { get; init; } = [];
 
     public Dictionary<RequestShift, int> ByShift { get; init; } = [];
 }

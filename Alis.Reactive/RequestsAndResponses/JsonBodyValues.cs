@@ -17,12 +17,13 @@ namespace Alis.Reactive.RequestsAndResponses;
 
 internal sealed class JsonLeaf
 {
-    private JsonLeaf(Expression value, Shape kept, bool leftOutWhenNothing, IReadOnlyList<(string Name, JsonForm Form)> enums)
+    private JsonLeaf(Expression value, Shape kept, bool leftOutWhenNothing, IReadOnlyList<(string Name, JsonForm Form)> enums, IReadOnlyList<Expression> sentWhen)
     {
         Value = value;
         Kept = kept;
         LeftOutWhenNothing = leftOutWhenNothing;
         Enums = enums;
+        SentWhen = sentWhen;
     }
 
     internal Expression Value { get; }
@@ -33,11 +34,15 @@ internal sealed class JsonLeaf
 
     internal IReadOnlyList<(string Name, JsonForm Form)> Enums { get; }
 
-    internal static JsonLeaf NullWhenNothing(Expression value) => new(value, AnyShape.Instance, false, []);
+    internal IReadOnlyList<Expression> SentWhen { get; }
 
-    internal static JsonLeaf LeftOut(Expression value, Shape kept) => new(value, kept, true, []);
+    internal static JsonLeaf NullWhenNothing(Expression value) => new(value, AnyShape.Instance, false, [], []);
 
-    internal JsonLeaf SentBy(string name, JsonForm form) => new(Value, Kept, LeftOutWhenNothing, [(name, form)]);
+    internal static JsonLeaf LeftOut(Expression value, Shape kept) => new(value, kept, true, [], []);
+
+    internal JsonLeaf SentBy(string name, JsonForm form) => new(Value, Kept, LeftOutWhenNothing, [(name, form)], SentWhen);
+
+    internal JsonLeaf SentWhenItReads() => new(Value, Kept, LeftOutWhenNothing, Enums, [RequestValues.ReadsSomething(Value)]);
 }
 
 internal readonly record struct JsonStep(string Name, bool IsIndex)
@@ -70,7 +75,13 @@ internal static class JsonBodyValues
     }
 
     private static JsonLeaf Leaf<TValue>(Expression value, BlockWriter writer, LambdaExpression member)
-        => Leaf(value, writer, member, () => Kept<TValue>(writer.Content.Json.BodyForm.GetTypeInfo(typeof(TValue)), member.ToString()));
+    {
+        var body = writer.Content.Json.BodyForm.GetTypeInfo(typeof(TValue));
+        var leaf = Leaf(value, writer, member, () => Kept<TValue>(body));
+        return leaf.LeftOutWhenNothing && WritesItsDefaultAsNull<TValue>(body) ? leaf.SentWhenItReads() : leaf;
+    }
+
+    private static bool WritesItsDefaultAsNull<TValue>(JsonTypeInfo body) => !body.IsList(out _) && JsonSerializer.SerializeToElement(default(TValue), body).ValueKind == JsonValueKind.Null;
 
     private static JsonLeaf Leaf(Expression value, BlockWriter writer, LambdaExpression member, Func<Shape> kept)
         => ConversionShapes.NothingOf(writer.Content.Json.BodyForm.GetTypeInfo(member.ReturnType)) == FieldNothing.Omit
@@ -210,7 +221,7 @@ internal static class JsonBodyValues
 
     private static bool IsADate(JsonTypeInfo type) => type is JsonTypeInfo<DateTime> or JsonTypeInfo<DateTime?> or JsonTypeInfo<DateTimeOffset> or JsonTypeInfo<DateTimeOffset?>;
 
-    private static Shape Kept<TValue>(JsonTypeInfo body, string member)
+    private static Shape Kept<TValue>(JsonTypeInfo body)
     {
         if (body.IsList(out var item)) return new ArrayShape(KeptItem(item));
         return JsonSerializer.SerializeToElement(default(TValue), body).ValueKind switch
@@ -220,7 +231,7 @@ internal static class JsonBodyValues
             JsonValueKind.String => Texts,
             JsonValueKind.Object => Objects,
             JsonValueKind.Array => new ArrayShape(AnyShape.Instance),
-            _ => throw new NotImplementedException($"'{member}' is a value type its JSON writes as null, and a JSON body leaves out a member that reads nothing through a shape that keeps it, which no shape holds yet; set it from a literal."),
+            _ => AnyShape.Instance,
         };
     }
 

@@ -62,6 +62,8 @@ internal sealed partial class BoundInput
             path.Add(new MemberStep(NameOf(member, step.Text)));
         }
 
+        var bindsAListItemThatIsAList = path[path.Count - 1] is IndexStep && app.GetTypeInfo(lambda.Lambda.Body.Type).IsList(out _);
+        if (bindsAListItemThatIsAList) throw AListItemThatIsAList(names.Name);
         var blank = lambda.EndsAtAPosition ? positionStart() : StartOf(lambda, sinceTheItem);
         var shape = InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank);
         if (shape is NumberShape && blank.ValueKind == JsonValueKind.String)
@@ -126,6 +128,9 @@ internal sealed partial class BoundInput
         throw new InvalidOperationException(
             $"Input '{lambda.Lambda}' binds a member the app's JSON options make only from the data the endpoint is sent: an abstract class, or a class they bind by the type the data names. A blank input has no start its plan can carry: bind a member of a class they make from an empty object.");
     }
+
+    private static InvalidOperationException AListItemThatIsAList(string name)
+        => new($"Input '{name}' binds a list that is an item of a list, and a list that holds no items sends no field in a query or form data, which ends the outer list at its position on both hosts, so the endpoint binds none of the items after it; bind each item of the inner list, as '{name}[0]', or send the outer list whole in a JSON body.");
 
     private static InvalidOperationException NoBodyPath(MemberLambda lambda, string member, Type? declaring, JsonTypeInfo holder)
     {

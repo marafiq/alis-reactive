@@ -63,14 +63,17 @@ internal static class RequestValues
         ]);
 
     internal static OpExpression Read(Expression captured, Expression held)
-    {
-        var nil = ContractRecord<ValueRead>.Literal<string?>(null);
-        return new OpExpression(Operator.Cond,
+        => new(Operator.Cond,
         [
-            new OpExpression(Operator.Or, [new OpExpression(Operator.Eq, [captured, nil]), new OpExpression(Operator.Neq, [captured, nil])]),
+            ReadsSomething(captured),
             Held(held),
             new ContractRecord<NothingValueRead>().Set(read => read.Kind, "nothing").Written,
         ]);
+
+    internal static OpExpression ReadsSomething(Expression captured)
+    {
+        var nil = ContractRecord<ValueRead>.Literal<string?>(null);
+        return new OpExpression(Operator.Or, [new OpExpression(Operator.Eq, [captured, nil]), new OpExpression(Operator.Neq, [captured, nil])]);
     }
 
     internal static RecordExpression Held(Expression value)

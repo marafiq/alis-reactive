@@ -480,8 +480,9 @@ each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `H
   it is never looked up and is in neither the check's inputs nor the reply's. A `SentInput` is its binding `name`
   and its `entry`, the inputs table's `InputEntry`, its `id` and `binding`.
 - `GuardedMember`: `path`, the wire names to a JSON member a `When` guards or to a holder only such members fill,
-  and `when`, the `or` of their bindings for a holder; the browser takes it out of the body's `value` where `when`
-  is false (D10.16).
+  and `when`, the `or` of their bindings for a holder; or to a member of a value type whose JSON converter writes its
+  default as `null`, and `when`, that its read reads something (D9.10); the browser takes it out of the body's `value`
+  where `when` is false (D10.16).
 - The wire forms are the table's above: the scalar forms `text`, `number`, `boolean`, `date`, `instant`, `written`,
   `enum` and `flags`, each `enum` and `flags` with its `values`, and `list` with its scalar `item` and
   `itemWhenNothing` (`empty` or `stop`). An `EnumValue` is its `held` and `name`, a `FlagValue` those and its `number`.

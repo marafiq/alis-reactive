@@ -443,6 +443,14 @@
         {
           "id": "X9.33",
           "rung": "behavior"
+        },
+        {
+          "id": "X9.34",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.35",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -694,6 +702,22 @@
           "outcome": "The answer reads Handed over with no note: the action read an empty body.",
           "opposite": "On Ada Hart's handover, whose note reads Slept well, the POST's body is Slept well and the answer reads Handed over: Slept well.",
           "defect": "A text body that holds null stops the request, so the answer keeps its dash; or the null sent as the text null, so the answer reads Handed over: null."
+        },
+        {
+          "for": "X9.34",
+          "page": "A room change page whose Change the room button GETs a resident's room, whose Code, a RoomCode its own JSON converter writes as its text and its default as null, the reply holds inside its Room, and in its success route POSTs, in a JSON body, r => r.Code from that read; the endpoint answers Room code and the code it bound, or Room code none for the default, its Code starting at A1.",
+          "gesture": "Click Change the room on Ada Hart's room change, whose room's code is the default.",
+          "outcome": "The POST's body is {\"code\":null} and the answer reads Room code none.",
+          "opposite": "On Ben Okafor's room change, whose reply holds no room, the POST's body is {}: the code reads nothing and is left out, and the answer reads Room code A1.",
+          "defect": "The null kept as text, so it reads nothing and leaves the body, which is {}, and the answer reads Room code A1; or the view refused where it renders, as it was before the kept shape held any value."
+        },
+        {
+          "for": "X9.35",
+          "page": "A bed count page whose Count the bed button POSTs, in a JSON body, r => r.Settled[Model.Settled] set to 2, its key the bool the view's model holds; the endpoint binds Settled, a dictionary keyed by bool, and answers Settled and the count under true, Unsettled and the count under false, or Not counted.",
+          "gesture": "Click Count the bed on Ada Hart's bed count, whose bed is settled.",
+          "outcome": "The POST's body is {\"settled\":{\"True\":2}} and the answer reads Settled 2.",
+          "opposite": "On Ben Okafor's bed count, whose bed is not settled, the POST's body is {\"settled\":{\"False\":2}} and the answer reads Unsettled 2.",
+          "defect": "The view refused where it renders, as a bool key was before, so no request leaves and the answer keeps its dash; or the key written true or false, a name neither host's writer gives it."
         }
       ],
       "verdicts": [

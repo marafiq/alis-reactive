@@ -2836,6 +2836,20 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F1 X9.34 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/RoomCodeChange.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.35 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/BedSettling.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F1 X9.8 0": {
     "modules": [],
     "views": [

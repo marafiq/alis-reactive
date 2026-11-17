@@ -113,13 +113,25 @@ public sealed class WhenAFieldIsRefused
     }
 
     [Test]
-    public void an_entry_of_a_dictionary_keyed_by_a_bool_is_refused_and_one_keyed_by_text_is_bound()
+    public void an_entry_of_a_dictionary_keyed_by_an_instant_is_refused_and_one_keyed_by_a_bool_is_bound()
     {
-        var html = Views.Of(new MoveIn { Settled = { [true] = 2 }, Rounds = { ["am"] = new Dose() } });
+        var visit = new DateTimeOffset(2026, 11, 17, 8, 30, 0, TimeSpan.Zero);
+        var html = Views.Of(new MoveIn { Settled = { [true] = 2 }, Visits = { [visit] = 1 } });
         var plan = html.ReactivePlan<MoveIn>();
-        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Settled[true]), Throws.InvalidOperationException.With.Message.EqualTo(
-            "A dictionary keyed by bool cannot be sent: System.Text.Json and MVC's binding name write its keys apart, as true and True, so a JSON body and form data name one entry two ways; key it by text or a number."));
-        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Rounds["am"].Amount), Throws.Nothing);
+        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Visits[visit]), Throws.InvalidOperationException.With.Message.EqualTo(
+            "A dictionary keyed by DateTimeOffset cannot be sent: System.Text.Json and MVC's binding name write its keys apart, as 2026-11-17T08:30:00+00:00 and 11/17/2026 08:30:00 +00:00, so a JSON body and form data name one entry two ways; key it by text or a number."));
+        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Settled[true]), Throws.Nothing);
+        html.RenderPlan(plan);
+    }
+
+    [Test]
+    public void an_input_bound_to_a_list_that_is_an_item_of_a_list_is_refused_and_one_bound_to_an_item_of_the_inner_list_is_bound()
+    {
+        var html = Views.Of(new MoveIn { Grid = [[1, 2], [3]] });
+        var plan = html.ReactivePlan<MoveIn>();
+        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Grid[0]), Throws.InvalidOperationException.With.Message.EqualTo(
+            "Input 'Grid[0]' binds a list that is an item of a list, and a list that holds no items sends no field in a query or form data, which ends the outer list at its position on both hosts, so the endpoint binds none of the items after it; bind each item of the inner list, as 'Grid[0][0]', or send the outer list whole in a JSON body."));
+        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Grid[0][1]), Throws.Nothing);
         html.RenderPlan(plan);
     }
 

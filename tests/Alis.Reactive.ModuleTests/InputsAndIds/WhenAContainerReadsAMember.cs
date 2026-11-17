@@ -65,6 +65,11 @@ public sealed class WhenAContainerReadsAMember
     }
 
     [Test]
+    public void a_bool_key_is_read_as_system_text_json_and_mvcs_binding_name_both_write_it()
+        => Assert.That(Read(m => m.Settled[true].Name),
+            Is.EqualTo("""{"kind":"data","path":[{"name":"name","requires":[],"absent":{"kind":"start","value":""}}],"target":{"kind":"data","path":[{"name":"True","requires":[],"absent":{"kind":"nothing"}}],"target":{"kind":"data","path":[{"name":"settled","requires":[],"absent":{"kind":"start","value":{}}}],"target":""" + Sent + "}}}"));
+
+    [Test]
     public void a_null_start_and_an_unbound_start_keep_their_declared_absences()
     {
         Assert.That(Read(m => m.Absent!.Name),
@@ -120,6 +125,7 @@ public sealed class ReadCard
     public NextOfKin Kin { get; set; } = new();
     public List<NextOfKin> Contacts { get; set; } = [];
     public Dictionary<string, NextOfKin> Rounds { get; set; } = [];
+    public Dictionary<bool, NextOfKin> Settled { get; set; } = [];
     public NextOfKin? Absent { get; set; }
     public RoundLog Log { get; set; } = new NightLog();
     public int Nights { get; set; } = 5;

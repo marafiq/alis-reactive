@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedSettlingDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Bed count";
+    var plan = Html.ReactivePlan<BedSettlingDesk>();
+}
+<h1>Bed count of @Model.Resident</h1>
+<p>Answer: <span id="counted">-</span></p>
+<button type="button" @Html.Raises(plan, BedSettlings.Count)>Count the bed</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BedSettlings.Count, pipeline => pipeline
+        .Post<BedSettlingSent>(BedSettlings.Counted, request => request.Json(body => body.Set(r => r.Settled[Model.Settled], 2)))
+        .OnSuccess(Content.Text, (counted, pipeline) => pipeline.Element("counted").Text.Set(counted.Body))));
+}
+@Html.RenderPlan(plan)

@@ -31,13 +31,18 @@ Terms used throughout:
   `locate` reads from its element (D17.3), an input binding's body path, a registration field's path, and the member
   paths of a request.
 - D1.4 A dictionary entry is a member step whose name is the key's text as System.Text.Json writes the key
-  as a property name. A dictionary whose key type System.Text.Json writes no property name for is refused
-  where the view renders.
+  as a property name, a text key its own text whatever the app's `DictionaryKeyPolicy` (below). A dictionary whose
+  key type System.Text.Json writes no property name for is refused where the view renders.
   A key System.Text.Json and MVC's binding name write apart is refused where the view renders too, a request's member
-  and an input's alike, since a JSON body and form data would name one entry two ways: a `bool`, written `true` and
-  `True`, a `DateTime`, written in ISO 8601 and in the invariant culture's date text, and an enum the app's JSON options
-  name by a policy, one of whose values they write as text other than its C# name. A key both write alike, text, a
-  number or an enum named as C# names it, is sent.
+  and an input's alike, since a JSON body and form data would name one entry two ways: a `DateTime` and a
+  `DateTimeOffset`, written in ISO 8601 and in the invariant culture's date text (`probe:core-instant-key-written-apart`),
+  and an enum the app's JSON options name by a policy, one of whose values they write as text other than its C# name.
+  A key both write alike, text, a number, a `bool` or an enum named as C# names it, is sent: System.Text.Json writes a
+  `bool` key `True` or `False`, as MVC's binding name does, and both bind it from `True` and `true`
+  (`probe:core-bool-key-written-true`, `probe:core-bool-key-binds-either-case`, X9.35). A text key is sent as its text
+  whatever the app's `DictionaryKeyPolicy`, which System.Text.Json applies when it writes a key and never when it reads
+  one (`probe:core-dictionary-key-policy-on-write`), so the endpoint binds the entry the view named in a JSON body as in
+  form data.
 - D1.5 `each` appears only in a registration's paths (Q16, Q19). No read, write, call or subscription carries
   `each`; a projection over a list is `map` (Q6).
 - D1.9 On a read, a write or a call, an index step and a member step of the same digits reach the same item:
@@ -1744,6 +1749,10 @@ Terms used throughout:
   `null` binds null over the start (`probe:core-json-null-object`).
   A value type its own JSON converter writes as a list is kept as a list of any items in a JSON body and left out when
   it reads nothing, as a list is (X9.32).
+  A value type whose JSON converter writes its default as `null` is kept as any value in a JSON body and guarded by
+  whether its read reads something: a read that holds the `null` the server wrote for the default sends it, which the
+  endpoint's converter reads back to the default, and a read that reads nothing leaves it out, so the endpoint binds
+  its start (X9.34).
 
   A list item that reads nothing, in a query or form data, is sent by this closed table, which C# writes into the
   plan from the item type the app's JSON contract names (D18.2), a nullable enum among the nullable value types:
@@ -1753,6 +1762,11 @@ Terms used throughout:
   | a nullable value type or text | an empty field, which binds a null item (`probe:core-query-nullable-enum-items`, `probe:mvc5-empty-list-item-null`) |
   | a non-nullable value type | the request stops, since no field binds back as nothing |
   | an object | the request stops: an empty field ends the list at that item on net10 (`probe:core-query-list-of-objects-empty-item`) and binds a null item on MVC 5, and an item left out ends the list there on both hosts (`probe:core-query-list-of-objects-gap`, `probe:mvc5-list-ends-at-missing-index`) |
+
+  An input bound to a list position whose item is itself a list is refused where the view renders, since a list that
+  holds no items sends no field in a query or form data, which ends the outer list at its position on both hosts
+  (`probe:mvc5-list-ends-at-missing-index`, `probe:core-query-list-of-lists-gap`), so the endpoint binds none of the
+  items after it; the cure is an input for each item of the inner list, or the outer list sent whole in a JSON body.
 - D9.11 A header is fixed text or a scalar source sent as text. A header that reads nothing is not sent. A
   header name is an HTTP token by RFC 9110, a name given twice ignoring case is refused, `Content-Type` is
   refused because the body format owns it, and `Accept` is refused because the success route's kind owns it (D10.6).
@@ -2122,6 +2136,11 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   its start.
 - `X9.33` behavior (D9.21): a text body read from a reply's member that holds null is sent as the empty text, and the
   action reads an empty body.
+- `X9.34` behavior (D9.10): a JSON body member of a value type whose JSON converter writes its default as `null`, set
+  from a reply's read, is sent as the `null` the server wrote, which the endpoint's converter reads back to the
+  default, and left out when the read reads nothing, so the endpoint binds its start.
+- `X9.35` behavior (D1.4): a JSON body entry of a dictionary keyed by a `bool` is sent under the key `True` or `False`,
+  as System.Text.Json and MVC's binding name both write it, and the endpoint binds that entry.
 
 ## Q10. The request's flow and its response
 

@@ -26,6 +26,10 @@ public static partial class CarePages
     public const string BedSpotMoveWithNoBed = Round + "bed-spot-move/no-bed";
     public const string NightHandoverWithANote = Round + "night-handover/with-a-note";
     public const string NightHandoverWithNoNote = Round + "night-handover/no-note";
+    public const string RoomCodeChangeOfAnUncodedRoom = Round + "room-code-change/uncoded-room";
+    public const string RoomCodeChangeWithNoRoom = Round + "room-code-change/no-room";
+    public const string BedSettlingOfASettledBed = Round + "bed-settling/settled-bed";
+    public const string BedSettlingOfAnUnsettledBed = Round + "bed-settling/unsettled-bed";
     public const string SupplyRound = Round + "supplies";
     public const string OrderStart = Round + "order-start";
     public const string NurseCall = Round + "nurse-call";

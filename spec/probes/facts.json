@@ -1252,6 +1252,51 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-bool-key-written-true",
+      "statement": "System.Text.Json writes a bool dictionary key True, under a DictionaryKeyPolicy too, as MVC names it.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-bool-key-written-true: System.Text.Json writes the key true as {\"True\":2}, and under a camel DictionaryKeyPolicy as {\"True\":2}; MVC names it Settled[True]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-bool-key-binds-either-case",
+      "statement": "A bool dictionary key binds from True and from true, in a JSON body and in form data.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-bool-key-binds-either-case: JSON {\"settled\":{\"True\":2}} binds Settled=[True:2] Notes=[] | {\"settled\":{\"true\":2}} binds Settled=[True:2] Notes=[] | form Settled[True]=2 binds Settled=[True:2] Notes=[] | Settled[true]=2 binds Settled=[True:2] Notes=[]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-dictionary-key-policy-on-write",
+      "statement": "System.Text.Json applies a DictionaryKeyPolicy when it writes a key and never when it reads one, and form data binds the key's text.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-dictionary-key-policy-on-write: a camel DictionaryKeyPolicy writes the key Morning as {\"morning\":\"x\"} and reads {\"Morning\":\"x\"} as the key Morning; form Notes[Morning]=x binds Settled=[] Notes=[Morning:x]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-instant-key-written-apart",
+      "statement": "System.Text.Json writes a DateTimeOffset dictionary key in ISO 8601, and MVC names it in the invariant culture's date text.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-instant-key-written-apart: System.Text.Json writes a DateTimeOffset key as {\"2026-11-17T08:30:00+00:00\":1} and MVC names it Visits[11/17/2026 08:30:00 +00:00]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-list-of-lists-gap",
+      "statement": "A list whose items are lists ends at the first missing index, in a query and in form data.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-list-of-lists-gap: Grid[1]=3 binds Grid=[] | Grid[0]=1&Grid[1]=3 binds Grid=[[1],[3]] | form Grid[1]=3 binds Grid=[]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
       "id": "core-query-read-only-lists",
       "statement": "A query binds an IReadOnlyList member that starts null, and binds nothing into one that starts as [], of objects or of scalars, inside an object too.",
       "host": "net10",

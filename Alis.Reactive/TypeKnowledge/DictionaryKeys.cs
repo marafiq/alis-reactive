@@ -9,8 +9,8 @@ internal static class DictionaryKeys
 {
     internal static void RefuseAKeyNamedApart(JsonTypeInfo key)
     {
-        if (key.Type == typeof(bool)) throw NamedApart(key.Type, "true", "True");
         if (key.Type == typeof(DateTime)) throw NamedApart(key.Type, "2026-11-17T08:30:00", "11/17/2026 08:30:00");
+        if (key.Type == typeof(DateTimeOffset)) throw NamedApart(key.Type, "2026-11-17T08:30:00+00:00", "11/17/2026 08:30:00 +00:00");
         if (!new JsonStringEnumConverter().CanConvert(key.Type)) return;
         foreach (Enum value in Enum.GetValues(key.Type))
         {
