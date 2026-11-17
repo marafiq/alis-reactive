@@ -1537,9 +1537,7 @@
     ]
   },
   "M21.F50 M21.X1031 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/NextDose.cshtml",
       "/Shared/_FusionLayout.cshtml"
