@@ -8484,7 +8484,7 @@
    "meanings": [
     {
      "id": "M21.D701",
-     "meaning": "An Uploader's files are what its public getFilesData() lists (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:1177): each item's rawFile is the browser's File for a file the user chose (probe:ej2-uploader-getfilesdata-selected) and text for one the app lists through the builder's files (probe:ej2-uploader-getfilesdata-preloaded), where EJ2's TypeScript types rawFile string | Blob (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:97). FileInfo.RawFile is declared BrowserFile?, and text read as a file reads nothing (D3.3), so Files, and the form-data request that sends it, holds the files the user chose alone. FilesChanged is the framework's: its component code raises it after EJ2's selected and removing, once the list holds the change, since EJ2's change fires after a server upload or removal alone (@syncfusion/ej2-inputs/src/uploader/uploader.js:1130, :2249), and its payload's FilesData is getFilesData()'s list."
+     "meaning": "An Uploader's files are what its public getFilesData() lists (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:1177): each item's rawFile is the browser's File for a file the user chose (probe:ej2-uploader-getfilesdata-selected) and text for one the app lists through the builder's files (probe:ej2-uploader-getfilesdata-preloaded), where EJ2's TypeScript types rawFile string | Blob (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:97). FileInfo.RawFile is declared BrowserFile?, and text read as a file reads nothing (D3.3), so Files, and the form-data request that sends it, holds the files the user chose alone. FilesChanged is the framework's: its component code raises it after EJ2's selected, removing and clearing, the last the uploader's Clear button and clearAll() raise (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:806), once the list holds the change, since EJ2's change fires after a server upload or removal alone (@syncfusion/ej2-inputs/src/uploader/uploader.js:1130, :2249), and its payload's FilesData is getFilesData()'s list."
     }
    ],
    "oracle": "Syncfusion EJ2 33.1.47's Uploader as its TypeScript declares it (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts, SelectedEventArgs and FileInfo there), its selected payload and file items as the browser hands them (probe:ej2-payload-uploader-selected, probe:ej2-uploader-getfilesdata-selected, probe:ej2-uploader-getfilesdata-preloaded), and as its source raises change (@syncfusion/ej2-inputs/src/uploader/uploader.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
@@ -8516,7 +8516,17 @@
     {
      "id": "M21.X1014",
      "rung": "behavior",
-     "defect": "Both lines render the Uploader by EJ2's Uploader(id), which binds no member, with automatic upload off and the input named by the member's path, .AutoUpload(false) and [\"name\"] = setup.BindingPath (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs:34-36 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:106-110 at 65fdf118d), since a browser starts a file input with no file. A helper that drops AutoUpload(false) sends each file the moment it is chosen, EJ2's autoUpload true (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:600-602), one that drops the name sends the file under no member, and one at another id leaves the plan's FilesChanged (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:37 at 65fdf118d) listening to no component, against D17.13."
+     "defect": "Both lines render the Uploader by EJ2's Uploader(id) with automatic upload off and the input named by the member's path, .AutoUpload(false) and [\"name\"] = setup.BindingPath (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs:34-36 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:106-110 at 65fdf118d), and raise FilesChanged from component code (Alis.Reactive.Assets/components/fusion/file-upload.ts:13-21 at 65fdf118d). In the rewrite a form's request sends the input's Files, the shape file (D9.16), under its binding name: a helper that renders the uploader at another id than the field's leaves the plan's FilesChanged and the input's read on no component, against D17.13; component code that raises filesChanged inside EJ2's selected listener, before EJ2 lists the chosen files (@syncfusion/ej2-inputs/src/uploader/uploader.js:1349-1351), or that does not listen to selected, hands a handler of FilesChanged a list without them; and an input of a host's file member written with the shape any stops the request, since no form data field writes it."
+    },
+    {
+     "id": "M21.X1039",
+     "rung": "behavior",
+     "defect": "The redesign's component code raises FilesChanged after EJ2's selected and removing alone (Alis.Reactive.Assets/components/fusion/file-upload.ts:19-20 at 65fdf118d), and main raises no FilesChanged, while the uploader's Clear button and clearAll() empty the list through EJ2's clearing (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:806; @syncfusion/ej2-inputs/src/uploader/uploader.js:863-864, :3396-3399), so a handler of FilesChanged and the input's live check keep the files the person cleared. The rewrite's component code raises it after clearing as after selected and removing (M21.D701)."
+    },
+    {
+     "id": "M21.X1040",
+     "rung": "behavior",
+     "defect": "Both lines name the uploader's input by the member's path (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs:34-36 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:106-110 at 65fdf118d). EJ2 copies a chosen file into a hidden input under the input's name (@syncfusion/ej2-inputs/src/uploader/uploader.js:391, :1706-1716), which the browser's own submission of a native form sends; a helper that sets no name leaves EJ2 to name the input by its id (:372-375), so the endpoint binds no file into the member."
     }
    ],
    "promises": [
@@ -8525,8 +8535,24 @@
      "gesture": "Choose care-plan.pdf in the uploader, then click Save.",
      "outcome": "chosen reads 1 at once, the network log holds no request until Save, and the echo reads care-plan.pdf.",
      "opposite": "Clicking Save with no file chosen, the echo reads no file.",
-     "defect": "The uploader sends the file the moment it is chosen, so the network log holds a request before Save; or the input carries no name, so the echo reads no file; or it is rendered at another id, so chosen stays 0.",
+     "defect": "The uploader is rendered at another id, so chosen stays 0; or filesChanged is raised inside EJ2's selected listener, before the list holds the file, or not on selected, so chosen stays 0; or CarePlan's input is written with the shape any, so the request stops before it sends and the echo stays Not saved.",
      "for": "M21.X1014"
+    },
+    {
+     "page": "An admission's care plan draft, rendered by field.FusionUploader() outside a native form, so EJ2 shows its Clear button once a file is listed, for a model whose CarePlan is an IFormFile, whose FilesChanged handler sets the element chosen's text to the count of the uploader's Files; chosen starts as 0.",
+     "gesture": "Choose care-plan.pdf in the uploader, then click the uploader's Clear.",
+     "outcome": "chosen reads 1 once the file is listed and 0 once Clear empties the list.",
+     "opposite": "Before Clear, with care-plan.pdf listed, chosen reads 1.",
+     "defect": "The component code does not listen to clearing, so chosen still reads 1 after Clear; or the helper drops AutoUpload(false), so EJ2 uploads the file at once and shows no Clear button.",
+     "for": "M21.X1039"
+    },
+    {
+     "page": "An admission's care plan filing, a plain HTML form with method post and enctype multipart/form-data around field.FusionUploader() for a model whose CarePlan is an IFormFile and a File submit button, posted by the browser's own submission, with no plan request, to an action that renders the name of the CarePlan it bound.",
+     "gesture": "Choose care-plan.pdf in the uploader and click File.",
+     "outcome": "The page reads Care plan filed: care-plan.pdf.",
+     "opposite": "Click File with no file chosen: the page reads No care plan filed.",
+     "defect": "The helper sets no name on the input, so EJ2 names it by its id, the file leaves under that name and the page reads No care plan filed.",
+     "for": "M21.X1040"
     }
    ],
    "verdicts": [

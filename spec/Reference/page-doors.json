@@ -1276,11 +1276,23 @@
     ]
   },
   "M21.F22 M21.X1014 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/CarePlanUpload.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F22 M21.X1039 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/CarePlanDraft.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F22 M21.X1040 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/CarePlanFiling.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },

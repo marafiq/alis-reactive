@@ -1871,6 +1871,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the lock holds the latest published version of its package; once a newer version is published, or npm no
   longer reports it, the check fails until the lock moves and the id leaves (`spec/REWRITE.md`, section 2.7).
   An excused advisory is the owner's each time; `WhenThePackagesAreAudited` holds the rule.
+- The owner, 2026-11-17, answering the lead's ask on FusionUploader's FilesChanged, raised by the slice's code
+  through EJ2's trigger, which ej2-base 33.1.47 marks private (base.d.ts:98), verbatim: "yes, but let it be known
+  somewhere explicigt, i will revist later on why u could not find the actual event that achieve the task, their
+  file upload is quite modern". Read by the lead: the one private member a slice's code calls, held by M21.X1014's,
+  M21.X1039's and M21.X1040's tests at the pinned version, and open for the owner's revisit. What the lead read in
+  ej2-inputs' uploader.js: no public event fires once the list holds a chosen file; fileListRendering fires in
+  internalCreateFileList (:1402) before filesData takes the file (:1407), change only after a server upload or
+  removal (:1130, :2249), actionComplete only once every file's upload completes (:2306-2313), and selected,
+  removing and clearing before the list changes (D701); a listener EJ2's public addEventListener holds is notified
+  by trigger alone.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

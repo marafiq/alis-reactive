@@ -9304,6 +9304,37 @@
       ]
     },
     {
+      "feature": "M21.F22",
+      "for": "M21.X1039",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "carePlanUpload"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F22",
+      "for": "M21.X1040",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "carePlanUpload",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F24",
       "for": "M21.X1015",
       "index": 0,

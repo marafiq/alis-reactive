@@ -8,7 +8,7 @@ using Alis.Reactive.TypeKnowledge;
 
 namespace Alis.Reactive.InputsAndIds;
 
-internal static class InputShapes
+internal static partial class InputShapes
 {
     private static readonly Type[] Integers =
     [
@@ -28,6 +28,7 @@ internal static class InputShapes
         JsonTypeInfo<bool> or JsonTypeInfo<bool?> => BooleanShape.Instance,
         JsonTypeInfo<DateTime> or JsonTypeInfo<DateTime?> => DateShape.Instance,
         JsonTypeInfo<DateTimeOffset> or JsonTypeInfo<DateTimeOffset?> => new InstantShape(DateMeaning.None),
+        _ when IsAHostsFile(member) => FileShape.Instance,
         _ when Integers.Contains(member.Type) => new NumberShape(NumberOf.Integer, numbers, ConversionShapes.OverflowOf(member)),
         _ when Fractions.Contains(member.Type) => new NumberShape(NumberOf.Fraction, numbers, ConversionShapes.OverflowOf(member)),
         _ when member.IsList(out var item) => new ArrayShape(Nullable.GetUnderlyingType(item.Type) is null ? Of(item, NoStart, numbers) : new NullableShape(Of(item, NoStart, numbers))),
@@ -43,6 +44,8 @@ internal static class InputShapes
         NullableShape nullable => new NullableShape(From(nullable.Inner, source)),
         _ => shape,
     };
+
+    private static partial bool IsAHostsFile(JsonTypeInfo member);
 
     private static Shape WrittenAs(JsonElement start, NumberCulture numbers) => start.ValueKind switch
     {

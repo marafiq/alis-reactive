@@ -88,6 +88,10 @@ public static partial class CarePages
 
     public const string CarePlanUpload = AdmissionClinical + "care-plan-upload";
 
+    public const string CarePlanDraft = AdmissionClinical + "care-plan-draft";
+
+    public const string CarePlanFiling = AdmissionClinical + "care-plan-filing";
+
     public const string RoomType = AdmissionClinical + "room-type";
 
     public const string AdmissionStepsAtMedications = AdmissionClinical + "admission-steps/medications";
