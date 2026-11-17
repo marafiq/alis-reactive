@@ -561,6 +561,7 @@ public static class Promises
     public static class M21_F7
     {
         public const string M21_X1003_0 = "M21.F7 M21.X1003 0";
+        public const string M21_X1041_0 = "M21.F7 M21.X1041 0";
     }
 
     public static class M21_F8
@@ -716,6 +717,7 @@ public static class Promises
     public static class M21_F34
     {
         public const string M21_X1020_0 = "M21.F34 M21.X1020 0";
+        public const string M21_X1043_0 = "M21.F34 M21.X1043 0";
     }
 
     public static class M21_F35
@@ -744,6 +746,7 @@ public static class Promises
         public const string M21_X306_0 = "M21.F39 M21.X306 0";
         public const string M21_X306_1 = "M21.F39 M21.X306 1";
         public const string M21_X306_2 = "M21.F39 M21.X306 2";
+        public const string M21_X1042_0 = "M21.F39 M21.X1042 0";
     }
 
     public static class M21_F40

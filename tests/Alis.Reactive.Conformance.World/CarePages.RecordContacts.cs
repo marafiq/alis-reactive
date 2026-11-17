@@ -16,6 +16,8 @@ public static partial class CarePages
 
     public const string RotaWeekShifts = RecordContacts + "rota-week-shifts";
 
+    public const string RotaCarers = RecordContacts + "rota-carers";
+
     public const string RoomComfort = RecordContacts + "room-comfort";
 
     public const string CareSectionsAtAllergies = RecordContacts + "care-sections/allergies";

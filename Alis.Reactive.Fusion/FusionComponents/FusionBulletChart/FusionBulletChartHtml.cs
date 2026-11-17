@@ -15,7 +15,7 @@ public static partial class FusionBulletChartHtml
     private static readonly ConditionalWeakTable<BulletChartBuilder, Action<BulletChartBuilder, ItemPaths>> NamedFields = new();
 
     /// <summary>Names the members of an item the chart draws as its value and its target.</summary>
-    /// <remarks>Type the first lambda's item, as <c>(Shift s) =&gt; s.Hours</c>.</remarks>
+    /// <remarks>Type the first lambda's item, as <c>(Shift s) =&gt; s.Hours</c>. Each lambda names one member of the item, since the chart reads each field by its one name; a path past it is refused where the view renders.</remarks>
     /// <param name="build">The chart's builder.</param>
     /// <param name="value">The member drawn as an item's value.</param>
     /// <param name="target">The member drawn as an item's target.</param>
@@ -24,7 +24,7 @@ public static partial class FusionBulletChartHtml
         => Named(build, (chart, paths) => chart.ValueField(paths.Of(value)).TargetField(paths.Of(target)));
 
     /// <summary>Names the members of an item the chart draws as its value and its target, and the category it shows it under.</summary>
-    /// <remarks>Type the first lambda's item, as <c>(Shift s) =&gt; s.Hours</c>.</remarks>
+    /// <remarks>Type the first lambda's item, as <c>(Shift s) =&gt; s.Hours</c>. Each lambda names one member of the item, since the chart reads each field by its one name; a path past it is refused where the view renders.</remarks>
     /// <param name="build">The chart's builder.</param>
     /// <param name="value">The member drawn as an item's value.</param>
     /// <param name="target">The member drawn as an item's target.</param>
@@ -57,6 +57,11 @@ public static partial class FusionBulletChartHtml
 
     private sealed class PlanPaths<TModel>(ReactivePlan<TModel> plan) : ItemPaths
     {
-        internal override string Of<TItem, TMember>(Expression<Func<TItem, TMember>> member) => string.Join(".", plan.JsonPath(member));
+        internal override string Of<TItem, TMember>(Expression<Func<TItem, TMember>> member)
+        {
+            var names = plan.JsonPath(member);
+            if (names.Count != 1) throw new InvalidOperationException($"FusionBulletChartHtml.Fields names '{member}', a path past one member of the item, and the chart reads each field as one member of an item; name one member, such as item => item.Taken.");
+            return names[0];
+        }
     }
 }

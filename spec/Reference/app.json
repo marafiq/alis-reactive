@@ -949,7 +949,7 @@
         {
           "id": "refusalFusion",
           "kind": "fusion",
-          "role": "the Fusion components the refused Fusion pages render: FusionGrid with FusionGridValidation's rules or a template, and FusionSmartPasteButton"
+          "role": "the Fusion components the refused Fusion pages render: FusionGrid with FusionGridValidation's rules or a template, FusionSmartPasteButton, and FusionBulletChart with its Fields"
         },
         {
           "id": "fusionRefusalValidator",
@@ -3775,6 +3775,21 @@
       "parts": [
         "visits",
         "contactsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F39",
+      "for": "M21.X1042",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "visits"
       ],
       "harness": [
         "seed"
@@ -9137,6 +9152,21 @@
       ]
     },
     {
+      "feature": "M21.F7",
+      "for": "M21.X1041",
+      "index": 0,
+      "screen": "fusion-refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalFusion"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F8",
       "for": "M21.X1004",
       "index": 0,
@@ -9427,6 +9457,21 @@
     {
       "feature": "M21.F34",
       "for": "M21.X1020",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F34",
+      "for": "M21.X1043",
       "index": 0,
       "screen": "bed-board",
       "hosts": [

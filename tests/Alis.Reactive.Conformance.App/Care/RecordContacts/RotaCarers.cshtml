@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Schedule
+@model RotaCarers
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Carers on shift";
+    var plan = Html.ReactivePlan<RotaCarers>();
+}
+<h1>Carers on shift</h1>
+@(Html.FusionSchedule(plan, "carer-rota", build => build
+    .CurrentView(View.Week)
+    .SelectedDate(Model.SelectedDate)
+    .EventSettings(new ScheduleEventSettings
+    {
+        DataSource = Model.Shifts,
+        Fields = new ScheduleField
+        {
+            Subject = new ScheduleFieldOptions { Name = "carer" },
+            StartTime = new ScheduleFieldOptions { Name = "starts" },
+            EndTime = new ScheduleFieldOptions { Name = "ends" },
+        },
+    }))
+    .Reactive(rota => rota.PopupOpen<CarerShift>(), (opened, pipeline) => pipeline.Element("shift-picked").Text.Set(opened.Data.Read(shift => shift.Carer))))
+<p>Picked: <output id="shift-picked">-</output></p>
+@Html.RenderPlan(plan)

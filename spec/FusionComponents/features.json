@@ -2456,6 +2456,11 @@
      "id": "M21.X1003",
      "rung": "behavior",
      "defect": "Both lines render the BulletChart by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().BulletChart(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartHtmlExtensions.cs:34-35 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:97-98 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, draws the chart with EJ2's title '' (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts:113-115), and the plan's BulletChartMouseClick handler (Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:36 at 65fdf118d; @syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts:302) listens to no component, against D17.13."
+    },
+    {
+     "id": "M21.X1041",
+     "rung": "refusal",
+     "defect": "The rewrite's Fields<TItem>(value, target) and Fields<TItem>(value, target, category) on EJ2's BulletChartBuilder (M21.N7), a door neither line has, take each field as a lambda of the item, which C# lets name a path past one member, while EJ2 33.1.47's BulletChart reads each field as one member of an item, data[valueField], data[targetField] and data[categoryField] (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.js:162, :497; @syncfusion/ej2-charts/src/bullet-chart/renderer/scale-render.js:112, :119, :239; @syncfusion/ej2-charts/src/bullet-chart/user-interaction/tooltip.js:80-82): a path's members joined with dots name a field no item holds, so the chart draws no value, target or category for it and says nothing. No type stages a lambda's shape, and the analyzers no unit has built wait until after 1.0 (spec/CLAUDE.md, the owner, 2026-11-15), so the rewrite's render helper refuses it where the view renders: \"FusionBulletChartHtml.Fields names 'w => w.Lead.Name', a path past one member of the item, and the chart reads each field as one member of an item; name one member, such as item => item.Taken.\""
     }
    ],
    "promises": [
@@ -2466,6 +2471,14 @@
      "opposite": "Built with the title Weight, the chart shows Weight.",
      "defect": "The chart is rendered without the view's options, so it shows no title; or at another id, so the click leaves chart-note at its dash.",
      "for": "M21.X1003"
+    },
+    {
+     "for": "M21.X1041",
+     "page": "A ward fluids page whose FusionBulletChart of North's intake, 1200 ml taken against a 1500 ml target with Rose Achebe as its lead, is rendered by Html.FusionBulletChart(plan, \"ward-fluids\", wards, build => build.Title(\"Fluid intake\").Fields((WardIntake w) => w.Taken, w => w.Target, w => w.Lead.Name)).",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with InvalidOperationException: FusionBulletChartHtml.Fields names 'w => w.Lead.Name', a path past one member of the item, and the chart reads each field as one member of an item; name one member, such as item => item.Taken.",
+     "opposite": "With the category w => w.Ward the page renders, and the chart shows the category North.",
+     "defect": "The path's members are joined with dots as lead.name, which no item holds, so the page renders and the chart shows no category."
     }
    ],
    "verdicts": [
@@ -15941,6 +15954,11 @@
      "id": "M21.X1020",
      "rung": "behavior",
      "defect": "Both lines render the PivotView by EJ2's builder under the view's id with the view's options, EJS().PivotView(elementId) (Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewHtmlExtensions.cs:28 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:135 at 65fdf118d): a helper that drops the view's options starts it at EJ2's Table view (@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:960-963), and one that renders an id the plan does not name leaves the rewrite's DisplayOption.View (M21.N34, M21.D301; @syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1476) nothing to reach, against D17.13. The rewrite's render helper renders the PivotView under the plan's id with the options the view sets."
+    },
+    {
+     "id": "M21.X1043",
+     "rung": "behavior",
+     "defect": "EJ2 33.1.47's PivotViewBuilder takes the rows of its dataSourceSettings as an object (PivotViewDataSourceSettings.DataSource, Syncfusion.EJ2.xml of Syncfusion.EJ2.AspNet.Core 33.1.47), which it writes through Newtonsoft's process-wide default settings and so names each member by its C# name and reads no [JsonPropertyName] (probe:fusion-ej2-builder-newtonsoft-defaults), while the pivot's fields are the first row's member names (@syncfusion/ej2-pivotview/src/base/engine.js:283) and its rows and values find them by the names a view gives. Both lines hand the rows to EJ2's builder alone (Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewHtmlExtensions.cs:28-29 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:135-138 at 65fdf118d), so rows and values named by the members' JSON names find no field. The rewrite's render helper writes dataSourceSettings.dataSource by the plan's one writer after the view's build (M21.N34, M21.D1), so a row's members reach the pivot under their JSON names, a [JsonPropertyName]'s among them."
     }
    ],
    "promises": [
@@ -15951,6 +15969,14 @@
      "outcome": "The census shows as a chart and view-name reads Chart.",
      "opposite": "Rendered with View = View.Table, the census shows as a table and view-name reads Table.",
      "defect": "The helper drops the view's options, so the census shows as a table and view-name reads Table; or it renders the pivot at an id the plan does not name, so the read stops and view-name keeps No view."
+    },
+    {
+     "for": "M21.X1043",
+     "page": "A ward occupancy page whose FusionPivotView in Table view is handed in EJ2's dataSourceSettings the residents North, North and East, each counting 1, of a row class whose Ward member the app's camel case names ward and whose Residents member carries [JsonPropertyName(\"headcount\")], with its row named ward and its value named headcount.",
+     "gesture": "Open the page.",
+     "outcome": "The table shows the row East 1 and the row North 2.",
+     "opposite": "Opened with one North resident moved to East, the table shows the row East 2 and the row North 1.",
+     "defect": "EJ2 writes the rows through Newtonsoft under their C# names, Ward and Residents, while the row and the value name ward and headcount, so the table shows no ward."
     }
    ],
    "verdicts": [
@@ -17894,6 +17920,11 @@
      "id": "M21.X307",
      "rung": "analyzer",
      "defect": "The redesign declares eventSettings as Object<FusionScheduleEventSettings>(), a live object with no null mark (Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:35 at 65fdf118d), where EJ2 documents it null until set (@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:705-707): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5), which a live object meets only declared nullable: true, and refuses the declaration by ALIS019. The rewrite's EventSettings is LiveObject<FusionSchedule.EventSettingsModel>(nullable: true). Main declares no door for eventSettings and writes its dataSource by a mapped path (Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:62 at 623dd4a27)."
+    },
+    {
+     "id": "M21.X1042",
+     "rung": "behavior",
+     "defect": "EJ2 33.1.47's ScheduleBuilder takes the events of its eventSettings as an object (ScheduleEventSettings.DataSource, Syncfusion.EJ2.xml of Syncfusion.EJ2.AspNet.Core 33.1.47), which it writes through Newtonsoft's process-wide default settings and so names each member by its C# name and reads no [JsonPropertyName] (probe:fusion-ej2-builder-newtonsoft-defaults), while the schedule finds an event's subject, start and end by the names its fields give (@syncfusion/ej2-schedule/src/schedule/event-renderer/event-base.js:214-218) and a view's read of an event, PopupOpen<TEvent>()'s Data among them, names each member as the app's JSON names it. Both lines hand the events to EJ2's builder alone (Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleHtmlExtensions.cs:34-35 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:324-327 at 65fdf118d), so fields named by the members' JSON names find no event. The rewrite's render helper writes the events the view's build sets in eventSettings by the plan's one writer after the build, as a Fusion render helper writes every C# value it hands EJ2 (M21.N39, M21.D1)."
     }
    ],
    "promises": [
@@ -17920,6 +17951,14 @@
      "outcome": "The request's body sends currentDate as 2026-11-16.",
      "opposite": "Clicking Previous instead sends 2026-11-02.",
      "defect": "The body sends 2026-11-16T08:00:00.000Z, an instant with an offset, where a DateTime goes as its text with none."
+    },
+    {
+     "for": "M21.X1042",
+     "page": "A carers rota page whose FusionSchedule in week view, its selected date 2026-11-09, opened in America/Los_Angeles, is handed in EJ2's eventSettings the shifts Ada Brooks, Monday 2026-11-09 from 9:00 to 17:00, and Lena Ortiz, Tuesday 2026-11-10 from 9:00 to 17:00, its subject, startTime and endTime fields naming the shift's members by their JSON names carer, starts and ends, and whose PopupOpen<CarerShift>() handler sets shift-picked's text to the opened shift's Carer; shift-picked starts as a dash.",
+     "gesture": "Open the page, then click Ada Brooks's shift.",
+     "outcome": "The schedule shows the shifts Ada Brooks and Lena Ortiz, and shift-picked reads Ada Brooks.",
+     "opposite": "Clicking Lena Ortiz's shift, shift-picked reads Lena Ortiz.",
+     "defect": "EJ2 writes the shifts through Newtonsoft under their C# names, Carer, Starts and Ends, while the fields name carer, starts and ends, so the schedule shows no shift and shift-picked keeps its dash."
     }
    ],
    "verdicts": [

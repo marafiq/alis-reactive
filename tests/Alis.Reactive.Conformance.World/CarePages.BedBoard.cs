@@ -55,4 +55,8 @@ public static partial class CarePages
     public const string WardCensus = BedBoard + "ward-census";
 
     public const string WardCensusAsTable = BedBoard + "ward-census-as-table";
+
+    public const string WardOccupancy = BedBoard + "ward-occupancy";
+
+    public const string WardOccupancyAfterAMove = BedBoard + "ward-occupancy/after-a-move";
 }

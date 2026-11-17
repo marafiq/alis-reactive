@@ -1451,6 +1451,13 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F34 M21.X1043 0": {
+    "modules": [],
+    "views": [
+      "/Care/BedBoard/WardOccupancy.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F35 M21.X1021 0": {
     "modules": [],
     "views": [
@@ -1483,6 +1490,13 @@
     "modules": [],
     "views": [
       "/Care/Handover/SummarySending.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F39 M21.X1042 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/RotaCarers.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
@@ -1616,6 +1630,14 @@
     "modules": [],
     "views": [
       "/Care/RecordContacts/FluidChart.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F7 M21.X1041 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionComponents/WardFluids.cshtml",
+      "/Refusals/FusionComponents/WardFluidsByLead.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },

@@ -1238,9 +1238,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   hold every member; a carousel renders with AutoPlay off, so the slide shown waits on no time. A context menu renders with its animation off
   (its effect None), since EJ2 33.1.47's menu takes focus only when its opening animation ends, so a key pressed on
   the open menu waits on no time (the lead, 2026-11-17, from batch 4's red leg). The drop-down tree names
-  its fields through EJ2's own fields object with `nameof`, since M21.N21 declares no typed fields as FusionMultiSelect
-  declares its; U26 reads whether EJ2 writes the tree's data under those names, and a typed door for them is a gap the
-  lead raises. M21.X201's three exports read Exporting while the export runs, which a test reads only while the export
+  its fields through EJ2's own fields object by the members' JSON names, as the ward census names its pivot's row and
+  value, since M21.N21 and M21.N34 declare no typed fields as FusionMultiSelect declares its: each render helper writes
+  the nodes or the rows a view hands EJ2 by the plan's writer after the view's build (M21.D1), and `nameof` named what
+  EJ2's own writer writes, each member's C# name, which holds under Newtonsoft's process-wide defaults alone (M21.X3)
+  (the lead, 2026-11-17, from U26's batch 5a). A typed door for the tree's fields and for the pivot's rows and values is
+  a gap the lead raises, its use a view that names each by a lambda of its item, so a renamed member, or one that
+  carries [JsonPropertyName], reaches EJ2's fields as the plan writes it, with no string. M21.X201's three exports read
+  Exporting while the export runs, which a test reads only while the export
   is held, and their placement names the seed alone: they wait on the harness's remaining verbs, the clock read against
   EJ2's export first. X15.5 waits on the pascalCase host. The owner can overrule each.
 - The lead, 2026-11-13, landing the record-contacts screen's seventeen pages from a fork's work read at the source.

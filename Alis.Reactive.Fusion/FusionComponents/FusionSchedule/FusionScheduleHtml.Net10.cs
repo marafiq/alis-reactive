@@ -19,6 +19,6 @@ public static partial class FusionScheduleHtml
     /// <param name="build">What the view sets on the schedule.</param>
     /// <returns>The rendered schedule, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionSchedule, TModel> FusionSchedule<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<ScheduleBuilder> build)
-        => plan.Render<FusionSchedule>(elementId, Built(html.EJS().Schedule(elementId), build).Render());
+        => plan.Render<FusionSchedule>(elementId, Built(plan, html.EJS().Schedule(elementId), build).Render());
 }
 #endif
