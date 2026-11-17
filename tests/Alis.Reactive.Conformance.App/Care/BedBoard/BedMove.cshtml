@@ -15,9 +15,9 @@
         .FusionDropDownTree(build => build.Fields(new DropDownTreeFields
         {
             DataSource = Model.Wings,
-            Value = nameof(WingNode.Id),
-            Text = nameof(WingNode.Name),
-            Child = nameof(WingNode.Wards),
+            Value = "id",
+            Text = "name",
+            Child = "wards",
         })))
 </fieldset>
 @Html.RenderPlan(plan)

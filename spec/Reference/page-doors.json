@@ -1195,9 +1195,7 @@
     ]
   },
   "M21.F21 M21.X1013 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/BedMove.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1248,9 +1246,7 @@
     ]
   },
   "M21.F26 M21.X1017 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/DoseBoard.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1264,18 +1260,14 @@
     ]
   },
   "M21.F28 M21.X509 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/RoundSelection.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M21.F28 M21.X509 1": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/RoundUnselection.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1299,18 +1291,14 @@
     ]
   },
   "M21.F31 M21.X512 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/BedAllocation.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M21.F31 M21.X512 1": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/OpenBeds.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1331,9 +1319,7 @@
     ]
   },
   "M21.F34 M21.X1020 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/WardCensus.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1368,27 +1354,21 @@
     ]
   },
   "M21.F39 M21.X306 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/RotaWeek.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M21.F39 M21.X306 1": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/RotaWeekBefore.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M21.F39 M21.X306 2": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/RotaWeekShifts.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1409,9 +1389,7 @@
     ]
   },
   "M21.F42 M21.X805 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/FusionComponents/SmartPasteIntake.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1497,9 +1475,7 @@
     ]
   },
   "M21.F7 M21.X1003 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/FluidChart.cshtml",
       "/Shared/_FusionLayout.cshtml"
