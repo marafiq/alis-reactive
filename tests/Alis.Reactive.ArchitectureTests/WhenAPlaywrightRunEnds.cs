@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using NUnit.Framework;
 
 namespace Alis.Reactive.ArchitectureTests;
@@ -341,6 +342,108 @@ public class WhenAPlaywrightRunEnds
         Assert.That(File.Exists(budget), Is.False);
     }
 
+    [RefusedCase]
+    public void a_measurement_that_mixes_fusion_fixtures_tests_with_others_is_refused()
+    {
+        using var written = new WrittenFolder();
+        var selection = Selection(written, [Listed, Opened], fusion: [Opened]);
+        var budget = Budget(written, 8, 2);
+        var held = File.ReadAllText(budget);
+        var runs = Enumerable.Range(1, RunsOfABudget).Select(run =>
+        {
+            Steps(written, run, (Listed, "Frame", "goto", 80), (Opened, "Frame", "click", 41));
+            return Trx(written, [Ran(Listed, "Passed", 1), Ran(Opened, "Passed", 1)], $"measure-{run}.trx");
+        });
+
+        var asked = Run("--measurable", "--selection", selection);
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, "--weights", Weights(selection), .. runs]);
+
+        const string Mixed = "[playwright:result] 'rounds' holds tests of Fusion fixtures and tests of other fixtures (1 and 1); a measurement writes one block of the budget, so the Fusion fixtures' tests are measured apart.";
+        Assert.That(asked.Errors.Trim(), Is.EqualTo(Mixed));
+        Assert.That(asked.ExitCode, Is.EqualTo(2));
+        Assert.That(measured.Errors.Trim(), Is.EqualTo(Mixed));
+        Assert.That(measured.ExitCode, Is.EqualTo(2));
+        Assert.That(File.ReadAllText(budget), Is.EqualTo(held));
+    }
+
+    [AcceptedCase]
+    public void a_measurement_of_fusion_fixtures_tests_alone_or_of_none_is_taken()
+    {
+        using var written = new WrittenFolder();
+
+        var ofFusion = Run("--measurable", "--selection", Selection(written, [Listed, Opened], fusion: [Listed, Opened]));
+        var ofNone = Run("--measurable", "--selection", Selection(written, [Listed, Opened]));
+
+        Assert.That(new[] { ofFusion.Errors, ofNone.Errors }, Is.EqualTo(new[] { "", "" }));
+        Assert.That(new[] { ofFusion.ExitCode, ofNone.ExitCode }, Is.EqualTo(new[] { 0, 0 }));
+    }
+
+    [AcceptedCase]
+    public void twenty_green_runs_of_fusion_fixtures_tests_write_the_fusion_block_and_keep_the_cores()
+    {
+        using var written = new WrittenFolder();
+        var selection = Selection(written, [Listed, Opened], fusion: [Listed, Opened]);
+        var budget = Budget(written, 8, 2);
+        var runs = Enumerable.Range(1, RunsOfABudget).Select(run =>
+        {
+            Steps(written, run, (Listed, "Frame", "goto", run == 4 ? 900 : 640), (Listed, "Frame", "click", 300.25), (Opened, "Page", "reload", 410));
+            return Trx(written, [Ran(Listed, "Passed", 1), Ran(Opened, "Passed", run == 9 ? 3.5 : 2)], $"measure-{run}.trx");
+        });
+
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, "--weights", Weights(selection), .. runs]);
+
+        Assert.That(measured.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:measured] fusion budget 14s, four times the slowest test of 20 green runs of 2 tests, 3.5s {Opened}",
+            $"[playwright:measured] fusion action wait 1204ms, four times the slowest action, 301ms Frame.click in {Listed}",
+            $"[playwright:measured] fusion navigation wait 3600ms, four times the slowest navigation, 900ms Frame.goto in {Listed}",
+            "[playwright:measured] a run's seconds by shard unit: Residents 2.08s, Rounds 1s",
+        }));
+        Assert.That(measured.ExitCode, Is.Zero);
+        using var held = JsonDocument.Parse(File.ReadAllText(budget));
+        Assert.That(held.RootElement.GetProperty("budgetSeconds").GetDouble(), Is.EqualTo(8));
+        Assert.That(held.RootElement.GetProperty("navigationWaitMilliseconds").GetInt32(), Is.EqualTo(800));
+        Assert.That(held.RootElement.GetProperty("fusion").GetProperty("budgetSeconds").GetDouble(), Is.EqualTo(14));
+        Assert.That(held.RootElement.GetProperty("fusion").GetProperty("actionWaitMilliseconds").GetInt32(), Is.EqualTo(1204));
+        Assert.That(held.RootElement.GetProperty("fusion").GetProperty("navigationWaitMilliseconds").GetInt32(), Is.EqualTo(3600));
+        Assert.That(held.RootElement.GetProperty("fusion").GetProperty("runs").GetInt32(), Is.EqualTo(20));
+        Assert.That(held.RootElement.GetProperty("fusion").GetProperty("budgetAtOnce").GetInt32(), Is.EqualTo(1));
+        Assert.That(Read(written, [Listed, Opened], [Ran(Listed, "Passed", 1), Ran(Opened, "Passed", 14)], budget, fusion: [Opened]).Said, Is.EqualTo(new[]
+        {
+            $"[playwright:result] rounds 1/1: 2 selected, 2 ran, 2 passed, 0 failed, 0 over budget, slowest 14.00s {Opened}",
+        }));
+    }
+
+    [RefusedCase]
+    public void a_fusion_fixtures_test_over_its_budget_a_fusion_block_a_hand_chose_and_no_fusion_block_are_refused()
+    {
+        using var written = new WrittenFolder();
+        var measured = WithFusion(Budget(written, 8, 2, name: "measured.json"), navigationWait: 10000);
+        var chosen = WithFusion(Budget(written, 8, 2, name: "chosen.json"), navigationWait: 9999);
+        var coreAlone = Budget(written, 8, 2, name: "core.json");
+
+        var over = Read(written, [Listed, Opened], [Ran(Listed, "Passed", 1), Ran(Opened, "Passed", 20.01)], measured, fusion: [Opened]);
+        var handChosen = Read(written, [Opened], [Ran(Opened, "Passed", 1)], chosen, fusion: [Opened]);
+        var unmeasured = Read(written, [Opened], [Ran(Opened, "Passed", 1)], coreAlone, fusion: [Opened]);
+
+        Assert.That(over.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:result] over budget, 20.01s of 20s: {Opened}",
+            $"[playwright:result] rounds 1/1: 2 selected, 2 ran, 2 passed, 0 failed, 1 over budget, slowest 20.01s {Opened}",
+        }));
+        Assert.That(handChosen.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:result] the fusion navigation wait at {chosen} is 9999ms and its slowest step 2500ms; a wait is four times the slowest step measured, never chosen",
+            $"[playwright:result] rounds 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.00s {Opened}",
+        }));
+        Assert.That(unmeasured.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:result] no fusion budget is measured at {coreAlone}; scripts/playwright.sh --measure over the Fusion fixtures' tests writes it",
+            $"[playwright:result] rounds 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.00s {Opened}",
+        }));
+        Assert.That(new[] { over.ExitCode, handChosen.ExitCode, unmeasured.ExitCode }, Is.EqualTo(new[] { 1, 1, 1 }));
+    }
+
     [AcceptedCase]
     public void twenty_green_runs_at_each_count_keep_the_quickest_count_that_is_quick_enough()
     {
@@ -633,10 +736,10 @@ public class WhenAPlaywrightRunEnds
     private static (string Id, string Outcome, double Seconds) Ran(string id, string outcome, double seconds) => (id, outcome, seconds);
 
     private static (IReadOnlyList<string> Said, string Errors, int ExitCode) Read(
-        WrittenFolder written, string[] selected, (string Id, string Outcome, double Seconds)[] ran, string budget)
-        => Run("--selection", Selection(written, selected), "--trx", Trx(written, ran), "--budget", budget);
+        WrittenFolder written, string[] selected, (string Id, string Outcome, double Seconds)[] ran, string budget, string[]? fusion = null)
+        => Run("--selection", Selection(written, selected, fusion), "--trx", Trx(written, ran), "--budget", budget);
 
-    private static string Selection(WrittenFolder written, string[] cases)
+    private static string Selection(WrittenFolder written, string[] cases, string[]? fusion = null)
         => written.Write("selection.json", JsonSerializer.Serialize(new
         {
             label = "rounds",
@@ -644,7 +747,29 @@ public class WhenAPlaywrightRunEnds
             filter = "",
             cases,
             units = cases.ToDictionary(test => test, test => test == Opened ? "Residents" : "Rounds"),
+            fusion = fusion ?? [],
         }));
+
+    private static string WithFusion(string budget, int navigationWait)
+    {
+        var measured = JsonNode.Parse(File.ReadAllText(budget))!.AsObject();
+        measured["fusion"] = new JsonObject
+        {
+            ["budgetSeconds"] = 20,
+            ["slowestSeconds"] = 5,
+            ["slowest"] = Opened,
+            ["actionWaitMilliseconds"] = 4000,
+            ["slowestActionMilliseconds"] = 1000,
+            ["slowestAction"] = "Frame.click in " + Opened,
+            ["navigationWaitMilliseconds"] = navigationWait,
+            ["slowestNavigationMilliseconds"] = 2500,
+            ["slowestNavigation"] = "Frame.goto in " + Opened,
+            ["runs"] = RunsOfABudget,
+            ["budgetAtOnce"] = 1,
+        };
+        File.WriteAllText(budget, measured.ToJsonString());
+        return budget;
+    }
 
     private static string Weights(string selection) => Path.Combine(Path.GetDirectoryName(selection)!, "shard-weights.json");
 

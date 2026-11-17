@@ -8,6 +8,54 @@ public static partial class CarePages
 
     public const string WardAllergies = AdmissionClinical + "ward-allergies";
 
+    public const string AllergyHintGiven = AdmissionClinical + "allergy-hint/given";
+
+    public const string AllergyHintUnset = AdmissionClinical + "allergy-hint/unset";
+
+    public const string HintChange = AdmissionClinical + "hint-change";
+
+    public const string AllergyField = AdmissionClinical + "allergy-field";
+
+    public const string FieldChange = AdmissionClinical + "field-change";
+
+    public const string AllergyList = AdmissionClinical + "allergy-list";
+
+    public const string AllergyListOnTheSouthWard = AdmissionClinical + "allergy-list?ward=South";
+
+    public const string AllergyListOnTheNorthWard = AdmissionClinical + "allergy-list?ward=North";
+
+    public const string AllergySelectionEmpty = AdmissionClinical + "allergy-selection/empty";
+
+    public const string AllergySelectionOfLatex = AdmissionClinical + "allergy-selection/latex";
+
+    public const string AllergySource = AdmissionClinical + "allergy-source";
+
+    public const string AllergyTagging = AdmissionClinical + "allergy-tagging";
+
+    public const string PeanutCheck = AdmissionClinical + "peanut-check";
+
+    public const string AllergyOffsetWritten = AdmissionClinical + "allergy-offset/written";
+
+    public const string AllergyOffsetRead = AdmissionClinical + "allergy-offset/read";
+
+    public const string AllergySaveOfTwo = AdmissionClinical + "allergy-save/two";
+
+    public const string AllergySaveOfNone = AdmissionClinical + "allergy-save/none";
+
+    public const string AllergySearch = AdmissionClinical + "allergy-search";
+
+    public const string AllergyCard = AdmissionClinical + "allergy-card";
+
+    public const string AllergyWatch = AdmissionClinical + "allergy-watch";
+
+    public const string AllergyRemoval = AdmissionClinical + "allergy-removal";
+
+    public const string IntakeCheck = AdmissionClinical + "intake-check";
+
+    public const string GuardianAllergiesOfLatex = AdmissionClinical + "guardian-allergies/latex";
+
+    public const string GuardianAllergiesUnrecorded = AdmissionClinical + "guardian-allergies/unrecorded";
+
     public const string MedicationIntake = AdmissionClinical + "medication-intake";
 
     public const string WardMedications = AdmissionClinical + "ward-medications";

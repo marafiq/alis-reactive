@@ -11,10 +11,10 @@ public sealed class ResidentPreviewController : Controller
     private const string PlainText = "text/plain";
 
     [HttpGet(CarePages.ResidentPreview)]
-    public IActionResult AsTheAppWritesIt() => View("/Care/AdmissionClinical/ResidentPreview.cshtml", new ResidentPreview { Address = ResidentPreviewEndpoints.AsWritten, GivenName = "Rose" });
+    public IActionResult AsTheAppWritesIt() => View("/Care/AdmissionClinical/ResidentPreview.cshtml", new ResidentPreview { Address = ResidentPreviewEndpoints.AsWritten });
 
     [HttpGet(CarePages.ResidentPreviewInCamelCase)]
-    public IActionResult InCamelCase() => View("/Care/AdmissionClinical/ResidentPreview.cshtml", new ResidentPreview { Address = ResidentPreviewEndpoints.InCamelCase, GivenName = "Rose" });
+    public IActionResult InCamelCase() => View("/Care/AdmissionClinical/ResidentPreview.cshtml", new ResidentPreview { Address = ResidentPreviewEndpoints.InCamelCase });
 
     [HttpGet(ResidentPreviewEndpoints.AsWritten)]
     public IActionResult AsWritten() => Content(JsonConvert.SerializeObject(new PreviewedResident(7, "Rose")), PlainText);
@@ -28,7 +28,7 @@ public sealed class ResidentPreview
 {
     public string Address { get; init; } = null!;
 
-    public string? GivenName { get; set; }
+    public int[]? AllergyCodes { get; set; }
 }
 
 public sealed record PreviewedResident(int ResidentId, string GivenName);

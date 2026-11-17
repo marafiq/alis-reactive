@@ -46,7 +46,9 @@ Options:
   --measure       Run the selection 20 times, each green, and write to the harness's measured.json the budget,
                   four times the slowest test, and the action wait and the navigation wait, each four times the
                   slowest step of its kind, and to shard-weights.json the seconds each shard unit took in a run.
-                  A measured run sets no measured wait and records every step.
+                  A measured run sets no measured wait and records every step. A selection of Fusion fixtures'
+                  tests alone writes the same fields in measured.json's fusion block, which a Fusion fixture reads;
+                  a selection that mixes them with other tests is refused before it runs.
   --measure-parallelism
                   Run the selection 20 times at each of 1, 2, 4 and 8 tests at once, each a measured run, and write
                   to measured.json the count a run takes: the quickest of 2, 4 and 8 whose green runs took at most
@@ -208,6 +210,7 @@ if [ "$parallelism" -eq 1 ]; then
   done
   node scripts/playwright-result.mjs --measure-parallelism --selection "$run/selection.json" --budget "$budget" "${measured[@]}"
 elif [ "$measure" -eq 1 ]; then
+  node scripts/playwright-result.mjs --measurable --selection "$run/selection.json" || exit 2
   for number in $(seq 1 "$measured_runs"); do
     run_measured "measure-$number" "$at_once"
     echo "[playwright:runner] measured run $number of $measured_runs"

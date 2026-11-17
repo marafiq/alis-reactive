@@ -30,7 +30,6 @@ internal static class Run
     {
         _playwright = await Playwright.CreateAsync();
         _browser = await _playwright.Chromium.LaunchAsync();
-        Waits.SetOnEveryExpectation();
     }
 
     internal static async Task CloseTheBrowserAndStopEveryHost()

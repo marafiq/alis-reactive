@@ -124,8 +124,12 @@ its views.
   case is a second address of the same view; a seed is for what a test changes while its page is open. A list a
   page reads is a response body of the page's own endpoint, named beside its controller
   (`Care/Residents/ResidentsEndpoints.cs`) unless a test names it. A Fusion screen's page takes
-  `Shared/_FusionLayout.cshtml`, which holds what `Shared/_Layout.cshtml` holds until U25 links EJ2's script and
-  theme in it, before the framework's (`Care/AdmissionClinical/AllergyIntake.cshtml`). A page that reads a value a
+  `Shared/_FusionLayout.cshtml`, which links EJ2's Bootstrap 5.3 theme in its head and, after the body, EJ2's
+  script, EJ2's script manager, then the conformance script, Native's bundle and the framework's, in section 2.5's
+  order (`Care/AdmissionClinical/AllergyIntake.cshtml`); `build.mjs` copies the script and the theme from
+  "@syncfusion/ej2" into the app's wwwroot, where git ignores them, and a partial a request loads ends with EJ2's
+  script manager, which the slot runs (`Care/AdmissionClinical/AllergyCard.cshtml`). `AppHost.cs` registers
+  Syncfusion's licence when the configuration holds "SYNCFUSION_LICENSE_KEY". A page that reads a value a
   person types or chooses, typed as its member, renders the field inside a container block and reads it by the
   container's `Read` (`Care/Record/PainAssessment.cshtml`).
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view

@@ -4716,7 +4716,8 @@ plans (Q19).
 - `N17.4` new: `NativeConfirm` and `NativeToast` in Alis.Reactive.Native, each a declaration and a render helper.
 - `N17.5` new: the declaration's argument kind that carries its block's abort signal (D17.11).
 - `N17.10` new: an input field's `ValueJson` and `Json(options)`, the starting value and options a render helper
-  writes (D17.13); their names go to gate 2.
+  writes (D17.13), and `JsonName(member)`, a member of an item named as the plan writes it, for a component's field
+  mapping (M21.X2); their names go to gate 2.
 - `N17.13` new: an input field's `BindsAList`, whether the live form writes its member's type as a list
   (D17.13).
 - kept: `Plugin`, `Plugin.Name` and `Plugin(string name)` (both lines).

@@ -8,7 +8,7 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.FusionTemplates;
 
 [TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10))]
 [Category(Hosts.Net10Name)]
-public sealed class WhenARowsWardIsNullOrMissing(string host) : ConformanceFixture(host)
+public sealed class WhenARowsWardIsNullOrMissing(string host) : FusionFixture(host)
 {
     [Test]
     [FailsFor(Promises.M22_F1.M22_X3_0)]

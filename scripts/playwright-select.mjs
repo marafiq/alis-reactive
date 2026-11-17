@@ -4,7 +4,8 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 const usage = `usage: node scripts/playwright-select.mjs --spec <file> --assembly <file> --weights <file> --out <file> <selector> [--host <name> | --every-host] [--shard <i>/<k>]
 
 Joins the tests the spec lands (spec/tools/landings.py) with the tests an assembly holds (scripts/list-tests.cs, each with
-its fixture's folder), writes the cases one run must run to --out and prints the VSTest filter that selects them.
+its fixture's folder), writes the cases one run must run to --out, with the Fusion fixtures' cases among them, and prints
+the VSTest filter that selects them.
 
 Selectors, one a run:
   --all                 every test the assembly holds
@@ -155,7 +156,7 @@ const onShard = unitsOnShard(new Set(inReach.map(row => unitOf(row, written.get(
 const taken = inReach.filter(row => onShard.has(unitOf(row, written.get(row.promise))));
 const cases = taken.map(row => {
   const test = written.get(row.promise);
-  return { fixture: test.fixture, method: test.method, host: row.host, unit: unitOf(row, test), id: `${test.fixture}("${row.host}").${test.method}` };
+  return { fixture: test.fixture, method: test.method, host: row.host, unit: unitOf(row, test), fusion: poolOf(row, test) === "fusion", id: `${test.fixture}("${row.host}").${test.method}` };
 });
 if (cases.length === 0) {
   if (selector.kind === "pool") {
@@ -190,5 +191,5 @@ const selection = selector.kind === "through" ? `through ${selector.value}` : se
 const label = options.everyHost === true ? `${selection}@every host` : options.host === undefined ? selection : `${selection}@${options.host}`;
 const units = Object.fromEntries(cases.map(one => [one.id, one.unit]).sort(([one], [other]) => (one < other ? -1 : 1)));
 const freshApps = [...new Set(taken.filter(row => row.served === "fresh").map(row => freshAppOf[row.host]))].sort();
-writeFileSync(options.out, `${JSON.stringify({ label, shard: `${shard.index}/${shard.count}`, filter, cases: cases.map(one => one.id).sort(), units, freshApps }, null, 2)}\n`);
+writeFileSync(options.out, `${JSON.stringify({ label, shard: `${shard.index}/${shard.count}`, filter, cases: cases.map(one => one.id).sort(), units, fusion: cases.filter(one => one.fusion).map(one => one.id).sort(), freshApps }, null, 2)}\n`);
 console.log(filter);

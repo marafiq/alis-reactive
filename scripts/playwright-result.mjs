@@ -6,6 +6,7 @@ const usage = `usage: node scripts/playwright-result.mjs --selection <file> --tr
        node scripts/playwright-result.mjs --measure --selection <file> --budget <file> --weights <file> <file.trx>...
        node scripts/playwright-result.mjs --measure-parallelism --selection <file> --budget <file> --at 1 <file.trx>... --at 2 <file.trx>... --at 4 <file.trx>... --at 8 <file.trx>...
        node scripts/playwright-result.mjs --at-once --budget <file>
+       node scripts/playwright-result.mjs --measurable --selection <file>
        node scripts/playwright-result.mjs --proof --full <selection file> --budget <file> <run folder>...
 
 Reads what one run of the browser tests wrote and prints its result line:
@@ -19,6 +20,9 @@ the result line.
 budget, four times the slowest test, and the action wait and the navigation wait, each four times the slowest step
 of its kind: a navigation is goto, reload, goBack or goForward, an action every other call on a frame. It writes
 to --weights, for each shard unit the selection names, the seconds its tests took in one run, the mean of the 20.
+A selection of Fusion fixtures' tests alone, the selection's fusion cases, writes the same fields in the budget's
+fusion block, which those tests are read against; a selection of none writes the core's and keeps the block. A
+selection that mixes the two measures neither, and --measurable refuses it before a run starts.
 
 --measure-parallelism reads 20 runs at each of 1, 2, 4 and 8 tests at once, each run's wall time from its TRX, and
 writes the count a run takes: the quickest of 2, 4 and 8 whose runs are green and took, together, no more than the
@@ -34,6 +38,7 @@ const timesTheSlowest = 4;
 const navigations = ["goto", "reload", "goBack", "goForward"];
 const holderOfAnAction = "Frame";
 const waits = ["action", "navigation"];
+const fusionBlock = "fusion";
 const countsAtOnce = [1, 2, 4, 8];
 const timesQuicker = 1.6;
 
@@ -43,13 +48,14 @@ function refuse(message) {
 }
 
 function parse(argv) {
-  const options = { "servers-left": "0", "fresh-servers-left": "0", measure: false, parallelism: false, atOnce: false, proof: false, trxFiles: [], runsAt: new Map() };
+  const options = { "servers-left": "0", "fresh-servers-left": "0", measure: false, parallelism: false, atOnce: false, measurable: false, proof: false, trxFiles: [], runsAt: new Map() };
   let files = options.trxFiles;
   for (let index = 0; index < argv.length; index += 1) {
     const word = argv[index];
     if (word === "--measure") options.measure = true;
     else if (word === "--measure-parallelism") options.parallelism = true;
     else if (word === "--at-once") options.atOnce = true;
+    else if (word === "--measurable") options.measurable = true;
     else if (word === "--proof") options.proof = true;
     else if (word === "--at") {
       if (index + 1 >= argv.length) refuse(`${word} takes a value.\n${usage}`);
@@ -62,6 +68,7 @@ function parse(argv) {
     else files.push(word);
   }
   const needed = options.atOnce ? ["budget"]
+    : options.measurable ? ["selection"]
     : options.proof ? ["full", "budget"]
     : options.measure ? ["selection", "budget", "weights"]
     : options.parallelism ? ["selection", "budget"]
@@ -108,28 +115,51 @@ function hundredths(seconds) {
 function budgetOf(path) {
   if (!existsSync(path)) return { problem: `no budget is measured at ${path}; scripts/playwright.sh --measure writes it` };
   const measured = JSON.parse(readFileSync(path, "utf8"));
-  if (measured.runs < measuredRuns) return { problem: `the budget at ${path} is measured over ${measured.runs} runs; a budget is measured over ${measuredRuns} green runs` };
+  const problem = problemOf(measured, path, "") ?? countProblemOf(measured, path)
+    ?? (measured[fusionBlock] === undefined ? undefined : problemOf(measured[fusionBlock], path, `${fusionBlock} `) ?? atOnceProblemOf(measured[fusionBlock], measured, path, `${fusionBlock} `));
+  if (problem !== undefined) return { problem };
+  return { path, seconds: measured.budgetSeconds, fusionSeconds: measured[fusionBlock]?.budgetSeconds };
+}
+
+function problemOf(measured, path, block) {
+  if (measured.runs < measuredRuns) return `the ${block}budget at ${path} is measured over ${measured.runs} runs; a budget is measured over ${measuredRuns} green runs`;
   if (hundredths(measured.budgetSeconds) !== timesTheSlowest * hundredths(measured.slowestSeconds)) {
-    return { problem: `the budget at ${path} is ${measured.budgetSeconds}s and its slowest test ${measured.slowestSeconds}s; a budget is four times the slowest test measured, never chosen` };
+    return `the ${block}budget at ${path} is ${measured.budgetSeconds}s and its slowest test ${measured.slowestSeconds}s; a budget is four times the slowest test measured, never chosen`;
   }
   for (const kind of waits) {
     const wait = measured[`${kind}WaitMilliseconds`];
     const slowest = measured[`${slowestOf(kind)}Milliseconds`];
-    if (wait === undefined || slowest === undefined) return { problem: `no ${kind} wait is measured at ${path}; scripts/playwright.sh --measure writes it` };
+    if (wait === undefined || slowest === undefined) return `no ${block}${kind} wait is measured at ${path}; scripts/playwright.sh --measure writes it`;
     if (wait !== timesTheSlowest * slowest) {
-      return { problem: `the ${kind} wait at ${path} is ${wait}ms and its slowest step ${slowest}ms; a wait is four times the slowest step measured, never chosen` };
+      return `the ${block}${kind} wait at ${path} is ${wait}ms and its slowest step ${slowest}ms; a wait is four times the slowest step measured, never chosen`;
     }
   }
+  return undefined;
+}
+
+function countProblemOf(measured, path) {
   if (measured.testsAtOnce === undefined || measured.wallSeconds === undefined) {
-    return { problem: `no count of tests at once is measured at ${path}; scripts/playwright.sh --measure-parallelism writes it` };
+    return `no count of tests at once is measured at ${path}; scripts/playwright.sh --measure-parallelism writes it`;
   }
   if (measured.testsAtOnce !== keptOf(measured.wallSeconds)) {
-    return { problem: `the count of tests at once at ${path} is ${measured.testsAtOnce} and its wall times keep ${keptOf(measured.wallSeconds)}; a count is measured, never chosen` };
+    return `the count of tests at once at ${path} is ${measured.testsAtOnce} and its wall times keep ${keptOf(measured.wallSeconds)}; a count is measured, never chosen`;
   }
-  if (measured.budgetAtOnce !== measured.testsAtOnce) {
-    return { problem: `the budget at ${path} is measured at ${measured.budgetAtOnce} at once and a run takes ${measured.testsAtOnce}; scripts/playwright.sh --measure measures it again` };
+  return atOnceProblemOf(measured, measured, path, "");
+}
+
+function atOnceProblemOf(block, measured, path, name) {
+  if (block.budgetAtOnce !== measured.testsAtOnce) {
+    return `the ${name}budget at ${path} is measured at ${block.budgetAtOnce} at once and a run takes ${measured.testsAtOnce}; scripts/playwright.sh --measure measures it again`;
   }
-  return { seconds: measured.budgetSeconds };
+  return undefined;
+}
+
+function blockOf(selection) {
+  const fusion = new Set(selection.fusion);
+  const ofFusion = selection.cases.filter(id => fusion.has(id)).length;
+  if (ofFusion === 0) return "core";
+  if (ofFusion === selection.cases.length) return fusionBlock;
+  refuse(`'${selection.label}' holds tests of Fusion fixtures and tests of other fixtures (${ofFusion} and ${selection.cases.length - ofFusion}); a measurement writes one block of the budget, so the Fusion fixtures' tests are measured apart.`);
 }
 
 function keptOf(wallSeconds) {
@@ -181,9 +211,14 @@ function read(selection, trxPath, budget, serversLeft, freshServersLeft) {
   }
   const failed = ran.filter(result => result.outcome !== "Passed");
   for (const result of failed) said.push(`failed (${result.outcome}): ${result.id}`);
-  const overBudget = budget.seconds === undefined ? [] : ran.filter(result => result.seconds > budget.seconds);
-  for (const result of overBudget) said.push(`over budget, ${result.seconds.toFixed(2)}s of ${budget.seconds}s: ${result.id}`);
+  const fusion = new Set(selection.fusion);
+  const budgetFor = id => (fusion.has(id) ? budget.fusionSeconds : budget.seconds);
+  const overBudget = budget.seconds === undefined ? [] : ran.filter(result => budgetFor(result.id) !== undefined && result.seconds > budgetFor(result.id));
+  for (const result of overBudget) said.push(`over budget, ${result.seconds.toFixed(2)}s of ${budgetFor(result.id)}s: ${result.id}`);
   if (budget.problem !== undefined) said.push(budget.problem);
+  if (budget.seconds !== undefined && budget.fusionSeconds === undefined && ran.some(result => fusion.has(result.id))) {
+    said.push(`no ${fusionBlock} budget is measured at ${budget.path}; scripts/playwright.sh --measure over the Fusion fixtures' tests writes it`);
+  }
   if (serversLeft > 0) said.push(`${serversLeft} server of the conformance app left alive after the run`);
   if (freshServersLeft > 0) said.push(`${freshServersLeft} server of a fresh app left alive after the run`);
 
@@ -231,6 +266,7 @@ function measureParallelism(options, selection) {
 }
 
 function measure(options, selection) {
+  const block = blockOf(selection);
   if (options.trxFiles.length < measuredRuns) refuse(`a budget is measured over ${measuredRuns} green runs, and ${options.trxFiles.length} TRX files were given.`);
   let slowest = { seconds: 0, id: "no test" };
   const slowestStep = Object.fromEntries(waits.map(kind => [kind, { milliseconds: 0, what: "no step" }]));
@@ -265,7 +301,7 @@ function measure(options, selection) {
   const slowestHundredths = Math.ceil(slowest.seconds * 100 - 1e-6);
   const slowestSeconds = slowestHundredths / 100;
   const now = new Date();
-  const measured = {
+  const measuredBlock = {
     budgetSeconds: (timesTheSlowest * slowestHundredths) / 100,
     slowestSeconds,
     slowest: slowest.id,
@@ -283,15 +319,18 @@ function measure(options, selection) {
     measuredOn: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`,
     machine: `${cpus()[0].model}, ${type()} ${release()}`,
     budgetAtOnce: held.testsAtOnce,
-    testsAtOnce: held.testsAtOnce,
-    wallSeconds: held.wallSeconds,
   };
-  writeFileSync(options.budget, `${JSON.stringify(measured, null, 2)}\n`);
+  const written = block === fusionBlock
+    ? { ...held, [fusionBlock]: measuredBlock }
+    : { ...measuredBlock, testsAtOnce: held.testsAtOnce, wallSeconds: held.wallSeconds, [fusionBlock]: held[fusionBlock] };
+  writeFileSync(options.budget, `${JSON.stringify(written, null, 2)}\n`);
+  const measured = measuredBlock;
+  const named = block === fusionBlock ? `${fusionBlock} ` : "";
   const weights = { ...heldAt(options.weights), ...Object.fromEntries([...secondsOf].map(([unit, seconds]) => [unit, hundredths(seconds / options.trxFiles.length) / 100])) };
   writeFileSync(options.weights, `${JSON.stringify(Object.fromEntries(Object.entries(weights).sort(([one], [other]) => (one < other ? -1 : 1))), null, 2)}\n`);
-  console.log(`[playwright:measured] budget ${measured.budgetSeconds}s, four times the slowest test of ${measured.runs} green runs of ${measured.tests} tests, ${slowestSeconds}s ${slowest.id}`);
+  console.log(`[playwright:measured] ${named}budget ${measured.budgetSeconds}s, four times the slowest test of ${measured.runs} green runs of ${measured.tests} tests, ${slowestSeconds}s ${slowest.id}`);
   for (const kind of waits) {
-    console.log(`[playwright:measured] ${kind} wait ${measured[`${kind}WaitMilliseconds`]}ms, four times the slowest ${kind}, ${measured[`${slowestOf(kind)}Milliseconds`]}ms ${measured[slowestOf(kind)]}`);
+    console.log(`[playwright:measured] ${named}${kind} wait ${measured[`${kind}WaitMilliseconds`]}ms, four times the slowest ${kind}, ${measured[`${slowestOf(kind)}Milliseconds`]}ms ${measured[slowestOf(kind)]}`);
   }
   console.log(`[playwright:measured] a run's seconds by shard unit: ${[...secondsOf.keys()].sort().map(unit => `${unit} ${weights[unit]}s`).join(", ")}`);
 }
@@ -335,6 +374,11 @@ if (options.atOnce) {
 }
 if (!existsSync(options.selection)) refuse(`no selection at ${options.selection}; scripts/playwright-select.mjs writes it.`);
 const selection = JSON.parse(readFileSync(options.selection, "utf8"));
+
+if (options.measurable) {
+  blockOf(selection);
+  process.exit(0);
+}
 
 if (options.parallelism) {
   measureParallelism(options, selection);

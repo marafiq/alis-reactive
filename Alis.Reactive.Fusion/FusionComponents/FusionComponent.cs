@@ -13,7 +13,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 public abstract class FusionComponent : Component
 {
     /// <summary>Gets the vendor of every Fusion component: EJ2's object on the element, listened to as EJ2 listens.</summary>
-    public static ComponentVendor FusionVendor => ComponentVendor.Define("fusion", objectPath: "ej2_instances.0", subscribe: "addEventListener", unsubscribe: "removeEventListener");
+    public static ComponentVendor FusionVendor { get; } = ComponentVendor.Define("fusion", objectPath: "ej2_instances.0", subscribe: "addEventListener", unsubscribe: "removeEventListener");
 
     /// <summary>Gets the vendor of the component, <see cref="FusionVendor"/>.</summary>
     public sealed override ComponentVendor Vendor => FusionVendor;

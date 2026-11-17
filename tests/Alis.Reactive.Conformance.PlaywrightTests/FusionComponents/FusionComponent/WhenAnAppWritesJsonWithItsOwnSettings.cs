@@ -8,7 +8,7 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.FusionComponents;
 
 [TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10))]
 [Category(Hosts.Net10Name)]
-public sealed class WhenAnAppWritesJsonWithItsOwnSettings(string host) : ConformanceFixture(host)
+public sealed class WhenAnAppWritesJsonWithItsOwnSettings(string host) : FusionFixture(host)
 {
     [Test]
     [FailsFor(Promises.M21_F2.M21_X3_0)]

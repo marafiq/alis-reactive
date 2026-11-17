@@ -52,7 +52,17 @@ internal sealed partial class MemberPath
         return string.Join(".", members._links.Select(link => link.Written.Name));
     }
 
+    internal static string NameOfItemsMember(LambdaExpression member, JsonSerializerOptions options)
+    {
+        var namesOneMember = member.Body is MemberExpression { Expression: ParameterExpression };
+        if (!namesOneMember || !TryOf(member, options, out var members)) throw NoItemsMember(member);
+        return members.Member.Name;
+    }
+
     internal static partial string BodyName(WrittenMember written, string clrName);
+
+    private static InvalidOperationException NoItemsMember(LambdaExpression member)
+        => new($"'{member}' is not one member of the item, so the component would name a field its data does not hold; name one member, such as item => item.Name.");
 
     internal static InvalidOperationException NoMemberPath(LambdaExpression path)
         => new($"'{path}' names no member path, so the browser has no member to read; read a member and the members past it, such as record => record.Detail.Name.");

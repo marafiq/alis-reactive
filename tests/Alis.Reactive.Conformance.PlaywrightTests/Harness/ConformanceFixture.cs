@@ -18,9 +18,14 @@ public abstract class ConformanceFixture(string host)
 
     protected Task<TestWorld> NewWorldInZone(string zone) => OpenWorld(host, zone);
 
+    private bool IsAFusionFixture => this is FusionFixture;
+
+    [SetUp]
+    public void SetTheExpectationWait() => Waits.SetOnEveryExpectation(IsAFusionFixture);
+
     private async Task<TestWorld> OpenWorld(string under, string zone)
     {
-        var world = await TestWorld.Open(await ConformanceHost.Of(under), zone);
+        var world = await TestWorld.Open(await ConformanceHost.Of(under), zone, IsAFusionFixture);
         _worlds.GetOrAdd(TestContext.CurrentContext.Test.ID, _ => []).Add(world);
         Watch(world.Page);
         return world;
@@ -32,7 +37,7 @@ public abstract class ConformanceFixture(string host)
 
     private async Task<IPage> OpenPerson(bool javaScriptEnabled)
     {
-        var context = await TestWorld.NewContext(await ConformanceHost.Of(host), Zones.LosAngeles, javaScriptEnabled);
+        var context = await TestWorld.NewContext(await ConformanceHost.Of(host), Zones.LosAngeles, javaScriptEnabled, IsAFusionFixture);
         _people.GetOrAdd(TestContext.CurrentContext.Test.ID, _ => []).Add(context);
         var page = await context.NewPageAsync();
         Watch(page);
@@ -54,7 +59,7 @@ public abstract class ConformanceFixture(string host)
             foreach (var world in worlds) parked.AddRange(await world.End());
         }
 
-        var askedOfSyncfusion = _asked.TryRemove(test, out var asked) ? asked.Where(IsSyncfusionsScript).Distinct(StringComparer.Ordinal).ToList() : [];
+        var askedOfSyncfusion = _asked.TryRemove(test, out var asked) && !IsAFusionFixture ? asked.Where(IsSyncfusionsScript).Distinct(StringComparer.Ordinal).ToList() : [];
 
         if (parked.Count > 0)
             throw new InvalidOperationException("The test ended with a gate still parked, so a request of its world never ran: " + string.Join(", ", parked));
@@ -62,7 +67,7 @@ public abstract class ConformanceFixture(string host)
         {
             throw new InvalidOperationException(
                 "A page of the test asked for Syncfusion's script, " + string.Join(", ", askedOfSyncfusion)
-                + ". A core test's page holds the conformance library's components and no component library, so a change to Fusion cannot fail it and a framework defect cannot hide behind one; a Syncfusion component is tested by its own slice's tests.");
+                + ". A core test's page holds the conformance library's components and no component library, so a change to Fusion cannot fail it and a framework defect cannot hide behind one; a Syncfusion component is tested by its own slice's tests, whose fixture is a FusionFixture.");
         }
     }
 

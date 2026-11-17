@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.InputsAndIds;
+using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Vendors;
 
 namespace Alis.Reactive.RenderingAndDelivery;
@@ -39,6 +40,13 @@ public sealed partial class InputField<TModel, TValue>
     /// <param name="options">The options to write.</param>
     /// <returns>The options' JSON.</returns>
     public string Json<TOptions>(TOptions options) => _plan.Json(options);
+
+    /// <summary>Names a member of the component's items as their JSON names it, for a component that finds a field of its data by name.</summary>
+    /// <remarks>The name is the one the items handed with <see cref="Json{TOptions}"/> and the app's endpoints hold: its <c>JsonPropertyName</c>, else the name the app's JSON options give it.</remarks>
+    /// <param name="member">One member of the item, as <c>(Allergy a) =&gt; a.Name</c>.</param>
+    /// <returns>The member's name in the items' data.</returns>
+    public string JsonName<TItem, TMember>(Expression<Func<TItem, TMember>> member)
+        => MemberPath.NameOfItemsMember(member ?? throw new ArgumentNullException(nameof(member)), _plan.Writer.Content.Json.LiveForm);
 
     private Rendered<TComponent, TModel> Registers<TComponent>(Func<Rendered<TComponent, TModel>> render)
         where TComponent : Component, IInputComponent, new()

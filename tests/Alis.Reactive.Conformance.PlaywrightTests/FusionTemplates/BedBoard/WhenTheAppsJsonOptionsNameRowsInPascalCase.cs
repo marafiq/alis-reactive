@@ -8,7 +8,7 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.FusionTemplates;
 
 [TestFixtureSource(typeof(Hosts), nameof(Hosts.PascalCase))]
 [Category(Hosts.PascalCaseName)]
-public sealed class WhenTheAppsJsonOptionsNameRowsInPascalCase(string host) : ConformanceFixture(host)
+public sealed class WhenTheAppsJsonOptionsNameRowsInPascalCase(string host) : FusionFixture(host)
 {
     [Test]
     [FailsFor(Promises.M22_F1.X15_5_0)]

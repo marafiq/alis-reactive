@@ -11,8 +11,8 @@
 }
 <h1>Resident preview</h1>
 <fieldset>
-    <legend>Given name</legend>
-    @(Html.InputField(plan, m => m.GivenName, options => options.Label("Given name")).FusionTextBox())
+    <legend>Allergies</legend>
+    @(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies")).FusionMultiSelect())
 </fieldset>
 <button type="button" @Html.Raises(plan, ResidentPreviews.Preview)>Preview</button>
 <pre id="preview">Not previewed</pre>

@@ -88,6 +88,7 @@ function rowsRule(table) {
 }
 
 export default defineConfig(
+  { ignores: ["tests/Alis.Reactive.Conformance.App/wwwroot/"] },
   {
     files: [
       "tests/Alis.Reactive.Conformance.App/**/*.ts",

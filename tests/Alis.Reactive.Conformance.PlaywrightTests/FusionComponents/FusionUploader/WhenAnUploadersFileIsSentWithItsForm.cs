@@ -8,7 +8,7 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.FusionComponents;
 
 [TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10))]
 [Category(Hosts.Net10Name)]
-public sealed class WhenAnUploadersFileIsSentWithItsForm(string host) : ConformanceFixture(host)
+public sealed class WhenAnUploadersFileIsSentWithItsForm(string host) : FusionFixture(host)
 {
     [Test]
     [FailsFor(Promises.M21_F22.M21_X1014_0)]

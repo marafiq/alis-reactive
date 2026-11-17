@@ -8,7 +8,7 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.FusionComponents;
 
 [TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10))]
 [Category(Hosts.Net10Name)]
-public sealed class WhenAMentionsStaffAreHandedOverWithTheView(string host) : ConformanceFixture(host)
+public sealed class WhenAMentionsStaffAreHandedOverWithTheView(string host) : FusionFixture(host)
 {
     [Test]
     [FailsFor(Promises.M21_F29.M21_X510_0)]

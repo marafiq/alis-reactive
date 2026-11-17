@@ -402,6 +402,9 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   page requests the EJ2 script: the harness reads every request of a test's pages, a world's and a person's, and at
   the test's teardown fails a test whose page asked for `ej2.min.js`, naming the address. Through U24 that is every
   test; U25 lands, with the first test of a Fusion slice, the one way such a fixture takes the script.
+  That fixture, a Fusion fixture, reads its budget and its waits from the measured file's fusion block, measured
+  as the core's are over the Fusion fixtures' tests alone, so the core's waits stay what the core's tests took; a
+  measurement whose selection mixes the two is refused before it runs.
 
 ### 2.6 TLA+
 

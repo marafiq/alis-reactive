@@ -8,7 +8,7 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.FusionComponents;
 
 [TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10))]
 [Category(Hosts.Net10Name)]
-public sealed class WhenAMaskedTextBoxIsRenderedForAMember(string host) : ConformanceFixture(host)
+public sealed class WhenAMaskedTextBoxIsRenderedForAMember(string host) : FusionFixture(host)
 {
     [Test]
     [FailsFor(Promises.M21_F25.M21_X1016_0)]

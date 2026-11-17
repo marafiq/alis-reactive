@@ -1,10 +1,12 @@
-import { readdirSync } from "node:fs";
+import { copyFileSync, mkdirSync, readdirSync } from "node:fs";
 import { posix, sep } from "node:path";
 import { build } from "esbuild";
 
 const app = "tests/Alis.Reactive.Conformance.App";
 
 const screens = ["Bench", "Care", "Refusals", "World"];
+
+const syncfusion = "node_modules/@syncfusion/ej2";
 
 function pageScriptsOf(screen) {
   return readdirSync(posix.join(app, screen), { recursive: true })
@@ -57,3 +59,7 @@ await build({
   target: "es2022",
   logLevel: "info",
 });
+
+mkdirSync(app + "/wwwroot/css", { recursive: true });
+copyFileSync(syncfusion + "/dist/ej2.min.js", app + "/wwwroot/js/ej2.min.js");
+copyFileSync(syncfusion + "/bootstrap5.3.css", app + "/wwwroot/css/bootstrap5.3.css");

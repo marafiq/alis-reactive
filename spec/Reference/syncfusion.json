@@ -498,8 +498,8 @@
         "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and an Open handler that sets the payload's Popup's OffsetY to 8 and then sets the element offset's text to Popup's OffsetY.",
         "gesture": "Click the box to open its list.",
         "outcome": "offset reads 8.",
-        "opposite": "An Open handler that only reads Popup's OffsetY sets offset to 0, EJ2's default.",
-        "defect": "The write lands on the payload object instead of the Popup component it holds, so the read shows 0."
+        "opposite": "An Open handler that only reads Popup's OffsetY sets offset to 1, the offset EJ2's multi-select gives its popup (@syncfusion/ej2-dropdowns/src/multi-select/multi-select.js:3277).",
+        "defect": "The write lands on the payload object instead of the Popup component it holds, so the read shows 1."
       }
     },
     "event.poc15.component.held.after": {

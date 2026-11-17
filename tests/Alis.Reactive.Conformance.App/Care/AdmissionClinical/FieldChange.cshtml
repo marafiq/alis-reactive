@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FieldChange
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Helen Martinez's intake";
+    var plan = Html.ReactivePlan<FieldChange>();
+}
+<h1>Helen Martinez's intake</h1>
+<fieldset>
+    <legend>Allergies</legend>
+    @(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies"))
+        .FusionMultiSelect(HelensAllergies.Offered(), build => build.Fields((HelenAllergy a) => a.Name, a => a.Code)))
+</fieldset>
+<button type="button" @Html.Raises(plan, AllergyFields.Show)>Show field</button>
+<button type="button" @Html.Raises(plan, AllergyFields.UseLabels)>Use labels</button>
+<p>Text field: <output id="field">Not shown</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(AllergyFields.Show, pipeline => pipeline
+        .Element("field").Text.Set(pipeline.Input(m => m.AllergyCodes).Component<FusionMultiSelect<int[]?>>().Fields.Text)));
+    Html.On(plan, trigger => trigger.CustomEvent(AllergyFields.UseLabels, pipeline =>
+    {
+        pipeline.Input(m => m.AllergyCodes).Component<FusionMultiSelect<int[]?>>().Fields.Text.Set("label");
+        pipeline.Element("field").Text.Set(pipeline.Input(m => m.AllergyCodes).Component<FusionMultiSelect<int[]?>>().Fields.Text);
+    }));
+}
+@Html.RenderPlan(plan)

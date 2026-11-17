@@ -1090,18 +1090,14 @@
     ]
   },
   "M21.F1 M21.X2 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/AllergyIntake.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
   "M21.F1 M21.X2 1": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/WardAllergies.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1198,9 +1194,7 @@
     ]
   },
   "M21.F2 M21.X3 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/ResidentPreview.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -4171,6 +4165,129 @@
     "views": [
       "/Bench/Validation/CodeForm.cshtml",
       "/Shared/_Layout.cshtml"
+    ]
+  },
+  "own event.list": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PeanutCheck.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own event.method": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergySearch.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own event.object": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergyTagging.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own event.poc15.component.held.before": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergyOffset.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own event.scalar": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergySource.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own http.into": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergyCard.cshtml",
+      "/Care/AdmissionClinical/AllergyCardPage.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own http.post": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergySave.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own lane.slot.hostDestroyed": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergyRemoval.cshtml",
+      "/Care/AdmissionClinical/AllergyRemovalCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own lane.slot.unloadListener": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergyWatch.cshtml",
+      "/Care/AdmissionClinical/AllergyWatchCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own method.arg.scalar": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergySelection.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own method.void": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergyList.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own prop.dotted.read": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergyField.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own prop.dotted.write": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/FieldChange.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own prop.scalar.read": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/AllergyHint.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own prop.scalar.write": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/HintChange.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own validation.live": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/IntakeCheck.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "own validation.prefix": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/GuardianAllergies.cshtml",
+      "/Care/AdmissionClinical/GuardianAllergyBox.cshtml",
+      "/Shared/_FusionLayout.cshtml"
     ]
   }
 }

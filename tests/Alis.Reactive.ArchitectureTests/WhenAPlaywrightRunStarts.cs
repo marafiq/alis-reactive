@@ -220,6 +220,25 @@ public class WhenAPlaywrightRunStarts
     }
 
     [AcceptedCase]
+    public void a_selection_names_the_tests_of_its_fusion_fixtures()
+    {
+        using var written = new WrittenFolder();
+
+        var all = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, "--all");
+        var core = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, "--pool", "core");
+
+        Assert.That(all.Fusion, Is.EqualTo(new[]
+        {
+            $"{Grid}(\"fusionShell\").the_grid_sorts",
+            $"{Grid}(\"net10\").the_grid_sorts",
+            $"{MultiSelect}(\"net10\").the_item_is_picked",
+            $"{Badge}(\"net10\").the_badge_renders",
+        }));
+        Assert.That(all.Cases, Has.Count.EqualTo(9));
+        Assert.That(core.Fusion, Is.Empty);
+    }
+
+    [AcceptedCase]
     public void a_shard_takes_its_units_longest_first_each_onto_the_lightest_shard()
     {
         using var written = new WrittenFolder();
@@ -365,7 +384,7 @@ public class WhenAPlaywrightRunStarts
         Assert.That(Select(written, TheSpec, TheAssembly).Errors, Does.StartWith("[playwright:select] a run takes one selector, and 0 were given."));
     }
 
-    private sealed record Selected(IReadOnlyList<string> Cases, IReadOnlyList<string> Units, string Filter, string Label, string Shard, IReadOnlyList<string> FreshApps, string Errors, int ExitCode);
+    private sealed record Selected(IReadOnlyList<string> Cases, IReadOnlyList<string> Units, string Filter, string Label, string Shard, IReadOnlyList<string> FreshApps, IReadOnlyList<string> Fusion, string Errors, int ExitCode);
 
     private static Selected Select(WrittenFolder written, string[] spec, string[] assembly, params string[] selector)
     {
@@ -378,7 +397,7 @@ public class WhenAPlaywrightRunStarts
             "--assembly", written.Write("tests.tsv", string.Join("\n", assembly) + "\n"), "--weights", weights, "--out", selection,
             .. selector.Skip(holdsWeights ? 1 : 0),
         ]);
-        if (run.ExitCode != 0) return new Selected([], [], "", "", "", [], run.Errors, run.ExitCode);
+        if (run.ExitCode != 0) return new Selected([], [], "", "", "", [], [], run.Errors, run.ExitCode);
 
         using var read = JsonDocument.Parse(File.ReadAllText(selection));
         var filter = read.RootElement.GetProperty("filter").GetString()!;
@@ -391,6 +410,7 @@ public class WhenAPlaywrightRunStarts
             read.RootElement.GetProperty("label").GetString()!,
             read.RootElement.GetProperty("shard").GetString()!,
             read.RootElement.GetProperty("freshApps").EnumerateArray().Select(one => one.GetString()!).ToList(),
+            read.RootElement.GetProperty("fusion").EnumerateArray().Select(one => one.GetString()!).ToList(),
             run.Errors,
             0);
     }

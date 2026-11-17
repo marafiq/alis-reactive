@@ -8,7 +8,7 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.FusionTemplates;
 
 [TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10))]
 [Category(Hosts.Net10Name)]
-public sealed class WhenATemplateConditionAddsTwoMembers(string host) : ConformanceFixture(host)
+public sealed class WhenATemplateConditionAddsTwoMembers(string host) : FusionFixture(host)
 {
     [Test]
     [FailsFor(Promises.M22_F2.M22_X4_0)]

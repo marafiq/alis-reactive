@@ -106,7 +106,10 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
 - A test whose page asks for Syncfusion's script, an address that ends in `"/ej2.min.js"`, fails at its teardown,
   which names the address: a core test's page holds no component library, and `ConformanceFixture` reads every
   request of a world's page and of a person's. The last command below plants that script's link on the World area's
-  pages and reads the refusal; the same plant with another script's name passes.
+  pages and reads the refusal; the same plant with another script's name passes. A test of a Fusion slice or of a
+  Fusion screen is the one that takes the script: its fixture derives from `FusionFixture`, the only fixture
+  `ConformanceFixture` does not refuse it to, and every fixture under `FusionComponents/` and `FusionTemplates/` does
+  (U25, section 2.5 of `spec/REWRITE.md`).
 - A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits until
   the harness reports it held, asserts the held state, and releases the held gate that wait returned. It never
   provokes an ordering by timing, by a stubbed network or by a control on the page. A test that holds one action at
@@ -127,7 +130,11 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   runs are green and took no more than the runs at one divided by 1.6. Fixtures run beside each other at that count,
   a fixture's tests one after another, and the budget is measured at it. A hand never edits the file: the runner
   refuses a budget or a wait that is not four times what it measured, a count its wall times do not keep, and a
-  budget measured at another count.
+  budget measured at another count. A Fusion fixture's page loads EJ2's whole script, so its budget and its waits are
+  the file's fusion block, the same fields measured over the Fusion fixtures' tests alone, which `Harness/Waits.cs`
+  sets for a `FusionFixture` and the runner reads its tests against; the core's stay what the core's tests took. A
+  measurement writes the fusion block when every test it selects is a Fusion fixture's, the core's when none is, and
+  refuses a selection that mixes them before it runs (the lead, 2026-11-17).
 - `shard-weights.json` holds the seconds each shard unit took in one run, which `--measure` writes: a module folder,
   a slice under FusionComponents, and the host variants' tests as one unit. CI runs a pool in shards (`--pool`,
   `--shard`), its units placed longest first, each on the lightest shard; a unit with no weight is placed last.

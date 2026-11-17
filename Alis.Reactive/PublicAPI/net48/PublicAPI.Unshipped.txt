@@ -140,6 +140,7 @@ Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.BindsAList.get -> 
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Html.get -> System.Web.Mvc.HtmlHelper<TModel>!
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Id.get -> string!
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Json<TOptions>(TOptions options) -> string!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.JsonName<TItem, TMember>(System.Linq.Expressions.Expression<System.Func<TItem, TMember>!>! member) -> string!
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Member.get -> System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>!
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Name.get -> string!
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Render<TComponent>(System.Web.IHtmlString! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!

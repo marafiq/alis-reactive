@@ -9,23 +9,25 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.Harness;
 internal static class Waits
 {
     private const string StepsOfAMeasuredRun = "ALIS_MEASURED_STEPS";
-    private const string Measured = "measured.json";
+    private const string MeasuredFile = "measured.json";
     private const string ActionWait = "actionWaitMilliseconds";
     private const string NavigationWait = "navigationWaitMilliseconds";
+    private const string FusionBlock = "fusion";
     private const string CallsOfTheTrace = "trace.trace";
 
     private static readonly string StepsFile = Environment.GetEnvironmentVariable(StepsOfAMeasuredRun) ?? "";
-    private static readonly Lazy<(float Action, float Navigation)> Held = new(ReadTheMeasured);
+    private static readonly Lazy<MeasuredWaits> OfTheCore = new(ReadTheCore);
+    private static readonly Lazy<MeasuredWaits> OfAFusionFixture = new(ReadTheFusionBlock);
     private static readonly Lock WritingSteps = new();
 
     private static bool TheRunIsMeasured => StepsFile.Length > 0;
 
-    internal static void SetOnEveryExpectation()
+    internal static void SetOnEveryExpectation(bool ofAFusionFixture)
     {
-        if (!TheRunIsMeasured) Assertions.SetDefaultExpectTimeout(Held.Value.Action);
+        if (!TheRunIsMeasured) Assertions.SetDefaultExpectTimeout(Of(ofAFusionFixture).Action);
     }
 
-    internal static async Task Open(IBrowserContext context)
+    internal static async Task Open(IBrowserContext context, bool ofAFusionFixture)
     {
         if (TheRunIsMeasured)
         {
@@ -33,8 +35,8 @@ internal static class Waits
             return;
         }
 
-        context.SetDefaultTimeout(Held.Value.Action);
-        context.SetDefaultNavigationTimeout(Held.Value.Navigation);
+        context.SetDefaultTimeout(Of(ofAFusionFixture).Action);
+        context.SetDefaultNavigationTimeout(Of(ofAFusionFixture).Navigation);
     }
 
     internal static async Task Close(IBrowserContext context)
@@ -82,15 +84,30 @@ internal static class Waits
     private static string Text(JsonElement entry, string name)
         => entry.GetProperty(name).GetString() ?? throw new InvalidOperationException($"A call of Playwright's trace holds no text in {name}: {entry.GetRawText()}");
 
-    private static (float Action, float Navigation) ReadTheMeasured()
+    private static MeasuredWaits Of(bool ofAFusionFixture) => (ofAFusionFixture ? OfAFusionFixture : OfTheCore).Value;
+
+    private static string MeasuredPath => Path.Combine(TestContext.CurrentContext.TestDirectory, nameof(Harness), MeasuredFile);
+
+    private static MeasuredWaits ReadTheCore()
     {
-        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, nameof(Harness), Measured);
-        using var measured = JsonDocument.Parse(File.ReadAllText(path));
-        return (Wait(measured.RootElement, ActionWait, path), Wait(measured.RootElement, NavigationWait, path));
+        using var measured = JsonDocument.Parse(File.ReadAllText(MeasuredPath));
+        return WaitsIn(measured.RootElement, MeasuredPath);
     }
+
+    private static MeasuredWaits ReadTheFusionBlock()
+    {
+        using var measured = JsonDocument.Parse(File.ReadAllText(MeasuredPath));
+        return measured.RootElement.TryGetProperty(FusionBlock, out var block)
+            ? WaitsIn(block, MeasuredPath + " " + FusionBlock)
+            : throw new InvalidOperationException($"{MeasuredPath} holds no {FusionBlock} block: a Fusion fixture's waits are measured over the Fusion fixtures' tests alone, and scripts/playwright.sh --measure writes them.");
+    }
+
+    private static MeasuredWaits WaitsIn(JsonElement measured, string path) => new(Wait(measured, ActionWait, path), Wait(measured, NavigationWait, path));
 
     private static float Wait(JsonElement measured, string name, string path)
         => measured.TryGetProperty(name, out var wait)
             ? wait.GetSingle()
             : throw new InvalidOperationException($"{path} holds no {name}: a wait is measured, never chosen, and scripts/playwright.sh --measure writes it.");
+
+    private sealed record MeasuredWaits(float Action, float Navigation);
 }

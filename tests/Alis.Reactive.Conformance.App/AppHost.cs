@@ -14,6 +14,7 @@ using Microsoft.Net.Http.Headers;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Trace;
+using Syncfusion.Licensing;
 
 namespace Alis.Reactive.Conformance.App;
 
@@ -21,6 +22,12 @@ internal static class AppHost
 {
     private const string Urls = "urls";
     private const string ASecondPort = "http://127.0.0.1:0";
+    private const string SyncfusionsLicenceKey = "SYNCFUSION_LICENSE_KEY";
+
+    internal static void RegisterSyncfusionsLicence(IConfiguration configuration)
+    {
+        if (configuration[SyncfusionsLicenceKey] is { Length: > 0 } licence) SyncfusionLicenseProvider.RegisterLicense(licence);
+    }
 
     internal static void SetJsonOptions(string host, JsonSerializerOptions json)
     {
@@ -188,6 +195,8 @@ internal static class AppHost
             .Add<Bench.EntriesRules>()
             .Add<Bench.FirstRules>()
             .Add<Care.ArrivalIntakeRules>()
+            .Add<Care.IntakeValidator>()
+            .Add<Care.FamilyValidator>()
             .Add<Care.BedAssignmentRules>()
             .Add<Care.DeputyAppointmentRules>()
             .Add<Care.DeputyNamelessAppointmentRules>()
