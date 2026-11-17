@@ -1179,9 +1179,7 @@
     ]
   },
   "M21.F19 M21.X1012 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/DoseRow.cshtml",
       "/Shared/_FusionLayout.cshtml"
