@@ -2,6 +2,7 @@
 using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -18,6 +19,13 @@ public static class FusionTabHtml
     /// <param name="build">What the view sets on the strip and its items.</param>
     /// <returns>The rendered strip, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionTab, TModel> FusionTab<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<TabBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var tab = html.EJS().Tab(elementId);
+        build(tab);
+        return plan.Render<FusionTab>(elementId, tab.Render());
+    }
 }
 #endif
