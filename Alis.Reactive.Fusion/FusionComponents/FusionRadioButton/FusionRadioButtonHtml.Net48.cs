@@ -2,6 +2,7 @@
 using System;
 using System.Web.Mvc;
 using Alis.Reactive.RenderingAndDelivery;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Buttons;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -19,6 +20,10 @@ public static class FusionRadioButtonHtml
     /// <param name="build">What the view sets on the button.</param>
     /// <returns>The rendered button, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionRadioButton, TModel> FusionRadioButton<TModel>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<RadioButtonBuilder> build)
-        => throw new NotImplementedException();
+    {
+        var button = html.EJS().RadioButton(elementId ?? throw new ArgumentNullException(nameof(elementId)));
+        (build ?? throw new ArgumentNullException(nameof(build)))(button);
+        return (plan ?? throw new ArgumentNullException(nameof(plan))).Render<FusionRadioButton>(elementId, button.Render());
+    }
 }
 #endif

@@ -1385,9 +1385,7 @@
     ]
   },
   "M21.F36 M21.X1022 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/RoomType.cshtml",
       "/Shared/_FusionLayout.cshtml"
