@@ -11,7 +11,7 @@ public static class FusionGridColumns
     /// <summary>Starts the fields of the columns of a grid over a row class.</summary>
     /// <typeparam name="TRow">The class of the rows.</typeparam>
     /// <returns>The fields of the row class.</returns>
-    public static FusionGridColumns<TRow> Of<TRow>() => throw new NotImplementedException();
+    public static FusionGridColumns<TRow> Of<TRow>() => new();
 }
 
 /// <summary>
@@ -25,9 +25,13 @@ public sealed class FusionGridColumns<TRow>
     }
 
     /// <summary>Names a column's field as the app's JSON names the member, the name the grid's rows hold.</summary>
-    /// <remarks>Hand the name to the column's <c>Field</c> on EJ2's builder.</remarks>
+    /// <remarks>Hand the name to the column's <c>Field</c> on EJ2's builder; the grid's render helper names it under the view's plan.</remarks>
     /// <typeparam name="TValue">The type of the member.</typeparam>
     /// <param name="member">The member, as <c>r =&gt; r.RoomNumber</c>.</param>
     /// <returns>The field.</returns>
-    public string Field<TValue>(Expression<Func<TRow, TValue>> member) => throw new NotImplementedException();
+    public string Field<TValue>(Expression<Func<TRow, TValue>> member)
+    {
+        _ = member ?? throw new ArgumentNullException(nameof(member));
+        return FusionGridNames.Defer(names => FusionGridNames.Path(names.Of(member)));
+    }
 }

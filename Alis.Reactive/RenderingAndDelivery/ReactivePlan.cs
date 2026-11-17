@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Execution;
+using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Plugins;
 using Alis.Reactive.Schema;
 using Alis.Reactive.TriggersAndPipelines;
@@ -56,6 +58,35 @@ public sealed partial class ReactivePlan<TModel>
     /// <typeparam name="TRow">The type of a row.</typeparam>
     /// <returns>The rows.</returns>
     public Rows<TModel, TRow> Rows<TRow>(string rowsId) => new(Writer, rowsId ?? throw new ArgumentNullException(nameof(rowsId)));
+
+    /// <summary>Names each member along a path of an item as the item's JSON names it, for a component that reads its data by those names.</summary>
+    /// <remarks>Each name is the one <see cref="InputField{TModel, TValue}.JsonName{TItem, TMember}"/> gives a member: its <c>JsonPropertyName</c>, else the name the app's JSON options give it. A lambda that is not a chain of members of the item is refused where the view renders.</remarks>
+    /// <typeparam name="TItem">The class of the item.</typeparam>
+    /// <typeparam name="TMember">The type of the path's last member.</typeparam>
+    /// <param name="path">The path, as <c>(Resident r) =&gt; r.Address.City</c>.</param>
+    /// <returns>The name of each member of the path, the first member first.</returns>
+    public IReadOnlyList<string> JsonPath<TItem, TMember>(Expression<Func<TItem, TMember>> path)
+        => MemberPath.NamesOfItemsPath(path ?? throw new ArgumentNullException(nameof(path)), Writer.Content.Json.LiveForm);
+
+    /// <summary>Writes the attributes that make a click at or inside an element raise an app event, with one member of its payload filled by a template's text.</summary>
+    /// <remarks>
+    /// For a component's template, whose engine fills the member's text for each item it renders. The attributes are
+    /// those Html.Raises writes, and the member is named and refused as it names and refuses a payload's member: a
+    /// direct member of the payload whose type is text, a number, a bool, a date, a Guid or an enum, named in camel case.
+    /// The template's text is written as given.
+    /// </remarks>
+    /// <typeparam name="TPayload">The class of the event's payload.</typeparam>
+    /// <typeparam name="TMember">The type of the payload's member.</typeparam>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    /// <param name="member">The payload's member the template fills, as <c>p =&gt; p.ResidentId</c>.</param>
+    /// <param name="template">The template's text the engine fills the member's attribute with.</param>
+    /// <returns>The attributes, to write inside the element's tag.</returns>
+    public string Raises<TPayload, TMember>(AppEvent<TPayload> appEvent, Expression<Func<TPayload, TMember>> member, string template)
+        => MarkupRaise.OfTemplate(
+            appEvent ?? throw new ArgumentNullException(nameof(appEvent)),
+            member ?? throw new ArgumentNullException(nameof(member)),
+            template ?? throw new ArgumentNullException(nameof(template)),
+            Writer.Content.Json);
 }
 
 /// <summary>

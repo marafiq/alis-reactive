@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Grids;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -10,7 +11,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// <summary>
 /// The doors of a view to a grid.
 /// </summary>
-public static class FusionGridHtml
+public static partial class FusionGridHtml
 {
     /// <summary>Renders a grid under the id the view gives it, with what the view sets on EJ2's builder.</summary>
     /// <remarks>Write both type arguments, the view's model and the row class.</remarks>
@@ -20,7 +21,7 @@ public static class FusionGridHtml
     /// <param name="build">What the view sets on the grid.</param>
     /// <returns>The rendered grid, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionGrid, TModel> FusionGrid<TModel, TRow>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<GridBuilder<TRow>> build) where TRow : class
-        => throw new NotImplementedException();
+        => plan.Render<FusionGrid>(elementId, Built(plan, html.EJS().Grid<TRow>(elementId), build).Render());
 
     /// <summary>Renders a grid under the id the view gives it over the rows the view hands it.</summary>
     /// <remarks>The rows reach the grid named as the app's JSON names them, the names <see cref="FusionGridColumns{TRow}.Field{TValue}"/> gives a column.</remarks>
@@ -31,6 +32,6 @@ public static class FusionGridHtml
     /// <param name="build">What the view sets on the grid.</param>
     /// <returns>The rendered grid, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionGrid, TModel> FusionGrid<TModel, TRow>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, IReadOnlyList<TRow> rows, Action<GridBuilder<TRow>> build) where TRow : class
-        => throw new NotImplementedException();
+        => plan.Render<FusionGrid>(elementId, Built(plan, html.EJS().Grid<TRow>(elementId).DataSource(FusionData.AsWritten(plan.Json(rows ?? throw new ArgumentNullException(nameof(rows))))), build).Render());
 }
 #endif

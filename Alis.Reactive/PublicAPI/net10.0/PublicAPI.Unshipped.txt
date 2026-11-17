@@ -158,6 +158,8 @@ Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactiv
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Component<TComponent>() -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Json<TValue>(TValue value) -> string!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.JsonPath<TItem, TMember>(System.Linq.Expressions.Expression<System.Func<TItem, TMember>!>! path) -> System.Collections.Generic.IReadOnlyList<string!>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Raises<TPayload, TMember>(Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, System.Linq.Expressions.Expression<System.Func<TPayload, TMember>!>! member, string! template) -> string!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Plugin<TPlugin>() -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Render<TComponent>(string! id, Microsoft.AspNetCore.Html.IHtmlContent! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Rows<TRow>(string! rowsId) -> Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>!

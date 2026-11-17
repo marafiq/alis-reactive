@@ -59,6 +59,14 @@ internal sealed partial class MemberPath
         return members.Member.Name;
     }
 
+    internal static IReadOnlyList<string> NamesOfItemsPath(LambdaExpression path, JsonSerializerOptions options)
+    {
+        var read = path.Body is UnaryExpression { NodeType: ExpressionType.Convert } converted ? converted.Operand : path.Body;
+        if (!TryOf(read, path.Parameters[0], path, options, out var members)) throw NoMemberPath(path);
+        members.RefuseAReadPastItsOwnConverter(path.Body.ToString());
+        return members.WireNames;
+    }
+
     internal static partial string BodyName(WrittenMember written, string clrName);
 
     private static InvalidOperationException NoItemsMember(LambdaExpression member)

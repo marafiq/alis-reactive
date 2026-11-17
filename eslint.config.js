@@ -95,6 +95,7 @@ export default defineConfig(
       "Alis.Reactive.Assets/runtime/**/*.ts",
       "Alis.Reactive.OpenTelemetry/**/*.ts",
       "Alis.Reactive.Native/**/*.ts",
+      "Alis.Reactive.Fusion/**/*.ts",
       "tests/Alis.Reactive.ArchitectureTests/LintCases/**/*.ts",
     ],
     extends: [eslint.configs.recommended, tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
