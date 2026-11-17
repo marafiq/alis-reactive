@@ -2,6 +2,7 @@
 using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Kanban;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -9,7 +10,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// <summary>
 /// The door of a view to a Kanban board.
 /// </summary>
-public static class FusionKanbanHtml
+public static partial class FusionKanbanHtml
 {
     /// <summary>Renders a Kanban board under the id the view gives it, with what the view sets on EJ2's builder.</summary>
     /// <param name="html">The view's HTML helper.</param>
@@ -18,6 +19,6 @@ public static class FusionKanbanHtml
     /// <param name="build">What the view sets on the board.</param>
     /// <returns>The rendered board, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionKanban, TModel> FusionKanban<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<KanbanBuilder> build)
-        => throw new NotImplementedException();
+        => plan.Render<FusionKanban>(elementId, Built(plan, html.EJS().Kanban(elementId), build).Render());
 }
 #endif

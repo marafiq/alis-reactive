@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Charts;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -16,7 +17,7 @@ public static partial class FusionBulletChartHtml
     /// <param name="build">What the view sets on the chart.</param>
     /// <returns>The rendered chart, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionBulletChart, TModel> FusionBulletChart<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<BulletChartBuilder> build)
-        => throw new NotImplementedException();
+        => plan.Render<FusionBulletChart>(elementId, Built(plan, html.EJS().BulletChart(elementId), build).Render());
 
     /// <summary>Renders a bullet chart under the id the view gives it over the items the view hands it.</summary>
     /// <remarks>The items reach the chart named as the app's JSON names them, the names <see cref="Fields{TItem, TItemValue, TTarget}"/> reads.</remarks>
@@ -27,6 +28,6 @@ public static partial class FusionBulletChartHtml
     /// <param name="build">What the view sets on the chart.</param>
     /// <returns>The rendered chart, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionBulletChart, TModel> FusionBulletChart<TModel, TItem>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, IReadOnlyList<TItem> items, Action<BulletChartBuilder> build)
-        => throw new NotImplementedException();
+        => plan.Render<FusionBulletChart>(elementId, Built(plan, Items(plan, html.EJS().BulletChart(elementId), items), build).Render());
 }
 #endif
