@@ -78,6 +78,9 @@ public sealed class Lead
 {
     public string? Name { get; set; } = "";
     public string? Phone { get; set; }
+
+    [JsonIgnore]
+    public string? Code { get; set; }
 }
 
 public sealed class HomeCardRules : ReactiveValidator<HomeCard>
@@ -94,6 +97,11 @@ public sealed class SignedHomeCard
 {
     [JsonConverter(typeof(LeadSignature))]
     public Lead Lead { get; set; } = new() { Name = "Ruth" };
+}
+
+public sealed class SignedLeadCodeRules : ReactiveValidator<SignedHomeCard>
+{
+    public SignedLeadCodeRules() => RuleFor(card => card.Lead.Code).NotEmpty().WithMessage("Code the lead.");
 }
 
 public sealed class LeadSignature : JsonConverter<Lead>
@@ -770,4 +778,53 @@ public sealed class WardCode : JsonConverter<string>
     public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => reader.GetString()?.Substring("Ward ".Length);
 
     public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options) => writer.WriteStringValue("Ward " + value);
+}
+
+public sealed class CodedDeputyCard
+{
+    public CodedDeputy? Deputy { get; set; } = new() { Code = "A1" };
+}
+
+public sealed class CodedDeputy
+{
+    [JsonIgnore]
+    public string? Code { get; set; } = "Z9";
+
+    public string? Name { get; set; }
+}
+
+public sealed class CodedDeputyRules : ReactiveValidator<CodedDeputy>
+{
+    public CodedDeputyRules() => RuleFor(deputy => deputy.Code).Equal("A1").WithMessage("Code the deputy A1.");
+}
+
+public sealed class CodedDeputyCardRules : ReactiveValidator<CodedDeputyCard>
+{
+    public CodedDeputyCardRules() => RuleFor(card => card.Deputy!).SetValidator(new CodedDeputyRules());
+}
+
+public sealed class CodedDeputyPastItsHolderRules : ReactiveValidator<CodedDeputyCard>
+{
+    public CodedDeputyPastItsHolderRules() => RuleFor(card => card.Deputy!.Code).Equal("A1").WithMessage("Code the deputy A1.");
+}
+
+public sealed class HiddenDosesRound
+{
+    [JsonIgnore]
+    public List<int> Doses { get; set; } = [5, 4];
+}
+
+public sealed class HiddenDosesRoundRules : ReactiveValidator<HiddenDosesRound>
+{
+    public HiddenDosesRoundRules() => RuleForEach(round => round.Doses).GreaterThanOrEqualTo(5).WithMessage("Give at least five.");
+}
+
+public sealed class CodedDeputyNameRules : ReactiveValidator<CodedDeputy>
+{
+    public CodedDeputyNameRules() => RuleFor(deputy => deputy.Name).NotEqual(deputy => deputy.Code).WithMessage("Name the deputy apart from the code.").When(deputy => deputy.Code != "Z9");
+}
+
+public sealed class CodedDeputyNameCardRules : ReactiveValidator<CodedDeputyCard>
+{
+    public CodedDeputyNameCardRules() => RuleFor(card => card.Deputy!).SetValidator(new CodedDeputyNameRules());
 }

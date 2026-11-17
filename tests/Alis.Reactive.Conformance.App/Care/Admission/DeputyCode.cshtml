@@ -1,0 +1,33 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DeputyCodeCard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Deputy code";
+    var plan = Html.ReactivePlan<DeputyCodeCard>();
+}
+<h1>Deputy code</h1>
+<fieldset>
+    <legend>Note</legend>
+    @(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+</fieldset>
+@using (var contact = Html.BeginRequestContainer(plan, "deputy-contact"))
+{
+    <fieldset>
+        <legend>Phone</legend>
+        @(Html.InputField(plan, m => m.Deputy.Phone, options => options.Label("Phone")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-deputy", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<DeputyCodeCard>(DeputyCodeEndpoints.Deputies, request => request.Json(contact.Container, body => { }))
+        .Validate<DeputyCodeCardRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+    @(Html.NativeButton("save-note", "Save note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<DeputyCodeCard>(DeputyCodeEndpoints.Deputies, request => request.Json(body => body.Input(r => r.Note, pipeline.Input(m => m.Note))))
+        .Validate<DeputyCodeCardRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

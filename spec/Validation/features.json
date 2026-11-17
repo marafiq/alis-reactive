@@ -210,6 +210,14 @@
         {
           "id": "X16.40",
           "rung": "behavior"
+        },
+        {
+          "id": "X16.44",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X16.45",
+          "rung": "analyzer"
         }
       ],
       "promises": [
@@ -1216,6 +1224,14 @@
         {
           "id": "X16.26",
           "rung": "analyzer"
+        },
+        {
+          "id": "X16.42",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X16.43",
+          "rung": "analyzer"
         }
       ],
       "promises": [
@@ -1403,6 +1419,10 @@
         {
           "id": "X16.14",
           "rung": "analyzer"
+        },
+        {
+          "id": "X18.10",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -1421,6 +1441,14 @@
           "outcome": "saved reads Unnamed, 555-0101, and no message shows.",
           "opposite": "With the Deputy type starting Name empty, Save shows \"Name the deputy.\" in the summary and saved stays empty.",
           "defect": "The browser reads the null deputy's Name as null and runs the child rule on it, so \"Name the deputy.\" holds a save the endpoint takes, binding a new deputy named Unnamed."
+        },
+        {
+          "for": "X18.10",
+          "page": "A net10 deputy page whose model starts Deputy with a deputy whose Code is A1, and whose deputy type declares Code with [JsonIgnore], starting it at Z9; the validator holds RuleFor(m => m.Deputy).SetValidator(new DeputyCodeRules()), whose rule is RuleFor(d => d.Code).Equal(\"A1\").WithMessage(\"Code the deputy A1.\"); the page renders a Note input bound to Note and, inside the container, a Phone input bound to Deputy.Phone; Save sends a JSON body holding the container's inputs, Save note sends a JSON body holding the Note input alone, and the page writes the endpoint's answer, the note and the deputy's code, comma separated, into saved, and renders the container's summary.",
+          "gesture": "Type 555-0101 in Phone and click Save.",
+          "outcome": "\"Code the deputy A1.\" shows in the summary, saved stays empty, and no request is sent.",
+          "opposite": "Typing Quiet in Note and clicking Save note shows Quiet, A1 in saved with no message.",
+          "defect": "The browser reads the deputy the model starts with, coded A1, where the endpoint replaces a sent deputy with a new one coded Z9, so the save is sent and the endpoint holds Z9; or the page is refused where the view renders, as before U17 carried a left-out member's start, with X18.8's message for 'deputy => deputy.Code'."
         },
         {
           "for": "X16.4",

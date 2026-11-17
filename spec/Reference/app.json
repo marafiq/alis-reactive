@@ -7537,6 +7537,23 @@
     },
     {
       "feature": "M8.F3",
+      "for": "X18.10",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F3",
       "for": "X16.3",
       "index": 0,
       "screen": "admission",

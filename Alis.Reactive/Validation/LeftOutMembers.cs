@@ -1,20 +1,82 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Alis.Reactive.TypeKnowledge;
+using Alis.Reactive.ValuesAndSources;
+using MemberStep = Alis.Reactive.Schema.MemberStep;
+using RegistrationStep = Alis.Reactive.Schema.RegistrationStep;
 
 namespace Alis.Reactive.Validation;
 
-internal static class LeftOutMembers
+internal sealed class CarriedMembers(JsonSerializerOptions app)
 {
-    internal static bool Checks(LambdaExpression read, JsonSerializerOptions app)
-        => Unconverted(read.Body) is MemberExpression { Expression: ParameterExpression holder } access && holder == read.Parameters[0]
-            && WrittenMember.LeftOutByItsClass(access, app);
+    private readonly List<CarriedMember> _carried = [];
 
-    internal static TRead ReadAsStarts<T, TRead>(TRead read, T start, JsonSerializerOptions app)
-        where TRead : LambdaExpression
-        => new StartsOfLeftOutMembers<T>(read.Parameters[0], start, app).VisitAndConvert(read, nameof(ReadAsStarts));
+    internal IReadOnlyList<RegistrationStep>? PathOf(LambdaExpression read)
+    {
+        var accesses = new List<MemberExpression>();
+        var held = Unconverted(read.Body);
+        while (held is MemberExpression { Expression: { } holder } access)
+        {
+            accesses.Insert(0, access);
+            held = Unconverted(holder);
+        }
+
+        var passesALeftOutMember = held == read.Parameters[0] && accesses.Any(LeftOut);
+        if (!passesALeftOutMember) return null;
+        var readsPastAConverter = accesses.Take(accesses.Count - 1).Any(access => !LeftOut(access) && WrittenMember.Of(access, app.GetTypeInfo(access.Expression!.Type), read).HasItsOwnConverter);
+        return readsPastAConverter ? null : [.. accesses.Select(access => Step(access, read))];
+    }
+
+    internal HeldForm Reading(HeldForm form, params LambdaExpression[] reads)
+    {
+        var leftOut = reads.SelectMany(read => new LeftOutReads(LeftOut).Of(read)).ToList();
+        if (leftOut.Count == 0) return form;
+        foreach (var access in leftOut) Carry(access);
+        return form.Carrying(Writing);
+    }
+
+    internal JsonSerializerOptions Writing(JsonSerializerOptions liveForm)
+    {
+        if (_carried.Count == 0) return liveForm;
+        var carried = _carried.ToArray();
+        var starts = new JsonSerializerOptions(liveForm) { TypeInfoResolver = (liveForm.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver()).WithAddedModifier(holder => Carry(holder, carried)) };
+        starts.MakeReadOnly();
+        return starts;
+    }
+
+    private MemberStep Step(MemberExpression access, LambdaExpression read)
+    {
+        if (!LeftOut(access)) return new MemberStep(WrittenMember.Of(access, app.GetTypeInfo(access.Expression!.Type), read).Name);
+        Carry(access);
+        return new MemberStep(WrittenMember.AsCSharpDeclaresIt(access));
+    }
+
+    private void Carry(MemberExpression access)
+    {
+        var holder = access.Expression!.Type;
+        var name = WrittenMember.AsCSharpDeclaresIt(access);
+        if (_carried.Any(carried => carried.Holder == holder && carried.Name == name)) return;
+        _carried.Add(new CarriedMember(access, holder, name, ReadOf(access, holder)));
+    }
+
+    private bool LeftOut(MemberExpression access)
+        => access.Expression is { } holder && app.GetTypeInfo(holder.Type).Kind == JsonTypeInfoKind.Object && WrittenMember.LeftOutByItsClass(access, app);
+
+    private static Func<object, object?> ReadOf(MemberExpression access, Type holder)
+    {
+        var instance = Expression.Parameter(typeof(object), "holder");
+        return ServerExpressions.Read(Expression.Lambda<Func<object, object?>>(Expression.Convert(access.Update(Expression.Convert(instance, holder)), typeof(object)), instance));
+    }
+
+    private static void Carry(JsonTypeInfo holder, IReadOnlyList<CarriedMember> carried)
+    {
+        foreach (var member in carried.Where(member => member.Holder == holder.Type || WrittenMember.DeclaringClass(member.Access) == holder.Type))
+            WrittenMember.Carry(holder, member.Access, member.Read);
+    }
 
     private static Expression Unconverted(Expression read)
     {
@@ -22,46 +84,30 @@ internal static class LeftOutMembers
         return read;
     }
 
-    private sealed class StartsOfLeftOutMembers<T>(ParameterExpression checkedModel, T start, JsonSerializerOptions app) : ExpressionVisitor
-    {
-        public override Expression? Visit(Expression? node)
-        {
-            var readsOnlyLeftOutMembers = node is not null and not LambdaExpression && node.Type != typeof(void) && new Census(checkedModel, app).ReadsOnlyLeftOutMembers(node);
-            if (!readsOnlyLeftOutMembers) return base.Visit(node);
-            var startOf = ServerExpressions.Read(Expression.Lambda<Func<T, object?>>(Expression.Convert(node!, typeof(object)), checkedModel));
-            return Expression.Constant(startOf(start), node!.Type);
-        }
-    }
+    private sealed record CarriedMember(MemberExpression Access, Type Holder, string Name, Func<object, object?> Read);
 
-    private sealed class Census(ParameterExpression checkedModel, JsonSerializerOptions app) : ExpressionVisitor
+    private sealed class LeftOutReads(Func<MemberExpression, bool> leftOut) : ExpressionVisitor
     {
-        private readonly HashSet<ParameterExpression> _declared = [];
-        private int _leftOut;
-        private bool _readsWhatTheBodyHolds;
+        private readonly List<MemberExpression> _found = [];
 
-        internal bool ReadsOnlyLeftOutMembers(Expression node)
+        internal IReadOnlyList<MemberExpression> Of(LambdaExpression read)
         {
-            Visit(node);
-            return _leftOut > 0 && !_readsWhatTheBodyHolds;
+            Visit(read);
+            return _found;
         }
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            if (node.Expression != checkedModel || !WrittenMember.LeftOutByItsClass(node, app)) return base.VisitMember(node);
-            _leftOut++;
-            return node;
+            if (ReadsAParameter(node) && leftOut(node)) _found.Add(node);
+            return base.VisitMember(node);
         }
 
-        protected override Expression VisitLambda<TDelegate>(Expression<TDelegate> node)
+        private static bool ReadsAParameter(MemberExpression node)
         {
-            _declared.UnionWith(node.Parameters);
-            return base.VisitLambda(node);
-        }
-
-        protected override Expression VisitParameter(ParameterExpression node)
-        {
-            if (!_declared.Contains(node)) _readsWhatTheBodyHolds = true;
-            return node;
+            var held = node.Expression;
+            while (held is MemberExpression or UnaryExpression { NodeType: ExpressionType.Convert })
+                held = held is MemberExpression member ? member.Expression : ((UnaryExpression)held).Operand;
+            return held is ParameterExpression;
         }
     }
 }

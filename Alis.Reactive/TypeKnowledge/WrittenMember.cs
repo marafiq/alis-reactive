@@ -73,6 +73,18 @@ internal sealed class WrittenMember
         return declared is not { Get: not null };
     }
 
+    [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's exception, 2026-11-16: a member the app's JSON options leave out is named as C# declares it, the name the browser holds its start under (D16.6, X18.6).")]
+    internal static string AsCSharpDeclaresIt(MemberExpression access) => access.Member.Name;
+
+    internal static void Carry(JsonTypeInfo holder, MemberExpression access, Func<object, object?> read)
+    {
+        foreach (var ignored in holder.Properties.Where(property => Equals(property.AttributeProvider, access.Member)).ToList()) holder.Properties.Remove(ignored);
+        var carried = holder.CreateJsonPropertyInfo(access.Type, AsCSharpDeclaresIt(access));
+        carried.Get = read;
+        carried.AttributeProvider = access.Member;
+        holder.Properties.Add(carried);
+    }
+
     internal JsonSerializerOptions OwnForm()
     {
         var options = Holder.Options;

@@ -3140,6 +3140,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M8.F3 X18.10 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/DeputyCode.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M8.F4 X1.5 0": {
     "modules": [],
     "views": [

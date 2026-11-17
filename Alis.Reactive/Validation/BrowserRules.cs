@@ -61,12 +61,13 @@ internal sealed class BrowserScope<T>
 {
     private readonly ValidationRun _selection;
 
-    internal BrowserScope(ValidationRun selection, AppJson json, HeldForm form, BrowserScalars scalars, IReadOnlyList<RegistrationStep> path, MemberPath holder, string prefix, bool each, Func<T> start)
+    internal BrowserScope(ValidationRun selection, AppJson json, HeldForm form, BrowserScalars scalars, CarriedMembers carried, IReadOnlyList<RegistrationStep> path, MemberPath holder, string prefix, bool each, Func<T> start)
     {
         _selection = selection;
         Json = json;
         Form = form;
         Scalars = scalars;
+        Carried = carried;
         Path = path;
         Holder = holder;
         Prefix = prefix;
@@ -77,6 +78,7 @@ internal sealed class BrowserScope<T>
     internal AppJson Json { get; }
     internal HeldForm Form { get; }
     internal BrowserScalars Scalars { get; }
+    internal CarriedMembers Carried { get; }
     internal IReadOnlyList<RegistrationStep> Path { get; }
     internal MemberPath Holder { get; }
     internal string Prefix { get; }
@@ -85,14 +87,6 @@ internal sealed class BrowserScope<T>
     internal IReadOnlyCollection<Type> Flags => _selection.Flags;
 
     internal bool Selects(IReadOnlyList<string> sets, bool include) => _selection.Selects(sets, include);
-
-    internal bool ChecksALeftOutMember(LambdaExpression read) => IsTheModel && LeftOutMembers.Checks(read, Json.App);
-
-    internal TRead ReadingLeftOutMembersAsStarts<TRead>(TRead read)
-        where TRead : LambdaExpression
-        => IsTheModel ? LeftOutMembers.ReadAsStarts(read, Start(), Json.App) : read;
-
-    private bool IsTheModel => Prefix.Length == 0;
 
     internal FnExpression When(IReadOnlyList<RuleGuard<T>> guards)
     {
@@ -125,7 +119,7 @@ internal sealed class BrowserScope<T>
         => new(this, member, path, each, stops, displayName, start);
 
     internal BrowserScope<TChild> Child<TChild>(IReadOnlyList<RegistrationStep> path, MemberPath holder, string prefix, bool each, Func<TChild> start)
-        => new(_selection, Json, Form, Scalars, path, holder, prefix, each, start);
+        => new(_selection, Json, Form, Scalars, Carried, path, holder, prefix, each, start);
 
     private static PlanExpression Term((FnExpression Read, bool Negated) condition)
         => condition.Negated ? new OpExpression(Operator.Not, [condition.Read.Body]) : condition.Read.Body;
@@ -134,7 +128,7 @@ internal sealed class BrowserScope<T>
     {
         try
         {
-            return ItemLambda.Of(ReadingLeftOutMembersAsStarts(condition), Form);
+            return ItemLambda.Of(condition, Carried.Reading(Form, condition));
         }
         catch (InvalidOperationException refused)
         {
@@ -156,6 +150,7 @@ internal sealed class BrowserMember<T, TValue>
     private readonly string _displayName;
     private readonly Func<TValue> _start;
     private readonly List<(FnExpression Check, FnExpression When)> _earlier = [];
+    private readonly Lazy<IReadOnlyList<RegistrationStep>?> _carriedPath;
     private int _written;
 
     internal BrowserMember(BrowserScope<T> scope, LambdaExpression member, string path, bool each, bool stops, string displayName, Func<TValue> start)
@@ -167,6 +162,7 @@ internal sealed class BrowserMember<T, TValue>
         _stops = stops;
         _displayName = displayName;
         _start = start;
+        _carriedPath = new(() => scope.Carried.PathOf(member));
     }
 
     internal IReadOnlyCollection<Type> Flags => _scope.Flags;
@@ -177,10 +173,9 @@ internal sealed class BrowserMember<T, TValue>
     {
         var when = _scope.When(guards);
         var message = Message(text, test);
-        var reads = ReadingItsStartWhereLeftOut(test.Check);
-        if (!_stops) return new RuleTest(reads, when, message);
-        var check = PassingWhereAnEarlierFailed(reads);
-        _earlier.Add((reads, when));
+        if (!_stops) return new RuleTest(test.Check, when, message);
+        var check = PassingWhereAnEarlierFailed(test.Check);
+        _earlier.Add((test.Check, when));
         return new RuleTest(check, when, message);
     }
 
@@ -242,26 +237,27 @@ internal sealed class BrowserMember<T, TValue>
 
     internal BrowserTest ComparedWithMember<TPeer>(Comparison comparison, Expression<Func<T, TPeer>> peer, string peerName)
     {
-        if (!ChecksALeftOutMember)
+        if (_carriedPath.Value is null)
         {
             _ = ItsMemberPath();
-            RefuseAReadTheBrowserDoesNotHold(_member);
+            RefuseAReadTheBrowserDoesNotHold(_member, _scope.Form);
         }
 
-        var peerAsBound = _scope.ReadingLeftOutMembersAsStarts(peer);
-        RefuseAReadTheBrowserDoesNotHold(peerAsBound);
         void Arguments(MessageArguments arguments) => arguments.With("ComparisonProperty", peerName);
         if (_each)
         {
+            var itemsForm = _scope.Carried.Reading(FormItIsHeldIn(), peer);
+            RefuseAReadTheBrowserDoesNotHold(peer, itemsForm);
             var item = LinqExpression.Parameter(typeof(TValue), BrowserTerms.Value);
-            var itemBesidePeer = PassesBeside<TPeer>(comparison, item, peerAsBound.Body);
-            var test = ItemLambda.CheckingAnItemBesideItsHolder(itemBesidePeer, item, BrowserTerms.Value, peerAsBound, FormItIsHeldIn(), Term(comparison.Name), DatesJudgedBy);
+            var itemBesidePeer = PassesBeside<TPeer>(comparison, item, peer.Body);
+            var test = ItemLambda.CheckingAnItemBesideItsHolder(itemBesidePeer, item, BrowserTerms.Value, peer, itemsForm, Term(comparison.Name), DatesJudgedBy);
             return new BrowserTest(test, Arguments, ["ComparisonValue"], false);
         }
 
-        var memberAsBound = _scope.ReadingLeftOutMembersAsStarts(_member);
-        var memberBesidePeer = PassesBeside<TPeer>(comparison, Unconverted(memberAsBound.Body), peerAsBound.Body);
-        var read = ItemLambda.CheckingAMemberBesideItsPeer(memberBesidePeer, memberAsBound.Parameters[0], peerAsBound, _scope.Form, Term(comparison.Name), DatesJudgedBy);
+        var form = _scope.Carried.Reading(_scope.Form, _member, peer);
+        RefuseAReadTheBrowserDoesNotHold(peer, form);
+        var memberBesidePeer = PassesBeside<TPeer>(comparison, Unconverted(_member.Body), peer.Body);
+        var read = ItemLambda.CheckingAMemberBesideItsPeer(memberBesidePeer, _member.Parameters[0], peer, form, Term(comparison.Name), DatesJudgedBy);
         return new BrowserTest(new FnExpression([BrowserTerms.Value, read.Params[0]], read.Body), Arguments, ["ComparisonValue"], false);
     }
 
@@ -316,16 +312,18 @@ internal sealed class BrowserMember<T, TValue>
     {
         if (tests.Count == 0) return;
         _written += tests.Count;
-        segments.Add(new RuleGroup([], ItemLambda.EveryItem(), [new RuleField(ChecksALeftOutMember ? [new MemberStep(_path)] : FieldPath(ItsMemberPath()), [.. tests])], []));
+        segments.Add(new RuleGroup([], ItemLambda.EveryItem(), [new RuleField(_carriedPath.Value is { } carried ? Each(carried) : FieldPath(ItsMemberPath()), [.. tests])], []));
         tests.Clear();
     }
 
     internal RuleGroup Child(ReactiveValidator<TValue> reactive)
     {
         _written++;
-        var members = ItsMemberPath();
-        var path = FieldPath(members);
-        var scope = _scope.Child([.. _scope.Path, .. path], _scope.Holder.Then(members), _scope.Prefix + _path + ".", _each || _scope.Each, ChildStart);
+        var carried = _carriedPath.Value;
+        var members = carried is null ? ItsMemberPath() : null;
+        var path = members is null ? Each(carried!) : FieldPath(members);
+        var holder = members is null ? _scope.Holder : _scope.Holder.Then(members);
+        var scope = _scope.Child([.. _scope.Path, .. path], holder, _scope.Prefix + _path + ".", _each || _scope.Each, ChildStart);
         var group = new RuleGroup(path, BrowserTerms.HoldsAValue, [], reactive.BrowserGroups(scope));
         if (!_stops || _earlier.Count == 0) return group;
         var instance = new RefExpression(BrowserTerms.Instance);
@@ -341,11 +339,6 @@ internal sealed class BrowserMember<T, TValue>
         if (_stops && _each)
             throw new InvalidOperationException($"The rule of '{_path}' stops at its first failing item (CascadeMode.Stop), and the browser checks every item, so it would show failures the endpoint never gives; mark the rule .ServerOnly().");
     }
-
-    private bool ChecksALeftOutMember => !_each && _scope.ChecksALeftOutMember(_member);
-
-    private FnExpression ReadingItsStartWhereLeftOut(FnExpression check)
-        => ChecksALeftOutMember ? new FnExpression(check.Params, PlanSubstitution.Applied(check, _scope.Form.Beside(_start()), new RefExpression(check.Params[1]))) : check;
 
     private FnExpression PassingWhereAnEarlierFailed(FnExpression check)
     {
@@ -394,9 +387,11 @@ internal sealed class BrowserMember<T, TValue>
         return members;
     }
 
-    private IReadOnlyList<RegistrationStep> FieldPath(MemberPath members) => _each ? [.. members.BodyPath, EachRegistrationStep.Instance] : [.. members.BodyPath];
+    private IReadOnlyList<RegistrationStep> FieldPath(MemberPath members) => Each(members.BodyPath);
 
-    private void RefuseAReadTheBrowserDoesNotHold(LambdaExpression read) => ReadsAsWritten(read, _scope.Form.DataOptions, out _);
+    private IReadOnlyList<RegistrationStep> Each(IReadOnlyList<RegistrationStep> path) => _each ? [.. path, EachRegistrationStep.Instance] : path;
+
+    private void RefuseAReadTheBrowserDoesNotHold(LambdaExpression read, HeldForm form) => ReadsAsWritten(read, form.DataOptions, out _);
 
     private bool ReadsAsWritten(LambdaExpression read, JsonSerializerOptions options, [NotNullWhen(true)] out MemberPath? members)
     {
@@ -416,7 +411,7 @@ internal sealed class BrowserMember<T, TValue>
 
     private HeldForm FormItIsHeldIn()
     {
-        if (ChecksALeftOutMember) return _scope.Form;
+        if (_carriedPath.Value is not null) return _scope.Form;
         var read = Unconverted(_member.Body);
         if (!MemberPath.TryOf(read, _member.Parameters[0], _member, _scope.Form.DataOptions, out var members) || !members.Member.HoldsItsOwnForm) return _scope.Form;
         return _scope.Form.WrittenBy(members.Member, Printed.Of(read));

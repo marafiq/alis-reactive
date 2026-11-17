@@ -191,4 +191,16 @@ public sealed class WhenTheServerChecksAdmission
         var rules = new InlineValidator<Admission>();
         Assert.That((await rules.ValidateAsync(new Admission(), new CancellationToken(true))).IsValid, Is.True);
     }
+
+    [Test]
+    public void a_check_written_on_a_rule_no_reactive_validator_declares_is_refused_naming_the_rule_it_needs()
+        => Assert.That(() => new AnAppsOwnRule().GreaterThan(0),
+            Throws.ArgumentException.With.Message.EqualTo("Write a check on a rule a ReactiveValidator declares: RuleFor(x => x.Member). (Parameter 'rule')"));
+
+    private sealed class AnAppsOwnRule : IRuleBuilder<Admission, int>
+    {
+        public IRuleBuilderOptions<Admission, int> SetValidator(IValidator<int> validator) => throw new NotSupportedException();
+
+        public IRuleBuilder<Admission, int> Cascade(CascadeMode mode) => this;
+    }
 }

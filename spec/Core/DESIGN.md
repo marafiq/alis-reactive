@@ -4208,6 +4208,20 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `X16.41` behavior (D16.15): a live container holding a Name input and a Phone input, each member with its own rule
   and message: leaving Name with A shows Name's message beside it and not Phone's; leaving Phone empty then shows
   Phone's as well.
+- `X16.42` analyzer (D16.2): in a compilation that makes the startup call, a check by a validator the call does not
+  add, by a request or at the endpoint: "{Model} has no registered {Validator} validator. Register it with
+  services.AddReactiveFluentValidation(validation => validation.Add<{Validator}>())." At build by ALIS006, and where
+  the view renders or the endpoint checks on code it does not follow (D18.6): new:N18.11.
+- `X16.43` analyzer (D16.2): in the startup call, two validators added for one model: "{Model} has more than one
+  registered validator: {Validator} and {Other}. Register one validator for {Model} with Add<TValidator>(); put its
+  alternate checks in rule sets." At build by ALIS006, and where the view renders or the endpoint checks on code it
+  does not follow (D18.6): new:N18.11.
+- `X16.44` analyzer: a check written on a rule no `ReactiveValidator` declares, an app's own `IRuleBuilder`: "Write a
+  check on a rule a ReactiveValidator declares: RuleFor(x => x.Member)." At build by ALIS006, and where the view
+  renders or the endpoint checks on code it does not follow (D18.6): new:N18.11.
+- `X16.45` analyzer (D16.9): a synchronous check of a validator whose rule waits, reached: "A rule that waits
+  (MustAsync, CustomAsync or WhenAsync) runs only in ValidateAsync." At build by ALIS006, and where the endpoint
+  checks on code it does not follow (D18.6): new:N18.11.
 
 ## Q17. Vendors and inversion
 
@@ -5146,6 +5160,9 @@ shapes, starts and the payload's path of each event.
 - `X18.8` refusal: a read of an override the app's JSON options ignore is refused with "'{lambda}' reads a member
   of '{type}' that the app's JSON options do not write, so the browser never holds it." (`WhenARosterReadIsRefused`).
 - `X18.9` analyzer: an override that renames, ignores or writes what its declaration does not: new:N18.5 (POC 13f).
+- `X18.10` behavior (D16.6): on net10, a JSON save that sends a deputy fails `RuleFor(d => d.Code).Equal("A1")` of a
+  child validator before sending, as the endpoint answers, where the app's options leave Code out and the model's
+  deputy starts it at A1 and a new deputy at Z9; a save that sends no deputy passes and the endpoint holds A1.
 
 ## Q19. The schema
 

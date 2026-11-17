@@ -6,6 +6,7 @@ public static partial class CarePages
     public const string AdmissionWard = Admission + "admission-ward";
     public const string RoomNumbering = Admission + "room-numbering";
     public const string HomeLead = Admission + "home-lead";
+    public const string DeputyCode = Admission + "deputy-code";
     public const string DeputyAppointment = Admission + "deputy-appointment";
     public const string DeputyAppointmentOfANamelessDeputy = Admission + "deputy-appointment/nameless-deputy";
     public const string ArrivalIntake = Admission + "arrival-intake";

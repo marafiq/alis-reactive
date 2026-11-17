@@ -58,6 +58,8 @@ internal sealed class HeldForm
 
     internal static HeldForm App(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.App, true, null, null, KeyedAlone);
 
+    internal HeldForm Carrying(Func<JsonSerializerOptions, JsonSerializerOptions> carried) => new(_json, RendersUnder, carried(_baseOptions), _fromApp, Own, ReadTheAppsConverterWrites, _keyArguments);
+
     internal HeldForm WrittenBy(WrittenMember member, string read) => new(_json, RendersUnder, _baseOptions, _fromApp, new OwnWriting(member, read, BaseFormName), null, KeyedAlone);
 
     internal HeldForm ReadAs(string read, Type type) => WritesByAConverterOfTheApps(type) ? new(_json, RendersUnder, _baseOptions, _fromApp, Own, read, KeyedAlone) : this;
