@@ -1104,9 +1104,7 @@
     ]
   },
   "M21.F10 M21.X1006 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/PhotoConsent.cshtml",
       "/Shared/_FusionLayout.cshtml"
