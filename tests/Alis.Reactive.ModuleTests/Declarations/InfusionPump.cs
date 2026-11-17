@@ -78,6 +78,8 @@ public sealed class InfusionPump : Component
 
     public Property<IReadOnlyList<int>> Readings => Property<IReadOnlyList<int>>();
 
+    public Property<IReadOnlyList<string?>> Captions => Property<IReadOnlyList<string?>>();
+
     public Property<bool> Ready => Property<bool>();
 
     public void Start() => Method();
@@ -248,6 +250,10 @@ public sealed class PumpChannel : JsObject
     public ReadOnly<IReadOnlyList<Prescription>> Prescriptions => ReadOnly<IReadOnlyList<Prescription>>();
 
     public LiveObjects<PumpChannel> Channels => LiveObjects<PumpChannel>();
+
+    public PumpDisplay Display => LiveObject<PumpDisplay>();
+
+    public PumpDisplay DetachedDisplay => LiveObject<PumpDisplay>(nullable: true);
 
     public MethodResult<bool> IsRunning() => Method<bool>();
 

@@ -324,4 +324,44 @@ public sealed class WhenAListHoldsLiveObjects
         Assert.That(Views.TextOf(html.RenderPlan(plan)), Is.EqualTo(ScriptOpen + expected + ScriptClose));
         Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
     }
+
+    [Test]
+    public void select_reads_the_object_every_item_holds_through_its_declaration()
+    {
+        var html = Views.Of(new Infusion("North"));
+        var plan = html.ReactivePlan<Infusion>();
+        html.On(plan, trigger => trigger.DomReady(pipeline =>
+        {
+            var pump = pipeline.Component<InfusionPump>("pump");
+            var displays = pump.Panel.Channels.Select(channel => channel.Display);
+            pump.Panel.Caption.Set(displays.At(0).Caption);
+            pump.Captions.Set(displays.Select(display => display.Caption));
+            pump.Panel.Caption.Set(displays.Find(display => display.Caption.Eq("Ready")).Caption);
+            pump.Panel.Caption.Set(displays.Where(display => display.Caption.Eq("Ready")).At(0).Caption);
+        }));
+        const string expected = OnLoad +
+            """{"kind":"set","path":["caption"],"members":"required","content":false,"target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}},"value":{"kind":"get","path":["caption"],"members":"required","target":{"kind":"get","path":[0],"members":"requiredIfHeld","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"get","path":["channels"],"members":"required","target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}}},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["display"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]}}}},{"kind":"set","path":["captions"],"members":"required","content":false,"target":{"kind":"obj","id":"pump"},"value":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"get","path":["channels"],"members":"required","target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}}},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["display"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]},"args":[{"kind":"fn","params":["liveItem2"],"body":{"kind":"get","path":["caption"],"members":"required","target":{"kind":"ref","name":"liveItem2"}}}]}},{"kind":"set","path":["caption"],"members":"required","content":false,"target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}},"value":{"kind":"get","path":["caption"],"members":"required","target":{"kind":"call","path":["find"],"members":"requiredIfHeld","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"get","path":["channels"],"members":"required","target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}}},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["display"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]},"args":[{"kind":"fn","params":["liveItem3"],"body":{"kind":"op","op":"eq","args":[{"kind":"get","path":["caption"],"members":"required","target":{"kind":"ref","name":"liveItem3"}},{"kind":"lit","value":"Ready"}]}}]}}},{"kind":"set","path":["caption"],"members":"required","content":false,"target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}},"value":{"kind":"get","path":["caption"],"members":"required","target":{"kind":"get","path":[0],"members":"requiredIfHeld","target":{"kind":"call","path":["filter"],"members":"requiredIfHeld","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"get","path":["channels"],"members":"required","target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}}},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["display"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]},"args":[{"kind":"fn","params":["liveItem4"],"body":{"kind":"op","op":"eq","args":[{"kind":"get","path":["caption"],"members":"required","target":{"kind":"ref","name":"liveItem4"}},{"kind":"lit","value":"Ready"}]}}]}}}}""" + Ends;
+        Assert.That(Views.TextOf(html.RenderPlan(plan)), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void select_of_a_nullable_object_reads_its_members_as_nothing_where_an_item_holds_none()
+    {
+        var html = Views.Of(new Infusion("North"));
+        var plan = html.ReactivePlan<Infusion>();
+        html.On(plan, trigger => trigger.DomReady(pipeline =>
+        {
+            var pump = pipeline.Component<InfusionPump>("pump");
+            var displays = pump.Panel.Channels.Select(channel => channel.DetachedDisplay);
+            pump.Panel.Caption.Set(displays.At(0).Caption);
+            pump.Captions.Set(displays.Select(display => display.Caption));
+            pump.Panel.Caption.Set(displays.Find(display => display.Caption.Eq("Ready")).Caption);
+            pump.Panel.Caption.Set(displays.Where(display => display.Caption.Eq("Ready")).At(0).Caption);
+        }));
+        const string expected = OnLoad +
+            """{"kind":"set","path":["caption"],"members":"required","content":false,"target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}},"value":{"kind":"get","path":["caption"],"members":"requiredIfHeld","target":{"kind":"get","path":[0],"members":"requiredIfHeld","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"get","path":["channels"],"members":"required","target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}}},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["detachedDisplay"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]}}}},{"kind":"set","path":["captions"],"members":"required","content":false,"target":{"kind":"obj","id":"pump"},"value":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"get","path":["channels"],"members":"required","target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}}},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["detachedDisplay"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]},"args":[{"kind":"fn","params":["liveItem2"],"body":{"kind":"get","path":["caption"],"members":"requiredIfHeld","target":{"kind":"ref","name":"liveItem2"}}}]}},{"kind":"set","path":["caption"],"members":"required","content":false,"target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}},"value":{"kind":"get","path":["caption"],"members":"requiredIfHeld","target":{"kind":"call","path":["find"],"members":"requiredIfHeld","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"get","path":["channels"],"members":"required","target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}}},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["detachedDisplay"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]},"args":[{"kind":"fn","params":["liveItem3"],"body":{"kind":"op","op":"eq","args":[{"kind":"get","path":["caption"],"members":"requiredIfHeld","target":{"kind":"ref","name":"liveItem3"}},{"kind":"lit","value":"Ready"}]}}]}}},{"kind":"set","path":["caption"],"members":"required","content":false,"target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}},"value":{"kind":"get","path":["caption"],"members":"requiredIfHeld","target":{"kind":"get","path":[0],"members":"requiredIfHeld","target":{"kind":"call","path":["filter"],"members":"requiredIfHeld","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"get","path":["channels"],"members":"required","target":{"kind":"get","path":["panel"],"members":"required","target":{"kind":"obj","id":"pump"}}},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["detachedDisplay"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]},"args":[{"kind":"fn","params":["liveItem4"],"body":{"kind":"op","op":"eq","args":[{"kind":"get","path":["caption"],"members":"requiredIfHeld","target":{"kind":"ref","name":"liveItem4"}},{"kind":"lit","value":"Ready"}]}}]}}}}""" + Ends;
+        Assert.That(Views.TextOf(html.RenderPlan(plan)), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
 }

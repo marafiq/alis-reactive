@@ -82,10 +82,16 @@ internal sealed partial class BoundInput
         => new(
             Name,
             _path,
-            new OpExpression(Operator.Coalesce, [new AsExpression(input.Read, new NullableShape(InputShapes.From(_shape, input.Text))), _blank]),
+            new OpExpression(Operator.Coalesce, [new AsExpression(ReadOf(input), new NullableShape(InputShapes.From(_shape, input.Text))), _blank]),
             input.Committed,
             invalidClass,
             hidden ? "" : MessageId);
+
+    private Schema.Expression ReadOf(ComponentInput input)
+    {
+        var readsTheFirstObject = input.ListsObjects && !BindsAList;
+        return readsTheFirstObject ? new GetExpression([new IndexStep(0)], PathMembers.Optional, input.Read) : input.Read;
+    }
 
     private static partial string NameOf(WrittenMember member, string clrName);
 

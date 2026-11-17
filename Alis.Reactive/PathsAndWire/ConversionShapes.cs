@@ -17,10 +17,14 @@ internal static class ConversionShapes
             JsonTypeInfo<double> or JsonTypeInfo<double?> => (-0d).ToString(culture),
             JsonTypeInfo<float> or JsonTypeInfo<float?> => (-0f).ToString(culture),
             JsonTypeInfo<decimal> or JsonTypeInfo<decimal?> => new decimal(0, 0, 0, true, 0).ToString(culture),
-            _ => 0.ToString(culture),
+            _ => WholeZero(culture),
         };
         return new StringShape(DateOf(source), zero);
     }
+
+    internal static StringShape TextOfAnObject(CultureInfo culture) => new(DateMeaning.None, WholeZero(culture));
+
+    private static string WholeZero(CultureInfo culture) => 0.ToString(culture);
 
     private static DateMeaning DateOf(JsonTypeInfo source)
     {

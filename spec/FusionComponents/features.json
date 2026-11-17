@@ -8493,7 +8493,7 @@
     {
      "id": "M21.X709",
      "rung": "type",
-     "defect": "Main reads the uploader's value as text, ComponentProperty<string> over filesData (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadExtensions.cs:22, :29 at 623dd4a27), a list of file items (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:540), so a comparison of it with text compiles and reads a list. The rewrite's Files in M21.N22 is ReadOnly<IReadOnlyList<BrowserFile>>, as the redesign's is."
+     "defect": "Main reads the uploader's value as text, ComponentProperty<string> over filesData (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadExtensions.cs:22, :29 at 623dd4a27), a list of file items (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:540), so a comparison of it with text compiles and reads a list. The rewrite's Files in M21.N22 is LiveObjects<BrowserFile>, GetFilesData().Select(file => file.RawFile), a declared list of the browser's files that no text compares with."
     },
     {
      "id": "M21.X710",

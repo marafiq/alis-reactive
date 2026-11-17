@@ -19,15 +19,22 @@ public sealed class LiveObjects<TItem>
     where TItem : JsObject, new()
 {
     private readonly Binding _bound;
+    private readonly bool _itemsMayBeAbsent;
 
     internal LiveObjects(Binding bound)
+        : this(bound, false)
+    {
+    }
+
+    internal LiveObjects(Binding bound, bool itemsMayBeAbsent)
     {
         _bound = bound;
+        _itemsMayBeAbsent = itemsMayBeAbsent;
     }
 
     internal Schema.Expression Target => _bound.Target;
 
-    private HeldForm Form => HeldForm.Live(_bound.Writer.Content.Json, _bound.Writer.Content.RendersUnder);
+    internal HeldForm Form => HeldForm.Live(_bound.Writer.Content.Json, _bound.Writer.Content.RendersUnder);
 
     /// <summary>Reaches the item at a position.</summary>
     /// <param name="position">The item's position, the first at zero.</param>
@@ -35,7 +42,7 @@ public sealed class LiveObjects<TItem>
     public TItem At(int position)
     {
         if (position < 0) throw new InvalidOperationException("An item's position is zero or more.");
-        return JsObject.Reaching<TItem>(new Reached(() => new GetExpression([new IndexStep(position)], PathMembers.RequiredIfHeld, _bound.Target), _bound.Writer, false));
+        return JsObject.Reaching<TItem>(new Reached(() => new GetExpression([new IndexStep(position)], PathMembers.RequiredIfHeld, _bound.Target), _bound.Writer, _itemsMayBeAbsent));
     }
 
     /// <summary>Counts the list's items.</summary>
@@ -46,7 +53,7 @@ public sealed class LiveObjects<TItem>
     /// <param name="keep">The condition an item is kept by.</param>
     /// <returns>The list of the items kept, in the list's order.</returns>
     public LiveObjects<TItem> Where(Func<TItem, TypedSource<bool>> keep)
-        => new(new Reached(ListForms.Filter(_bound.Target, Lambda(keep).Function), _bound.Writer));
+        => new(new Reached(ListForms.Filter(_bound.Target, Lambda(keep).Function), _bound.Writer), _itemsMayBeAbsent);
 
     /// <summary>Reads one member of every item.</summary>
     /// <param name="field">The member read from each item.</param>
@@ -59,6 +66,22 @@ public sealed class LiveObjects<TItem>
             ? selected.Function
             : new FnExpression(selected.Function.Params, new OpExpression(Operator.NonNull, [selected.Function.Body]));
         return new Computed<IReadOnlyList<TResult>>(ListForms.Map(list, function), selected.Form);
+    }
+
+    /// <summary>Reads the object every item holds.</summary>
+    /// <param name="held">The object read from each item, a member of the item that holds one.</param>
+    /// <typeparam name="TObject">The declaration of the object each item holds.</typeparam>
+    /// <returns>A new list of the objects, in the list's order, each read through its declaration.</returns>
+    public LiveObjects<TObject> Select<TObject>(Func<TItem, TObject> held)
+        where TObject : JsObject, new()
+    {
+        var list = _bound.Target;
+        var selected = OverEachItem(item =>
+        {
+            var reached = held(item).Bound;
+            return (reached.Target, reached.MayBeAbsent);
+        });
+        return new(new Reached(ListForms.Map(list, selected.Function), _bound.Writer), selected.Value);
     }
 
     /// <summary>Counts the items a condition holds for.</summary>
@@ -110,18 +133,21 @@ public sealed class LiveObjects<TItem>
     }
 
     private TItem Found(Func<TItem, TypedSource<bool>> predicate, bool mayBeAbsent)
-        => JsObject.Reaching<TItem>(new Reached(ListForms.Find(_bound.Target, Lambda(predicate).Function), _bound.Writer, mayBeAbsent));
+        => JsObject.Reaching<TItem>(new Reached(ListForms.Find(_bound.Target, Lambda(predicate).Function), _bound.Writer, mayBeAbsent || _itemsMayBeAbsent));
 
     private (FnExpression Function, HeldForm Form) Lambda<TResult>(Func<TItem, TypedSource<TResult>> field)
-    {
-        var writer = _bound.Writer;
-        var name = writer.NextLiveItem();
-        var item = JsObject.Reaching<TItem>(new Reached(new RefExpression(name), writer));
-        var selected = writer.Lambda(() =>
+        => OverEachItem(item =>
         {
             var source = field(item);
             return (source.Expression, source.Form);
         });
+
+    private (FnExpression Function, TValue Value) OverEachItem<TValue>(Func<TItem, (Schema.Expression Body, TValue Value)> read)
+    {
+        var writer = _bound.Writer;
+        var name = writer.NextLiveItem();
+        var item = JsObject.Reaching<TItem>(new Reached(new RefExpression(name), writer, _itemsMayBeAbsent));
+        var selected = writer.Lambda(() => read(item));
         return (new FnExpression([name], selected.Body), selected.Value);
     }
 }

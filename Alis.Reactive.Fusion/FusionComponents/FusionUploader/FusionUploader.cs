@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.InputsAndIds;
 using Alis.Reactive.RequestsAndResponses;
@@ -17,8 +15,8 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 [Mirrors("@syncfusion/ej2-inputs", "Uploader")]
 public sealed class FusionUploader : FusionComponent, IInputComponent
 {
-    /// <summary>Gets the files a person chose, as the browser holds them; a file the app listed reads nothing.</summary>
-    public ReadOnly<IReadOnlyList<BrowserFile>> Files => throw new NotImplementedException();
+    /// <summary>Gets the files the uploader lists, in its order, each as the browser holds it.</summary>
+    public LiveObjects<BrowserFile> Files => GetFilesData().Select(file => file.RawFile);
 
     /// <summary>Gets the files the uploader lists.</summary>
     /// <returns>The files, each as the uploader describes it.</returns>

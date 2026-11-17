@@ -731,7 +731,11 @@ Terms used throughout:
 - D6.2 One name per operation, the names `ReactiveArray` has on both lines: `Where`, `Select`, `OrderBy`,
   `OrderByDescending`, `Count()`, `Count(predicate)`, `Any()`, `Any(predicate)`, `All(predicate)`, `Sum` over
   `int`, `decimal` and `double`, `Find(predicate)` and `Find(predicate, field)`. The property `Count` and the
-  method `Each` on a declared list (`LiveObjects<T>`) leave, renamed to `Count()` and `Select`.
+  method `Each` on a declared list (`LiveObjects<T>`) leave, renamed to `Count()` and `Select`. A `Select` on a
+  declared list whose field is an object a declaration reads, `GetFilesData().Select(file => file.RawFile)`, is a
+  declared list of those objects, written as D6.1's projection: its item is null where the object is declared
+  optional or nullable and holds nothing (D6.16), and a member read from such an item, wherever the list's
+  operations reach it, reads nothing (D5.3).
 - D6.3 An operation over a list that reads nothing reads nothing; `Any()` and `All()` over nothing read nothing,
   so a condition on them does not hold. An operation over a value that lacks the operation's JavaScript member
   stops the pipeline: a paged result (`{ result, count }`) where the declaration says a list has no `length` and

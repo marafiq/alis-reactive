@@ -51,8 +51,10 @@ Each name is gate 2's; each door is the capability it carries.
   the field registers its component and renders its own label and marker, and no view, test or render helper of Fusion
   or Native reads either at 65fdf118d.
 - `M7.N3` kept: `IInputComponent.Input`, a `ComponentInput.Of(value, committedBy)` built from the declaration's typed
-  value property and the event that commits it: the read an input's binding takes (N3.3) and the event its live check
-  runs on (D16.15). It replaces main's `IInputComponent.ValueMember`, a string.
+  value property, or from a declared list of objects such as the files an uploader lists, and the event that commits
+  it: the read an input's binding takes (N3.3) and the event its live check runs on (D16.15). The read runs whole at
+  each read, a method it calls included, and a list of objects bound to a member that holds no list reads its first
+  object. It replaces main's `IInputComponent.ValueMember`, a string.
 - `M7.N4` kept: the redesign's `services.AddReactiveClassNames(names => ..)` and `ReactiveClassNames`, the class names
   every field renders with, `Field`, `FieldLabel`, `FieldRequired`, `FieldMessage` and `InvalidInput`, chosen once at
   startup, each unset name its default; C# writes `InvalidInput` into each input's binding as its `invalidClass`

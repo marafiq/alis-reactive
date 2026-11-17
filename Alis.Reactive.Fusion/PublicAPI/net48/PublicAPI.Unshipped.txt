@@ -1393,7 +1393,7 @@ Alis.Reactive.Fusion.FusionComponents.FusionUploader.FileInfo.RawFile.get -> Ali
 Alis.Reactive.Fusion.FusionComponents.FusionUploader.FileInfo.Size.get -> Alis.Reactive.Declarations.ReadOnly<long>!
 Alis.Reactive.Fusion.FusionComponents.FusionUploader.FileInfo.Status.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
 Alis.Reactive.Fusion.FusionComponents.FusionUploader.FileInfo.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
-Alis.Reactive.Fusion.FusionComponents.FusionUploader.Files.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<Alis.Reactive.RequestsAndResponses.BrowserFile!>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionUploader.Files.get -> Alis.Reactive.Declarations.LiveObjects<Alis.Reactive.RequestsAndResponses.BrowserFile!>!
 Alis.Reactive.Fusion.FusionComponents.FusionUploader.FilesChanged.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionUploader.FilesChangedEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionUploader.FilesChangedEventArgs
 Alis.Reactive.Fusion.FusionComponents.FusionUploader.FilesChangedEventArgs.FilesChangedEventArgs() -> void

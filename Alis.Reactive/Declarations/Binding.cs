@@ -23,6 +23,8 @@ internal abstract class Binding
     internal abstract PathMembers Reads(bool optional);
 
     internal virtual bool IsAnEventsPayload => false;
+
+    internal virtual bool MayBeAbsent => false;
 }
 
 internal sealed class NotReached : Binding
@@ -63,6 +65,8 @@ internal sealed class Reached : Binding
     internal override Expression Target => _target();
 
     internal override BlockWriter Writer { get; }
+
+    internal override bool MayBeAbsent => _mayBeAbsent;
 
     internal override PathMembers Reads(bool optional)
         => _mayBeAbsent

@@ -60,6 +60,7 @@ Alis.Reactive.Declarations.LiveObjects<TItem>.Count() -> Alis.Reactive.ValuesAnd
 Alis.Reactive.Declarations.LiveObjects<TItem>.Count(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<int>!
 Alis.Reactive.Declarations.LiveObjects<TItem>.Find(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> TItem!
 Alis.Reactive.Declarations.LiveObjects<TItem>.Find<TResult>(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate, System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! field) -> Alis.Reactive.ValuesAndSources.TypedSource<TResult>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Select<TObject>(System.Func<TItem!, TObject!>! held) -> Alis.Reactive.Declarations.LiveObjects<TObject!>!
 Alis.Reactive.Declarations.LiveObjects<TItem>.Select<TResult>(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! field) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TResult>!>!
 Alis.Reactive.Declarations.LiveObjects<TItem>.Where(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! keep) -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
 Alis.Reactive.Declarations.MethodResult<TResult>
@@ -797,6 +798,7 @@ static Alis.Reactive.Declarations.JsObject.Fixed<TValue>(TValue value) -> Alis.R
 static Alis.Reactive.Declarations.JsObject.Pass<TDeclared, TSource>(Alis.Reactive.ValuesAndSources.TypedSource<TSource>! value) -> Alis.Reactive.ValuesAndSources.Arg!
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.Property<TValue?>! property, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.WriteOnly<TValue?>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+static Alis.Reactive.InputsAndIds.ComponentInput.Of<TItem, TArgs>(Alis.Reactive.Declarations.LiveObjects<TItem!>! value, Alis.Reactive.Declarations.Event<TArgs!>! committedBy) -> Alis.Reactive.InputsAndIds.ComponentInput!
 static Alis.Reactive.InputsAndIds.ComponentInput.Of<TValue, TArgs>(Alis.Reactive.Declarations.ReadOnly<TValue>! value, Alis.Reactive.Declarations.Event<TArgs!>! committedBy) -> Alis.Reactive.InputsAndIds.ComponentInput!
 static Alis.Reactive.InputsAndIds.IdGenerator.For<TModel, TProp>(System.Linq.Expressions.Expression<System.Func<TModel, TProp>!>! member) -> string!
 static Alis.Reactive.RenderingAndDelivery.ClassNameServices.AddReactiveClassNames(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.InputsAndIds.ReactiveClassNames!>! names) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
