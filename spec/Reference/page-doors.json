@@ -1111,9 +1111,7 @@
     ]
   },
   "M21.F11 M21.X401 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/AllergyTags.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1134,9 +1132,7 @@
     ]
   },
   "M21.F14 M21.X405 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/BedActions.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1238,9 +1234,7 @@
     ]
   },
   "M21.F24 M21.X1015 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/RecordContacts/ResidentRoom.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1297,9 +1291,7 @@
     ]
   },
   "M21.F3 M21.X901 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/MedicationAssistant.cshtml",
       "/Care/Handover/MedicationAssistantOnCall.cshtml",
@@ -1369,9 +1361,7 @@
     ]
   },
   "M21.F38 M21.X1023 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Handover/HandoverSummary.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1444,9 +1434,7 @@
     ]
   },
   "M21.F45 M21.X1026 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/AdmissionClinical/AdmissionSteps.cshtml",
       "/Shared/_FusionLayout.cshtml"
@@ -1525,9 +1513,7 @@
     ]
   },
   "M21.F9 M21.X1005 0": {
-    "modules": [
-      "FusionComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/BedBoard/WardTour.cshtml",
       "/Shared/_FusionLayout.cshtml"

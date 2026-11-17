@@ -1235,7 +1235,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   opposite that changes the view's code is a second view
   (`tests/Alis.Reactive.Conformance.App/Care/BedBoard/WardRoomsBedsFirst.cshtml`); a row that lacks a member or holds it
   null is written by the page's endpoint as an anonymous object beside the row's record, since rows handed with the view
-  hold every member; a carousel renders with AutoPlay off, so the slide shown waits on no time. The drop-down tree names
+  hold every member; a carousel renders with AutoPlay off, so the slide shown waits on no time. A context menu renders with its animation off
+  (its effect None), since EJ2 33.1.47's menu takes focus only when its opening animation ends, so a key pressed on
+  the open menu waits on no time (the lead, 2026-11-17, from batch 4's red leg). The drop-down tree names
   its fields through EJ2's own fields object with `nameof`, since M21.N21 declares no typed fields as FusionMultiSelect
   declares its; U26 reads whether EJ2 writes the tree's data under those names, and a typed door for them is a gap the
   lead raises. M21.X201's three exports read Exporting while the export runs, which a test reads only while the export

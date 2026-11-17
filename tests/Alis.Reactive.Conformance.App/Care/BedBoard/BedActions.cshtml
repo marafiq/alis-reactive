@@ -19,7 +19,7 @@
 </section>
 <p>Opening: <output id="opening-status"></output></p>
 <p>Focus: <output id="focus-status"></output></p>
-@(Html.FusionContextMenu(plan, "bed-menu", build => build.Target("#bed-area").Items(wards))
+@(Html.FusionContextMenu(plan, "bed-menu", build => build.Target("#bed-area").Items(wards).AnimationSettings(new ContextMenuAnimationSettings { Effect = MenuEffect.None }))
     .Reactive(menu => menu.BeforeOpen, (opening, pipeline) => pipeline.When(opening.IsFocused)
         .Then(pipeline => pipeline.Element("opening-status").Text.Set("Focused"))
         .Else(pipeline => pipeline.Element("opening-status").Text.Set("No focus")))
