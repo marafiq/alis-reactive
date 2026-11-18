@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Wed Nov 18 04:22:43 EST 2026
+Written at `date`: Wed Nov 18 04:40:04 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -17,9 +17,7 @@ note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUD
 note: open 2026-11-17 | decision | spec/CLAUDE.md, the Conditions module's decisions, with a table "After 1.0" in spec/
 note: open 2026-11-17 | process rule | .claude/rules/process.md | queue | "your whole goal is to get the tooling, the p
 note: open 2026-11-18 | decision | spec/CLAUDE.md | DecisionsByModule | "where you're gonna keep the decisions. So it c
-note: closed 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses : its follow-up TypedDoors landed
-  leaves by: the entry leaves the notes block of `HANDOFF.md`
-  goes to: gone
+note: open 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses 
 note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSlice1 | "For the app, you
 note: open 2026-11-18 | direction | the queue of this file | queue | "I don't need acceptance numbers, sir. I need that
 unit: building ../ci2 CiGreen2: it lacks paths.txt or message.txt
@@ -27,21 +25,21 @@ unit: building ../ci2 CiGreen2: it lacks paths.txt or message.txt
   read first: the rule file of each kind of file, as it is opened
   exit line: each line of the brief's "Done"
   goes to: unit: ready, or unit: returned for an agent
+unit: waiting ../ci2 MoveInSpec: for MoveInSlice1
+  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
+  exit line: each line of the brief's "Done"
+  goes to: unit: ready
 unit: ready ../movein1 MoveInSlice1
   next: scripts/land-unit.sh ../movein1 e9b49a1eb "conformance app: the move-in's foundation and MI.1, a residence chosen through three lookups over a model one world owns" ".landing/MoveInSlice1"
   leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
   exit line: "landed", with the browser run's result line
   goes to: unit: landed
-unit: landed ../typed-doors TypedDoors
-  next: git worktree remove ../typed-doors
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
-lane: pushed at 4c5ae8e1c on feature/rewrite: equal to the remote
+lane: pushed at f4cd5af46 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 4c5ae8e1c
+ci: unread at f4cd5af46
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -50,23 +48,23 @@ file: over CLAUDE.md: holds 326 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2064 lines, its limit 150
-file: over HANDOFF.md: holds 201 lines, its limit 150
-file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 197 lines, its limit 150
+file: over HANDOFF.md: holds 202 lines, its limit 150
+file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 4c5ae8e1c analyzers: ALIS044, a door of the framework takes no dynamic (N18.18)
-- Full check: .work/logs/spec-check-4c5ae8e1c.log: spec check at 4c5ae8e1c: 40 of 40 checks pass
-- .work/last-run.txt: 20261118-041235-17720 4c5ae8e1c
+- HEAD: f4cd5af46 conformance app: the move-in's foundation and MI.1, a residence chosen through three lookups over a model one world owns
+- Full check: .work/logs/spec-check-f4cd5af46.log: spec check at f4cd5af46: 40 of 40 checks pass
+- .work/last-run.txt: 20261118-042953-62784 f4cd5af46
 
 ## Landed since the commit before the last spec: STATE commit
-4c5ae8e1c analyzers: ALIS044, a door of the framework takes no dynamic (N18.18)
-5ed0e0a5e spec: STATE and handoff at 2836ae7e4
+f4cd5af46 conformance app: the move-in's foundation and MI.1, a residence chosen through three lookups over a model one world owns
+c044853ea spec: STATE and handoff at 4c5ae8e1c
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 533; named by a browser test: 514; with no browser test: 19
+feature promises: 538; named by a browser test: 519; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -111,8 +109,11 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 378 to 381
-- A shell command or a script wrong in its own terms: 529 to 533
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 334 to 346
+- A rule or a tool's list not applied before the change: 381 to 384
+- A number, a proof line or an absence not read from the run that proves it: 53 to 54
+- A shell command or a script wrong in its own terms: 533 to 542
+- A fault found in an agent's work whose instruction the brief did not give: 2 to 5
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1926: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having

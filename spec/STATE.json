@@ -4,7 +4,7 @@
       "counts": {
         "actions": 74,
         "named": 74,
-        "promises": 127,
+        "promises": 128,
         "unnamed": 0
       },
       "detail": "every action of the async lanes' specs is named by a promise, and every promise's action is its spec's",
@@ -14,22 +14,22 @@
       "counts": {
         "cells": 117,
         "hosts": 24,
-        "placed": 533,
+        "placed": 538,
         "problems": 0,
         "rewrite": 0,
-        "screens": 14
+        "screens": 15
       },
-      "detail": "533 feature tests and 117 cell tests on 14 screens under 24 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
+      "detail": "538 feature tests and 117 cell tests on 15 screens under 24 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "bindings": {
       "counts": {
-        "constants": 660,
+        "constants": 665,
         "gates": 74,
-        "marks": 66,
+        "marks": 67,
         "problems": 0
       },
-      "detail": "Gates.g.cs holds 74 gates and Promises.g.cs 660 constants, 66 of a held gate marked on them, each as the spec writes it",
+      "detail": "Gates.g.cs holds 74 gates and Promises.g.cs 665 constants, 67 of a held gate marked on them, each as the spec writes it",
       "pass": true
     },
     "carriers": {
@@ -1417,7 +1417,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 683,
+        "defects": 688,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1668,7 +1668,7 @@
         "unrefused": 0
       },
       "detail": "248 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "8635724603dca9791ba10763804167cd8775707ef18f06a78ffaaa742161c211",
+      "digest": "a8b543ca36694c85b34c8fed543dbe3d324d12914bcdce7ed793b4c5a0cd5227",
       "pass": true
     },
     "probes": {
@@ -1689,7 +1689,7 @@
         "mapped": 8909,
         "matrix_promised": 117,
         "matrix_runs": 117,
-        "promises": 533,
+        "promises": 538,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1717,10 +1717,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 650,
+        "tests": 655,
         "units": 27
       },
-      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 3, U10 5, U11 16, U12 0, U13 98, U14 6, U15 29, U16 0, U17 0, U18 97, U19 18, U20 8, U21 51, U22 7, U23 144, U24 30, U25 38, U26 92, U27 3",
+      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 3, U10 5, U11 16, U12 0, U13 98, U14 6, U15 29, U16 0, U17 0, U18 97, U19 18, U20 8, U21 51, U22 7, U23 149, U24 30, U25 38, U26 92, U27 3",
       "pass": true
     },
     "slice_tests": {
@@ -4339,7 +4339,7 @@
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 53m 3h, U4 1b 18m 3a, U5 1b 21m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 3b 17m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 21m 21a, U18 97b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 51b 14m 1a 1h, U22 7b 4m, U23 144b, U24 30b 1a, U25 38b 1a, U26 92b 35a, U27 3b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 53m 3h, U4 1b 18m 3a, U5 1b 21m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 3b 17m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 21m 21a, U18 97b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 51b 14m 1a 1h, U22 7b 4m, U23 149b, U24 30b 1a, U25 38b 1a, U26 92b 35a, U27 3b",
       "pass": true
     },
     "verdicts": {
@@ -4357,7 +4357,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "4c5ae8e1c9004c813ba32b28b5f63e4027c31f55",
+  "read_at_head": "f4cd5af46838b150b35729023426bc9d5eaac786",
   "step": {
     "failing": [],
     "name": "End of session",
