@@ -23,7 +23,15 @@ case "$current" in
     [ "$ALIS_ALLOW_PROTECTED" = "1" ] || exit 1
     ;;
 esac
+if [ -f "$(git rev-parse --show-toplevel)/scripts/land.sh" ] && [ "$ALIS_LANDING" != "1" ]; then
+  echo "" >&2
+  echo "  LANDING GUARD — refusing a commit the landing script did not make." >&2
+  echo "  A unit lands by scripts/land-unit.sh and a push by scripts/push.sh (CLAUDE.md, How you work)." >&2
+  echo "  Override once:   ALIS_ALLOW_COMMIT=1 git commit ..." >&2
+  echo "" >&2
+  [ "$ALIS_ALLOW_COMMIT" = "1" ] || exit 1
+fi
 HOOK
 chmod +x "$hooks/pre-commit"
 
-echo "installed: $hooks/pre-commit (refuses direct commits on main and release/*)"
+echo "installed: $hooks/pre-commit (refuses direct commits on main and release/*, and a commit the landing script did not make)"

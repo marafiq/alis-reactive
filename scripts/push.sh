@@ -26,7 +26,7 @@ git add spec/STATE.json HANDOFF.md
   cat .work/attribution.txt
   printf '\n'
 } > "$W/message-state-$checked.txt"
-git commit -q -F "$W/message-state-$checked.txt" || { echo "STATE commit refused"; exit 1; }
+ALIS_LANDING=1 git commit -q -F "$W/message-state-$checked.txt" || { echo "STATE commit refused"; exit 1; }
 grep -q -x "spec check at $checked: 40 of 40 checks pass" "$log" && git push origin "HEAD:refs/heads/$branch" || { echo "STATE push refused"; exit 1; }
 test "$(git ls-remote origin "refs/heads/$branch" | cut -c1-40)" = "$(git rev-parse HEAD)" || { echo "remote differs after the STATE push"; exit 1; }
 echo "pushed $checked and $(git rev-parse --short=9 HEAD); remote equals HEAD"

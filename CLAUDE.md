@@ -55,6 +55,23 @@ scripts/playwright.sh --all
 ```
 A script bash is running is never edited; a planted file is restored by cp and touch, since mv keeps the old time.
 
+The mistakes made most, and what stops each. The eight kinds and their counts are `spec/MISTAKES.md`; a count is a
+meter and no journal: a kind that grows after its tool landed means the tool is wrong (the owner, 2026-11-17: "mistake
+log was created only to prevent mistakes, not to keep a journal"). Read these before each piece:
+- A command wrong in its own terms (the largest kind). The shapes above are refused before they run by
+  `.claude/hooks/refuse-known-traps.mjs`. An edit or a read of more than one line is a Python script that asserts each
+  match's count before it writes; a long output is filtered to the lines that decide.
+- A rule or a tool's list not applied before the change. A commit is made only by `scripts/land-unit.sh` or
+  `scripts/push.sh`: the pre-commit hook refuses any other where `scripts/land.sh` stands.
+- Written from memory. Before a page, a test, a line or an answer to the owner is written, its landed exemplar and
+  the file it goes into are read at HEAD; a claim about what the repository holds carries its file and line.
+- A number or an absence not read from the run that proves it. The result line is read when it prints, CI's line by
+  its commit among them; "not built" and "no test" are `scripts/open.py`'s output.
+- Said in a way that blurred what holds. A status is `scripts/open.py`'s first line and its lists.
+- The process put before the product. A push per unit; no check of a check.
+- A costly agent run on an unproven environment. The brief names the exact commands, probed first.
+- The toolchain kept where the system deletes it. `scripts/toolchain-env.sh` and `scripts/doctor.sh` name its home.
+
 ## Vision: typed access to JavaScript objects
 
 Everything the browser runs (a Syncfusion component, a native input, a plugin, an app service like Toast or Drawer)
@@ -167,6 +184,8 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | A comment in any language; an XML doc off a shipped package's public surface | `WhenCodeIsWritten` |
 | A rule file that names code the repo does not hold | `tests/Alis.Reactive.ArchitectureTests/WhenARuleNamesTheCode.cs` |
 | A hand edit of the generated contract | `.claude/hooks/protect-generated.mjs`, held by `WhenClaudeRunsAHook` |
+| A command in a shape this machine gets wrong: a `git grep` extended expression with a class it lacks, the browser runner by a filter, `grep --include`, Codex started with its input open | `.claude/hooks/refuse-known-traps.mjs`, held by `WhenClaudeRunsAHook` |
+| A commit the landing script did not make, where `scripts/land.sh` stands | the pre-commit hook `scripts/install-git-hooks.sh` installs |
 | An untyped public door | `ALIS009` |
 | A slice that uses a later row; a namespace off its folder; an open public class; a table off its project | `ALIS010`, `ALIS011`, `ALIS012`, `ALIS013` |
 | A project that holds folders, or a shipped package, built without its slice table | `WhenAProjectHoldsFolders`, `WhenAPackageShips` |

@@ -37,7 +37,7 @@ cat "$W/regress-$n.txt"
 grep -q -x "no test that passed at $last_sha fails or is gone" "$W/regress-$n.txt" || { echo "[land] a test that passed before fails; not committed"; exit 1; }
 test -z "$(git diff --name-only)" || { echo "[land] the browser run left unstaged changes:"; git diff --name-only; exit 1; }
 python3 -I "$T/stamp.py" "$msg" "$W/pw-all-$n.log" "$W/regress-$n.txt" "$W/stamped-$n.txt" || { echo "[land] the message could not be stamped"; exit 1; }
-git commit -q -F "$W/stamped-$n.txt" || { echo "[land] the commit failed"; exit 1; }
+ALIS_LANDING=1 git commit -q -F "$W/stamped-$n.txt" || { echo "[land] the commit failed"; exit 1; }
 printf '%s %s\n' "$(basename "$run")" "$(git rev-parse --short=9 HEAD)" > .work/last-run.txt
 git log --oneline -1
 lsof -nP -iTCP -sTCP:LISTEN | grep -E 'Alis|dotnet' || true

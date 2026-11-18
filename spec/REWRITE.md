@@ -198,7 +198,7 @@ spec/                                         the design source: BRIEF.md, REWRI
                                               plants/, probes/, Reference/, tools/, one folder per module
 ```
 
-Beside the tree the repository keeps `.claude/settings.json`, `.claude/hooks/protect-generated.mjs`,
+Beside the tree the repository keeps `.claude/settings.json`, `.claude/hooks/protect-generated.mjs`, `.claude/hooks/refuse-known-traps.mjs`,
 `.claude/rules/analyzers.md`, `.claude/rules/csharp.md`, `.claude/rules/docs.md`, `.claude/rules/tests.md`,
 `.claude/rules/views.md`,
 `.claude/skills/onboard-component`, `.claude/skills/prove-behavior`, `.claude/agents/builder.md`,

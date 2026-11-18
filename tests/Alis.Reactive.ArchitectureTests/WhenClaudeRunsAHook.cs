@@ -14,6 +14,28 @@ public class WhenClaudeRunsAHook
     private static readonly string[] OneFactFromTheContract =
         [ContractFolder + "index.ts", "Alis.Reactive.Assets/runtime/Execution/plan.ts", "Alis.Reactive.Assets/runtime/Execution/plan.schema.json"];
 
+    private static readonly string[] CommandsThisMachineGetsWrong =
+    [
+        "git grep -n -E \"foo\\b\" -- \"*.cs\"",
+        "git -C /repo grep -n -E \"a\\sb\" -- \"*.md\"",
+        "git grep -c -E \"x|y\\d\" -- spec",
+        "scripts/playwright.sh --filter \"FullyQualifiedName~Rooms\"",
+        "grep -rn --include=\"*.cs\" foo .",
+        "codex exec -s read-only \"brief\"",
+        "caffeinate -i codex exec -s read-only \"brief\" > out.log 2>&1",
+    ];
+
+    private static readonly string[] OneFactFromACommandThisMachineGetsWrong =
+    [
+        "git grep -n -E \"a[[:space:]]b\" -- \"*.cs\"",
+        "git grep -n -F \"\\b\" -- \"*.ts\"",
+        "scripts/playwright.sh --test M22_F2.M22_X11_0",
+        "scripts/playwright.sh --all",
+        "git grep -n foo -- \"*.cs\"",
+        "pgrep -f \"codex exec -s read-only\"",
+        "caffeinate -i codex exec -s read-only \"brief\" < /dev/null > out.log 2>&1",
+    ];
+
     [Test]
     public void every_file_a_hook_command_runs_is_in_the_repo()
     {
@@ -54,6 +76,22 @@ public class WhenClaudeRunsAHook
         var refused = OneFactFromTheContract.Where(file => DecisionFor("Edit", new { file_path = Path.Combine(Repository.Root, file) }) == "deny").ToList();
 
         Assert.That(refused, Is.Empty, "A hook refused an edit to a hand-written file:\n" + string.Join("\n", refused));
+    }
+
+    [RefusedCase]
+    public void a_command_in_a_shape_this_machine_gets_wrong_is_refused()
+    {
+        var allowed = CommandsThisMachineGetsWrong.Where(command => DecisionFor("Bash", new { command }) != "deny").ToList();
+
+        Assert.That(allowed, Is.Empty, "A hook allowed a command in a shape this machine gets wrong:\n" + string.Join("\n", allowed));
+    }
+
+    [AcceptedCase]
+    public void a_command_one_fact_from_such_a_shape_is_allowed()
+    {
+        var refused = OneFactFromACommandThisMachineGetsWrong.Where(command => DecisionFor("Bash", new { command }) == "deny").ToList();
+
+        Assert.That(refused, Is.Empty, "A hook refused a command this machine runs as written:\n" + string.Join("\n", refused));
     }
 
     [Test]

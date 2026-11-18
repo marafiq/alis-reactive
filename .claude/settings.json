@@ -39,6 +39,15 @@
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-generated.mjs\""
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/refuse-known-traps.mjs\""
+          }
+        ]
       }
     ]
   }
