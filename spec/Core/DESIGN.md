@@ -5221,6 +5221,13 @@ shapes, starts and the payload's path of each event.
   parameter of any other method and Razor's `@` get no report, since the rule cannot prove what that method does with
   the source, and neither does a source a second variable holds, which the rule does not follow. It lands in U3 by the
   owner's yes of 2026-11-13, since the thin path's text door takes any .NET text.
+- `N18.18` new: ALIS044, the typed-call analyzer: a door of the framework takes no `dynamic`. A type argument handed
+  to a door that is `dynamic`, a plan opened over `object`, and a call of a door the compiler binds at run time
+  because its receiver or an argument is `dynamic`, are each refused at build. Every door after a plan is typed by the
+  plan's model: the member a lambda names, the type a source carries and the shape a request sends are read from
+  that type, and `dynamic` leaves the compiler nothing to check. The cure is the view's `@model`, a class the app
+  wrote (the owner, 2026-11-18: "The whole point of the framework is tight, and you end up using dynamic"). On MVC 5
+  the build does not read a view (the owner, 2026-11-12), and the rule there is the line of `.claude/rules/views.md`.
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
   dot (D17.3, D17.14), an argument at a position on a declaration that is neither an event's payload nor a
   callback's arguments (D17.4), two constant definitions of one vendor name whose data differ in one compilation

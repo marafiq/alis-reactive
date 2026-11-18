@@ -24,3 +24,4 @@ ALIS038 | Alis.Reactive.Analyzers | Error | Flags enums are named at startup and
 ALIS041 | Alis.Reactive.Analyzers | Error | A view renders the plan it opens once, after every door that takes it
 ALIS042 | Alis.Reactive.Analyzers | Error | A list's operation runs over a list
 ALIS043 | Alis.Reactive.Analyzers | Error | A text is joined with a source by pipeline.Concat
+ALIS044 | Alis.Reactive.Analyzers | Error | A door of the framework takes no dynamic

@@ -55,6 +55,9 @@ Kept from the core, each the analyzer that holds its rule:
 - `N18.16` ALIS042, the text list analyzer: an operation of `DataLists` run over a source of text (D6.10).
 - `N18.17` ALIS043, the joined text analyzer: a source .NET makes a text of, by `+`, `+=`, an interpolation hole,
   `ToString()` or a static method of `string` (D7.3).
+- `N18.18` ALIS044, the typed-call analyzer: a door of the framework handed `dynamic` as a type argument, a plan
+  opened over `object`, or a door's call the compiler binds at run time because its receiver or an argument is
+  `dynamic` (D14.7, D18.5).
 - `N6.3` `ReadsNothingSuppressor`, ALIS026 and ALIS027, and `N9.5` `RequestKeysSuppressor`, ALIS036, the two
   suppressors whose meanings are modules 4's and 6's; `N9.4` ALIS029, a file-shaped member in a GET or a JSON body;
   ALIS028, `ITypedSource<T>`'s analyzer (N6.4).
@@ -101,6 +104,7 @@ One id, one rule. Each analyzer id of both lines and the rewrite:
 | ALIS041 | a plan a view opens and does not render once, last | new (N18.15) |
 | ALIS042 | a list's operation over a source of text | new (N18.16) |
 | ALIS043 | a source .NET makes a text of | new (N18.17) |
+| ALIS044 | a door of the framework handed `dynamic`, or a plan opened over `object` | new (N18.18) |
 
 ## Improvements
 

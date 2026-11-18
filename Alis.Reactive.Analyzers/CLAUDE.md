@@ -3,9 +3,10 @@
 The compiler's rules, packed inside AlisReactive: each analyzer is one line of the spec that the build runs. A folder
 is named for the module whose lines its rules enforce; `Analyzers/` holds module 20's own, `ALIS009` to `ALIS013`,
 `TypeKnowledge/` holds `ALIS023` to `ALIS025`, a declaration door's body and constants and an override's JSON name
-and ignore, `PartialsAndSlots/` holds `ALIS041`, the plan a view opens and renders, `ValuesAndSources/` holds
-`ALIS043`, a source .NET makes a text of, and `ArrayLambdas/` holds `ALIS042`, a list's operation over a text, and
-the suppressors `ALIS026` and `ALIS027`, a data lambda's read past a holder that holds null and a nullable's value.
+and ignore, `PartialsAndSlots/` holds `ALIS041`, the plan a view opens and renders, and `ALIS044`, a door of the
+framework handed `dynamic` or a plan opened over `object`, `ValuesAndSources/` holds `ALIS043`, a source .NET makes a
+text of, and `ArrayLambdas/` holds `ALIS042`, a list's operation over a text, and the suppressors `ALIS026` and
+`ALIS027`, a data lambda's read past a holder that holds null and a nullable's value.
 Two folders hold build files the packages carry beside the analyzers: `Vendors/` the vendor contract (D17.5), which a
 project opts into, and `RenderingAndDelivery/` the target that copies a package's browser files into a net48 app's
 Content/<PackageId>/ when their content changes (M19.D2).
