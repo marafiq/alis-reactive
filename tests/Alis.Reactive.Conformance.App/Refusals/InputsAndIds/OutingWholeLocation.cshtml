@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model Outing
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Outing";
+    var plan = Html.ReactivePlan<Outing>();
+}
+<h1>Outing</h1>
+@(Html.InputField(plan, m => m.Location, options => options.Label("Location")).NativeTextBox())
+@Html.RenderPlan(plan)

@@ -50,7 +50,7 @@ internal sealed class BrowserScalars(AppJson json)
     {
         var contract = json.LiveForm.GetTypeInfo(typeof(TValue));
         if (contract.Kind != System.Text.Json.Serialization.Metadata.JsonTypeInfoKind.None || !_paths.Add(clrPath)) return;
-        var shape = InputShapes.Of(contract, JsonSerializer.SerializeToElement(default(TValue), contract));
+        var shape = InputShapes.Of(contract, JsonSerializer.SerializeToElement(default(TValue), contract), clrPath);
         if (shape is StringShape) return;
         var member = clrPath.Substring(clrPath.LastIndexOf('.') + 1);
         _named.Add(new BoundScalar(path, shape, Before, "' is not valid for " + member + "."));

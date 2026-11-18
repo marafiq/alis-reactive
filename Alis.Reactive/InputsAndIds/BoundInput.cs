@@ -65,7 +65,7 @@ internal sealed partial class BoundInput
         var bindsAListItemThatIsAList = path[path.Count - 1] is IndexStep && app.GetTypeInfo(lambda.Lambda.Body.Type).IsList(out _);
         if (bindsAListItemThatIsAList) throw AListItemThatIsAList(names.Name);
         var blank = lambda.EndsAtAPosition ? positionStart() : StartOf(lambda, sinceTheItem);
-        var shape = InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank);
+        var shape = InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank, names.Name);
         if (shape is NumberShape && blank.ValueKind == JsonValueKind.String)
         {
             using var number = JsonDocument.Parse(blank.GetString()!);
@@ -76,7 +76,7 @@ internal sealed partial class BoundInput
     }
 
     private static BoundInput InNoBody(MemberLambda lambda, MvcNames names, JsonSerializerOptions live, JsonElement blank)
-        => new(lambda.Scope + "__" + names.IdOfTheName, names.Name, [], InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank), new LitExpression(blank), false);
+        => new(lambda.Scope + "__" + names.IdOfTheName, names.Name, [], InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank, names.Name), new LitExpression(blank), false);
 
     internal InputBinding Binding(ComponentInput input, string invalidClass, bool hidden)
         => new(

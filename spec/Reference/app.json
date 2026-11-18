@@ -4175,6 +4175,21 @@
       ]
     },
     {
+      "feature": "M7.F1",
+      "for": "M7.X8",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M7.F2",
       "for": "X14.5",
       "index": 0,

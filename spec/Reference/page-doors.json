@@ -3061,6 +3061,14 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M7.F1 M7.X8 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/InputsAndIds/OutingLocationsLatitude.cshtml",
+      "/Refusals/InputsAndIds/OutingWholeLocation.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M7.F1 X14.10 0": {
     "modules": [],
     "views": [

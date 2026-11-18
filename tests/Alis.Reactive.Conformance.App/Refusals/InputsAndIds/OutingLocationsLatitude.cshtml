@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Outing
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Outing";
+    var plan = Html.ReactivePlan<Outing>();
+}
+<h1>Outing</h1>
+@(Html.InputField(plan, m => m.Location.Lat, options => options.Label("Latitude")).NativeTextBox())
+<p id="saved"></p>
+<button type="button" @Html.Raises(plan, Outings.Save)>Save</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(Outings.Save, pipeline => pipeline
+        .Post<Outing>(RefusalEndpoints.Outings, request => request.UrlEncoded(body => body.Input(r => r.Location.Lat, pipeline.Input(m => m.Location.Lat))))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

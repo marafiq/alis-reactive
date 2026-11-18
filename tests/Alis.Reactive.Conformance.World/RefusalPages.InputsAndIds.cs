@@ -10,4 +10,6 @@ public static partial class RefusalPages
     public const string FamilyPrefixLeftAsItsPlanStarted = Area + "inputs-and-ids/family/prefix-left-as-its-plan-started";
     public const string DepartureRoomTwice = Area + "inputs-and-ids/departure/room-twice";
     public const string DepartureRoomOnce = Area + "inputs-and-ids/departure/room-once";
+    public const string OutingWholeLocation = Area + "inputs-and-ids/outing/whole-location";
+    public const string OutingLocationsLatitude = Area + "inputs-and-ids/outing/locations-latitude";
 }

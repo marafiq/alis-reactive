@@ -1886,6 +1886,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   removal (:1130, :2249), actionComplete only once every file's upload completes (:2306-2313), and selected,
   removing and clearing before the list changes (D701); a listener EJ2's public addEventListener holds is notified
   by trigger alone.
+- The owner, 2026-11-17, answering the lead's ask B (an input bound to a whole object, a list of objects or a
+  dictionary), verbatim: "B - approved but note down improvement to be made." Read by the lead: such an input is
+  refused where its field renders, naming the doors that carry it (an input per member, `Html.PartialFor(m => m.Member)`,
+  or `Set` from the component in a JSON body); InputShapes.Of's last arm refuses, after the uploader's file arm lands.
+  The improvement to be made, after 1.0, from the investigation of 2026-11-17 (complex/reply.md, part C): an input whose
+  value is an object, a list of objects or a dictionary, sent in a query or form data as MVC binds it
+  (`Location.Lat=..`, `Items[0].Name=..`, `Doses[morning]=..`). Five pieces: a wire form in the grammar for an object's
+  fields (JSON name, C# name, form; a list's item and a dictionary's value as one); the C# writer naming each field's C#
+  name on both hosts (a second use of the type-information read on the owner's list, WrittenMember.cs); the runtime's
+  fields with D9.10's rows nested; Validation showing a failure under the input's path at that input and re-checking it
+  live; probes and browser tests on both hosts (a dictionary of objects, a key holding a dot or a bracket, empty list and
+  dictionary, MVC 5's short form, number, enum and Guid keys). Its trigger: an app that brings such a component.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

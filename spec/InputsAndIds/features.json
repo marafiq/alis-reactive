@@ -293,6 +293,11 @@
           "id": "M7.X7",
           "rung": "behavior",
           "defect": "A field renders the framework's class names whatever the app chose, or an invalid input takes alis-has-error, so an app's stylesheet styles nothing: the field's wrapper, label, required marker and message slot render the names AddReactiveClassNames sets, each unset name its default, and C# writes InvalidInput into each input's binding as its invalidClass (M7.N4)."
+        },
+        {
+          "id": "M7.X8",
+          "rung": "refusal",
+          "defect": "An input bound to a member the app's JSON options write as an object, a dictionary, or a list of objects, dictionaries or lists renders with a shape no form data field writes, so a request that sends it in a query or form data stops in the browser on code the framework has not built, and a JSON body sends what the component holds in no form its endpoint binds. The rewrite refuses it where its field renders, naming the doors that carry it (D14.3): \"Input 'Location' binds Place, which the app's JSON options write as an object\"."
         }
       ],
       "promises": [
@@ -372,6 +377,14 @@
           "outcome": "After the first Save, Name's box carries is-invalid and not alis-has-error, and \"Name the resident.\" shows in an element of class invalid-feedback; after Ada and the second Save, the box carries neither class and no message shows.",
           "opposite": "With no AddReactiveClassNames call, the same first Save gives Name's box alis-has-error and shows the message in an element of class alis-field__message.",
           "defect": "The field writes the framework's names whatever the app chose, so the box takes alis-has-error and the message shows in alis-field__message, which the app's stylesheet does not style; or the box keeps is-invalid after Ada is saved."
+        },
+        {
+          "for": "M7.X8",
+          "page": "An outing view whose input binds m => m.Location, where Location is a Place of Lat and Lng the app's JSON options write as an object.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"Input 'Location' binds Place, which the app's JSON options write as an object, and an input binds a member the browser sends as one text, a list of texts or files: bind an input to each value it holds, render its view with Html.PartialFor, or Set it in a JSON body from the component that holds it.\"",
+          "opposite": "An input of m => m.Location.Lat renders, and its save posts Location.Lat, which the endpoint binds and answers Latitude: 51.5.",
+          "defect": "The page renders a text box over the whole location, and a request that sends it stops in the browser on code the framework has not built, so nothing the person types there reaches the endpoint."
         }
       ],
       "verdicts": [

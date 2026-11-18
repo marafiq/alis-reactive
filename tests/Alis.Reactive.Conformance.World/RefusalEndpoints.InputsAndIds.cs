@@ -6,4 +6,5 @@ public static partial class RefusalEndpoints
     public const string DoseOrders = "/refusals/inputs-and-ids/dose-orders";
     public const string Families = "/refusals/inputs-and-ids/families";
     public const string Departures = "/refusals/inputs-and-ids/departures";
+    public const string Outings = "/refusals/inputs-and-ids/outings";
 }

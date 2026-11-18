@@ -3508,6 +3508,13 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     refused naming the nullable member to bind (X14.14), every other one naming the type and how the contract writes it
     (X14.15). Chosen within the owner's yes at gate 1: C11 lifts the refusal of a generic declaring class, which also
     refused `m => m.Dose.Value` and `m => m.Items.Count`, with the generic class's message. The owner can overrule it.
+  - An input binds a member the browser sends as one text, a list of texts or files (the owner, 2026-11-17): a member
+    the app's JSON contract writes as an object or a dictionary, or as a list of objects, of dictionaries or of lists,
+    is refused where its field renders, naming its type, how the contract writes it and the doors that carry it: an
+    input for each value it holds, `Html.PartialFor`, and `Set` in a JSON body from the component that holds it
+    (M7.X8). A list of lists meets the same refusal, since an inner list that holds no items sends no field and ends
+    the outer list there (D9.10). A file member and a list of files bind, and so does a component whose input is a
+    list of objects over a member that holds one (M7.N3).
   - A lambda is bound only when MVC's name names each step it takes from the model: a member, a single-argument
     indexer, an array position. MVC stops its name at any other call (`Find(..)`, `Substring(1)`) and keeps what lies
     outside it, so the form would post the input under a name that binds nothing; the framework counts the steps
@@ -3544,7 +3551,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - At render, within one plan:
     - R14.1 an input or a partial whose lambda MVC's name does not name step by step from the model (a call that
       is no indexer, a value the view holds), an input whose lambda names no member, a member an interface declares,
-      or a member of a type the app's JSON contract writes as one value or a list (D14.3);
+      a member of a type the app's JSON contract writes as one value or a list, or an input whose member it writes as
+      an object, a dictionary, or a list of objects, dictionaries or lists (D14.3);
     - R14.2 an input, or a pipeline's read of one, under a prefix its view took after its plan started, and a plan's
       block that ends under such a prefix, since MVC's own doors after the move (`EditorFor` for the next member)
       render under it while no input of the view need follow (`Partials.tla:PageReadFindsEachAttachedInput`);
