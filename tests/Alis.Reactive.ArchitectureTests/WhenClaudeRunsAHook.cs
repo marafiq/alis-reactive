@@ -23,6 +23,9 @@ public class WhenClaudeRunsAHook
         "grep -rn --include=\"*.cs\" foo .",
         "codex exec -s read-only \"brief\"",
         "caffeinate -i codex exec -s read-only \"brief\" > out.log 2>&1",
+        "for unit in \"ci Handoff\" \"skill BuildAScreen\"; do set -- $unit; echo \"$1\"; done",
+        "names=\"a b\"; for name in $names; do echo \"$name\"; done",
+        "TSC=\"node tsc -b\"\n$TSC > tsc.log 2>&1",
     ];
 
     private static readonly string[] OneFactFromACommandThisMachineGetsWrong =
@@ -34,6 +37,10 @@ public class WhenClaudeRunsAHook
         "git grep -n foo -- \"*.cs\"",
         "pgrep -f \"codex exec -s read-only\"",
         "caffeinate -i codex exec -s read-only \"brief\" < /dev/null > out.log 2>&1",
+        "for name in a b; do set -- one two; echo \"$name $1\"; done",
+        "cat > run.sh <<'EOF'\nfor unit in $units; do set -- $unit; $TOOL \"$1\"; done\nEOF\nbash run.sh",
+        "S=/tmp/work; \"$S/tool\" --version; $S/tool --version; echo $S done",
+        "bash -c 'for name in $names; do echo \"$name\"; done'",
     ];
 
     [Test]

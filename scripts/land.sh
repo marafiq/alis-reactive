@@ -24,7 +24,7 @@ test -n "$paused" && kill -STOP $paused
 echo "[quiet] paused TLC: ${paused:-none}"
 bash "$T/gate.sh" "$n"
 grep -q -x '\[check\] every check passed\.' "$W/gate-$n.log" || { echo "[land] the gate did not pass"; exit 1; }
-test -z "$(git diff --name-only)" || { echo "[land] the gate left unstaged changes:"; git diff --name-only; exit 1; }
+test -z "$(git diff --name-only -- . ':!HANDOFF.md')" || { echo "[land] the gate left unstaged changes:"; git diff --name-only -- . ':!HANDOFF.md'; exit 1; }
 read -r last_run last_sha < .work/last-run.txt
 caffeinate -i scripts/playwright.sh --all > "$W/pw-all-$n.log" 2>&1
 grep -E '^\[playwright:result\] all ' "$W/pw-all-$n.log" | tail -1
@@ -35,7 +35,7 @@ grep -q -E '"label": "all"' "$run/selection.json" || { echo "[land] the newest r
 python3 -I "$T/regressions.py" "$R/$last_run" "$run" "$last_sha" > "$W/regress-$n.txt"
 cat "$W/regress-$n.txt"
 grep -q -x "no test that passed at $last_sha fails or is gone" "$W/regress-$n.txt" || { echo "[land] a test that passed before fails; not committed"; exit 1; }
-test -z "$(git diff --name-only)" || { echo "[land] the browser run left unstaged changes:"; git diff --name-only; exit 1; }
+test -z "$(git diff --name-only -- . ':!HANDOFF.md')" || { echo "[land] the browser run left unstaged changes:"; git diff --name-only -- . ':!HANDOFF.md'; exit 1; }
 python3 -I "$T/stamp.py" "$msg" "$W/pw-all-$n.log" "$W/regress-$n.txt" "$W/stamped-$n.txt" || { echo "[land] the message could not be stamped"; exit 1; }
 ALIS_LANDING=1 git commit -q -F "$W/stamped-$n.txt" || { echo "[land] the commit failed"; exit 1; }
 printf '%s %s\n' "$(basename "$run")" "$(git rev-parse --short=9 HEAD)" > .work/last-run.txt

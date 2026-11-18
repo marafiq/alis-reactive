@@ -126,6 +126,8 @@ scripts/stamp.py                      stamp a commit message with the browser ru
 scripts/tlc.sh                        pause or resume TLC processes
 scripts/open.py                       list unwritten promises, runtime cases not built and doors not implemented
 scripts/handoff.py                    generate HANDOFF.md from facts, preserving the lead's next queue
+scripts/state.py                      print the process's state machine: each note, unit, the lane, CI and each file
+scripts/ci.py                         read the jobs of the remote head's run, each by its result
 
 Alis.Reactive/                        net48;net10.0, PackageId AlisReactive, AlisSliceTree on
   SliceTree.txt BannedSymbols.txt PublicAPI/net48/ PublicAPI/net10.0/
@@ -200,7 +202,7 @@ spec/                                         the design source: BRIEF.md, REWRI
 
 Beside the tree the repository keeps `.claude/settings.json`, `.claude/hooks/protect-generated.mjs`, `.claude/hooks/refuse-known-traps.mjs`,
 `.claude/rules/analyzers.md`, `.claude/rules/csharp.md`, `.claude/rules/docs.md`, `.claude/rules/tests.md`,
-`.claude/rules/views.md`,
+`.claude/rules/views.md`, `.claude/rules/process.md`,
 `.claude/skills/onboard-component`, `.claude/skills/prove-behavior`, `.claude/agents/builder.md`,
 `.claude/agents/designer.md`, `.claude/agents/page-writer.md` and `.claude/agents/pragmatic-architect.md`, which
 the cut rewrites for the new tree, and `.github/actions`, `.github/dependabot.yml` and `.github/release.yml`. Each project
@@ -467,7 +469,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | Vitest | vitest 5.1.0, with vite 8.3.8, the peer it requires; node environment, no jsdom | a runtime module's pure tests of what its index exports (1.2): the files that end in .test.ts under the runtime, which the root's `vitest.config.js` names |
 | @microsoft/signalr | 10.0.11 | the hub's own asset; held on the 10.0 line, the line of the hub it talks to (the latest is 11.0.0) |
 | Probe packages | jsdom 31.0.0, parse5 8.1.1, ws 8.22.2 | what the node probes load beside the pins they read: a DOM for EJ2's code, HTML's parser and a WebSocket server; no test loads them |
-| OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/resources 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.2 | the adapter's bundle (N20.2); sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
+| OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/resources 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.2, with @types/node 26.6.6, which the exporter's declarations name | the adapter's bundle (N20.2); `tsc -b` reads the exporter's declarations, which reference Node's types, so the lock holds them, on the line of the pinned Node; sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
 | Server tracing | OpenTelemetry.Exporter.InMemory 1.20.1, OpenTelemetry.Extensions.Hosting 1.20.1, OpenTelemetry.Instrumentation.AspNetCore 1.20.2 | the conformance app's `tracing` host; held on the 10.0 line, since 1.21.0's net10.0 build takes System.Diagnostics.DiagnosticSource 11.0.0 (the latest is 1.21.0) |
 | Roslyn | Microsoft.CodeAnalysis.CSharp 4.14.0 for the analyzer projects; 5.9.0 for the projects that host the compiler | 4.14.0 is the floor, the lowest compiler the packed analyzers load in: a compiler below an analyzer's Roslyn refuses to load it (CS9057), and 4.14.0 is Visual Studio 2022's last, so an MVC 5 app built there runs every rule; the analyzer cases, the test-rule cases and the architecture tests host 5.9.0, the latest, which parses C# 14 (`LanguageVersion.CSharp14`) |
 | Analyzer authoring | Microsoft.CodeAnalysis.Analyzers 5.9.0, private | the compiler's own rules for an analyzer project, release tracking among them (`.claude/rules/analyzers.md`) |

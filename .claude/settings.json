@@ -28,6 +28,15 @@
             "command": "sh \"$CLAUDE_PROJECT_DIR/scripts/install-git-hooks.sh\" >/dev/null 2>&1 || true"
           }
         ]
+      },
+      {
+        "matcher": "compact|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/spec/tools/check.py\" --orient"
+          }
+        ]
       }
     ],
     "PreToolUse": [

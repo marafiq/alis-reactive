@@ -20,6 +20,7 @@ def git(*args):
 
 handoff = root / "HANDOFF.md"
 next_text = "\nThe lead writes the queue here in the plan's words.\n"
+notes_text = "\nNone open.\n"
 if handoff.exists():
     with handoff.open(newline="") as existing:
         previous = existing.read()
@@ -28,6 +29,8 @@ if handoff.exists():
     if len(starts) != 1 or len(ends) != 1 or starts[0].end() >= ends[0].start():
         raise SystemExit("HANDOFF.md must hold one ordered pair of next markers")
     next_text = previous[starts[0].end():ends[0].start()]
+    held = re.search(r"^<!-- notes -->\r?$(.*?)^<!-- /notes -->\r?$", previous, re.M | re.S)
+    notes_text = held.group(1) if held else notes_text
 
 branch = git("branch", "--show-current") or "detached HEAD"
 head = git("rev-parse", "--short=9", "HEAD")
@@ -50,20 +53,14 @@ if state:
         landed_args.append(f"{parents[1]}..HEAD")
 landed = git(*landed_args)
 opened = command(sys.executable, "scripts/open.py").rstrip("\n")
-unlanded = []
-for entry in git("worktree", "list", "--porcelain", "-z").split("\0\0"):
-    fields = dict(field.split(" ", 1) for field in entry.split("\0") if " " in field)
-    if "worktree" not in fields:
-        continue
-    worktree = Path(fields["worktree"])
-    if worktree.resolve() == root:
-        continue
-    changed = git("-C", str(worktree), "status", "--porcelain").splitlines()
-    if not changed:
-        continue
-    base = git("merge-base", "HEAD", fields["HEAD"])
-    relative = os.path.relpath(worktree, root)
-    unlanded.append(f"- {relative}: base {base}, {len(changed)} paths changed")
+machine = command(sys.executable, "scripts/state.py").rstrip("\n")
+def kinds(text):
+    return {row.group(1).strip(): int(row.group(2)) for row in re.finditer(r"^\| ([^|]+?) \| (\d+) \|", text, re.M)}
+
+
+counted = kinds(Path("spec/MISTAKES.md").read_text())
+pushed = kinds(git("show", f"{state}:spec/MISTAKES.md")) if state else counted
+grew = [f"- {kind}: {pushed.get(kind, 0)} to {count}" for kind, count in counted.items() if count > pushed.get(kind, 0)]
 decisions = []
 for number, line in enumerate(Path("spec/CLAUDE.md").read_text().splitlines(), 1):
     dated = re.match(r"^- The owner, (\d{4}-\d{2}-\d{2})", line)
@@ -75,6 +72,9 @@ body = "\n".join([
     "# Handoff",
     "",
     f"Written at `date`: {date}",
+    "",
+    "## State, as `scripts/state.py` reads it from git",
+    machine,
     "",
     "## Where it stands",
     f"- Branch: {branch}",
@@ -88,11 +88,14 @@ body = "\n".join([
     "## Open",
     opened,
     "",
-    "## Unlanded work",
-    "\n".join(unlanded) if unlanded else "No other worktree has uncommitted paths.",
+    "## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file",
+    "\n".join(grew) if grew else "None.",
     "",
     "## The owner's latest decisions",
     "\n".join(owners) if owners else "No dated owner decision is recorded.",
+    "",
+    "## The owner's notes that are open: date | kind | home | follow-up | the owner's words",
+    "<!-- notes -->" + notes_text + "<!-- /notes -->",
     "",
     "## Next",
     "<!-- next -->" + next_text + "<!-- /next -->",

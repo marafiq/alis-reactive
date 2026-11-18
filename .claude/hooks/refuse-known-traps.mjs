@@ -4,7 +4,13 @@ process.stdin.on("data", (chunk) => (raw += chunk));
 process.stdin.on("end", () => {
   const input = JSON.parse(raw);
   const command = input.tool_input?.command ?? "";
-  const refusal = [gitGrepsWithAClassTheMachineLacks, runsTheBrowserTestsByAFilter, searchesWithGrepInclude, startsCodexWithItsInputOpen]
+  const refusal = [
+    gitGrepsWithAClassTheMachineLacks,
+    runsTheBrowserTestsByAFilter,
+    searchesWithGrepInclude,
+    startsCodexWithItsInputOpen,
+    splitsAVariableIntoWordsAsBashDoes,
+  ]
     .map((trap) => trap(command))
     .find((reason) => reason !== undefined);
   if (refusal !== undefined) {
@@ -61,5 +67,32 @@ function startsCodexWithItsInputOpen(command) {
   const starts = /(^|[;&|]\s*|\bcaffeinate\s+(-\w+\s+)*)codex exec\b/.test(command);
   return starts && !/<\s*\/dev\/null/.test(command)
     ? "codex exec reads its input and waits on it: start it with < /dev/null (CLAUDE.md, How you work)."
+    : undefined;
+}
+
+function outsideHeredocsAndSingleQuotes(command) {
+  const lines = command.split("\n");
+  const kept = [];
+  let until = "";
+  for (const line of lines) {
+    if (until !== "") {
+      if (line.trim() === until) until = "";
+      continue;
+    }
+    kept.push(line.replace(/'[^']*'/g, "''"));
+    const heredoc = /<<-?\s*['"]?([A-Za-z_][A-Za-z0-9_]*)['"]?/.exec(line);
+    if (heredoc !== null) until = heredoc[1];
+  }
+  return kept.join("\n");
+}
+
+function splitsAVariableIntoWordsAsBashDoes(command) {
+  const shell = outsideHeredocsAndSingleQuotes(command);
+  const splits =
+    /(^|[\s;&|(])set\s+--\s+\$\{?[A-Za-z_]/.test(shell) ||
+    /(^|[\s;&|(])for\s+[A-Za-z_][A-Za-z0-9_]*\s+in\s+\$\{?[A-Za-z_]/.test(shell) ||
+    /(^|[;&|]\s*|\n\s*)\$\{?[A-Za-z_][A-Za-z0-9_]*\}?[ \t]+[^=\s]/.test(shell);
+  return splits
+    ? "zsh does not split a variable into words as bash does: `set -- $name`, `for x in $name` and a command held in a variable each run as one word here. Write the words out, or run it as a bash script (CLAUDE.md, How you work)."
     : undefined;
 }

@@ -87,7 +87,11 @@ public class WhenAConsumerAppIsBuilt
 
         Assert.That(
             await WhatTheBuiltAppDoesNotServe(app),
-            Is.EqualTo(new[] { "/_content/AlisReactive/js/alis-reactive.js answers 404: the app's static web assets serve no file of its package there" }));
+            Is.EqualTo(new[]
+            {
+                "/_content/AlisReactive/js/alis-reactive-hub.js answers 404: the app's static web assets serve no file of its package there",
+                "/_content/AlisReactive/js/alis-reactive.js answers 404: the app's static web assets serve no file of its package there",
+            }));
     }
 
     [AcceptedCase]

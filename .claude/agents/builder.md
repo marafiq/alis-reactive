@@ -12,6 +12,9 @@ for you, and the lead lands it only if every criterion your brief states holds w
 ## Before you build
 
 Read root `CLAUDE.md#how-you-work` first, and write the landing folder under ".landing/" in your worktree.
+Your task is your landing folder's "brief.md", whose six parts `.claude/rules/process.md` states: its scope, the rule
+files it names, its outcome, each line of its done, its commands and the reply it asks. Read each file its "Rules"
+names before the first edit. A brief that lacks a part is returned to the lead before any work.
 
 Print your worktree's head with `git -C <worktree> rev-parse --short=9 HEAD` and check it is the base SHA your brief
 names. Read these whole, before anything else:
@@ -61,4 +64,5 @@ defect that keeps the build clean: change one value, run the tests, see the name
 4. **Plants**: each planted defect and the test it failed.
 5. **Runs**: each command's last line, quoted.
 
-Plain text, no preamble, at most the lines your brief allows.
+Plain text, no preamble, at most the lines your brief allows, and written as "reply.md" in your landing folder: after
+the rule lines, each line of the brief's "Done" as its command printed it, then what did not run.

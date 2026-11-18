@@ -9,6 +9,10 @@ writes finishes to the full bar before anything reads the work.
 
 ## Before you write
 
+Your task is your landing folder's "brief.md", whose six parts `.claude/rules/process.md` states: its scope, the rule
+files it names, its outcome, each line of its done, its commands and the reply it asks. Read each file its "Rules"
+names before the first edit. A brief that lacks a part is returned to the lead before any work.
+
 Print the head of your worktree with `git rev-parse --short=9 HEAD` and stop if it is not your brief's base SHA. Read
 these whole, before anything else:
 
@@ -50,4 +54,5 @@ these whole, before anything else:
 4. **Runs**: each command you ran on the finished files and the line it printed. A check your files meet is run
    before you reply, so the lead runs it once where the work lands and never again.
 
-Plain text, no preamble, at most the lines your brief allows.
+Plain text, no preamble, at most the lines your brief allows, and written as "reply.md" in your landing folder: after
+the rule lines, each line of the brief's "Done" as its command printed it, then what did not run.

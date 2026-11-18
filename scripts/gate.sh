@@ -5,7 +5,7 @@ test "$#" -eq 1 || { echo "usage: gate.sh <name>"; exit 1; }
 n="$1"; W=.work/logs
 mkdir -p "$W" || exit 1
 test "$(git branch --show-current)" != main || { echo "gate not run: main is refused"; exit 1; }
-test -z "$(git diff --name-only)" || { echo "gate not run: unstaged changes"; git diff --name-only; exit 1; }
+test -z "$(git diff --name-only -- . ':!HANDOFF.md')" || { echo "gate not run: unstaged changes"; git diff --name-only -- . ':!HANDOFF.md'; exit 1; }
 if git diff --cached --name-only | grep -q -E '(^|/)CLAUDE\.md$|^\.claude/(rules|agents|skills)/'; then
   dotnet test tests/Alis.Reactive.ArchitectureTests --filter "FullyQualifiedName~WhenARuleNamesTheCode" > "$W/rule-names-$n.log" 2>&1
   code=$?

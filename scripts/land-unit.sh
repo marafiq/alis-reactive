@@ -19,11 +19,13 @@ for landing in "$@"; do
   folders+=("$d")
 done
 mkdir -p "$W" || exit 1
-[ -z "$(git diff --name-only)" ] || { echo "[$batch] unstaged changes before the batch"; exit 1; }
+[ -z "$(git diff --name-only -- . ':!HANDOFF.md')" ] || { echo "[$batch] unstaged changes before the batch"; exit 1; }
 mistakes=0
 for d in "${folders[@]}"; do
   slice="$(basename "$d")"
   [ -f "$d/paths.txt" ] && [ -f "$d/message.txt" ] || { echo "[$batch] $slice: no paths.txt or message.txt"; exit 1; }
+  [ "$d" = "$P/.landing/$slice" ] || { echo "[$batch] $slice: a landing folder lives under its worktree's .landing"; exit 1; }
+  python3 -I -B scripts/state.py --unit "$P" "$slice" || { echo "[$batch] $slice: not ready, as scripts/state.py reads it"; exit 1; }
   while IFS= read -r path; do
     [ -n "$path" ] || continue
     if [ "$path" = "spec/MISTAKES.md" ]; then mistakes=1; continue; fi
@@ -71,7 +73,7 @@ git add -- spec
 python3 spec/tools/check.py --generate > /dev/null || { echo "[$batch] check.py --generate refused"; exit 1; }
 git checkout -- spec/STATE.json 2>/dev/null
 git add -- tests/Alis.Reactive.Conformance.World/Promises.g.cs tests/Alis.Reactive.Conformance.World/Gates.g.cs
-[ -z "$(git diff --name-only)" ] || { echo "[$batch] unstaged changes after staging"; git diff --name-only; exit 1; }
+[ -z "$(git diff --name-only -- . ':!HANDOFF.md')" ] || { echo "[$batch] unstaged changes after staging"; git diff --name-only -- . ':!HANDOFF.md'; exit 1; }
 python3 -I -B - "$W/msg-$batch.txt" "$title" .work/attribution.txt "${folders[@]}" <<'PYMESSAGE' || exit 1
 import sys
 import re
@@ -94,7 +96,7 @@ parts += ["",
 Path(out).write_text("\n".join(parts) + "\n")
 PYMESSAGE
 caffeinate -i bash scripts/land.sh "$batch" "$W/msg-$batch.txt" > "$W/land-$batch.log" 2>&1
-if [ -z "$(git status --porcelain --untracked-files=no)" ] && [ "$(git log -1 --format=%s)" = "$title" ]; then
+if [ -z "$(git status --porcelain --untracked-files=no -- . ':!HANDOFF.md')" ] && [ "$(git log -1 --format=%s)" = "$title" ]; then
   echo "[$batch] landed $(git rev-parse --short=9 HEAD): $(grep -E 'selected, .* ran' "$W/land-$batch.log" | tail -1)"
 else
   echo "[$batch] did not land; read $W/land-$batch.log"; grep -E "\[land\]|\[check\]|no test that passed|fails" "$W/land-$batch.log" | tail -4; exit 1

@@ -22,29 +22,19 @@ of mistake and what holds it is `spec/MISTAKES.md`; the one place of every other
 section 1.3. These are read before the first edit of a unit: the commands below carry the work and are never what
 makes it good (the owner, 2026-11-17: "he does not mention any quality rules where they were living").
 
-Start: run `scripts/doctor.sh`, source `scripts/toolchain-env.sh`, read `HANDOFF.md` and run `scripts/open.py`.
+The process is `.claude/rules/process.md`: one state machine, whose table `scripts/state.py` reads as its data. The
+script prints the state of each of the owner's notes, of each unit, of the landing lane, of CI and of each file a
+reader is given, and for each what to read first, the one command that leaves it and its exit line. A unit starts
+from its brief, whoever builds it; a note of the owner's is homed the turn it arrives; a mistake is counted where it
+is found and read at every start. Nothing a session reads to resume lives outside the repo (the owner, 2026-11-18).
 ```bash
 scripts/doctor.sh
 . scripts/toolchain-env.sh
+python3 scripts/state.py
 python3 scripts/open.py
 ```
-A unit starts in a worktree from the pushed head: read every file it touches, write the test red first, write the code, turn the test green and have `scripts/plant-defect.sh` catch its defect.
-```bash
-git worktree add --detach ".worktrees/<name>" "<pushed sha>"
-```
-Its landing folder is ".landing/<Name>/" in that worktree, holding "paths.txt", "message.txt" and "spec.py".
-Land the unit with `scripts/land-unit.sh`; landing folders are relative to the source worktree or absolute.
-```bash
-scripts/land-unit.sh "<worktree>" "<base sha>" "<title>" ".landing/<Name>"
-```
-Push after `scripts/full-check.sh` with `scripts/push.sh`, which writes `HANDOFF.md`.
-```bash
-scripts/full-check.sh
-scripts/push.sh
-```
-Status to the owner is `scripts/open.py`'s first line and its lists, never a sentence carried from an earlier status (the owner, 2026-11-17).
 Builds run one at a time, with a read-only consult beside the build (the owner, 2026-11-17: "Work serially once current work lands and pushed").
-Commands on this Mac: git grep's extended expressions take no \b and no \s; zsh ties the variable path to PATH and expands $var:A, so a script is bash and writes ${var}; BSD sed's in-place edit takes ''; a tool that reads its input is started with < /dev/null.
+Commands on this Mac: git grep's extended expressions take no \b and no \s; zsh ties the variable path to PATH, expands $var:A and runs a command held in a variable as one word, so a script is bash and writes ${var}; BSD sed's in-place edit takes ''; a tool that reads its input is started with < /dev/null.
 The browser runner takes --test or --all here and no --filter.
 ```bash
 git grep -E '<pattern>' -- '<glob>'
@@ -54,23 +44,6 @@ scripts/playwright.sh --test "<promise>"
 scripts/playwright.sh --all
 ```
 A script bash is running is never edited; a planted file is restored by cp and touch, since mv keeps the old time.
-
-The mistakes made most, and what stops each. The eight kinds and their counts are `spec/MISTAKES.md`; a count is a
-meter and no journal: a kind that grows after its tool landed means the tool is wrong (the owner, 2026-11-17: "mistake
-log was created only to prevent mistakes, not to keep a journal"). Read these before each piece:
-- A command wrong in its own terms (the largest kind). The shapes above are refused before they run by
-  `.claude/hooks/refuse-known-traps.mjs`. An edit or a read of more than one line is a Python script that asserts each
-  match's count before it writes; a long output is filtered to the lines that decide.
-- A rule or a tool's list not applied before the change. A commit is made only by `scripts/land-unit.sh` or
-  `scripts/push.sh`: the pre-commit hook refuses any other where `scripts/land.sh` stands.
-- Written from memory. Before a page, a test, a line or an answer to the owner is written, its landed exemplar and
-  the file it goes into are read at HEAD; a claim about what the repository holds carries its file and line.
-- A number or an absence not read from the run that proves it. The result line is read when it prints, CI's line by
-  its commit among them; "not built" and "no test" are `scripts/open.py`'s output.
-- Said in a way that blurred what holds. A status is `scripts/open.py`'s first line and its lists.
-- The process put before the product. A push per unit; no check of a check.
-- A costly agent run on an unproven environment. The brief names the exact commands, probed first.
-- The toolchain kept where the system deletes it. `scripts/toolchain-env.sh` and `scripts/doctor.sh` name its home.
 
 ## Vision: typed access to JavaScript objects
 
@@ -184,7 +157,7 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | A comment in any language; an XML doc off a shipped package's public surface | `WhenCodeIsWritten` |
 | A rule file that names code the repo does not hold | `tests/Alis.Reactive.ArchitectureTests/WhenARuleNamesTheCode.cs` |
 | A hand edit of the generated contract | `.claude/hooks/protect-generated.mjs`, held by `WhenClaudeRunsAHook` |
-| A command in a shape this machine gets wrong: a `git grep` extended expression with a class it lacks, the browser runner by a filter, `grep --include`, Codex started with its input open | `.claude/hooks/refuse-known-traps.mjs`, held by `WhenClaudeRunsAHook` |
+| A command in a shape this machine gets wrong: a `git grep` extended expression with a class it lacks, the browser runner by a filter, `grep --include`, Codex started with its input open, a variable split into words as bash splits it | `.claude/hooks/refuse-known-traps.mjs`, held by `WhenClaudeRunsAHook` |
 | A commit the landing script did not make, where `scripts/land.sh` stands | the pre-commit hook `scripts/install-git-hooks.sh` installs |
 | An untyped public door | `ALIS009` |
 | A slice that uses a later row; a namespace off its folder; an open public class; a table off its project | `ALIS010`, `ALIS011`, `ALIS012`, `ALIS013` |
@@ -335,7 +308,9 @@ slip is about you invented so you can avoid accountability about mistakes").
   `scripts/land-unit.sh` (merge a worktree's landing folders and land one commit), `scripts/full-check.sh` (the full
   spec check at HEAD), `scripts/push.sh` (push the checked branch, STATE and handoff), `scripts/regressions.py`
   (compare browser runs), `scripts/stamp.py` (stamp a message with its run), `scripts/tlc.sh` (pause or resume TLC),
-  `scripts/open.py` (list unwritten promises and unbuilt code), `scripts/handoff.py` (write the handoff from facts).
+  `scripts/open.py` (list unwritten promises and unbuilt code), `scripts/handoff.py` (write the handoff from facts),
+  `scripts/state.py` (the state of every note, unit, lane, CI reading and file, with the command that leaves it),
+  `scripts/ci.py` (read the jobs of the remote head's run, each by its result).
   A script joins this list with the commit that writes it.
 - Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a hold names its
   reason in `spec/REWRITE.md` section 2.7, and Syncfusion's is the owner's (`node scripts/pin-syncfusion.mjs <version>`).
@@ -345,5 +320,6 @@ slip is about you invented so you can avoid accountability about mistakes").
 
 The spec is the reference for a door that is not built; the code and its XML docs are the reference for one that is.
 Rules for one kind of file live in `.claude/rules/` and load with such a file: `tests.md` (`tests/`), `views.md`
-(`.cshtml`), `csharp.md` (`.cs`), `analyzers.md` (an analyzer project and its cases) and `docs.md` (docs). A project's
+(`.cshtml`), `csharp.md` (`.cs`), `analyzers.md` (an analyzer project and its cases), `docs.md` (docs) and
+`process.md` (the process, with every file). A project's
 own `CLAUDE.md` holds its standard, its command and what it refuses. This file wins. `AGENTS.md` is a symlink to it.

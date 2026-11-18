@@ -10,6 +10,7 @@
     "@opentelemetry/resources": "3.1.1",
     "@opentelemetry/sdk-trace": "3.1.1",
     "@syncfusion/ej2": "33.1.47",
+    "@types/node": "26.6.6",
     "esbuild": "0.28.2",
     "eslint": "10.14.0",
     "jsdom": "31.0.0",

@@ -1764,8 +1764,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   JsonResponses.Net48.cs of `RequestsAndResponses`, which writes the body under those options. (4) The twin links the
   app's views and models; a controller of a page placed on net48 has a file beside it named for its host, Net48, which
   the twin alone compiles and the app's project leaves out; the twin holds its own layouts, which link with
-  Url.AppendVersion. (5) Visual Studio's MSBuild builds the fresh MVC 5 app (`msbuild /restore` after the
-  setup-msbuild action, pinned by its SHA), the one form a run has proven; the twin is SDK-style on net48 and builds
+  Url.AppendVersion. (5) Visual Studio's MSBuild builds the fresh MVC 5 app (`msbuild /restore`, MSBuild found by
+  vswhere and put on the PATH by a step of the job's own, since the setup-msbuild action left it off the PATH once the
+  runner's image held Visual Studio 18: the lead, 2026-11-18, from the job's log at af5ad37a9); the twin is SDK-style on net48 and builds
   with `dotnet build`. (6) A script delivery.sh beside the others is the delivery proof's one command: it packs at a
   version of the run's own, builds the fresh net10 app from the packs, and runs WhenAConsumerAppIsBuilt and the
   browser tests under consumerNet10; `scripts/check.sh` leaves WhenAConsumerAppIsBuilt out by name. (7) A fixture
@@ -1932,6 +1933,63 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
   an agent's draft is a lead until its cites are re-read at the source.
+- The owner, 2026-11-18, after the lead reported that the hook a compaction runs printed a file of the lead's private
+  folder (verbatim in `spec/NOTES.md`): "It shouldn't be reading your private files, sir." It reads inside the repo:
+  "That's not the right way." And of the process: a "state machine, so that it is crystal clear". So nothing
+  a session reads to resume lives outside the repo: `HANDOFF.md` is the handoff, the tracked `.claude/settings.json`
+  holds the hook that prints it after a compaction, and the survival check reads both. The process is one state
+  machine, the table of `.claude/rules/process.md`, which `scripts/state.py` reads as its data: each state, what
+  holds in it, what is read first, the one command that leaves it, its exit line and where a failure goes. The
+  lead's line within it, the owner's to change: the lane's scripts leave a changed `HANDOFF.md` alone, so its queue
+  is edited while a unit lands and goes out with the next push.
+- The owner, 2026-11-18, of that machine (both verbatim in `spec/NOTES.md`): "Is there a mistake read part of the state
+  machine? How it gets logged, how it gets read, what is read by you, what is read by agents, is there any
+  difference? Document that whole process", and "If you are handing out work to agents, have it that as a part of the
+  state machine. Is the scope and the outcomes defined? Definition of done is clear. And then when it returns work,
+  what is the steps?" So a unit's landing folder holds the files the machine reads: "brief.md" before any work, its
+  six parts Scope, Rules, Outcome, Done, Commands and Reply, the one thing an agent is handed beside its definition and the
+  lead's own for a unit of its own; an agent's "reply.md"; and the lead's "read.md", its steps when work returns,
+  ending in a verdict to land, to send back or to drop. `scripts/land-unit.sh` lands a unit only while the script
+  reads it as ready. A mistake is logged on a failure and at a return, one count in its kind, and read at every
+  start, where the hook prints each kind with its count; `HANDOFF.md` lists each kind that grew since the last push.
+  The process file states who reads what, the lead, a Claude agent and Codex, and what shows it.
+- The owner, 2026-11-18, the same hour (verbatim in `spec/NOTES.md`): "What other steps are missing? How about quality
+  rules? Do they matter to you? how my nodes are gonna be followed up, how you're gonna apply them to quality rules if
+  they belong to it, where you're gonna keep the decisions. So it cannot be one bulky file. So state machine has to be
+  accurate and optimized, not a hellhole." So the machine names each step that was missing. A note of the owner's is
+  an entry of the notes block of `HANDOFF.md` the turn it arrives, with its kind, its home and its follow-up, and the
+  script prints one that lacks any; a quality rule's home is the rule file of its kind of file and a tool on its
+  rung. A brief names, under "Rules", the rule files and the decisions its unit reads. CI's jobs at the pushed
+  commit are a state, read by `scripts/ci.py`. Each file a reader is given has one job and a limit of lines, and
+  the script prints one that is over: this file among them, 2,000 lines whose newest decisions the harness does
+  not show a reader, so its decisions are split by module, word for word, by the unit that follows this one.
+- The owner, 2026-11-18, on the machine as built (verbatim in `spec/NOTES.md`): the mistakes are condensed past a
+  threshold "so that LLMs can comply with it"; "The quality rules must be read"; "TLA plus is the central piece, but
+  don't waste time in process and get nothing done"; "Leave some room for agents to work and for yourself to work";
+  "If it doesn't work in the state machine, then change it. Don't wait for my commands as long as it doesn't lower
+  the quality of the framework"; and of a fault in an agent's work, "clearly you gave a task and you didn't give the
+  instructions. If that happens, that's on you", and it goes into the process. So: `spec/MISTAKES.md` has a
+  limit of lines and of ten kinds, and past it a unit condenses it; a brief's "Rules" name, by path, the rule
+  files, the decisions and the TLA+ spec of each ordering its unit meets, and the script reads a brief that names
+  no file the repo holds as unbriefed; the machine holds the hand-offs alone and adds no step that proves nothing;
+  the lead re-evaluates the machine when ten units have landed since it changed, or when a state fails the work,
+  and changes it without waiting for the owner, never lowering the framework's quality bar; and a fault in
+  returned work is held against the brief first, the lead's mistake where the brief did not give the instruction,
+  with the missing line added to the process file, the agent's definition or the rule file that owns it.
+- The owner, 2026-11-18, after a unit's delivery proof stopped before its browser step (verbatim in `spec/NOTES.md`):
+  "the browser never ran because your process was wrong ... Get it into the process." Mistakes are to be few. The
+  unit had been built on a base where its own proof command was red for a cause another unit fixes. So a brief's
+  "Done" holds a line "At the base:", what each proof command printed at the base before any work, and the script
+  reads a brief without it as unbriefed; a unit whose command is red there for a cause outside it names the unit
+  that fixes the cause on a line "After:", is read as waiting, and is landed only once that unit has landed and its
+  own proof has run on the new head.
+- The owner, 2026-11-18, on the machine as the lead had written it, one table with sentences around it and checks
+  hidden in its script (verbatim in `spec/NOTES.md`): "I thought you were doing state machine. You are back to writing
+  plain instructions again." So `.claude/rules/process.md` is tables alone: six tracks whose rows are states in the
+  order they are tested, each with its guard by name, what is read first, the command that leaves it, its exit line,
+  the state it goes to and where a failure goes; and one table that says what the script checks for each guard.
+  `scripts/state.py` interprets those tables, runs each guard by the function of its name, and stops where a guard
+  stands on one side alone. A rule of the process is a row or a guard, never a sentence beside the table.
 
 ## Modules
 

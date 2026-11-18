@@ -147,8 +147,8 @@
   "edits": [
    {
     "file": "spec/Core/schema.md",
-    "old": "Today 33 kinds, proposed 52: twenty added, one removed",
-    "new": "Today holds 33 kinds and the proposed set 52: twenty added, one removed"
+    "old": "Today 33 kinds, proposed 53: twenty-one added, one removed",
+    "new": "Today holds 33 kinds and the proposed set 53: twenty-one added, one removed"
    }
   ],
   "expect": null

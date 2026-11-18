@@ -659,13 +659,8 @@ The session will compact several times. The summary loses detail, so everything 
 - **`spec/BRIEF.md`:** this brief, copied in step 1 from `~/.claude/projects/-Users-muhammadadnanrafiq-Documents-Code-alis-reactive-framework-1-0-Alis-Reactive/handoff/2026-11-05-spec-first/BRIEF.md`, which holds the same text. Until the branch exists, that copy is the brief. After a compaction, re-read the section you are working in.
 - **`spec/STATE.json`:** written only by `check.py`, never by hand. It holds the current phase and step, each check's pass or fail with counts, and the next action.
 - **`spec/NOTES.md`:** append-only, at most two lines per entry. Each entry is a decision, a fact, or an owner answer, with its evidence (a command result or a file:line). Nothing else goes in it.
-- **A SessionStart hook with matcher `compact|resume`,** in `.claude/settings.local.json` at the repo root. The file exists, holds only permissions, and is ignored by git globally. Its command:
-  ```bash
-  cd "$CLAUDE_PROJECT_DIR/.worktrees/spec-first"; python3 spec/tools/check.py --brief; tail -20 spec/NOTES.md; echo "Re-read spec/BRIEF.md for the current step before acting."
-  ```
-  - The commands are joined with `;`, so a failing check never hides the notes. `check.py` exits nonzero while checks fail.
+- **A SessionStart hook with matcher `compact|resume`,** in the tracked `.claude/settings.json`. Its command runs `spec/tools/check.py --orient` of the checkout the session starts in, which prints the branch against its remote, the state `scripts/state.py` reads from git, the owner's latest decisions and `HANDOFF.md`, the repo's handoff. Nothing a session reads after a compaction lives outside the repo (the owner, 2026-11-18); the hook this brief first placed in a machine's own settings printed a file of the lead's private folder.
   - A SessionStart hook's plain stdout is added to the context.
-  - Prove the hook once by running its command by hand while a check fails, and show its output. The project's tracked `.claude/settings.json` already has its own SessionStart hook; leave it as it is.
 - **Commit and push after every step,** and after every module in steps 6 to 9. A step is never half on disk.
 - **Context hygiene:**
   - read code by file:line range, never whole large files;

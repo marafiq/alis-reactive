@@ -27,13 +27,13 @@ JAVA = str(Path(os.environ["JAVA_HOME"]) / "bin" / "java") if os.environ.get("JA
 TLA_JAR = Path(os.environ["TLA2TOOLS_JAR"]) if os.environ.get("TLA2TOOLS_JAR") else Path.home() / ".local/share/tlaplus/tla2tools.jar"
 TLA_LOCK = SPEC / "tools" / "tla2tools.lock"
 TLC_GREEN = "Model checking completed. No error has been found."
-LOCAL_SETTINGS = Path("/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.claude/settings.local.json")
-HOOK_COMMAND = "cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite; python3 spec/tools/check.py --orient"
+SETTINGS = REPO / ".claude" / "settings.json"
+HOOK_COMMAND = 'python3 "$CLAUDE_PROJECT_DIR/spec/tools/check.py" --orient'
 CI_SKIPPED = ("survival", "probes")
 CI_TOOLS = ("JAVA_HOME", "TLA2TOOLS_JAR")
 CI_CACHE = "TLC_CACHE"
 SKIPPED = ()
-HANDOFF = Path.home() / ".claude/projects/-Users-muhammadadnanrafiq-Documents-Code-alis-reactive-framework-1-0-Alis-Reactive/memory/project-spec-first-branch.md"
+HANDOFF = REPO / "HANDOFF.md"
 OWNER_LINE = re.compile(r"^- The owner, (\d{4}-\d{2}-\d{2})")
 
 MAIN_PACKAGES = {
@@ -129,18 +129,18 @@ def check_survival():
         return not_started(*needed)
     problems = []
     try:
-        hooks = json.loads(LOCAL_SETTINGS.read_text()).get("hooks", {}).get("SessionStart", [])
+        hooks = json.loads(SETTINGS.read_text()).get("hooks", {}).get("SessionStart", [])
     except (OSError, json.JSONDecodeError) as error:
         hooks = []
-        problems.append(f"{LOCAL_SETTINGS} unreadable: {error}")
+        problems.append(f"{SETTINGS.relative_to(REPO)} unreadable: {error}")
     installed = [
         hook for entry in hooks if entry.get("matcher") == "compact|resume"
         for hook in entry.get("hooks", []) if hook.get("command") == HOOK_COMMAND
     ]
     if not installed:
-        problems.append("the compact|resume SessionStart hook is not installed in " + str(LOCAL_SETTINGS))
-    if not HANDOFF.is_file():
-        problems.append(f"the handoff the compact hook prints, {HANDOFF}, is missing")
+        problems.append("the compact|resume SessionStart hook is not installed in " + str(SETTINGS.relative_to(REPO)))
+    if str(HANDOFF.relative_to(REPO)) not in git("ls-files", "--", str(HANDOFF.relative_to(REPO))).splitlines():
+        problems.append(f"the handoff the compact hook prints, {HANDOFF.relative_to(REPO)}, is missing from the tracked tree")
     if not git("rev-parse", "--verify", "-q", f"refs/remotes/origin/{SPEC_BRANCH}"):
         problems.append(f"origin/{SPEC_BRANCH} is not pushed")
     tracked = set(git("ls-files", "spec").splitlines())
@@ -3502,7 +3502,11 @@ def orient():
         f"last committed STATE: read at {read_at or 'no commit'}, {behind} commits behind HEAD, {state.get('passed', 0)} of "
         f"{state.get('total', 0)} pass, failing {', '.join(failing) or 'none'}, step {step.get('number', '?')} {step.get('name', '')}",
         f"owner decisions dated {latest}: spec/CLAUDE.md lines {', '.join(str(number) for number, date in dated if date == latest)}",
-        f"handoff, {HANDOFF}:",
+        subprocess.run([sys.executable, str(REPO / "scripts" / "state.py")], capture_output=True, text=True, check=True).stdout.rstrip("\n"),
+        "mistakes, by kind, with its count and what stops it (spec/MISTAKES.md):",
+        *[f"- {row.group(2)} {row.group(1).strip()}: {row.group(3).strip()}" for row in
+          re.finditer(r"^\| ([^|]+?) \| (\d+) \| (.+?) \|$", (SPEC / "MISTAKES.md").read_text(), re.MULTILINE)],
+        f"handoff, {HANDOFF.relative_to(REPO)}:",
         HANDOFF.read_text() if HANDOFF.is_file() else "MISSING: write the handoff before any other work",
         "Before acting: read the handoff whole, the owner lines above and every file the next queue item touches; "
         "a claim stands on what is run now, never on what is recalled.",

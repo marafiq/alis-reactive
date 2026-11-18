@@ -4,32 +4,43 @@
   "edits": [
    {
     "file": "spec/tools/check.py",
-    "old": "rewrite; python3 spec/tools/check.py --orient\"",
-    "new": "rewrite; python3 spec/tools/check.py --brief\""
+    "old": "check.py\" --orient'\n",
+    "new": "check.py\" --brief'\n"
    }
   ],
   "expect": "the compact|resume SessionStart hook is not installed"
  },
  {
-  "name": "the handoff file is gone",
+  "name": "the handoff is no tracked file of the repo",
   "edits": [
    {
     "file": "spec/tools/check.py",
-    "old": "memory/project-spec-first-branch.md\"",
-    "new": "memory/project-spec-first-gone.md\""
+    "old": "HANDOFF = REPO / \"HANDOFF.md\"",
+    "new": "HANDOFF = REPO / \".work\" / \"HANDOFF.md\""
    }
   ],
-  "expect": "is missing"
+  "expect": "is missing from the tracked tree"
  },
  {
   "name": "the hook command written as two joined literals",
   "edits": [
    {
     "file": "spec/tools/check.py",
-    "old": "HOOK_COMMAND = \"cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite; python3 spec/tools/check.py --orient\"",
-    "new": "HOOK_COMMAND = (\"cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite; \"\n                \"python3 spec/tools/check.py --orient\")"
+    "old": "HOOK_COMMAND = 'python3 \"$CLAUDE_PROJECT_DIR/spec/tools/check.py\" --orient'",
+    "new": "HOOK_COMMAND = ('python3 \"$CLAUDE_PROJECT_DIR/spec/tools/check.py\" '\n                '--orient')"
    }
   ],
   "expect": null
+ },
+ {
+  "name": "the tracked settings hold no hook for a compaction",
+  "edits": [
+   {
+    "file": ".claude/settings.json",
+    "old": "\"matcher\": \"compact|resume\"",
+    "new": "\"matcher\": \"startup\""
+   }
+  ],
+  "expect": "the compact|resume SessionStart hook is not installed"
  }
 ]
