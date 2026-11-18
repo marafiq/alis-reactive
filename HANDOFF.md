@@ -1,20 +1,65 @@
 # Handoff
 
-Written at `date`: Wed Nov 18 00:54:58 EST 2026
+Written at `date`: Wed Nov 18 02:53:25 EST 2026
+
+## State, as `scripts/state.py` reads it from git
+unit: landed ../ci CiGreen
+  next: git worktree remove ../ci
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
+unit: landed ../ci Handoff
+  next: git worktree remove ../ci
+unit: ready ../ci KindsPlant
+  next: scripts/land-unit.sh ../ci e9b49a1eb "spec: the kinds check's accepted plant edits the schema's paragraph as unit 3 left it" ".landing/KindsPlant"
+  leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
+  exit line: "landed", with the browser run's result line
+  goes to: unit: landed
+unit: building ../movein1 MoveInSlice1: it lacks paths.txt or message.txt
+  leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
+  read first: the rule file of each kind of file, as it is opened
+  exit line: each line of the brief's "Done"
+  goes to: unit: ready, or unit: returned for an agent
+unit: ready ../skill BuildAScreen
+  next: scripts/land-unit.sh ../skill e9b49a1eb "skill: build-a-screen, a decision map from a developer's question to one door, its meaning, its ordering and a landed view" ".landing/BuildAScreen"
+unit: returned ../typed-doors TypedDoors: reply.md waits for read.md
+  leaves by: the lead writes "read.md"
+  read first: the rule lines "reply.md" opens with, at their source; the change against its base
+  exit line: "verdict: land"
+  goes to: unit: ready
+unit: ready ../typed-home TypedHome
+  next: scripts/land-unit.sh ../typed-home e9b49a1eb "fresh apps and README: the home page has a model of its own, and no example opens a plan over dynamic" ".landing/TypedHome"
+lane: pushed at ccae92cac on feature/rewrite: equal to the remote
+  leaves by: the landing of a unit that is ready
+  read first: the queue of `HANDOFF.md`
+  exit line: "landed"
+  goes to: lane: landed
+ci: unread at ccae92cac
+  leaves by: `python3 scripts/ci.py`
+  exit line: "ci at" the commit, with each job
+  goes to: ci: running, ci: failed or ci: passed
+file: over CLAUDE.md: holds 325 lines, its limit 200
+  leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
+  exit line: "landed"
+  goes to: gone
+file: over spec/CLAUDE.md: holds 2051 lines, its limit 150
+file: over HANDOFF.md: holds 264 lines, its limit 150
+file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 197 lines, its limit 150
+file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 949eefe47 conformance app: the arrival desk, the first combined screen, with its partials proven together
-- Full check: .work/logs/spec-check-949eefe47.log: spec check at 949eefe47: 40 of 40 checks pass
-- .work/last-run.txt: 20261118-004355-58397 949eefe47
+- HEAD: ccae92cac harness: the process as one state machine, the handoff in the repo, CI's causes fixed, and the kinds plant restated
+- Full check: .work/logs/spec-check-ccae92cac.log: spec check at ccae92cac: 40 of 40 checks pass
+- .work/last-run.txt: 20261118-024159-72751 ccae92cac
 
 ## Landed since the commit before the last spec: STATE commit
-949eefe47 conformance app: the arrival desk, the first combined screen, with its partials proven together
-af5ad37a9 spec: STATE and handoff at 878033d78
+ccae92cac harness: the process as one state machine, the handoff in the repo, CI's causes fixed, and the kinds plant restated
+09726c86f values (unit 3, piece 1): a shape kind enum for as, so a live object takes an enum the app's JSON names in the form it holds (the owner's yes, 2026-11-17)
+e9b49a1eb spec: STATE and handoff at 949eefe47
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 526; named by a browser test: 507; with no browser test: 19
+feature promises: 533; named by a browser test: 514; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -39,7 +84,7 @@ Alis.Reactive.Assets/runtime/Conditions/operators.ts:43
 Alis.Reactive.Assets/runtime/InputsAndIds/model.ts:240
 Alis.Reactive.Assets/runtime/InputsAndIds/model.ts:248
 Alis.Reactive.Assets/runtime/InputsAndIds/model.ts:264
-Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:273
+Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:274
 Alis.Reactive.Assets/runtime/Validation/forms.ts:194
 Alis.Reactive.Assets/runtime/Validation/forms.ts:231
 doors not implemented:
@@ -58,95 +103,25 @@ Alis.Reactive.Fusion/FusionComponents/FusionSidebar/FusionSidebarHtml.Net48.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:21
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
-## Unlanded work
-- ../..: base 65fdf118d1498a8285db84a43c4da81dfaa0ea3e, 1 paths changed
-- ../../.claude/worktrees/agent-a00a1711dcf7a6d00: base 59e79a595b39149b9e3369bdf11d1a5c37c5bead, 2 paths changed
-- ../../.claude/worktrees/agent-a087381ed4e704c09: base 6ab77b717b9db3bc8dc57933e772d63f9878db35, 2 paths changed
-- ../../.claude/worktrees/agent-a0a6202526eebf18b: base fa22f3166cb7addcaa5ae7cd9abbf89ac4f0c229, 2 paths changed
-- ../../.claude/worktrees/agent-a0b5a2b70b8200fcc: base 6ab77b717b9db3bc8dc57933e772d63f9878db35, 2 paths changed
-- ../../.claude/worktrees/agent-a103f190a25764213: base 877b149575d08a5340e0f14846f6f1e74bd88bff, 1 paths changed
-- ../../.claude/worktrees/agent-a31851ac03d5b7c69: base 3016f85152e7c323786ad364474624a345a118d6, 2 paths changed
-- ../../.claude/worktrees/agent-a3244be516d978539: base eb7529f7767ada3ebc969383d995dec9554aabbf, 2 paths changed
-- ../../.claude/worktrees/agent-a40504c60401d4690: base 6ab77b717b9db3bc8dc57933e772d63f9878db35, 2 paths changed
-- ../../.claude/worktrees/agent-a4244fc1e4500b1d0: base 8f0230e4e5dd2476463174172a6b66589aaf7cba, 2 paths changed
-- ../../.claude/worktrees/agent-a5420607c80e0052e: base 6ab77b717b9db3bc8dc57933e772d63f9878db35, 2 paths changed
-- ../../.claude/worktrees/agent-a740a6fa394f23b56: base 1543e8059d3bcea4d0653958a88c282a738f5534, 2 paths changed
-- ../../.claude/worktrees/agent-a8ca7b2d3c1b780df: base 052b1677d7c5c42a730075f9c5ab1fcedcb9a4a2, 2 paths changed
-- ../../.claude/worktrees/agent-a9363882f208aaa73: base 877b149575d08a5340e0f14846f6f1e74bd88bff, 1 paths changed
-- ../../.claude/worktrees/agent-a9d20255edb96665c: base 8404ad585a88e058efcbb12a55ac4382231bbef9, 1 paths changed
-- ../../.claude/worktrees/agent-aa607ef8a7d3ee58c: base b65005f6ba04255eabaee48d95e41a93ff4c7e8d, 2 paths changed
-- ../../.claude/worktrees/agent-aa694ffd126f9fb76: base 2124bb5946c03032694f13f2528ee51907460b55, 2 paths changed
-- ../../.claude/worktrees/agent-aa982faf0f983745f: base abc039af4b338302027c8f01e98380081467a8d5, 2 paths changed
-- ../../.claude/worktrees/agent-aaa3eefcaef1ffb35: base 6815082a45a1108acd446265cd1c7025da1b6b6a, 2 paths changed
-- ../../.claude/worktrees/agent-ab1dfb883841a9aa8: base 4694cb88751e84bab1c37318df192a45f1b89ab9, 2 paths changed
-- ../../.claude/worktrees/agent-ab639ef412d90afbd: base 94b1238751fb2efba51cff4a9dfc46df5138617d, 2 paths changed
-- ../../.claude/worktrees/agent-ab975fa2e855a2456: base 4e1fa93950491f0ab8f7a933f6e221846fd13852, 2 paths changed
-- ../../.claude/worktrees/agent-ac079d5955b8b90a4: base 08c4d79c453001eed575b7d5b03ece9642d0f79a, 2 paths changed
-- ../../.claude/worktrees/agent-af9101f80704f4b02: base 5bb48b782d3cfecdd19a9d0de5ea17b835521084, 2 paths changed
-- ../../.claude/worktrees/wf_09af784e-883-1: base c90a816647aaff403c0e14e87d5631d780603efd, 2 paths changed
-- ../../.claude/worktrees/wf_09af784e-883-2: base 247caa844237a8e88a1947a99bcc8ce6ce3506a1, 2 paths changed
-- ../../.claude/worktrees/wf_15f82345-f50-1: base 1cb15f8648c8318bd6bc78d43512e89ab3588642, 2 paths changed
-- ../../.claude/worktrees/wf_15f82345-f50-2: base 1cb15f8648c8318bd6bc78d43512e89ab3588642, 3 paths changed
-- ../../.claude/worktrees/wf_15f82345-f50-3: base 1cb15f8648c8318bd6bc78d43512e89ab3588642, 2 paths changed
-- ../../.claude/worktrees/wf_28531daa-606-1: base 7663072c1aa33f48b7bef3616b771e010e3cf88d, 2 paths changed
-- ../../.claude/worktrees/wf_28531daa-606-2: base 5f3f9a4f1857d7dc474a5800fd5167d06b4cb046, 2 paths changed
-- ../../.claude/worktrees/wf_55072de0-a21-1: base db492f7245cadfc310ec44f48a52bf9ab6373dea, 2 paths changed
-- ../../.claude/worktrees/wf_55072de0-a21-2: base bcb37787a31d4b63d7003efbcee965756cb4968f, 2 paths changed
-- ../../.claude/worktrees/wf_86ddefea-935-1: base 57ad9ea743e57512906f28782987bef5d55963db, 2 paths changed
-- ../../.claude/worktrees/wf_86ddefea-935-2: base e0b171551f39a94547d93cdcee9b3eede0f2aa06, 2 paths changed
-- ../../.claude/worktrees/wf_86ddefea-935-3: base 06a686ba2e3911b0231cd0eb0b42443efe06150b, 2 paths changed
-- ../../.claude/worktrees/wf_86ddefea-935-4: base c63a11befdf0cf6e66541327999ed1708164d6bb, 2 paths changed
-- ../../.claude/worktrees/wf_86ddefea-935-5: base 2e97adc452f78858cf618de95cb186008bc9151f, 2 paths changed
-- ../../.claude/worktrees/wf_bef18f5c-129-1: base b5fb0a6bca2fd7965b1124f17016e05cf9644fae, 2 paths changed
-- ../../.claude/worktrees/wf_bef18f5c-129-2: base e830401824f19e8ce49101f9dee34686835733b5, 2 paths changed
-- ../../.claude/worktrees/wf_bef18f5c-129-3: base 7cf5a9c78e895ec6d142c6fca50cd2aa7a1a9bd0, 2 paths changed
-- ../codex-p: base 8391f0be5043b4d809bfa3a0fdb486b761a91b0e, 18 paths changed
-- ../integrate-slices: base 4fcf042cbc5aac8dee796182f54d886123451c9b, 2 paths changed
-- ../opus-b: base 649c6bd8f5406a46c88fff7827566abf9de21132, 19 paths changed
-- ../opus-fields: base 44cf5f3b215a2817f3752ca7ad6ea91c66593fc3, 86 paths changed
-- ../opus-rows: base 0dba7e32dac04599bd19a3d0a14c8be217a11bb2, 32 paths changed
-- ../opus-u1: base c1f3a26aebd239016e2a0c0d381277ab68781482, 3 paths changed
-- ../opus-u19b: base dd5eebbf5705208304ec60243fb6e977e2d49a4e, 73 paths changed
-- ../opus-u19b/.worktrees/check-plants-e1lkm273/tree0: base dd5eebbf5705208304ec60243fb6e977e2d49a4e, 62 paths changed
-- ../opus-u19b/.worktrees/check-plants-e1lkm273/tree1: base dd5eebbf5705208304ec60243fb6e977e2d49a4e, 62 paths changed
-- ../opus-u19b/.worktrees/check-plants-e1lkm273/tree2: base dd5eebbf5705208304ec60243fb6e977e2d49a4e, 62 paths changed
-- ../opus-u19b/.worktrees/check-plants-e1lkm273/tree3: base dd5eebbf5705208304ec60243fb6e977e2d49a4e, 62 paths changed
-- ../opus-u19c: base 35090a20951737c407ee1845b30ec76ac335b57f, 86 paths changed
-- ../opus-u2: base 51cd34230aec20c1cf97353ff730aa98357ac91e, 20 paths changed
-- ../opus-u26b: base b786d224e98013bcaa3e9cfc08894a8f59f53f86, 27 paths changed
-- ../opus-u26c: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 17 paths changed
-- ../opus-u26d: base 76ca0e0b362169290a47f9b84d9c948f0d92418f, 18 paths changed
-- ../opus-u26e: base cc75d21291c43b20be9a4ac49afcc75035308d05, 28 paths changed
-- ../opus-u26f: base cc75d21291c43b20be9a4ac49afcc75035308d05, 14 paths changed
-- ../opus-u26g: base 0bffecf95f4435078a90ad13682ac2c1f114c140, 28 paths changed
-- ../opus-u26h: base fcfca56c5915a01abc54d0a47394113c81bf0141, 23 paths changed
-- ../opus-u26h/.worktrees/check-plants-761ejgt6/tree0: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
-- ../opus-u26h/.worktrees/check-plants-761ejgt6/tree1: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
-- ../opus-u26h/.worktrees/check-plants-761ejgt6/tree2: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
-- ../opus-u26h/.worktrees/check-plants-761ejgt6/tree3: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
-- ../opus-u3: base 8391f0be5043b4d809bfa3a0fdb486b761a91b0e, 64 paths changed
-- ../opus-u4: base 3eb49e2dcbc3d396a3bfa9271b2deb390970c1d1, 17 paths changed
-- ../opus-upload: base 7c1e23c8b9933cdd590c8524cb817554fd807646, 18 paths changed
-- ../opus-upload2: base 0bffecf95f4435078a90ad13682ac2c1f114c140, 37 paths changed
-- ../opus-x1738: base 44cf5f3b215a2817f3752ca7ad6ea91c66593fc3, 21 paths changed
-- ../rewrite-next: base e4fa6904120dbfffc5050a63801055494e99672a, 1 paths changed
-- .worktrees/check-plants-e7stabxu/tree0: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
-- .worktrees/check-plants-e7stabxu/tree1: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
-- .worktrees/check-plants-e7stabxu/tree2: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
-- .worktrees/check-plants-e7stabxu/tree3: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
-- ../screen1: base af5ad37a9107a730a13c887345c23c2ae329a060, 18 paths changed
-- ../unit-m: base 0ecebf67d351e77dd38a5a9377e36e1447f478a1, 9 paths changed
+## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 330 to 334
+- A rule or a tool's list not applied before the change: 370 to 376
+- A number, a proof line or an absence not read from the run that proves it: 51 to 53
+- A shell command or a script wrong in its own terms: 519 to 529
 
 ## The owner's latest decisions
-spec/CLAUDE.md:1848: - The owner, 2026-11-17, answering the lead's ask to mark a refused check's stop in the plan, verbatim: "yes
-spec/CLAUDE.md:1858: - The owner, 2026-11-17, answering the lead's two asks on request shapes, verbatim: "i will go with your calls."
-spec/CLAUDE.md:1865: - The owner, 2026-11-17, answering the lead's ask on the hub's client, verbatim: "yes on hub.clinet." Read by the
-spec/CLAUDE.md:1870: - The owner, 2026-11-17, answering the lead's ask on a container's read of a member the app's JSON options leave
-spec/CLAUDE.md:1874: - The owner, 2026-11-17, answering the lead's ask on GHSA-fc5q-39xc-vjpf, which failed every landing's
-spec/CLAUDE.md:1880: - The owner, 2026-11-17, answering the lead's ask on FusionUploader's FilesChanged, raised by the slice's code
-spec/CLAUDE.md:1890: - The owner, 2026-11-17 (verbatim in `spec/NOTES.md`): "Rewrite must apply wherever it applies. That's the point of
-spec/CLAUDE.md:1901: - The owner, 2026-11-17, answering the lead's ask 4 (X17.38), verbatim: "4- yes approved". Read by the lead: a class,
-spec/CLAUDE.md:1905: - The owner, 2026-11-17, answering the lead's ask B (an input bound to a whole object, a list of objects or a
+spec/CLAUDE.md:1926: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
+spec/CLAUDE.md:1936: - The owner, 2026-11-18, after the lead reported that the hook a compaction runs printed a file of the lead's private
+spec/CLAUDE.md:1945: - The owner, 2026-11-18, of that machine (both verbatim in `spec/NOTES.md`): "Is there a mistake read part of the state
+spec/CLAUDE.md:1956: - The owner, 2026-11-18, the same hour (verbatim in `spec/NOTES.md`): "What other steps are missing? How about quality
+spec/CLAUDE.md:1966: - The owner, 2026-11-18, on the machine as built (verbatim in `spec/NOTES.md`): the mistakes are condensed past a
+spec/CLAUDE.md:1979: - The owner, 2026-11-18, after a unit's delivery proof stopped before its browser step (verbatim in `spec/NOTES.md`):
+spec/CLAUDE.md:1986: - The owner, 2026-11-18, on the machine as the lead had written it, one table with sentences around it and checks
+
+## The owner's notes that are open: date | kind | home | follow-up | the owner's words
+<!-- notes -->
+None open.
+<!-- /notes -->
 
 ## Next
 <!-- next -->
@@ -155,27 +130,93 @@ current module in progress." What the framework cannot express is a named gap in
 written without it; nothing of it is put to the owner as a decision. Three separate things: the skill, the app's spec,
 the app.
 
-In work:
-1. Unit 3, piece 1, the shape kind `enum` for `as` (the owner's yes, 2026-11-17), built in `.worktrees/opus-u3` at
-   base 8391f0be5. The owner, 2026-11-18, to the lead's ask on what an element's text shows: "Yes, I agree with the
-   enum." An enum set as an element's text or HTML shows the name the app's JSON writes; the live form is for a live
-   object's members and for a method's or a plugin's arguments. Its builder changes that one path and adds its
-   promise, then the unit lands and is pushed ("So ship it.").
+Landed, 2026-11-18: unit 3's first piece, the shape kind `enum` for `as`. A live object's members and a method's or a
+plugin's arguments take an enum in the live form; an element's text and HTML, a joined text and a notice show the
+name the app's JSON writes (the owner: "Yes, I agree with the enum.").
 
-Then, in this order:
-2. CI green on GitHub's machines, the MVC 5 job running its build. At 421d7227e, the last run that finished, these
+The owner is away for 24 hours from 2026-11-18 ("Hopefully you have the clarity to what to work on, and again we are
+burning tokens at such high speed"). The lead works alone, the app first, and spends little: it acts on a
+notification, never polls, and starts no agent beyond the three running until one returns.
+
+WHAT THE OWNER GETS ON HIS RETURN, in his words: "I don't need acceptance numbers, sir. I need that complex app behavior
+asserted and proved. I am done with hearing excuses or fake numbers." So: the move-in app running, each behavior of
+its spec asserted in a browser on the page and in what the server stored, named as proven or as not proven. No
+score of a spec and no count offered as the result; the coverage script is the lead's own check before building.
+
+The app's spec: the owner's lists were examples ("I did not iterate complete set of features ... you have specs, you
+have TLA+"). A read-only Codex run derives the complete spec in `.worktrees/movein1`, ".landing/MoveInSlice1"
+("consult2-answer.md"); "coverage.py" beside it accepts it or names what goes back: every door name, rule door,
+schema kind and TLA+ action named and in the coverage table, a row left out for a stated fact alone.
+
+In flight, the lead's notes of 2026-11-18, each to its exit line:
+- `.worktrees/ci`, base e9b49a1eb, holds two units, both ready, that land as one commit once the lane is pushed, by
+  scripts/land-unit.sh with both folders. ".landing/CiGreen": CI's four causes, three fixed (the typecheck red then
+  green in a clean copy; "[delivery] every delivery check passed."). ".landing/Handoff": the owner's four messages
+  of 2026-11-18 on the process. It writes .claude/rules/process.md, one state machine whose table scripts/state.py
+  reads as its data (a note of the owner's, a unit from its brief to its landing, an agent's hand-out and return,
+  the lane, CI at the pushed commit, each file against its limit of lines), the tracked compaction hook, and the
+  notes block of this file. After it lands: run scripts/state.py and act on what it prints; run scripts/ci.py
+  about fifteen minutes after the push and read each failed job's log.
+- The owner's notes of 2026-11-17 and 2026-11-18 that no commit has homed yet are entered in the notes block of this
+  file the moment that block exists, each with its kind, its home and its follow-up: the requirement for a care
+  screen and the real-domain app; the skill for every consumer; no decision put to him for the app; Native's
+  components as the app's inputs; no new TypeScript component. Their words are whole in the lead's scratch folder
+  until then, the last of this work outside the repo.
+- Next unit, the owner's "it cannot be one bulky file": spec/CLAUDE.md is 2,000 lines, 274 decisions oldest first,
+  and the harness shows a reader its first 1,394, so no decision since 2026-11-17 (line 1,849 on) reaches one. Its
+  decisions move, word for word, into one file a module under spec/decisions, newest first; spec/CLAUDE.md keeps
+  the module table, the files and the index. An agent builds it from a brief; a script proves each decision moved
+  once. Readers to change with it: spec/tools/check.py (module_rows, orient, the two quoted citations) and
+  scripts/handoff.py. Then root CLAUDE.md is cut to its limit.
+- `.worktrees/skill`, base e9b49a1eb, holds the skill's unit, ready: ".landing/BuildAScreen" writes
+  .claude/skills/build-a-screen/SKILL.md, twelve questions, each answered by one door, its meaning, its TLA+
+  ordering and a landed view, with seven view examples copied by line range; and teaches WhenADocShowsAnExample and
+  WhenARuleNamesTheCode to hold a skill's view examples (each new case failed on its planted defect; "Failed: 0,
+  Passed: 55"). It lands after the harness unit, by the command scripts/state.py prints for it.
+- `.worktrees/typed-home`, base e9b49a1eb, WAITING for CiGreen: ".landing/TypedHome". The owner, 2026-11-18: "why
+  would you use dynamic? The whole point of the framework is tight". README's first example and both fresh apps'
+  home views opened a plan over dynamic; each has a model of its own now. Its delivery proof is red at its base for
+  a cause CiGreen fixes, so after the harness commit lands it moves to the new head and scripts/delivery.sh is run
+  whole there, then it lands. Its browser step alone, run by hand: "1 selected, 1 ran, 1 passed".
+- `.worktrees/typed-doors`, base e9b49a1eb, with a builder agent: ".landing/TypedDoors/brief.md", ALIS044, a door
+  of the framework takes no dynamic (the owner, 2026-11-18: "Yeah, write the analyzer"). It lands after TypedHome.
+  When its "reply.md" stands, the lead reads it at the source and writes "read.md" with its verdict.
+- The owner, 2026-11-18: "the browser never ran because your process was wrong ... Get it into the process." The
+  process unit now holds it: a brief's Done carries a line "At the base:", and a unit whose proof is red at its base
+  for another unit's cause names it on a line "After:" and is read as waiting.
+- THE APP, the owner's first concern (2026-11-18: "we haven't really got any work done since last 40 minutes. We're
+  just working on the process"): resident move-in, 21 features MI.1 to MI.21 in six slices, a Codex consult's draft
+  the lead showed the owner. `.worktrees/movein1`, base e9b49a1eb, with a builder agent: ".landing/MoveInSlice1"
+  (brief.md, the consult's brief and answer). Slice 1 is MI.1 to MI.4 on one combined page: the residence cascade,
+  the level of care with its confirm, the resident's nested and two-member rules, and the allocation review over the
+  conformance component. The owner, the same hour: "you need to build fake data ... Sending request isn't enough. It
+  has to send the correct payload so you can observe what is being returned, what is being changed ... you gotta
+  build the domain model of the apps in memory", and the work is cut too small. So the unit builds the app's domain
+  model first, in memory, seeded, one test world's own, shaped for all 21 features; every endpoint answers from it
+  and none answers a constant; every test reads what the server stored and what changed. When its "reply.md"
+  stands the lead reads it at the source and writes "read.md". The other 17 features follow on that model as two
+  units built side by side, never five: the forms (contacts, payer, medications, services and price), and the
+  lifecycle (save, submit, the bed conflict and waitlist, discard, live availability). No process work goes ahead.
+- The decisions split has its brief written, six parts, for an agent; its worktree opens at the head the harness
+  unit is pushed as.
+
+In this order:
+1. CI green on GitHub's machines, the MVC 5 job running its build. At 421d7227e, the last run that finished, these
    failed: checks (after npm audit), playwright fusion (35 of 86), delivery-net10 (one architecture test) and
-   verify-net48 (msbuild not found). The newest finished run is read by its commit first.
-3. The conformance component gains the two members it lacks, each a cell with its test and its planted defect: a
+   verify-net48 (msbuild not found). Each cause is read from its job's log and its fix is built in `.worktrees/ci`,
+   landing next: the lock takes Node's types for the typecheck, the delivery test names both browser files of
+   the net10 pack, the delivery job sets git's safe.directory, and the Windows job finds MSBuild by vswhere. A
+   job's result is read from its own log, since the next push cancels a run.
+2. The conformance component gains the two members it lacks, each a cell with its test and its planted defect: a
    method of two and of three parameters of mixed kinds, and an async method that takes an argument. No new
    TypeScript component is written (the owner, 2026-11-18).
-4. The move-in app's spec, a file under `spec/`, written before the app: every feature in the domain's words with
+3. The move-in app's spec, a file under `spec/`, written before the app: every feature in the domain's words with
    the doors, the schema's nodes and the TLA+ actions it uses; where the features are mixed on one screen, in one
    request and in one check; its coverage read against `spec/Core/schema.md` and the TLA+ specs as they stand, with
    no second inventory of them; and the gaps. The owner reviews it once.
-5. The skill under `.claude/skills/`: general, for every consumer of the framework, a decision map from the schema
+4. The skill under `.claude/skills/`: general, for every consumer of the framework, a decision map from the schema
    and the TLA+ specs to the door by its one name. It holds no feature of the app.
-6. The app, written with the skill from its spec: resident move-in at a senior living community, a new screen set of
+5. The app, written with the skill from its spec: resident move-in at a senior living community, a new screen set of
    the conformance app, its inputs in request containers, Native's components its inputs, the conformance component
    its one custom component, no Fusion, every landed page and test kept. Six slices, each promise a browser test
    with its planted defect: where they live and level of care; contacts and payer; medications; services and
