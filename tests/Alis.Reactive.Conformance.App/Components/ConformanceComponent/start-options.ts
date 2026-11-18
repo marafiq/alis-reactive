@@ -59,6 +59,7 @@ export interface SpotStart {
 export interface OuterStart {
     text: string;
     count: number;
+    innerText: string;
 }
 export interface HeldStart {
     items: ItemStart[];

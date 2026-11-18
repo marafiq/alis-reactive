@@ -529,6 +529,76 @@
           "id": "M9.X14",
           "rung": "behavior",
           "defect": "A cascade's older answer, arriving after a newer choice replaced its run, loads its list over the newer one, or a lookup moves the saved draft before a save: on the move-in, Harbor House's late buildings stand over Maple Court's, or Saved location moves with no save (MI.1, situation 5)."
+        },
+        {
+          "id": "M9.X15",
+          "rung": "behavior",
+          "defect": "A slot's load chosen among several by a condition loads another level's content, or a save keeps the content the load replaced: on the move-in, confirming Memory care shows another level's questions, or the saved draft still holds Assisted's answers (MI.2, situation 1)."
+        },
+        {
+          "id": "M9.X16",
+          "rung": "behavior",
+          "defect": "A question a person declines still replaces a slot's content, or leaves the input that asked showing the level it did not load: on the move-in, No to Replace the current care answers? loads Memory's questions, or leaves Memory checked over Assisted's answers (MI.2, situation 2)."
+        },
+        {
+          "id": "M9.X17",
+          "rung": "behavior",
+          "defect": "A slot's load the server refuses after its slot was unloaded shows no reason, or loads content, or moves the saved draft: on the move-in, Memory care refused by the server shows no message, or the saved care changes (MI.2, situation 3)."
+        },
+        {
+          "id": "M9.X18",
+          "rung": "behavior",
+          "defect": "A slot's load whose connection drops on every attempt, after its slot was unloaded, leaves the page with no word of it or with content it did not load, or loses the saved content: on the move-in, the failed questions GET shows no notice, or the page opened again lacks Assisted's saved answers (MI.2, situation 4)."
+        },
+        {
+          "id": "M9.X19",
+          "rung": "behavior",
+          "defect": "A slot's older load, answered after a newer choice replaced its run, puts its content over the newer one, and a save then holds both: on the move-in, Memory's late questions stand over Skilled's (MI.2, situation 5)."
+        },
+        {
+          "id": "M9.X20",
+          "rung": "behavior",
+          "defect": "A reply read members deep shows another value or none, or a request its condition guards leaves where the condition fails: on the move-in, the identity check names nobody, or asks for a receipt the reply does not require (MI.3, situation 1)."
+        },
+        {
+          "id": "M9.X21",
+          "rung": "behavior",
+          "defect": "A two-member rule over inputs of two attached partials passes where the members differ, in a pipeline's check of the container or in a request's rule set: on the move-in, a mismatched email confirmation is called ready, or its identity review leaves the page (MI.3, situation 2)."
+        },
+        {
+          "id": "M9.X22",
+          "rung": "behavior",
+          "defect": "A refusal the server alone decides, answered by a status the request names with a typed body, runs the success route or no route: on the move-in, a resident who already holds an admission is called checked, or no reason shows (MI.3, situation 3)."
+        },
+        {
+          "id": "M9.X23",
+          "rung": "behavior",
+          "defect": "A POST whose connection drops is sent again, or its failure shows no notice: on the move-in, the dropped identity review leaves twice, or the page says nothing (MI.3, situation 4)."
+        },
+        {
+          "id": "M9.X25",
+          "rung": "behavior",
+          "defect": "A request under an awaited condition leaves before the condition's answer arrives, or a reply read members deep writes another value into a component: on the move-in, the allocation review is posted while readiness is still asked, or the panel shows another status or community (MI.4, situation 1)."
+        },
+        {
+          "id": "M9.X26",
+          "rung": "behavior",
+          "defect": "An awaited condition nested under a condition that fails is still asked: on the move-in, an allocation panel that is not ready still asks the server for readiness (MI.4, situation 2)."
+        },
+        {
+          "id": "M9.X27",
+          "rung": "behavior",
+          "defect": "A fallback for a value that reads nothing is not applied, or a conflict's body read members deep shows nobody: on the move-in, a bed taken since it was listed shows no holder, or a review reference of no text (MI.4, situation 3)."
+        },
+        {
+          "id": "M9.X28",
+          "rung": "behavior",
+          "defect": "A run whose awaited method rejects goes on to the steps after it: on the move-in, a readiness call that never answers still writes the allocation line or posts a review (MI.4, situation 4)."
+        },
+        {
+          "id": "M9.X29",
+          "rung": "behavior",
+          "defect": "A run a newer event replaced while it awaited a method goes on when its answer arrives: on the move-in, the review of an older bed selection posts a second review once its readiness answers (MI.4, situation 5)."
         }
       ],
       "promises": [
@@ -710,6 +780,121 @@
           "opposite": "With no second choice, Harbor House's held GET, once released, offers Cedar and Willow.",
           "defect": "The run a newer choice replaced runs its route, so Harbor House's late answer puts Cedar and Willow over Elm.",
           "observes": "Lanes.tla:Route"
+        },
+        {
+          "for": "M9.X15",
+          "page": "The move-in of draft D100, saved at version 7 under Assisted care with the assessment AS-100 of 2026-11-17, 2.50 hours and the note Uses a walking frame. Its request container move-in holds the Care level radio group, a NativeRadioGroup, and the slot care-branch, which the page renders with the saved level's questions. The group's change compares the chosen level with the saved one: a level that differs asks the layout's NativeConfirm Replace the current care answers?, and Yes, as a return to the saved level does with no question, raises one event whose handler, under replace, unloads care-branch and GETs the chosen level's questions into it by When, ElseIf and Else; No raises the event the loaded questions' own plan answers by checking the radio of its level again. Save draft PUTs the container's inputs, and Saved care is what the page renders from the saved draft.",
+          "gesture": "Choose Memory as Care level and answer Yes; type MC-7 as Assessment code, tick Secure unit consent, type CT1 as Representative contact and click Save draft; then open the page again.",
+          "outcome": "Secure unit consent shows and Assistance hours leaves the page; after the save the page reads Draft saved: version 8, and opened again Saved care reads Memory, assessment MC-7, secure unit consent given, representative CT1, Memory is checked and no Assistance hours shows.",
+          "opposite": "With Skilled chosen and Yes answered, Order reference shows and no Secure unit consent.",
+          "defect": "Eq holds where its two values differ, so the first branch runs, Independent's questions load for Memory and Secure unit consent never shows."
+        },
+        {
+          "for": "M9.X16",
+          "page": "The move-in of draft D100, saved at version 7 under Assisted care with the assessment AS-100 of 2026-11-17, 2.50 hours and the note Uses a walking frame. Its request container move-in holds the Care level radio group, a NativeRadioGroup, and the slot care-branch, which the page renders with the saved level's questions. The group's change compares the chosen level with the saved one: a level that differs asks the layout's NativeConfirm Replace the current care answers?, and Yes, as a return to the saved level does with no question, raises one event whose handler, under replace, unloads care-branch and GETs the chosen level's questions into it by When, ElseIf and Else; No raises the event the loaded questions' own plan answers by checking the radio of its level again. Save draft PUTs the container's inputs, and Saved care is what the page renders from the saved draft.",
+          "gesture": "Choose Memory as Care level and answer No; then open the page again.",
+          "outcome": "Assisted is checked again, Assessment code still holds AS-100 and no Secure unit consent shows; opened again, Saved care reads Assisted, assessment AS-100 on 2026-11-17, 2.50 hours, Uses a walking frame and Saved version reads 7.",
+          "opposite": "With Yes answered, Secure unit consent shows and Memory stays checked.",
+          "defect": "The confirm answers true whichever button is pressed, so No loads Memory's questions."
+        },
+        {
+          "for": "M9.X17",
+          "page": "The move-in of draft D100, saved at version 7 under Assisted care with the assessment AS-100 of 2026-11-17, 2.50 hours and the note Uses a walking frame. Its request container move-in holds the Care level radio group, a NativeRadioGroup, and the slot care-branch, which the page renders with the saved level's questions. The group's change compares the chosen level with the saved one: a level that differs asks the layout's NativeConfirm Replace the current care answers?, and Yes, as a return to the saved level does with no question, raises one event whose handler, under replace, unloads care-branch and GETs the chosen level's questions into it by When, ElseIf and Else; No raises the event the loaded questions' own plan answers by checking the radio of its level again. Save draft PUTs the container's inputs, and Saved care is what the page renders from the saved draft.",
+          "gesture": "In a world whose seed closes building B1, the one building of Harbor House that holds a Memory care apartment, choose Memory as Care level and answer Yes; then open the page again.",
+          "outcome": "The care line reads Memory care admission is closed. and no Secure unit consent shows; opened again, Saved care reads Assisted, assessment AS-100 on 2026-11-17, 2.50 hours, Uses a walking frame and Assisted is checked.",
+          "opposite": "In a world where no building is closed, Secure unit consent shows and the care line stays empty.",
+          "defect": "A reply typed application/json is not read as JSON, so the refusal's route does not run and the care line stays empty."
+        },
+        {
+          "for": "M9.X18",
+          "page": "The move-in of draft D100, saved at version 7 under Assisted care with the assessment AS-100 of 2026-11-17, 2.50 hours and the note Uses a walking frame. Its request container move-in holds the Care level radio group, a NativeRadioGroup, and the slot care-branch, which the page renders with the saved level's questions. The group's change compares the chosen level with the saved one: a level that differs asks the layout's NativeConfirm Replace the current care answers?, and Yes, as a return to the saved level does with no question, raises one event whose handler, under replace, unloads care-branch and GETs the chosen level's questions into it by When, ElseIf and Else; No raises the event the loaded questions' own plan answers by checking the radio of its level again. Save draft PUTs the container's inputs, and Saved care is what the page renders from the saved draft.",
+          "gesture": "In a world whose seed drops the connection of the care questions GET, choose Memory as Care level, answer Yes and let the page's clock run until that GET has been sent four times, its first attempt and the three the host's retry default sends again; then open the page again.",
+          "outcome": "Notices reads Notices: error: The request failed., no Secure unit consent shows and Assistance hours has left the page; opened again, Saved care reads Assisted, assessment AS-100 on 2026-11-17, 2.50 hours, Uses a walking frame and Assessment code holds AS-100.",
+          "opposite": "In a world that drops nothing, Secure unit consent shows and Notices reads Notices: none.",
+          "defect": "An unload releases its slot's owners and leaves its content, so Assistance hours stays on the page after the change is confirmed."
+        },
+        {
+          "for": "M9.X19",
+          "page": "The move-in of draft D100, saved at version 7 under Assisted care with the assessment AS-100 of 2026-11-17, 2.50 hours and the note Uses a walking frame. Its request container move-in holds the Care level radio group, a NativeRadioGroup, and the slot care-branch, which the page renders with the saved level's questions. The group's change compares the chosen level with the saved one: a level that differs asks the layout's NativeConfirm Replace the current care answers?, and Yes, as a return to the saved level does with no question, raises one event whose handler, under replace, unloads care-branch and GETs the chosen level's questions into it by When, ElseIf and Else; No raises the event the loaded questions' own plan answers by checking the radio of its level again. Save draft PUTs the container's inputs, and Saved care is what the page renders from the saved draft.",
+          "gesture": "With the first care questions GET held, choose Memory as Care level and answer Yes; choose Skilled and answer Yes, whose GET answers; release Memory's; type ORD-7788 as Order reference and Dr Lee as Prescriber, click Save draft and open the page again.",
+          "outcome": "Order reference shows and no Secure unit consent, while Memory's GET is held and after its release; after the save the page reads Draft saved: version 8, and opened again Saved care reads Skilled, order ORD-7788 on 2026-11-18, prescriber Dr Lee.",
+          "opposite": "With no second choice, Memory's held GET, once released, shows Secure unit consent.",
+          "defect": "A run a newer event replaced is left running, so Memory's late answer puts its questions over Skilled's.",
+          "observes": "Lanes.tla:Route"
+        },
+        {
+          "for": "M9.X20",
+          "page": "The move-in of draft D100, saved at version 7 for resident R101, Helen Ward, born 1942-05-14, moving in 2026-11-20, of 18 Oak Street. Its request container move-in holds the resident's partials, rendered with Html.PartialFor at Resident, Resident.Identity and Resident.Address, each with its own plan: NativeTextBox inputs for the name, the emails and the address, a NativeTextArea for the notes, and for the birth date and the move-in date a ConformanceComponent bound to the date member, whose listbox Value offers days. At its start the resident's view GETs its desk, a partial of its own model, into resident-desk. The desk's Review resident details, a NativeButton, checks the container by the move-in's validator and then writes Resident details ready; its Verify identity POSTs the container's inputs as JSON to the draft's identity review with the resident's id in the query, checked by the rule set Identity; its 200 writes Identity checked by and the coordinator's name and, where the reply's review is required, GETs its receipt into identity-receipt; its 400 shows the server's failures and its 409 writes the server's message. Identity review on file and Active admission are what the page renders from the world's model.",
+          "gesture": "Click Verify identity; then open the page again.",
+          "outcome": "The identity line reads Identity checked by Maya Chen and no receipt is asked for; opened again, Identity review on file reads ID100, checked by Maya Chen.",
+          "opposite": "With 2026-11-25 picked as Move-in date before the click, the receipt reads Identity review ID100: Helen Ward, born 1942-05-14, moving in 2026-11-25, 18 Oak Street.",
+          "defect": "A branch runs where its condition holds false, so a receipt the reply does not require is asked for."
+        },
+        {
+          "for": "M9.X21",
+          "page": "The move-in of draft D100, saved at version 7 for resident R101, Helen Ward, born 1942-05-14, moving in 2026-11-20, of 18 Oak Street. Its request container move-in holds the resident's partials, rendered with Html.PartialFor at Resident, Resident.Identity and Resident.Address, each with its own plan: NativeTextBox inputs for the name, the emails and the address, a NativeTextArea for the notes, and for the birth date and the move-in date a ConformanceComponent bound to the date member, whose listbox Value offers days. At its start the resident's view GETs its desk, a partial of its own model, into resident-desk. The desk's Review resident details, a NativeButton, checks the container by the move-in's validator and then writes Resident details ready; its Verify identity POSTs the container's inputs as JSON to the draft's identity review with the resident's id in the query, checked by the rule set Identity; its 200 writes Identity checked by and the coordinator's name and, where the reply's review is required, GETs its receipt into identity-receipt; its 400 shows the server's failures and its 409 writes the server's message. Identity review on file and Active admission are what the page renders from the world's model.",
+          "gesture": "Choose Cedar, Apartment 7 and Window, type helen@example.org as Email confirmation, click Review resident details, then Verify identity; then open the page again.",
+          "outcome": "The email addresses must match. shows in the Email confirmation group and alone in the container's summary, the resident line stays empty and no identity review leaves the page; opened again, Identity review on file reads none.",
+          "opposite": "With the confirmation left as saved, Review resident details writes Resident details ready and Verify identity writes Identity checked by Maya Chen, one identity review sent.",
+          "defect": "A rule of a nested holder is run and its failure dropped, so the mismatch shows no message, is called ready and its review leaves."
+        },
+        {
+          "for": "M9.X22",
+          "page": "The move-in of draft D100, saved at version 7 for resident R101, Helen Ward, born 1942-05-14, moving in 2026-11-20, of 18 Oak Street. Its request container move-in holds the resident's partials, rendered with Html.PartialFor at Resident, Resident.Identity and Resident.Address, each with its own plan: NativeTextBox inputs for the name, the emails and the address, a NativeTextArea for the notes, and for the birth date and the move-in date a ConformanceComponent bound to the date member, whose listbox Value offers days. At its start the resident's view GETs its desk, a partial of its own model, into resident-desk. The desk's Review resident details, a NativeButton, checks the container by the move-in's validator and then writes Resident details ready; its Verify identity POSTs the container's inputs as JSON to the draft's identity review with the resident's id in the query, checked by the rule set Identity; its 200 writes Identity checked by and the coordinator's name and, where the reply's review is required, GETs its receipt into identity-receipt; its 400 shows the server's failures and its 409 writes the server's message. Identity review on file and Active admission are what the page renders from the world's model.",
+          "gesture": "With the page open, seed an admission for resident R101 in the world, click Verify identity, then open the page again.",
+          "outcome": "The identity line reads Helen Ward already holds admission ADM101.; opened again, Active admission reads ADM101 and Identity review on file reads none.",
+          "opposite": "In a world with no such admission, the identity line reads Identity checked by Maya Chen, and opened again Identity review on file reads ID100, checked by Maya Chen and Active admission reads none.",
+          "defect": "A request that sends a body sends no query, so the server is asked about no resident and answers another status."
+        },
+        {
+          "for": "M9.X23",
+          "page": "The move-in of draft D100, saved at version 7 for resident R101, Helen Ward, born 1942-05-14, moving in 2026-11-20, of 18 Oak Street. Its request container move-in holds the resident's partials, rendered with Html.PartialFor at Resident, Resident.Identity and Resident.Address, each with its own plan: NativeTextBox inputs for the name, the emails and the address, a NativeTextArea for the notes, and for the birth date and the move-in date a ConformanceComponent bound to the date member, whose listbox Value offers days. At its start the resident's view GETs its desk, a partial of its own model, into resident-desk. The desk's Review resident details, a NativeButton, checks the container by the move-in's validator and then writes Resident details ready; its Verify identity POSTs the container's inputs as JSON to the draft's identity review with the resident's id in the query, checked by the rule set Identity; its 200 writes Identity checked by and the coordinator's name and, where the reply's review is required, GETs its receipt into identity-receipt; its 400 shows the server's failures and its 409 writes the server's message. Identity review on file and Active admission are what the page renders from the world's model.",
+          "gesture": "In a world whose seed drops the connection of the identity review, click Verify identity; then open the page again.",
+          "outcome": "Notices reads Notices: error: The request failed., the identity line stays empty and the review was sent once; opened again, Identity review on file reads none.",
+          "opposite": "In a world that drops nothing, the identity line reads Identity checked by Maya Chen and Notices reads Notices: none.",
+          "defect": "A POST is sent again after its connection drops, so the notice waits on the retries and the review leaves more than once."
+        },
+        {
+          "for": "M9.X25",
+          "page": "The move-in of draft D100, saved at version 7 for Helen Ward with bed BED4 at revision 12. Beside its request container move-in a partial of its own model renders the allocation panel, a ConformanceComponent whose inner text is North allocation desk and whose check POSTs the draft's readiness endpoint, and at its start GETs its desk, a partial of its own model, into allocation-desk. The desk's Review allocation runs a handler, under replace, that reads the container's bed and the panel's Check() in one condition and, where both hold, the panel's awaited SettleCheck() in a condition of its own; where that answers true it POSTs the allocation review as JSON, the location, the level, the resident and the version read from the container, Ready true and the panel's inner text as its reference. Its 200 sets the panel's Text to the status and its WriteOnlyText to the community's name, writes the allocation line and, where the reply's instructions are required, GETs them into allocation-instructions; its 409 writes who holds the bed, the review reference read from the container through IfNull, and whether a waitlist place is offered; where either condition fails it writes Allocation is not ready. Bed on file and the list Allocation reviews are what the page renders from the world's model.",
+          "gesture": "Choose Cedar, Apartment 7 and Window; with the readiness POST held, click Review allocation; release it; then open the page again.",
+          "outcome": "While readiness is held no allocation review has left and the allocation line reads Not reviewed; released, the panel's heading reads Cleared, its Write-only reads Written Harbor House, the allocation line reads Cleared: BED4 revision 12 and the instructions read North allocation desk: prepare BED4 revision 12 for Helen Ward.; opened again, Allocation reviews lists AR100: BED4 revision 12, Cleared, North allocation desk.",
+          "opposite": "With Maple Court, Elm, Apartment 21 and Bed 21 chosen, whose apartment holds one bed, the panel reads Cleared and Written Maple Court, the allocation line reads Cleared: BED21 revision 6 and no instructions are asked for.",
+          "defect": "A reply's member read six members deep reads nothing, so the panel's Write-only stays Unwritten and the allocation line is never written.",
+          "observes": "Run.tla:Settle"
+        },
+        {
+          "for": "M9.X26",
+          "page": "The move-in of draft D100, saved at version 7 for Helen Ward with bed BED4 at revision 12. Beside its request container move-in a partial of its own model renders the allocation panel, a ConformanceComponent whose inner text is North allocation desk and whose check POSTs the draft's readiness endpoint, and at its start GETs its desk, a partial of its own model, into allocation-desk. The desk's Review allocation runs a handler, under replace, that reads the container's bed and the panel's Check() in one condition and, where both hold, the panel's awaited SettleCheck() in a condition of its own; where that answers true it POSTs the allocation review as JSON, the location, the level, the resident and the version read from the container, Ready true and the panel's inner text as its reference. Its 200 sets the panel's Text to the status and its WriteOnlyText to the community's name, writes the allocation line and, where the reply's instructions are required, GETs them into allocation-instructions; its 409 writes who holds the bed, the review reference read from the container through IfNull, and whether a waitlist place is offered; where either condition fails it writes Allocation is not ready. Bed on file and the list Allocation reviews are what the page renders from the world's model.",
+          "gesture": "In a world whose seed takes coordinator CO1's permission to admit, so the panel starts not enabled, choose Cedar, Apartment 7 and Window and click Review allocation; then open the page again.",
+          "outcome": "The allocation line reads Allocation is not ready and no readiness POST has left the page; opened again, Allocation reviews lists nothing.",
+          "opposite": "In a world where CO1 admits, the allocation line reads Cleared: BED4 revision 12, one readiness POST sent, and opened again Allocation reviews lists AR100: BED4 revision 12, Cleared, North allocation desk.",
+          "defect": "And holds where its second term fails, so the readiness POST leaves."
+        },
+        {
+          "for": "M9.X27",
+          "page": "The move-in of draft D100, saved at version 7 for Helen Ward with bed BED4 at revision 12. Beside its request container move-in a partial of its own model renders the allocation panel, a ConformanceComponent whose inner text is North allocation desk and whose check POSTs the draft's readiness endpoint, and at its start GETs its desk, a partial of its own model, into allocation-desk. The desk's Review allocation runs a handler, under replace, that reads the container's bed and the panel's Check() in one condition and, where both hold, the panel's awaited SettleCheck() in a condition of its own; where that answers true it POSTs the allocation review as JSON, the location, the level, the resident and the version read from the container, Ready true and the panel's inner text as its reference. Its 200 sets the panel's Text to the status and its WriteOnlyText to the community's name, writes the allocation line and, where the reply's instructions are required, GETs them into allocation-instructions; its 409 writes who holds the bed, the review reference read from the container through IfNull, and whether a waitlist place is offered; where either condition fails it writes Allocation is not ready. Bed on file and the list Allocation reviews are what the page renders from the world's model.",
+          "gesture": "Choose Cedar, Apartment 7 and Window; seed the world's bed BED4 as held by James Reed at revision 13; click Review allocation; then open the page again.",
+          "outcome": "The allocation line reads Bed held by James Reed; review reference Unassigned and the waitlist line reads A waitlist place can be offered; opened again, Bed on file reads BED4 revision 13, held by James Reed and Allocation reviews lists nothing.",
+          "opposite": "In a world where the bed stays free, the allocation line reads Cleared: BED4 revision 12 and the waitlist line stays empty.",
+          "defect": "IfNull's fallback is not read where its source reads nothing, so the line ends at review reference with no text."
+        },
+        {
+          "for": "M9.X28",
+          "page": "The move-in of draft D100, saved at version 7 for Helen Ward with bed BED4 at revision 12. Beside its request container move-in a partial of its own model renders the allocation panel, a ConformanceComponent whose inner text is North allocation desk and whose check POSTs the draft's readiness endpoint, and at its start GETs its desk, a partial of its own model, into allocation-desk. The desk's Review allocation runs a handler, under replace, that reads the container's bed and the panel's Check() in one condition and, where both hold, the panel's awaited SettleCheck() in a condition of its own; where that answers true it POSTs the allocation review as JSON, the location, the level, the resident and the version read from the container, Ready true and the panel's inner text as its reference. Its 200 sets the panel's Text to the status and its WriteOnlyText to the community's name, writes the allocation line and, where the reply's instructions are required, GETs them into allocation-instructions; its 409 writes who holds the bed, the review reference read from the container through IfNull, and whether a waitlist place is offered; where either condition fails it writes Allocation is not ready. Bed on file and the list Allocation reviews are what the page renders from the world's model.",
+          "gesture": "In a world whose seed drops the connection of the readiness POST, choose Cedar, Apartment 7 and Window and click Review allocation; then open the page again.",
+          "outcome": "The panel's Settle reads Refused, the allocation line stays Not reviewed, Busy reads Busy: none and no allocation review has left the page; opened again, Allocation reviews lists nothing.",
+          "opposite": "In a world that drops nothing, the panel's Settle reads Answered, the allocation line reads Cleared: BED4 revision 12 and one allocation review was sent.",
+          "defect": "A rejected awaited call reads as nothing and its run goes on, so the allocation line reads Allocation is not ready."
+        },
+        {
+          "for": "M9.X29",
+          "page": "The move-in of draft D100, saved at version 7 for Helen Ward with bed BED4 at revision 12. Beside its request container move-in a partial of its own model renders the allocation panel, a ConformanceComponent whose inner text is North allocation desk and whose check POSTs the draft's readiness endpoint, and at its start GETs its desk, a partial of its own model, into allocation-desk. The desk's Review allocation runs a handler, under replace, that reads the container's bed and the panel's Check() in one condition and, where both hold, the panel's awaited SettleCheck() in a condition of its own; where that answers true it POSTs the allocation review as JSON, the location, the level, the resident and the version read from the container, Ready true and the panel's inner text as its reference. Its 200 sets the panel's Text to the status and its WriteOnlyText to the community's name, writes the allocation line and, where the reply's instructions are required, GETs them into allocation-instructions; its 409 writes who holds the bed, the review reference read from the container through IfNull, and whether a waitlist place is offered; where either condition fails it writes Allocation is not ready. Bed on file and the list Allocation reviews are what the page renders from the world's model.",
+          "gesture": "Choose Cedar, Apartment 7 and Window and, with the readiness POST held, click Review allocation; choose Maple Court, Elm, Apartment 21 and Bed 21 and click Review allocation again, whose readiness answers; release the held one; click Save draft and open the page again.",
+          "outcome": "The allocation line reads Cleared: BED21 revision 6 before the release and after it; after the save the page reads Draft saved: version 8, and opened again Saved location reads C2 / B3 / A21 / BED21 revision 6 and Allocation reviews lists AR100: BED21 revision 6, Cleared, North allocation desk alone.",
+          "opposite": "With no second selection, the held review, once released, reads Cleared: BED4 revision 12, and opened again Allocation reviews lists AR100: BED4 revision 12, Cleared, North allocation desk.",
+          "defect": "A run that waits is not cut when a newer event replaces it, so the older review posts a second review once its readiness answers.",
+          "observes": "Run.tla:Abort"
         }
       ],
       "verdicts": []

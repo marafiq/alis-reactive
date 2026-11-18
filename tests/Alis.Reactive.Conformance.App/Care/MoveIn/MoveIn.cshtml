@@ -25,10 +25,16 @@
     </section>
 
     <section id="move-in-resident" aria-label="Resident">
+        <p>Identity review on file: <span id="identity-review">@Reads.IdentityReviewOf(Model.DraftId)</span></p>
+        <p>Active admission: <span id="active-admission">@Reads.ActiveAdmissionOf(Model.ResidentId)</span></p>
+        @await Html.PartialFor(m => m.Resident, "/Care/MoveIn/Resident.cshtml")
     </section>
 
     <section id="move-in-care" aria-label="Care">
         @await Html.PartialFor(m => m.Care, "/Care/MoveIn/Care.cshtml")
+        <div id="care-branch">
+            @await Html.PartialAsync("/Care/MoveIn/CareBranch.cshtml", Reads.CareQuestionsOf(Model))
+        </div>
     </section>
 
     <section id="move-in-contacts" aria-label="Contacts">

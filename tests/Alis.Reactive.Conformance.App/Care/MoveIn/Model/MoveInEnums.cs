@@ -87,6 +87,7 @@ public enum ReviewKind
     Services,
     Room,
     Mobility,
+    Identity,
 }
 
 [Flags]

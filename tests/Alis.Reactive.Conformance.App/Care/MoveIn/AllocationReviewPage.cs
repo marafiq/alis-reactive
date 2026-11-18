@@ -9,4 +9,8 @@ public sealed class AllocationReviewPage
     public string? Reference { get; set; }
 
     public ConformanceStart ComponentStart { get; set; } = new();
+
+    public string BedOnFile { get; set; } = string.Empty;
+
+    public IReadOnlyList<string> Reviews { get; set; } = [];
 }

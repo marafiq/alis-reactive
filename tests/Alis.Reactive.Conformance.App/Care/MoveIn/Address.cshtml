@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model Address
+@{
+    var plan = Html.ReactivePlan<Address>();
+}
+<fieldset>
+    <legend>Address</legend>
+    @(Html.InputField(plan, m => m.Street, options => options.Label("Street")).NativeTextBox())
+    @(Html.InputField(plan, m => m.City, options => options.Label("City")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Region, options => options.Label("Region")).NativeTextBox())
+    @(Html.InputField(plan, m => m.PostalCode, options => options.Label("Postal code")).NativeTextBox())
+    @(Html.InputField(plan, m => m.CountryCode, options => options.Label("Country code")).NativeTextBox())
+</fieldset>
+@Html.RenderPlan(plan)

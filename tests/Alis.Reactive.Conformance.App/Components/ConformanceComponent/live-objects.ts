@@ -79,6 +79,7 @@ export class Outer {
         this.heldText = start.text;
         this.heldCount = start.count;
         this.middle = new Middle(middle, view, request, endpoint);
+        this.middle.inner.text = start.innerText;
         this.text = start.text;
         this.count = start.count;
     }

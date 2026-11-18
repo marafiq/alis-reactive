@@ -9,4 +9,7 @@ public sealed class OuterStart
 
     [JsonPropertyName("count")]
     public int Count { get; init; }
+
+    [JsonPropertyName("innerText")]
+    public string InnerText { get; init; } = "";
 }

@@ -398,6 +398,50 @@
           "kind": "plugin",
           "module": "RequestsAndResponses",
           "role": "the page's notice, the conformance library's ConformanceNotice, which the layout renders: it provides the plugin notice and shows each notice the core passes it in its status Notices"
+        },
+        {
+          "id": "careInputs",
+          "kind": "nativeSlice",
+          "role": "the care level's NativeRadioGroup and the NativeTextBox and NativeCheckBox inputs of the level's questions",
+          "module": "NativeComponents"
+        },
+        {
+          "id": "careBranch",
+          "kind": "slot",
+          "role": "the slot the questions of one care level load into, inside the move-in's container"
+        },
+        {
+          "id": "confirm",
+          "kind": "nativeSlice",
+          "role": "NativeConfirm, which the layout renders",
+          "module": "NativeAppLevelObjects"
+        },
+        {
+          "id": "residentPartials",
+          "kind": "partial",
+          "role": "the resident's views, partials the page renders with Html.PartialFor at Resident, Resident.Identity and Resident.Address, each with its own plan"
+        },
+        {
+          "id": "residentInputs",
+          "kind": "nativeSlice",
+          "role": "the resident's NativeTextBox and NativeTextArea inputs and the NativeButton that reviews them",
+          "module": "NativeComponents"
+        },
+        {
+          "id": "dayPickers",
+          "kind": "conformance",
+          "role": "the day pickers, each a ConformanceComponent bound to a date member, whose value a person picks among the days its listbox offers",
+          "declares": "ConformanceComponent"
+        },
+        {
+          "id": "receiptSlots",
+          "kind": "slot",
+          "role": "the slots a receipt loads into: the identity review's and the allocation's instructions"
+        },
+        {
+          "id": "deskSlots",
+          "kind": "slot",
+          "role": "the slots the resident's desk and the allocation's desk load into at their views' start, each a partial with its own plan"
         }
       ]
     },
@@ -5519,6 +5563,377 @@
           "verb": "gate",
           "action": "Lanes.tla:Respond",
           "on": "Harbor House's buildings GET, the page's own at its start"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X15",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "careInputs",
+        "careBranch",
+        "confirm",
+        "moveInEndpoint",
+        "dayPickers"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X16",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "careInputs",
+        "careBranch",
+        "confirm",
+        "moveInEndpoint",
+        "dayPickers"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X17",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "careInputs",
+        "careBranch",
+        "confirm",
+        "moveInEndpoint",
+        "dayPickers"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "building B1, closed in the world's rules"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X18",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "careInputs",
+        "careBranch",
+        "confirm",
+        "moveInEndpoint",
+        "dayPickers",
+        "notice"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the care questions GET, whose connection the world drops"
+        },
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the retry's waits"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X19",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "careInputs",
+        "careBranch",
+        "confirm",
+        "moveInEndpoint",
+        "dayPickers",
+        "busy"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the first care questions GET, Memory's"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X20",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "residentPartials",
+        "residentInputs",
+        "dayPickers",
+        "deskSlots",
+        "moveInEndpoint",
+        "moveInValidator",
+        "receiptSlots"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X21",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "residentPartials",
+        "residentInputs",
+        "dayPickers",
+        "deskSlots",
+        "moveInEndpoint",
+        "moveInValidator",
+        "locationInputs",
+        "lookupSlots"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X22",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "residentPartials",
+        "residentInputs",
+        "dayPickers",
+        "deskSlots",
+        "moveInEndpoint",
+        "moveInValidator"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "an admission resident R101 holds, seeded while the page is open"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X23",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "residentPartials",
+        "residentInputs",
+        "dayPickers",
+        "deskSlots",
+        "moveInEndpoint",
+        "moveInValidator",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the identity review POST, whose connection the world drops"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X25",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "deskSlots",
+        "moveInEndpoint",
+        "allocationPanel",
+        "receiptSlots"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the readiness POST the panel's SettleCheck() awaits"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X26",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "deskSlots",
+        "moveInEndpoint",
+        "allocationPanel"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "coordinator CO1, whose permission to admit the world takes"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X27",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "deskSlots",
+        "moveInEndpoint",
+        "allocationPanel"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "bed BED4, held by James Reed at revision 13, seeded while the page is open"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X28",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "deskSlots",
+        "moveInEndpoint",
+        "allocationPanel",
+        "busy"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the readiness POST, whose connection the world drops"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X29",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "deskSlots",
+        "moveInEndpoint",
+        "allocationPanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the readiness POST of the first review, Window's"
         }
       ]
     },

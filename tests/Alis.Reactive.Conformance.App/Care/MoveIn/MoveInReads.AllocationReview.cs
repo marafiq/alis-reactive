@@ -10,6 +10,8 @@ internal sealed partial class MoveInReads
     {
         DraftId = page.DraftId,
         Reference = page.Review.Reference,
+        BedOnFile = Desk.BedOnFileOf(page.Location.BedId),
+        Reviews = Desk.AllocationReviewsOf(page.DraftId),
         ComponentStart = new ConformanceStart
         {
             Text = "Service review",
@@ -17,7 +19,9 @@ internal sealed partial class MoveInReads
             Options = ["none", "DIN", "PHA", "TRA"],
             Count = 2,
             Amount = 240.00m,
-            Enabled = true,
+            Enabled = Desk.MayAdmit(page.CoordinatorId),
+            Outer = new OuterStart { InnerText = TheDeskOf(page.Location.CommunityId) },
+            CheckEndpoint = MoveInEndpoints.ReviewCheckOf(page.DraftId),
             ReadOnlyText = page.Location.CommunityId,
             CurrentItem = "Dining",
             Items =
@@ -35,4 +39,6 @@ internal sealed partial class MoveInReads
             Record = new RecordStart { Name = "Service review", Code = RecordCode.Text("Q3"), Count = 2, Day = TheReviewsDay, Detail = new DetailStart { Name = "Capacity checked" } },
         },
     };
+
+    private string TheDeskOf(string communityId) => Desk.SiteOf(communityId) is { Length: > 0 } site ? site + " allocation desk" : "Allocation desk";
 }

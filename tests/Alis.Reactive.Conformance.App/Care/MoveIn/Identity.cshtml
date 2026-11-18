@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@inject MoveInReads Reads
+@model ResidentIdentity
+@{
+    var plan = Html.ReactivePlan<ResidentIdentity>();
+}
+<fieldset>
+    <legend>Resident name</legend>
+    @(Html.InputField(plan, m => m.Name, options => options.Label("Resident name")).NativeTextBox())
+</fieldset>
+<fieldset>
+    <legend>Preferred name</legend>
+    @(Html.InputField(plan, m => m.PreferredName, options => options.Label("Preferred name")).NativeTextBox())
+</fieldset>
+<fieldset>
+    <legend>Birth date</legend>
+    @(Html.InputField(plan, m => m.BirthDate, options => options.Label("Birth date")).ConformanceComponent(Reads.DayPicker("Birth date", Model.BirthDate, Reads.Today().AddYears(-55), Reads.Today().AddYears(-40))))
+</fieldset>
+<fieldset>
+    <legend>Email</legend>
+    @(Html.InputField(plan, m => m.Email, options => options.Label("Email")).NativeTextBox())
+</fieldset>
+<fieldset>
+    <legend>Email confirmation</legend>
+    @(Html.InputField(plan, m => m.EmailConfirmation, options => options.Label("Email confirmation")).NativeTextBox())
+</fieldset>
+@Html.RenderPlan(plan)
