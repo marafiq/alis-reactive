@@ -162,6 +162,13 @@ jobs:
           & $env:MSBUILD_EXE tests/Alis.Reactive.Consumer.Net48/Alis.Reactive.Consumer.Net48.csproj -restore "-p:Configuration=Release" -warnaserror
       - name: What a build wrote into the fresh app, and the analyzers that reach it
         run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt"
+      - name: Chromium, at the version the browser tests' Playwright pins
+        shell: pwsh
+        run: |
+          dotnet restore tests/Alis.Reactive.Conformance.PlaywrightTests
+          $pin = (Select-Xml -Path Directory.Packages.props -XPath "//PackageVersion[@Include='Microsoft.Playwright']").Node.Version
+          $playwright = Join-Path $HOME ".nuget/packages/microsoft.playwright/$pin/.playwright"
+          & (Join-Path $playwright "node/win32_x64/node.exe") (Join-Path $playwright "package/cli.js") install chromium
       - name: The tests under the twin
         run: scripts/playwright.sh --all --host net48
       - name: The tests under the fresh MVC 5 app
