@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Wed Nov 18 03:19:57 EST 2026
+Written at `date`: Wed Nov 18 03:37:26 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -25,25 +25,23 @@ unit: building ../movein1 MoveInSlice1: it lacks paths.txt or message.txt
   read first: the rule file of each kind of file, as it is opened
   exit line: each line of the brief's "Done"
   goes to: unit: ready, or unit: returned for an agent
-unit: landed ../skill BuildAScreen
-  next: git worktree remove ../skill
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: ready ../skill BuildAScreen
+  next: scripts/land-unit.sh ../skill e9b49a1eb "skill: build-a-screen, a decision map from a developer's question to one door, its meaning, its ordering and a landed view" ".landing/BuildAScreen"
+  leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
+  exit line: "landed", with the browser run's result line
+  goes to: unit: landed
 unit: waiting ../typed-doors TypedDoors: for TypedHome
   leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
   exit line: each line of the brief's "Done"
   goes to: unit: ready
 unit: ready ../typed-home TypedHome
   next: scripts/land-unit.sh ../typed-home 176de4cd3 "fresh apps and README: the home page has a model of its own, and no example opens a plan over dynamic" ".landing/TypedHome"
-  leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
-  exit line: "landed", with the browser run's result line
-  goes to: unit: landed
-lane: pushed at fa8b912da on feature/rewrite: equal to the remote
+lane: pushed at 2836ae7e4 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at fa8b912da
+ci: unread at 2836ae7e4
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -51,20 +49,20 @@ file: over CLAUDE.md: holds 325 lines, its limit 200
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over spec/CLAUDE.md: holds 2058 lines, its limit 150
-file: over HANDOFF.md: holds 195 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2064 lines, its limit 150
+file: over HANDOFF.md: holds 202 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 197 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: fa8b912da skill: build-a-screen, a decision map from a developer's question to one door, its meaning, its ordering and a landed view
-- Full check: .work/logs/spec-check-fa8b912da.log: spec check at fa8b912da: 40 of 40 checks pass
-- .work/last-run.txt: 20261118-030920-20596 fa8b912da
+- HEAD: 2836ae7e4 fresh apps and README: the home page has a model of its own, and no example opens a plan over dynamic
+- Full check: .work/logs/spec-check-2836ae7e4.log: spec check at 2836ae7e4: 40 of 40 checks pass
+- .work/last-run.txt: 20261118-032656-66296 2836ae7e4
 
 ## Landed since the commit before the last spec: STATE commit
-fa8b912da skill: build-a-screen, a decision map from a developer's question to one door, its meaning, its ordering and a landed view
-176de4cd3 spec: STATE and handoff at ccae92cac
+2836ae7e4 fresh apps and README: the home page has a model of its own, and no example opens a plan over dynamic
+1ca74af0a spec: STATE and handoff at fa8b912da
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -113,7 +111,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A fault found in an agent's work whose instruction the brief did not give: 0 to 2
+- A rule or a tool's list not applied before the change: 376 to 378
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1926: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -124,6 +122,7 @@ spec/CLAUDE.md:1966: - The owner, 2026-11-18, on the machine as built (verbatim 
 spec/CLAUDE.md:1979: - The owner, 2026-11-18, after a unit's delivery proof stopped before its browser step (verbatim in `spec/NOTES.md`):
 spec/CLAUDE.md:1986: - The owner, 2026-11-18, on the machine as the lead had written it, one table with sentences around it and checks
 spec/CLAUDE.md:1993: - The owner, 2026-11-18 (verbatim in `spec/NOTES.md`): "I want you to build a skill out of that TLA plus and schema,
+spec/CLAUDE.md:2000: - The owner, 2026-11-18, on README's first example and both fresh apps' home views (verbatim in `spec/NOTES.md`):
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
