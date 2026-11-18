@@ -29,6 +29,7 @@ public sealed class Program
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(cookie => cookie.LoginPath = SessionNotesEndpoints.SignIn);
         if (builder.Environment.IsDevelopment()) builder.Services.AddWorld();
+        builder.Services.AddScoped<MoveInReads>();
         AppHost.AddTracing(host, builder);
 
         var app = builder.Build();

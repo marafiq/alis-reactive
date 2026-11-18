@@ -504,6 +504,31 @@
           "id": "M9.X9",
           "rung": "behavior",
           "defect": "A partial that holds a container, a request and a validator of its own is checked by the page's rules, or the page by its: a save of one is refused for what the other lacks. On the arrival desk the next of kin partial's save is checked by its own two rules alone, and the arrival's rules by the arrival's request alone."
+        },
+        {
+          "id": "M9.X10",
+          "rung": "behavior",
+          "defect": "A cascade's list is loaded without the parents chosen before it or the care level read beside them, or a choice among a loaded list moves the saved draft: on the move-in, apartment 7 offers no bed, Willow offers apartment 9 under Assisted care, or the saved location changes with no save (MI.1, situation 1)."
+        },
+        {
+          "id": "M9.X11",
+          "rung": "behavior",
+          "defect": "A cascade's first level left empty still sends its lookup, or leaves the levels under it on the page: on the move-in, an empty Community sends a second buildings GET, or the Building list stays (MI.1, situation 2)."
+        },
+        {
+          "id": "M9.X12",
+          "rung": "behavior",
+          "defect": "A slot's load the server refuses by a status its request names runs the load, or no route: on the move-in, choosing a building the world holds closed shows no reason, or loads a list (MI.1, situation 3)."
+        },
+        {
+          "id": "M9.X13",
+          "rung": "behavior",
+          "defect": "A slot's load whose connection drops on every attempt leaves the page with no word of it, or with choices it did not load: on the move-in, the failed apartments GET shows no notice, or an Apartment list (MI.1, situation 4)."
+        },
+        {
+          "id": "M9.X14",
+          "rung": "behavior",
+          "defect": "A cascade's older answer, arriving after a newer choice replaced its run, loads its list over the newer one, or a lookup moves the saved draft before a save: on the move-in, Harbor House's late buildings stand over Maple Court's, or Saved location moves with no save (MI.1, situation 5)."
         }
       ],
       "promises": [
@@ -644,6 +669,47 @@
           "outcome": "Saved reads Next of kin: Jo Hart.",
           "opposite": "With the kin's boxes left empty, Save next of kin shows Name the next of kin. and Give a phone number. in their groups, and Saved stays nobody.",
           "defect": "The partial's save is held to the page's rules, so Name the resident. blocks it and Saved stays nobody; or its own rules are skipped and an empty kin is saved."
+        },
+        {
+          "for": "M9.X10",
+          "page": "The move-in of draft D100, whose world holds Harbor House with its buildings Cedar and Willow, Maple Court with Elm, and the draft saved at version 7 with Harbor House, Cedar, apartment 7 and bed BED4 at revision 12 under Assisted care. Its request container move-in holds the Community drop-down, whose change and the page's start raise one event, whose handler, under replace, GETs that community's buildings into their slot; the Building drop-down's change GETs the apartments that take the care level, and the Apartment drop-down's the apartment's beds, each into its slot inside the container, each read from the world's model. Save draft PUTs the container's inputs with the saved version in a header, and Saved location is what the page renders from the saved draft.",
+          "gesture": "Choose Cedar as Building, Apartment 7 as Apartment, then Window as Bed, then Door, held by Nora Patel as Bed; then open the page again.",
+          "outcome": "Bed offers Window and Door, held by Nora Patel; the bed line reads Window bed available, then Door bed held by Nora Patel; opened again, Saved location reads C1 / B1 / A7 / BED4 revision 12 and Saved version reads 7.",
+          "opposite": "With Willow chosen as Building, Apartment offers no apartment, since Willow's apartment 9 takes Skilled care alone.",
+          "defect": "A lookup leaves with the first member of its query alone, so Building offers no building of Harbor House and no list under it loads."
+        },
+        {
+          "for": "M9.X11",
+          "page": "The move-in of draft D100, whose world holds Harbor House with its buildings Cedar and Willow, Maple Court with Elm, and the draft saved at version 7 with Harbor House, Cedar, apartment 7 and bed BED4 at revision 12 under Assisted care. Its request container move-in holds the Community drop-down, whose change and the page's start raise one event, whose handler, under replace, GETs that community's buildings into their slot; the Building drop-down's change GETs the apartments that take the care level, and the Apartment drop-down's the apartment's beds, each into its slot inside the container, each read from the world's model. Save draft PUTs the container's inputs with the saved version in a header, and Saved location is what the page renders from the saved draft.",
+          "gesture": "Choose the empty choice, Choose a community, as Community.",
+          "outcome": "Choose a community. shows in the Community group, the Building list leaves the page and the page has sent one buildings GET, its own at load; opened again, Community reads Harbor House.",
+          "opposite": "With Maple Court chosen as Community, Building offers Elm and the page has sent two buildings GETs.",
+          "defect": "The condition on the community's value passes for an empty one, so a second buildings GET leaves and a Building list that offers no building shows."
+        },
+        {
+          "for": "M9.X12",
+          "page": "The move-in of draft D100, whose world holds Harbor House with its buildings Cedar and Willow, Maple Court with Elm, and the draft saved at version 7 with Harbor House, Cedar, apartment 7 and bed BED4 at revision 12 under Assisted care. Its request container move-in holds the Community drop-down, whose change and the page's start raise one event, whose handler, under replace, GETs that community's buildings into their slot; the Building drop-down's change GETs the apartments that take the care level, and the Apartment drop-down's the apartment's beds, each into its slot inside the container, each read from the world's model. Save draft PUTs the container's inputs with the saved version in a header, and Saved location is what the page renders from the saved draft.",
+          "gesture": "In a world whose seed closes building B1, choose Cedar, closed as Building; then open the page again and choose it again.",
+          "outcome": "The building line reads Cedar is closed. and no Apartment list shows; opened again, Building still offers Cedar, closed, and choosing it reads Cedar is closed. again.",
+          "opposite": "In a world where no building is closed, Building offers Cedar and choosing it offers Apartment 7.",
+          "defect": "The 422's typed route does not run, so the building line stays empty."
+        },
+        {
+          "for": "M9.X13",
+          "page": "The move-in of draft D100, whose world holds Harbor House with its buildings Cedar and Willow, Maple Court with Elm, and the draft saved at version 7 with Harbor House, Cedar, apartment 7 and bed BED4 at revision 12 under Assisted care. Its request container move-in holds the Community drop-down, whose change and the page's start raise one event, whose handler, under replace, GETs that community's buildings into their slot; the Building drop-down's change GETs the apartments that take the care level, and the Apartment drop-down's the apartment's beds, each into its slot inside the container, each read from the world's model. Save draft PUTs the container's inputs with the saved version in a header, and Saved location is what the page renders from the saved draft.",
+          "gesture": "In a world whose seed drops the connection of the apartments GET, choose Cedar as Building and let the page's clock run until that GET has been sent four times, its first attempt and the three the host's retry default sends again; then open the page again.",
+          "outcome": "Notices reads Notices: error: The request failed., Building still offers Cedar and Willow and no Apartment list shows; opened again, Saved location reads C1 / B1 / A7 / BED4 revision 12.",
+          "opposite": "In a world that drops nothing, choosing Cedar offers Apartment 7 and Notices reads Notices: none.",
+          "defect": "The failed load's catch-all route does not run, so Notices stays Notices: none."
+        },
+        {
+          "for": "M9.X14",
+          "page": "The move-in of draft D100, whose world holds Harbor House with its buildings Cedar and Willow, Maple Court with Elm, and the draft saved at version 7 with Harbor House, Cedar, apartment 7 and bed BED4 at revision 12 under Assisted care. Its request container move-in holds the Community drop-down, whose change and the page's start raise one event, whose handler, under replace, GETs that community's buildings into their slot; the Building drop-down's change GETs the apartments that take the care level, and the Apartment drop-down's the apartment's beds, each into its slot inside the container, each read from the world's model. Save draft PUTs the container's inputs with the saved version in a header, and Saved location is what the page renders from the saved draft.",
+          "gesture": "With the page's own buildings GET of Harbor House held, choose Maple Court as Community, whose GET answers; then release Harbor House's; choose Elm, Apartment 21 and Bed 21; open the page again; choose Maple Court, Elm, Apartment 21 and Bed 21 again and click Save draft; open the page once more.",
+          "outcome": "Building offers Elm alone while Harbor House's GET is held and after its release; opened again, Saved location still reads C1 / B1 / A7 / BED4 revision 12; after the save the page reads Draft saved: version 8, and opened once more Saved location reads C2 / B3 / A21 / BED21 revision 6 and Saved version reads 8.",
+          "opposite": "With no second choice, Harbor House's held GET, once released, offers Cedar and Willow.",
+          "defect": "The run a newer choice replaced runs its route, so Harbor House's late answer puts Cedar and Willow over Elm.",
+          "observes": "Lanes.tla:Route"
         }
       ],
       "verdicts": []

@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+    var beds = Reads.BedsOf(Model.Location.CommunityId, Model.Location.BuildingId, Model.Location.ApartmentId);
+}
+@(Html.InputField(plan, m => m.Location.BedId, options => options.Label("Bed")).NativeDropDown(build => build.Placeholder("Choose a bed").Items(beds.Select(bed => new SelectListItem(bed.Offered, bed.Id))))
+    .Reactive(bed => bed.Change, (changed, pipeline) =>
+    {
+        var chosen = pipeline.Input(m => m.Location.BedId).Component<NativeDropDown>().Value;
+        var told = pipeline.When(chosen.IsEmpty()).Then(pipeline =>
+        {
+            pipeline.Input(m => m.Location.BedRevision).Component<NativeHiddenField>().Value.Set("0");
+            pipeline.Element("bed-status").Text.Set("No bed chosen");
+        });
+        foreach (var bed in beds)
+        {
+            told = told.ElseIf(chosen.Eq(bed.Id)).Then(pipeline =>
+            {
+                pipeline.Input(m => m.Location.BedRevision).Component<NativeHiddenField>().Value.Set(bed.Revision);
+                pipeline.Element("bed-status").Text.Set(bed.Told);
+            });
+        }
+    }))
+@(Html.NativeHiddenField(plan, m => m.Location.BedRevision))
+@Html.RenderPlan(plan)

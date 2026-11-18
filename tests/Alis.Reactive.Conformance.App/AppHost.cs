@@ -194,7 +194,7 @@ internal static class AppHost
     private static bool Traces(string host) => host is HostNames.Tracing or HostNames.TracingSinkThrows;
 
     internal static void AddValidation(IServiceCollection services)
-        => services.AddReactiveFluentValidation(validators => validators
+        => services.AddReactiveFluentValidation(validators => Care.MoveInValidators.AddTo(validators
             .Flags<Components.CareDays>()
             .Flags<Care.CareDays>()
             .Flags<Care.RotaDays>()
@@ -244,7 +244,7 @@ internal static class AppHost
             .Add<Care.AddressAdmissionRules>()
             .Add<Care.WardPharmacyAdmissionRules>()
             .Add<Care.WardPharmacyAdmissionInItsContractRules>()
-            .Add<Refusals.VisitValidator>());
+            .Add<Refusals.VisitValidator>()));
 
     private static void WriteEnumNames(JsonSerializerOptions json) => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 

@@ -16,6 +16,10 @@ its views.
   validation; a cascade, where one input's change loads another's choices; and the conformance component's members,
   sync and async, as the values. `Care/Admission/ArrivalDesk.cshtml` is the first such screen. A behavior joins a
   combined screen before it gets a page of its own; `Bench/` keeps the reference cells, one member a page.
+- A care screen's endpoints read and change a domain model held in memory, one test world's own and seeded: none
+  answers a constant. A test observes what the server received, the values the person entered as the server stored
+  them, and what changed, by the next read of that model (the owner, 2026-11-18: "Sending request isn't enough ...
+  you gotta build the domain model of the apps in memory so that you can observe real behavior").
 - A screen's inputs sit in a request container, `Html.BeginRequestContainer`, since containers nest and a form cannot
   hold a form (the owner, 2026-11-08: "forms are not always possible -- could be a container"); `Html.BeginRequestForm`
   is for a page that sends its body as the browser's own form does and nests nothing.

@@ -3598,6 +3598,71 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M9.F2 M9.X10 0": {
+    "modules": [],
+    "views": [
+      "/Care/MoveIn/AllocationReview.cshtml",
+      "/Care/MoveIn/Apartments.cshtml",
+      "/Care/MoveIn/Beds.cshtml",
+      "/Care/MoveIn/Buildings.cshtml",
+      "/Care/MoveIn/Care.cshtml",
+      "/Care/MoveIn/Location.cshtml",
+      "/Care/MoveIn/MoveIn.cshtml",
+      "/Care/MoveIn/_MoveInLayout.cshtml"
+    ]
+  },
+  "M9.F2 M9.X11 0": {
+    "modules": [],
+    "views": [
+      "/Care/MoveIn/AllocationReview.cshtml",
+      "/Care/MoveIn/Apartments.cshtml",
+      "/Care/MoveIn/Beds.cshtml",
+      "/Care/MoveIn/Buildings.cshtml",
+      "/Care/MoveIn/Care.cshtml",
+      "/Care/MoveIn/Location.cshtml",
+      "/Care/MoveIn/MoveIn.cshtml",
+      "/Care/MoveIn/_MoveInLayout.cshtml"
+    ]
+  },
+  "M9.F2 M9.X12 0": {
+    "modules": [],
+    "views": [
+      "/Care/MoveIn/AllocationReview.cshtml",
+      "/Care/MoveIn/Apartments.cshtml",
+      "/Care/MoveIn/Beds.cshtml",
+      "/Care/MoveIn/Buildings.cshtml",
+      "/Care/MoveIn/Care.cshtml",
+      "/Care/MoveIn/Location.cshtml",
+      "/Care/MoveIn/MoveIn.cshtml",
+      "/Care/MoveIn/_MoveInLayout.cshtml"
+    ]
+  },
+  "M9.F2 M9.X13 0": {
+    "modules": [],
+    "views": [
+      "/Care/MoveIn/AllocationReview.cshtml",
+      "/Care/MoveIn/Apartments.cshtml",
+      "/Care/MoveIn/Beds.cshtml",
+      "/Care/MoveIn/Buildings.cshtml",
+      "/Care/MoveIn/Care.cshtml",
+      "/Care/MoveIn/Location.cshtml",
+      "/Care/MoveIn/MoveIn.cshtml",
+      "/Care/MoveIn/_MoveInLayout.cshtml"
+    ]
+  },
+  "M9.F2 M9.X14 0": {
+    "modules": [],
+    "views": [
+      "/Care/MoveIn/AllocationReview.cshtml",
+      "/Care/MoveIn/Apartments.cshtml",
+      "/Care/MoveIn/Beds.cshtml",
+      "/Care/MoveIn/Buildings.cshtml",
+      "/Care/MoveIn/Care.cshtml",
+      "/Care/MoveIn/Location.cshtml",
+      "/Care/MoveIn/MoveIn.cshtml",
+      "/Care/MoveIn/_MoveInLayout.cshtml"
+    ]
+  },
   "M9.F2 M9.X2 0": {
     "modules": [],
     "views": [

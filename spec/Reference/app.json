@@ -350,6 +350,58 @@
       ]
     },
     {
+      "id": "moveIn",
+      "area": "care",
+      "title": "Move-in",
+      "user": "prepares a resident's move-in from its saved draft: chooses the community, the building, the apartment and the bed, each list loaded for the choices before it, saves the draft and reads it again as the world's model holds it",
+      "parts": [
+        {
+          "id": "moveInForm",
+          "kind": "form",
+          "role": "the move-in's request container with its summary"
+        },
+        {
+          "id": "locationInputs",
+          "kind": "nativeSlice",
+          "role": "the location's NativeDropDown inputs for community, building, apartment and bed, and the NativeHiddenField inputs of the draft and the bed's revision",
+          "module": "NativeComponents"
+        },
+        {
+          "id": "lookupSlots",
+          "kind": "slot",
+          "role": "the slots the buildings, the apartments and the beds load into, inside the move-in's container"
+        },
+        {
+          "id": "moveInEndpoint",
+          "kind": "endpoint",
+          "role": "the move-in's endpoints: the page, the lookups and the save, each answered from the model one world owns"
+        },
+        {
+          "id": "allocationPanel",
+          "kind": "conformance",
+          "role": "the allocation panel, a ConformanceComponent another plan renders, whose read-only text names the desk's community in a lookup's header",
+          "declares": "ConformanceComponent"
+        },
+        {
+          "id": "moveInValidator",
+          "kind": "validator",
+          "role": "the move-in's validator: the location's four rules"
+        },
+        {
+          "id": "busy",
+          "kind": "plugin",
+          "module": "RequestsAndResponses",
+          "role": "the page's busy indicator, the conformance library's ConformanceBusy, which the layout renders: it provides the plugin busy under ShowBusy() and shows each target a request holds in its status Busy"
+        },
+        {
+          "id": "notice",
+          "kind": "plugin",
+          "module": "RequestsAndResponses",
+          "role": "the page's notice, the conformance library's ConformanceNotice, which the layout renders: it provides the plugin notice and shows each notice the core passes it in its status Notices"
+        }
+      ]
+    },
+    {
       "id": "admission-clinical",
       "area": "care",
       "under": "admission",
@@ -5342,6 +5394,132 @@
       ],
       "harness": [
         "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X10",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "allocationPanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X11",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "allocationPanel",
+        "moveInValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X12",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "allocationPanel"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "building B1, closed in the world's rules"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X13",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "allocationPanel",
+        "notice"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the apartments GET, whose connection the world drops"
+        },
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the retry's waits"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X14",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "allocationPanel",
+        "busy"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "Harbor House's buildings GET, the page's own at its start"
+        }
       ]
     },
     {

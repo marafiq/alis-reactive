@@ -14,6 +14,8 @@ internal sealed class WorldData
     private readonly ConcurrentQueue<CollectedSpan> _spans = new();
     private readonly ConcurrentQueue<HeardAttempt> _attempts = new();
     private readonly ConcurrentQueue<string> _secondOriginLog = new();
+    private readonly List<Seed> _seeds = [];
+    private readonly Dictionary<Type, IOwnedByAWorld> _owned = [];
     private volatile string _word = "";
     private volatile string _componentText = "Alpha";
     private volatile string _componentOuterText = "Gamma";
@@ -171,6 +173,25 @@ internal sealed class WorldData
         if (seed.BindingStarted is { } bindingStarted) _bindingStarted = bindingStarted;
         if (seed.BindingsWhole is { } bindingsWhole) _bindingsWhole = bindingsWhole;
         if (seed.RenderUnrecorded is { } renderUnrecorded) _renderUnrecorded = renderUnrecorded;
+        lock (_owned)
+        {
+            _seeds.Add(seed);
+            foreach (var owned in _owned.Values) owned.Take(seed);
+        }
+    }
+
+    internal TOwned Owns<TOwned>(Func<TOwned> start)
+        where TOwned : class, IOwnedByAWorld
+    {
+        lock (_owned)
+        {
+            if (_owned.TryGetValue(typeof(TOwned), out var held)) return (TOwned)held;
+
+            var owned = start();
+            foreach (var seed in _seeds) owned.Take(seed);
+            _owned[typeof(TOwned)] = owned;
+            return owned;
+        }
     }
 
     internal void Collected(CollectedSpan span) => _spans.Enqueue(span);

@@ -329,6 +329,12 @@ public static class Promises
         public const string M9_X7_0 = "M9.F2 M9.X7 0";
         public const string M9_X8_0 = "M9.F2 M9.X8 0";
         public const string M9_X9_0 = "M9.F2 M9.X9 0";
+        public const string M9_X10_0 = "M9.F2 M9.X10 0";
+        public const string M9_X11_0 = "M9.F2 M9.X11 0";
+        public const string M9_X12_0 = "M9.F2 M9.X12 0";
+        public const string M9_X13_0 = "M9.F2 M9.X13 0";
+        [Holds(LanesGate.Respond)]
+        public const string M9_X14_0 = "M9.F2 M9.X14 0";
     }
 
     public static class M10_F1

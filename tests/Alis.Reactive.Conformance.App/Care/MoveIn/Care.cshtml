@@ -1,0 +1,13 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model CareInput
+@{
+    var plan = Html.ReactivePlan<CareInput>();
+}
+<fieldset>
+    <legend>Care level</legend>
+    @(Html.InputField(plan, m => m.Level, options => options.Label("Care level")).NativeRadioGroup(group => group.Option("Independent").Option("Assisted").Option("Memory").Option("Skilled")))
+</fieldset>
+<div id="care-branch"></div>
+@Html.RenderPlan(plan)

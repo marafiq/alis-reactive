@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@model AllocationReviewPage
+@{
+    var plan = Html.ReactivePlan<AllocationReviewPage>();
+}
+@(plan.ConformanceComponent("allocation-panel", Model.ComponentStart))
+@Html.RenderPlan(plan)

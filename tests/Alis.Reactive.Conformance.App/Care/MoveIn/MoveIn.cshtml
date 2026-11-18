@@ -1,0 +1,123 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    Layout = "/Care/MoveIn/_MoveInLayout.cshtml";
+    ViewData["Title"] = "Move-in";
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+<h1>Move-in @Model.DraftId</h1>
+<p>Saved version: <span id="saved-version">@Model.Version</span></p>
+@using (var moveIn = Html.BeginRequestContainer(plan, "move-in"))
+{
+    @(Html.NativeHiddenField(plan, m => m.DraftId))
+    @(Html.NativeHiddenField(plan, m => m.Version))
+    @(Html.NativeHiddenField(plan, m => m.ResidentId))
+    @(Html.NativeHiddenField(plan, m => m.CoordinatorId))
+    @(Html.NativeHiddenField(plan, m => m.OperationId))
+
+    <section id="move-in-location" aria-label="Location">
+        @await Html.PartialFor(m => m.Location, "/Care/MoveIn/Location.cshtml")
+    </section>
+
+    <section id="move-in-resident" aria-label="Resident">
+    </section>
+
+    <section id="move-in-care" aria-label="Care">
+        @await Html.PartialFor(m => m.Care, "/Care/MoveIn/Care.cshtml")
+    </section>
+
+    <section id="move-in-contacts" aria-label="Contacts">
+    </section>
+
+    <section id="move-in-payer" aria-label="Payer">
+    </section>
+
+    <section id="move-in-medications" aria-label="Medications">
+    </section>
+
+    <section id="move-in-services" aria-label="Services">
+    </section>
+
+    <section id="move-in-diet" aria-label="Diet">
+    </section>
+
+    <section id="move-in-documents" aria-label="Documents">
+    </section>
+
+    <section id="move-in-draft" aria-label="Draft">
+        <button type="button" @Html.Raises(plan, MoveInDraftEvents.Save)>Save draft</button>
+        <p id="save-status"></p>
+        @{
+            Html.On(plan, trigger => trigger.CustomEvent(MoveInDraftEvents.Save, pipeline => pipeline
+                .Put<MoveInPage>(MoveInEndpoints.Draft, request => request
+                    .Path(sent => sent.DraftId, moveIn.Container.Read(m => m.DraftId))
+                    .Header(MoveInEndpoints.VersionHeader, moveIn.Container.Read(m => m.Version))
+                    .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Container.Read(m => m.CoordinatorId))
+                    .Header(MoveInEndpoints.OperationHeader, moveIn.Container.Read(m => m.OperationId))
+                    .Json(moveIn.Container, body => { }))
+                .NoValidation()
+                .OnSuccess<SaveReply>((saved, pipeline) =>
+                {
+                    pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(reply => reply.Receipt.Version)));
+                    pipeline.Element("saved-version").Text.Set(saved.Body.Read(reply => reply.Receipt.Version));
+                    pipeline.Element("save-status").Text.Set(pipeline.Concat("Draft saved: version ", saved.Body.Read(reply => reply.Receipt.Version)));
+                })));
+        }
+    </section>
+}
+
+<section id="move-in-desk-options" aria-label="Desk options">
+</section>
+
+<section id="move-in-allocation-review" aria-label="Allocation review">
+    @await Html.PartialAsync("/Care/MoveIn/AllocationReview.cshtml", Reads.AllocationReviewOf(Model))
+</section>
+
+<section id="move-in-service-review" aria-label="Service review">
+</section>
+
+<section id="move-in-waitlist" aria-label="Waitlist">
+</section>
+
+<section id="move-in-documents-upload" aria-label="Documents upload">
+</section>
+
+<section id="move-in-deposit" aria-label="Deposit">
+</section>
+
+<section id="move-in-reception" aria-label="Reception">
+</section>
+
+<section id="move-in-bed-card" aria-label="Bed card">
+</section>
+
+<section id="move-in-coordinator-line" aria-label="Coordinator line">
+</section>
+
+<section id="move-in-allocation-owner" aria-label="Allocation owner">
+</section>
+
+<section id="move-in-receipt" aria-label="Receipt">
+</section>
+
+<section id="move-in-comparison" aria-label="Comparison">
+</section>
+
+<section id="move-in-checklist" aria-label="Checklist">
+</section>
+
+<section id="move-in-policy" aria-label="Policy">
+</section>
+
+<section id="move-in-alternatives" aria-label="Alternatives">
+</section>
+
+<section id="move-in-terms" aria-label="Terms">
+</section>
+
+@Html.RenderPlan(plan)

@@ -88,6 +88,8 @@ public sealed class Seed
 
     public bool? ResolverLeftUnset { get; set; }
 
+    public MoveInChange? MoveIn { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed Carer(string name) => new Seed().AndCarer(name);
