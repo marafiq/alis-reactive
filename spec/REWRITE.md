@@ -203,7 +203,7 @@ spec/                                         the design source: BRIEF.md, REWRI
 Beside the tree the repository keeps `.claude/settings.json`, `.claude/hooks/protect-generated.mjs`, `.claude/hooks/refuse-known-traps.mjs`,
 `.claude/rules/analyzers.md`, `.claude/rules/csharp.md`, `.claude/rules/docs.md`, `.claude/rules/tests.md`,
 `.claude/rules/views.md`, `.claude/rules/process.md`,
-`.claude/skills/onboard-component`, `.claude/skills/prove-behavior`, `.claude/agents/builder.md`,
+`.claude/skills/onboard-component`, `.claude/skills/prove-behavior`, `.claude/skills/build-a-screen`, `.claude/agents/builder.md`,
 `.claude/agents/designer.md`, `.claude/agents/page-writer.md` and `.claude/agents/pragmatic-architect.md`, which
 the cut rewrites for the new tree, and `.github/actions`, `.github/dependabot.yml` and `.github/release.yml`. Each project
 holds a CLAUDE.md of its own: its standard, its command and what it refuses.

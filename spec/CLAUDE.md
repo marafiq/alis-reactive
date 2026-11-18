@@ -1990,6 +1990,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the state it goes to and where a failure goes; and one table that says what the script checks for each guard.
   `scripts/state.py` interprets those tables, runs each guard by the function of its name, and stops where a guard
   stands on one side alone. A rule of the process is a row or a guard, never a sentence beside the table.
+- The owner, 2026-11-18 (verbatim in `spec/NOTES.md`): "I want you to build a skill out of that TLA plus and schema,
+  which will be used by every consumer as well", and of what it is, "a guiding principle for any developer to write any
+  complex app by simple decisions, because it has a map, right? It has clear names, right?" The skill is
+  `.claude/skills/build-a-screen/SKILL.md`: a decision map, section by section a question a developer asks, each
+  answered by one door as the PublicAPI text names it, the meaning that decides between two doors, the TLA+
+  invariant that fixes an ordering and a landed view that shows it. It holds no feature of any one app and no list
+  of combinations, which are an app's own spec. Its examples are copied whole from views a browser test runs.
 
 ## Modules
 

@@ -35,7 +35,7 @@ A code example in the docs is copied whole from a view a Playwright test runs, n
 its controller and its model exist in the conformance app, and the test that opens it passes; or it is copied whole
 from a file of a fresh app (`tests/Alis.Reactive.Consumer.Net10`, `tests/Alis.Reactive.Consumer.Net48`), which
 README's steps wire and M19.X5's test opens. `WhenADocShowsAnExample` refuses an example of README.md found whole in
-neither.
+neither, and a view example of a skill, a cshtml block of its file, the same way.
 
 "If you get anything wrong in terms of syntax or explanation, users will not use it. It will never come back."
 

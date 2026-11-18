@@ -81,6 +81,18 @@ public class WhenARuleNamesTheCode
             "The list of what rules cite from outside the repo holds only what a rule cites and the repo lacks:");
 
     [RefusedCase]
+    public void a_view_example_in_a_rule_file_that_is_no_skill_is_refused()
+        => Assert.That(
+            AuditOf(Rule("CASE.md", "Run `scripts/playwright.sh`.", "```cshtml", "@Html.RenderPlan(plan)", "```"), NotInTheRepo).Unread,
+            Is.EqualTo(new[] { "CASE.md:2: a ```cshtml block; this guard reads bash, csharp, csharp illustration" }));
+
+    [AcceptedCase]
+    public void a_view_example_in_a_skill_is_left_to_the_guard_that_reads_examples()
+        => Assert.That(
+            AuditOf(Rule(".claude/skills/case/SKILL.md", "Run `scripts/playwright.sh`.", "```cshtml", "@Html.RenderPlan(plan)", "```"), NotInTheRepo).Unread,
+            Is.Empty);
+
+    [RefusedCase]
     public void a_fence_the_guard_does_not_read_and_a_rule_file_with_no_code_are_refused()
     {
         var fenced = AuditOf(Rule("CASE.md", "Run `scripts/playwright.sh`.", "```python", "print(1)", "```"), NotInTheRepo);
@@ -241,6 +253,9 @@ public class WhenARuleNamesTheCode
             .Select(path => ReadRule(path, File.ReadAllLines(Path.Combine(Repository.Root, path))))
             .ToList();
 
+    private static bool IsAViewExampleOfASkill(string path, string fence)
+        => fence == "cshtml" && path.StartsWith(".claude/skills/", StringComparison.Ordinal) && path.EndsWith("/SKILL.md", StringComparison.Ordinal);
+
     private static RuleFile ReadRule(string path, string[] lines)
     {
         var globs = new List<string>();
@@ -266,7 +281,7 @@ public class WhenARuleNamesTheCode
             if (line.TrimStart().StartsWith("```", StringComparison.Ordinal))
             {
                 fence = fence == null ? line.Trim()[3..].Trim() : null;
-                if (fence != null && !ReadFences.Contains(fence)) unread.Add($"{at}: a ```{fence} block; this guard reads {string.Join(", ", ReadFences)}");
+                if (fence != null && !ReadFences.Contains(fence) && !IsAViewExampleOfASkill(path, fence)) unread.Add($"{at}: a ```{fence} block; this guard reads {string.Join(", ", ReadFences)}");
                 continue;
             }
 
