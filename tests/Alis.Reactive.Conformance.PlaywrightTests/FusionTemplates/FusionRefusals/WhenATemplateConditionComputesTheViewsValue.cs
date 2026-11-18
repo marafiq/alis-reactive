@@ -18,7 +18,7 @@ public sealed class WhenATemplateConditionComputesTheViewsValue(string host) : F
         await refused.Page.GotoAsync(RefusalPages.WardResidentsByAComputedWard);
         await Expect(refused.Page.GetByRole(AriaRole.Heading, new PageGetByRoleOptions
         {
-            Name = "InvalidOperationException: 'Model.Ward.ToUpper()' computes a value inside a list's lambda; "
+            Name = "InvalidOperationException: 'Model.Ward.ToUpper()' computes a value inside a template condition; "
                 + "compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();.",
             Exact = true,
         })).ToBeVisibleAsync();

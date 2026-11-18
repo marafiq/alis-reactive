@@ -12,16 +12,24 @@ namespace Alis.Reactive.ArrayLambdas;
 
 internal static class ViewValues
 {
-    internal static object? Of(Expression node) => node switch
+    private const string ListsLambda = "a list's lambda";
+
+    private const string TemplateCondition = "a template condition";
+
+    internal static object? Of(Expression node) => Of(node, ListsLambda);
+
+    private static object? Of(Expression node, string inside) => node switch
     {
         ConstantExpression constant => constant.Value,
         MemberExpression { Expression: null } shared => Read(shared, null),
-        MemberExpression { Expression: { } holder } member => Read(member, Of(holder) ?? throw ReadThroughNull(member)),
-        _ => throw Computed(node),
+        MemberExpression { Expression: { } holder } member => Read(member, Of(holder, inside) ?? throw ReadThroughNull(member)),
+        _ => throw Computed(node, inside),
     };
 
-    internal static InvalidOperationException Computed(Expression node)
-        => new($"'{Printed.Of(node)}' computes a value inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();.");
+    internal static InvalidOperationException Computed(Expression node) => Computed(node, ListsLambda);
+
+    private static InvalidOperationException Computed(Expression node, string inside)
+        => new($"'{Printed.Of(node)}' computes a value inside {inside}; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();.");
 
     internal static Type WrittenAs(Expression member, Expression held)
     {
@@ -39,7 +47,7 @@ internal static class ViewValues
     internal static string InTerm(LambdaExpression term, AppJson json)
     {
         var item = term.Parameters[0];
-        if (!Reads(item, term.Body)) return JsonSerializer.Serialize(Of(term.Body), term.Body.Type, json.LiveForm);
+        if (!Reads(item, term.Body)) return JsonSerializer.Serialize(Of(term.Body, TemplateCondition), term.Body.Type, json.LiveForm);
         if (term.Body is not BinaryExpression { NodeType: ExpressionType.Equal or ExpressionType.NotEqual or ExpressionType.LessThan or ExpressionType.LessThanOrEqual or ExpressionType.GreaterThan or ExpressionType.GreaterThanOrEqual } comparison)
             throw HoldsNoViewValue(term);
         var left = Unconverted(comparison.Left);
@@ -49,7 +57,7 @@ internal static class ViewValues
         var member = leftReadsTheItem ? left : right;
         var held = leftReadsTheItem ? right : left;
         var writtenAs = WrittenAs(member, held);
-        var value = Held(Of(held), held.Type, writtenAs, json.LiveForm);
+        var value = Held(Of(held, TemplateCondition), held.Type, writtenAs, json.LiveForm);
         var written = OwnFormOf(item, member, term, json.LiveForm)?.Written(value, writtenAs) ?? JsonSerializer.SerializeToElement(value, writtenAs, json.LiveForm);
         var orders = comparison.NodeType is ExpressionType.LessThan or ExpressionType.LessThanOrEqual or ExpressionType.GreaterThan or ExpressionType.GreaterThanOrEqual;
         RefuseAnOrderingOfText(Printed.Of(term.Body), written, member.Type, orders);

@@ -621,7 +621,7 @@
         {
           "id": "M22.X9",
           "rung": "refusal",
-          "defect": "Both lines refuse a view value that calls a method with \"Operand type Call is not supported\", naming no cure (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:103-114 at aecb617b4, :72-83 at 65fdf118d). The rewrite refuses it as D6.7 refuses one in a list's lambda, naming a local computed before the lambda: \"'Model.Ward.ToUpper()' computes a value inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();.\" (M22.D4)."
+          "defect": "Both lines refuse a view value that calls a method with \"Operand type Call is not supported\", naming no cure (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:103-114 at aecb617b4, :72-83 at 65fdf118d). The rewrite refuses it as D6.7 refuses one in a list's lambda, naming a local computed before the lambda: \"'Model.Ward.ToUpper()' computes a value inside a template condition; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();.\" (M22.D4)."
         },
         {
           "id": "M22.X10",
