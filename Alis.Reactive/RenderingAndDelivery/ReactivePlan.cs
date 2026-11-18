@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using Alis.Reactive.ArrayLambdas;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Execution;
 using Alis.Reactive.PathsAndWire;
@@ -67,6 +68,20 @@ public sealed partial class ReactivePlan<TModel>
     /// <returns>The name of each member of the path, the first member first.</returns>
     public IReadOnlyList<string> JsonPath<TItem, TMember>(Expression<Func<TItem, TMember>> path)
         => MemberPath.NamesOfItemsPath(path ?? throw new ArgumentNullException(nameof(path)), Writer.Content.Json.LiveForm);
+
+    /// <summary>Writes the value a view holds in a term of a condition over an item, as <see cref="Json{TValue}"/> writes the item's member it is compared with, for a component whose own engine evaluates the condition on each item.</summary>
+    /// <remarks>
+    /// The term compares a member of the item with a value that reads no member of it, as <c>(Bed b) =&gt; b.Spare &gt; Model.MinSpare</c>,
+    /// or reads no member of the item at all. A literal is read as written, and a value the view holds along its chain of fields and
+    /// properties when the view renders, as a list's lambda reads one, so an enum is written as the item's member is: its number, or
+    /// its name when its type carries a string converter. A value that calls a method, indexes or computes is refused where the view
+    /// renders, naming a local computed before the lambda, and so is a read through a value that is null.
+    /// </remarks>
+    /// <typeparam name="TItem">The class of the item.</typeparam>
+    /// <param name="term">The term, as <c>(Bed b) =&gt; b.Status == WardStatus.Open</c>.</param>
+    /// <returns>The value's JSON.</returns>
+    public string ViewValueJson<TItem>(Expression<Func<TItem, bool>> term)
+        => ViewValues.InTerm(term ?? throw new ArgumentNullException(nameof(term)), Writer.Content.Json);
 
     /// <summary>Writes the attributes that make a click at or inside an element raise an app event, with one member of its payload filled by a template's text.</summary>
     /// <remarks>

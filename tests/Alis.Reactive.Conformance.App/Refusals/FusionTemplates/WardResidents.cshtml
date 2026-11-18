@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model WardResidents
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward residents";
+    var plan = Html.ReactivePlan<WardResidents>();
+    var columns = FusionGridColumns.Of<WardResident>();
+    var here = FusionTemplate.Create<WardResident>()
+        .When(m => m.Ward == Model.Ward.ToUpper(), then: t => t.Span("this ward"), @else: e => e.Span("elsewhere"))
+        .Render(plan);
+}
+<h1>Ward residents</h1>
+@(Html.FusionGrid(plan, "ward-residents", Model.Residents, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.Name), HeaderText = "Name" },
+        new() { HeaderText = "Ward", Template = here },
+    })))
+@Html.RenderPlan(plan)

@@ -350,7 +350,7 @@
     },
     {
       "id": "M22.F2",
-      "summary": "A template's conditions: When(condition, then) and When(condition, then, else) write the engine's own condition, ${if(..)} with ${else} and ${/if}, around the branches a FusionConditionalBuilder writes with its element doors (Span, Badge, Icon, Div, Img and Raw); the engine evaluates it on each item, not the core (D8.4). The condition is a typed lambda of the item: members, ==, !=, <, <=, >, >=, &&, ||, !, arithmetic and constants. The rewrite writes each comparison with its member first, only constants the engine reads back as written and only * and / of two members, refuses any other constant or arithmetic where the view renders, and reads a view value the lambda captures when the view renders, as D6.7 reads one (M22.D4). Both lines write each comparison in its authored order and each constant as it is, text between single quotes, and compile a captured value with Expression.Compile; main's ShowIf is When with no else.",
+      "summary": "A template's conditions: When(condition, then) and When(condition, then, else) write the engine's own condition, ${if(..)} with ${else} and ${/if}, around the branches a FusionConditionalBuilder writes with its element doors (Span, Badge, Icon, Div, Img and Raw); the engine evaluates it on each item, not the core (D8.4). The condition is a typed lambda of the item: members, ==, !=, <, <=, >, >=, &&, ||, !, arithmetic and constants. The rewrite writes each comparison with its member first, only constants the engine reads back as written and only * and / of two members, refuses any other constant or arithmetic where the view renders, and reads a view value the lambda captures, and a literal, when the view renders by D6.7's reader in the core, written as the plan writes the item's member it is compared with (M22.D4). Both lines write each comparison in its authored order and each constant as it is, text between single quotes, and compile a captured value with Expression.Compile; main's ShowIf is When with no else.",
       "status": "both",
       "types": [
         "Alis.Reactive.Fusion:FusionConditionalBuilder<TModel>"
@@ -502,7 +502,7 @@
         },
         {
           "line": "proposed",
-          "text": "A view value the condition captures, m => m.Ward == Model.Ward, is read when the view renders by walking its fields and properties as D6.7 reads one, with no expression compiled; the writer's exception to D18.3 goes to the owner at gate 2.",
+          "text": "A view value the condition captures, m => m.Beds > Model.MinSpare, and a literal, m => m.State == RoomState.Open, are read when the view renders by D6.7's reader in the core, reached through ReactivePlan.ViewValueJson, with no expression compiled and no reflection in Fusion, and written as the plan writes the item's member they are compared with: an enum its number, or its name when its type or the member carries a string converter, and an ordering against a value written as text is refused as a list's lambda refuses one (the owner, 2026-11-17).",
           "doors": [
             "M22.N2"
           ]
@@ -569,7 +569,7 @@
       "meanings": [
         {
           "id": "M22.D4",
-          "meaning": "A template's condition is code the engine runs, and the engine rewrites what it reads in it word by word (template.js:127-131): it prefixes a bare word with the item, data., keeps a word that holds a quote, and keeps a run of digits as a number only when the global regular expression that tests it starts from the run's first character, which a number tested just before, in the same condition or in one compiled earlier, prevents (template.js:13, template.js:209-211). The builder therefore writes each comparison with its member first, so a member's word is tested before each constant (probe:ej2-grid-template-member-first, probe:ej2-grid-template-constant-first), and each constant only in a form the engine is pinned to read back: true and false, a whole number of decimal digits (probe:ej2-grid-template-condition-integers), and text holding only ASCII letters, digits, single spaces, _, - and . between single quotes (probe:ej2-grid-template-condition-text, probe:ej2-grid-template-condition-plain-text). The comparisons ==, !=, <, <=, >, >=, &&, || and ! read as written (probe:ej2-grid-template-operators), and so does * or / of two members; + and - of two members, which the engine reads as one word with the prefix on its first member only, and arithmetic with a constant, whose two numbers in a row the engine reads as a number and a member, are refused where the view renders, naming a member the server computes (probe:ej2-grid-template-arithmetic). An enum constant is the value the app's options write for it, held to the same forms. Any other constant, null, a decimal, a negative number, text with an apostrophe or any other character, is refused where the view renders, naming a boolean member of the item the server computes: the engine fails to compile a decimal and an apostrophe (probe:ej2-grid-template-decimal-constant, probe:ej2-grid-template-apostrophe-constant), and reads text with two escapes as other text though one escape reads back (probe:ej2-grid-template-two-escapes, probe:ej2-grid-template-escaped-constant). A view value the lambda captures is read when the view renders by its chain of fields and properties as D6.7 reads one, with no expression compiled, and is held to the same forms; a captured value that calls a method, indexes or computes is refused as D6.7 refuses it, naming a local computed before the lambda. The builder writes ! over a comparison or a group in parentheses, since ! binds before a comparison and !status==='Active' reads every row as false, and writes no space between tokens, since the engine prefixes a run of spaces standing alone, as between ) and &&, with data. and fails the compile with a SyntaxError (probe:ej2-grid-template-grouping)."
+          "meaning": "A template's condition is code the engine runs, and the engine rewrites what it reads in it word by word (template.js:127-131): it prefixes a bare word with the item, data., keeps a word that holds a quote, and keeps a run of digits as a number only when the global regular expression that tests it starts from the run's first character, which a number tested just before, in the same condition or in one compiled earlier, prevents (template.js:13, template.js:209-211). The builder therefore writes each comparison with its member first, so a member's word is tested before each constant (probe:ej2-grid-template-member-first, probe:ej2-grid-template-constant-first), and each constant only in a form the engine is pinned to read back: true and false, a whole number of decimal digits (probe:ej2-grid-template-condition-integers), and text holding only ASCII letters, digits, single spaces, _, - and . between single quotes (probe:ej2-grid-template-condition-text, probe:ej2-grid-template-condition-plain-text). The comparisons ==, !=, <, <=, >, >=, &&, || and ! read as written (probe:ej2-grid-template-operators), and so does * or / of two members; + and - of two members, which the engine reads as one word with the prefix on its first member only, and arithmetic with a constant, whose two numbers in a row the engine reads as a number and a member, are refused where the view renders, naming a member the server computes (probe:ej2-grid-template-arithmetic). An enum constant, and the number the compiler folds a constant to beside an enum or char member, is written as the plan writes the item's member, in D7.7's live form or the member's own converter's: an enum its number, or its name when its type or the member carries a string converter, held to the same forms (M22.X7, M22.X8); an ordering against a value the plan writes as text, an enum by its name among them, is refused as a list's lambda refuses one, since the engine orders text by its letters (M22.X10). Any other constant, null, a decimal, a negative number, text with an apostrophe or any other character, is refused where the view renders, naming a boolean member of the item the server computes: the engine fails to compile a decimal and an apostrophe (probe:ej2-grid-template-decimal-constant, probe:ej2-grid-template-apostrophe-constant), and reads text with two escapes as other text though one escape reads back (probe:ej2-grid-template-two-escapes, probe:ej2-grid-template-escaped-constant). A view value the lambda captures is read when the view renders by D6.7's reader in the core, reached through ReactivePlan.ViewValueJson, along its chain of fields and properties, with no expression compiled and no reflection in Fusion, and is held to the same forms (M22.X6); a captured value that calls a method, indexes or computes is refused as D6.7 refuses it in a list's lambda, with its message, naming a local computed before the lambda (M22.X9). The builder writes ! over a comparison or a group in parentheses, since ! binds before a comparison and !status==='Active' reads every row as false, and writes no space between tokens, since the engine prefixes a run of spaces standing alone, as between ) and &&, with data. and fails the compile with a SyntaxError (probe:ej2-grid-template-grouping)."
         }
       ],
       "oracle": "Syncfusion EJ2 33.1.47's string template engine (@syncfusion/ej2-base/src/template.js), which compiles a component's template once into a function of each item and runs it per item, observed in Chromium in a real Grid's column templates by spec/probes/ej2-template-m22.mjs: a condition on text, on two whole numbers and on a member written first renders each branch per item, a constant written first after a template whose condition ends on a number, a decimal and an apostrophe fail the compile with a SyntaxError, and text with two escapes reads as other text; ==, !=, <=, >=, || and ! read as written, * and / of two members read, and + or - of two members throws a ReferenceError; and D6.7's read of a view value.",
@@ -602,6 +602,31 @@
           "id": "M22.X5",
           "rung": "behavior",
           "defect": "Both lines write a negation as ! before the condition it negates and each operator between spaces (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:85 and :97 at 623dd4a27, Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:57 and :69 at 65fdf118d), so !(m.Status == \"Active\") reads every row as false, and a negated comparison beside && or || leaves a run of spaces between ) and &&, which the engine reads as data. and fails to compile (probe:ej2-grid-template-grouping); main fixed both at 7b9e987cc (#242). The rewrite writes ! over a comparison in parentheses and no space between tokens (M22.D4)."
+        },
+        {
+          "id": "M22.X6",
+          "rung": "behavior",
+          "defect": "Main writes a view value whose holder is no constant as a member path of the item (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:64-80 and :103-114 at aecb617b4): m => m.Beds > Model.MinSpare reaches its writer as a member of the view's Model, which it names model.minSpare, so the engine reads data.model.minSpare, which no item holds; the redesign likewise (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:37-49 and :72-83 at 65fdf118d), and both compile a value whose holder is a constant (:116-122 at aecb617b4, :85-91 at 65fdf118d). The rewrite reads it by D6.7's reader in the core when the view renders (M22.D4)."
+        },
+        {
+          "id": "M22.X7",
+          "rung": "behavior",
+          "defect": "Main takes no operand the compiler converts, so a comparison of an enum member, m => m.State == RoomState.Open, which reaches its writer as Convert(m.State) beside the constant, is refused with \"Operand type Convert is not supported\", and it writes an enum constant by its name, bare, which the engine reads as a member of the item (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:103-114 and :124-135 at aecb617b4); the redesign likewise (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:72-83 and :93-104 at 65fdf118d). The plan writes an enum whose type carries no converter as its number (D7.7), and the rewrite writes the constant so (M22.D4)."
+        },
+        {
+          "id": "M22.X8",
+          "rung": "behavior",
+          "defect": "The compiler folds an enum constant beside a member of its enum to the constant's number, m => m.Cleaning == Cleaning.Done as Convert(m.Cleaning) == 1, so a writer that writes the constant as it reaches it writes 1 where the plan writes the member by its name, Done, when the enum's type carries a string converter (D7.7). Main and the redesign refuse the converted member (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:103-114 at aecb617b4, :72-83 at 65fdf118d). The rewrite writes the constant as the plan writes the member (M22.D4)."
+        },
+        {
+          "id": "M22.X9",
+          "rung": "refusal",
+          "defect": "Both lines refuse a view value that calls a method with \"Operand type Call is not supported\", naming no cure (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:103-114 at aecb617b4, :72-83 at 65fdf118d). The rewrite refuses it as D6.7 refuses one in a list's lambda, naming a local computed before the lambda: \"'Model.Ward.ToUpper()' computes a value inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();.\" (M22.D4)."
+        },
+        {
+          "id": "M22.X10",
+          "rung": "refusal",
+          "defect": "An enum whose type carries a string converter is written by its name (D7.7), and the engine orders text by its letters, so m => m.Stage > TurnoverStage.Stripped, written data.stage > 'Stripped', holds for no bed whose stage is Made, since 'Made' orders before 'Stripped', though .NET orders Made after Stripped. Neither line writes an enum constant in a template condition (M22.X7). The rewrite refuses an ordering against a value the plan writes as text, save a char or a date, where the view renders, as a list's lambda refuses one (ViewValues.RefuseAnOrderingOfText): \"'m.Stage > TurnoverStage.Stripped' orders a value the app's JSON writes as text, which does not order as the value does in .NET; compare it with == or !=, or order on the server.\" (M22.D4)."
         }
       ],
       "promises": [
@@ -644,6 +669,46 @@
           "outcome": "Ann's Spare cell shows other and Bo's shows away with spare beds.",
           "opposite": "Bo made active on the server: both cells show other.",
           "defect": "A writer that puts ! before the comparison with no parentheses shows other on both rows, and one that spaces the operators renders no row (probe:ej2-grid-template-grouping)."
+        },
+        {
+          "for": "M22.X6",
+          "page": "A bed board whose grid's Spare column is FusionTemplate.Create<SpareRoom>().When(m => m.Beds > Model.MinSpare, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")).Render(plan), the view's MinSpare 2, over North 1 of 3 beds and North 2 of 1 bed.",
+          "gesture": "Open the page.",
+          "outcome": "North 1's Spare cell shows spare and North 2's shows full.",
+          "opposite": "The view's MinSpare 0: both cells show spare.",
+          "defect": "A writer that reads Model.MinSpare as a member path of the item writes model.minSpare, which the engine reads off each item, which holds no model, so the grid shows no row."
+        },
+        {
+          "for": "M22.X7",
+          "page": "A bed board whose grid's State column is FusionTemplate.Create<StatedRoom>().When(m => m.State == RoomState.Open, then: t => t.Span(\"open\"), @else: e => e.Span(\"closed\")).Render(plan), State a RoomState? whose type carries no converter, over North 1 open and North 2 closed.",
+          "gesture": "Open the page.",
+          "outcome": "North 1's State cell shows open and North 2's shows closed.",
+          "opposite": "North 1 closed and North 2 open: North 1 shows closed and North 2 open.",
+          "defect": "A writer that writes RoomState.Open by its name compares the item's 1 with 'Open', so both rows show closed."
+        },
+        {
+          "for": "M22.X8",
+          "page": "A bed board whose grid's Cleaning column is FusionTemplate.Create<CleanedBed>().When(m => m.Cleaning == Cleaning.Done, then: t => t.Span(\"ready\"), @else: e => e.Span(\"awaiting cleaning\")).Render(plan), Cleaning an enum whose type carries JsonStringEnumConverter<Cleaning>, over Bed 1 done and Bed 2 due.",
+          "gesture": "Open the page.",
+          "outcome": "Bed 1's Cleaning cell shows ready and Bed 2's shows awaiting cleaning.",
+          "opposite": "Bed 1 due and Bed 2 done: Bed 1 shows awaiting cleaning and Bed 2 ready.",
+          "defect": "A writer that writes the number the compiler folded Cleaning.Done to compares the item's 'Done' with 1, so both rows show awaiting cleaning."
+        },
+        {
+          "for": "M22.X9",
+          "page": "A ward residents board whose grid's Ward column is FusionTemplate.Create<WardResident>().When(m => m.Ward == Model.Ward.ToUpper(), then: t => t.Span(\"this ward\"), @else: e => e.Span(\"elsewhere\")).Render(plan).",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with M22.X9's message, which names Model.Ward.ToUpper() and cures it with a local computed before the lambda.",
+          "opposite": "The same board with var ward = Model.Ward.ToUpper(); before the template and When(m => m.Ward == ward, ..): it renders, and Ada of NORTH shows this ward and Ruth of SOUTH elsewhere.",
+          "defect": "A writer that does not hand the computed value to D6.7's reader refuses it as a term the template engine cannot read, naming the view's page class and no local."
+        },
+        {
+          "for": "M22.X10",
+          "page": "A bed turnover board whose grid's Turnover column is FusionTemplate.Create<TurnoverBed>().When(m => m.Stage > TurnoverStage.Stripped, then: t => t.Span(\"ready\"), @else: e => e.Span(\"stripped\")).Render(plan), TurnoverStage an enum whose type carries JsonStringEnumConverter<TurnoverStage>, over Bed 1 made and Bed 2 stripped.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with InvalidOperationException: 'm.Stage > TurnoverStage.Stripped' orders a value the app's JSON writes as text, which does not order as the value does in .NET; compare it with == or !=, or order on the server.",
+          "opposite": "The same board with When(m => m.Stage == TurnoverStage.Made, ..): it renders, and Bed 1 shows ready and Bed 2 stripped.",
+          "defect": "The ordering is written data.stage > 'Stripped', so the page renders and Bed 1, made, shows stripped."
         }
       ],
       "verdicts": [

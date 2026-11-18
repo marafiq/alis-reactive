@@ -18,8 +18,9 @@ each row, card or list item. Module 22 of `spec/CLAUDE.md`.
 - Q6: a view value a condition captures is read when the view renders, as D6.7 reads one (M22.D4).
 - Q17: the event button raises its event by markup's form (M1.D3), and the handler reads its payload at
   `[0, "detail"]` (D17.4).
-- Q18: `Expression.Compile` in the template writer is not listed (D18.3); M22.D4 reads a view value with none, and
-  the writer's exception for D6.7's read goes to the owner at gate 2.
+- Q18: `Expression.Compile` in the template writer is not listed (D18.3); M22.D4 reads a view value with none, by
+  D6.7's reader in the core through `ReactivePlan.ViewValueJson`, so the module holds no reflection of its own (the
+  owner, 2026-11-17).
 
 ## Boundaries
 

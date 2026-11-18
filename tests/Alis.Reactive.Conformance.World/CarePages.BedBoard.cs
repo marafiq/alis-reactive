@@ -40,6 +40,18 @@ public static partial class CarePages
 
     public const string SpareBedsAllActive = BedBoard + "spare-beds-all-active";
 
+    public const string SpareRooms = BedBoard + "spare-rooms";
+
+    public const string SpareRoomsAboveNone = BedBoard + "spare-rooms-above-none";
+
+    public const string RoomStates = BedBoard + "room-states";
+
+    public const string RoomStatesSwapped = BedBoard + "room-states-swapped";
+
+    public const string BedCleaning = BedBoard + "bed-cleaning";
+
+    public const string BedCleaningSwapped = BedBoard + "bed-cleaning-swapped";
+
     public const string WardTour = BedBoard + "ward-tour";
 
     public const string WardTourFromWardB = BedBoard + "ward-tour-from-ward-b";

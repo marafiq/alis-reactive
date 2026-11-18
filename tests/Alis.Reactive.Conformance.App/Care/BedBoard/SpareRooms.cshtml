@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model SpareRooms
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed board";
+    var plan = Html.ReactivePlan<SpareRooms>();
+    var columns = FusionGridColumns.Of<SpareRoom>();
+    var spare = FusionTemplate.Create<SpareRoom>()
+        .When(m => m.Beds > Model.MinSpare, then: t => t.Span("spare"), @else: e => e.Span("full"))
+        .Render(plan);
+}
+<h1>Bed board</h1>
+@(Html.FusionGrid(plan, "spare-rooms", Model.Rooms, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.Room), HeaderText = "Room" },
+        new() { HeaderText = "Spare", Template = spare },
+    })))
+@Html.RenderPlan(plan)

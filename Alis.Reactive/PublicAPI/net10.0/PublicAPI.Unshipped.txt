@@ -164,6 +164,7 @@ Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Raises<TPayload, TMember
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Plugin<TPlugin>() -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Render<TComponent>(string! id, Microsoft.AspNetCore.Html.IHtmlContent! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Rows<TRow>(string! rowsId) -> Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.ViewValueJson<TItem>(System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! term) -> string!
 Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>
 Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive(System.Func<TPlugin!, Alis.Reactive.Declarations.Event!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive(System.Func<TPlugin!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!

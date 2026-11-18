@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.Json;
 
 namespace Alis.Reactive.Fusion.FusionTemplates;
 
@@ -40,15 +41,17 @@ internal static class TemplateConditions
             UnaryExpression { NodeType: ExpressionType.Not } not => "!(" + Term(not.Operand) + ")",
             BinaryExpression compared when Compared.ContainsKey(compared.NodeType) => Comparison(compared),
             ConstantExpression { Value: bool constant } => constant ? "true" : "false",
-            _ => Guarded([Operand(node)], Operand(node).Written),
+            _ => Alone(Operand(node, node)),
         };
 
         private string Side(Expression side, ExpressionType grouped) => side.NodeType == grouped ? "(" + Term(side) + ")" : Term(side);
 
+        private static string Alone(Operand operand) => Guarded([operand], operand.Written);
+
         private string Comparison(BinaryExpression compared)
         {
-            var left = Operand(compared.Left);
-            var right = Operand(compared.Right);
+            var left = Operand(compared.Left, compared);
+            var right = Operand(compared.Right, compared);
             var constantFirst = left.IsConstant && !right.IsConstant;
             var (first, second, kind) = constantFirst ? (right, left, Mirrored[compared.NodeType]) : (left, right, compared.NodeType);
             first.RefuseAsAConstant(second);
@@ -62,13 +65,12 @@ internal static class TemplateConditions
             return holders.Count == 0 ? term : string.Join("&&", holders) + "&&" + term;
         }
 
-        private Operand Operand(Expression node)
+        private Operand Operand(Expression node, Expression term)
         {
             var read = Unconverted(node);
-            if (read is ConstantExpression constant) return new Constant(constant.Value);
+            if (!new ItemFinder(item).Finds(read)) return new Constant(JsonSerializer.Deserialize<JsonElement>(context.ViewValue(Expression.Lambda<Func<TModel, bool>>(term, item))));
             if (read is BinaryExpression arithmetic && Arithmetic.TryGetValue(arithmetic.NodeType, out var operation)) return Product(arithmetic, operation);
             if (IsItemsRead(read)) return Read((MemberExpression)read);
-            if (IsViewsValue(read)) throw new NotImplementedException($"A template condition reads the view's value '{read}', and reading a view's value without a compiled expression is not built for templates; compare with a literal, or with a member the server sets on the item.");
             throw new InvalidOperationException($"A template condition holds '{read}', which Syncfusion's template engine cannot read; compare members of the item with literals, joined by &&, || and !.");
         }
 
@@ -110,8 +112,6 @@ internal static class TemplateConditions
             return node is MemberExpression && reached == item;
         }
 
-        private static bool IsViewsValue(Expression node) => node is MemberExpression;
-
         private string CSharpText(Expression node) => node is MemberExpression member && member.Expression is { } holder && holder != item
             ? CSharpText(holder) + "." + member.Member.Name
             : node is MemberExpression own ? own.Member.Name : node.ToString();
@@ -150,7 +150,7 @@ internal static class TemplateConditions
         internal override IReadOnlyList<string> Holders => holders;
     }
 
-    private sealed class Constant(object? value) : Operand
+    private sealed class Constant(JsonElement value) : Operand
     {
         private const string Readable = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _-.";
 
@@ -162,31 +162,39 @@ internal static class TemplateConditions
 
         internal override void RefuseAsAConstant(Operand compared)
         {
-            if (value is Enum) throw new NotImplementedException($"A template condition compares {compared.Named} with the enum value {value}, and writing an enum as the app's JSON writes it is not built for templates; compare with a member the server sets on the item.");
             if (WrittenAs() is null) throw new InvalidOperationException($"A template condition compares {compared.Named} with {Shown()}, which Syncfusion's template engine cannot read back as written; compare with true, false, a whole number or plain text, or with a boolean member the server sets on the item.");
         }
 
-        private string? WrittenAs() => value switch
+        private string? WrittenAs() => value.ValueKind switch
         {
-            bool flag => flag ? "true" : "false",
-            string text when IsPlain(text) => "'" + text + "'",
-            sbyte or byte or short or ushort or int or uint or long or ulong => Whole(Convert.ToDecimal(value, CultureInfo.InvariantCulture)),
-            float or double => Whole(Convert.ToDouble(value, CultureInfo.InvariantCulture)),
-            decimal number => Whole(number),
+            JsonValueKind.True => "true",
+            JsonValueKind.False => "false",
+            JsonValueKind.String when IsPlain(value.GetString()!) => "'" + value.GetString() + "'",
+            JsonValueKind.Number when value.TryGetDecimal(out var number) => Whole(number),
             _ => null,
         };
-
-        private static string? Whole(double number) => number >= 0 && number == Math.Floor(number) && number <= (double)decimal.MaxValue ? Whole((decimal)number) : null;
 
         private static string? Whole(decimal number) => number >= 0 && number == decimal.Truncate(number) ? number.ToString("0", CultureInfo.InvariantCulture) : null;
 
         private static bool IsPlain(string text) => text.All(letter => Readable.IndexOf(letter) >= 0) && !text.Contains("  ");
 
-        private string Shown() => value switch
+        private string Shown() => value.ValueKind == JsonValueKind.String ? "\"" + value.GetString() + "\"" : value.GetRawText();
+    }
+
+    private sealed class ItemFinder(ParameterExpression item) : ExpressionVisitor
+    {
+        private bool _found;
+
+        internal bool Finds(Expression node)
         {
-            null => "null",
-            string text => "\"" + text + "\"",
-            _ => Convert.ToString(value, CultureInfo.InvariantCulture) ?? "",
-        };
+            Visit(node);
+            return _found;
+        }
+
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            _found |= node == item;
+            return node;
+        }
     }
 }

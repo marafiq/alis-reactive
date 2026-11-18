@@ -1886,6 +1886,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   removal (:1130, :2249), actionComplete only once every file's upload completes (:2306-2313), and selected,
   removing and clearing before the list changes (D701); a listener EJ2's public addEventListener holds is notified
   by trigger alone.
+- The owner, 2026-11-17 (verbatim in `spec/NOTES.md`): "Rewrite must apply wherever it applies. That's the point of
+  rewrite, that things become easier to maintain." Read by the lead: one pattern wherever it applies, in two pieces.
+  (1) Each slice that takes an item's member names takes them through a typed door, each member named as the plan's
+  writer names it, as FusionDropDownList's Fields names its text and value: FusionDropDownTree's fields,
+  FusionPivotView's rows and values, FusionKanban's key and card fields, FusionSchedule's event fields and a
+  FusionMultiColumnComboBox column's field, so a member that carries [JsonPropertyName] reaches EJ2 as the plan writes
+  it, with no string in the view. (2) A template condition reads a view's value, or a literal, by D6.7's reader in the
+  core, reached through ReactivePlan's public surface beside JsonPath and Json, and writes it as the plan writes the
+  item's member it is compared with: an enum its number, or its name when its type or the member carries a string
+  converter, and an ordering against a value written as text is refused as a list's lambda refuses one; Fusion holds
+  no reflection and no compiled expression of its own, and the owner's list in WhenTheCoreIsCompiled does not change.
 - The owner, 2026-11-17, answering the lead's ask 4 (X17.38), verbatim: "4- yes approved". Read by the lead: a class,
   Append or Hidden write on a row action's control marks that control as an element, so the write works and only that
   row's control shows busy while its request runs (D17.15, D10.21); a grammar change, the owner's; built after U26's

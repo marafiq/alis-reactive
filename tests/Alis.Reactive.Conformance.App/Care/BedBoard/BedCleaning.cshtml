@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model BedCleanings
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed board";
+    var plan = Html.ReactivePlan<BedCleanings>();
+    var columns = FusionGridColumns.Of<CleanedBed>();
+    var cleaning = FusionTemplate.Create<CleanedBed>()
+        .When(m => m.Cleaning == Cleaning.Done, then: t => t.Span("ready"), @else: e => e.Span("awaiting cleaning"))
+        .Render(plan);
+}
+<h1>Bed board</h1>
+@(Html.FusionGrid(plan, "bed-cleaning", Model.Beds, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(b => b.Bed), HeaderText = "Bed" },
+        new() { HeaderText = "Cleaning", Template = cleaning },
+    })))
+@Html.RenderPlan(plan)

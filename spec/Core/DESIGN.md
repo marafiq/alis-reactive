@@ -757,7 +757,10 @@ Terms used throughout:
   is important"). No expression is compiled at render and no accessor is cached. A view value that calls a method,
   indexes or computes (`Model.Ward.ToUpper()`, `ward + "x"`) is refused, naming its door, a local computed before
   the lambda (the owner, 2026-11-06: "if var works i do not see any downside"). The redesign compiles such a value
-  today (`Alis.Reactive/Members/Expressions.cs:28`); the local keeps the capability.
+  today (`Alis.Reactive/Members/Expressions.cs:28`); the local keeps the capability. A template condition's value, a
+  literal or one the view holds, is read by the same reader and refused as it refuses one, through
+  `ReactivePlan.ViewValueJson`, and written as the plan writes the item's member it is compared with, an ordering against
+  a value written as text refused as a list's lambda refuses one (M22.D4; the owner, 2026-11-17).
 - D6.8 A list's lambda takes one of two forms, by what an item is. An item of `LiveObjects<T>` is a live object:
   its lambda is a delegate over the item's declaration, `bed => bed.Resident`, run once when the view renders with
   the item bound to the `fn`'s parameter, and its members are required (D4.1). An item of a list of data is a C#
@@ -4973,7 +4976,7 @@ plans (Q19).
   - the class that declares a lambda's member, `MemberInfo.DeclaringType` (D18.3);
   - a value the view holds inside an array lambda, read along its chain of fields and properties with
     `FieldInfo.GetValue` and `PropertyInfo.GetValue` (D6.7; the owner, 2026-11-06: "capturing the model value is
-    important");
+    important"), and inside a template condition by the same reader (the owner, 2026-11-17);
   - the identity of a .NET member an array lambda calls, compared with the closed table of D6.5, never listed
     or invoked: `MemberInfo.Module` and `MemberInfo.MetadataToken`, which name a member's definition for every
     instantiation of a generic member, in `poc/Alis.Reactive.Poc/Conditions/TranslatedMembers.cs`.
@@ -5031,8 +5034,10 @@ plans (Q19).
     decided when a real case raises it;
   - the `FlagsAttribute` read of `IsInEnum`: the typed door `Flags<TEnum>()` (N16.4, gate 1's P2), which ALIS038 holds
     to the `[Flags]` mark at build (N16.5);
-  - `Expression.Compile` in validation (Q16): listed at gate 1 (C13, D18.1); in the template writer (Q15): not listed,
-    since the writer is the Fusion templates module's, which asks the owner for its own exception when it is onboarded.
+  - `Expression.Compile` in validation (Q16): listed at gate 1 (C13, D18.1); in the template writer (Q15): not listed
+    and not needed, since the writer reads a condition's value by D6.7's reader in the core, through
+    `ReactivePlan.ViewValueJson`, so the Fusion templates module holds no reflection and no exception of its own (the
+    owner, 2026-11-17).
   - an overridden member that a view's expression names (the owner, 2026-11-06: "Override cannot change it"). The
     expression carries the declaration (`d => d.Room` names `Person.Room`), and the derived class's contract holds
     the override. The member is named as the contract of the class that declares it names it, found up the member's

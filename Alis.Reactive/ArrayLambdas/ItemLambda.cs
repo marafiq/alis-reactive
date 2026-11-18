@@ -251,19 +251,13 @@ internal sealed class ItemLambda
         var held = leftReadsAnItem ? right : left;
         if (ReadsItsOwnForm(member, out var inItsOwnForm)) return ComparedInItsOwnForm(comparison, op, orders, inItsOwnForm, held, leftReadsAnItem);
         RefuseADateTheAppsConverterWrites(comparison, member.Type);
-        var writtenAs = WrittenAs(member, held);
-        var written = TranslatedMembers.ReadsADayOfTheWeek(member) ? DayNumber(ViewValues.Of(held)) : _form.Base.Beside(Held(ViewValues.Of(held), held.Type, writtenAs), writtenAs);
+        var writtenAs = ViewValues.WrittenAs(member, held);
+        var written = TranslatedMembers.ReadsADayOfTheWeek(member) ? DayNumber(ViewValues.Of(held)) : _form.Base.Beside(ViewValues.Held(ViewValues.Of(held), held.Type, writtenAs, _form.Base.DataOptions), writtenAs);
         RequireComparableValue(comparison, written.Value, member.Type, orders);
         RequireAValueThatEqualsAsItsNumber(comparison, written.Value, member.Type);
         var memberRead = Keys.Of(member.Type, Read(member), _form);
         var value = Keys.Of(member.Type, written, _form);
         return new OpExpression(op, leftReadsAnItem ? [memberRead, value] : [value, memberRead]);
-    }
-
-    private static Type WrittenAs(LinqExpression member, LinqExpression held)
-    {
-        var compilerFoldedTheValueToANumber = !ComparedTypes.IsNumber(member.Type) && ComparedTypes.IsNumber(held.Type);
-        return compilerFoldedTheValueToANumber ? member.Type : held.Type;
     }
 
     private OpExpression ComparedInItsOwnForm(BinaryExpression comparison, Operator op, bool orders, OwnFormRead read, LinqExpression held, bool memberOnTheLeft)
@@ -274,8 +268,8 @@ internal sealed class ItemLambda
         if (orders) throw ComparisonRefused(comparison, $"orders {unlikeTheBase}, so the browser does not order it as .NET does; order it on the server.");
         if (!_form.Computed.WritesAsAScalar(member.Type)) throw ComparisonRefused(comparison, $"compares {unlikeTheBase}, and .NET compares the object it holds; compare it on the server.");
         if (Keys.IsDateOrTime(member.Type)) throw ComparisonRefused(comparison, "compares a date or a time its own converter writes, whose text the converter decides; compare it on the server.");
-        var writtenAs = WrittenAs(member, held);
-        var value = written.Written(Held(ViewValues.Of(held), held.Type, writtenAs), writtenAs);
+        var writtenAs = ViewValues.WrittenAs(member, held);
+        var value = written.Written(ViewValues.Held(ViewValues.Of(held), held.Type, writtenAs, _form.Base.DataOptions), writtenAs);
         var writtenAsText = value.ValueKind == JsonValueKind.String;
         if (writtenAsText && ComparedTypes.IsBinaryFraction(member.Type)) throw ComparisonRefused(comparison, ComparesAFractionWrittenAsText);
         if (writtenAsText && ComparedTypes.IsDecimal(member.Type) && written.HasItsOwnConverter)
@@ -315,26 +309,13 @@ internal sealed class ItemLambda
     private void RequireComparableValue(BinaryExpression comparison, JsonElement written, Type member, bool orders)
     {
         if (written.ValueKind is JsonValueKind.Object or JsonValueKind.Array) throw ComparesObjects(comparison);
-        var orderedAsText = orders && written.ValueKind == JsonValueKind.String && !ComparedTypes.IsChar(member) && !Keys.IsDateOrTime(member);
-        if (!orderedAsText) return;
-        var cure = ComparedTypes.IsBinaryFraction(member)
-            ? "order it on the server."
-            : "compare it with == or !=, or order on the server.";
-        throw ComparisonRefused(comparison, "orders a value the app's JSON writes as text, which does not order as the value does in .NET; " + cure);
+        ViewValues.RefuseAnOrderingOfText(TermOf(comparison), written, member, orders);
     }
 
     private void RequireAValueThatEqualsAsItsNumber(BinaryExpression comparison, JsonElement written, Type member)
     {
         var aFractionWrittenAsText = written.ValueKind == JsonValueKind.String && ComparedTypes.IsBinaryFraction(member);
         if (aFractionWrittenAsText) throw ComparisonRefused(comparison, ComparesAFractionWrittenAsText);
-    }
-
-    private object? Held(object? value, Type heldAs, Type writtenAs)
-    {
-        if (value is null || heldAs == writtenAs) return value;
-        if (value is int code && ComparedTypes.IsChar(writtenAs)) return Convert.ToChar(code, CultureInfo.InvariantCulture);
-        var options = _form.Base.DataOptions;
-        return JsonSerializer.SerializeToElement(value, heldAs, options).Deserialize(writtenAs, options);
     }
 
     private static LitExpression DayNumber(object? day) => new(JsonSerializer.SerializeToElement(day is null ? (int?)null : Convert.ToInt32(day, CultureInfo.InvariantCulture)));
@@ -381,7 +362,7 @@ internal sealed class ItemLambda
 
     private sealed record RuleCheck(string Term, ParameterExpression? Value);
 
-    private sealed class ItemFinder(ICollection<ParameterExpression> items) : ExpressionVisitor
+    internal sealed class ItemFinder(ICollection<ParameterExpression> items) : ExpressionVisitor
     {
         private bool _found;
 

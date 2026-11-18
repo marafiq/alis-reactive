@@ -22,6 +22,10 @@ pinned at one version for NuGet and npm together (`scripts/pin-syncfusion.mjs`);
   built there from the start its render helper writes: the smart text area's code,
   `FusionComponents/FusionSmartTextArea/fusion-smart-text-area.ts`.
 - A file compiles for both hosts or for one, by the core's rule (`Alis.Reactive/CLAUDE.md`).
+- A template condition holds no reader of its own: a value the view holds, or a literal, is read and written by the
+  core's `ReactivePlan.ViewValueJson`, D6.7's reader, as the plan writes the item's member it is compared with, and
+  refused where a list's lambda refuses it, so the package holds no reflection and no compiled expression (the owner,
+  2026-11-17, `spec/NOTES.md`).
 - U3 declares a slice with the first view that holds its component; U25 builds the package and the reference, and U26
   the other slices. The declaration is written member for member from its line of `spec/FusionComponents/module.md`, and
   its render helpers throw `NotImplementedException` until its unit builds them. The multi-select box is the exemplar:

@@ -1691,6 +1691,13 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M22.F2 M22.X10 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionTemplates/BedTurnover.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M22.F2 M22.X2 0": {
     "modules": [],
     "views": [
@@ -1711,6 +1718,35 @@
     "modules": [],
     "views": [
       "/Care/BedBoard/SpareBeds.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M22.F2 M22.X6 0": {
+    "modules": [],
+    "views": [
+      "/Care/BedBoard/SpareRooms.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M22.F2 M22.X7 0": {
+    "modules": [],
+    "views": [
+      "/Care/BedBoard/RoomStates.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M22.F2 M22.X8 0": {
+    "modules": [],
+    "views": [
+      "/Care/BedBoard/BedCleaning.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M22.F2 M22.X9 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionTemplates/WardResidents.cshtml",
+      "/Refusals/FusionTemplates/WardResidentsByALocal.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },
