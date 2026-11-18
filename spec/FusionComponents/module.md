@@ -257,7 +257,8 @@ Each name is gate 2's; each door is the capability it carries.
 - `M21.N21` kept: `FusionDropDownTree`: `Value` as `Property<string[]?>` and `Text` as `Property<string?>` (M21.X508),
   `DataBind`, `ShowPopup`, `HidePopup`, `Clear` and `Change`, with `IInputComponent.Input` committed by `Change`
   (M7.N3); the payload `FusionDropDownTree.DdtChangeEventArgs` (`Value`, `OldValue`, `IsInteracted`); and the render
-  helpers `field.FusionDropDownTree()` and `field.FusionDropDownTree(build => ..)`. It replaces main's six files
+  helpers `field.FusionDropDownTree()` and `field.FusionDropDownTree(build => ..)`, with
+  `FusionDropDownTreeFields.Of<TNode>().Field(..)` naming a field of its nodes (M21.X1050). It replaces main's six files
   (`Alis.Reactive.Fusion/Components/FusionDropDownTree/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts:127`, `:131`, `:135`, `:627`, `:646`, `:695`,
@@ -315,7 +316,8 @@ Each name is gate 2's; each door is the capability it carries.
   `FusionKanban.CurrentAction` (M21.X301) and `CloseDialog`; fourteen events and their payloads, nested in it under
   EJ2's names, each cancel a `Property<bool>` and `DataSourceChanged`'s `EndEdit` and `CancelEdit` its methods;
   `FusionKanban.ColumnsModel<TKey>` and `FusionKanban.HeaderArgs<TKey>`, each member named by `[JsonPropertyName]` and a
-  column's key typed by the cards' key (M21.X303); and the render helper `Html.FusionKanban(plan, id, build => ..)`. It
+  column's key typed by the cards' key (M21.X303); and the render helper `Html.FusionKanban(plan, id, build => ..)`,
+  with `FusionKanbanFields.Of<TCard>().Field(..)` naming its key field and a card's fields, one member each (M21.X1051, M21.X1055). It
   replaces main's seven files (`Alis.Reactive.Fusion/Components/FusionKanban/` at 623dd4a27), whose doors carry their
   verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:112`, `:234`, `:429`, `:468`, `:484`, `:502`, `:511`, `:527`).
@@ -363,7 +365,8 @@ Each name is gate 2's; each door is the capability it carries.
   | string`, `IsInteracted`); and the render helpers `field.FusionMultiColumnComboBox<TValue>()` and
   `field.FusionMultiColumnComboBox<TValue>(build => ..)`, TValue the view's, and `field.FusionMultiColumnComboBox(rows,
   build => ..)`, TValue the type of the rows' value member, which hands EJ2 the rows by M21.D1, with
-  `Fields<TItem>(text, value)` and `Fields<TItem>(text, value, groupBy)` (M21.X512). It replaces main's six files
+  `Fields<TItem>(text, value)` and `Fields<TItem>(text, value, groupBy)` (M21.X512), and
+  `FusionMultiColumnComboBoxColumns.Of<TRow>().Field(..)` naming a column's field (M21.X1052). It replaces main's six files
   (`Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts:361`, `:389`, `:437`,
@@ -398,7 +401,8 @@ Each name is gate 2's; each door is the capability it carries.
   and `CellSelecting`, whose payload `FusionPivotView.PivotCellSelectedEventArgs` reads its cell as
   `FusionPivotView.IAxisSet`, each member named by `[JsonPropertyName]`, with no door for its loosely typed
   `actualText`, `rowHeaders` and `columnHeaders` (M21.X304); and the render helper `Html.FusionPivotView(plan, id, build
-  => ..)`. It replaces main's eight files (`Alis.Reactive.Fusion/Components/FusionPivotView/` at 623dd4a27), whose doors
+  => ..)`, with `FusionPivotViewFields.Of<TRow>().Field(..)` naming a field of its rows, one member each (M21.X1053, M21.X1056). It replaces main's
+  eight files (`Alis.Reactive.Fusion/Components/FusionPivotView/` at 623dd4a27), whose doors
   carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1447`, `:1476`, `:2244`, `:2460`, `:2467`, `:2816`).
 - `M21.N35` kept: `FusionProgressButton`: `Content` and `CssClass` as `Property<string>`, `Disabled` and
@@ -442,7 +446,8 @@ Each name is gate 2's; each door is the capability it carries.
   with null (`@syncfusion/ej2-schedule/src/schedule/actions/crud.js:59`, D17.4); an event's data the app's own class
   `TEvent` and
   `Navigating`'s dates read as `DateTime` (M21.X306); and the render helper `Html.FusionSchedule(plan, id, build =>
-  ..)`. It replaces main's fifteen files (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors
+  ..)`, with `FusionScheduleFields.Of<TEvent>().Field(..)` naming an event's fields, one member each (M21.X1054, M21.X1057). It replaces main's
+  fifteen files (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors
   carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:250`, `:274`, `:707`, `:867`, `:1716`, `:1726`, `:1770`, `:1878`,
   `:1900`, `:1926`).

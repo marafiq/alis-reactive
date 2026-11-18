@@ -8113,6 +8113,11 @@
      "id": "M21.X1013",
      "rung": "behavior",
      "defect": "Both lines render the DropDownTree by EJ2's DropDownTreeFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTreeHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTree.cs:89 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the DropDownTree at the member's value, written by M21.D1; a helper that drops it shows an empty box, EJ2's value null (@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts:643-646), though the member holds a ward, against D17.13."
+    },
+    {
+     "id": "M21.X1050",
+     "rung": "behavior",
+     "defect": "Both lines take a DropDownTree's fields as the strings a view sets on EJ2's DropDownTreeFields, with no door that names a field from a member of the node (Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTreeHtmlExtensions.cs:18-39 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTree.cs:20-94 at 65fdf118d), so a view repeats each member's name by hand and a name that differs from the one the nodes are written under finds no field. The rewrite's door names the field as the plan's writer names the member (M21.D1), resolved where the view's plan renders the component; a door that names the member's C# name, as EJ2's own writer does (M21.X3), finds no field for a member that carries [JsonPropertyName]."
     }
    ],
    "promises": [
@@ -8123,6 +8128,14 @@
      "opposite": "A model whose Ward is null shows an empty box.",
      "defect": "The DropDownTree is rendered with no starting value, so the box shows empty though the model holds north-2.",
      "for": "M21.X1013"
+    },
+    {
+     "page": "A room picker page whose room box is rendered by field.FusionDropDownTree(build => ..) over North wing, holding North 1 and North 2, and South wing, holding South 1, of a node class whose Label member carries [JsonPropertyName(\"title\")], its value, text and child fields named by FusionDropDownTreeFields.Of<RoomNode>().Field(n => n.Code), .Field(n => n.Label) and .Field(n => n.Rooms), for a model whose Room holds north-2.",
+     "gesture": "Open the page.",
+     "outcome": "The room box shows North 2.",
+     "opposite": "A model whose Room holds south-1 shows South 1.",
+     "defect": "The door names the text field Label, the member's C# name, while the nodes are written with title, so the box shows no room's text.",
+     "for": "M21.X1050"
     }
    ],
    "verdicts": [
@@ -11949,6 +11962,16 @@
      "id": "M21.X1017",
      "rung": "behavior",
      "defect": "Both lines render the Kanban by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().Kanban(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanHtmlExtensions.cs:29-30 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:358-359 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, draws no column and no card, EJ2's columns [] and dataSource [] (@syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:144-146, :109-112), and the plan's CardClick handler (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:113 at 65fdf118d; @syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:270) listens to no component, against D17.13."
+    },
+    {
+     "id": "M21.X1051",
+     "rung": "behavior",
+     "defect": "Both lines take a Kanban board's key field and a card's fields as the strings a view sets on EJ2's builder, with no door that names a field from a member of the card (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanHtmlExtensions.cs:29-30 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:358-359 at 65fdf118d), so a view repeats each member's name by hand and a name that differs from the one the cards are written under finds no field. The rewrite's door names the field as the plan's writer names the member (M21.D1), resolved where the view's plan renders the component; a door that names the member's C# name, as EJ2's own writer does (M21.X3), finds no field for a member that carries [JsonPropertyName]."
+    },
+    {
+     "id": "M21.X1055",
+     "rung": "refusal",
+     "defect": "The rewrite's FusionKanbanFields.Of<TCard>().Field(..) (M21.X1051), a door neither line has, takes a lambda of the card, which C# lets name a path past one member, while EJ2 33.1.47's Kanban reads each field as one member of a card, data[keyField] and data[cardSettings.headerField] (@syncfusion/ej2-kanban/src/kanban/base/layout-render.js:404, :424, :1020): a path's members joined with dots name a field no card holds, so the board shows the card under no column, or with no header, and says nothing. No type stages a lambda's shape, and the analyzers no unit has built wait until after 1.0 (spec/CLAUDE.md, the owner, 2026-11-15), so the rewrite's render helper refuses it where the view renders, as M21.X1041 refuses one: \"FusionKanbanFields names 'c => c.Nurse.Name', a path past one member of the card, and the board reads each field as one member of a card; name one member, such as card => card.Status.\""
     }
    ],
    "promises": [
@@ -11959,6 +11982,22 @@
      "opposite": "Clicking the Paracetamol card, dose-picked reads Paracetamol.",
      "defect": "The board is rendered without the view's options, so it shows no column and no card; or at another id, so dose-picked keeps its dash.",
      "for": "M21.X1017"
+    },
+    {
+     "page": "A staged round, Html.FusionKanban(plan, \"staged-round\", build => ..) with the columns To give (Due) and Given (Given), of a card class whose Medicine member carries [JsonPropertyName(\"drug\")] and whose Status member carries [JsonPropertyName(\"stage\")], its key field named by FusionKanbanFields.Of<StagedDose>().Field(c => c.Status) and each card headed by .Field(c => c.Medicine), over Aspirin, Due, and Paracetamol, Given.",
+     "gesture": "Open the page.",
+     "outcome": "The To give column shows Aspirin and the Given column shows Paracetamol.",
+     "opposite": "Opened after the round, Aspirin Given and Paracetamol Due: the Given column shows Aspirin and the To give column Paracetamol.",
+     "defect": "The door names the key field Status and the header field Medicine, the members' C# names, while the cards are written with stage and drug, so no column shows a card.",
+     "for": "M21.X1051"
+    },
+    {
+     "page": "A nursed round page, Html.FusionKanban(plan, \"nursed-round\", build => ..) keyed on FusionKanbanFields.Of<NursedDose>().Field(c => c.Status) with the columns To give (Due) and Given (Given), over Aspirin, Due, nursed by Rose Achebe, each card headed by .Field(c => c.Nurse.Name).",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with InvalidOperationException: FusionKanbanFields names 'c => c.Nurse.Name', a path past one member of the card, and the board reads each field as one member of a card; name one member, such as card => card.Status.",
+     "opposite": "Each card headed by .Field(c => c.Medicine), the page renders and the To give column shows Aspirin.",
+     "defect": "The path's members are joined with dots as nurse.name, which no card holds, so the page renders and the card shows no header.",
+     "for": "M21.X1055"
     }
    ],
    "verdicts": [
@@ -14639,6 +14678,11 @@
      "id": "M21.X512",
      "rung": "behavior",
      "defect": "A text field named by a member that carries [JsonPropertyName(\"label\")] shows no text: in the redesign Fields names label (Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/FusionMultiColumnComboBox.cs:80, Alis.Reactive/Members/JsonMemberName.cs:11 at 65fdf118d) while EJ2 writes the rows handed over with the view through Newtonsoft as displayLabel (probe:fusion-ej2-builder-newtonsoft-defaults); in main Fields names displayLabel, the camel case of the C# name (Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/FusionMultiColumnComboBoxHtmlExtensions.cs:27, Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9 at 623dd4a27), while an endpoint's body, written by System.Text.Json, holds label. The rewrite names the field and writes the handed rows by one writer (M21.D1, probe:fusion-ej2-builder-raw-json)."
+    },
+    {
+     "id": "M21.X1052",
+     "rung": "behavior",
+     "defect": "Both lines name a MultiColumnComboBox's text and value fields from members of the row (Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/FusionMultiColumnComboBoxHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/FusionMultiColumnComboBox.cs:80 at 65fdf118d) and leave a column's field the string a view sets on EJ2's Column, so a view repeats each member's name by hand and a name that differs from the one the rows are written under shows an empty column. The rewrite's door names the field as the plan's writer names the member (M21.D1), resolved where the view's plan renders the component; a door that names the member's C# name, as EJ2's own writer does (M21.X3), finds no field for a member that carries [JsonPropertyName]."
     }
    ],
    "promises": [
@@ -14652,11 +14696,19 @@
     },
     {
      "for": "M21.X512",
-     "page": "A bed assignment page whose Load beds button requests the open beds, which the endpoint writes as label and bedCode, and sets them as the FusionMultiColumnComboBox's rows, with Fields(b => b.DisplayLabel, b => b.BedCode) on the same bed class.",
+     "page": "A bed assignment page whose Load beds button requests the open beds, which the endpoint writes as label and bedCode, and sets them as the FusionMultiColumnComboBox's rows, with Fields(b => b.DisplayLabel, b => b.BedCode) on the same bed class, and its Bed and Code columns named by FusionMultiColumnComboBoxColumns.Of<CareBed>().Field(b => b.DisplayLabel) and .Field(b => b.BedCode).",
      "gesture": "Click Load beds, open the bed box's popup and click the row of bed 12A.",
      "outcome": "The bed box shows 12A Maple.",
      "opposite": "Before Load beds is clicked, the popup shows no rows.",
      "defect": "The field names displayLabel, the camel case of the C# name, while the body holds label, so the box shows no text after the choice, as main names fields."
+    },
+    {
+     "page": "A bed labels page whose bed FusionMultiColumnComboBox is rendered with the beds 12A Maple and 14B Cedar handed over with the view, of the bed class whose DisplayLabel member carries [JsonPropertyName(\"label\")], with Fields(b => b.DisplayLabel, b => b.BedCode) and the columns Bed and Code, their fields named by FusionMultiColumnComboBoxColumns.Of<CareBed>().Field(b => b.DisplayLabel) and .Field(b => b.BedCode).",
+     "gesture": "Open the bed box's popup.",
+     "outcome": "The popup shows the row 12A Maple, 12A.",
+     "opposite": "The second row shows its own label and code, 14B Cedar, 14B.",
+     "defect": "The door names the Bed column's field DisplayLabel, the member's C# name, while the rows are written with label, so the Bed column shows no label.",
+     "for": "M21.X1052"
     }
    ],
    "verdicts": [
@@ -15959,6 +16011,16 @@
      "id": "M21.X1043",
      "rung": "behavior",
      "defect": "EJ2 33.1.47's PivotViewBuilder takes the rows of its dataSourceSettings as an object (PivotViewDataSourceSettings.DataSource, Syncfusion.EJ2.xml of Syncfusion.EJ2.AspNet.Core 33.1.47), which it writes through Newtonsoft's process-wide default settings and so names each member by its C# name and reads no [JsonPropertyName] (probe:fusion-ej2-builder-newtonsoft-defaults), while the pivot's fields are the first row's member names (@syncfusion/ej2-pivotview/src/base/engine.js:283) and its rows and values find them by the names a view gives. Both lines hand the rows to EJ2's builder alone (Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewHtmlExtensions.cs:28-29 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:135-138 at 65fdf118d), so rows and values named by the members' JSON names find no field. The rewrite's render helper writes dataSourceSettings.dataSource by the plan's one writer after the view's build (M21.N34, M21.D1), so a row's members reach the pivot under their JSON names, a [JsonPropertyName]'s among them."
+    },
+    {
+     "id": "M21.X1053",
+     "rung": "behavior",
+     "defect": "Both lines take a pivot's rows and values as the names a view sets on EJ2's dataSourceSettings, with no door that names a field from a member of the row (Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewHtmlExtensions.cs:28-29 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:135-138 at 65fdf118d), so a view repeats each member's name by hand and a name that differs from the one the rows are written under finds no field. The rewrite's door names the field as the plan's writer names the member (M21.D1), resolved where the view's plan renders the component; a door that names the member's C# name, as EJ2's own writer does (M21.X3), finds no field for a member that carries [JsonPropertyName]."
+    },
+    {
+     "id": "M21.X1056",
+     "rung": "refusal",
+     "defect": "The rewrite's FusionPivotViewFields.Of<TRow>().Field(..) (M21.X1053), a door neither line has, takes a lambda of the row, which C# lets name a path past one member, while EJ2 33.1.47's pivot takes its fields as the first row's own member names, Object.keys(this.data[0]) (@syncfusion/ej2-pivotview/src/base/engine.js:283): a path's members joined with dots name a field no row holds, so the table shows no unit and says nothing. No type stages a lambda's shape, and the analyzers no unit has built wait until after 1.0 (spec/CLAUDE.md, the owner, 2026-11-15), so the rewrite's render helper refuses it where the view renders, as M21.X1041 refuses one: \"FusionPivotViewFields names 'u => u.Lead.Name', a path past one member of the row, and the pivot reads each field as one member of a row; name one member, such as row => row.Ward.\""
     }
    ],
    "promises": [
@@ -15972,11 +16034,27 @@
     },
     {
      "for": "M21.X1043",
-     "page": "A ward occupancy page whose FusionPivotView in Table view is handed in EJ2's dataSourceSettings the residents North, North and East, each counting 1, of a row class whose Ward member the app's camel case names ward and whose Residents member carries [JsonPropertyName(\"headcount\")], with its row named ward and its value named headcount.",
+     "page": "A ward occupancy page whose FusionPivotView in Table view is handed in EJ2's dataSourceSettings the residents North, North and East, each counting 1, of a row class whose Ward member the app's camel case names ward and whose Residents member carries [JsonPropertyName(\"headcount\")], with its row and its value named by FusionPivotViewFields.Of<OccupancyEntry>().Field(e => e.Ward) and .Field(e => e.Residents).",
      "gesture": "Open the page.",
      "outcome": "The table shows the row East 1 and the row North 2.",
      "opposite": "Opened with one North resident moved to East, the table shows the row East 2 and the row North 1.",
      "defect": "EJ2 writes the rows through Newtonsoft under their C# names, Ward and Residents, while the row and the value name ward and headcount, so the table shows no ward."
+    },
+    {
+     "page": "A unit occupancy page whose FusionPivotView in Table view is handed in EJ2's dataSourceSettings the residents North, North and East, each counting 1 bed, of a row class whose Ward member carries [JsonPropertyName(\"unit\")], its row named by FusionPivotViewFields.Of<UnitEntry>().Field(e => e.Ward) and its value by .Field(e => e.Beds).",
+     "gesture": "Open the page.",
+     "outcome": "The table shows the row East 1 and the row North 2.",
+     "opposite": "Opened with one North resident moved to East, the table shows the row East 2 and the row North 1.",
+     "defect": "The door names the row Ward, the member's C# name, while the rows are written with unit, so the table shows no unit.",
+     "for": "M21.X1053"
+    },
+    {
+     "page": "A led units page whose FusionPivotView in Table view is handed in EJ2's dataSourceSettings the unit North, counting 1 bed, led by Rose Achebe, its value named by FusionPivotViewFields.Of<LedUnit>().Field(u => u.Beds) and its row by .Field(u => u.Lead.Name).",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with InvalidOperationException: FusionPivotViewFields names 'u => u.Lead.Name', a path past one member of the row, and the pivot reads each field as one member of a row; name one member, such as row => row.Ward.",
+     "opposite": "Its row named by .Field(u => u.Ward), the page renders and the table shows the row North 1.",
+     "defect": "The path's members are joined with dots as lead.name, which no row holds, so the page renders and the table shows no unit.",
+     "for": "M21.X1056"
     }
    ],
    "verdicts": [
@@ -17925,6 +18003,16 @@
      "id": "M21.X1042",
      "rung": "behavior",
      "defect": "EJ2 33.1.47's ScheduleBuilder takes the events of its eventSettings as an object (ScheduleEventSettings.DataSource, Syncfusion.EJ2.xml of Syncfusion.EJ2.AspNet.Core 33.1.47), which it writes through Newtonsoft's process-wide default settings and so names each member by its C# name and reads no [JsonPropertyName] (probe:fusion-ej2-builder-newtonsoft-defaults), while the schedule finds an event's subject, start and end by the names its fields give (@syncfusion/ej2-schedule/src/schedule/event-renderer/event-base.js:214-218) and a view's read of an event, PopupOpen<TEvent>()'s Data among them, names each member as the app's JSON names it. Both lines hand the events to EJ2's builder alone (Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleHtmlExtensions.cs:34-35 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:324-327 at 65fdf118d), so fields named by the members' JSON names find no event. The rewrite's render helper writes the events the view's build sets in eventSettings by the plan's one writer after the build, as a Fusion render helper writes every C# value it hands EJ2 (M21.N39, M21.D1)."
+    },
+    {
+     "id": "M21.X1054",
+     "rung": "behavior",
+     "defect": "Both lines take a schedule's event fields as the names a view sets on EJ2's eventSettings, with no door that names a field from a member of the event (Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleHtmlExtensions.cs:34-35 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:324-327 at 65fdf118d), so a view repeats each member's name by hand and a name that differs from the one the events are written under finds no field. The rewrite's door names the field as the plan's writer names the member (M21.D1), resolved where the view's plan renders the component; a door that names the member's C# name, as EJ2's own writer does (M21.X3), finds no field for a member that carries [JsonPropertyName]."
+    },
+    {
+     "id": "M21.X1057",
+     "rung": "refusal",
+     "defect": "The rewrite's FusionScheduleFields.Of<TEvent>().Field(..) (M21.X1054), a door neither line has, takes a lambda of the event, which C# lets name a path past one member, while EJ2 33.1.47's schedule reads each field as one member of an event, record[eventFields.subject] and eventData[eventFields.startTime] (@syncfusion/ej2-schedule/src/schedule/event-renderer/event-base.js:1262, :214-218): a path's members joined with dots name a field no event holds, so the shift shows no subject and says nothing. No type stages a lambda's shape, and the analyzers no unit has built wait until after 1.0 (spec/CLAUDE.md, the owner, 2026-11-15), so the rewrite's render helper refuses it where the view renders, as M21.X1041 refuses one: \"FusionScheduleFields names 's => s.Lead.Name', a path past one member of the event, and the schedule reads each field as one member of an event; name one member, such as item => item.Subject.\""
     }
    ],
    "promises": [
@@ -17954,11 +18042,27 @@
     },
     {
      "for": "M21.X1042",
-     "page": "A carers rota page whose FusionSchedule in week view, its selected date 2026-11-09, opened in America/Los_Angeles, is handed in EJ2's eventSettings the shifts Ada Brooks, Monday 2026-11-09 from 9:00 to 17:00, and Lena Ortiz, Tuesday 2026-11-10 from 9:00 to 17:00, its subject, startTime and endTime fields naming the shift's members by their JSON names carer, starts and ends, and whose PopupOpen<CarerShift>() handler sets shift-picked's text to the opened shift's Carer; shift-picked starts as a dash.",
+     "page": "A carers rota page whose FusionSchedule in week view, its selected date 2026-11-09, opened in America/Los_Angeles, is handed in EJ2's eventSettings the shifts Ada Brooks, Monday 2026-11-09 from 9:00 to 17:00, and Lena Ortiz, Tuesday 2026-11-10 from 9:00 to 17:00, its subject, startTime and endTime fields named by FusionScheduleFields.Of<CarerShift>().Field(s => s.Carer), .Field(s => s.Starts) and .Field(s => s.Ends), and whose PopupOpen<CarerShift>() handler sets shift-picked's text to the opened shift's Carer; shift-picked starts as a dash.",
      "gesture": "Open the page, then click Ada Brooks's shift.",
      "outcome": "The schedule shows the shifts Ada Brooks and Lena Ortiz, and shift-picked reads Ada Brooks.",
      "opposite": "Clicking Lena Ortiz's shift, shift-picked reads Lena Ortiz.",
      "defect": "EJ2 writes the shifts through Newtonsoft under their C# names, Carer, Starts and Ends, while the fields name carer, starts and ends, so the schedule shows no shift and shift-picked keeps its dash."
+    },
+    {
+     "page": "A named shifts page whose FusionSchedule in week view, its selected date 2026-11-09, opened in America/Los_Angeles, is handed in EJ2's eventSettings the shifts Ada Brooks, Monday 2026-11-09 from 9:00 to 17:00, and Lena Ortiz, Tuesday 2026-11-10 from 9:00 to 17:00, of a shift class whose Carer, Starts and Ends members carry [JsonPropertyName(\"who\")], [JsonPropertyName(\"from\")] and [JsonPropertyName(\"until\")], its subject, startTime and endTime fields named by FusionScheduleFields.Of<NamedShift>().Field(s => s.Carer), .Field(s => s.Starts) and .Field(s => s.Ends).",
+     "gesture": "Open the page.",
+     "outcome": "Monday shows Ada Brooks's shift from 9:00 AM to 5:00 PM.",
+     "opposite": "Tuesday shows Lena Ortiz's shift, its own carer and day.",
+     "defect": "The door names the fields Carer, Starts and Ends, the members' C# names, while the events are written with who, from and until, so the week shows no shift.",
+     "for": "M21.X1054"
+    },
+    {
+     "page": "A led shifts page whose FusionSchedule in week view, its selected date 2026-11-09, opened in America/Los_Angeles, is handed in EJ2's eventSettings the shift Ada Brooks, Monday 2026-11-09 from 9:00 to 17:00, led by Rose Achebe, its startTime and endTime fields named by FusionScheduleFields.Of<LedShift>().Field(s => s.Starts) and .Field(s => s.Ends) and its subject by .Field(s => s.Lead.Name).",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with InvalidOperationException: FusionScheduleFields names 's => s.Lead.Name', a path past one member of the event, and the schedule reads each field as one member of an event; name one member, such as item => item.Subject.",
+     "opposite": "Its subject named by .Field(s => s.Carer), the page renders and Monday shows Ada Brooks's shift from 9:00 AM to 5:00 PM.",
+     "defect": "The path's members are joined with dots as lead.name, which no event holds, so the page renders and the shift shows no carer.",
+     "for": "M21.X1057"
     }
    ],
    "verdicts": [

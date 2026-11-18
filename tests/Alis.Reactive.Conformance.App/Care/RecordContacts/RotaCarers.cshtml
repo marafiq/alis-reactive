@@ -8,6 +8,7 @@
     Layout = "/Shared/_FusionLayout.cshtml";
     ViewData["Title"] = "Carers on shift";
     var plan = Html.ReactivePlan<RotaCarers>();
+    var shift = FusionScheduleFields.Of<CarerShift>();
 }
 <h1>Carers on shift</h1>
 @(Html.FusionSchedule(plan, "carer-rota", build => build
@@ -18,9 +19,9 @@
         DataSource = Model.Shifts,
         Fields = new ScheduleField
         {
-            Subject = new ScheduleFieldOptions { Name = "carer" },
-            StartTime = new ScheduleFieldOptions { Name = "starts" },
-            EndTime = new ScheduleFieldOptions { Name = "ends" },
+            Subject = new ScheduleFieldOptions { Name = shift.Field(s => s.Carer) },
+            StartTime = new ScheduleFieldOptions { Name = shift.Field(s => s.Starts) },
+            EndTime = new ScheduleFieldOptions { Name = shift.Field(s => s.Ends) },
         },
     }))
     .Reactive(rota => rota.PopupOpen<CarerShift>(), (opened, pipeline) => pipeline.Element("shift-picked").Text.Set(opened.Data.Read(shift => shift.Carer))))

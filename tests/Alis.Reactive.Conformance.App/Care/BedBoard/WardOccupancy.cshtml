@@ -7,6 +7,7 @@
     Layout = "/Shared/_FusionLayout.cshtml";
     ViewData["Title"] = "Ward occupancy";
     var plan = Html.ReactivePlan<WardOccupancy>();
+    var entry = FusionPivotViewFields.Of<OccupancyEntry>();
 }
 <h1>Ward occupancy</h1>
 @(Html.FusionPivotView(plan, "ward-occupancy", build => build
@@ -14,7 +15,7 @@
     .DataSourceSettings(new PivotViewDataSourceSettings
     {
         DataSource = Model.Residents,
-        Rows = new List<PivotViewRow> { new() { Name = "ward", Caption = "Ward" } },
-        Values = new List<PivotViewRow> { new() { Name = "headcount", Caption = "Headcount" } },
+        Rows = new List<PivotViewRow> { new() { Name = entry.Field(e => e.Ward), Caption = "Ward" } },
+        Values = new List<PivotViewRow> { new() { Name = entry.Field(e => e.Residents), Caption = "Headcount" } },
     })))
 @Html.RenderPlan(plan)

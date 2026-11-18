@@ -1275,6 +1275,13 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F21 M21.X1050 0": {
+    "modules": [],
+    "views": [
+      "/Care/BedBoard/RoomPicker.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F22 M21.X1014 0": {
     "modules": [],
     "views": [
@@ -1366,6 +1373,20 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F26 M21.X1051 0": {
+    "modules": [],
+    "views": [
+      "/Care/Handover/StagedRound.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F26 M21.X1055 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionComponents/NursedRound.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F27 M21.X1018 0": {
     "modules": [],
     "views": [
@@ -1416,6 +1437,13 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F31 M21.X1052 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/BedLabels.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F31 M21.X512 0": {
     "modules": [],
     "views": [
@@ -1458,6 +1486,20 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F34 M21.X1053 0": {
+    "modules": [],
+    "views": [
+      "/Care/BedBoard/UnitOccupancy.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F34 M21.X1056 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionComponents/LedUnits.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F35 M21.X1021 0": {
     "modules": [],
     "views": [
@@ -1497,6 +1539,20 @@
     "modules": [],
     "views": [
       "/Care/RecordContacts/RotaCarers.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F39 M21.X1054 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/NamedShifts.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F39 M21.X1057 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionComponents/LedShifts.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },

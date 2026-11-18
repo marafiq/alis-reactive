@@ -949,7 +949,7 @@
         {
           "id": "refusalFusion",
           "kind": "fusion",
-          "role": "the Fusion components the refused Fusion pages render: FusionGrid with FusionGridValidation's rules or a template, FusionSmartPasteButton, and FusionBulletChart with its Fields"
+          "role": "the Fusion components the refused Fusion pages render: FusionGrid with FusionGridValidation's rules or a template, FusionSmartPasteButton, FusionBulletChart with its Fields, and FusionKanban, FusionSchedule and FusionPivotView with a field their doors name"
         },
         {
           "id": "fusionRefusalValidator",
@@ -3705,6 +3705,21 @@
       ]
     },
     {
+      "feature": "M21.F31",
+      "for": "M21.X1052",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "bed"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F33",
       "for": "M21.X612",
       "index": 0,
@@ -3783,6 +3798,21 @@
     {
       "feature": "M21.F39",
       "for": "M21.X1042",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "visits"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F39",
+      "for": "M21.X1054",
       "index": 0,
       "screen": "record-contacts",
       "hosts": [
@@ -9329,6 +9359,51 @@
       ]
     },
     {
+      "feature": "M21.F26",
+      "for": "M21.X1055",
+      "index": 0,
+      "screen": "fusion-refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalFusion"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F34",
+      "for": "M21.X1056",
+      "index": 0,
+      "screen": "fusion-refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalFusion"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F39",
+      "for": "M21.X1057",
+      "index": 0,
+      "screen": "fusion-refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalFusion"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F8",
       "for": "M21.X1004",
       "index": 0,
@@ -9479,6 +9554,21 @@
       ]
     },
     {
+      "feature": "M21.F21",
+      "for": "M21.X1050",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "wardTree"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F22",
       "for": "M21.X1014",
       "index": 0,
@@ -9587,6 +9677,21 @@
       ]
     },
     {
+      "feature": "M21.F26",
+      "for": "M21.X1051",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doseBoard"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F27",
       "for": "M21.X1018",
       "index": 0,
@@ -9634,6 +9739,21 @@
     {
       "feature": "M21.F34",
       "for": "M21.X1043",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F34",
+      "for": "M21.X1053",
       "index": 0,
       "screen": "bed-board",
       "hosts": [

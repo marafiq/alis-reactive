@@ -13,7 +13,11 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// </summary>
 public static partial class FusionMultiColumnComboBoxHtml
 {
+    private const string NamedWhereTheBoxRenders = "named where FusionMultiColumnComboBox renders";
+
     private static readonly ConditionalWeakTable<MultiColumnComboBoxBuilder, Func<ItemNames, MultiColumnComboBoxFieldSettings>> NamedFields = new();
+
+    private static readonly ConditionalWeakTable<string, Func<ItemNames, string>> DeferredColumns = new();
 
     /// <summary>Renders a multi-column combo box for the field's member, holding the member's value.</summary>
     /// <remarks>Name every type argument: the model, the member's type and the type of the rows' value member.</remarks>
@@ -67,8 +71,25 @@ public static partial class FusionMultiColumnComboBoxHtml
     private static Rendered<FusionMultiColumnComboBox<TValue>, TModel> Rendered<TModel, TMember, TValue>(InputField<TModel, TMember> field, MultiColumnComboBoxBuilder box, Action<MultiColumnComboBoxBuilder> build)
     {
         (build ?? throw new ArgumentNullException(nameof(build)))(box);
-        if (NamedFields.TryGetValue(box, out var fields)) box.Fields(fields(new FieldNames<TModel, TMember>(field)));
+        var names = new FieldNames<TModel, TMember>(field);
+        if (NamedFields.TryGetValue(box, out var fields)) box.Fields(fields(names));
+        if (box.model.Columns is List<Column> columns) NameEach(columns, names);
         return RenderedBox<TModel, TMember, TValue>(field, box);
+    }
+
+    internal static string Defer(Func<ItemNames, string> named)
+    {
+        var text = new string(NamedWhereTheBoxRenders.ToCharArray());
+        DeferredColumns.Add(text, named);
+        return text;
+    }
+
+    private static void NameEach(List<Column> columns, ItemNames names)
+    {
+        foreach (var column in columns)
+        {
+            if (column.Field is { } named && DeferredColumns.TryGetValue(named, out var name)) column.Field = name(names);
+        }
     }
 
     private static MultiColumnComboBoxBuilder Named(MultiColumnComboBoxBuilder build, Func<ItemNames, MultiColumnComboBoxFieldSettings> fields)
@@ -94,7 +115,7 @@ public static partial class FusionMultiColumnComboBoxHtml
 
     private static partial Rendered<FusionMultiColumnComboBox<TValue>, TModel> RenderedBox<TModel, TMember, TValue>(InputField<TModel, TMember> field, MultiColumnComboBoxBuilder box);
 
-    private abstract class ItemNames
+    internal abstract class ItemNames
     {
         internal abstract string Of<TItem, TMember>(Expression<Func<TItem, TMember>> member);
     }

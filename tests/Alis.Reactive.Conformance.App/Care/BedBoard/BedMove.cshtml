@@ -7,6 +7,7 @@
     Layout = "/Shared/_FusionLayout.cshtml";
     ViewData["Title"] = "Bed move";
     var plan = Html.ReactivePlan<BedMove>();
+    var node = FusionDropDownTreeFields.Of<WingNode>();
 }
 <h1>Bed move</h1>
 <fieldset>
@@ -15,9 +16,9 @@
         .FusionDropDownTree(build => build.Fields(new DropDownTreeFields
         {
             DataSource = Model.Wings,
-            Value = "id",
-            Text = "name",
-            Child = "wards",
+            Value = node.Field(n => n.Id),
+            Text = node.Field(n => n.Name),
+            Child = node.Field(n => n.Wards),
         })))
 </fieldset>
 @Html.RenderPlan(plan)

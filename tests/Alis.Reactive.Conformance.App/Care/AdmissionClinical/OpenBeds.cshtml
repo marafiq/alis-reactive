@@ -9,6 +9,7 @@
     Layout = "/Shared/_FusionLayout.cshtml";
     ViewData["Title"] = "Open beds";
     var plan = Html.ReactivePlan<OpenBeds>();
+    var bed = FusionMultiColumnComboBoxColumns.Of<CareBed>();
 }
 <h1>Open beds</h1>
 <fieldset>
@@ -16,7 +17,7 @@
     @(Html.InputField(plan, m => m.BedCode, options => options.Label("Bed"))
         .FusionMultiColumnComboBox<OpenBeds, string?, string>(build => build
             .Fields((CareBed b) => b.DisplayLabel, b => b.BedCode)
-            .Columns([new Column { Field = "label", Header = "Bed" }, new Column { Field = "bedCode", Header = "Code" }])))
+            .Columns([new Column { Field = bed.Field(b => b.DisplayLabel), Header = "Bed" }, new Column { Field = bed.Field(b => b.BedCode), Header = "Code" }])))
 </fieldset>
 <button type="button" @Html.Raises(plan, OpenBedLists.Load)>Load beds</button>
 <p>The open beds: <output id="bed-list">Not loaded</output></p>
