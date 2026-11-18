@@ -26,25 +26,35 @@ A view opens its plan, says what happens and when, and writes the plan as its la
 ### How does a view open its plan?
 
 ```cshtml
+@model Welcome
 @{
     ViewData["Title"] = "Home";
-    var plan = Html.ReactivePlan<dynamic>();
+    var plan = Html.ReactivePlan<Welcome>();
 }
 ```
 
-`Html.ReactivePlan<TModel>()` opens the plan for the view's model, `dynamic` for a view with no `@model`.
+`Html.ReactivePlan<TModel>()` opens the plan for the view's model, a class of your own that the action hands the
+view. Every door after it is typed by that class, so the compiler catches a wrong member before the browser does.
+
+```csharp
+public sealed class Welcome
+{
+    public string Message { get; set; } = "Booted";
+}
+```
 
 ### How does the page react once it loads?
 
 ```cshtml
 <p id="consumer-status">Not booted</p>
 @{
-    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("consumer-status").Text.Set("Booted")));
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("consumer-status").Text.Set(Model.Message)));
 }
 ```
 
 `Html.On` handles a trigger: `DomReady` runs its pipeline once the page has loaded, and `pipeline.Element(id)` reaches
-an element by the id you gave it. The view holds no JavaScript.
+an element by the id you gave it. `Model.Message` is the view's own model, read where the view renders. The view
+holds no JavaScript.
 
 ### How does the plan reach the page?
 
@@ -57,11 +67,13 @@ an element by the id you gave it. The view holds no JavaScript.
 ### Which namespaces does the view name?
 
 ```cshtml
+@using Alis.Reactive.Consumer.Net10.Models
 @using Alis.Reactive.RenderingAndDelivery
 @using Alis.Reactive.TriggersAndPipelines
 ```
 
-Each `@using` names the namespace of the fluent builders a view calls: `Alis.Reactive.RenderingAndDelivery` for the
+The first `@using` is the app's own, where the view's model lives. Each of the others names the namespace of the
+fluent builders a view calls: `Alis.Reactive.RenderingAndDelivery` for the
 plan, `Alis.Reactive.TriggersAndPipelines` for its triggers and what a pipeline does. Write them at the top of the
 view, or once in `Views/_ViewImports.cshtml` for every view.
 

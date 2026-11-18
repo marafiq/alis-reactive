@@ -20,7 +20,7 @@ public class WhenADocShowsAnExample
         @using Alis.Reactive.TriggersAndPipelines
         @{
             ViewData["Title"] = "Home";
-            var plan = Html.ReactivePlan<dynamic>();
+            var plan = Html.ReactivePlan<Welcome>();
         }
         <p id="consumer-status">Not booted</p>
         @{

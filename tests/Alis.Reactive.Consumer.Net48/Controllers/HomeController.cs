@@ -1,4 +1,5 @@
 using System.Web.Mvc;
+using Alis.Reactive.Consumer.Net48.Models;
 
 namespace Alis.Reactive.Consumer.Net48.Controllers
 {
@@ -6,7 +7,7 @@ namespace Alis.Reactive.Consumer.Net48.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return View(new Welcome());
         }
     }
 }

@@ -1,11 +1,13 @@
+@using Alis.Reactive.Consumer.Net10.Models
 @using Alis.Reactive.RenderingAndDelivery
 @using Alis.Reactive.TriggersAndPipelines
+@model Welcome
 @{
     ViewData["Title"] = "Home";
-    var plan = Html.ReactivePlan<dynamic>();
+    var plan = Html.ReactivePlan<Welcome>();
 }
 <p id="consumer-status">Not booted</p>
 @{
-    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("consumer-status").Text.Set("Booted")));
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("consumer-status").Text.Set(Model.Message)));
 }
 @Html.RenderPlan(plan)

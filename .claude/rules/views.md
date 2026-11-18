@@ -21,6 +21,9 @@ and a script URL in any tracked view, and a layout links a script by its file.
 - A partial has a tight model of its own, and plan state never travels by weak typing: no `ViewData`, nothing stored
   on the request.
 - A screen that needs a model has a model of its own, shared with no other view.
+- A plan's model is a class the app wrote, the view's `@model`: never `dynamic` and never `object`, in a test app, a
+  fresh app or README, since every door after `Html.ReactivePlan<TModel>()` is typed by it (the owner, 2026-11-18:
+  "The whole point of the framework is tight, and you end up using dynamic").
 - A page carries only what a real application page would: no echo spans, no debug divs, nothing that exists
   only to be asserted. It reads as a product screen, not a test rig.
 

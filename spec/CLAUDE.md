@@ -1997,6 +1997,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   answered by one door as the PublicAPI text names it, the meaning that decides between two doors, the TLA+
   invariant that fixes an ordering and a landed view that shows it. It holds no feature of any one app and no list
   of combinations, which are an app's own spec. Its examples are copied whole from views a browser test runs.
+- The owner, 2026-11-18, on README's first example and both fresh apps' home views (verbatim in `spec/NOTES.md`):
+  "Dude, why would you use dynamic? The whole point of the framework is tight, and you end up using dynamic. What a
+  pity." A plan's model is a class the app wrote, the view's `@model`, never `dynamic` and never `object`: every door
+  after `Html.ReactivePlan<TModel>()` is typed by it. `.claude/rules/views.md` states it; the fresh apps' home page
+  has a model of its own, Welcome, and README shows it. An analyzer that refuses a plan opened over `dynamic` or
+  `object` is the rung that holds it in an app's build, and is the unit that follows.
 
 ## Modules
 
