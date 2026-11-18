@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Wed Nov 18 03:37:26 EST 2026
+Written at `date`: Wed Nov 18 04:22:43 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -17,52 +17,52 @@ note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUD
 note: open 2026-11-17 | decision | spec/CLAUDE.md, the Conditions module's decisions, with a table "After 1.0" in spec/
 note: open 2026-11-17 | process rule | .claude/rules/process.md | queue | "your whole goal is to get the tooling, the p
 note: open 2026-11-18 | decision | spec/CLAUDE.md | DecisionsByModule | "where you're gonna keep the decisions. So it c
-note: open 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses 
+note: closed 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses : its follow-up TypedDoors landed
+  leaves by: the entry leaves the notes block of `HANDOFF.md`
+  goes to: gone
 note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSlice1 | "For the app, you
 note: open 2026-11-18 | direction | the queue of this file | queue | "I don't need acceptance numbers, sir. I need that
-unit: building ../movein1 MoveInSlice1: it lacks paths.txt or message.txt
+unit: building ../ci2 CiGreen2: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
   exit line: each line of the brief's "Done"
   goes to: unit: ready, or unit: returned for an agent
-unit: ready ../skill BuildAScreen
-  next: scripts/land-unit.sh ../skill e9b49a1eb "skill: build-a-screen, a decision map from a developer's question to one door, its meaning, its ordering and a landed view" ".landing/BuildAScreen"
+unit: ready ../movein1 MoveInSlice1
+  next: scripts/land-unit.sh ../movein1 e9b49a1eb "conformance app: the move-in's foundation and MI.1, a residence chosen through three lookups over a model one world owns" ".landing/MoveInSlice1"
   leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
   exit line: "landed", with the browser run's result line
   goes to: unit: landed
-unit: waiting ../typed-doors TypedDoors: for TypedHome
-  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
-  exit line: each line of the brief's "Done"
-  goes to: unit: ready
-unit: ready ../typed-home TypedHome
-  next: scripts/land-unit.sh ../typed-home 176de4cd3 "fresh apps and README: the home page has a model of its own, and no example opens a plan over dynamic" ".landing/TypedHome"
-lane: pushed at 2836ae7e4 on feature/rewrite: equal to the remote
+unit: landed ../typed-doors TypedDoors
+  next: git worktree remove ../typed-doors
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
+lane: pushed at 4c5ae8e1c on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 2836ae7e4
+ci: unread at 4c5ae8e1c
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over CLAUDE.md: holds 325 lines, its limit 200
+file: over CLAUDE.md: holds 326 lines, its limit 200
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2064 lines, its limit 150
-file: over HANDOFF.md: holds 202 lines, its limit 150
+file: over HANDOFF.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 197 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 2836ae7e4 fresh apps and README: the home page has a model of its own, and no example opens a plan over dynamic
-- Full check: .work/logs/spec-check-2836ae7e4.log: spec check at 2836ae7e4: 40 of 40 checks pass
-- .work/last-run.txt: 20261118-032656-66296 2836ae7e4
+- HEAD: 4c5ae8e1c analyzers: ALIS044, a door of the framework takes no dynamic (N18.18)
+- Full check: .work/logs/spec-check-4c5ae8e1c.log: spec check at 4c5ae8e1c: 40 of 40 checks pass
+- .work/last-run.txt: 20261118-041235-17720 4c5ae8e1c
 
 ## Landed since the commit before the last spec: STATE commit
-2836ae7e4 fresh apps and README: the home page has a model of its own, and no example opens a plan over dynamic
-1ca74af0a spec: STATE and handoff at fa8b912da
+4c5ae8e1c analyzers: ALIS044, a door of the framework takes no dynamic (N18.18)
+5ed0e0a5e spec: STATE and handoff at 2836ae7e4
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -111,7 +111,8 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 376 to 378
+- A rule or a tool's list not applied before the change: 378 to 381
+- A shell command or a script wrong in its own terms: 529 to 533
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1926: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
