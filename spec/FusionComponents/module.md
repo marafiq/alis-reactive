@@ -446,7 +446,8 @@ Each name is gate 2's; each door is the capability it carries.
   with null (`@syncfusion/ej2-schedule/src/schedule/actions/crud.js:59`, D17.4); an event's data the app's own class
   `TEvent` and
   `Navigating`'s dates read as `DateTime` (M21.X306); and the render helper `Html.FusionSchedule(plan, id, build =>
-  ..)`, with `FusionScheduleFields.Of<TEvent>().Field(..)` naming an event's fields, one member each (M21.X1054, M21.X1057). It replaces main's
+  ..)`, with `FusionScheduleFields.Of<TEvent>().Field(..)` naming an event's fields, one member each (M21.X1054, M21.X1057), and, over a resource's class, the resource's own
+  fields, whose data the helper writes as the plan writes it (M21.X1058, M21.X1059). It replaces main's
   fifteen files (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors
   carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:250`, `:274`, `:707`, `:867`, `:1716`, `:1726`, `:1770`, `:1878`,

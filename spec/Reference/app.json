@@ -3826,6 +3826,21 @@
       ]
     },
     {
+      "feature": "M21.F39",
+      "for": "M21.X1058",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "visits"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F41",
       "for": "M21.X615",
       "index": 0,
@@ -9406,6 +9421,21 @@
     {
       "feature": "M21.F39",
       "for": "M21.X1057",
+      "index": 0,
+      "screen": "fusion-refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalFusion"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F39",
+      "for": "M21.X1059",
       "index": 0,
       "screen": "fusion-refusals",
       "hosts": [

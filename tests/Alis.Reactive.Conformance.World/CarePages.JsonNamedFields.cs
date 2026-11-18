@@ -15,6 +15,7 @@ public static partial class CarePages
     public const string StagedRoundAfterTheRound = Handover + "staged-round/after-the-round";
 
     public const string NamedShifts = RecordContacts + "named-shifts";
+    public const string TeamShifts = RecordContacts + "team-shifts";
 
     public const string BedLabels = AdmissionClinical + "bed-labels";
 }

@@ -1556,6 +1556,20 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F39 M21.X1058 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/TeamShifts.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F39 M21.X1059 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionComponents/LedTeams.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F39 M21.X306 0": {
     "modules": [],
     "views": [

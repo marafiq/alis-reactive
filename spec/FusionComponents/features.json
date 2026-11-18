@@ -18013,6 +18013,16 @@
      "id": "M21.X1057",
      "rung": "refusal",
      "defect": "The rewrite's FusionScheduleFields.Of<TEvent>().Field(..) (M21.X1054), a door neither line has, takes a lambda of the event, which C# lets name a path past one member, while EJ2 33.1.47's schedule reads each field as one member of an event, record[eventFields.subject] and eventData[eventFields.startTime] (@syncfusion/ej2-schedule/src/schedule/event-renderer/event-base.js:1262, :214-218): a path's members joined with dots name a field no event holds, so the shift shows no subject and says nothing. No type stages a lambda's shape, and the analyzers no unit has built wait until after 1.0 (spec/CLAUDE.md, the owner, 2026-11-15), so the rewrite's render helper refuses it where the view renders, as M21.X1041 refuses one: \"FusionScheduleFields names 's => s.Lead.Name', a path past one member of the event, and the schedule reads each field as one member of an event; name one member, such as item => item.Subject.\""
+    },
+    {
+     "id": "M21.X1058",
+     "rung": "behavior",
+     "defect": "The rewrite at c1f3a26ae names a schedule's event fields and a resource's field through FusionScheduleFields (M21.X1054), while a resource's own fields, idField and textField among them, stay names a view writes by hand, and the resource's dataSource is written by EJ2's own writer, where the events are written as the plan writes them (M21.D1): a field named as the plan's writer names its member finds none in that data, and each resource's cell reads undefined. Neither line has a door for a resource's fields. The rewrite's render helper names each of a resource's own fields through the same door over the resource's class, and writes the resource's dataSource as the plan writes it."
+    },
+    {
+     "id": "M21.X1059",
+     "rung": "refusal",
+     "defect": "The door that names a resource's own fields (M21.X1058) takes a lambda of the resource's class, which C# lets name a path past one member, while EJ2 33.1.47's schedule reads each of a resource's fields as one member of a resource, resourceData[resource.textField] and e[resource.idField] (@syncfusion/ej2-schedule/src/schedule/base/resource.js:380, :1019): a path's members joined with dots name a field no resource holds, so the page renders, a shift reads [object Object] for its team, and nothing is said. No type stages a lambda's shape, and the analyzers no unit has built wait until after 1.0 (spec/CLAUDE.md, the owner, 2026-11-15), so the rewrite's render helper refuses it where the view renders, as M21.X1057 refuses one of an event: \"FusionScheduleFields names 't => t.Lead.Name', a path past one member of the resource, and the schedule reads each field as one member of a resource; name one member, such as item => item.Subject.\""
     }
    ],
    "promises": [
@@ -18063,6 +18073,22 @@
      "opposite": "Its subject named by .Field(s => s.Carer), the page renders and Monday shows Ada Brooks's shift from 9:00 AM to 5:00 PM.",
      "defect": "The path's members are joined with dots as lead.name, which no event holds, so the page renders and the shift shows no carer.",
      "for": "M21.X1057"
+    },
+    {
+     "page": "A team shifts page whose FusionSchedule in week view, its selected date 2026-11-09, opened in America/Los_Angeles, grouped by its Teams resource, is handed the teams Day team, 1, and Night team, 2, of a team class whose Code and Name members carry [JsonPropertyName(\"code\")] and [JsonPropertyName(\"label\")], the resource's idField and textField named by FusionScheduleFields.Of<CareTeam>().Field(t => t.Code) and .Field(t => t.Name), its field by FusionScheduleFields.Of<TeamShift>().Field(s => s.TeamCode), a member that carries [JsonPropertyName(\"team\")], and the shifts Ada Brooks, Monday 2026-11-09 from 9:00 to 17:00, of team 1, and Lena Ortiz, Tuesday 2026-11-10 from 9:00 to 17:00, of team 2.",
+     "gesture": "Open the page.",
+     "outcome": "The week shows the teams Day team and Night team, and Ada Brooks's Monday shift under Day team.",
+     "opposite": "Lena Ortiz's Tuesday shift shows under Night team, its own team.",
+     "defect": "The teams are written by EJ2's own writer while the fields name code and label, as the plan's writer names them, so each team's cell reads undefined.",
+     "for": "M21.X1058"
+    },
+    {
+     "page": "A led teams page whose FusionSchedule in week view, its selected date 2026-11-09, opened in America/Los_Angeles, grouped by its Teams resource, is handed the team Day team, 1, led by Rose Achebe, and the shift Ada Brooks, Monday 2026-11-09 from 9:00 to 17:00, of team 1, the resource's idField named by FusionScheduleFields.Of<LedTeam>().Field(t => t.Code) and its textField by .Field(t => t.Lead.Name).",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with InvalidOperationException: FusionScheduleFields names 't => t.Lead.Name', a path past one member of the resource, and the schedule reads each field as one member of a resource; name one member, such as item => item.Subject.",
+     "opposite": "Its textField named by .Field(t => t.Name), the page renders and the week shows the team Day team.",
+     "defect": "The path's members are joined with dots as lead.name, which no resource holds, so the page renders and Ada Brooks's shift reads [object Object] for its team.",
+     "for": "M21.X1059"
     }
    ],
    "verdicts": [

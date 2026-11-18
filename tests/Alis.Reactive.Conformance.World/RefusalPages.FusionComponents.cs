@@ -11,6 +11,8 @@ public static partial class RefusalPages
     public const string NursedRoundByMedicine = Area + "fusion-components/nursed-round/by-medicine";
     public const string LedShiftsByLead = Area + "fusion-components/led-shifts/by-lead";
     public const string LedShiftsByCarer = Area + "fusion-components/led-shifts/by-carer";
+    public const string LedTeamsByLead = Area + "fusion-components/led-teams/by-lead";
+    public const string LedTeamsByName = Area + "fusion-components/led-teams/by-name";
     public const string LedUnitsByLead = Area + "fusion-components/led-units/by-lead";
     public const string LedUnitsByWard = Area + "fusion-components/led-units/by-ward";
 }
