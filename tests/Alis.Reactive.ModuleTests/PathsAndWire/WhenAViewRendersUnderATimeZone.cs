@@ -35,8 +35,8 @@ public sealed class WhenAViewRendersUnderATimeZone
         => Assert.That(RenderedUnder(TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")), Is.EqualTo(ScriptOpen + UnderKolkata + ScriptClose));
 
     [Test]
-    public void a_zone_found_by_its_windows_id_is_named_as_net_converts_it()
-        => Assert.That(RenderedUnder(TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")), Is.EqualTo(ScriptOpen + UnderCalcutta + ScriptClose));
+    public void a_zone_that_carries_a_windows_id_is_named_as_net_converts_it()
+        => Assert.That(RenderedUnder(TimeZoneInfo.CreateCustomTimeZone("India Standard Time", TimeSpan.FromMinutes(330), "India", "India")), Is.EqualTo(ScriptOpen + UnderCalcutta + ScriptClose));
 
     [Test]
     public void a_request_that_chooses_none_renders_under_the_browsers_clock()

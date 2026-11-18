@@ -1765,8 +1765,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   app's views and models; a controller of a page placed on net48 has a file beside it named for its host, Net48, which
   the twin alone compiles and the app's project leaves out; the twin holds its own layouts, which link with
   Url.AppendVersion. (5) Visual Studio's MSBuild builds the fresh MVC 5 app (`msbuild /restore`, MSBuild found by
-  vswhere and put on the PATH by a step of the job's own, since the setup-msbuild action left it off the PATH once the
-  runner's image held Visual Studio 18: the lead, 2026-11-18, from the job's log at af5ad37a9); the twin is SDK-style on net48 and builds
+  vswhere in a step of the job's own, which hands its full path to the build step, run by PowerShell: bash on the
+  Windows runner printed "msbuild: command not found" after the setup-msbuild action and again after that step put
+  the folder on the PATH: the lead, 2026-11-18, from the job's logs at af5ad37a9 and 5ed0e0a5e); the twin is SDK-style on net48 and builds
   with `dotnet build`. (6) A script delivery.sh beside the others is the delivery proof's one command: it packs at a
   version of the run's own, builds the fresh net10 app from the packs, and runs WhenAConsumerAppIsBuilt and the
   browser tests under consumerNet10; `scripts/check.sh` leaves WhenAConsumerAppIsBuilt out by name. (7) A fixture
@@ -2003,6 +2004,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   after `Html.ReactivePlan<TModel>()` is typed by it. `.claude/rules/views.md` states it; the fresh apps' home page
   has a model of its own, Welcome, and README shows it. An analyzer that refuses a plan opened over `dynamic` or
   `object` is the rung that holds it in an app's build, and is the unit that follows.
+- The owner, 2026-11-18, on the app that proves the framework as an app uses it (verbatim in `spec/NOTES.md`): "you
+  have to first list down every feature the app will have", then "I did not iterate complete set of features ...
+  you have specs, you have TLA+". The move-in app's only spec is `spec/Reference/move-in.md`: its domain and literal
+  seed, its endpoints, its screens, its features MI.1 to MI.31 by their interactions, its validators and five
+  situations a feature, derived from the door map, the rule grammar, the schema and the TLA+ specs, never from a
+  list of the owner's examples. A unit of the app builds its features from that file, proves each situation by a
+  browser test that reads what the model holds after and at the next read, and adds to the file's ninth part each
+  place the source won over it and each gap it met. What the owner reads of the app is each behavior named as
+  proven or not proven, never a count ("I need that complex app behavior asserted and proved").
 
 ## Modules
 

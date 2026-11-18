@@ -154,9 +154,12 @@ jobs:
           $found = vswhere -latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
           if (-not $found) { Write-Output "::error::vswhere found no MSBuild.exe under Visual Studio"; exit 1 }
           Split-Path $found | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "MSBUILD_EXE=$found" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           & $found -version
       - name: The fresh MVC 5 app, built against the packs with warnings as errors
-        run: msbuild tests/Alis.Reactive.Consumer.Net48/Alis.Reactive.Consumer.Net48.csproj -restore -p:Configuration=Release -warnaserror
+        shell: pwsh
+        run: |
+          & $env:MSBUILD_EXE tests/Alis.Reactive.Consumer.Net48/Alis.Reactive.Consumer.Net48.csproj -restore "-p:Configuration=Release" -warnaserror
       - name: What a build wrote into the fresh app, and the analyzers that reach it
         run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt"
       - name: The tests under the twin

@@ -646,8 +646,8 @@ PLAYWRIGHT_MACHINES = {"arm64": "arm64", "aarch64": "arm64", "x86_64": "x64"}
 
 
 def browser_probe(script):
-    host = REPO / "tests" / "Alis.Reactive.Playwright.TestHost" / "Alis.Reactive.Playwright.TestHost.csproj"
-    bundled = Path.home() / ".nuget" / "packages" / "microsoft.playwright" / PLAYWRIGHT_PIN.search(host.read_text()).group(1) / ".playwright"
+    pins = REPO / "Directory.Packages.props"
+    bundled = Path.home() / ".nuget" / "packages" / "microsoft.playwright" / PLAYWRIGHT_PIN.search(pins.read_text()).group(1) / ".playwright"
     node = bundled / "node" / f"{PLAYWRIGHT_SYSTEMS[platform.system()]}-{PLAYWRIGHT_MACHINES[platform.machine()]}" / "node"
     environment = {**os.environ, "PLAYWRIGHT_PACKAGE": str(bundled / "package"), "NODE_PATH": str(installed_modules())}
     return [str(node), str(script)], environment
