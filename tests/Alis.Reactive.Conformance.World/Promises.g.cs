@@ -30,6 +30,7 @@ public static class Promises
     {
         public const string X7_5_0 = "M2.F1 X7.5 0";
         public const string X7_10_0 = "M2.F1 X7.10 0";
+        public const string X7_10_1 = "M2.F1 X7.10 1";
         public const string X7_13_0 = "M2.F1 X7.13 0";
         public const string X7_14_0 = "M2.F1 X7.14 0";
         public const string X7_6_0 = "M2.F1 X7.6 0";
@@ -45,6 +46,12 @@ public static class Promises
         public const string X7_12_1 = "M2.F1 X7.12 1";
         public const string X7_17_0 = "M2.F1 X7.17 0";
         public const string X7_18_0 = "M2.F1 X7.18 0";
+        public const string X7_20_0 = "M2.F1 X7.20 0";
+        public const string X7_20_1 = "M2.F1 X7.20 1";
+        public const string X7_20_2 = "M2.F1 X7.20 2";
+        public const string X7_20_3 = "M2.F1 X7.20 3";
+        public const string X7_20_4 = "M2.F1 X7.20 4";
+        public const string X7_20_5 = "M2.F1 X7.20 5";
     }
 
     public static class M2_F2

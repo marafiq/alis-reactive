@@ -69,7 +69,7 @@ internal static class JsonBodyValues
         var lambda = member.Lambda;
         var held = form.DataOptions.GetTypeInfo(typeof(TValue));
         var scalar = held.IsList(out var item) ? item : held;
-        if (!RequestValues.IsEnum(scalar.Type)) return Leaf<TValue>(Value<TValue>(captured, form, writer, lambda.ToString()), writer, lambda);
+        if (!EnumRows.IsEnum(scalar.Type)) return Leaf<TValue>(Value<TValue>(captured, form, writer, lambda.ToString()), writer, lambda);
         var sent = RequestValues.JsonFormOf(typeof(TValue), form, writer, lambda.ToString());
         return Leaf(captured, writer, lambda, () => AnyShape.Instance).SentBy(member.Name, sent);
     }
@@ -167,7 +167,7 @@ internal static class JsonBodyValues
             return AsALiveObjectHoldsIt<TValue>(captured, form, writer, member);
         }
 
-        var live = form.IntoLive<TValue>(captured);
+        var live = form.NumbersAndDatesIntoLive<TValue>(captured);
         var text = ConversionShapes.TextOf(scalar, writer.Content.RendersUnder);
         if (text.Date == DateMeaning.None) return live;
         return new AsExpression(live, isList ? new ArrayShape(text) : text);
@@ -175,7 +175,7 @@ internal static class JsonBodyValues
 
     private static Expression InTheBodysForm<TValue>(Expression captured, HeldForm form, JsonTypeInfo held, CultureInfo culture, string member)
     {
-        var live = form.IntoLive<TValue>(captured);
+        var live = form.NumbersAndDatesIntoLive<TValue>(captured);
         return DatesAsText(held, culture, member, [], (_, _, _) => { }) is { } texts ? new AsExpression(live, texts) : live;
     }
 
@@ -238,7 +238,7 @@ internal static class JsonBodyValues
     {
         var scalar = held.IsList(out var item) ? item : held;
         if (property.CustomConverter is not null || IsADate(scalar)) return;
-        if (RequestValues.IsEnum(scalar.Type))
+        if (EnumRows.IsEnum(scalar.Type))
         {
             RefuseAnEnumItsEndpointReadsApart(property, Nullable.GetUnderlyingType(scalar.Type) ?? scalar.Type, form, json, member);
             return;

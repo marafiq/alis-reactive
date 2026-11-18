@@ -177,7 +177,8 @@ Terms used throughout:
 
 **Decision.**
 - D3.1 A shape is one of `string`, `number`, `boolean`, `date`, `instant`, `file`, `any`, `array(item)`,
-  `nullable(inner)`, `object(fields)`. `file` is new (Q9).
+  `nullable(inner)`, `object(fields)`, `enum(values)`. `file` is new (Q9), and `enum` maps an enum from the form
+  its source holds it in to the form a live object holds (D7.7, the owner, 2026-11-17).
 - D3.2 There is one conversion node, `as(expr, shape)`. The operators `toNumber`, `toDate`, `toBoolean` and
   `toText` leave the grammar, and a validation rule converts with `as` like every read. A comparison or a sort of a
   date or a time reads each operand through its key (D6.12), an operator C# writes only as an argument of a
@@ -297,12 +298,20 @@ Terms used throughout:
   - C# writes `as(value, shape)` where that type holds a date: `DateTime` is `date` and `DateTimeOffset` is
     `instant`, each `nullable` when it is nullable, inside `object(fields)` that names only the members holding one,
     and `array(item)`. The same walk writes `number{of, text: invariant}` at each number a source in the app's form,
-    or in the form of a member's own number handling, holds as text, so it reaches the live member as its number (D7.7). A type that holds no date and no such number is
-    written as the plan writes it, with no `as`.
+    or in the form of a member's own number handling, holds as text, so it reaches the live member as its number (D7.7),
+    and `enum{flags, values}` at each enum a source in the app's form writes otherwise than the live form, `nullable`
+    when it is nullable, so it reaches the live member as the live form writes it (D7.7, X7.20). A type that holds no
+    date, no such number and no such enum is written as the plan writes it, with no `as`.
   - The shape comes from the app's contract (D18.1): a type test of the member's `JsonTypeInfo` against
     `JsonTypeInfo<DateTime>` and its kin, its members and its item type, with no read of a `System.Type` member.
   - Refused where the view renders: a dictionary whose values hold dates, since `object(fields)` names its members
-    ahead, and a type that holds itself and a date, since its shape would not end.
+    ahead, and a type that holds itself and a date, since its shape would not end. An enum the walk maps is refused
+    in both places as a date is, each sentence naming "an enum the app's JSON converter writes" where it names a
+    date: "A value written into a live member is a dictionary whose values hold an enum the app's JSON converter
+    writes. Such an enum reaches a live member by its member's name: pass the entries as a list of objects that name
+    each key.", and "A value written into a live member holds its own type and an enum the app's JSON converter
+    writes in it. Such an enum reaches a live member through a shape that ends: pass the values as a list of their
+    own."
   - A value whose dates are already `Date`s reaches the member as it is, so an object a live method returns, a class
     instance, keeps its identity and prototype; only a plain object or array that holds a date as text is copied
     with it converted (`spec/Core/conversions.md`). C# writes each declared field's `nothing` from its type: a
@@ -759,7 +768,8 @@ Terms used throughout:
   the lambda (the owner, 2026-11-06: "if var works i do not see any downside"). The redesign compiles such a value
   today (`Alis.Reactive/Members/Expressions.cs:28`); the local keeps the capability. A template condition's value, a
   literal or one the view holds, is read by the same reader and refused as it refuses one, through
-  `ReactivePlan.ViewValueJson`, and written as the plan writes the item's member it is compared with, an ordering against
+  `ReactivePlan.ViewValueJson`, and written as the plan writes the item's member it is compared with, the live form,
+  which a component's rows hold whether its view handed them or a step set them from a reply (D7.7, X7.20), an ordering against
   a value written as text refused as a list's lambda refuses one (M22.D4; the owner, 2026-11-17). An ordering of two
   members of the item in a template condition is held to D6.12's rule for two members, through
   `ReactivePlan.RequireMembersTheBrowserOrders` (M22.D4, M22.X11).
@@ -1344,10 +1354,22 @@ Terms used throughout:
     element's text and HTML, a render helper's start, D17.13) is in the live form. A literal is written in it, and a
     source in the live form as it is held. A source in the app's form is written as held where both forms write its
     type alike; a number the app's form or a member's own number handling writes as text is converted to the live
-    form's number by `as` (D3.13, X7.14); an enum the two forms write otherwise is mapped through D9.13's rows, whose enum read D18.1 lists since
-    gate 1 (C37); any other difference, a converter the
-    app's options add or a member's own converter, is refused where the view renders (X7.10), and a value its own
-    converter writes is shown by the server.
+    form's number by `as` (D3.13, X7.14); an enum the two forms write otherwise is mapped by `as` too, through the
+    shape `enum` (D3.13, X7.20), whose rows C# writes as D9.13 writes its rows, from each form's own writing of each
+    value `Enum.GetValues` lists, a read D18.1 lists since gate 1 (C37): the held form, the live form and, for an enum
+    the app names as flags, the value's number, the largest first, so a combination is split as D9.13 splits it and
+    reaches the member as the number its parts join, or, where the live form writes names, as the names of the rows
+    it took, the smallest first, joined by ", ". The rows are read from the two writings and never from a naming
+    rule, a null stays null, and a held form no row lists reads nothing (D3.3): a number no value names, a
+    combination of an enum the app does not name as flags, and what D9.13's split cannot read. A member at any depth
+    that its own converter writes is taken by that converter's writing in both forms, an enum by rows of it, so it
+    reaches the member as held where the two agree. Any other difference, a converter the app's options add, at any
+    depth of the source, or a source's own converter, is refused where the view renders (X7.10), and a value its own
+    converter writes is shown by the server. A conversion a request makes for itself, of a query's date or of a JSON
+    body, maps no enum: a body keeps the form its endpoint binds (D9.13). The mapping is for a live object's members
+    and for a method's or a plugin's arguments: an element's text and HTML, set or appended, and a text joined from
+    parts show an enum as its source holds it, the name the app's JSON writes, with no mapping, and convert what they
+    converted before it, a number written as text and a date (the owner, 2026-11-18, X7.20).
   - Two sources a choice or a comparison joins (`IfNull`, `Choose`, D8.10) are taken in one form by the same rules:
     a number the app's form writes as text is converted, an enum is mapped by D9.13's rows, and
     any other difference is refused (X7.11, X8.21). Two forms write alike when both are one base form, both are one
@@ -1447,7 +1469,13 @@ Terms used throughout:
 - `X7.10` refusal (D7.7): a source in the app's form, or in its own form, that the live form writes otherwise, set
   into a property, passed as an argument or answered to a vendor: "A live object takes '{read}' as JavaScript holds
   its type, and {its own JSON converter | the app's JSON converter} writes it otherwise; pass the value from the
-  server."
+  server." A member at any depth of the source that a converter of the app's options writes is refused naming it:
+  "A live object takes '{read}' as JavaScript holds its type, and the app's JSON converter writes '{member}'
+  otherwise; give the member a JSON converter of its own, or pass the value from the server." `{read}` is the read
+  as its lambda writes it and `{member}` the member's class, a dot and the member as C# declares it; a source the
+  view passes whole, a reply's body among them, is named by that member, or by its type as C# writes it where the
+  converter writes the value itself. An enum the walk maps inside a dictionary's values or a type that holds
+  itself is refused by D3.13's sentences, and two values of an enum the source's form writes alike by D9.13's.
 - `X7.11` refusal (D7.7): `IfNull` or `Choose` between two sources the two forms write otherwise: "A choice joins
   '{read}', which {cause} writes unlike {base}, with another value read from the page; choose between it and a value
   the view writes, or choose on the server."
@@ -1486,6 +1514,13 @@ Terms used throughout:
   source, read in the browser when its step runs, and .NET makes a text of it here, the name of its type; pass
   '{source}' itself where a source is taken, and join it into a text with pipeline.Concat." At build by ALIS043:
   new:N18.17.
+- `X7.20` behavior (D7.7, D3.13): a care panel's days set from a response body that names `Mon | Sat | Sun` of an
+  enum the app names as flags reach the panel as the number 97, so a request set from them sends `Mon, Weekend`,
+  where the body's text in a member held as a number stops the request; a record's stage the app's JSON names
+  reaches the panel's records as its number at any depth, a wing its own converter writes arriving beside it as
+  that converter writes it, and a stage no value of its enum names reading nothing; days set from another
+  panel's days arrive as held; and a planned day set as an element's text reads the name the app's JSON writes,
+  `sat`, where the same read set into the panel's days arrives as its number.
 
 ## Q8. Conditions: three kinds
 
@@ -5237,12 +5272,13 @@ shapes, starts and the payload's path of each event.
   and nothing else, so the runtime and the builders proceed in parallel from that file. The builders and the JSON they
   write are one track: one C# model writes the grammar, with no lowering pass (the owner, 2026-11-06, and the answer in
   `spec/NOTES.md`) (`check:kinds`, `Schema.tla:KindsHandledOnce`).
-- D19.2 The set is closed at 52 kinds: today's 33 but `try`, and `request`, `stop`, `listen`, `data`, `start`,
-  `nothing`, `unbound`, `signal`, `answer`, `file`, `each`, `returned`, `living`, `held`, `located`, `stream`, `clock`,
-  `zone`, `off` and `on`, the 20 `spec/Core/schema.md` marks added and `spec/Schema/Schema.tla` checks. `try` leaves, its
+- D19.2 The set is closed at 53 kinds: today's 33 but `try`, and `request`, `stop`, `listen`, `data`, `start`,
+  `nothing`, `unbound`, `signal`, `answer`, `file`, `enum`, `each`, `returned`, `living`, `held`, `located`, `stream`,
+  `clock`, `zone`, `off` and `on`, the 21 `spec/Core/schema.md` marks added and `spec/Schema/Schema.tla` checks. `try` leaves, its
   `finally` carried by a `request`'s layers, since nothing but a request's `Finally` wrote it (the owner's amendment of
   G2, 2026-11-08, D10.23); no other kind leaves. `located` joined it by the owner's yes of 2026-11-15, the release of a
-  `listen` on a component reached by its element's id (D12.8). After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
+  `listen` on a component reached by its element's id (D12.8), and `enum` by the owner's yes of 2026-11-17, the shape
+  that maps an enum into the form a live object holds (D7.7). After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
   to the owner with its use case (`check:kinds`).
 - D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
   is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).

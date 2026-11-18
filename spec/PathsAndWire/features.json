@@ -193,6 +193,7 @@
         "array",
         "nullable",
         "object",
+        "enum",
         "zone"
       ],
       "writes": [

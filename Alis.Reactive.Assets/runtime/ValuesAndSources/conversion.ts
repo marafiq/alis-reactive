@@ -1,4 +1,5 @@
-import { assertNever, type Culture, type DateMeaning, type FieldConversion, type FieldNothing, type NumberOf, type NumberOverflow, type NumberShape, type Shape, type StringShape, type TimeZone } from "../Schema/index";
+import { assertNever, type Culture, type DateMeaning, type EnumShape, type FieldConversion, type FieldNothing, type NumberOf, type NumberOverflow, type NumberShape, type Shape, type StringShape, type TimeZone } from "../Schema/index";
+import { flagRows } from "./flags";
 import { nothing, value, type Read } from "./read";
 
 interface WallTime {
@@ -64,6 +65,8 @@ export function converted(read: Read, shape: Shape, culture: Culture, timeZone: 
       return isBlank(held) ? nothing : converted(read, shape.inner, culture, timeZone);
     case "object":
       return isRecord(held) ? asRecord(held, Object.entries(shape.fields), (field, fieldShape) => converted(field, fieldShape, culture, timeZone)) : nothing;
+    case "enum":
+      return asEnum(held, shape);
     default:
       return assertNever(shape);
   }
@@ -510,6 +513,19 @@ function utcOf(wall: WallTime): number {
 
 function isMoment(held: Date): boolean {
   return !Number.isNaN(held.getTime());
+}
+
+function asEnum(held: unknown, shape: EnumShape): Read {
+  if (shape.flags) return asFlags(held, shape);
+  const row = shape.values.find(row => row.held === held);
+  return row === undefined ? nothing : value(row.live);
+}
+
+function asFlags(held: unknown, shape: EnumShape): Read {
+  const taken = flagRows(held, shape.values);
+  if (taken === undefined) return nothing;
+  const names = taken.map(row => row.live).filter(live => typeof live === "string");
+  return value(names.length === taken.length ? names.join(", ") : taken.reduce((sum, row) => sum + row.number, 0));
 }
 
 function asList(items: readonly unknown[], item: (read: Read) => Read): Read {

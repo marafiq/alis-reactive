@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Schema;
@@ -14,6 +15,7 @@ namespace Alis.Reactive.Schema;
 [JsonDerivedType(typeof(ArrayShape), "array")]
 [JsonDerivedType(typeof(NullableShape), "nullable")]
 [JsonDerivedType(typeof(ObjectShape), "object")]
+[JsonDerivedType(typeof(EnumShape), "enum")]
 internal abstract class Shape
 {
     private protected Shape()
@@ -165,6 +167,35 @@ internal sealed class FieldConversion
     public Shape Shape { get; }
 
     public FieldNothing Nothing { get; }
+}
+
+internal sealed class EnumShape : Shape
+{
+    internal EnumShape(bool flags, IReadOnlyList<LiveEnumValue> values)
+    {
+        Flags = flags;
+        Values = values;
+    }
+
+    public bool Flags { get; }
+
+    public IReadOnlyList<LiveEnumValue> Values { get; }
+}
+
+internal sealed class LiveEnumValue
+{
+    internal LiveEnumValue(JsonElement held, JsonElement live, long number)
+    {
+        Held = held;
+        Live = live;
+        Number = number;
+    }
+
+    public JsonElement Held { get; }
+
+    public JsonElement Live { get; }
+
+    public long Number { get; }
 }
 
 [JsonConverter(typeof(ChoiceConverter<DateMeaning>))]

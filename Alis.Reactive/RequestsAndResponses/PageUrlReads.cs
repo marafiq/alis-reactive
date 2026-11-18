@@ -21,7 +21,7 @@ internal static class PageUrlReads
         var name = MvcText.Of(member);
         var leaf = live.GetTypeInfo(typeof(TValue));
         if (leaf.Kind != JsonTypeInfoKind.None) throw HoldsMoreThanOneValue(member, name, leaf);
-        if (RequestValues.IsEnum(typeof(TValue))) throw IsAnEnum(member, name);
+        if (EnumRows.IsEnum(typeof(TValue))) throw IsAnEnum(member, name);
         var startWritten = StartOf(member, written);
         var shape = InputShapes.Of(leaf, startWritten, NumberCulture.Invariant, name);
         var start = new LitExpression(AsTheShapeHoldsIt(startWritten, shape));

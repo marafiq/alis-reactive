@@ -505,6 +505,9 @@
         },
         {
           "$ref": "#/$defs/ObjectShape"
+        },
+        {
+          "$ref": "#/$defs/EnumShape"
         }
       ]
     },
@@ -713,6 +716,45 @@
         "omit",
         "null"
       ]
+    },
+    "EnumShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "enum"
+        },
+        "flags": {
+          "type": "boolean"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LiveEnumValue"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "flags",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "LiveEnumValue": {
+      "type": "object",
+      "properties": {
+        "held": {},
+        "live": {},
+        "number": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "held",
+        "live",
+        "number"
+      ],
+      "additionalProperties": false
     },
     "CallExpression": {
       "type": "object",

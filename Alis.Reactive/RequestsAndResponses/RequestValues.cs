@@ -41,7 +41,7 @@ internal static class RequestValues
     {
         var form = Sources.FormOf(source);
         var wire = SourceForm(typeof(TValue), form, writer, member);
-        var captured = Captured(ReadsDate(wire) ? form.IntoLive<TValue>(Sources.Of(source)) : Sources.Of(source), writer, capture);
+        var captured = Captured(ReadsDate(wire) ? form.NumbersAndDatesIntoLive<TValue>(Sources.Of(source)) : Sources.Of(source), writer, capture);
         return (Read(captured), wire, captured);
     }
 
@@ -83,11 +83,9 @@ internal static class RequestValues
 
     private static ItemWhenNothing ItemAbsence(Type type) => Absence(type) == WhenNothing.Empty ? ItemWhenNothing.Empty : ItemWhenNothing.Stop;
 
-    internal static bool IsEnum(Type type) => new JsonStringEnumConverter().CanConvert(Nullable.GetUnderlyingType(type) ?? type);
-
     private static ScalarWireForm LiteralForm(Type type)
     {
-        if (IsEnum(type)) return new TextScalarWireForm();
+        if (EnumRows.IsEnum(type)) return new TextScalarWireForm();
         return Scalar(type, false);
     }
 
@@ -118,7 +116,7 @@ internal static class RequestValues
             return new ListWireForm(scalar, ItemAbsence(item.Type));
         }
 
-        if (IsEnum(type)) return EnumForm(type, held, writer, member);
+        if (EnumRows.IsEnum(type)) return EnumForm(type, held, writer, member);
         if (!held.WritesAsAScalar(type)) throw Object(member);
         var writesNumberAsText = ComparedTypes.IsNumber(type) && ((contract.NumberHandling ?? held.DataOptions.NumberHandling) & JsonNumberHandling.WriteAsString) != 0;
         return Scalar(type, held.WritesOwnScalar(type) || writesNumberAsText);
@@ -162,41 +160,13 @@ internal static class RequestValues
             : new EnumScalarWireForm(rows.Select(row => new EnumValue(row.Held, row.Name)).ToArray());
     }
 
-    private static List<HeldRow> HeldRows(Type type, HeldForm held, BlockWriter writer, string member)
-    {
-        var enumeration = Nullable.GetUnderlyingType(type) ?? type;
-        var rows = new List<HeldRow>();
-        var byHeld = new Dictionary<string, string>(StringComparer.Ordinal);
-        var isFlags = writer.Content.NamesFlags(enumeration);
-        foreach (Enum value in Enum.GetValues(enumeration))
+    private static List<EnumRows.HeldRow> HeldRows(Type type, HeldForm held, BlockWriter writer, string member)
+        => EnumRows.Of(type, writer.Content.NamesFlags(EnumRows.EnumOf(type)), member, (value, name) =>
         {
-            var name = value.ToString();
             var written = held.Beside(value, type).Value;
-            if (written.ValueKind is not (JsonValueKind.String or JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False))
-                throw new InvalidOperationException($"'{member}' holds {name} as {written.GetRawText()} under its own JSON converter, and a request sends one text or number per member; send a member written as text or a number.");
-            var key = written.ValueKind == JsonValueKind.Number ? (written.GetDouble() == 0 ? "0" : written.GetDouble().ToString("R", CultureInfo.InvariantCulture)) : written.GetRawText();
-            if (byHeld.TryGetValue(key, out var previous))
-            {
-                if (previous == name) continue;
-                throw new InvalidOperationException($"'{member}' holds {previous} and {name} in one form, {written.GetRawText()}, under the app's options, so the browser cannot tell which one it holds; give one of them a JsonStringEnumMemberName of its own.");
-            }
-
-            byHeld.Add(key, name);
-            rows.Add(new HeldRow(value, name, written, isFlags ? FlagNumber(value, name, member) : 0));
-        }
-
-        return rows;
-    }
-
-    private static long FlagNumber(Enum value, string name, string member)
-    {
-        var number = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
-        if (number < 0 || number > 9007199254740991m)
-            throw new InvalidOperationException($"'{member}' names flags value {name} outside 0 to 9007199254740991; give each flag a non-negative JavaScript-safe integer.");
-        return decimal.ToInt64(number);
-    }
-
-    private sealed record HeldRow(Enum Value, string Name, JsonElement Held, long Number);
+            if (EnumRows.IsOneTextNumberOrBoolean(written)) return written;
+            throw new InvalidOperationException($"'{member}' holds {name} as {written.GetRawText()} under its own JSON converter, and a request sends one text or number per member; send a member written as text or a number.");
+        });
 
     private static InvalidOperationException Object(string member)
         => new($"'{member}' holds an object or a nested list; send its scalar members by their paths, or send it in a JSON body.");

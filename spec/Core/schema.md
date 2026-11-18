@@ -363,8 +363,13 @@ and nothing where it holds null (D6.14).
 | `array` | | `item`: a shape | yes |
 | `nullable` | | `inner`: a shape that is not `nullable` | yes |
 | `object` | | `fields`: a map from wire name to `FieldConversion` | yes: C# states what a copied field that converts to nothing holds, as the member's JSON binding reads it (D3.13, D9.10) |
+| `enum` | `flags`: a boolean; `values`: a list of `LiveEnumValue` | | yes: where a source enters a live object's member or an argument, C# writes a row for each value of an enum the form its source holds it in and the live form write otherwise, each read from that form's own writing; a held form no row lists reads nothing; an element's text and HTML carry no such shape (D7.7, D9.13, D3.3) |
 
 `FieldConversion` carries `shape`, a shape, and `nothing`, `omit` or `null`: the member's binding when its conversion reads nothing (D3.13, D9.10).
+
+`LiveEnumValue` carries `held`, the value as the source's form writes it, a JSON text, number or boolean; `live`, the value as the live
+form writes it; and `number`, the value's number where `flags` is true, the rows then the largest number first, as D9.13's split takes them,
+and 0 where `flags` is false, since the split alone reads it (D7.7).
 
 ## Contracts
 
@@ -540,6 +545,7 @@ proposed column says `added`.
 | shape | nullable | `Alis.Reactive.Assets/runtime/grammar/shape.ts:24`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:42` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.6 |
 | shape | any | `Alis.Reactive.Assets/runtime/grammar/shape.ts:25`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:35` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.6 |
 | shape | file | absent | added | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | N3.2 |
+| shape | enum | absent | added | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D7.7 |
 | path step | each | absent | added | the path walk of the form plugin, `Alis.Reactive.Assets/runtime/plugins/form/form.ts` | N1.1 |
 | object locator | element | `Alis.Reactive.Assets/runtime/objects/plan-objects.ts:16`, `Alis.Reactive.Assets/runtime/objects/plan-objects.ts:29` | kept | the one locator switch of `Alis.Reactive.Assets/runtime/objects/plan-objects.ts` | G1 |
 | object locator | plugin | `Alis.Reactive.Assets/runtime/objects/plan-objects.ts:15`, `Alis.Reactive.Assets/runtime/objects/plan-objects.ts:28` | kept | the one locator switch of `Alis.Reactive.Assets/runtime/objects/plan-objects.ts` | G1 |
@@ -559,7 +565,7 @@ proposed column says `added`.
 | trace | off | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 | trace | on | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 
-Today 33 kinds, proposed 52: twenty added, one removed (`try`, whose `finally` a `request`'s layers carry).
+Today 33 kinds, proposed 53: twenty-one added, one removed (`try`, whose `finally` a `request`'s layers carry).
 
 Today, each shape has two handlers: the conversion switch and the switch that picks a default by shape, `bound`
 (`Alis.Reactive.Assets/runtime/grammar/shape.ts:31-45`). That second switch leaves, because the browser chooses
@@ -586,6 +592,8 @@ The diff beyond the kinds, each with the decision that makes it:
 - `PlanDocument` gains `culture` (N3.4), `timeZone` (N3.5) and `trace` (Q20), and `version` becomes 7;
 - `number` gains `of`, `text` and `overflow` (D3.11);
 - `string` gains `date` and `negativeZero`, `instant` gains `from`, and each `object` field gains `nothing` beside its `shape` (D3.4, D3.11, D3.12, D3.13);
+- the shapes gain `enum`, whose rows map an enum from the form its source holds it in to the form a live object holds (D7.7, the owner,
+  2026-11-17);
 - the operator set loses four conversions (N3.1), `truthy`, whose writers `Truthy` and `Falsy` are refused (M3.D1), and
   `order`, which compared whatever came (D6.13); it gains `nullableValue` (D6.14), `nonNull` (D6.16), `compareNumbers`,
   `compareOrdinal`, `compareBooleans` and `compareCulture` (D6.13), the text operators `trim`, `trimStart`, `trimEnd`,

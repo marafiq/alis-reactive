@@ -149,6 +149,7 @@
         "do",
         "each",
         "element",
+        "enum",
         "file",
         "fn",
         "form",

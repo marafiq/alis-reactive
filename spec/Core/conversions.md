@@ -83,6 +83,23 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 | an object whose declared fields each convert to themselves | the object itself, its identity and prototype kept |
 | a plain object a declared field of which converts to another value | a copy, each declared field converted to its shape; a field that converts to nothing follows its `nothing` entry, `omit` removing it and `null` writing null, as D9.10's JSON member binding reads it; fields it does not declare stay as they are |
 
+## enum
+
+The rows are C#'s: each value of the enum as the source's form writes it, `held`, and as the live form writes it, `live` (D7.7). A
+value is compared with a row's `held` as JSON compares scalars, a text with a text and a number with a number. C# writes the shape
+where a source enters a live object's member or an argument; an element's text and HTML carry none, so an enum shows there as its
+source holds it, the `string` row's text as itself (D7.7, the owner, 2026-11-18).
+
+| Source | Result |
+|--------|--------|
+| a value a row holds as its `held`, the shape's `flags` false | that row's `live` |
+| a text or a number D9.13's split reads over the rows, the shape's `flags` true: a text split at `", "` whose every part a row holds, under rows held as text, or an integer from 0 to 9,007,199,254,740,991 under rows held as numbers, whose bits the rows take, the largest first, zero as the row whose `number` is zero | where each row it took holds a text as its `live`, those texts joined by `", "`, the smallest number first; else the sum of the `number`s of the rows it took, the number the live form holds |
+
+A held form no row lists converts to nothing, as every row of this table is closed (D3.3): a number no value of the enum names, a
+name in another casing than the source's form writes, a combination under rows that are not flags, and what the split cannot read (a
+part no row holds, a number under rows held as text, a text under rows held as numbers, bits no row takes, zero with no row for
+zero). Null converts to nothing too, and stays null inside `nullable(enum)`.
+
 ## any
 
 | Source | Result |

@@ -8233,6 +8233,19 @@
     },
     {
       "feature": "M2.F1",
+      "for": "X7.10",
+      "index": 1,
+      "screen": "refusals",
+      "hosts": [
+        "dateConverter"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
       "for": "X7.13",
       "index": 0,
       "screen": "refusals",
@@ -8467,6 +8480,108 @@
       "parts": [
         "doses",
         "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.20",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.20",
+      "index": 1,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.20",
+      "index": 2,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.20",
+      "index": 3,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.20",
+      "index": 4,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.20",
+      "index": 5,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint",
+        "carePanel"
       ],
       "harness": [
         "seed"

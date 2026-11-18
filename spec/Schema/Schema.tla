@@ -13,7 +13,7 @@ ASSUME Mutant \in Mutants
 StatementKinds == {"set", "do", "let", "if", "all", "request", "stop", "listen"}
 ExpressionKinds == {"lit", "obj", "ref", "get", "data", "as", "call", "fn", "answer", "record", "list", "op", "signal"}
 AbsenceKinds == {"start", "nothing", "unbound"}
-ShapeKinds == {"string", "number", "boolean", "date", "instant", "file", "any", "array", "nullable", "object"}
+ShapeKinds == {"string", "number", "boolean", "date", "instant", "file", "any", "array", "nullable", "object", "enum"}
 PathStepKinds == {"each"}
 LocatorKinds == {"element", "plugin"}
 ListeningKinds == {"method", "assignment", "returned"}
@@ -151,7 +151,7 @@ WriterAccepts(e) ==
 
 RootAccepts(e) == ~IsKey(e) \/ Mutant = "KeyAsAValue"
 
-ShapeLeaves == {[k |-> k, c |-> <<>>] : k \in {"string", "file", "any"}}
+ShapeLeaves == {[k |-> k, c |-> <<>>] : k \in {"string", "file", "any", "enum"}}
 
 RECURSIVE ShapesTo(_)
 ShapesTo(d) ==

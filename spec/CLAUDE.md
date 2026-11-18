@@ -1914,6 +1914,20 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   fields with D9.10's rows nested; Validation showing a failure under the input's path at that input and re-checking it
   live; probes and browser tests on both hosts (a dictionary of objects, a key holding a dot or a bracket, empty list and
   dictionary, MVC 5's short form, number, enum and Guid keys). Its trigger: an app that brings such a component.
+- The owner, 2026-11-17, on unit 3, a shape kind `enum` for `as`, the grammar production its design asks for, verbatim:
+  "Okay, I'll go with your recommendation. Hopefully you have thought through the use cases where it is necessary.
+  Don't lower the quality or bring stuff because you have short-sighted." Read by the lead: yes to the one
+  production; the case list is settled before the build (the design's cases, checked by a read-only Codex
+  inspection, each re-read at the source), and nothing is cut to land sooner. A source in the app's form set into a
+  live object carries `as(value, enum)` wherever the two forms write an enum otherwise, the rows read from each
+  form's own writing (D7.7, D3.13, X7.20); D19.2 closes the set at 53, and `spec/Schema/Schema.tla` holds `enum`
+  among its shape kinds, one handler.
+- The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
+  shown its number, since D7.7 counts an element's text a live write, verbatim: "Yes, I agree with the enum. If there
+  is an intact ad, we'll see it later. Let's get back to the framework. So ship it." Read by the lead ("intact ad"
+  is the dictation's rendering of "impact"): yes to the lead's recommendation. An enum set as an element's text or
+  HTML shows the name the app's JSON writes, as before; the mapping to the live form is for a live object's members
+  and for a method's or a plugin's arguments (D7.7, X7.20). Then the piece lands.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

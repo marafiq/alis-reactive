@@ -10,10 +10,12 @@ internal sealed class AppJson
     private static readonly ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions> LiveForms = new();
     private static readonly ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions> BodyForms = new();
     private readonly Lazy<JsonSerializerOptions> _options;
+    private readonly Func<Type, bool> _namesFlags;
 
-    internal AppJson(Func<JsonSerializerOptions> read)
+    internal AppJson(Func<JsonSerializerOptions> read, Func<Type, bool> namesFlags)
     {
         _options = new Lazy<JsonSerializerOptions>(read);
+        _namesFlags = namesFlags;
     }
 
     internal JsonSerializerOptions App => _options.Value;
@@ -21,6 +23,8 @@ internal sealed class AppJson
     internal JsonSerializerOptions LiveForm => LiveForms.GetValue(_options.Value, LiveFormOf);
 
     internal JsonSerializerOptions BodyForm => BodyForms.GetValue(_options.Value, BodyFormOf);
+
+    internal bool NamesFlags(Type enumeration) => _namesFlags(enumeration);
 
     private static JsonSerializerOptions LiveFormOf(JsonSerializerOptions app) => new()
     {

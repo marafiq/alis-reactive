@@ -1,6 +1,6 @@
 import { assertNever, type Culture, type FlagValue, type ItemWhenNothing, type JsonForm, type ScalarWireForm, type SentField, type TimeZone, type ValueRead } from "../Schema/index";
-import { flagNames, flagRows } from "../Conditions/index";
-import { Stop } from "../ValuesAndSources/index";
+import { flagNames } from "../Conditions/index";
+import { flagRows, Stop } from "../ValuesAndSources/index";
 
 export interface TextPlace {
   readonly decimal: string;

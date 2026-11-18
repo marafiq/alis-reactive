@@ -1028,6 +1028,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M2.F1 X7.10 1": {
+    "modules": [],
+    "views": [
+      "/Refusals/ValuesAndSources/BedRegister.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M2.F1 X7.11 0": {
     "modules": [],
     "views": [
@@ -1083,6 +1090,48 @@
     "modules": [],
     "views": [
       "/Care/Round/DoseLookup.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M2.F1 X7.20 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/PanelWeek.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M2.F1 X7.20 1": {
+    "modules": [],
+    "views": [
+      "/Care/Record/BedTurnover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M2.F1 X7.20 2": {
+    "modules": [],
+    "views": [
+      "/Care/Record/BedTurnover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M2.F1 X7.20 3": {
+    "modules": [],
+    "views": [
+      "/Care/Record/BedTurnover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M2.F1 X7.20 4": {
+    "modules": [],
+    "views": [
+      "/Care/Record/NightPanel.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M2.F1 X7.20 5": {
+    "modules": [],
+    "views": [
+      "/Care/Record/PlannedCare.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

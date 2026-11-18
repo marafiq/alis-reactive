@@ -11,7 +11,7 @@ internal static class TextForms
     internal static AsExpression Shown<T>(ITypedSource<T> source)
     {
         var form = Sources.FormOf(source);
-        return new AsExpression(form.IntoLive<T>(Sources.Of(source)), ConversionShapes.TextOf(form.DataOptions.GetTypeInfo(typeof(T)), form.RendersUnder));
+        return new AsExpression(form.NumbersAndDatesIntoLive<T>(Sources.Of(source)), ConversionShapes.TextOf(form.DataOptions.GetTypeInfo(typeof(T)), form.RendersUnder));
     }
 
     internal static LitExpression Part(string? text) => Literals.Text(text ?? string.Empty);

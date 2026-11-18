@@ -270,6 +270,7 @@ function scalarFormOf(shape: Shape, name: string): ScalarWireForm {
     case "array":
     case "nullable":
     case "object":
+    case "enum":
       throw notBuilt("input '" + name + "' converts to the shape " + shape.kind + ", which no form data field writes as one text");
     default:
       return assertNever(shape);

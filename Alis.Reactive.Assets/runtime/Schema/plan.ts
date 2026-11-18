@@ -121,7 +121,7 @@ export interface AsExpression {
   readonly shape: Shape;
 }
 
-export type Shape = StringShape | NumberShape | BooleanShape | DateShape | InstantShape | FileShape | AnyShape | ArrayShape | NullableShape | ObjectShape;
+export type Shape = StringShape | NumberShape | BooleanShape | DateShape | InstantShape | FileShape | AnyShape | ArrayShape | NullableShape | ObjectShape | EnumShape;
 
 export interface StringShape {
   readonly kind: "string";
@@ -186,6 +186,18 @@ export interface FieldConversion {
 }
 
 export type FieldNothing = "omit" | "null";
+
+export interface EnumShape {
+  readonly kind: "enum";
+  readonly flags: boolean;
+  readonly values: readonly LiveEnumValue[];
+}
+
+export interface LiveEnumValue {
+  readonly held: JsonValue;
+  readonly live: JsonValue;
+  readonly number: number;
+}
 
 export interface CallExpression {
   readonly kind: "call";

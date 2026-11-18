@@ -17,14 +17,16 @@ internal sealed class HeldForm
 
     private readonly bool _fromApp;
     private readonly Func<Expression, Expression[]> _keyArguments;
+    private readonly string? _read;
 
     private HeldForm(AppJson json, CultureInfo rendersUnder, JsonSerializerOptions baseOptions, bool fromApp, OwnWriting? own, string? readTheAppsConverterWrites,
-        Func<Expression, Expression[]> keyArguments)
+        Func<Expression, Expression[]> keyArguments, string? read)
     {
         _json = json;
         _baseOptions = baseOptions;
         _fromApp = fromApp;
         _keyArguments = keyArguments;
+        _read = read;
         RendersUnder = rendersUnder;
         Own = own;
         ReadTheAppsConverterWrites = readTheAppsConverterWrites;
@@ -38,7 +40,7 @@ internal sealed class HeldForm
 
     internal HeldForm Computed => Live(_json, RendersUnder);
 
-    internal HeldForm Base => Own is null ? this : new(_json, RendersUnder, _baseOptions, _fromApp, null, null, KeyedAlone);
+    internal HeldForm Base => Own is null ? this : new(_json, RendersUnder, _baseOptions, _fromApp, null, null, KeyedAlone, null);
 
     internal string BaseFormName => _fromApp ? "the app's options" : "JavaScript's value";
 
@@ -51,18 +53,20 @@ internal sealed class HeldForm
     internal bool HoldsAListItsConverterWrites
         => Own is { Member: { HasItsOwnConverter: true } member } && member.Contract.Kind is JsonTypeInfoKind.Enumerable or JsonTypeInfoKind.Dictionary;
 
-    internal static HeldForm Live(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.LiveForm, false, own: null, null, KeyedAlone);
+    internal static HeldForm Live(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.LiveForm, false, own: null, null, KeyedAlone, null);
 
     internal static HeldForm PageText(AppJson json, CultureInfo rendersUnder, Expression read, LitExpression start)
-        => new(json, rendersUnder, json.LiveForm, false, own: null, null, operand => ReferenceEquals(operand, read) ? [operand, start] : [operand]);
+        => new(json, rendersUnder, json.LiveForm, false, own: null, null, operand => ReferenceEquals(operand, read) ? [operand, start] : [operand], null);
 
-    internal static HeldForm App(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.App, true, null, null, KeyedAlone);
+    internal static HeldForm App(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.App, true, null, null, KeyedAlone, null);
 
-    internal HeldForm Carrying(Func<JsonSerializerOptions, JsonSerializerOptions> carried) => new(_json, RendersUnder, carried(_baseOptions), _fromApp, Own, ReadTheAppsConverterWrites, _keyArguments);
+    internal HeldForm Carrying(Func<JsonSerializerOptions, JsonSerializerOptions> carried) => new(_json, RendersUnder, carried(_baseOptions), _fromApp, Own, ReadTheAppsConverterWrites, _keyArguments, _read);
 
-    internal HeldForm WrittenBy(WrittenMember member, string read) => new(_json, RendersUnder, _baseOptions, _fromApp, new OwnWriting(member, read, BaseFormName), null, KeyedAlone);
+    internal HeldForm WrittenBy(WrittenMember member, string read) => new(_json, RendersUnder, _baseOptions, _fromApp, new OwnWriting(member, read, BaseFormName), null, KeyedAlone, read);
 
-    internal HeldForm ReadAs(string read, Type type) => WritesByAConverterOfTheApps(type) ? new(_json, RendersUnder, _baseOptions, _fromApp, Own, read, KeyedAlone) : this;
+    internal HeldForm ReadAs(string read, Type type) => WritesByAConverterOfTheApps(type)
+        ? new(_json, RendersUnder, _baseOptions, _fromApp, Own, read, KeyedAlone, read)
+        : new(_json, RendersUnder, _baseOptions, _fromApp, Own, ReadTheAppsConverterWrites, _keyArguments, read);
 
     internal Expression[] KeyArguments(Expression operand) => _keyArguments(operand);
 
@@ -83,10 +87,14 @@ internal sealed class HeldForm
 
     internal LitExpression Beside(object? value, Type type) => Own is { } own ? new(own.Member.Written(value, type)) : new(JsonSerializer.SerializeToElement(value, DataOptions.GetTypeInfo(type)));
 
-    internal Expression IntoLive<TValue>(Expression held)
+    internal Expression IntoLive<TValue>(Expression held) => IntoLive<TValue>(held, new HeldIntoLive(_json, _read));
+
+    internal Expression NumbersAndDatesIntoLive<TValue>(Expression held) => IntoLive<TValue>(held, null);
+
+    private Expression IntoLive<TValue>(Expression held, HeldIntoLive? into)
     {
         if (Own is not { } own)
-            return _fromApp && LiveShapes.Converts(DataOptions.GetTypeInfo(typeof(TValue)), out var appShape) ? new AsExpression(held, appShape) : held;
+            return _fromApp && LiveShapes.Converts(DataOptions.GetTypeInfo(typeof(TValue)), into, out var appShape) ? new AsExpression(held, appShape) : held;
         if (own.Member.HasItsOwnConverter)
             throw new InvalidOperationException($"A live object takes '{own.Read}' as JavaScript holds its type, and its own JSON converter writes it otherwise; pass the value from the server.");
         return LiveShapes.Converts(own.Member.OwnForm().GetTypeInfo(typeof(TValue)), out var shape) ? new AsExpression(held, shape) : held;

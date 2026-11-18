@@ -38,6 +38,44 @@ const file: Shape = { kind: "file" };
 const any: Shape = { kind: "any" };
 const nullable = (inner: Shape): Shape => ({ kind: "nullable", inner });
 const list = (item: Shape): Shape => ({ kind: "array", item });
+const stage: Shape = {
+  kind: "enum",
+  flags: false,
+  values: [
+    { held: "waiting", live: 0, number: 0 },
+    { held: "ready", live: 1, number: 0 },
+    { held: "held over", live: 2, number: 0 },
+  ],
+};
+const stageByName: Shape = {
+  kind: "enum",
+  flags: false,
+  values: [
+    { held: "waiting", live: "Waiting", number: 0 },
+    { held: "ready", live: "Ready", number: 0 },
+  ],
+};
+const careDays: Shape = {
+  kind: "enum",
+  flags: true,
+  values: [
+    { held: "weekend", live: 96, number: 96 },
+    { held: "sun", live: 64, number: 64 },
+    { held: "sat", live: 32, number: 32 },
+    { held: "mon", live: 1, number: 1 },
+    { held: "none", live: 0, number: 0 },
+  ],
+};
+const careDaysByName: Shape = {
+  kind: "enum",
+  flags: true,
+  values: [
+    { held: 96, live: "Weekend", number: 96 },
+    { held: 64, live: "Sun", number: 64 },
+    { held: 32, live: "Sat", number: 32 },
+    { held: 1, live: "Mon", number: 1 },
+  ],
+};
 const record = (fields: Readonly<Record<string, Shape>>): Shape => ({ kind: "object", fields: Object.fromEntries(Object.entries(fields).map(([name, shape]) => [name, { shape, nothing: "omit" }])) });
 
 const none = { kind: "nothing" };
@@ -492,6 +530,77 @@ describe("as(expr, object(fields))", () => {
     expect(as({ seen: null, bed: "Bed 4" }, { kind: "object", fields: { seen: { shape: nullable(date), nothing: "null" } } })).toStrictEqual({ kind: "value", value: { seen: null, bed: "Bed 4" } });
     expect(as({ seen: ["bad"], bed: "Bed 4" }, { kind: "object", fields: { seen: { shape: record({ at: date }), nothing: "null" } } })).toStrictEqual({ kind: "value", value: { seen: null, bed: "Bed 4" } });
     expect(as({ seen: "bad", bed: "Bed 4" }, { kind: "object", fields: { seen: { shape: list(date), nothing: "omit" } } })).toStrictEqual({ kind: "value", value: { bed: "Bed 4" } });
+  });
+});
+
+describe("as(expr, enum)", () => {
+  test("a value a row holds as its held form reads that row's live form, and a held form no row lists reads nothing", () => {
+    expect(as("ready", stage)).toStrictEqual({ kind: "value", value: 1 });
+    expect(as("waiting", stage)).toStrictEqual({ kind: "value", value: 0 });
+    expect(as("held over", stage)).toStrictEqual({ kind: "value", value: 2 });
+    expect(as("ready", stageByName)).toStrictEqual({ kind: "value", value: "Ready" });
+    expect(as("Ready", stage)).toStrictEqual(none);
+    expect(as("heldOver", stage)).toStrictEqual(none);
+    expect(as(99, stage)).toStrictEqual(none);
+    expect(as(1, stage)).toStrictEqual(none);
+    expect(as(true, stage)).toStrictEqual(none);
+    expect(as({ stage: "ready" }, stage)).toStrictEqual(none);
+  });
+
+  test("a combination reads nothing under rows that are not flags, where the same text is split under rows that are", () => {
+    const plain: Shape = { kind: "enum", flags: false, values: [{ held: "mon", live: 1, number: 1 }, { held: "weekend", live: 96, number: 96 }] };
+    expect(as("mon, weekend", plain)).toStrictEqual(none);
+    expect(as("mon, weekend", careDays)).toStrictEqual({ kind: "value", value: 97 });
+  });
+
+  test("null stays null inside nullable and reads nothing without it, and a blank text reads nothing", () => {
+    expect(as(null, nullable(stage))).toStrictEqual({ kind: "value", value: null });
+    expect(as("ready", nullable(stage))).toStrictEqual({ kind: "value", value: 1 });
+    expect(as(null, stage)).toStrictEqual(none);
+    expect(as("", nullable(stage))).toStrictEqual(none);
+    expect(as(99, nullable(stage))).toStrictEqual(none);
+  });
+
+  test("a flags text is split at its commas into the number its rows' numbers join, in any order its parts come", () => {
+    expect(as("weekend, mon", careDays)).toStrictEqual({ kind: "value", value: 97 });
+    expect(as("mon, sat, sun", careDays)).toStrictEqual({ kind: "value", value: 97 });
+    expect(as("mon", careDays)).toStrictEqual({ kind: "value", value: 1 });
+    expect(as("none", careDays)).toStrictEqual({ kind: "value", value: 0 });
+  });
+
+  test("what the flags split cannot read reads nothing: a part no row holds, a number under rows held as text and a text under rows held as numbers", () => {
+    expect(as("mon, tue", careDays)).toStrictEqual(none);
+    expect(as("mon,weekend", careDays)).toStrictEqual(none);
+    expect(as(97, careDays)).toStrictEqual(none);
+    expect(as("Mon", careDaysByName)).toStrictEqual(none);
+    expect(as(129, careDaysByName)).toStrictEqual(none);
+    expect(as(0, careDaysByName)).toStrictEqual(none);
+    expect(as(1.5, careDaysByName)).toStrictEqual(none);
+  });
+
+  test("a flags number under rows whose live form is text reads the names of the rows it took, the smallest first", () => {
+    expect(as(97, careDaysByName)).toStrictEqual({ kind: "value", value: "Mon, Weekend" });
+    expect(as(33, careDaysByName)).toStrictEqual({ kind: "value", value: "Mon, Sat" });
+    expect(as(64, careDaysByName)).toStrictEqual({ kind: "value", value: "Sun" });
+  });
+
+  test("each item of a list is mapped, and an item no row lists stays nothing in its place", () => {
+    expect(as(["ready", "waiting", "closed"], list(stage))).toStrictEqual({ kind: "value", value: [1, 0, undefined] });
+    expect(as(["ready", null], list(nullable(stage)))).toStrictEqual({ kind: "value", value: [1, null] });
+  });
+
+  test("a record in a list is copied with its enum mapped, its other members kept, and a member it lacks stays absent", () => {
+    const beds = [{ name: "Bed 1", stage: "ready" }, { name: "Bed 2" }];
+    const mapped = as(beds, list(record({ stage })));
+    expect(mapped).toStrictEqual({ kind: "value", value: [{ name: "Bed 1", stage: 1 }, { name: "Bed 2" }] });
+    expect(beds).toStrictEqual([{ name: "Bed 1", stage: "ready" }, { name: "Bed 2" }]);
+    expect((heldOf(mapped) as readonly unknown[])[1]).toBe(beds[1]);
+  });
+
+  test("a member no row lists follows its nothing entry: left out where it binds its start, and null where it holds null", () => {
+    expect(as({ name: "Bed 1", stage: 99 }, record({ stage }))).toStrictEqual({ kind: "value", value: { name: "Bed 1" } });
+    expect(as({ name: "Bed 1", next: 99 }, { kind: "object", fields: { next: { shape: nullable(stage), nothing: "null" } } })).toStrictEqual({ kind: "value", value: { name: "Bed 1", next: null } });
+    expect(as({ name: "Bed 1", next: null }, { kind: "object", fields: { next: { shape: nullable(stage), nothing: "null" } } })).toStrictEqual({ kind: "value", value: { name: "Bed 1", next: null } });
   });
 });
 

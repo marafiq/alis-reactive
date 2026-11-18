@@ -1506,9 +1506,23 @@
           "ts": "ratio: number",
           "door": "double",
           "csharp": "Ratio"
+        },
+        {
+          "js": "stage",
+          "kind": "property",
+          "ts": "stage: number",
+          "door": "RecordStage",
+          "csharp": "Stage"
+        },
+        {
+          "js": "wing",
+          "kind": "property",
+          "ts": "wing: string",
+          "door": "RecordWing",
+          "csharp": "Wing"
         }
       ],
-      "what": "the app's C# class Record, whose Name starts at null and whose Code at C0, the values a record whose data lacks name or code reads (D4.2)"
+      "what": "the app's C# class Record, whose Name starts at null and whose Code at C0, the values a record whose data lacks name or code reads (D4.2); its Stage is the enum RecordStage, Waiting, Ready and Closed, which the live form holds as its number and starts at Waiting, and its Wing the enum RecordWing, North and South, which the member's own JsonStringEnumConverter writes by its C# name in both forms (D7.7, X7.20)"
     },
     {
       "name": "Detail",

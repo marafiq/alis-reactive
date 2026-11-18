@@ -47,7 +47,8 @@
         "list",
         "ref",
         "call",
-        "op"
+        "op",
+        "enum"
       ],
       "writes": [
         {
@@ -167,6 +168,10 @@
         {
           "id": "X7.19",
           "rung": "analyzer"
+        },
+        {
+          "id": "X7.20",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -185,6 +190,14 @@
           "outcome": "The page is refused where the view renders with X7.10's message, naming the field and its own JSON converter.",
           "opposite": "The same field with no converter of its own renders, and the component shows the amount the response holds.",
           "defect": "The converter's text reaches the live member, so the component holds the text in place of its number."
+        },
+        {
+          "for": "X7.10",
+          "page": "A bed register page whose step, when the document is ready, GETs the register and sets a ConformanceComponent's Records from its Beds, each a Record whose Day is a DateTime, in an app whose JSON options add a DateTime converter.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X7.10's message for a member at depth, naming the read register.Beds and the member Record.Day.",
+          "opposite": "Under the app's options without that converter the same page renders, and the component lists Bed 1 and Bed 2.",
+          "defect": "The converter's text is shaped as a date, which no date form reads, so each record reaches the component without its day and with no error."
         },
         {
           "for": "X7.13",
@@ -305,6 +318,54 @@
           "outcome": "The dose line reads Dose 5E-05 g.",
           "opposite": "A dose of 0.5 grams: the dose line reads Dose 0.5 g.",
           "defect": "The join converts the number by JavaScript's own rules, so the line reads Dose 0.00005 g (Schema.tla:JoinedPartsAreTexts)."
+        },
+        {
+          "for": "X7.20",
+          "page": "A panel week page with a care panel, a ConformanceComponent, whose Load button GETs a week's plan, whose Care holds Mon | Sat | Sun of CareDays, an enum the app names as flags and its JSON writes by name, sets the panel's Days from it and shows the plan's resident, and whose Send care button GETs the care endpoint with r => r.Care set from the panel's Days and shows the endpoint's answer, the days it bound.",
+          "gesture": "Click Load, and once the plan's resident shows, click Send care.",
+          "outcome": "The URL holds Care=Mon%2C+Weekend and Care sent reads Mon, Weekend.",
+          "opposite": "At the address whose plan holds Mon alone, the URL holds Care=Mon and Care sent reads Mon.",
+          "defect": "The body's text enters the panel's Days, a member held as a number, so the request's split cannot read it and no request leaves (D9.13)."
+        },
+        {
+          "for": "X7.20",
+          "page": "A bed turnover page with a turnover panel, a ConformanceComponent, whose Load the beds button GETs a ward's beds, Records whose Stage is an enum the app's JSON writes by name and whose Wing its own JSON converter writes by its C# name, sets the panel's Records from them, and shows the count of the panel's records whose Stage equals Ready, of those whose Stage equals Waiting, and of those whose Wing equals South. The north ward's beds are Bed 1, ready, Bed 2, waiting, and Bed 3, closed.",
+          "gesture": "Click Load the beds.",
+          "outcome": "Ready beds reads 1.",
+          "opposite": "At the south ward's address, whose beds are waiting, ready and ready, Ready beds reads 2.",
+          "defect": "The walk maps no enum inside a record, so each record in the panel holds its stage as the body's text, no record's stage equals Ready, and Ready beds reads 0."
+        },
+        {
+          "for": "X7.20",
+          "page": "A bed turnover page with a turnover panel, a ConformanceComponent, whose Load the beds button GETs a ward's beds, Records whose Stage is an enum the app's JSON writes by name and whose Wing its own JSON converter writes by its C# name, sets the panel's Records from them, and shows the count of the panel's records whose Stage equals Ready, of those whose Stage equals Waiting, and of those whose Wing equals South. The north ward's beds are in the South, North and South wings, and the app's JSON names every other enum in camel case.",
+          "gesture": "Click Load the beds.",
+          "outcome": "South wing beds reads 2 and Ready beds reads 1.",
+          "opposite": "At the south ward's address, whose beds are all in the North wing, South wing beds reads 0 and Ready beds reads 2.",
+          "defect": "The wing's rows are written from its type's writing under the app's options, south, so the South the member holds matches no row, each record reaches the panel without its wing, and South wing beds reads 0."
+        },
+        {
+          "for": "X7.20",
+          "page": "A bed turnover page with a turnover panel, a ConformanceComponent, whose Load the beds button GETs a ward's beds, Records whose Stage is an enum the app's JSON writes by name and whose Wing its own JSON converter writes by its C# name, sets the panel's Records from them, and shows the count of the panel's records whose Stage equals Ready, of those whose Stage equals Waiting, and of those whose Wing equals South. At the east ward's address Bed 1 holds 99 as its stage, a number no value of the enum names, and Bed 2 is ready.",
+          "gesture": "Click Load the beds.",
+          "outcome": "Waiting beds reads 1: Bed 1's stage reads nothing, so its record reaches the panel without a stage and reads the stage a record starts at, Waiting (D3.3, D4.2).",
+          "opposite": "At the west ward's address, whose Bed 1 is closed, Waiting beds reads 0.",
+          "defect": "A held form no row lists is passed on, so the panel's record holds 99 and Waiting beds reads 0."
+        },
+        {
+          "for": "X7.20",
+          "page": "A night panel page with a day panel, a ConformanceComponent started with the days Mon | Sat | Sun, and a night panel, a second one; a Copy the day panel's days button sets the night panel's Days from the day panel's and shows that it did, and a Send night care button GETs the care endpoint with r => r.Care set from the night panel's Days and shows the endpoint's answer.",
+          "gesture": "Click Copy the day panel's days, and once the page shows the days copied, click Send night care.",
+          "outcome": "The URL holds Care=Mon%2C+Weekend and Care sent reads Mon, Weekend.",
+          "opposite": "At the address whose day panel starts with Mon alone, the URL holds Care=Mon and Care sent reads Mon.",
+          "defect": "The rows of the app's form are written for a source a live object holds, so the number the day panel holds matches no row, the night panel's days read nothing, and the request sends neither Mon nor Weekend."
+        },
+        {
+          "for": "X7.20",
+          "page": "A planned care page with a care panel, a ConformanceComponent, whose Load button GETs a plan whose Care holds Sat of CareDays, an enum the app names as flags and its JSON writes by name, sets the text of the Day planned line from it and the panel's Days from the same read, and whose Send care button GETs the care endpoint with r => r.Care set from the panel's Days and shows the endpoint's answer.",
+          "gesture": "Click Load.",
+          "outcome": "Day planned reads sat, the name the app's JSON writes.",
+          "opposite": "The same read set into the panel's Days arrives as the live form holds it: Send care then sends Care=Sat and Care sent reads Sat.",
+          "defect": "The element's text is written through the mapping a live member takes, so Day planned reads 32."
         }
       ],
       "verdicts": [

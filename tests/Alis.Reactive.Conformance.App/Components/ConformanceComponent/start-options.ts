@@ -37,6 +37,8 @@ export interface RecordStart {
     count: number;
     day?: string;
     detail: DetailStart | null;
+    stage?: number;
+    wing?: string;
 }
 export interface DetailStart {
     name?: string;

@@ -14,7 +14,6 @@ internal sealed class PlanContent
     private const string PluginObjectId = "$plugin:";
 
     private readonly string _planId;
-    private readonly Func<Type, bool> _namesFlags;
     private readonly Culture _culture;
     private readonly TimeZone _timeZone;
     private readonly SortedDictionary<string, Vendor> _vendors = new(StringComparer.Ordinal);
@@ -34,7 +33,7 @@ internal sealed class PlanContent
     private readonly Lazy<PageAntiforgery> _antiforgery;
     private bool _rendered;
 
-    internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json, Func<string, (string Prefix, string Name, string Id)> nameInput, Func<Type, bool> namesFlags,
+    internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json, Func<string, (string Prefix, string Name, string Id)> nameInput,
         Func<IServiceProvider> services, Func<PageAntiforgery> antiforgery, Func<string> pathBase)
     {
         _planId = planId;
@@ -43,7 +42,6 @@ internal sealed class PlanContent
         _timeZone = timeZone;
         Json = json;
         _nameInput = nameInput;
-        _namesFlags = namesFlags;
         _services = services;
         _pathBase = pathBase;
         _antiforgery = new Lazy<PageAntiforgery>(antiforgery);
@@ -57,7 +55,7 @@ internal sealed class PlanContent
 
     internal PageAntiforgery Antiforgery => _antiforgery.Value;
 
-    internal bool NamesFlags(Type type) => _namesFlags(type);
+    internal bool NamesFlags(Type type) => Json.NamesFlags(type);
 
     internal CultureInfo RendersUnder { get; }
 

@@ -23,12 +23,12 @@ public static class PlanHtml
     /// </remarks>
     /// <returns>The plan.</returns>
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
-        => ViewPlans.Open<TModel>(RequestTimeZone.Of(html.ViewContext.HttpContext), new AppJson(() => RegisteredJson.ReadBy(ViewPaths.Of(html))),
+        => ViewPlans.Open<TModel>(RequestTimeZone.Of(html.ViewContext.HttpContext), new AppJson(() => RegisteredJson.ReadBy(ViewPaths.Of(html)),
+                type => DependencyResolver.Current.GetService<ValidatorCatalog>()?.Flags.Contains(type) == true),
             () => html.ViewData.TemplateInfo.HtmlFieldPrefix,
             text => html.ViewData.TemplateInfo.GetFullHtmlFieldName(text),
             HtmlHelper.GenerateIdFromName,
             () => ViewPaths.Of(html),
-            type => DependencyResolver.Current.GetService<ValidatorCatalog>()?.Flags.Contains(type) == true,
             () => new ResolverServices(),
             () => RequestAntiforgery.Of(html.ViewContext.HttpContext),
             () => html.ViewContext.HttpContext.Request.ApplicationPath);
