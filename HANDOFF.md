@@ -1,16 +1,16 @@
 # Handoff
 
-Written at `date`: Tue Nov 17 23:59:49 EST 2026
+Written at `date`: Wed Nov 18 00:18:15 EST 2026
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 0ecebf67d process: the work loop, the open list and the handoff live in the repository
-- Full check: .work/logs/spec-check-0ecebf67d.log: spec check at 0ecebf67d: 40 of 40 checks pass
-- .work/last-run.txt: 20261117-234911-49575 0ecebf67d
+- HEAD: 878033d78 mistakes: the eight kinds stand as instructions every agent reads, and the two largest are held by a tool
+- Full check: .work/logs/spec-check-878033d78.log: spec check at 878033d78: 40 of 40 checks pass
+- .work/last-run.txt: 20261118-000718-99781 878033d78
 
 ## Landed since the commit before the last spec: STATE commit
-0ecebf67d process: the work loop, the open list and the handoff live in the repository
-8391f0be5 spec: STATE at a3c26b5cd
+878033d78 mistakes: the eight kinds stand as instructions every agent reads, and the two largest are held by a tool
+f103bf548 spec: STATE and handoff at 0ecebf67d
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -124,7 +124,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:2
 - ../opus-u26h/.worktrees/check-plants-761ejgt6/tree1: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
 - ../opus-u26h/.worktrees/check-plants-761ejgt6/tree2: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
 - ../opus-u26h/.worktrees/check-plants-761ejgt6/tree3: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
-- ../opus-u3: base 8391f0be5043b4d809bfa3a0fdb486b761a91b0e, 56 paths changed
+- ../opus-u3: base 8391f0be5043b4d809bfa3a0fdb486b761a91b0e, 60 paths changed
 - ../opus-u4: base 3eb49e2dcbc3d396a3bfa9271b2deb390970c1d1, 17 paths changed
 - ../opus-upload: base 7c1e23c8b9933cdd590c8524cb817554fd807646, 18 paths changed
 - ../opus-upload2: base 0bffecf95f4435078a90ad13682ac2c1f114c140, 37 paths changed
