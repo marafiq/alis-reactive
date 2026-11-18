@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Wed Nov 18 04:40:04 EST 2026
+Written at `date`: Wed Nov 18 05:01:29 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -9,37 +9,36 @@ note: open 2026-11-18 | direction | the queue of this file | queue | "Think of r
   exit line: "landed"
   goes to: note: closed
 note: open 2026-11-18 | direction | the queue of this file | queue | "I want you to build a skill out of that TLA plus 
-note: open 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "This should not be i
-note: open 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "The framework is not
-note: open 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "Yeah, I'm fine with 
+note: closed 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "This should not be i: its follow-up MoveInSpec landed
+  leaves by: the entry leaves the notes block of `HANDOFF.md`
+  goes to: gone
+note: closed 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "The framework is not: its follow-up MoveInSpec landed
+note: closed 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "Yeah, I'm fine with : its follow-up MoveInSpec landed
 note: open 2026-11-18 | quality rule | spec/Reference/native.json and tests/Alis.Reactive.Conformance.App/CLAUDE.md | C
-note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSpec | "Build an app which
+note: closed 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSpec | "Build an app which: its follow-up MoveInSpec landed
 note: open 2026-11-17 | decision | spec/CLAUDE.md, the Conditions module's decisions, with a table "After 1.0" in spec/
 note: open 2026-11-17 | process rule | .claude/rules/process.md | queue | "your whole goal is to get the tooling, the p
 note: open 2026-11-18 | decision | spec/CLAUDE.md | DecisionsByModule | "where you're gonna keep the decisions. So it c
 note: open 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses 
 note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSlice1 | "For the app, you
 note: open 2026-11-18 | direction | the queue of this file | queue | "I don't need acceptance numbers, sir. I need that
-unit: building ../ci2 CiGreen2: it lacks paths.txt or message.txt
-  leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
-  read first: the rule file of each kind of file, as it is opened
-  exit line: each line of the brief's "Done"
-  goes to: unit: ready, or unit: returned for an agent
-unit: waiting ../ci2 MoveInSpec: for MoveInSlice1
-  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
-  exit line: each line of the brief's "Done"
-  goes to: unit: ready
-unit: ready ../movein1 MoveInSlice1
-  next: scripts/land-unit.sh ../movein1 e9b49a1eb "conformance app: the move-in's foundation and MI.1, a residence chosen through three lookups over a model one world owns" ".landing/MoveInSlice1"
-  leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
-  exit line: "landed", with the browser run's result line
-  goes to: unit: landed
-lane: pushed at f4cd5af46 on feature/rewrite: equal to the remote
+unit: landed ../ci2 CiGreen2
+  next: git worktree remove ../ci2
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
+unit: landed ../ci2 MoveInSpec
+  next: git worktree remove ../ci2
+unit: briefed ../movein-care MoveInCare: it lacks paths.txt or message.txt
+  leaves by: its builder starts: the lead, or the agent handed the brief
+  read first: the brief; each file its "Rules" names; the kinds of `spec/MISTAKES.md`
+  goes to: unit: building
+unit: briefed ../movein-contacts MoveInContacts: it lacks paths.txt or message.txt
+lane: pushed at cff7dd154 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at f4cd5af46
+ci: unread at cff7dd154
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -47,20 +46,20 @@ file: over CLAUDE.md: holds 326 lines, its limit 200
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over spec/CLAUDE.md: holds 2064 lines, its limit 150
-file: over HANDOFF.md: holds 202 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
+file: over HANDOFF.md: holds 223 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: f4cd5af46 conformance app: the move-in's foundation and MI.1, a residence chosen through three lookups over a model one world owns
-- Full check: .work/logs/spec-check-f4cd5af46.log: spec check at f4cd5af46: 40 of 40 checks pass
-- .work/last-run.txt: 20261118-042953-62784 f4cd5af46
+- HEAD: cff7dd154 ci and spec: CI's three causes read from the jobs' logs at 5ed0e0a5e, and the move-in app's complete spec
+- Full check: .work/logs/spec-check-cff7dd154.log: spec check at cff7dd154: 40 of 40 checks pass
+- .work/last-run.txt: 20261118-045057-9263 cff7dd154
 
 ## Landed since the commit before the last spec: STATE commit
-f4cd5af46 conformance app: the move-in's foundation and MI.1, a residence chosen through three lookups over a model one world owns
-c044853ea spec: STATE and handoff at 4c5ae8e1c
+cff7dd154 ci and spec: CI's three causes read from the jobs' logs at 5ed0e0a5e, and the move-in app's complete spec
+fbea584b2 spec: STATE and handoff at f4cd5af46
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -109,22 +108,20 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 334 to 346
-- A rule or a tool's list not applied before the change: 381 to 384
-- A number, a proof line or an absence not read from the run that proves it: 53 to 54
-- A shell command or a script wrong in its own terms: 533 to 542
-- A fault found in an agent's work whose instruction the brief did not give: 2 to 5
+- A rule or a tool's list not applied before the change: 384 to 385
+- A number, a proof line or an absence not read from the run that proves it: 54 to 55
 
 ## The owner's latest decisions
-spec/CLAUDE.md:1926: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
-spec/CLAUDE.md:1936: - The owner, 2026-11-18, after the lead reported that the hook a compaction runs printed a file of the lead's private
-spec/CLAUDE.md:1945: - The owner, 2026-11-18, of that machine (both verbatim in `spec/NOTES.md`): "Is there a mistake read part of the state
-spec/CLAUDE.md:1956: - The owner, 2026-11-18, the same hour (verbatim in `spec/NOTES.md`): "What other steps are missing? How about quality
-spec/CLAUDE.md:1966: - The owner, 2026-11-18, on the machine as built (verbatim in `spec/NOTES.md`): the mistakes are condensed past a
-spec/CLAUDE.md:1979: - The owner, 2026-11-18, after a unit's delivery proof stopped before its browser step (verbatim in `spec/NOTES.md`):
-spec/CLAUDE.md:1986: - The owner, 2026-11-18, on the machine as the lead had written it, one table with sentences around it and checks
-spec/CLAUDE.md:1993: - The owner, 2026-11-18 (verbatim in `spec/NOTES.md`): "I want you to build a skill out of that TLA plus and schema,
-spec/CLAUDE.md:2000: - The owner, 2026-11-18, on README's first example and both fresh apps' home views (verbatim in `spec/NOTES.md`):
+spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
+spec/CLAUDE.md:1937: - The owner, 2026-11-18, after the lead reported that the hook a compaction runs printed a file of the lead's private
+spec/CLAUDE.md:1946: - The owner, 2026-11-18, of that machine (both verbatim in `spec/NOTES.md`): "Is there a mistake read part of the state
+spec/CLAUDE.md:1957: - The owner, 2026-11-18, the same hour (verbatim in `spec/NOTES.md`): "What other steps are missing? How about quality
+spec/CLAUDE.md:1967: - The owner, 2026-11-18, on the machine as built (verbatim in `spec/NOTES.md`): the mistakes are condensed past a
+spec/CLAUDE.md:1980: - The owner, 2026-11-18, after a unit's delivery proof stopped before its browser step (verbatim in `spec/NOTES.md`):
+spec/CLAUDE.md:1987: - The owner, 2026-11-18, on the machine as the lead had written it, one table with sentences around it and checks
+spec/CLAUDE.md:1994: - The owner, 2026-11-18 (verbatim in `spec/NOTES.md`): "I want you to build a skill out of that TLA plus and schema,
+spec/CLAUDE.md:2001: - The owner, 2026-11-18, on README's first example and both fresh apps' home views (verbatim in `spec/NOTES.md`):
+spec/CLAUDE.md:2007: - The owner, 2026-11-18, on the app that proves the framework as an app uses it (verbatim in `spec/NOTES.md`): "you
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -146,58 +143,78 @@ spec/CLAUDE.md:2000: - The owner, 2026-11-18, on README's first example and both
 ## Next
 <!-- next -->
 The owner is away for 24 hours from the early morning of 2026-11-18. The lead works alone, THE APP FIRST AND ONLY,
-and spends little: it acts on a notification, never polls, runs one build at a time on this Mac, and adds no process.
+and spends little: it acts on a notification, never polls, and adds no process.
 
 WHAT THE OWNER GETS ON HIS RETURN, in his words: "I don't need acceptance numbers, sir. I need that complex app behavior
 asserted and proved. I am done with hearing excuses or fake numbers." So the report names each behavior of the
 move-in app as proven in a browser against the in-memory model, by its test's result line, or as not proven. No
 score of a spec and no count is offered as the result.
 
-THE APP: resident move-in at a senior living community, a vertical slice inside the conformance app (the owner:
-"It must have its domain model with the fake in-memory data. It must have real endpoints with typed payload").
-- Its ONLY spec is "consult2-answer.md" in `.worktrees/movein1`, ".landing/MoveInSlice1": part 1 the domain and its
-  literal seed (one MoveInWorld a test; Harbor House and Maple Court; draft D100 at version 7; Helen Ward), 2 the
-  endpoints, 3 the screens and partials, 4 the features MI.1 to MI.31 with their interactions, 5 the validators,
-  6 FIVE SITUATIONS A FEATURE (a success with what the model holds after and what the next read shows, a refusal by
-  the browser, a refusal by the server alone, a transport failure, two features meeting), 7 coverage, 8 gaps. A
-  read-only Codex run derived it from the door map, the rule grammar, the schema and the TLA+ specs. "scenarios.md"
-  and "spec.md" beside it are withdrawn. It lands under `spec/` with the app's first unit.
-- In flight: a builder agent in `.worktrees/movein1` (base e9b49a1eb) builds THE FOUNDATION AND MI.1: the domain and
-  seed whole, the world wiring, the main page with one empty element for each section of part 3, the draft's read
-  and its save, and MI.1's five situations, each test green and failing on its planted defect. It was told to lay
-  every shared file (the world's addresses, the store, the controller, the validators' registration) in files by
-  area, so a later unit adds a file and edits none of the foundation's.
-- When its "reply.md" stands: read MI.1 in the spec, read the change at the source, hold each line of "Done",
-  write "read.md", land, push.
-- Then the other thirty features, on the landed head, by two fresh builders side by side, each from a six-part
-  brief that names its features by number and its files by area, each reply a batch of three or four features that
-  lands before the next. A build is one at a time (the owner, 2026-11-17), so each build and browser run of a
-  builder and of the lane is taken through one lock; the machine is what bounds the work, about a minute a run.
-  First the features that carry what the owner named: rules under a condition, a condition inside an event and
-  inside a request's reply, a chained and a parallel request, a callback, an event's payload, a live object walked
-  by its members, a value of one plan read by another, a partial under a condition and an independent one.
-  By area: care, resident, allocation, bed conflict and live availability (MI.2 to MI.4, MI.18, MI.20, MI.21, MI.28,
-  MI.29); contacts, payer, services and price, deposit, diet (MI.5 to MI.9, MI.13 to MI.15, MI.25, MI.26);
-  medications, documents, save, submit and discard, the coordinators' line, reception, request defaults (MI.10 to
-  MI.12, MI.16, MI.17, MI.19, MI.22 to MI.24, MI.27, MI.30, MI.31).
+ONE BUILD AT A TIME on this Mac (the owner, 2026-11-17). Every build and browser run of a builder and of the lane is
+started through one lock, `/usr/bin/lockf -k "$HOME/.local/share/alis-toolchain/build.lock" <the command>`; the lane's
+chains under ".work" of this worktree are started so. The machine bounds the work, about a minute a run.
 
-THE LANE, small units finished beside the app, each landed by the command `scripts/state.py` prints for it:
-- ".landing/BuildAScreen" in `.worktrees/skill`: the skill for every consumer. Its gate passed in its worktree.
-- ".landing/TypedHome" in `.worktrees/typed-home`, moved to 176de4cd3: the fresh apps' home page has a model of its
-  own. Its "Done" at that head: scripts/delivery.sh whole, read from ".work/logs/delivery-at-head.log" there.
-- ".landing/TypedDoors" in `.worktrees/typed-doors`: ALIS044, a door of the framework takes no dynamic (the owner:
-  "Yeah, write the analyzer"). Read at the source; "read.md" sends it back for one thing: sixteen of its eighteen
-  planted defects ran on an earlier form of the file. When they have run on the file that lands: it moves to the
-  head that holds TypedHome, scripts/delivery.sh runs whole there (the packed analyzer reads the fresh app), it lands.
-- After each push: `python3 scripts/ci.py` about fifteen minutes later, and each failed job's log read. MVC 5 on
-  net48 is proven by the job verify-net48 alone; the Syncfusion-upgrade probe's Playwright pin is a later unit.
+THE APP: resident move-in at a senior living community, a vertical slice inside the conformance app, under
+`tests/Alis.Reactive.Conformance.App/Care/MoveIn/`. Its only spec is `spec/Reference/move-in.md` once the unit
+MoveInSpec lands (it is in `.worktrees/ci2`, landing with the CI fix); until then each builder holds a copy beside
+its brief. 31 features MI.1 to MI.31, five situations a feature, each situation one browser test that reads the
+page, what the model holds after and what the next read shows.
 
-Deferred, no process work goes ahead of the app: the decisions split by module (`spec/CLAUDE.md` is 2,000 lines; its
-brief is written); root CLAUDE.md cut to its limit; this file cut to its limit.
+Proven, each by a test green in a browser and caught on its planted defect (landed f4cd5af46, "637 selected, 637
+ran, 637 passed", "40 of 40 checks pass"):
+- The foundation: the domain model and its seed, one test world's own; the main page with one section an area; the
+  draft's read and its save by PUT.
+- MI.1, residence selection, its five situations: each list offers what the choices before it hold and a choice
+  alone saves nothing; an empty community is refused beside its list and sends no lookup; a building the world holds
+  closed is refused by the server with its reason; a lookup whose connection drops says so and offers nothing it did
+  not load; a lookup a newer choice replaced loads nothing, and the draft moves only at its save.
+Not proven: every other feature. Two gaps of the framework the foundation met, no code written for either: a Native
+input over a date renders the server's culture text, which the browser's code does not read as a date (Native holds
+no date input); an input over an enum whose zero no name holds. Three members a builder added to the conformance
+component with no test are held out as a patch in the lead's durable scratch, "conformance-members", for the unit
+that brings each with its cell and its test.
 
-Behind the app, the framework's open list: a list of files in a request form (D14.3; the runtime throws notBuilt); a
-validation check on a text or a file body (refused where the view renders); the seven operators no C# writes leave
-the grammar (the owner's yes, 2026-11-17), with the table "After 1.0" in spec/NOTES.md; the plan contract narrowed to
-what the C# writes; an enum in a pushed message's member. Then unit 3's second piece (the Fusion template pages), and
-Fusion's own: an equality of two members in a template, the grid's validation door and exports, SmartPaste, U27.
+In flight, two builder agents, each in a worktree at fbea584b2 with a six-part brief, the spec and the foundation's
+reply beside it, each replying when its three features stand:
+- `.worktrees/movein-care`, ".landing/MoveInCare": MI.2 care-specific admission, MI.3 resident details, MI.4
+  allocation review; promise ids M9.X15 to M9.X39.
+- `.worktrees/movein-contacts`, ".landing/MoveInContacts": MI.5 contact rows, MI.6 contact authority, MI.7 contact
+  removal; promise ids M9.X40 to M9.X64.
+When a "reply.md" stands: read the feature in the spec, read the tests and the views at the source, hold each line
+of "Done", write "read.md", land through the lock, push, remove the worktree; then open the next unit for that
+builder's line from the new head with a fresh agent, by the brief template and the script in the lead's scratchpad
+folder "fanout" (a copy of both is kept in the durable scratch). The lines, in the order the owner's concerns give:
+- after MoveInCare: MI.18 bed conflict and waitlist, MI.28 assessment objects and their owners, MI.29 room handoff
+  callback; then MI.20 and MI.21, bed availability by server push and its reconnect;
+- after MoveInContacts: MI.8 primary and secondary payer, MI.9 independent payer verification, MI.13 services and
+  price calculation; then MI.14 service review component, MI.15 price acceptance, MI.25 deposit, MI.26 diet;
+- then MI.10 to MI.12 medications and pharmacy, MI.16 save draft, MI.17 submit admission, MI.19 discard, MI.22 to
+  MI.24 documents and the packet, MI.27 the coordinators' line, MI.30 reception's native form, MI.31 request defaults.
+Promise ids are given in blocks of 25 from M9.X65 on, so two units never take one id.
+
+THE LANE:
+- `.worktrees/ci2`, two units landing as one commit by ".work/chain-ci2.sh": ".landing/CiGreen2", CI's three causes
+  at 5ed0e0a5e (a zone test that read the machine's zone files; the Windows job's msbuild under bash; the Syncfusion
+  probes on the POC's Playwright pin), and ".landing/MoveInSpec", the app's spec as a file of the repo.
+- After its push: `python3 scripts/ci.py` about fifteen minutes later, and each failed job's log read by
+  `gh api repos/marafiq/alis-reactive/actions/jobs/<id>/logs`, since a run's logs wait for the whole run to end. MVC 5
+  on net48 is proven by the job verify-net48 alone.
+- A landed unit whose file the landing merged reads as "ready" and never "landed", since its worktree's file no
+  longer equals the head's: it is removed by hand once each of its paths is found in its commit. A defect of the
+  guard paths-equal-head, for the machine's next review.
+
+Landed 2026-11-18 beside the app: the process as a state machine and this file in the repo; CI's first three causes;
+the enum shape kind; the skill `.claude/skills/build-a-screen/SKILL.md`; the fresh apps' typed home page; ALIS044, a
+door of the framework takes no dynamic, with the fresh net10 app built under the packed rule.
+
+Deferred, no process work goes ahead of the app: the decisions split by module (`spec/CLAUDE.md` is over 2,000 lines;
+its brief is written); root CLAUDE.md cut to its limit; this file cut to its limit; the conformance component's
+three members with their cells.
+
+Behind the app, the framework's open list: a Native date input and an input over a date (the app's gap 1); a list
+of files in a request form (D14.3; the runtime throws notBuilt); a validation check on a text or a file body (refused
+where the view renders); the seven operators no C# writes leave the grammar (the owner's yes, 2026-11-17), with the
+table "After 1.0" in spec/NOTES.md; the plan contract narrowed to what the C# writes; an enum in a pushed message's
+member. Then unit 3's second piece (the Fusion template pages), and Fusion's own: an equality of two members in a
+template, the grid's validation door and exports, SmartPaste, U27.
 <!-- /next -->

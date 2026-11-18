@@ -1524,7 +1524,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 105,
+        "files": 106,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1668,7 +1668,7 @@
         "unrefused": 0
       },
       "detail": "248 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "a8b543ca36694c85b34c8fed543dbe3d324d12914bcdce7ed793b4c5a0cd5227",
+      "digest": "8eed7e1e29772ed5cfb7c357fd4ec28dbabec96817ea63c9a85b01d50d07cf69",
       "pass": true
     },
     "probes": {
@@ -4357,7 +4357,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "f4cd5af46838b150b35729023426bc9d5eaac786",
+  "read_at_head": "cff7dd154a7619cdaf40c70f0561beca1e031035",
   "step": {
     "failing": [],
     "name": "End of session",
