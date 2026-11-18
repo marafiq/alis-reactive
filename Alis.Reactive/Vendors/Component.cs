@@ -19,4 +19,6 @@ public abstract class Component : EventedObject
     protected internal sealed override EventListening Listening => Vendor.Listening;
 
     internal override Schema.Expression WriteTarget => Bound.Target;
+
+    internal override Binding Kept(Binding bound) => HeldComponents.Recording(bound, Vendor.Grammar.ElementPath);
 }

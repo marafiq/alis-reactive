@@ -4588,6 +4588,78 @@
     },
     {
       "feature": "M25.F3",
+      "for": "X17.38",
+      "index": 1,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "rows",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "Bea's POST"
+        }
+      ]
+    },
+    {
+      "feature": "M25.F3",
+      "for": "X17.38",
+      "index": 2,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "rows",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "Bea's POST"
+        }
+      ]
+    },
+    {
+      "feature": "M25.F3",
+      "for": "X17.38",
+      "index": 3,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "rows",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "Bea's POST"
+        }
+      ]
+    },
+    {
+      "feature": "M25.F3",
       "for": "M25.X4",
       "index": 0,
       "screen": "residents",

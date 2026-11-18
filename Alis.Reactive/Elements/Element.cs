@@ -16,6 +16,8 @@ namespace Alis.Reactive.Elements;
 [Mirrors("lib.dom", "HTMLElement")]
 public sealed class Element : Component
 {
+    internal const string IdMember = "id";
+
     /// <inheritdoc />
     public override ComponentVendor Vendor => ComponentVendor.Native;
 
@@ -130,13 +132,14 @@ public sealed partial class ElementContent : ReadOnly<string?>
     private void Added(Expression part)
     {
         var writer = Owner.Bound.Writer;
+        var target = Owner.Bound.Target;
         var element = writer.NextBinding("element");
         var text = writer.NextBinding("text");
-        writer.Write(new LetStatement(element.Name, false, LetBinds.Line, Owner.Bound.Target));
+        writer.Write(new LetStatement(element.Name, false, LetBinds.Line, target));
         writer.Write(new LetStatement(text.Name, false, LetBinds.Line, TextForms.Joined([part])));
         var adds = new DoStatement(false, new CallExpression([new MemberStep(_addsBy)], Owner.Bound.Reads(false), element, [Literals.Text(AtTheEnd), text]));
         var textHoldsSomething = new OpExpression(Operator.Neq, [text, Literals.Text(string.Empty)]);
-        writer.Write(new IfStatement(textHoldsSomething, [adds], []));
+        writer.Write(GuardedWrites.Writing(new IfStatement(textHoldsSomething, [adds], []), target));
     }
 }
 
@@ -174,11 +177,12 @@ public sealed class ClassList : JsObject, IDataIterable<string>
     private void Changed(string method, Expression name)
     {
         var writer = Bound.Writer;
+        var target = Bound.Target;
         var className = writer.NextBinding("className");
         writer.Write(new LetStatement(className.Name, false, LetBinds.Line, name));
-        var change = new DoStatement(false, new CallExpression([new MemberStep(method)], Bound.Reads(false), Bound.Target, [className]));
+        var change = new DoStatement(false, new CallExpression([new MemberStep(method)], Bound.Reads(false), target, [className]));
         var nameHoldsAValue = new OpExpression(Operator.Neq, [className, Literals.Text(null)]);
-        writer.Write(new IfStatement(nameHoldsAValue, [change], []));
+        writer.Write(GuardedWrites.Writing(new IfStatement(nameHoldsAValue, [change], []), target));
     }
 }
 

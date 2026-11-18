@@ -3370,13 +3370,13 @@
         "kind": {
           "const": "component"
         },
-        "value": {
+        "id": {
           "$ref": "#/$defs/ValueRead"
         }
       },
       "required": [
         "kind",
-        "value"
+        "id"
       ],
       "additionalProperties": false
     },

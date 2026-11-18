@@ -870,7 +870,7 @@ export interface ElementBusyTarget {
 
 export interface ComponentBusyTarget {
   readonly kind: "component";
-  readonly value: ValueRead;
+  readonly id: ValueRead;
 }
 
 export type RequestContract = "busy" | "notice";

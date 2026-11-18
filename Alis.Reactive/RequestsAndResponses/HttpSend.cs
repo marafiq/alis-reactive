@@ -523,12 +523,12 @@ internal sealed class ElementBusyTarget : BusyTarget
 
 internal sealed class ComponentBusyTarget : BusyTarget
 {
-    internal ComponentBusyTarget(ValueRead value)
+    internal ComponentBusyTarget(ValueRead id)
     {
-        Value = value;
+        Id = id;
     }
 
     public override string Kind => "component";
 
-    public ValueRead Value { get; }
+    public ValueRead Id { get; }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Alis.Reactive.Declarations;
+using Alis.Reactive.Elements;
 using Alis.Reactive.Execution;
 using Alis.Reactive.OwnershipAndState;
 using Alis.Reactive.RequestsAndResponses;
@@ -354,10 +355,11 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
     private static (string? Key, Expression? Target) TargetWrittenBy(Statement statement, HashSet<string> boundOnceTheRequestStarts)
     {
         if (WrittenElement(statement) is { } id) return (id, ElementTarget(id));
-        if (statement is not SetStatement { Content: true } content || Root(content.Target) is not RefExpression holder) return (null, null);
+        if (WrittenObject(statement) is not { } held || HeldComponents.ElementPathOf(held) is not { } elementPath || End(held) is not RefExpression holder) return (null, null);
         var readWhenTheRequestStarts = !boundOnceTheRequestStarts.Contains(holder.Name);
         if (!readWhenTheRequestStarts) return (null, null);
-        return ("$" + JsonSerializer.Serialize(content.Target, PlanJson.Options), new ContractRecord<ComponentBusyTarget>().Set(target => target.Kind, "component").Set(target => target.Value, RequestValues.Held(content.Target)).Written);
+        var elementId = new GetExpression([.. elementPath, new MemberStep(Element.IdMember)], PathMembers.Required, held);
+        return ("$" + JsonSerializer.Serialize(held, PlanJson.Options), new ContractRecord<ComponentBusyTarget>().Set(target => target.Kind, "component").Set(target => target.Id, RequestValues.Held(elementId)).Written);
     }
 
     private static RecordExpression ElementTarget(string id)
@@ -366,7 +368,7 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
     private static string? WrittenElement(Statement statement)
         => SlotPlugin.ElementLoadedBy(statement) ?? (WrittenObject(statement) is ObjExpression written && !written.Id.StartsWith("$", StringComparison.Ordinal) ? written.Id : null);
 
-    private static Expression? WrittenObject(Statement statement) => statement switch
+    private static Expression? WrittenObject(Statement statement) => GuardedWrites.ObjectWrittenBy(statement) is { } guarded ? Root(guarded) : statement switch
     {
         SetStatement set => Root(set.Target),
         DoStatement done => Root(done.Expr),
@@ -375,10 +377,27 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
         _ => null,
     };
 
-    private static Expression Root(Expression expression) => expression switch
+    private static Expression Root(Expression expression)
     {
-        GetExpression read => Root(read.Target),
-        CallExpression call => Root(call.Target),
+        var end = End(expression);
+        return end is RefExpression ? FirstHeld(expression) ?? end : end;
+    }
+
+    private static Expression? FirstHeld(Expression expression)
+    {
+        if (HeldComponents.ElementPathOf(expression) is not null) return expression;
+        return expression switch
+        {
+            GetExpression read => FirstHeld(read.Target),
+            CallExpression call => FirstHeld(call.Target),
+            _ => null,
+        };
+    }
+
+    private static Expression End(Expression expression) => expression switch
+    {
+        GetExpression read => End(read.Target),
+        CallExpression call => End(call.Target),
         _ => expression,
     };
 

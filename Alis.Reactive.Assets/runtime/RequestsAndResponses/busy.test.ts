@@ -151,27 +151,32 @@ describe("when a request holds busy targets, Composition.tla counts every pipeli
     expect([find.mock.calls, busy.hide.mock.calls, [...panel.attributes]]).toStrictEqual([[["removed-panel"]], [["removed-panel"]], []]);
   });
 
-  test("ComponentReadOnce: the activated row's element is captured before loading", () => {
+  test("ComponentReadOnce: the activated row's element is found by the id read before loading", () => {
     const row = target("residents-0-0");
     const busy = indicator();
-    const component = { control: row };
-    const request = send({ kind: "targets", values: [{ kind: "component", value: { kind: "held", value: component } }] });
-    const fromComponent = vi.fn((value: unknown) => value === component ? component.control : null);
-    const captured = captureBusy(request.busy, () => null, fromComponent);
-    component.control = target("residents-1-0");
+    const request = send({ kind: "targets", values: [{ kind: "component", id: { kind: "held", value: "residents-0-0" } }] });
+    const find = vi.fn<ElementFor>().mockReturnValueOnce(row).mockReturnValue(target("residents-0-0"));
+    const captured = captureBusy(request.busy, find);
     const prepared = prepareWith(request, captured, busy);
-    expect([fromComponent.mock.calls.length, busy.show.mock.calls, [...row.attributes], [...component.control.attributes]]).toStrictEqual([1, [["residents-0-0"]], [["aria-busy", "true"]], []]);
+    expect([find.mock.calls, busy.show.mock.calls, [...row.attributes]]).toStrictEqual([[["residents-0-0"]], [["residents-0-0"]], [["aria-busy", "true"]]]);
     prepared.releaseBusy();
-    expect(busy.hide.mock.calls).toStrictEqual([["residents-0-0"]]);
+    expect([busy.hide.mock.calls, [...row.attributes]]).toStrictEqual([[["residents-0-0"]], []]);
   });
 
   test.each<Extract<Send["busy"], { kind: "targets" }>["values"][number]>([
-    { kind: "component", value: { kind: "nothing" } }, { kind: "component", value: { kind: "held", value: null } },
-  ])("MissingComponentStops: a missing component element is refused at Guard", value => {
+    { kind: "component", id: { kind: "nothing" } }, { kind: "component", id: { kind: "held", value: "" } }, { kind: "component", id: { kind: "held", value: null } },
+  ])("MissingComponentStops: a component whose element reads no id is refused at Guard", value => {
     const busy = indicator();
     const request = send({ kind: "targets", values: [value] });
-    const captured = captureBusy(request.busy, () => null, () => null);
-    expect(() => prepareWith(request, captured, busy)).toThrow("The request's busy component holds no element.");
+    const find = vi.fn<ElementFor>();
+    expect(() => prepareWith(request, captureBusy(request.busy, find), busy)).toThrow("The request's busy component's element reads no id.");
+    expect([find.mock.calls, busy.show.mock.calls]).toStrictEqual([[], []]);
+  });
+
+  test("ComponentElementMissingStops: an id no element of the page holds is a missing target", () => {
+    const busy = indicator();
+    const request = send({ kind: "targets", values: [{ kind: "component", id: { kind: "held", value: "residents-9-0" } }] });
+    expect(() => prepareWith(request, captureBusy(request.busy, () => null), busy)).toThrow("The request's busy target 'residents-9-0' is missing.");
     expect(busy.show.mock.calls).toStrictEqual([]);
   });
 

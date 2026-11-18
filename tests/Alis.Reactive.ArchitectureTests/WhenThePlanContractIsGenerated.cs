@@ -259,7 +259,7 @@ public class WhenThePlanContractIsGenerated
             CapturedContainerCapture={"type":"object","properties":{"kind":{"const":"captured"},"id":{"type":"string"},"body":{"$ref":"#/$defs/EvaluatedValue"},"inputs":{"type":"array","items":{"$ref":"#/$defs/SentInput"}}},"required":["kind","id","body","inputs"],"additionalProperties":false}
             CapturedInputCapture={"type":"object","properties":{"kind":{"const":"captured"},"input":{"$ref":"#/$defs/SentInput"}},"required":["kind","input"],"additionalProperties":false}
             CheckedBody={"type":"object","properties":{"format":{"$ref":"#/$defs/BodyFormat"},"value":{"$ref":"#/$defs/EvaluatedValue"}},"required":["format","value"],"additionalProperties":false}
-            ComponentBusyTarget={"type":"object","properties":{"kind":{"const":"component"},"value":{"$ref":"#/$defs/ValueRead"}},"required":["kind","value"],"additionalProperties":false}
+            ComponentBusyTarget={"type":"object","properties":{"kind":{"const":"component"},"id":{"$ref":"#/$defs/ValueRead"}},"required":["kind","id"],"additionalProperties":false}
             ContainerCapture={"oneOf":[{"$ref":"#/$defs/NoneContainerCapture"},{"$ref":"#/$defs/MissingContainerCapture"},{"$ref":"#/$defs/CapturedContainerCapture"}]}
             DateScalarWireForm={"type":"object","properties":{"kind":{"const":"date"}},"required":["kind"],"additionalProperties":false}
             ElementBusyTarget={"type":"object","properties":{"kind":{"const":"element"},"id":{"type":"string"}},"required":["kind","id"],"additionalProperties":false}

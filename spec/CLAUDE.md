@@ -1886,6 +1886,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   removal (:1130, :2249), actionComplete only once every file's upload completes (:2306-2313), and selected,
   removing and clearing before the list changes (D701); a listener EJ2's public addEventListener holds is notified
   by trigger alone.
+- The owner, 2026-11-17, answering the lead's ask 4 (X17.38), verbatim: "4- yes approved". Read by the lead: a class,
+  Append or Hidden write on a row action's control marks that control as an element, so the write works and only that
+  row's control shows busy while its request runs (D17.15, D10.21); a grammar change, the owner's; built after U26's
+  landings, with X17.38's test red first and failing on its planted defect.
 - The owner, 2026-11-17, answering the lead's ask B (an input bound to a whole object, a list of objects or a
   dictionary), verbatim: "B - approved but note down improvement to be made." Read by the lead: such an input is
   refused where its field renders, naming the doors that carry it (an input per member, `Html.PartialFor(m => m.Member)`,

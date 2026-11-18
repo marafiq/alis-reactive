@@ -8,6 +8,7 @@ public static partial class CarePages
     public const string ResidentKeysOfLetters = Residents + "keys/letters";
     public const string DischargeList = Residents + "discharge-list";
     public const string BusyDischarges = Residents + "busy-discharges";
+    public const string DischargeSteps = Residents + "discharge-steps";
     public const string ResidentLinksBehindAClickGuard = Residents + "links/click-guard";
     public const string ResidentLinksWithNoClickGuard = Residents + "links/no-click-guard";
 }

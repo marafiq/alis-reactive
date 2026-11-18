@@ -2351,10 +2351,15 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
     2026-11-08: the loader shows on the right target, parallel requests of 5 and 1 seconds updating one target or two).
     A request holds the indicator on its targets, which the C# derives where the view renders and the plan carries, so
     the browser infers nothing: each element and component its success route writes outside any condition (a text, an
-    HTML, a class, a component's member or method, a component a payload holds among them, such as a row action's
-    control, read when the request starts), the element its `Into(elementId)` loads and the element of the
-    container its `Form` or `Inputs` sends.
-    A payload object that is no element holds no target, since busy is aria-busy on an element (X17.38, X11.8).
+    HTML, a class, an appended text, whether it is hidden, a component's member or method, a component a payload
+    holds among them, such as a row action's control), the element its `Into(elementId)` loads and the element of
+    the container its `Form` or `Inputs` sends. The test a class or an appended text is written under, the door's
+    own, is no condition of the route.
+    A component a payload holds is held by the id of its element, which the plan reads when the request starts
+    through the element path its vendor names, the component itself under `ComponentVendor.Native`, and the browser
+    takes that element by the id alone; an element whose id is empty stops the request before it sends (X17.38).
+    A payload object that is no component, and a component whose vendor names no element path, hold no target,
+    since busy is aria-busy on an element (X17.38, X11.8).
     An `Input`, a notice, a plugin, a dispatch and a step inside a branch add
     none, and a request whose route
     writes nothing so holds the page's own target, an indicator with no element. On the full form `Busy(elementId, ..)`

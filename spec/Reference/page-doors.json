@@ -1896,6 +1896,27 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M25.F3 X17.38 1": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/DischargeSteps.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M25.F3 X17.38 2": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/DischargeSteps.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M25.F3 X17.38 3": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/DischargeSteps.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M25.F4 M25.X12 0": {
     "modules": [],
     "views": [

@@ -25,7 +25,9 @@ public abstract class JsObject
 {
     internal Binding Bound { get; private set; } = NotReached.Instance;
 
-    internal void Reach(Binding bound) => Bound = bound;
+    internal void Reach(Binding bound) => Bound = Kept(bound);
+
+    internal virtual Binding Kept(Binding bound) => bound;
 
     internal virtual Schema.Expression WriteTarget => Bound.WriteTarget;
 

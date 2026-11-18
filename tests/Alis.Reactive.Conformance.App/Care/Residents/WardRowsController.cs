@@ -16,6 +16,9 @@ public sealed class WardRowsController : Controller
     [HttpGet(CarePages.BusyDischarges)]
     public IActionResult BusyDischarges() => View("/Care/Residents/BusyDischarges.cshtml", new BusyDischarges(TheResidents()));
 
+    [HttpGet(CarePages.DischargeSteps)]
+    public IActionResult DischargeSteps() => View("/Care/Residents/DischargeSteps.cshtml", new DischargeSteps(TheResidents()));
+
     [HttpPost(CareEndpoints.ResidentDischarge)]
     public async Task<IActionResult> Discharge(int residentId)
     {
@@ -69,6 +72,8 @@ public static class WardRowsEndpoints
 public sealed record ResidentDischarges(IReadOnlyList<ResidentRow> Residents);
 
 public sealed record BusyDischarges(IReadOnlyList<ResidentRow> Residents);
+
+public sealed record DischargeSteps(IReadOnlyList<ResidentRow> Residents);
 
 public sealed class DischargeRequest
 {

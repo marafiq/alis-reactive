@@ -85,6 +85,7 @@ public sealed class WhenARequestShowsTheBusyIndicator
             pipeline.Component<BedBoard>("board").Note.Set("Full");
             pipeline.Element("beds").Html.Set("<b>Full</b>");
             pipeline.Element("log").Text.Append("Booked");
+            pipeline.Element("ward").Classes.Add("full");
             pipeline.When(reply.Status.Eq(204)).Then(pipeline => pipeline.Element("quiet").Text.Set("Quiet"));
             pipeline.Notice().Success("Saved");
         }));
@@ -92,7 +93,8 @@ public sealed class WhenARequestShowsTheBusyIndicator
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"targets"}},{"name":"values","value":{"kind":"list","items":[""" +
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"element"}},{"name":"id","value":{"kind":"lit","value":"beds"}}]},""" +
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"element"}},{"name":"id","value":{"kind":"lit","value":"board"}}]},""" +
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"element"}},{"name":"id","value":{"kind":"lit","value":"log"}}]}]}}]}"""));
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"element"}},{"name":"id","value":{"kind":"lit","value":"log"}}]},""" +
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"element"}},{"name":"id","value":{"kind":"lit","value":"ward"}}]}]}}]}"""));
         Assert.That(RequestPage.Send(plan, "contracts").GetRawText(), Is.EqualTo(BusyContract));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }

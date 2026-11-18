@@ -387,8 +387,9 @@ no argument type of its own (D9.1).
     POST, PUT or DELETE to the page's origin (D9.22);
   - `retry`: none, or the standard policy with the attempts and first wait the defaults set, never a request's own
     (D10.14, N10.3);
-  - `busy`: none, the page, or its targets as the C# derived them, each an element id or an expression that reads a
-    component a payload holds, such as a row action's control, resolved when the request starts (D10.21, D17.15);
+  - `busy`: none, the page, or its targets as the C# derived them, each an element id or a read of the id of the
+    element of a component a payload holds, such as a row action's control, read when the request starts, whose
+    element the browser takes by that id alone (D10.21, D17.15);
   - `respondedJson`: true on net48 (D10.7);
   - `contracts`: the contracts its defaults name, `busy` under `ShowBusy()` and `notice` for a default route's notice,
     which its `guard` state looks up before the send (D10.21, D10.23).
@@ -469,7 +470,7 @@ each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `H
   `antiforgery` (`none`, or `token` with its `value` and `place`, `header` or `field`,
   each with its `name`), `retry` (`none`, or `standard` with its `attempts` and `firstWaitMilliseconds`), `busy`
   (`none`, `page`, or `targets` with its `values`, each `missing` or `element` with its `id`, or `component` with its
-  `value`), `respondedJson` and `contracts` (a list of `RequestContract`, `busy` or `notice`).
+  `id`, a `ValueRead` of its element's id), `respondedJson` and `contracts` (a list of `RequestContract`, `busy` or `notice`).
 - `SentField`: `name`, its `path`, `value`, `form` (a wire form), `whenNothing` (`leave` or `empty`) and `when`.
   A `value` is a `ValueRead`, `nothing` or `held` with its `value`, so a value that reads nothing is apart from a
   held null; an evaluated value is a leaf the contract writes as `unknown`, since it holds the user's data, a

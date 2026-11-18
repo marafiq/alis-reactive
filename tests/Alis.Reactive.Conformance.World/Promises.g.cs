@@ -919,6 +919,12 @@ public static class Promises
         public const string X17_37_0 = "M25.F3 X17.37 0";
         [Holds(LanesGate.Respond)]
         public const string X17_38_0 = "M25.F3 X17.38 0";
+        [Holds(LanesGate.Respond)]
+        public const string X17_38_1 = "M25.F3 X17.38 1";
+        [Holds(LanesGate.Respond)]
+        public const string X17_38_2 = "M25.F3 X17.38 2";
+        [Holds(LanesGate.Respond)]
+        public const string X17_38_3 = "M25.F3 X17.38 3";
         public const string M25_X4_0 = "M25.F3 M25.X4 0";
     }
 

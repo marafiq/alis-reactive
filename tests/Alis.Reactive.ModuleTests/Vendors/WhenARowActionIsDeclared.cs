@@ -35,6 +35,14 @@ public sealed class WhenARowActionIsDeclared
 
     private static readonly ResidentRow Bea = new(2, "Bea", "South", new ResidentRoom("14", 2));
 
+    private static readonly TestCaseData[] EveryWriteOnTheControl =
+    [
+        new TestCaseData((Action<WardRowChosen<ResidentRow>>)(chosen => chosen.Element.Text.Set("Discharged"))).SetArgDisplayNames("its text set"),
+        new TestCaseData((Action<WardRowChosen<ResidentRow>>)(chosen => chosen.Element.Classes.Add("discharged"))).SetArgDisplayNames("a class added"),
+        new TestCaseData((Action<WardRowChosen<ResidentRow>>)(chosen => chosen.Element.Text.Append(" discharged"))).SetArgDisplayNames("a text appended"),
+        new TestCaseData((Action<WardRowChosen<ResidentRow>>)(chosen => chosen.Element.Hide())).SetArgDisplayNames("hidden"),
+    ];
+
     private static string Listen(string policy, int listen)
         => "{\"kind\":\"listen\",\"event\":\"chosen\",\"listen\":{\"kind\":\"method\",\"subscribe\":\"addEventListener\",\"unsubscribe\":\"removeEventListener\"},\"release\":{\"kind\":\"living\"},\"payload\":[0],\"members\":\"required\",\"policy\":\"" +
             policy + "\",\"payloadName\":\"listenPayload" + listen + "\",\"argumentsName\":\"listenArguments" + listen + "\",\"object\":{\"kind\":\"ref\",\"name\":\"result" + listen + "\"},\"do\":[";
@@ -118,22 +126,22 @@ public sealed class WhenARowActionIsDeclared
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 
-    [Test]
-    public void the_control_a_rows_activation_holds_its_success_route_writes_holds_it_read_from_the_payload_when_the_request_starts()
+    [TestCaseSource(nameof(EveryWriteOnTheControl))]
+    public void the_control_a_rows_activation_holds_its_success_route_writes_holds_it_by_its_id_read_from_the_payload_when_the_request_starts(Action<WardRowChosen<ResidentRow>> write)
     {
         var html = Views.Of(new Ward("North"), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery().ShowBusy()));
         var plan = html.ReactivePlan<Ward>();
         plan.Rows<ResidentRow>("residents").WardButton(HandlerPolicy.Overlap, (chosen, pipeline) => pipeline.Post("/residents/discharge")
             .OnSuccess(Content.None, (reply, pipeline) =>
             {
-                chosen.Element.Text.Set("Discharged");
+                write(chosen);
                 pipeline.Element("status").Text.Set("Discharged");
             })).Render(new ResidentRow(1, "Ada", "North", new ResidentRoom("12", 1)), "Discharge");
         var json = BellPlans.JsonOf(html.RenderPlan(plan));
         Assert.That(Busy(json), Is.EqualTo(
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"targets"}},{"name":"values","value":{"kind":"list","items":[""" +
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"component"}},{"name":"value","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},""" +
-            """{"name":"value","value":{"kind":"get","path":["element"],"members":"required","target":{"kind":"ref","name":"listenPayload1"}}}]}}]},""" +
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"component"}},{"name":"id","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},""" +
+            """{"name":"value","value":{"kind":"get","path":["id"],"members":"required","target":{"kind":"get","path":["element"],"members":"required","target":{"kind":"ref","name":"listenPayload1"}}}}]}}]},""" +
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"element"}},{"name":"id","value":{"kind":"lit","value":"status"}}]}]}}]}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }

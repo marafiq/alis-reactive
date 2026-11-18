@@ -856,6 +856,33 @@
           "observes": "Lanes.tla:Respond"
         },
         {
+          "for": "X17.38",
+          "page": "A discharge steps page rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\") in an app that takes ShowBusy(), each row with three controls from three NativeActionButtons whose blocks post the row's id: on success Ready adds the class ready to its control, Notify appends the text \" sent\" to its control and Discharge hides its control. The harness gates Bea's POST (Lanes.tla's Respond).",
+          "gesture": "Click Bea's Ready; once the harness reports Bea's POST held, check the controls, then release it.",
+          "outcome": "While it is held Bea's Ready holds aria-busy and Bea's Notify and Discharge, Ada's Ready and Cy's Ready hold none; after the release no control holds it and Bea's Ready holds the class ready.",
+          "opposite": "Click Ada's Ready instead: while the harness holds its POST only Ada's Ready holds aria-busy, and after the release it holds the class ready.",
+          "defect": "A class written on the control holds no busy target, since the class door writes its call under a test of its own, so the request holds the page and no control shows busy (D10.21).",
+          "observes": "Lanes.tla:Respond"
+        },
+        {
+          "for": "X17.38",
+          "page": "A discharge steps page rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\") in an app that takes ShowBusy(), each row with three controls from three NativeActionButtons whose blocks post the row's id: on success Ready adds the class ready to its control, Notify appends the text \" sent\" to its control and Discharge hides its control. The harness gates Bea's POST (Lanes.tla's Respond).",
+          "gesture": "Click Bea's Notify; once the harness reports Bea's POST held, check the controls, then release it.",
+          "outcome": "While it is held Bea's Notify holds aria-busy and Bea's Ready and Discharge, Ada's Notify and Cy's Notify hold none; after the release no control holds it and Bea's Notify reads Notify sent.",
+          "opposite": "Click Ada's Notify instead: while the harness holds its POST only Ada's Notify holds aria-busy, and after the release it reads Notify sent.",
+          "defect": "A text appended to the control holds no busy target, since the append door writes its call under a test of its own, so the request holds the page and no control shows busy (D10.21).",
+          "observes": "Lanes.tla:Respond"
+        },
+        {
+          "for": "X17.38",
+          "page": "A discharge steps page rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\") in an app that takes ShowBusy(), each row with three controls from three NativeActionButtons whose blocks post the row's id: on success Ready adds the class ready to its control, Notify appends the text \" sent\" to its control and Discharge hides its control. The harness gates Bea's POST (Lanes.tla's Respond).",
+          "gesture": "Click Bea's Discharge; once the harness reports Bea's POST held, check the controls, then release it.",
+          "outcome": "While it is held Bea's Discharge holds aria-busy and Bea's Ready and Notify, Ada's Discharge and Cy's Discharge hold none; after the release no control holds it, Bea's Discharge is hidden and Ada's shows.",
+          "opposite": "Click Ada's Discharge instead: while the harness holds its POST only Ada's Discharge holds aria-busy, and after the release it is hidden and Bea's shows.",
+          "defect": "Hiding the control holds no busy target, since a write of a member that is no content held no component a payload holds, so the request holds the page and no control shows busy (D10.21).",
+          "observes": "Lanes.tla:Respond"
+        },
+        {
           "for": "M25.X4",
           "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\"), each with a NativeActionLink whose block GETs /Residents/{residentId} into resident-detail, on a test page whose own script prevents the default of every click on the document in the capture phase.",
           "gesture": "Click Ada's link.",
