@@ -1,14 +1,15 @@
 # Handoff
 
-Written at `date`: Tue Nov 17 23:41:41 EST 2026
+Written at `date`: Tue Nov 17 23:59:49 EST 2026
 
 ## Where it stands
-- Branch: detached HEAD
-- HEAD: 8391f0be5 spec: STATE at a3c26b5cd
-- Full check: No .work/logs/spec-check-*.log exists.
-- .work/last-run.txt: missing
+- Branch: feature/rewrite
+- HEAD: 0ecebf67d process: the work loop, the open list and the handoff live in the repository
+- Full check: .work/logs/spec-check-0ecebf67d.log: spec check at 0ecebf67d: 40 of 40 checks pass
+- .work/last-run.txt: 20261117-234911-49575 0ecebf67d
 
 ## Landed since the commit before the last spec: STATE commit
+0ecebf67d process: the work loop, the open list and the handoff live in the repository
 8391f0be5 spec: STATE at a3c26b5cd
 
 ## Open
@@ -99,6 +100,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:2
 - ../../.claude/worktrees/wf_bef18f5c-129-1: base b5fb0a6bca2fd7965b1124f17016e05cf9644fae, 2 paths changed
 - ../../.claude/worktrees/wf_bef18f5c-129-2: base e830401824f19e8ce49101f9dee34686835733b5, 2 paths changed
 - ../../.claude/worktrees/wf_bef18f5c-129-3: base 7cf5a9c78e895ec6d142c6fca50cd2aa7a1a9bd0, 2 paths changed
+- ../codex-p: base 8391f0be5043b4d809bfa3a0fdb486b761a91b0e, 18 paths changed
 - ../integrate-slices: base 4fcf042cbc5aac8dee796182f54d886123451c9b, 2 paths changed
 - ../opus-b: base 649c6bd8f5406a46c88fff7827566abf9de21132, 19 paths changed
 - ../opus-fields: base 44cf5f3b215a2817f3752ca7ad6ea91c66593fc3, 86 paths changed
@@ -122,16 +124,17 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:2
 - ../opus-u26h/.worktrees/check-plants-761ejgt6/tree1: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
 - ../opus-u26h/.worktrees/check-plants-761ejgt6/tree2: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
 - ../opus-u26h/.worktrees/check-plants-761ejgt6/tree3: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
-- ../opus-u3: base 8391f0be5043b4d809bfa3a0fdb486b761a91b0e, 2 paths changed
+- ../opus-u3: base 8391f0be5043b4d809bfa3a0fdb486b761a91b0e, 56 paths changed
 - ../opus-u4: base 3eb49e2dcbc3d396a3bfa9271b2deb390970c1d1, 17 paths changed
 - ../opus-upload: base 7c1e23c8b9933cdd590c8524cb817554fd807646, 18 paths changed
 - ../opus-upload2: base 0bffecf95f4435078a90ad13682ac2c1f114c140, 37 paths changed
 - ../opus-x1738: base 44cf5f3b215a2817f3752ca7ad6ea91c66593fc3, 21 paths changed
 - ../rewrite-next: base e4fa6904120dbfffc5050a63801055494e99672a, 1 paths changed
-- ../rewrite/.worktrees/check-plants-e7stabxu/tree0: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
-- ../rewrite/.worktrees/check-plants-e7stabxu/tree1: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
-- ../rewrite/.worktrees/check-plants-e7stabxu/tree2: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
-- ../rewrite/.worktrees/check-plants-e7stabxu/tree3: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
+- .worktrees/check-plants-e7stabxu/tree0: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
+- .worktrees/check-plants-e7stabxu/tree1: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
+- .worktrees/check-plants-e7stabxu/tree2: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
+- .worktrees/check-plants-e7stabxu/tree3: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
+- ../unit-m: base 0ecebf67d351e77dd38a5a9377e36e1447f478a1, 9 paths changed
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1848: - The owner, 2026-11-17, answering the lead's ask to mark a refused check's stop in the plan, verbatim: "yes
