@@ -318,6 +318,10 @@ public static class Promises
         public const string M9_X3_0 = "M9.F2 M9.X3 0";
         public const string M9_X4_0 = "M9.F2 M9.X4 0";
         public const string M9_X5_0 = "M9.F2 M9.X5 0";
+        public const string M9_X6_0 = "M9.F2 M9.X6 0";
+        public const string M9_X7_0 = "M9.F2 M9.X7 0";
+        public const string M9_X8_0 = "M9.F2 M9.X8 0";
+        public const string M9_X9_0 = "M9.F2 M9.X9 0";
     }
 
     public static class M10_F1

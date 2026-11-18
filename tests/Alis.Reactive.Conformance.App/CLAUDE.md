@@ -4,6 +4,21 @@ The care home conformance app: every browser test runs on one of its screens (`s
 built on the shipped projects as an app builds on the packages, and `.claude/rules/views.md` holds the standard of
 its views.
 
+- The app proves the framework as an app uses it: the doors together on one screen, and never one door alone on a
+  page of its own as the whole proof (the owner, 2026-11-18: "Can you write one complex test page with combinations?
+  That is what Conformers app was supposed to", after 798 views proved each door apart; 2026-11-07: "an http request
+  goes out and return complex object which involve complex operations with conditions"). A care screen is a combined
+  screen. It holds, together, what the owner listed: a chained and a parallel request; GET, POST, PUT and DELETE; a
+  header, a query and a hidden field; a value from another component, one another plan rendered among them; if, else
+  if and else, nested, joined by and, or and not; a reply's body and an error's body read members deep, a condition
+  on each, and a request that condition issues; conditional, server-only, nested, per-item and two-member rules; a
+  partial that joins the screen's validation, one loaded under a condition, one unloaded, one that holds its own
+  validation; a cascade, where one input's change loads another's choices; and the conformance component's members,
+  sync and async, as the values. `Care/Admission/ArrivalDesk.cshtml` is the first such screen. A behavior joins a
+  combined screen before it gets a page of its own; `Bench/` keeps the reference cells, one member a page.
+- A screen's inputs sit in a request container, `Html.BeginRequestContainer`, since containers nest and a form cannot
+  hold a form (the owner, 2026-11-08: "forms are not always possible -- could be a container"); `Html.BeginRequestForm`
+  is for a page that sends its body as the browser's own form does and nests nothing.
 - A screen reads as a product's: it holds what its user does, a model of its own that no other screen shares, and
   nothing that exists only to be asserted.
 - `SliceTree.txt` orders its slices, so no screen reaches into another's model, and the framework's analyzers read
@@ -118,9 +133,9 @@ its views.
   controller (`Refusals/ArrayLambdas/ArrayLambdaEndpoints.cs`); one a test names is a constant of `RefusalEndpoints`
   in the world contract.
 - `Care/` holds the care screens, a folder for each screen of `spec/Reference/app.json` (`Care/Residents/` the
-  first): a promise placed on a screen is a page of its own there, as a refusal's is, with its controller, its
-  models and its view, named for what a person does on it (`Care/Residents/CensusController.cs`,
-  `Care/Residents/Census.cshtml`). Where the promise changes what the page or its server holds, the opposite
+  first): a promise placed on a screen is proven on that screen's combined page, the first line of this file, and
+  the pages that hold one promise each stay beside it, each with its controller, its models and its view, named for
+  what a person does on it (`Care/Residents/CensusController.cs`, `Care/Residents/Census.cshtml`). Where the promise changes what the page or its server holds, the opposite
   case is a second address of the same view; a seed is for what a test changes while its page is open. A list a
   page reads is a response body of the page's own endpoint, named beside its controller
   (`Care/Residents/ResidentsEndpoints.cs`) unless a test names it. A Fusion screen's page takes

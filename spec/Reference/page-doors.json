@@ -3584,6 +3584,50 @@
       "/Care/Record/_ScriptedLayout.cshtml"
     ]
   },
+  "M9.F2 M9.X6 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/ArrivalDesk.cshtml",
+      "/Care/Admission/ArrivalDeskBedCard.cshtml",
+      "/Care/Admission/ArrivalDeskFunding.cshtml",
+      "/Care/Admission/ArrivalDeskKin.cshtml",
+      "/Care/Admission/ArrivalDeskRooms.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M9.F2 M9.X7 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/ArrivalDesk.cshtml",
+      "/Care/Admission/ArrivalDeskBedCard.cshtml",
+      "/Care/Admission/ArrivalDeskFunding.cshtml",
+      "/Care/Admission/ArrivalDeskKin.cshtml",
+      "/Care/Admission/ArrivalDeskRooms.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M9.F2 M9.X8 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/ArrivalDesk.cshtml",
+      "/Care/Admission/ArrivalDeskBedCard.cshtml",
+      "/Care/Admission/ArrivalDeskFunding.cshtml",
+      "/Care/Admission/ArrivalDeskKin.cshtml",
+      "/Care/Admission/ArrivalDeskRooms.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M9.F2 M9.X9 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/ArrivalDesk.cshtml",
+      "/Care/Admission/ArrivalDeskBedCard.cshtml",
+      "/Care/Admission/ArrivalDeskFunding.cshtml",
+      "/Care/Admission/ArrivalDeskKin.cshtml",
+      "/Care/Admission/ArrivalDeskRooms.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M9.F2 X12.1 0": {
     "modules": [],
     "views": [

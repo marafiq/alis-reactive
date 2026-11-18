@@ -484,6 +484,26 @@
           "id": "M9.X5",
           "rung": "behavior",
           "defect": "A load or an unload of a slot whose element the page lacks, since it left with the slot around it, goes on as if it ran, or stops more than its own pipeline: it stops its own pipeline, as a missing element stops an element step's, and every other handler runs on (D10.21, D4.8)."
+        },
+        {
+          "id": "M9.X6",
+          "rung": "behavior",
+          "defect": "An input a slot's content renders inside a request container is left out of the container: its rule is not checked with the container's, or its value is not sent with it. The 798 views of af5ad37a9 prove a slot's input and a cascade apart, on pages of their own, and none together (the owner, 2026-11-18: \"Go build an app which involves partial views, conditional partial loading, independent partial loading. That is the main framework feature\"). On the arrival desk the room a ward's partial renders is checked and sent as the page's own inputs are."
+        },
+        {
+          "id": "M9.X7",
+          "rung": "behavior",
+          "defect": "A partial a pipeline loads only when its condition holds stays outside the check of the container it is loaded into, so a rule that reads its input passes with the input empty. On the arrival desk the funding partial is loaded when Publicly funded is ticked, and the rule on its number, itself under the condition that the box is ticked, is held with the container's."
+        },
+        {
+          "id": "M9.X8",
+          "rung": "behavior",
+          "defect": "A partial a condition unloads leaves its input, or the rule on it, behind: the box stays on the page, or the container still asks for what no box holds. On the arrival desk, when Publicly funded is ticked off, the funding partial leaves arrival-funding and the arrival is recorded."
+        },
+        {
+          "id": "M9.X9",
+          "rung": "behavior",
+          "defect": "A partial that holds a container, a request and a validator of its own is checked by the page's rules, or the page by its: a save of one is refused for what the other lacks. On the arrival desk the next of kin partial's save is checked by its own two rules alone, and the arrival's rules by the arrival's request alone."
         }
       ],
       "promises": [
@@ -592,6 +612,38 @@
           "defect": "The load of a slot no longer on the page goes on, so pin-after reads 2; or its stop ends more than its own pipeline, and the bell's handler leaves page-heard empty.",
           "existing_test": "redesign WhenASlotLoadsAnAnswer.loading_into_a_slot_no_longer_on_the_page_fails_only_its_own_pipeline",
           "observes": "Ownership.tla:LoadB"
+        },
+        {
+          "for": "M9.X6",
+          "page": "An arrival desk whose inputs sit in the request container arrival: the resident's name; a Ward drop-down whose change gets that ward's rooms into arrival-room, a partial that renders the Room drop-down for the page's own model; a Publicly funded checkbox whose change, when it is ticked, gets the funding partial into arrival-funding, which renders the Funding number box, and unloads it when it is not; a hidden Desk. Record the arrival posts the container's inputs, with the ward in a header and the desk's Rehearsal only box in the query; its rules name the resident, the ward and the room, and the funding number when Publicly funded is ticked. Add next of kin gets a partial of its own model into arrival-kin, whose container holds the kin's name and phone and whose Save next of kin posts them under its own validator.",
+          "gesture": "Type Bea Hart as Name, choose East as Ward, then Room 15 as Room, and click Record the arrival.",
+          "outcome": "Room given reads 15.",
+          "opposite": "With East chosen and no room, Record the arrival shows Choose a room. in the Room group and Room given stays none yet.",
+          "defect": "The partial's input is no part of the container, so the arrival is refused with Choose a room. though Room 15 is chosen, or it is sent with no room."
+        },
+        {
+          "for": "M9.X7",
+          "page": "An arrival desk whose inputs sit in the request container arrival: the resident's name; a Ward drop-down whose change gets that ward's rooms into arrival-room, a partial that renders the Room drop-down for the page's own model; a Publicly funded checkbox whose change, when it is ticked, gets the funding partial into arrival-funding, which renders the Funding number box, and unloads it when it is not; a hidden Desk. Record the arrival posts the container's inputs, with the ward in a header and the desk's Rehearsal only box in the query; its rules name the resident, the ward and the room, and the funding number when Publicly funded is ticked. Add next of kin gets a partial of its own model into arrival-kin, whose container holds the kin's name and phone and whose Save next of kin posts them under its own validator.",
+          "gesture": "Type Cy Wood as Name, choose North and Room 11, tick Publicly funded and click Record the arrival.",
+          "outcome": "Give the funding number. shows in the Funding group and Room given stays none yet.",
+          "opposite": "With F-204 typed as Funding number, Room given reads 11.",
+          "defect": "The partial loaded under the condition is no part of the check, so the arrival is recorded with no funding number and Room given reads 11."
+        },
+        {
+          "for": "M9.X8",
+          "page": "An arrival desk whose inputs sit in the request container arrival: the resident's name; a Ward drop-down whose change gets that ward's rooms into arrival-room, a partial that renders the Room drop-down for the page's own model; a Publicly funded checkbox whose change, when it is ticked, gets the funding partial into arrival-funding, which renders the Funding number box, and unloads it when it is not; a hidden Desk. Record the arrival posts the container's inputs, with the ward in a header and the desk's Rehearsal only box in the query; its rules name the resident, the ward and the room, and the funding number when Publicly funded is ticked. Add next of kin gets a partial of its own model into arrival-kin, whose container holds the kin's name and phone and whose Save next of kin posts them under its own validator.",
+          "gesture": "Type Cy Wood as Name, choose North and Room 11, tick Publicly funded, then tick it off and click Record the arrival.",
+          "outcome": "The Funding number box is gone and Room given reads 11.",
+          "opposite": "With Publicly funded left ticked the Funding number box shows, and Record the arrival leaves Room given at none yet.",
+          "defect": "The unload leaves the partial, so the Funding number box still shows after the box is ticked off."
+        },
+        {
+          "for": "M9.X9",
+          "page": "An arrival desk whose inputs sit in the request container arrival: the resident's name; a Ward drop-down whose change gets that ward's rooms into arrival-room, a partial that renders the Room drop-down for the page's own model; a Publicly funded checkbox whose change, when it is ticked, gets the funding partial into arrival-funding, which renders the Funding number box, and unloads it when it is not; a hidden Desk. Record the arrival posts the container's inputs, with the ward in a header and the desk's Rehearsal only box in the query; its rules name the resident, the ward and the room, and the funding number when Publicly funded is ticked. Add next of kin gets a partial of its own model into arrival-kin, whose container holds the kin's name and phone and whose Save next of kin posts them under its own validator.",
+          "gesture": "Click Add next of kin, type Jo Hart as Kin's name and 555-0101 as Kin's phone, and click Save next of kin, the arrival's own boxes left empty.",
+          "outcome": "Saved reads Next of kin: Jo Hart.",
+          "opposite": "With the kin's boxes left empty, Save next of kin shows Name the next of kin. and Give a phone number. in their groups, and Saved stays nobody.",
+          "defect": "The partial's save is held to the page's rules, so Name the resident. blocks it and Saved stays nobody; or its own rules are skipped and an empty kin is saved."
         }
       ],
       "verdicts": []

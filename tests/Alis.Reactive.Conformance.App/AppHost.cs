@@ -203,6 +203,8 @@ internal static class AppHost
             .Add<Bench.EntriesRules>()
             .Add<Bench.FirstRules>()
             .Add<Care.ArrivalIntakeRules>()
+            .Add<Care.ArrivalDeskRules>()
+            .Add<Care.ArrivalKinRules>()
             .Add<Care.IntakeValidator>()
             .Add<Care.FamilyValidator>()
             .Add<Care.BedAssignmentRules>()

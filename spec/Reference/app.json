@@ -5273,6 +5273,78 @@
       ]
     },
     {
+      "feature": "M9.F2",
+      "for": "M9.X6",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "sectionSlot",
+        "intakeValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X7",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "sectionSlot",
+        "intakeValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X8",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "sectionSlot",
+        "intakeValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X9",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "kinForm",
+        "nextOfKin",
+        "inputs",
+        "sectionSlot"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M15.F1",
       "for": "X1.4",
       "index": 0,

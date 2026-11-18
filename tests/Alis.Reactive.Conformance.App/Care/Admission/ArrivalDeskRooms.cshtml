@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ArrivalDesk
+@{
+    var plan = Html.ReactivePlan<ArrivalDesk>();
+}
+@(Html.InputField(plan, m => m.Room, options => options.Label("Room")).NativeDropDown(build => build.Placeholder("Choose a room").Items(ArrivalDeskLists.RoomsOf(Model.Ward))))
+@Html.RenderPlan(plan)
