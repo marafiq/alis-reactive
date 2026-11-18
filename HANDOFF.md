@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Wed Nov 18 05:01:29 EST 2026
+Written at `date`: Wed Nov 18 05:43:16 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -9,36 +9,33 @@ note: open 2026-11-18 | direction | the queue of this file | queue | "Think of r
   exit line: "landed"
   goes to: note: closed
 note: open 2026-11-18 | direction | the queue of this file | queue | "I want you to build a skill out of that TLA plus 
-note: closed 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "This should not be i: its follow-up MoveInSpec landed
-  leaves by: the entry leaves the notes block of `HANDOFF.md`
-  goes to: gone
-note: closed 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "The framework is not: its follow-up MoveInSpec landed
-note: closed 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "Yeah, I'm fine with : its follow-up MoveInSpec landed
+note: open 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "This should not be i
+note: open 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "The framework is not
+note: open 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "Yeah, I'm fine with 
 note: open 2026-11-18 | quality rule | spec/Reference/native.json and tests/Alis.Reactive.Conformance.App/CLAUDE.md | C
-note: closed 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSpec | "Build an app which: its follow-up MoveInSpec landed
+note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSpec | "Build an app which
 note: open 2026-11-17 | decision | spec/CLAUDE.md, the Conditions module's decisions, with a table "After 1.0" in spec/
 note: open 2026-11-17 | process rule | .claude/rules/process.md | queue | "your whole goal is to get the tooling, the p
 note: open 2026-11-18 | decision | spec/CLAUDE.md | DecisionsByModule | "where you're gonna keep the decisions. So it c
 note: open 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses 
 note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSlice1 | "For the app, you
 note: open 2026-11-18 | direction | the queue of this file | queue | "I don't need acceptance numbers, sir. I need that
-unit: landed ../ci2 CiGreen2
-  next: git worktree remove ../ci2
+unit: landed ../ci3 CiGreen3
+  next: git worktree remove ../ci3
   leaves by: `git worktree remove {worktree}`
   goes to: gone
-unit: landed ../ci2 MoveInSpec
-  next: git worktree remove ../ci2
-unit: briefed ../movein-care MoveInCare: it lacks paths.txt or message.txt
-  leaves by: its builder starts: the lead, or the agent handed the brief
-  read first: the brief; each file its "Rules" names; the kinds of `spec/MISTAKES.md`
-  goes to: unit: building
-unit: briefed ../movein-contacts MoveInContacts: it lacks paths.txt or message.txt
-lane: pushed at cff7dd154 on feature/rewrite: equal to the remote
+unit: building ../movein-care MoveInCare: it lacks paths.txt or message.txt
+  leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
+  read first: the rule file of each kind of file, as it is opened
+  exit line: each line of the brief's "Done"
+  goes to: unit: ready, or unit: returned for an agent
+unit: building ../movein-contacts MoveInContacts: it lacks paths.txt or message.txt
+lane: pushed at 7b552b3fb on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at cff7dd154
+ci: unread at 7b552b3fb
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -47,19 +44,19 @@ file: over CLAUDE.md: holds 326 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 223 lines, its limit 150
+file: over HANDOFF.md: holds 220 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: cff7dd154 ci and spec: CI's three causes read from the jobs' logs at 5ed0e0a5e, and the move-in app's complete spec
-- Full check: .work/logs/spec-check-cff7dd154.log: spec check at cff7dd154: 40 of 40 checks pass
-- .work/last-run.txt: 20261118-045057-9263 cff7dd154
+- HEAD: 7b552b3fb ci: the Windows job installs Chromium at the pin before its browser tests
+- Full check: .work/logs/spec-check-7b552b3fb.log: spec check at 7b552b3fb: 40 of 40 checks pass
+- .work/last-run.txt: 20261118-053247-59614 7b552b3fb
 
 ## Landed since the commit before the last spec: STATE commit
-cff7dd154 ci and spec: CI's three causes read from the jobs' logs at 5ed0e0a5e, and the move-in app's complete spec
-fbea584b2 spec: STATE and handoff at f4cd5af46
+7b552b3fb ci: the Windows job installs Chromium at the pin before its browser tests
+077ff795c spec: STATE and handoff at cff7dd154
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -108,8 +105,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 384 to 385
-- A number, a proof line or an absence not read from the run that proves it: 54 to 55
+None.
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
