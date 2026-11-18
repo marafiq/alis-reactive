@@ -11,6 +11,8 @@ for you, and the lead lands it only if every criterion your brief states holds w
 
 ## Before you build
 
+Read root `CLAUDE.md#how-you-work` first, and write the landing folder under ".landing/" in your worktree.
+
 Print your worktree's head with `git -C <worktree> rev-parse --short=9 HEAD` and check it is the base SHA your brief
 names. Read these whole, before anything else:
 

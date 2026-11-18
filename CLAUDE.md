@@ -9,6 +9,52 @@ one place of every other answer. Main, the redesign and `poc/` are evidence of f
 POCs proved, never the design: the unit that lands a door writes it from its spec lines, and where the rewrite meets
 an older line the rewrite's piece is written as its spec states it and the older line gives way.
 
+## How you work
+
+The bar comes before the mechanics. What done means for a unit is "Spec-first" below: its spec lines, TLC green with
+each mutant failing, its browser tests written from their promises and failing, the code until they pass, each test
+failing on its planted defect, then the commit. What governs a piece of work is "What governs what"; each forbidden
+practice and the tool that refuses it is the table under "What is forbidden, and what refuses it"; how confidence is
+determined is "Confidence", and where a correction goes is "Corrections". The standard of one kind of file is its
+file under `.claude/rules/`: `tests.md`, `csharp.md`, `views.md`, `docs.md` and `analyzers.md`; a project's own
+standard is its own `CLAUDE.md`. The owner's decisions are `spec/CLAUDE.md`, verbatim in `spec/NOTES.md`; each kind
+of mistake and what holds it is `spec/MISTAKES.md`; the one place of every other answer is `spec/REWRITE.md`,
+section 1.3. These are read before the first edit of a unit: the commands below carry the work and are never what
+makes it good (the owner, 2026-11-17: "he does not mention any quality rules where they were living").
+
+Start: run `scripts/doctor.sh`, source `scripts/toolchain-env.sh`, read `HANDOFF.md` and run `scripts/open.py`.
+```bash
+scripts/doctor.sh
+. scripts/toolchain-env.sh
+python3 scripts/open.py
+```
+A unit starts in a worktree from the pushed head: read every file it touches, write the test red first, write the code, turn the test green and have `scripts/plant-defect.sh` catch its defect.
+```bash
+git worktree add --detach ".worktrees/<name>" "<pushed sha>"
+```
+Its landing folder is ".landing/<Name>/" in that worktree, holding "paths.txt", "message.txt" and "spec.py".
+Land the unit with `scripts/land-unit.sh`; landing folders are relative to the source worktree or absolute.
+```bash
+scripts/land-unit.sh "<worktree>" "<base sha>" "<title>" ".landing/<Name>"
+```
+Push after `scripts/full-check.sh` with `scripts/push.sh`, which writes `HANDOFF.md`.
+```bash
+scripts/full-check.sh
+scripts/push.sh
+```
+Status to the owner is `scripts/open.py`'s first line and its lists, never a sentence carried from an earlier status (the owner, 2026-11-17).
+Builds run one at a time, with a read-only consult beside the build (the owner, 2026-11-17: "Work serially once current work lands and pushed").
+Commands on this Mac: git grep's extended expressions take no \b and no \s; zsh ties the variable path to PATH and expands $var:A, so a script is bash and writes ${var}; BSD sed's in-place edit takes ''; a tool that reads its input is started with < /dev/null.
+The browser runner takes --test or --all here and no --filter.
+```bash
+git grep -E '<pattern>' -- '<glob>'
+sed -i '' '<expression>' '<file>'
+"<tool>" < /dev/null
+scripts/playwright.sh --test "<promise>"
+scripts/playwright.sh --all
+```
+A script bash is running is never edited; a planted file is restored by cp and touch, since mv keeps the old time.
+
 ## Vision: typed access to JavaScript objects
 
 Everything the browser runs (a Syncfusion component, a native input, a plugin, an app service like Toast or Drawer)
@@ -169,9 +215,9 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
   in `caffeinate`.
 - A handoff is written after every push, since the harness compacts without warning. It holds the head, what landed
   with its proof line, what is next, and no time but one `date` printed then (the lead's mistake, 2026-11-11);
-  the lead's memory names its folder, and a session ends with it and the next prompt in the clipboard, read back.
+  `HANDOFF.md` is the handoff, written by `scripts/push.sh`, and a session ends with it and the next prompt in the clipboard, read back.
 - To begin: `scripts/doctor.sh`, then the orient command above, which prints the branch against its remote, what is
-  uncommitted, the last committed STATE, the owner's latest decisions and the handoff. Then read this file,
+  uncommitted, the last committed STATE and the owner's latest decisions. Read `HANDOFF.md` and run `python3 scripts/open.py`. Then read this file,
   `spec/REWRITE.md` sections 1 and 4, `spec/CLAUDE.md`'s standing decisions, the latest first, and the rule file of
   what the unit touches. Section 4 says where the rewrite stands and which unit is next.
 - To reorient after a compaction: read what the compact hook printed, the same orient output, whole, then the owner's
@@ -192,6 +238,8 @@ rule line, a log entry, a commit and a message to the owner, never by a softer w
 slip is about you invented so you can avoid accountability about mistakes").
 
 ## Forks, agents and reviews
+
+- Codex runs a consult read-only and a scoped build with full permissions when its sandbox blocks the brief's commands, its input closed (the owner, 2026-11-17: "scope has to be accurate ... Otherwise, it's just free fall of tokens").
 
 - A fork or an agent takes one bounded task that has a spec line, a landed exemplar and a command that proves it: one
   test rule to a landed rule's pattern, one module's half against the schema. Six at a time at most, three of Codex
@@ -263,7 +311,13 @@ slip is about you invented so you can avoid accountability about mistakes").
   tests), `scripts/doctor.sh` (every pin against this machine), `scripts/build.sh`, `scripts/run.sh` (the conformance
   app at http://localhost:5220), `scripts/pack.sh <version>`, `scripts/delivery.sh` (the six packages at a version of
   its own, then the apps `WhenAConsumerAppIsBuilt` builds on them, then the browser tests under consumerNet10 on the
-  fresh net10 app). A script joins this list with the commit that writes it.
+  fresh net10 app), `scripts/toolchain-env.sh` (the sourced toolchain environment), `scripts/gate.sh` (the staged
+  unit's checks), `scripts/land.sh` (the gate, browser run and regression comparison before a commit),
+  `scripts/land-unit.sh` (merge a worktree's landing folders and land one commit), `scripts/full-check.sh` (the full
+  spec check at HEAD), `scripts/push.sh` (push the checked branch, STATE and handoff), `scripts/regressions.py`
+  (compare browser runs), `scripts/stamp.py` (stamp a message with its run), `scripts/tlc.sh` (pause or resume TLC),
+  `scripts/open.py` (list unwritten promises and unbuilt code), `scripts/handoff.py` (write the handoff from facts).
+  A script joins this list with the commit that writes it.
 - Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a hold names its
   reason in `spec/REWRITE.md` section 2.7, and Syncfusion's is the owner's (`node scripts/pin-syncfusion.mjs <version>`).
 - C# 14, compiled for `net48` and `net10.0`; `Alis.Reactive/CLAUDE.md` holds the one rule for a host's own code.

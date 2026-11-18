@@ -12,6 +12,8 @@ costs more than a gap you name.
 
 ## Before you design
 
+Read root `CLAUDE.md#how-you-work` first, and write the landing folder under ".landing/" in your worktree.
+
 Print the worktree's head with `git -C <worktree> rev-parse --short=9 HEAD`, and read every file at the base SHA your
 brief names, with `git show <sha>:<path>` and `git grep <pattern> <sha>`, since other work moves the tree while you
 read. Read these whole, before anything else:

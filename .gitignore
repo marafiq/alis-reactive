@@ -24,3 +24,5 @@ Alis.Reactive.Fusion/wwwroot/js/alis-reactive-fusion-templates.js
 tests/Alis.Reactive.Conformance.App/wwwroot/js/
 tests/Alis.Reactive.Conformance.App/wwwroot/css/
 *.tsbuildinfo
+.work/
+.landing/

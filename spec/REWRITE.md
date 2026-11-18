@@ -79,6 +79,8 @@ how a unit collects those lines.
 | What is built, and where each piece lives | 1.1 and section 2 |
 | The order it is built in, and when a unit is done | section 4 |
 | What proves a piece of work, by what command | 1.2 |
+| What is open now | `scripts/open.py` and `HANDOFF.md` |
+| How a unit lands and is pushed | `scripts/land-unit.sh`, `scripts/full-check.sh`, `scripts/push.sh` |
 | What governs what; each forbidden practice and the tool that refuses it; how a unit is worked; how confidence is determined; when a handoff is written and a session starts, how to begin and how to reorient; where a correction goes; when a fork is used | root CLAUDE.md |
 | The standard of one kind of file | its file under `.claude/rules` |
 | The standard, the command and the refusals of one project | that project's own CLAUDE.md |
@@ -109,9 +111,21 @@ build.mjs                             esbuild: one bundle a package, written int
 tools/PlanContractGenerator/          writes Alis.Reactive.Assets/runtime/Schema/plan.ts and plan.schema.json
 .editorconfig .gitignore AGENTS.md CLAUDE.md
 README.md                             every package's readme (Directory.Build.props packs it): the docs, beside the XML docs
+HANDOFF.md                            the generated state, landed work, open work, owner decisions and the lead's queue
 .claude/                              the session's settings, hook, rules, skills and agent (below the tree)
 .github/                              the toolchain action, Dependabot, the release notes and section 2.8's workflows
 scripts/                              section 2.7's scripts
+scripts/toolchain-env.sh              the sourced toolchain environment from ALIS_TOOLCHAIN or the home folder
+scripts/gate.sh                       the staged unit's checks, refusing main
+scripts/land.sh                       pause TLC, gate, run every browser test, compare regressions, stamp and commit, resume TLC
+scripts/land-unit.sh                  merge a worktree's landing folders, apply their spec edits and land one commit
+scripts/full-check.sh                 the full spec check at HEAD, its log under .work/logs/
+scripts/push.sh                       push the checked branch, then its STATE and generated handoff together
+scripts/regressions.py                compare a browser run with the last landed run
+scripts/stamp.py                      stamp a commit message with the browser run and regression result
+scripts/tlc.sh                        pause or resume TLC processes
+scripts/open.py                       list unwritten promises, runtime cases not built and doors not implemented
+scripts/handoff.py                    generate HANDOFF.md from facts, preserving the lead's next queue
 
 Alis.Reactive/                        net48;net10.0, PackageId AlisReactive, AlisSliceTree on
   SliceTree.txt BannedSymbols.txt PublicAPI/net48/ PublicAPI/net10.0/
