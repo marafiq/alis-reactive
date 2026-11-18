@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Wed Nov 18 05:43:16 EST 2026
+Written at `date`: Wed Nov 18 07:39:07 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -20,22 +20,22 @@ note: open 2026-11-18 | decision | spec/CLAUDE.md | DecisionsByModule | "where y
 note: open 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses 
 note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSlice1 | "For the app, you
 note: open 2026-11-18 | direction | the queue of this file | queue | "I don't need acceptance numbers, sir. I need that
-unit: landed ../ci3 CiGreen3
-  next: git worktree remove ../ci3
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
-unit: building ../movein-care MoveInCare: it lacks paths.txt or message.txt
+unit: ready ../movein-care MoveInCare
+  next: scripts/land-unit.sh ../movein-care fbea584b2 "conformance app: the move-in's level of care, resident details and allocation review (MI.2, MI.3, MI.4)" ".landing/MoveInCare"
+  leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
+  exit line: "landed", with the browser run's result line
+  goes to: unit: landed
+unit: building ../movein-contacts MoveInContacts: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
   exit line: each line of the brief's "Done"
   goes to: unit: ready, or unit: returned for an agent
-unit: building ../movein-contacts MoveInContacts: it lacks paths.txt or message.txt
-lane: pushed at 7b552b3fb on feature/rewrite: equal to the remote
+lane: pushed at e02fafe66 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 7b552b3fb
+ci: unread at e02fafe66
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -44,23 +44,23 @@ file: over CLAUDE.md: holds 326 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 220 lines, its limit 150
+file: over HANDOFF.md: holds 230 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 7b552b3fb ci: the Windows job installs Chromium at the pin before its browser tests
-- Full check: .work/logs/spec-check-7b552b3fb.log: spec check at 7b552b3fb: 40 of 40 checks pass
-- .work/last-run.txt: 20261118-053247-59614 7b552b3fb
+- HEAD: e02fafe66 conformance app: the move-in's level of care, resident details and allocation review (MI.2, MI.3, MI.4)
+- Full check: .work/logs/spec-check-e02fafe66.log: spec check at e02fafe66: 40 of 40 checks pass
+- .work/last-run.txt: 20261118-072850-44045 e02fafe66
 
 ## Landed since the commit before the last spec: STATE commit
-7b552b3fb ci: the Windows job installs Chromium at the pin before its browser tests
-077ff795c spec: STATE and handoff at cff7dd154
+e02fafe66 conformance app: the move-in's level of care, resident details and allocation review (MI.2, MI.3, MI.4)
+4b69b305d spec: STATE and handoff at 7b552b3fb
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 538; named by a browser test: 519; with no browser test: 19
+feature promises: 552; named by a browser test: 533; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -105,7 +105,11 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-None.
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 346 to 350
+- A rule or a tool's list not applied before the change: 385 to 387
+- A number, a proof line or an absence not read from the run that proves it: 55 to 56
+- A shell command or a script wrong in its own terms: 542 to 548
+- A fault found in an agent's work whose instruction the brief did not give: 5 to 9
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -151,9 +155,8 @@ started through one lock, `/usr/bin/lockf -k "$HOME/.local/share/alis-toolchain/
 chains under ".work" of this worktree are started so. The machine bounds the work, about a minute a run.
 
 THE APP: resident move-in at a senior living community, a vertical slice inside the conformance app, under
-`tests/Alis.Reactive.Conformance.App/Care/MoveIn/`. Its only spec is `spec/Reference/move-in.md` once the unit
-MoveInSpec lands (it is in `.worktrees/ci2`, landing with the CI fix); until then each builder holds a copy beside
-its brief. 31 features MI.1 to MI.31, five situations a feature, each situation one browser test that reads the
+`tests/Alis.Reactive.Conformance.App/Care/MoveIn/`. Its only spec is `spec/Reference/move-in.md` (landed
+cff7dd154); a unit adds to its ninth part each place the source won over it and each gap it met. 31 features MI.1 to MI.31, five situations a feature, each situation one browser test that reads the
 page, what the model holds after and what the next read shows.
 
 Proven, each by a test green in a browser and caught on its planted defect (landed f4cd5af46, "637 selected, 637
@@ -170,12 +173,21 @@ no date input); an input over an enum whose zero no name holds. Three members a 
 component with no test are held out as a patch in the lead's durable scratch, "conformance-members", for the unit
 that brings each with its cell and its test.
 
-In flight, two builder agents, each in a worktree at fbea584b2 with a six-part brief, the spec and the foundation's
-reply beside it, each replying when its three features stand:
-- `.worktrees/movein-care`, ".landing/MoveInCare": MI.2 care-specific admission, MI.3 resident details, MI.4
-  allocation review; promise ids M9.X15 to M9.X39.
+In flight, read at 06:20 on 2026-11-18:
+- `.worktrees/movein-care`, ".landing/MoveInCare", its builder's reply standing: MI.2 care-specific admission, MI.3
+  resident details, MI.4 allocation review, fourteen tests (MI.3's fifth situation waits on MI.9's drawer), ids
+  M9.X15 to M9.X29. Each was red before its page; with the unit in place the full run printed "651 selected, 651
+  ran, 651 passed". NOT DONE: no test of the move-in passes when run alone, so no single green line and no planted
+  defect stands. The cause is the harness's navigation wait, 204 ms, measured on 2026-11-16 before this page existed;
+  the page's first render took 170 ms at the base and 243 ms with the unit. CI's core pool failed one of MI.1's
+  tests on the same wait at 4b69b305d. The remedy is the harness's own and is running in that worktree through the
+  lock: `scripts/playwright.sh --measure --pool core`, twenty green runs, its log ".work/logs/measure-core.log".
+  When it ends: the new "measured.json" is copied into `.worktrees/movein-contacts` (never into its paths.txt) and
+  its builder told; the care builder is sent back to run each test alone and its fourteen prepared planted defects
+  ("reply.md" lists each), with "measured.json" and "shard-weights.json" added to its paths; then read.md and the
+  landing. Read by the lead at the source so far: "AllocationDesk.cshtml" and the allocation review's test, whole.
 - `.worktrees/movein-contacts`, ".landing/MoveInContacts": MI.5 contact rows, MI.6 contact authority, MI.7 contact
-  removal; promise ids M9.X40 to M9.X64.
+  removal; promise ids M9.X40 to M9.X64. Its builder is working and has been told of the wait.
 When a "reply.md" stands: read the feature in the spec, read the tests and the views at the source, hold each line
 of "Done", write "read.md", land through the lock, push, remove the worktree; then open the next unit for that
 builder's line from the new head with a fresh agent, by the brief template and the script in the lead's scratchpad
@@ -188,20 +200,26 @@ folder "fanout" (a copy of both is kept in the durable scratch). The lines, in t
   MI.24 documents and the packet, MI.27 the coordinators' line, MI.30 reception's native form, MI.31 request defaults.
 Promise ids are given in blocks of 25 from M9.X65 on, so two units never take one id.
 
-THE LANE:
-- `.worktrees/ci2`, two units landing as one commit by ".work/chain-ci2.sh": ".landing/CiGreen2", CI's three causes
-  at 5ed0e0a5e (a zone test that read the machine's zone files; the Windows job's msbuild under bash; the Syncfusion
-  probes on the POC's Playwright pin), and ".landing/MoveInSpec", the app's spec as a file of the repo.
-- After its push: `python3 scripts/ci.py` about fifteen minutes later, and each failed job's log read by
-  `gh api repos/marafiq/alis-reactive/actions/jobs/<id>/logs`, since a run's logs wait for the whole run to end. MVC 5
-  on net48 is proven by the job verify-net48 alone.
+THE LANE, nothing in flight. CI at 4b69b305d, each failed job read from its own log
+(`gh api repos/marafiq/alis-reactive/actions/jobs/<id>/logs`):
+- checks and the Syncfusion upgrade pass (cff7dd154).
+- playwright core: one test failed of 485, MI.1's closed building, "Timeout 204ms exceeded" at its navigation: the
+  wait above, on a slower machine. The new measurement is its fix; read the job again after that push.
+- verify-net48: Visual Studio's MSBuild builds the fresh MVC 5 app with no warning and its 12 consumer tests pass
+  (2836ae7e4, cff7dd154); Chromium installs at the pin (7b552b3fb). Its browser run under the twin then fails each of
+  its 11 tests: "The conformance app serves no host 'net48'". The harness starts the net10 app under that name;
+  `tests/Alis.Reactive.Conformance.PlaywrightTests/Harness/ConformanceHost.cs` holds no start of the twin under IIS
+  Express. That start is the rewrite's own net48 work, a unit of its plan and no CI fix: MVC 5 in a browser stays
+  unproven until it is built. Also there: "ps: unknown option -- o", the runner's sweep for a server left alive,
+  which reads nothing under Git's bash.
 - A landed unit whose file the landing merged reads as "ready" and never "landed", since its worktree's file no
   longer equals the head's: it is removed by hand once each of its paths is found in its commit. A defect of the
   guard paths-equal-head, for the machine's next review.
 
 Landed 2026-11-18 beside the app: the process as a state machine and this file in the repo; CI's first three causes;
 the enum shape kind; the skill `.claude/skills/build-a-screen/SKILL.md`; the fresh apps' typed home page; ALIS044, a
-door of the framework takes no dynamic, with the fresh net10 app built under the packed rule.
+door of the framework takes no dynamic, with the fresh net10 app built under the packed rule; CI's second and
+third fixes; the app's spec, `spec/Reference/move-in.md`.
 
 Deferred, no process work goes ahead of the app: the decisions split by module (`spec/CLAUDE.md` is over 2,000 lines;
 its brief is written); root CLAUDE.md cut to its limit; this file cut to its limit; the conformance component's
