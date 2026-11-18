@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Wed Nov 18 00:18:15 EST 2026
+Written at `date`: Wed Nov 18 00:54:58 EST 2026
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 878033d78 mistakes: the eight kinds stand as instructions every agent reads, and the two largest are held by a tool
-- Full check: .work/logs/spec-check-878033d78.log: spec check at 878033d78: 40 of 40 checks pass
-- .work/last-run.txt: 20261118-000718-99781 878033d78
+- HEAD: 949eefe47 conformance app: the arrival desk, the first combined screen, with its partials proven together
+- Full check: .work/logs/spec-check-949eefe47.log: spec check at 949eefe47: 40 of 40 checks pass
+- .work/last-run.txt: 20261118-004355-58397 949eefe47
 
 ## Landed since the commit before the last spec: STATE commit
-878033d78 mistakes: the eight kinds stand as instructions every agent reads, and the two largest are held by a tool
-f103bf548 spec: STATE and handoff at 0ecebf67d
+949eefe47 conformance app: the arrival desk, the first combined screen, with its partials proven together
+af5ad37a9 spec: STATE and handoff at 878033d78
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 522; named by a browser test: 503; with no browser test: 19
+feature promises: 526; named by a browser test: 507; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -124,7 +124,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:2
 - ../opus-u26h/.worktrees/check-plants-761ejgt6/tree1: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
 - ../opus-u26h/.worktrees/check-plants-761ejgt6/tree2: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
 - ../opus-u26h/.worktrees/check-plants-761ejgt6/tree3: base fcfca56c5915a01abc54d0a47394113c81bf0141, 2 paths changed
-- ../opus-u3: base 8391f0be5043b4d809bfa3a0fdb486b761a91b0e, 60 paths changed
+- ../opus-u3: base 8391f0be5043b4d809bfa3a0fdb486b761a91b0e, 64 paths changed
 - ../opus-u4: base 3eb49e2dcbc3d396a3bfa9271b2deb390970c1d1, 17 paths changed
 - ../opus-upload: base 7c1e23c8b9933cdd590c8524cb817554fd807646, 18 paths changed
 - ../opus-upload2: base 0bffecf95f4435078a90ad13682ac2c1f114c140, 37 paths changed
@@ -134,6 +134,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:2
 - .worktrees/check-plants-e7stabxu/tree1: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
 - .worktrees/check-plants-e7stabxu/tree2: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
 - .worktrees/check-plants-e7stabxu/tree3: base 8b9f94562305d05d8f95e8cba01ad5f47c788598, 6 paths changed
+- ../screen1: base af5ad37a9107a730a13c887345c23c2ae329a060, 18 paths changed
 - ../unit-m: base 0ecebf67d351e77dd38a5a9377e36e1447f478a1, 9 paths changed
 
 ## The owner's latest decisions
@@ -149,30 +150,49 @@ spec/CLAUDE.md:1905: - The owner, 2026-11-17, answering the lead's ask B (an inp
 
 ## Next
 <!-- next -->
-In work: unit 3, piece 1, the shape kind `enum` for `as` (the owner's yes, 2026-11-17), built in `.worktrees/opus-u3`;
-it lands and is pushed when its proof lines stand.
+The owner's direction, 2026-11-18, which orders everything below: "The framework is not getting new code except the
+current module in progress." What the framework cannot express is a named gap in the app's spec, and the app is
+written without it; nothing of it is put to the owner as a decision. Three separate things: the skill, the app's spec,
+the app.
 
-Then the harness, the one goal (the owner, 2026-11-17: "the whole harness has to be reviewed"); nothing else opens
-until each line holds, by a tool where a tool can hold it:
-1. One start page: the quality bar and each rule's home first, then how the work is done (root CLAUDE.md, "How you work").
-2. What done means for a unit, checked by scripts/land-unit.sh: the gate, the full browser run compared test by test,
-   and a planted-defect line for each promise the unit adds.
-3. Agents: one brief form in the repo (scope, base, files, what done means, the proving commands, the reply's size);
-   one build at a time, a read-only consult beside it.
-4. The handoff generated at every push and before every compaction by a hook the repo tracks; a status is
-   scripts/open.py's output.
-5. CI green on GitHub's machines, the MVC 5 job running its build. At 421d7227e, the last run that finished, these
+In work:
+1. Unit 3, piece 1, the shape kind `enum` for `as` (the owner's yes, 2026-11-17), built in `.worktrees/opus-u3` at
+   base 8391f0be5. The owner, 2026-11-18, to the lead's ask on what an element's text shows: "Yes, I agree with the
+   enum." An enum set as an element's text or HTML shows the name the app's JSON writes; the live form is for a live
+   object's members and for a method's or a plugin's arguments. Its builder changes that one path and adds its
+   promise, then the unit lands and is pushed ("So ship it.").
+
+Then, in this order:
+2. CI green on GitHub's machines, the MVC 5 job running its build. At 421d7227e, the last run that finished, these
    failed: checks (after npm audit), playwright fusion (35 of 86), delivery-net10 (one architecture test) and
-   verify-net48 (msbuild not found). How C# is written for net10 and net48, true of the code.
-6. The conformance app's coverage of the core's public doors as a number, with no Fusion or Native component on a
-   core page; the doors no passing core test's page calls listed, then closed.
-7. The runtime's TypeScript and the C# core read against the rules by an independent inspector; each finding re-read
-   at its source, then fixed or refused with its reason.
+   verify-net48 (msbuild not found). The newest finished run is read by its commit first.
+3. The conformance component gains the two members it lacks, each a cell with its test and its planted defect: a
+   method of two and of three parameters of mixed kinds, and an async method that takes an argument. No new
+   TypeScript component is written (the owner, 2026-11-18).
+4. The move-in app's spec, a file under `spec/`, written before the app: every feature in the domain's words with
+   the doors, the schema's nodes and the TLA+ actions it uses; where the features are mixed on one screen, in one
+   request and in one check; its coverage read against `spec/Core/schema.md` and the TLA+ specs as they stand, with
+   no second inventory of them; and the gaps. The owner reviews it once.
+5. The skill under `.claude/skills/`: general, for every consumer of the framework, a decision map from the schema
+   and the TLA+ specs to the door by its one name. It holds no feature of the app.
+6. The app, written with the skill from its spec: resident move-in at a senior living community, a new screen set of
+   the conformance app, its inputs in request containers, Native's components its inputs, the conformance component
+   its one custom component, no Fusion, every landed page and test kept. Six slices, each promise a browser test
+   with its planted defect: where they live and level of care; contacts and payer; medications; services and
+   pricing; save, submit and discard; live bed availability. The arrival desk (`Care/Admission/ArrivalDesk.cshtml`,
+   M9.X6 to M9.X9) is four partial promises and is not the app's model.
 
-Behind the harness, the framework's open list: a list of files in a request form (D14.3; the runtime throws notBuilt);
-a validation check on a text or a file body (a view reaches it and no line gives it a meaning: refused where the view
-renders); the seven operators no C# writes leave the grammar (the owner's yes, 2026-11-17), with the table "After 1.0"
-in spec/NOTES.md; the plan contract narrowed to what the C# writes. Then unit 3's second piece (the Fusion template
-pages), and Fusion's own: an equality of two members in a template, the grid's validation door and exports,
-SmartPaste, U27.
+The harness lines still open (the owner, 2026-11-17: "the whole harness has to be reviewed"):
+- The handoff a compaction reads is this file. Today a hook this Mac alone holds prints a file outside the repo
+  (`spec/tools/check.py`, its orient): the hook is tracked and prints this file.
+- This file's list of unlanded work names every old worktree; each is landed or removed, so the list is what is open.
+- The landing script reads a planted-defect line for each promise a unit adds.
+- One agent brief form in the repo; one build at a time, a read-only consult beside it.
+- The runtime's TypeScript and the C# core read against the rules by an independent inspector.
+
+Behind the app, the framework's open list: a list of files in a request form (D14.3; the runtime throws notBuilt); a
+validation check on a text or a file body (refused where the view renders); the seven operators no C# writes leave
+the grammar (the owner's yes, 2026-11-17), with the table "After 1.0" in spec/NOTES.md; the plan contract narrowed to
+what the C# writes; an enum in a pushed message's member. Then unit 3's second piece (the Fusion template pages), and
+Fusion's own: an equality of two members in a template, the grid's validation door and exports, SmartPaste, U27.
 <!-- /next -->
