@@ -9182,6 +9182,21 @@
       ]
     },
     {
+      "feature": "M22.F2",
+      "for": "M22.X11",
+      "index": 0,
+      "screen": "fusion-refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalFusion"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M10.F1",
       "for": "X21.16",
       "index": 0,

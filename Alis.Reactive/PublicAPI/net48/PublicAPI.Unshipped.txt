@@ -162,6 +162,7 @@ Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.JsonPath<TItem, TMember>
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Raises<TPayload, TMember>(Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, System.Linq.Expressions.Expression<System.Func<TPayload, TMember>!>! member, string! template) -> string!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Plugin<TPlugin>() -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Render<TComponent>(string! id, System.Web.IHtmlString! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.RequireMembersTheBrowserOrders<TItem>(System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! ordering) -> void
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Rows<TRow>(string! rowsId) -> Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.ViewValueJson<TItem>(System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! term) -> string!
 Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>

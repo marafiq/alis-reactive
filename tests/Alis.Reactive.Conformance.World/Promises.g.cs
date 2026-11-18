@@ -847,6 +847,7 @@ public static class Promises
         public const string M22_X8_0 = "M22.F2 M22.X8 0";
         public const string M22_X9_0 = "M22.F2 M22.X9 0";
         public const string M22_X10_0 = "M22.F2 M22.X10 0";
+        public const string M22_X11_0 = "M22.F2 M22.X11 0";
     }
 
     public static class M22_F3

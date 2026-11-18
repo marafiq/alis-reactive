@@ -92,6 +92,15 @@ internal sealed class ItemLambda
 
     internal HeldForm FormOf(LinqExpression read) => ReadsItsOwnForm(read, out var own) ? _form.WrittenBy(own.Written, own.Named) : _form.Base;
 
+    internal static void RequireMembersTheBrowserOrders(LambdaExpression ordering, HeldForm form)
+    {
+        var item = new ItemFinder([ordering.Parameters[0]]);
+        var ordersTwoMembers = ordering.Body is BinaryExpression compared && Comparisons.TryGetValue(compared.NodeType, out var comparison) && comparison.Orders
+            && item.Finds(compared.Left) && item.Finds(compared.Right);
+        if (!ordersTwoMembers) throw new InvalidOperationException($"'{Printed.Of(ordering.Body)}' orders no two members of the item; pass an ordering such as m => m.Beds > m.Taken.");
+        Of(ordering, form);
+    }
+
     internal static InvalidOperationException NoBrowserForm(LinqExpression term)
         => Refused(term, "has no browser form in a list's lambda; use a member the framework translates, or move the work to the server.");
 

@@ -1754,6 +1754,13 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M22.F2 M22.X11 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/FusionTemplates/BedChecks.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M22.F2 M22.X2 0": {
     "modules": [],
     "views": [

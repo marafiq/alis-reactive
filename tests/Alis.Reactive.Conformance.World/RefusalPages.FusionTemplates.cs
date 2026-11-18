@@ -10,4 +10,6 @@ public static partial class RefusalPages
     public const string WardResidentsByALocalWard = Area + "fusion-templates/ward-residents/local-ward";
     public const string BedTurnoverOrdered = Area + "fusion-templates/bed-turnover/ordered";
     public const string BedTurnoverCompared = Area + "fusion-templates/bed-turnover/compared";
+    public const string BedChecksByStage = Area + "fusion-templates/bed-checks/by-stage";
+    public const string BedChecksByCount = Area + "fusion-templates/bed-checks/by-count";
 }

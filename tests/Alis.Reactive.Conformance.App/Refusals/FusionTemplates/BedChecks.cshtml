@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model BedChecks
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed checks";
+    var plan = Html.ReactivePlan<BedChecks>();
+    var columns = FusionGridColumns.Of<CheckedBed>();
+    var checks = FusionTemplate.Create<CheckedBed>();
+    var shown = (Model.ByStage
+            ? checks.When(m => m.Stage > m.Wanted, then: t => t.Span("ready"), @else: e => e.Span("waiting"))
+            : checks.When(m => m.Done > m.Due, then: t => t.Span("ready"), @else: e => e.Span("waiting")))
+        .Render(plan);
+}
+<h1>Bed checks</h1>
+@(Html.FusionGrid(plan, "bed-checks", Model.Beds, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(b => b.Bed), HeaderText = "Bed" },
+        new() { HeaderText = "Checks", Template = shown },
+    })))
+@Html.RenderPlan(plan)

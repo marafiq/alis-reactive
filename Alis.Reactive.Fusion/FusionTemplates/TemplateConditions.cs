@@ -19,6 +19,14 @@ internal static class TemplateConditions
         [ExpressionType.GreaterThanOrEqual] = ">=",
     };
 
+    private static readonly HashSet<ExpressionType> Ordered =
+    [
+        ExpressionType.LessThan,
+        ExpressionType.LessThanOrEqual,
+        ExpressionType.GreaterThan,
+        ExpressionType.GreaterThanOrEqual,
+    ];
+
     private static readonly IReadOnlyDictionary<ExpressionType, ExpressionType> Mirrored = new Dictionary<ExpressionType, ExpressionType>
     {
         [ExpressionType.Equal] = ExpressionType.Equal,
@@ -52,6 +60,8 @@ internal static class TemplateConditions
         {
             var left = Operand(compared.Left, compared);
             var right = Operand(compared.Right, compared);
+            var ordersTwoMembers = Ordered.Contains(compared.NodeType) && !left.IsConstant && !right.IsConstant;
+            if (ordersTwoMembers) context.RequireMembersTheBrowserOrders(Expression.Lambda<Func<TModel, bool>>(compared, item));
             var constantFirst = left.IsConstant && !right.IsConstant;
             var (first, second, kind) = constantFirst ? (right, left, Mirrored[compared.NodeType]) : (left, right, compared.NodeType);
             first.RefuseAsAConstant(second);

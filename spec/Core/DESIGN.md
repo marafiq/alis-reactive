@@ -760,7 +760,9 @@ Terms used throughout:
   today (`Alis.Reactive/Members/Expressions.cs:28`); the local keeps the capability. A template condition's value, a
   literal or one the view holds, is read by the same reader and refused as it refuses one, through
   `ReactivePlan.ViewValueJson`, and written as the plan writes the item's member it is compared with, an ordering against
-  a value written as text refused as a list's lambda refuses one (M22.D4; the owner, 2026-11-17).
+  a value written as text refused as a list's lambda refuses one (M22.D4; the owner, 2026-11-17). An ordering of two
+  members of the item in a template condition is held to D6.12's rule for two members, through
+  `ReactivePlan.RequireMembersTheBrowserOrders` (M22.D4, M22.X11).
 - D6.8 A list's lambda takes one of two forms, by what an item is. An item of `LiveObjects<T>` is a live object:
   its lambda is a delegate over the item's declaration, `bed => bed.Resident`, run once when the view renders with
   the item bound to the `fn`'s parameter, and its members are required (D4.1). An item of a list of data is a C#

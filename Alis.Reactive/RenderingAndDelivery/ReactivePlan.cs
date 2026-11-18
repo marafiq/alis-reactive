@@ -83,6 +83,18 @@ public sealed partial class ReactivePlan<TModel>
     public string ViewValueJson<TItem>(Expression<Func<TItem, bool>> term)
         => ViewValues.InTerm(term ?? throw new ArgumentNullException(nameof(term)), Writer.Content.Json);
 
+    /// <summary>Requires that the two members of an item a term orders are ones the browser orders as .NET does, for a component whose own engine evaluates the term on each item.</summary>
+    /// <remarks>
+    /// The term orders one member of the item against another, as <c>(Bed b) =&gt; b.Done &gt; b.Due</c>. Two numbers, two chars, and
+    /// two dates or two times of one type are let through. Any other pair, two enums among them, is refused where the view renders,
+    /// as a list's lambda refuses it, and so is a member that its own converter or number handling writes. A term that orders no two
+    /// members of the item is refused too.
+    /// </remarks>
+    /// <typeparam name="TItem">The class of the item.</typeparam>
+    /// <param name="ordering">The term, as <c>(Bed b) =&gt; b.Done &gt; b.Due</c>.</param>
+    public void RequireMembersTheBrowserOrders<TItem>(Expression<Func<TItem, bool>> ordering)
+        => ItemLambda.RequireMembersTheBrowserOrders(ordering ?? throw new ArgumentNullException(nameof(ordering)), HeldForm.Live(Writer.Content.Json, Writer.Content.RendersUnder));
+
     /// <summary>Writes the attributes that make a click at or inside an element raise an app event, with one member of its payload filled by a template's text.</summary>
     /// <remarks>
     /// For a component's template, whose engine fills the member's text for each item it renders. The attributes are
