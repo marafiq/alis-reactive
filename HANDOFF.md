@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 13:54:30 EST 2026
+Written at `date`: Thu Nov 19 15:08:20 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -63,17 +63,19 @@ unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   goes to: unit: ready, or unit: returned for an agent
 unit: ready ../movein-owners-restarted MoveInOwners
   next: scripts/land-unit.sh ../movein-owners-restarted 21d6a2ec4 "Implement MI.18 waitlisting and MI.28–29 assessment and room owners" ".landing/MoveInOwners"
+unit: landed ../movein-payer-pricing MoveInPayerPricing
+  next: git worktree remove ../movein-payer-pricing
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
 unit: ready ../movein-scope MoveInSessionScope
   next: scripts/land-unit.sh ../movein-scope d13a4ce7f "Keep move-in implementation and builder proof within scope" ".landing/MoveInSessionScope"
 unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
-lane: checking at e53943447 on feature/rewrite
+lane: checking at de1d8f40c on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at e53943447
+ci: unread at de1d8f40c
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -82,10 +84,10 @@ file: over CLAUDE.md: holds 335 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 425 lines, its limit 150
+file: over HANDOFF.md: holds 443 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 16 units have landed since .claude/rules/process.md last changed
+machine: review due : 17 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -93,17 +95,17 @@ machine: review due : 16 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: e53943447 Prove move-in availability and reconnect lifetimes
-- Full check: .work/logs/spec-check-e53943447.log: spec check at e53943447: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-134246-89248 e53943447
+- HEAD: de1d8f40c Prove move-in payers, verification and quote calculation
+- Full check: .work/logs/spec-check-de1d8f40c.log: spec check at de1d8f40c: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-145553-35099 de1d8f40c
 
 ## Landed since the commit before the last spec: STATE commit
-e53943447 Prove move-in availability and reconnect lifetimes
-980dee5ed spec: STATE and handoff at 03287bb21
+de1d8f40c Prove move-in payers, verification and quote calculation
+940dda15b spec: STATE and handoff at e53943447
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 610; named by a browser test: 591; with no browser test: 19
+feature promises: 626; named by a browser test: 607; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -148,9 +150,10 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 370 to 373
-- A rule or a tool's list not applied before the change: 404 to 406
-- A shell command or a script wrong in its own terms: 564 to 568
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 373 to 383
+- A rule or a tool's list not applied before the change: 406 to 410
+- A number, a proof line or an absence not read from the run that proves it: 58 to 59
+- A shell command or a script wrong in its own terms: 568 to 574
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -405,6 +408,23 @@ snapshot waits, and releasing an older snapshot preserves the newer bed holder. 
 check at response release and the two-client reconnect offer are held by their browser cases.
 X69 proves the waitlist join saves W100 and leaves BED4 available at revision 14 on the next read.
 MI.17 still owns the admission conflict entry, and MI.13 extends the E18 catalogue into pricing.
+
+MI.8 payer coverage, MI.9 independent verification and MI.13 service pricing landed together at
+`de1d8f40c`, including MI.3 situation 5 and the persisted quote check in MI.4.4. The scoped
+Astra xhigh builder restored 77 passing move-in cases and caught 22 app-only planted defects.
+The compiled page-door table matched all 718 entries. An independent replay matched all four
+reference and feature files byte for byte. The integrated non-browser gate passed and the full
+browser run passed all 725 without a budget overrun, preserving all 709 earlier passes.
+Harbor Mutual at 80 percent and the entered policy at 20 percent reopen together. Private
+funding excludes the late secondary reply and cannot inherit an old verification. The independent
+drawer checks POL-100 while the main draft stays editable, and its errors stay with the drawer.
+The exact 3040.00 quote and 2432.00 assistance wait for both catalogue and terms. An identical
+recalculation preserves acceptance and a changed selection clears it. Part 9 records the
+missing payer document and exemption facts, and the posted funding snapshot.
+
+Next is MI.14 service review and MI.15 acceptance of the exact current quote. Open their scoped
+builder after the checked push. MI.25 deposit and MI.26 diet follow in the existing queue.
+
 
 
 
