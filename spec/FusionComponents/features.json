@@ -4693,7 +4693,7 @@
   },
   {
    "id": "M21.F13",
-   "summary": "FusionComboBox: one declaration of the Syncfusion ComboBox by its JavaScript names, value, text, index, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, generic over the member it binds, its value that member's own type and committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder, and names no field; the redesign declares it in one file, the shape the rewrite keeps, with its value typed by the bound member and its text Property<string?>, each admitting null as main and the vendor hold them (M21.X504), and items handed by the plan's writer so its fields name each member as every framework read names it (M21.D1).",
+   "summary": "FusionComboBox: one declaration of the Syncfusion ComboBox by its JavaScript names, value, text, index, dataBind, focusIn, focusOut, showPopup, hidePopup, showSpinner, hideSpinner, clear, change, focus, blur and filtering, each EJ2 33.1.47's public member; the payloads of its four events; the input it is, generic over the member it binds, its value that member's own type and committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder, and names no field; the redesign declares it in one file, the shape the rewrite keeps, with its value typed by the bound member and its text Property<string?>, each admitting null as main and the vendor hold them (M21.X504), and items handed by the plan's writer so its fields name each member as every framework read names it (M21.D1).",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionComboBox",
@@ -4764,7 +4764,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionComboBox<TValue> declares the EJ2 ComboBox by its JavaScript names, TValue the type of the member it binds, since EJ2 marks ComboBox's value a generic type (@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:228-231): value as Value, a Property<TValue> that holds null until a choice, so the bound member's type admits null (string?, int?), text as Text, a Property<string?>, EJ2 holding each null until a choice (M21.X504), and index as Index, a Property<int?>; DataBind, FocusIn, FocusOut, ShowPopup, HidePopup and Clear as methods; and Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionComboBox<TValue> declares the EJ2 ComboBox by its JavaScript names, TValue the type of the member it binds, since EJ2 marks ComboBox's value a generic type (@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:228-231): value as Value, a Property<TValue> that holds null until a choice, so the bound member's type admits null (string?, int?), text as Text, a Property<string?>, EJ2 holding each null until a choice (M21.X504), and index as Index, a Property<int?>; DataBind, FocusIn, FocusOut, ShowPopup, HidePopup and Clear as methods; and Change, Focus, Blur and Filtering as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N13",
       "N5.4",
@@ -4806,6 +4806,40 @@
       "M21.N13",
       "N14.4"
      ]
+    },
+    {
+     "line": "proposed",
+     "text": "Reactive(c => c.Filtering, HandlerPolicy.Replace, (filtering, pipeline) => ..) reads FilteringEventArgs.Text, writes PreventDefaultAction before the request to suppress EJ2's own filter, and calls UpdateData<TItem> with the rows its reply holds. A replaced request runs no success route. The array argument is the item array accepted by updateData(dataSource, query?, fields?) in @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:847. Change reads the chosen result's ItemData<TItem>(). Focus and Blur on the object-valued language box show its keyboard guidance while it has focus.",
+     "doors": [
+      "M21.N13",
+      "N5.6",
+      "N11.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "ShowSpinner() shows the indicator on the ComboBox dropdown arrow. HideSpinner() removes it. On Helen's interpreter directory, WhileLoading shows the spinner. The success route installs the result rows and hides the spinner. The directory handles 400 and 401 before the host's routes for those statuses (D10.12). These routes and the catch-all hide the indicator, with a sign-in instruction for an expired session. A replaced search runs neither route (D11.7).",
+     "doors": [
+      "M21.N13",
+      "N11.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "DataSource<TItem>() writes a local IReadOnlyList<TItem> to the ComboBox's array-or-DataManager dataSource. Fields is the box's live FieldSettingsModel. Its optional Text and GroupBy properties name the item members whose JSON holds the option label and group heading. DataBind applies the changes, ShowPopup opens the list, and Clear removes the current provider from the bound form.",
+     "doors": [
+      "M21.N13",
+      "N5.4"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A box's nullable live Query declares Execute<TRow>() for the configured DataManager's row result. The method awaits EJ2's native Promise and exposes its result rows to Read (D5.3, D5.11, D17.5).",
+     "doors": [
+      "M21.N13",
+      "N5.4",
+      "N17.1"
+     ]
     }
    ],
    "nodes": [
@@ -4819,7 +4853,9 @@
     "lit",
     "on",
     "method",
-    "data"
+    "data",
+    "let",
+    "ref"
    ],
    "writes": [
     {
@@ -4875,7 +4911,9 @@
    "oracle": "Syncfusion EJ2 33.1.47's ComboBox as its TypeScript declares it (@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts, the members it inherits from src/drop-down-list/drop-down-list.d.ts, ChangeEventArgs there and in src/drop-down-base/drop-down-base.d.ts), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; its ASP.NET Core builder as the probes render it (fusion-ej2-builder-newtonsoft-defaults, fusion-ej2-builder-raw-json); and the browser, by the promise.",
    "checker": [
     "core:Q17",
-    "core:Q5"
+    "core:Q5",
+    "Lanes.tla:ReplacedRunRunsNoRoute",
+    "Lanes.tla:ReplacedRunRunsNothingAfter"
    ],
    "defects": [
     {
@@ -4917,6 +4955,56 @@
      "id": "M21.X1205",
      "rung": "behavior",
      "defect": "Keeping the previous row as the selected value or leaving a support panel open retains an instruction that no longer applies."
+    },
+    {
+     "id": "M21.X1206",
+     "rung": "behavior",
+     "defect": "Keeping the language guidance after blur leaves instructions for the wrong field."
+    },
+    {
+     "id": "M21.X1207",
+     "rung": "behavior",
+     "defect": "Applying the local filter while waiting, or passing the wrong rows to updateData, loses the server's choices."
+    },
+    {
+     "id": "M21.X1208",
+     "rung": "behavior",
+     "defect": "Reading the service name as its booking instruction loses the selected row's contact detail."
+    },
+    {
+     "id": "M21.X1209",
+     "rung": "behavior",
+     "defect": "Overlapping the two filtering callbacks lets the late reply offer the earlier Spanish service again."
+    },
+    {
+     "id": "M21.X1216",
+     "rung": "behavior",
+     "defect": "Leaving the directory spinner off while the active search is pending, or leaving it on after a successful or refused search, gives the caregiver the wrong loading state."
+    },
+    {
+     "id": "M21.X1210",
+     "rung": "behavior",
+     "defect": "A change to the weekend catalogue reuses the weekday items or their ordinary provider-name field. The popup offers the wrong providers or omits the weekend service descriptions."
+    },
+    {
+     "id": "M21.X1211",
+     "rung": "behavior",
+     "defect": "A change to the weekend catalogue groups by the provider name in place of the shift. The staff member sees company headings instead of shifts."
+    },
+    {
+     "id": "M21.X1212",
+     "rung": "behavior",
+     "defect": "Choosing family transport closes the list but leaves the previously selected provider in the form. Saving still books that provider."
+    },
+    {
+     "id": "M21.X1213",
+     "rung": "behavior",
+     "defect": "Declaring Query.execute as a synchronous method leaves the desk checking stock after the vendor Promise settles. Reading another row's dispatch instruction shows the wrong collection point."
+    },
+    {
+     "id": "M21.X1217",
+     "rung": "behavior",
+     "defect": "A query for Harbor while Northbank is selected displays Harbor's delivery window. Reading executeQuery synchronously leaves the desk checking after the manager's Promise settles."
     }
    ],
    "promises": [
@@ -4975,6 +5063,88 @@
      "outcome": "Staff use standard guidance, with Punjabi as the previous language and English as the selected option, and neither support panel is open.",
      "opposite": "Punjabi requires booked support while consent and telephone contact hold.",
      "defect": "Keeping the previous row as the selected value or leaving a support panel open retains an instruction that no longer applies."
+    },
+    {
+     "for": "M21.X1206",
+     "page": "Helen Martinez's communication preferences, with the preferred language and the interpreter directory on the same screen.",
+     "gesture": "Focus Preferred language, then tab to Interpreter service.",
+     "outcome": "The language box shows how to choose a language with the keyboard while it has focus.",
+     "opposite": "The guidance clears when focus leaves the box.",
+     "defect": "Keeping the language guidance after blur leaves instructions for the wrong field."
+    },
+    {
+     "for": "M21.X1207",
+     "page": "Helen Martinez's communication preferences, with the preferred language and the interpreter directory on the same screen.",
+     "gesture": "Search the directory for s, then narrow the search to sz.",
+     "outcome": "The directory lists Harbor Interpreting and Linden Language Services for Spanish and Swedish.",
+     "opposite": "A pending search shows no premature empty-result message. While the no-match search is held the previous choices stay available. The empty reply shows No interpreter services found.",
+     "defect": "Applying the local filter while waiting, or passing the wrong rows to updateData, loses the server's choices."
+    },
+    {
+     "for": "M21.X1208",
+     "page": "Helen Martinez's communication preferences, with the preferred language and the interpreter directory on the same screen.",
+     "gesture": "Search the directory for sw and choose Linden Language Services.",
+     "outcome": "The booking instruction reads Video appointments through extension 248.",
+     "opposite": "Searching for sp and choosing Harbor Interpreting shows the telephone booking instruction.",
+     "defect": "Reading the service name as its booking instruction loses the selected row's contact detail."
+    },
+    {
+     "for": "M21.X1209",
+     "page": "Helen Martinez's communication preferences, with the preferred language and the interpreter directory on the same screen.",
+     "gesture": "Hold the search for s, type w, hold the search for sw, then release the newer reply first.",
+     "outcome": "Only Linden Language Services is offered for Swedish. After the older reply is released and the directory finishes loading, Linden remains the only option.",
+     "opposite": "A search for s on its own offers both Harbor Interpreting and Linden Language Services.",
+     "defect": "Overlapping the two filtering callbacks lets the late reply offer the earlier Spanish service again."
+    },
+    {
+     "for": "M21.X1216",
+     "page": "Helen Martinez's communication preferences with the interpreter service directory.",
+     "gesture": "Search for s and then sw, holding both replies. Release the older reply while the newer search is pending, then release the newer reply.",
+     "outcome": "The directory's own spinner is visible through the newer search. Only Linden Language Services is offered when the search succeeds, and the spinner is gone.",
+     "opposite": "On a refused lookup the spinner remains visible until the refusal arrives, then clears and the directory asks the caregiver to try again. A rejected search also clears the indicator, and an expired session asks the caregiver to sign in again.",
+     "defect": "Leaving the directory spinner off while the active search is pending, or leaving it on after a successful or refused search, gives the caregiver the wrong loading state."
+    },
+    {
+     "for": "M21.X1210",
+     "page": "A transport booking form offers weekday providers by name and weekend services by service description. The description's JSON name is serviceLabel.",
+     "gesture": "Browse weekday providers and then browse weekend services.",
+     "outcome": "The popup offers Sunrise wheelchair van and Harbour evening shuttle.",
+     "opposite": "The weekday list offers Cedar Community Cars and Northside Transit.",
+     "defect": "The weekend button assigns the weekday catalogue, or the label field still names the provider rather than the weekend service."
+    },
+    {
+     "for": "M21.X1211",
+     "page": "The weekday transport catalogue is ungrouped. The weekend list groups its services by the shift, whose member carries the JSON name dutyPeriod.",
+     "gesture": "Browse weekend services and then browse weekday providers.",
+     "outcome": "The weekend services appear under Day shift and Evening shift.",
+     "opposite": "The weekday list shows Cedar Community Cars and Northside Transit without either shift heading.",
+     "defect": "The live groupBy points at the provider name instead of the shift."
+    },
+    {
+     "for": "M21.X1212",
+     "page": "A resident's transport form lets staff book a provider or choose family transport. Saving confirms the arrangement using the submitted provider code.",
+     "gesture": "Choose Northside Transit, save, choose family transport and save again.",
+     "outcome": "The form confirms Family will arrange transport.",
+     "opposite": "Before family transport was chosen, the same form confirmed Transport booked with Northside Transit.",
+     "defect": "The family transport button hides the popup instead of calling Clear, so the provider code is submitted again."
+    },
+    {
+     "for": "M21.X1213",
+     "page": "An equipment availability desk offers a Wheelchair and a Walking frame in its own ComboBox. Its live Query uses the stock endpoint's DataManager. The wheelchair stock includes a chair being cleaned before the one ready for collection.",
+     "gesture": "Choose Wheelchair and hold the stock answer at Run.tla:Settle.",
+     "outcome": "The desk shows Checking stock while the request is held, then Collect chair W-14 from North stores after release.",
+     "opposite": "Choosing Walking frame shows Collect frame F-08 from South stores.",
+     "defect": "Declaring execute with Method leaves Checking stock in place after release.",
+     "observes": "Run.tla:Settle"
+    },
+    {
+     "for": "M21.X1217",
+     "page": "A delivery desk chooses a supplier in a remote ComboBox. The box's DataManager supplies the catalogue. A separate availability Query requests the selected supplier's open dispatch windows.",
+     "gesture": "Choose Northbank Medical and click Check delivery. Hold the supplier answer at Run.tla:Settle.",
+     "outcome": "While the answer is held the desk shows Checking delivery windows. After release it shows Northbank delivers Monday at 09:30.",
+     "opposite": "Choose Harbor Mobility and click Check delivery. The desk shows Harbor delivers Tuesday at 14:00.",
+     "defect": "A query for Harbor displays its Tuesday window for Northbank. A synchronous call leaves Checking delivery windows after release.",
+     "observes": "Run.tla:Settle"
     }
    ],
    "verdicts": [

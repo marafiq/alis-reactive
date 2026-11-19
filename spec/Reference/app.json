@@ -589,6 +589,26 @@
           "id": "interpreterConsent",
           "kind": "fusion",
           "role": "the resident's consent to an interpreter, FusionComboBox"
+        },
+        {
+          "id": "interpreterDirectory",
+          "kind": "fusion",
+          "role": "the interpreter service directory searched by language, FusionComboBox"
+        },
+        {
+          "id": "transportProvider",
+          "kind": "fusion",
+          "role": "the transport provider and weekend service catalogue, FusionComboBox"
+        },
+        {
+          "id": "equipment",
+          "kind": "fusion",
+          "role": "the transport aid choice, FusionComboBox"
+        },
+        {
+          "id": "supplier",
+          "kind": "fusion",
+          "role": "the supplier catalogue, a DataManager-backed FusionComboBox"
         }
       ]
     },
@@ -3593,6 +3613,109 @@
       ],
       "harness": [
         "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1206",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "language"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1207",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "interpreterDirectory",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "GET /care/admission-clinical/communication-preferences/interpreters"
+        }
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1208",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "interpreterDirectory",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1209",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "interpreterDirectory",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "GET /care/admission-clinical/communication-preferences/interpreters"
+        }
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1216",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "interpreterDirectory",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "GET /care/admission-clinical/communication-preferences/interpreters"
+        }
       ]
     },
     {
@@ -11361,6 +11484,101 @@
       ],
       "harness": [
         "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1210",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "transportProvider"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1211",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "transportProvider"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1212",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "transportProvider",
+        "clinicalForm",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1213",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "equipment",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the stock DataManager's endpoint"
+        }
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1217",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "supplier",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the selected supplier's delivery lookup"
+        }
       ]
     }
   ],

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createServer } from "node:http";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
@@ -6,15 +7,23 @@ const { chromium } = require(process.env.PLAYWRIGHT_PACKAGE);
 const version = require("@syncfusion/ej2-dropdowns/package.json").version;
 const bundle = require.resolve("@syncfusion/ej2/dist/ej2.min.js");
 const style = require.resolve("@syncfusion/ej2-dropdowns/styles/material.css");
-const browser = await chromium.launch();
+const server = createServer((_request, response) => {
+  response.writeHead(200, { "Content-Type": "text/html" });
+  response.end("<!doctype html><input id='choice' aria-label='Choice'>");
+});
+await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+let browser;
 
 async function onPage(gesture) {
   const page = await browser.newPage();
+  const pageErrors = [];
+  page.on("pageerror", error => pageErrors.push(error.message));
   try {
-    await page.setContent("<!doctype html><input id='choice' aria-label='Choice'>");
+    await page.goto("http://127.0.0.1:" + server.address().port);
     await page.addScriptTag({ path: bundle });
     await page.addStyleTag({ path: style });
     await gesture(page);
+    assert.deepEqual(pageErrors, []);
   } finally {
     await page.close();
   }
@@ -36,6 +45,7 @@ const filtering = [
 const observed = { version, change: [], filtering: [] };
 
 try {
+  browser = await chromium.launch();
   for (const scenario of changes) {
     await onPage(async (page) => {
       await page.evaluate(({ kind, first, second }) => {
@@ -127,5 +137,9 @@ try {
 
   console.log(JSON.stringify(observed, null, 2));
 } finally {
-  await browser.close();
+  try {
+    await browser?.close();
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
 }

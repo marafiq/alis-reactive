@@ -1,0 +1,91 @@
+{
+  "changes": [
+    {
+      "value": "one",
+      "itemData": {
+        "label": "First",
+        "code": "one",
+        "support": {
+          "flag": false
+        }
+      },
+      "previousItemData": null,
+      "item": {
+        "element": "HTMLLIElement",
+        "text": "First"
+      },
+      "previousItem": null,
+      "cancel": {
+        "presence": "absent"
+      },
+      "isInteracted": true,
+      "element": {
+        "element": "HTMLInputElement",
+        "text": ""
+      },
+      "event": "KeyboardEvent",
+      "e": "KeyboardEvent"
+    },
+    {
+      "value": null,
+      "itemData": null,
+      "previousItemData": {
+        "label": "First",
+        "code": "one",
+        "support": {
+          "flag": false
+        }
+      },
+      "item": null,
+      "previousItem": {
+        "element": "HTMLLIElement",
+        "text": "First"
+      },
+      "cancel": {
+        "presence": "absent"
+      },
+      "isInteracted": false,
+      "element": {
+        "element": "HTMLInputElement",
+        "text": ""
+      },
+      "event": {
+        "presence": "own undefined"
+      },
+      "e": {
+        "presence": "own undefined"
+      }
+    }
+  ],
+  "queryDefault": null,
+  "amountDefault": null,
+  "amountChanges": [
+    {
+      "value": 17,
+      "previousValue": null,
+      "isInteracted": true,
+      "event": "Event",
+      "name": "change"
+    },
+    {
+      "value": null,
+      "previousValue": 17,
+      "isInteracted": true,
+      "event": "Event",
+      "name": "change"
+    }
+  ],
+  "query": {
+    "sameManager": true,
+    "sameQuery": true,
+    "returnedPromise": true,
+    "rows": [
+      {
+        "id": 7,
+        "dispatch": {
+          "note": "Carry upstairs"
+        }
+      }
+    ]
+  }
+}

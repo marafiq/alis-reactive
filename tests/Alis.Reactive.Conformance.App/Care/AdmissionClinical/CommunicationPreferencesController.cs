@@ -7,10 +7,20 @@ namespace Alis.Reactive.Conformance.App.Care;
 
 public sealed class CommunicationPreferencesController : Controller
 {
-    private CommunicationPlanFile FileOfHelen => HttpContext.RequestServices.GetRequiredService<CurrentWorld>().Data.Owns(CommunicationPlanFile.Open);
+    private WorldData World => HttpContext.RequestServices.GetRequiredService<CurrentWorld>().Data;
+
+    private CommunicationPlanFile FileOfHelen => World.Owns(CommunicationPlanFile.Open);
 
     [HttpGet(CarePages.CommunicationPreferences)]
     public IActionResult OfHelen() => View("/Care/AdmissionClinical/CommunicationPreferences.cshtml", FileOfHelen.Current);
+
+    [HttpGet(CareEndpoints.CommunicationInterpreters)]
+    public async Task<IActionResult> Interpreters([FromQuery] InterpreterSearch query)
+    {
+        await World.Reach(GateName.Of(LanesGate.Respond), Request.Path);
+        var status = World.NextAnswer(CareEndpoints.CommunicationInterpreters);
+        return status == StatusCodes.Status200OK ? Json(FileOfHelen.FindInterpreters(query.Language)) : StatusCode(status);
+    }
 
     [HttpPost(CommunicationPreferences.SaveEndpoint)]
     public IActionResult Save([FromBody] CommunicationPlan plan)
@@ -23,6 +33,13 @@ public sealed class CommunicationPreferencesController : Controller
 
 internal sealed class CommunicationPlanFile : IOwnedByAWorld
 {
+    private readonly InterpreterService[] _interpreters =
+    [
+        new("harbor", "Harbor Interpreting", "Spanish", "Telephone appointments through extension 317."),
+        new("linden", "Linden Language Services", "Swedish", "Video appointments through extension 248."),
+        new("maple", "Maple Community Interpreting", "Punjabi", "On-site appointments through extension 206."),
+    ];
+
     private volatile CommunicationPreferences _current = new();
 
     internal CommunicationPreferences Current => _current;
@@ -30,6 +47,13 @@ internal sealed class CommunicationPlanFile : IOwnedByAWorld
     internal static CommunicationPlanFile Open() => new();
 
     void IOwnedByAWorld.Take(Seed seed) { }
+
+    internal IReadOnlyList<InterpreterService> FindInterpreters(string? language)
+    {
+        if (string.IsNullOrWhiteSpace(language)) return [];
+
+        return _interpreters.Where(service => service.Language.StartsWith(language.Trim(), StringComparison.OrdinalIgnoreCase)).ToArray();
+    }
 
     internal bool Save(CommunicationPlan plan)
     {
@@ -89,6 +113,8 @@ public sealed class CommunicationPreferences
 
     public bool? Consent { get; init; } = true;
 
+    public string? InterpreterServiceCode { get; init; }
+
     public CommunicationLanguage Selected { get; init; } = Languages[0];
 
     public string PreviousLanguage { get; init; } = "English";
@@ -98,6 +124,10 @@ public sealed class CommunicationPreferences
     public string Guidance => Selected.Support.Spoken.RequiresInterpreter && Consent == true && (Channel == "telephone" || LeadMinutes >= 30)
         ? Book : Selected.Support.Written.NeedsTranslatedPack ? PreparePack : Standard;
 }
+
+public sealed record InterpreterSearch(string? Language);
+
+public sealed record InterpreterService(string Code, string Name, string Language, string BookingInstruction);
 
 public sealed record ContactChoice<T>(string Label, T Code);
 

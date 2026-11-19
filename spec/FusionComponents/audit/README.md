@@ -53,6 +53,22 @@ One existing typed example sends the filter text to the application's allergy en
 - Nine C# classes have no public EJ2 object context. The catalog lists them under each slice's `separate` field. They comprise Grid's DataResult, InPlaceEditor's three DOM classes and ActionBeginData, the two Smart render-options classes, Uploader.FilesChangedEventArgs, and Confirm. Uploader's `Files` is a projection through `GetFilesData` and `RawFile`. Its own `FilesChanged` event carries `filesData`; the component code calls EJ2's private trigger under the owner's November 17 exception. [Uploader declaration](../../../Alis.Reactive.Fusion/FusionComponents/FusionUploader/FusionUploader.cs) · [Component code](../../../Alis.Reactive.Fusion/FusionComponents/FusionUploader/fusion-uploader.ts)
 - Confirm exposes its own asynchronous `Ask(message)` with the run's abort signal. Its two host render helpers throw at this base. Toast does resolve to a pinned EJ2 object and exposes eight names; its render helpers also throw here. A public declaration or vendor catalog entry cannot establish an available end-to-end app object. [App-level contract](../../FusionAppLevelObjects/module.md) · [Confirm](../../../Alis.Reactive.Fusion/FusionAppLevelObjects/FusionConfirm/FusionConfirm.cs)
 
+## How do the current ComboBox declarations check out?
+
+Run the inventory command below with the baseline option omitted, then compare the current graph with the typed
+declarations used by the ComboBox examples. The source comparison checks the expected operation and both API
+manifests. The browser suite exercises the examples on the rendered component.
+
+```bash
+for example in payload search catalogue promise manager; do
+  python3 spec/FusionComponents/audit/check-combo-box-onboarding.py .landing/FusionAudit/catalog.json "$example"
+done
+scripts/playwright.sh FusionComboBox
+```
+
+[The onboarding replay](onboarding-replay.md) records the independent reading, what the comparison caught, and
+the vendor paths that retain separate proof requirements.
+
 ## How is the inventory reproduced?
 
 Run from the repository root using the pinned toolchain. At 9c77fd7d8, the npm lock pins the EJ2 umbrella and dropdowns at 33.1.47; other locked subpackages range from 33.1.44 through 33.1.47. The inventory checks each installed Syncfusion version against its own lock entry and records those versions in the graph. Run without `--verify-baseline` to inventory a changed slice or a new vendor pin. Review that slice’s rows and the sources they reference. The checked-in table records 9c77fd7d8.

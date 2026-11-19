@@ -1,5 +1,6 @@
 @using Alis.Reactive.Conditions
 @using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
 @using Alis.Reactive.Fusion.FusionComponents
 @using Alis.Reactive.Fusion.FusionTemplates
 @using Alis.Reactive.RenderingAndDelivery
@@ -32,6 +33,12 @@
         .ItemTemplate(languageOption)
         .AllowObjectBinding(true)
         .Value(new JRaw(plan.Json(Model.Selected)));
+
+    void DirectoryRefused(Pipeline<CommunicationPreferences> pipeline, string message)
+    {
+        pipeline.Input(m => m.InterpreterServiceCode).Component<FusionComboBox<string?>>().HideSpinner();
+        pipeline.Element("directory-error").Text.Set(message);
+    }
 
     void ReviewSupport(Pipeline<CommunicationPreferences> pipeline, TypedSource<bool> needsInterpreter, TypedSource<bool> needsTranslatedPack)
     {
@@ -167,6 +174,8 @@
     <legend>Preferred language</legend>
     <label for="@languageId">Preferred language</label>
     @(plan.Render<FusionComboBox<CommunicationLanguage?>>(languageId, languageBox.Render())
+        .Reactive(box => box.Focus, pipeline => pipeline.Element("language-keys").Show())
+        .Reactive(box => box.Blur, pipeline => pipeline.Element("language-keys").Hide())
         .Reactive(box => box.Change, (changed, pipeline) =>
         {
             var previous = changed.PreviousItemData<CommunicationLanguage>();
@@ -178,6 +187,49 @@
                 changed.Value.Read(language => language!.Support.Spoken.RequiresInterpreter),
                 changed.Value.Read(language => language!.Support.Written.NeedsTranslatedPack));
         }))
+    <p id="language-keys" hidden>Use the arrow keys to choose a language and Enter to confirm.</p>
+</fieldset>
+<fieldset id="interpreter-directory">
+    <legend>Interpreter service</legend>
+    @(Html.InputField(plan, m => m.InterpreterServiceCode, label => label.Label("Interpreter service"))
+        .FusionComboBox(box => box
+            .Fields((InterpreterService service) => service.Name, service => service.Code)
+            .AllowFiltering(true)
+            .AllowCustom(false)
+            .ShowClearButton(false)
+            .Placeholder("Search by language")
+            .NoRecordsTemplate("No interpreter services found."))
+        .Reactive(box => box.Filtering, HandlerPolicy.Replace, (filtering, pipeline) =>
+        {
+            filtering.PreventDefaultAction.Set(true);
+            pipeline.Get<InterpreterSearch>(CareEndpoints.CommunicationInterpreters, request => request
+                .Query(query => query.Language, filtering.Text))
+                .Busy("interpreter-directory")
+                .WhileLoading(pipeline =>
+                {
+                    pipeline.Input(m => m.InterpreterServiceCode).Component<FusionComboBox<string?>>().ShowSpinner();
+                    pipeline.Element("directory-error").Text.Set("");
+                })
+                .OnSuccess<IReadOnlyList<InterpreterService>>((services, pipeline) =>
+                {
+                    filtering.UpdateData<InterpreterService>(services.Body);
+                    pipeline.Input(m => m.InterpreterServiceCode).Component<FusionComboBox<string?>>().HideSpinner();
+                })
+                .OnError(400, Content.None, (rejected, pipeline) => DirectoryRefused(pipeline, "Interpreter search is unavailable. Try again."))
+                .OnError(401, Content.None, (expired, pipeline) =>
+                {
+                    DirectoryRefused(pipeline, "Sign in again to search for an interpreter.");
+                    pipeline.Notice().Warning("Your session has ended.");
+                })
+                .OnError((unavailable, pipeline) => DirectoryRefused(pipeline, "Interpreter search is unavailable. Try again."));
+        })
+        .Reactive(box => box.Change, (changed, pipeline) =>
+        {
+            var service = changed.ItemData<InterpreterService>();
+            pipeline.Element("service-booking").Text.Set(service.Read(row => row!.BookingInstruction));
+        }))
+    <p id="directory-error" role="alert"></p>
+    <p id="service-booking">Choose an interpreter service for booking instructions.</p>
 </fieldset>
 <h2>Support review</h2>
 <dl>

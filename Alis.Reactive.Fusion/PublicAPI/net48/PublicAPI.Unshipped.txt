@@ -250,6 +250,24 @@ Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs.Pre
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<TValue>!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Clear() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataBind() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataManager
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataManager.DataManager() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataManager.ExecuteQuery<TRow>(Alis.Reactive.ValuesAndSources.TypedSource<Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataQuery!>! query) -> Alis.Reactive.Declarations.MethodResult<Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.QueryResult<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataQuery
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataQuery.DataQuery() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataQuery.Execute<TRow>() -> Alis.Reactive.Declarations.MethodResult<Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.QueryResult<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataSource<TItem>() -> Alis.Reactive.Declarations.WriteOnly<System.Collections.Generic.IReadOnlyList<TItem>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FieldSettings
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FieldSettings.FieldSettings() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FieldSettings.GroupBy.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FieldSettings.Text.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Fields.get -> Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FieldSettings!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Filtering.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FilteringEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FilteringEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FilteringEventArgs.FilteringEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FilteringEventArgs.PreventDefaultAction.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FilteringEventArgs.Text.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FilteringEventArgs.UpdateData<TItem>(Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<TItem>!>! dataSource) -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Focus.get -> Alis.Reactive.Declarations.Event!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FocusIn() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FocusOut() -> void
@@ -258,8 +276,16 @@ Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HTMLLIElement
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HTMLLIElement.HTMLLIElement() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HTMLLIElement.TextContent.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HidePopup() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HideSpinner() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Index.get -> Alis.Reactive.Declarations.Property<int?>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ManagedDataSource.get -> Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataManager!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Query.get -> Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataQuery!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.QueryResult<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.QueryResult<TRow>.QueryResult() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.QueryResult<TRow>.Result.get -> System.Collections.Generic.IReadOnlyList<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.QueryResult<TRow>.Result.set -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ShowPopup() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ShowSpinner() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Text.get -> Alis.Reactive.Declarations.Property<string?>!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Value.get -> Alis.Reactive.Declarations.Property<TValue>!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBoxHtml

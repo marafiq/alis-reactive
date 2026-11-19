@@ -1289,6 +1289,76 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F13 M21.X1206 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/CommunicationPreferences.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F13 M21.X1207 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/CommunicationPreferences.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F13 M21.X1208 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/CommunicationPreferences.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F13 M21.X1209 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/CommunicationPreferences.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F13 M21.X1210 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/TransportProviders.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F13 M21.X1211 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/TransportProviders.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F13 M21.X1212 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/TransportProviders.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F13 M21.X1213 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/EquipmentAvailability.cshtml",
+      "/Care/AdmissionClinical/_EquipmentLayout.cshtml"
+    ]
+  },
+  "M21.F13 M21.X1216 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/CommunicationPreferences.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F13 M21.X1217 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/SupplierDelivery.cshtml",
+      "/Care/AdmissionClinical/_SupplierLayout.cshtml"
+    ]
+  },
   "M21.F13 M21.X505 0": {
     "modules": [],
     "views": [

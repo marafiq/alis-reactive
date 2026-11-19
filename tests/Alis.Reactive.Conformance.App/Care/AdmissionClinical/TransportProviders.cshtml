@@ -1,0 +1,65 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model TransportProviders
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident transport";
+    var plan = Html.ReactivePlan<TransportProviders>();
+}
+
+<h1>Resident transport</h1>
+
+@using (var booking = Html.BeginRequestForm(plan, "transport-booking"))
+{
+    <fieldset>
+        <legend>Transport provider</legend>
+        <button type="button" @Html.Raises(plan, TransportBookings.BrowseWeekdays)>Browse weekday providers</button>
+        <button type="button" @Html.Raises(plan, TransportBookings.BrowseWeekends)>Browse weekend services</button>
+        @(Html.InputField(plan, resident => resident.ProviderCode, options => options.Label("Transport provider"))
+            .FusionComboBox(Model.WeekdayProviders, build => build
+                .AllowCustom(false)
+                .Fields((TransportProvider provider) => provider.ProviderName, provider => provider.Code)))
+        <button type="button" @Html.Raises(plan, TransportBookings.UseFamilyTransport)>Use family transport</button>
+    </fieldset>
+
+    <button type="button" @Html.Raises(plan, TransportBookings.SaveArrangement)>Save transport</button>
+    <p role="status" id="booking-confirmation">Transport has not been booked.</p>
+
+    Html.On(plan, trigger => trigger.CustomEvent(TransportBookings.BrowseWeekdays, pipeline =>
+    {
+        var providers = pipeline.Input(resident => resident.ProviderCode).Component<FusionComboBox<string?>>();
+        providers.DataSource<TransportProvider>().Set(Model.WeekdayProviders);
+        providers.Fields.Text.Set(plan.JsonPath((TransportProvider provider) => provider.ProviderName).Single());
+        providers.Fields.GroupBy.Set((string?)null);
+        providers.DataBind();
+        providers.ShowPopup();
+    }));
+
+    Html.On(plan, trigger => trigger.CustomEvent(TransportBookings.BrowseWeekends, pipeline =>
+    {
+        var services = pipeline.Input(resident => resident.ProviderCode).Component<FusionComboBox<string?>>();
+        services.DataSource<TransportProvider>().Set(Model.WeekendServices);
+        services.Fields.Text.Set(plan.JsonPath((TransportProvider provider) => provider.ServiceDescription).Single());
+        services.Fields.GroupBy.Set(plan.JsonPath((TransportProvider provider) => provider.Shift).Single());
+        services.DataBind();
+        services.ShowPopup();
+    }));
+
+    Html.On(plan, trigger => trigger.CustomEvent(TransportBookings.UseFamilyTransport, pipeline =>
+    {
+        var providers = pipeline.Input(resident => resident.ProviderCode).Component<FusionComboBox<string?>>();
+        providers.Clear();
+    }));
+
+    Html.On(plan, trigger => trigger.CustomEvent(TransportBookings.SaveArrangement, pipeline => pipeline
+        .Post<TransportProviders>(TransportBookings.Save, request => request.Form(booking.Form))
+        .OnSuccess(Content.Text, (confirmation, pipeline) =>
+        {
+            pipeline.Element("booking-confirmation").Text.Set(confirmation.Body);
+        })));
+}
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,43 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model SupplierDelivery
+@{
+    Layout = "/Care/AdmissionClinical/_SupplierLayout.cshtml";
+    ViewData["Title"] = "Supplier deliveries";
+    var plan = Html.ReactivePlan<SupplierDelivery>();
+}
+<h1>Supplier deliveries</h1>
+<fieldset data-supplier-catalogue="@CareEndpoints.SupplierCatalogue">
+    <legend>Arrange a delivery</legend>
+    @(Html.InputField(plan, m => m.Supplier, options => options.Label("Supplier"))
+        .FusionComboBox(build => build
+            .Fields((SupplierOption supplier) => supplier.Name, supplier => supplier.Code)
+            .AllowCustom(false)))
+    @(Html.NativeButton("check-delivery", "Check delivery")
+        .Reactive(plan, button => button.Click, (clicked, pipeline) =>
+        {
+            var supplier = pipeline.Input(m => m.Supplier).Component<FusionComboBox<string?>>().Value;
+            pipeline.When(supplier.NotEmpty())
+                .Then(pipeline =>
+                {
+                    pipeline.Element("delivery-window").Text.Set("Checking delivery windows");
+                    var box = pipeline.Input(m => m.Supplier).Component<FusionComboBox<string?>>();
+                    var availability = pipeline.Plugin<SupplierQueries>().Availability;
+                    var delivery = box.ManagedDataSource.ExecuteQuery<SupplierWindow>(availability);
+                    pipeline.Element("delivery-window").Text.Set(delivery.Read(reply => reply.Result)
+                        .Find(window => window.Bookable, window => window.Dispatch.Instruction)
+                        .OrNull().IfNull("No delivery windows available"));
+                })
+                .Else(pipeline => pipeline.Element("delivery-window").Text.Set("Choose a supplier"));
+        }))
+</fieldset>
+<p>Delivery window</p>
+<output id="delivery-window" aria-label="Delivery window">Choose a supplier</output>
+@Html.RenderPlan(plan)

@@ -1,0 +1,39 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model EquipmentAvailability
+@{
+    Layout = "/Care/AdmissionClinical/_EquipmentLayout.cshtml";
+    ViewData["Title"] = "Equipment availability";
+    var plan = Html.ReactivePlan<EquipmentAvailability>();
+}
+<h1>Equipment availability</h1>
+<fieldset data-equipment-stock="@CareEndpoints.TransportStock">
+    <legend>Resident transport</legend>
+    @(Html.InputField(plan, m => m.TransportAid, options => options.Label("Transport aid"))
+        .FusionComboBox(Model.Choices, build => build
+            .Fields((TransportAidChoice aid) => aid.Name, aid => aid.Code)
+            .AllowCustom(false))
+        .Reactive(box => box.Change, HandlerPolicy.Replace, (changed, pipeline) => pipeline
+            .When(changed.Value.NotEmpty())
+            .Then(pipeline =>
+            {
+                pipeline.Element("collection").Text.Set("Checking stock");
+                var box = pipeline.Input(m => m.TransportAid).Component<FusionComboBox<string?>>();
+                var stock = box.Query.Execute<TransportStockRow>();
+                pipeline.Element("collection").Text.Set(stock.Read(reply => reply.Result)
+                    .Find(row => row.ReadyForCollection, row => row.Dispatch.Instruction).OrNull().IfNull("No equipment available"));
+            })
+            .Else(pipeline =>
+            {
+                pipeline.Element("collection").Text.Set("Choose a transport aid");
+            })))
+</fieldset>
+<p>Collection instructions</p>
+<output id="collection" aria-label="Collection instructions">Choose a transport aid</output>
+@Html.RenderPlan(plan)

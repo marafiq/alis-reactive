@@ -651,6 +651,21 @@ public static class Promises
         public const string M21_X1203_0 = "M21.F13 M21.X1203 0";
         public const string M21_X1204_0 = "M21.F13 M21.X1204 0";
         public const string M21_X1205_0 = "M21.F13 M21.X1205 0";
+        public const string M21_X1206_0 = "M21.F13 M21.X1206 0";
+        [Holds(LanesGate.Respond)]
+        public const string M21_X1207_0 = "M21.F13 M21.X1207 0";
+        public const string M21_X1208_0 = "M21.F13 M21.X1208 0";
+        [Holds(LanesGate.Respond)]
+        public const string M21_X1209_0 = "M21.F13 M21.X1209 0";
+        [Holds(LanesGate.Respond)]
+        public const string M21_X1216_0 = "M21.F13 M21.X1216 0";
+        public const string M21_X1210_0 = "M21.F13 M21.X1210 0";
+        public const string M21_X1211_0 = "M21.F13 M21.X1211 0";
+        public const string M21_X1212_0 = "M21.F13 M21.X1212 0";
+        [Holds(RunGate.Settle)]
+        public const string M21_X1213_0 = "M21.F13 M21.X1213 0";
+        [Holds(RunGate.Settle)]
+        public const string M21_X1217_0 = "M21.F13 M21.X1217 0";
     }
 
     public static class M21_F14

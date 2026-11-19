@@ -22,19 +22,34 @@ do, on the same public surface, and the conformance library is the exemplar of e
   or hidden, and names found only in docs, need a use case raised to the owner.
 - A weak type such as `Object`, `any` or a loose union needs evidence from the installed vendor. Start with the
   code that constructs or consumes the value. Run the applicable real gesture on the pinned version and record
-  the member's exact name, shape and presence in each lane the declaration covers. Observe absent, null and
+  the member's exact name, shape and presence in each lane the declaration covers. Use a rendered page on
+  an HTTP origin and make unexpected browser errors fail the probe. Observe absent, null and
   falsy values distinctly. An object row and its selected DOM element have different contracts.
-- Presence and nullability come from that API, on every object the declaration reaches, an event's payload
-  included. A member the API declares is required: a page whose object lacks it stops the pipeline that reads,
-  writes or calls it. A member it marks optional is `optional: true`; a value it types as text or null is
-  `string?`; an object it types as possibly null or undefined is `nullable: true`.
-- Sync or async is the declaration's, never what the browser finds: a method whose API returns a promise is
-  `MethodAsync`. One declared with `Method` that returns a promise stops its pipeline.
+- Record presence and nullability separately on every object the declaration reaches. Read a vendor
+  member's documented `@default null` even when its type declaration omits null. Include null in the
+  declaration and verify the initial value on a rendered control. Read the code that constructs an event
+  payload and observe the relevant gestures on the pinned build. An always-emitted member that holds null is
+  required and nullable. For example, ComboBox emits both row keys, and clearing a selection gives a null
+  current row. Use the nullable data type for plain data and `nullable: true` for a live holder. Reserve
+  `optional: true` for a member that can be absent.
+- Read the return type of the actual public call. A method that starts asynchronous work and returns void
+  uses `Method`. A call that returns a Promise uses `MethodAsync`, and a view can read its resolved data through
+  the typed result. Follow a live object to its own public methods. ComboBox's spinner methods return void.
+  Its configured EJ2 Query's execute method returns the DataManager's Promise.
 - A member's JavaScript name is its C# name in camel case. When the names differ, pass `name:`.
 - Check whether the project imports `Alis.Reactive.Analyzers/Vendors/VendorContract.targets` and supplies a
   vendor TypeScript program on each target. A configured build checks declarations it sees. Compare the vendor
   list against the C# declarations as well to find omitted doors. For Fusion, follow the per-slice inventory in
   `spec/FusionComponents/audit/README.md`, then read the recorded vendor source for the slice's rows.
+- Separate the render helper's initial options from the live object exposed after it renders. For a live
+  union, decide reads and writes independently. An array write to ComboBox's inherited dataSource has a
+  typed list lane. A list read needs evidence for the active data source because the same property can hold
+  a DataManager. Record and prove each exposed read or write lane, including cases that share a vendor name.
+- Onboard DataManager only for the component that needs it. Keep its live declaration, query and result
+  holders with that component's slice. Verify the configured source, query argument and adaptor envelope.
+  A live browser object passed to a method needs a typed source that carries the same instance. A C# live
+  declaration describes the object and its member paths. Read the supported value as a source for an
+  argument, and prove the actual Query reaches the vendor call before adding the door.
 
 ## Find the object
 
@@ -134,3 +149,34 @@ Cover absence or null as the contract permits. For a loose vendor type, keep the
 shape and the Playwright test that uses the resulting C# door. Rerun both on a vendor upgrade. For a payload
 method, exercise the supported argument forms and observe the vendor effect. Plant the defect each test names
 through the prove-behavior skill.
+
+## How does this look in a real Fusion slice?
+
+Use the pinned ComboBox examples as a cross-check after reading the vendor source:
+
+- Four value shapes, priority branches, a current row, a previous row and the selected list element.
+  The same page separately handles focus, blur and server filtering. While the lookup is active it shows
+  the vendor spinner. Apply the typed result through the event's updateData method and hide the spinner when
+  the active lookup settles. The returned list and its selected row give independent observable outcomes.
+  `tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/CommunicationPreferences.cshtml`
+  `tests/Alis.Reactive.Conformance.PlaywrightTests/FusionComponents/FusionComboBox/WhenHelenChoosesHerCommunicationPreferences.cs`
+  `tests/Alis.Reactive.Conformance.PlaywrightTests/FusionComponents/FusionComboBox/WhenHelenSearchesForAnInterpreter.cs`
+- A separate box writes a typed catalogue and nested label and grouping settings, binds the change and
+  shows the actual grouped options. Clearing it changes what the form saves.
+  `tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml`
+  `tests/Alis.Reactive.Conformance.PlaywrightTests/FusionComponents/FusionComboBox/WhenStaffArrangeResidentTransport.cs`
+- A separate box runs its actual configured Query. The typed handler waits for the vendor's Promise,
+  filters the returned rows and reads a nested dispatch instruction. The test holds the endpoint before
+  releasing it. Its planted synchronous call and wrong row selection fail at the visible result.
+  `tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/EquipmentAvailability.cshtml`
+  `tests/Alis.Reactive.Conformance.PlaywrightTests/FusionComponents/FusionComboBox/WhenTransportEquipmentIsRequested.cs`
+
+- A manager-backed box tests the actual DataManager call with a typed live Query argument. The provider
+  receives the selected supplier's query and returns its delivery rows. The handler waits for the result,
+  reads the bookable row's dispatch instruction and shows it on the page. The local array write and the live
+  manager read each have a separate declaration on this one component.
+  `tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/SupplierDelivery.cshtml`
+  `tests/Alis.Reactive.Conformance.PlaywrightTests/FusionComponents/FusionComboBox/WhenASupplierDeliveryIsChecked.cs`
+
+Replay the ComboBox declaration checks from `spec/FusionComponents/audit/README.md`. The baseline and current
+checks validate different facts. Use the current inventory when comparing an onboarded slice.

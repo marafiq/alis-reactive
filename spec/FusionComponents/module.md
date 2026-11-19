@@ -175,7 +175,12 @@ Each name is gate 2's; each door is the capability it carries.
   `Change` (M7.N3); the payload `FusionComboBox<TValue>.ChangeEventArgs` (`Value`, `IsInteracted`, the catalogue's
   nullable current and previous rows `ItemData<TItem>()` and `PreviousItemData<TItem>()`, and the selected
   `Item.TextContent` of its nullable `HTMLLIElement` holder, M21.X1200 to M21.X1205), and the focus and
-  blur payloads, which EJ2 types as `Object`, declaring no member (their class name a gate 2 gap); and the render
+  blur payloads, which EJ2 types as `Object`, declaring no member (M21.X1206). Its `Filtering` event hands
+  `FilteringEventArgs`: `Text` reads the search, `PreventDefaultAction` suppresses the local filter when set in the
+  callback, and `UpdateData<TItem>(dataSource)` takes the matching rows when the request succeeds (M21.X1207 to
+  M21.X1209, `@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822`). `ShowSpinner()` and
+  `HideSpinner()` show and remove the box's loading indicator during a directory search (M21.X1216,
+  `@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:281` and `:288`). The render
   helpers `field.FusionComboBox()`, `field.FusionComboBox(build => ..)` and `field.FusionComboBox(items, build => ..)`,
   which render it with the bound member's type and hand EJ2 the items by M21.D1, a door neither line has, with
   `Fields<TItem>(text, value)` (M21.X505). It replaces main's eight files
@@ -183,6 +188,20 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:92`, `:223`, `:231`, `:360`, `:367`, `:373`, `:380`, `:387`,
   `@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:365`, `:389`, `:395`).
+  The live ComboBox accepts a local array through `DataSource<TItem>()`, a `WriteOnly<IReadOnlyList<TItem>>`.
+  EJ2 types its dataSource as an array or a DataManager (drop-down-base.d.ts:390–392). Its `Fields` holds the
+  slice's own live `FieldSettings`. The optional `Text` and `GroupBy` properties name the item members whose JSON
+  holds the list's labels and group headings (drop-down-base.d.ts:331, drop-down-base-model.d.ts:15, :36).
+  M21.X1210–M21.X1212 exercise changing catalogues, grouping the services and clearing a provider before saving.
+  The box's `Query` is a nullable live EJ2 Query. With a DataManager selected by the query's `using` and an
+  adaptor that answers rows, `Query.Execute<TRow>()` waits for EJ2's Promise and reads its `result` as those rows
+  (M21.X1213, D5.3, D5.11, D17.5). The [pinned query probe](../probes/ej2-combo-box-query.mjs) records the
+  [settled row envelope](../probes/ej2-combo-box-query.json) from the remote UrlAdaptor.
+  A ComboBox configured with an EJ2 DataManager exposes that member through `ManagedDataSource` (M21.X1217).
+  Its `ExecuteQuery<TRow>(query)` accepts a typed source of a live EJ2 Query and waits for the manager's Promise.
+  The UrlAdaptor lane reads the returned array through `QueryResult<TRow>.Result`. The manager's callback form,
+  trailing callbacks, mutations, persistence and other adaptors have no typed ComboBox door in this lane.
+  The pinned [manager probe](../probes/ej2-combo-box-manager.mjs) records the [argument and settled result](../probes/ej2-combo-box-manager.json).
 - `M21.N14` kept: `FusionContextMenu`: `Open(top, left)` and `Close`; `BeforeItemRender`, `BeforeOpen`, `OnOpen`,
   `BeforeClose`, `OnClose` and `Select` and their payloads, `FusionContextMenu.BeforeOpenCloseMenuEventArgs` with
   `IsFocused` (optional, `isFocused`), which beforeClose holds (M21.X405); and the render helper

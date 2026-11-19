@@ -4369,6 +4369,36 @@
       "probe": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt",
       "expect": "return Enum.ToObject(destinationType, (int)value);",
       "source": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:99"
+    },
+    {
+      "id": "ej2-combo-box-query-awaits-rows",
+      "statement": "The ComboBox's configured Query returns a native Promise. The remote UrlAdaptor resolves it with its own result array.",
+      "host": "browser",
+      "oracle": "The pinned EJ2 browser bundle in Chromium calling Query.execute on the ComboBox's actual Query",
+      "probe": "ej2-combo-box-query.mjs",
+      "expect": "  \"nativePromise\": true,",
+      "source": "spec/probes/ej2-combo-box-query.mjs",
+      "proof": {
+        "feature": "M21.F13",
+        "page": "The equipment availability ComboBox with a Query set up against the stock catalogue.",
+        "gesture": "Choose Wheelchair, hold its stock response at Run.Settle, then release the response.",
+        "outcome": "Checking stock stays visible while held. The ready row then directs staff to collect chair W-14 from North stores."
+      }
+    },
+    {
+      "id": "ej2-combo-box-data-manager-uses-live-query",
+      "statement": "A ComboBox mounted with a DataManager retains that instance. Its executeQuery receives the same Query and returns a Promise of supplier rows.",
+      "host": "browser",
+      "oracle": "Pinned EJ2 in Chromium on a local HTTP origin with two Query instances and a UrlAdaptor",
+      "probe": "ej2-combo-box-manager.mjs",
+      "expect": "ej2-combo-box-manager: a registered DataManager received each supplied Query by identity, then its Promise returned Northbank delivers Monday at 09:30 and Harbor delivers Tuesday at 14:00",
+      "source": "spec/probes/ej2-combo-box-manager.mjs",
+      "proof": {
+        "feature": "M21.F13",
+        "page": "The supplier delivery screen with a manager-bound ComboBox and a typed availability Query.",
+        "gesture": "Choose Northbank Medical and check delivery. Hold and release the request. Then choose Harbor Mobility and check.",
+        "outcome": "The collection display waits while held and shows the delivery window for each supplier."
+      }
     }
   ]
 }
