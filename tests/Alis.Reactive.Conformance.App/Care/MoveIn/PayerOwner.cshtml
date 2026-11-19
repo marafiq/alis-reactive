@@ -1,0 +1,48 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model PayerOwnerPage
+@{
+    var plan = Html.ReactivePlan<PayerOwnerPage>();
+}
+<h3>Payer handoff</h3>
+<div id="room-payer-contact"></div>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline =>
+    {
+        var console = pipeline.Component<ConformanceCallbacks>("room-handoff");
+        pipeline.Listen(console, callbacks => callbacks.OnRaised, (raised, pipeline) =>
+        {
+            pipeline.Component<ConformanceCallbacks>("room-handoff").Append("Payer");
+            pipeline.Get<PayerExplanationQuery>(CareEndpoints.MoveInPayerExplanation, request => request
+                .Query(query => query.DraftId, Model.DraftId)
+                .Query(query => query.ContactId, Reads.PayerContactOf(Model.DraftId))
+                .Query(query => query.PolicyNumber, Model.Reference)
+                .Query(query => query.Culture, "en-US"))
+                .Into("room-payer-contact");
+        });
+        pipeline.Listen(console, callbacks => callbacks.OnSearch, HandlerPolicy.Replace, (search, pipeline) => pipeline
+            .When(search.Query.IsEmpty().Or(search.Query.MinLength(3).Not()))
+            .Then(pipeline => pipeline.Element("room-search-result").Text.Set("Enter at least three characters."))
+            .Else(pipeline => pipeline
+                .Get<RoomSearchQuery>(CareEndpoints.MoveInRoomSearch, request => request
+                    .Query(query => query.DraftId, Model.DraftId)
+                    .Query(query => query.CommunityId, pipeline.Container<MoveInPage>("move-in").Read(m => m.Location.CommunityId))
+                    .Query(query => query.Query, search.Query))
+                .NoRetry()
+                .OnSuccess<IReadOnlyList<string>>((names, pipeline) =>
+                {
+                    search.Show(names.Body);
+                    pipeline.Element("room-search-result").Text.Set("Room directory loaded.");
+                })
+                .OnError<ErrorEnvelope>(503, (failed, pipeline) => pipeline.Element("room-search-result").Text.Set(failed.Body.Read(reply => reply.Error.Message)))
+                .OnError((failed, pipeline) => pipeline.Element("room-search-result").Text.Set("The room search failed."))));
+    }));
+}
+@Html.RenderPlan(plan)

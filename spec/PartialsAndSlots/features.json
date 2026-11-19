@@ -674,6 +674,86 @@
           "id": "M9.X54",
           "rung": "behavior",
           "defect": "A request's route is chosen before its answer arrives, so an answer the server decided late is routed as the page expected it: on the move-in, a removal the payer came to depend on while it waited reads as removed (MI.7, situation 5)."
+        },
+        {
+          "id": "M9.X65",
+          "rung": "behavior",
+          "defect": "The endpoint returns a position without adding the accepted entry to the world's waitlist."
+        },
+        {
+          "id": "M9.X66",
+          "rung": "behavior",
+          "defect": "The validator accepts an unchecked waitlist agreement."
+        },
+        {
+          "id": "M9.X67",
+          "rung": "behavior",
+          "defect": "The service creates an entry after the community stopped accepting new waitlist entries."
+        },
+        {
+          "id": "M9.X68",
+          "rung": "behavior",
+          "defect": "The page calls a transport failure a successful waitlist submission."
+        },
+        {
+          "id": "M9.X70",
+          "rung": "behavior",
+          "defect": "The handed listener starts two writes for one assessment change."
+        },
+        {
+          "id": "M9.X71",
+          "rung": "behavior",
+          "defect": "The shared mobility rule accepts a ratio of 101."
+        },
+        {
+          "id": "M9.X72",
+          "rung": "behavior",
+          "defect": "The endpoint writes a review for an assessment the care team superseded."
+        },
+        {
+          "id": "M9.X73",
+          "rung": "behavior",
+          "defect": "The service commits the mobility review before dropping its unsent request."
+        },
+        {
+          "id": "M9.X74",
+          "rung": "behavior",
+          "defect": "A replacement assessment owner omits the listener for a newly raised peer."
+        },
+        {
+          "id": "M9.X75",
+          "rung": "behavior",
+          "defect": "The nested payer owner omits its search subscription, so its owed callback restoration is missing at release."
+        },
+        {
+          "id": "M9.X76",
+          "rung": "behavior",
+          "defect": "The payer appends Admission in place of its own word."
+        },
+        {
+          "id": "M9.X77",
+          "rung": "behavior",
+          "defect": "The callback sends a two-character room search."
+        },
+        {
+          "id": "M9.X78",
+          "rung": "behavior",
+          "defect": "The room review is recorded while the handoff is locked."
+        },
+        {
+          "id": "M9.X79",
+          "rung": "behavior",
+          "defect": "A failed search publishes an empty list over the last successful result."
+        },
+        {
+          "id": "M9.X80",
+          "rung": "behavior",
+          "defect": "Closing the payer clears only its contact content and leaves the payer subscribed."
+        },
+        {
+          "id": "M9.X81",
+          "rung": "behavior",
+          "defect": "A room handoff with the prior callback throwing misses the admission owner's write."
         }
       ],
       "promises": [
@@ -1093,6 +1173,139 @@
           "opposite": "With no change of the payer's contact, the held DELETE, once released, reads Contact removed: CONTACTS8 and Contacts on file lists Alice Ward alone.",
           "defect": "The explanation's GET leaves with the first member of its query alone, so the server finds no contact to explain and the slot reads No payer depends on this contact.",
           "observes": "Lanes.tla:Respond"
+        },
+        {
+          "for": "M9.X65",
+          "page": "A coordinator reviews Helen Ward's selected window bed. The allocation desk's conflict offers the terms for that community. They open an independent waitlist container, where the coordinator supplies a reason and agreement. The service records the waitlist position in the world's model, independently of the open draft and its bed.",
+          "gesture": "Select the now-held window bed, request its allocation review, accept the offered terms and join, then reopen the draft.",
+          "outcome": "The receipt reads Helen Ward is number 1 on the waitlist. W100 records Assisted care in Harbor House. The reopened draft remains Open, with BED4 held by James Reed.",
+          "opposite": "Before joining the same draft shows no waitlist entry.",
+          "defect": "The endpoint returns a position without adding the accepted entry to the world's waitlist."
+        },
+        {
+          "for": "M9.X66",
+          "page": "A coordinator reviews Helen Ward's selected window bed. The allocation desk's conflict offers the terms for that community. They open an independent waitlist container, where the coordinator supplies a reason and agreement. The service records the waitlist position in the world's model, independently of the open draft and its bed.",
+          "gesture": "Enter the reason and leave the offered terms unchecked, then ask to join and reopen the draft.",
+          "outcome": "Accept the waitlist terms. appears beside the checkbox, no join leaves, and the reopened draft has no waitlist entry.",
+          "opposite": "Checked terms with the same reason allow the join.",
+          "defect": "The validator accepts an unchecked waitlist agreement."
+        },
+        {
+          "for": "M9.X67",
+          "page": "A coordinator reviews Helen Ward's selected window bed. The allocation desk's conflict offers the terms for that community. They open an independent waitlist container, where the coordinator supplies a reason and agreement. The service records the waitlist position in the world's model, independently of the open draft and its bed.",
+          "gesture": "Open the terms, accept and enter a reason. Close the community to new waitlist entries before joining. Ask to join and reopen the draft.",
+          "outcome": "The server refuses with Harbor House is closed to waitlist entries. The reopened draft shows that closure and no waitlist entry.",
+          "opposite": "An open community accepts the same request.",
+          "defect": "The service creates an entry after the community stopped accepting new waitlist entries."
+        },
+        {
+          "for": "M9.X68",
+          "page": "A coordinator reviews Helen Ward's selected window bed. The allocation desk's conflict offers the terms for that community. They open an independent waitlist container, where the coordinator supplies a reason and agreement. The service records the waitlist position in the world's model, independently of the open draft and its bed.",
+          "gesture": "Agree to the terms and submit the reason in a world whose waitlist connection drops. Reopen the draft.",
+          "outcome": "The waitlist says The waitlist request failed. The saved record still reads No waitlist entry. and the reopened draft still lists none.",
+          "opposite": "With transport available the accepted terms produce a saved position.",
+          "defect": "The page calls a transport failure a successful waitlist submission."
+        },
+        {
+          "for": "M9.X70",
+          "page": "The allocation owner listens to handed and raised assessment peers from the allocation panel. Each change of a live peer starts a checked mobility request. The assessment card displays the service receipt and the page reads its review history from the world's store.",
+          "gesture": "Hand one peer twice, press Change and reopen the draft.",
+          "outcome": "One MOB25 receipt is shown and the reopened history lists one Mobility assessment for ratio 25.",
+          "opposite": "A released allocation owner hears no later change.",
+          "defect": "The handed listener starts two writes for one assessment change.",
+          "observes": "Lanes.tla:Respond"
+        },
+        {
+          "for": "M9.X71",
+          "page": "The allocation owner listens to handed and raised assessment peers from the allocation panel. Each change of a live peer starts a checked mobility request. The assessment card displays the service receipt and the page reads its review history from the world's store.",
+          "gesture": "Enter an assessment ratio of 101, hand the assessment over and press Change. Open the draft again.",
+          "outcome": "The browser refuses a ratio outside 0 to 100. The history remains empty on the next read.",
+          "opposite": "A ratio of 25 is accepted for the same assessment.",
+          "defect": "The shared mobility rule accepts a ratio of 101."
+        },
+        {
+          "for": "M9.X72",
+          "page": "The allocation owner listens to handed and raised assessment peers from the allocation panel. Each change of a live peer starts a checked mobility request. The assessment card displays the service receipt and the page reads its review history from the world's store.",
+          "gesture": "Hand the peer over, supersede the world's assessment, then press Change and reopen the draft.",
+          "outcome": "Assessment is superseded. appears; the next read shows the updated assessment code and no saved mobility review.",
+          "opposite": "The same change on the current assessment produces a receipt.",
+          "defect": "The endpoint writes a review for an assessment the care team superseded."
+        },
+        {
+          "for": "M9.X73",
+          "page": "The allocation owner listens to handed and raised assessment peers from the allocation panel. Each change of a live peer starts a checked mobility request. The assessment card displays the service receipt and the page reads its review history from the world's store.",
+          "gesture": "Hand over the peer, drop its mobility connection and press Change, then reopen the draft.",
+          "outcome": "The request fails, the busy indication clears and the reopened draft holds no mobility review.",
+          "opposite": "An answered mobility request adds one review.",
+          "defect": "The service commits the mobility review before dropping its unsent request."
+        },
+        {
+          "for": "M9.X74",
+          "page": "The allocation owner listens to handed and raised assessment peers from the allocation panel. Each change of a live peer starts a checked mobility request. The assessment card displays the service receipt and the page reads its review history from the world's store.",
+          "gesture": "Hand a peer over, drop that peer and restart its component before replacing the owner. Raise with the new peer and press Change, then reopen the draft.",
+          "outcome": "The new peer produces exactly one MOB25 review, preserved in history.",
+          "opposite": "Closing the owner leaves its peer unheard. With the response held after the write, closing clears busy. Attempts to file the absent container and ratio send no further review. Reopening the live card files ratios 46 and 38.",
+          "defect": "A replacement assessment owner omits the listener for a newly raised peer.",
+          "observes": "Ownership.tla:HostDestroys"
+        },
+        {
+          "for": "M9.X75",
+          "page": "The allocation owner listens to handed and raised assessment peers from the allocation panel. Each change of a live peer starts a checked mobility request. The assessment card displays the service receipt and the page reads its review history from the world's store.",
+          "gesture": "Open both owners and freeze the room callbacks, then replace the allocation owner. Hand the replacement a peer, press Change and reopen the draft.",
+          "outcome": "The nested unsubscribe reports the refused callback, the payer owner leaves, the replacement owner opens and its next change saves exactly one review.",
+          "opposite": "With callbacks writable, both owners leave without a refusal.",
+          "defect": "The nested payer owner omits its search subscription, so its owed callback restoration is missing at release.",
+          "observes": "Lanes.tla:Respond"
+        },
+        {
+          "for": "M9.X76",
+          "page": "The room handoff console has its own Desk callback. The allocation owner and its nested payer owner listen to that same component. Room review receipts and the directory are served from this draft's community.",
+          "gesture": "Open the allocation and payer owners and raise room 7. Reopen the draft.",
+          "outcome": "The words read Desk Admission Payer. The accepted receipt and the reopened history show a single ROOM7 room review.",
+          "opposite": "With only the vendor callback live the line reads Desk.",
+          "defect": "The payer appends Admission in place of its own word.",
+          "observes": "Lanes.tla:Respond"
+        },
+        {
+          "for": "M9.X77",
+          "page": "The room handoff console has its own Desk callback. The allocation owner and its nested payer owner listen to that same component. Room review receipts and the directory are served from this draft's community.",
+          "gesture": "Search for Cedar with the payer owner open, then shorten the search to two characters and reopen the draft.",
+          "outcome": "Enter at least three characters. is shown, both previous names remain, the short query sends nothing and the reopened room history is unchanged.",
+          "opposite": "The full Cedar query returns rooms 7 and 12.",
+          "defect": "The callback sends a two-character room search."
+        },
+        {
+          "for": "M9.X78",
+          "page": "The room handoff console has its own Desk callback. The allocation owner and its nested payer owner listen to that same component. Room review receipts and the directory are served from this draft's community.",
+          "gesture": "Raise room 7 with the room handoff locked, then reopen the draft.",
+          "outcome": "Room handoff is locked. appears and the reopened room history is empty.",
+          "opposite": "The same room is accepted with the handoff open.",
+          "defect": "The room review is recorded while the handoff is locked."
+        },
+        {
+          "for": "M9.X79",
+          "page": "The room handoff console has its own Desk callback. The allocation owner and its nested payer owner listen to that same component. Room review receipts and the directory are served from this draft's community.",
+          "gesture": "Search the directory successfully, drop its next connection and search again. Restore service and search for Cedar.",
+          "outcome": "The failed search leaves the last names in place and the recovered search shows 7 — Cedar and 12 — Cedar. The reopened room history is empty.",
+          "opposite": "A successful search replaces the displayed names with the returned list.",
+          "defect": "A failed search publishes an empty list over the last successful result."
+        },
+        {
+          "for": "M9.X80",
+          "page": "The room handoff console has its own Desk callback. The allocation owner and its nested payer owner listen to that same component. Room review receipts and the directory are served from this draft's community.",
+          "gesture": "Replace the vendor callback, close both owners, restart the console, open the allocation owner alone and raise the room again. Open the draft again.",
+          "outcome": "Only the vendor hears the raise after release. A fresh allocation owner appends Admission and the next history read shows one ROOM7 review.",
+          "opposite": "After closing just B on the new generation the vendor and A still hear the raise.",
+          "defect": "Closing the payer clears only its contact content and leaves the payer subscribed.",
+          "observes": "CallbackProperty.tla:Restart"
+        },
+        {
+          "for": "M9.X81",
+          "page": "The room handoff console has its own Desk callback. The allocation owner and its nested payer owner listen to that same component. Room review receipts and the directory are served from this draft's community.",
+          "gesture": "Make the console's prior callback throw with both owners live, raise room 7 and reopen the draft.",
+          "outcome": "The vendor error appears. Desk Admission Payer is still appended and the next read lists a single accepted ROOM7 review.",
+          "opposite": "With the prior callback returning normally the same review is accepted.",
+          "defect": "A room handoff with the prior callback throwing misses the admission owner's write."
         }
       ],
       "verdicts": []

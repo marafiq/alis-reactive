@@ -480,6 +480,39 @@
           "kind": "conformance",
           "role": "an authority's Starts on and Ends on, each a ConformanceComponent bound to its date, whose value a person picks",
           "declares": "ConformanceComponent"
+        },
+        {
+          "id": "allocationOwners",
+          "kind": "slot",
+          "role": "the allocation owner slot and its nested payer owner slot"
+        },
+        {
+          "id": "mobilityPeer",
+          "kind": "conformance",
+          "declares": "ConformancePeer",
+          "role": "the peer the allocation panel hands or raises, whose changes enter mobility reviews"
+        },
+        {
+          "id": "roomHandoff",
+          "kind": "conformance",
+          "declares": "ConformanceCallbacks",
+          "role": "the vendor's room handoff callbacks, their listeners and the room directory"
+        },
+        {
+          "id": "capacityGauge",
+          "kind": "conformance",
+          "declares": "ConformanceRegistered",
+          "role": "the community's admission capacity gauge, which reports available capacity through the registry"
+        },
+        {
+          "id": "waitlistForm",
+          "kind": "form",
+          "role": "the waitlist's independent container for the coordinator's reason and agreement to the offered terms"
+        },
+        {
+          "id": "waitlistTerms",
+          "kind": "slot",
+          "role": "the slot where the allocation conflict loads the offered community's waitlist terms"
         }
       ]
     },
@@ -11580,6 +11613,345 @@
           "on": "the selected supplier's delivery lookup"
         }
       ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X65",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationPanel",
+        "moveInEndpoint",
+        "waitlistTerms",
+        "waitlistForm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X66",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationPanel",
+        "moveInEndpoint",
+        "waitlistTerms",
+        "waitlistForm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X67",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationPanel",
+        "moveInEndpoint",
+        "waitlistTerms",
+        "waitlistForm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X68",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationPanel",
+        "moveInEndpoint",
+        "waitlistTerms",
+        "waitlistForm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X70",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationOwners",
+        "mobilityPeer",
+        "allocationPanel",
+        "capacityGauge",
+        "moveInEndpoint"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the mobility review"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X71",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationOwners",
+        "mobilityPeer",
+        "allocationPanel",
+        "capacityGauge",
+        "moveInEndpoint"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X72",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationOwners",
+        "mobilityPeer",
+        "allocationPanel",
+        "capacityGauge",
+        "moveInEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X73",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationOwners",
+        "mobilityPeer",
+        "allocationPanel",
+        "capacityGauge",
+        "moveInEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X74",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationOwners",
+        "mobilityPeer",
+        "allocationPanel",
+        "capacityGauge",
+        "moveInEndpoint"
+      ],
+      "harness": [
+        "restart",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "restart",
+          "action": "Ownership.tla:HostDestroys",
+          "on": "the allocation panel"
+        },
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the accepted mobility review's response"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X75",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "allocationOwners",
+        "mobilityPeer",
+        "allocationPanel",
+        "capacityGauge",
+        "moveInEndpoint"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the replacement allocation owner"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X76",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allocationOwners",
+        "roomHandoff",
+        "moveInForm",
+        "moveInEndpoint"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the room review"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X77",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allocationOwners",
+        "roomHandoff",
+        "moveInForm",
+        "moveInEndpoint"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X78",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allocationOwners",
+        "roomHandoff",
+        "moveInForm",
+        "moveInEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X79",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allocationOwners",
+        "roomHandoff",
+        "moveInForm",
+        "moveInEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X80",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allocationOwners",
+        "roomHandoff",
+        "moveInForm",
+        "moveInEndpoint"
+      ],
+      "harness": [
+        "restart"
+      ],
+      "held": [
+        {
+          "verb": "restart",
+          "action": "CallbackProperty.tla:Restart",
+          "on": "the room callback console"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X81",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allocationOwners",
+        "roomHandoff",
+        "moveInForm",
+        "moveInEndpoint"
+      ],
+      "harness": []
     }
   ],
   "cells": [

@@ -370,6 +370,26 @@ public static class Promises
         public const string M9_X53_0 = "M9.F2 M9.X53 0";
         [Holds(LanesGate.Respond)]
         public const string M9_X54_0 = "M9.F2 M9.X54 0";
+        public const string M9_X65_0 = "M9.F2 M9.X65 0";
+        public const string M9_X66_0 = "M9.F2 M9.X66 0";
+        public const string M9_X67_0 = "M9.F2 M9.X67 0";
+        public const string M9_X68_0 = "M9.F2 M9.X68 0";
+        [Holds(LanesGate.Respond)]
+        public const string M9_X70_0 = "M9.F2 M9.X70 0";
+        public const string M9_X71_0 = "M9.F2 M9.X71 0";
+        public const string M9_X72_0 = "M9.F2 M9.X72 0";
+        public const string M9_X73_0 = "M9.F2 M9.X73 0";
+        [Holds(LanesGate.Respond)]
+        public const string M9_X74_0 = "M9.F2 M9.X74 0";
+        [Holds(LanesGate.Respond)]
+        public const string M9_X75_0 = "M9.F2 M9.X75 0";
+        [Holds(LanesGate.Respond)]
+        public const string M9_X76_0 = "M9.F2 M9.X76 0";
+        public const string M9_X77_0 = "M9.F2 M9.X77 0";
+        public const string M9_X78_0 = "M9.F2 M9.X78 0";
+        public const string M9_X79_0 = "M9.F2 M9.X79 0";
+        public const string M9_X80_0 = "M9.F2 M9.X80 0";
+        public const string M9_X81_0 = "M9.F2 M9.X81 0";
     }
 
     public static class M10_F1

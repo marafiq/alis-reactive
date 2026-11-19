@@ -1,0 +1,37 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WaitlistPage
+@{
+    var plan = Html.ReactivePlan<WaitlistPage>();
+}
+@using (var waitlist = Html.BeginRequestContainer(plan, "waitlist"))
+{
+    @(Html.InputField(plan, m => m.Reason, options => options.Label("Reason for joining")).NativeTextBox())
+    <fieldset>
+        <legend>Accept waitlist terms</legend>
+        @(Html.InputField(plan, m => m.AcceptTerms, options => options.Label("Accept waitlist terms")).NativeCheckBox())
+    </fieldset>
+    @(Html.NativeButton("join-waitlist", "Join waitlist").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Post<WaitlistPage>(MoveInEndpoints.Waitlist, request => request
+            .Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+            .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+            .Json(waitlist.Container, body => body
+                .Set(sent => sent.ResidentId, moveIn.Read(m => m.ResidentId))
+                .Set(sent => sent.CommunityId, moveIn.Read(m => m.Location.CommunityId))
+                .Set(sent => sent.CareLevel, moveIn.Read(m => m.Care.Level))))
+            .OnSuccess<WaitlistState>((joined, pipeline) => pipeline.Element("waitlist-result").Text.Set(pipeline.Concat(moveIn.Read(m => m.Resident.Identity.Name), " is number ", joined.Body.Read(entry => entry.Position), " on the waitlist")))
+            .OnError<ErrorEnvelope>(422, (refused, pipeline) => pipeline.Element("waitlist-result").Text.Set(refused.Body.Read(reply => reply.Error.Message)))
+            .OnError<ErrorEnvelope>(409, (refused, pipeline) => pipeline.Element("waitlist-result").Text.Set(refused.Body.Read(reply => reply.Error.Message)))
+            .OnError((failed, pipeline) => pipeline.Element("waitlist-result").Text.Set("The waitlist request failed."))
+            .Chained((joined, pipeline) => pipeline.Get<DeskQuery>(CareEndpoints.MoveInWaitlistRecord, request => request.Query(query => query.DraftId, joined.Body.Read(entry => entry.DraftId))).Into("waitlist-file"));
+    }))
+    <p id="waitlist-result"></p>
+}
+@Html.RenderPlan(plan)

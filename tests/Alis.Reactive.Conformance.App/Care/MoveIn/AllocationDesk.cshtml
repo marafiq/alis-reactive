@@ -55,7 +55,15 @@
                 {
                     pipeline.Element("allocation-status").Text.Set(pipeline.Concat("Bed held by ", taken.Body.Read(conflict => conflict.Conflict.Bed.Holder.Name), "; review reference ", moveIn.Read(m => m.Review.Reference).IfNull("Unassigned")));
                     pipeline.When(taken.Body.Read(conflict => conflict.Conflict.Waitlist.Allowed))
-                        .Then(pipeline => pipeline.Element("allocation-waitlist").Text.Set("A waitlist place can be offered"))
+                        .Then(pipeline =>
+                        {
+                            pipeline.Element("allocation-waitlist").Text.Set("A waitlist place can be offered");
+                            pipeline.Get<WaitlistTermsQuery>(MoveInEndpoints.WaitlistTerms, request => request
+                                .Path(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                                .Path(query => query.TermsId, taken.Body.Read(conflict => conflict.Conflict.Waitlist.TermsId))
+                                .Query(query => query.BedId, taken.Body.Read(conflict => conflict.Conflict.Bed.Id)))
+                                .Into("waitlist-terms");
+                        })
                         .Else(pipeline => pipeline.Element("allocation-waitlist").Text.Set("No waitlist place can be offered"));
                 }))
                 .Else(pipeline => pipeline.Element("allocation-status").Text.Set("Allocation is not ready")))

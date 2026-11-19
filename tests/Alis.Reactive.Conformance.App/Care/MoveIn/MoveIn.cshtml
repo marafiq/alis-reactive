@@ -89,6 +89,14 @@
 </section>
 
 <section id="move-in-waitlist" aria-label="Waitlist">
+    @if (Model.Location.CommunityId.Length != 0)
+    {
+        @Html.ActionLink("Read community waitlist terms", nameof(MoveInDeskController.WaitlistTerms), "MoveInDesk", new { Model.DraftId, TermsId = "WT-" + Model.Location.CommunityId })
+    }
+    <div id="waitlist-terms"></div>
+    <div id="waitlist-file">
+        @await Html.PartialAsync("/Care/MoveIn/WaitlistRecord.cshtml", Reads.WaitlistOf(Model.DraftId))
+    </div>
 </section>
 
 <section id="move-in-documents-upload" aria-label="Documents upload">
@@ -107,6 +115,7 @@
 </section>
 
 <section id="move-in-allocation-owner" aria-label="Allocation owner">
+    @await Html.PartialAsync("/Care/MoveIn/OwnerDesk.cshtml", Reads.OwnerDeskOf(Model.DraftId))
 </section>
 
 <section id="move-in-receipt" aria-label="Receipt">
