@@ -213,6 +213,15 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
   uncommitted, the last committed STATE and the owner's latest decisions. Read `HANDOFF.md` and run `python3 scripts/open.py`. Then read this file,
   `spec/REWRITE.md` sections 1 and 4, `spec/CLAUDE.md`'s standing decisions, the latest first, and the rule file of
   what the unit touches. Section 4 says where the rewrite stands and which unit is next.
+- For a move-in session, read the unit's brief and `spec/Reference/move-in.md` before editing. Conformance work
+  uses the framework's landed typed doors and MVC's `Html.*` partial composition. Record a missing door and its
+  use case in part 9 of the move-in spec. A framework change requires its own authorized unit (the owner, 2026-11-19:
+  "you can not change framework now while working in conformance").
+  Each builder on the latest Astra at xhigh reads `AGENTS.md`, `.claude/rules/process.md`, the owner decisions in
+  `spec/CLAUDE.md`, the kinds in `spec/MISTAKES.md`, and the file and project rules named in its brief before editing.
+  The reply cites the rules it applied by file and line at the base. The lead reads the changed source against the
+  brief, checks that each test and its planted failure prove the named behavior, and reads the integrated landing
+  gate before accepting the batch (the owner, 2026-11-19: "its not check and rubber stamp it- quality bar has to be high").
 - To reorient after a compaction: read what the compact hook printed, the same orient output, whole, then the owner's
   latest decisions and the rule file of the file in hand, before the next edit. A claim stands on what is run now.
 

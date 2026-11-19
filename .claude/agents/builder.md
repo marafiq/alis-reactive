@@ -20,6 +20,7 @@ Print your worktree's head with `git -C <worktree> rev-parse --short=9 HEAD` and
 names. Read these whole, before anything else:
 
 - root `CLAUDE.md`: what governs what, the rungs a defect is held on, the doors, and the loop;
+- `.claude/rules/process.md`: the unit states, the evidence each state leaves and the landing packet;
 - `spec/CLAUDE.md`'s owner decisions, the latest first;
 - the kinds table of `spec/MISTAKES.md`, so your work repeats no kind met before;
 - for each kind of file you read or write, its rule file and its project's own `CLAUDE.md`:
@@ -45,6 +46,9 @@ names. Read these whole, before anything else:
   secrets.
 - Run no command your brief does not name, and no `scripts/check.sh`, TLC, package install or restore unless it
   names one.
+- Before treating a spec check as read-only, read the check it runs. The fluent check in `spec/tools/check.py`
+  starts nested .NET builds and uses the same serial build lock as a direct build (the lead's repeated mistake,
+  2026-11-19).
 - Change no file of `spec/` but `spec/MISTAKES.md`, and add or remove no public symbol unless your brief says so.
 - A form the spec does not state you decide by quality, from the TLA+ specs, the principles and the owner's decisions,
   and name it decided. A gap no line decides is left as it stands and named with its use; never invent a member, a
