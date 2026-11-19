@@ -94,6 +94,8 @@ public sealed class PayerVerificationPage
 
     public string ContactId { get; set; } = string.Empty;
 
+    public PayerKind FundingSource { get; set; }
+
     public CoverageInput Policy { get; set; } = new();
 
     public string? Reference { get; set; }

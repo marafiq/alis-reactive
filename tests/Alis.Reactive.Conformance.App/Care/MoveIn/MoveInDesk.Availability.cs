@@ -35,7 +35,15 @@ internal sealed partial class MoveInDesk
             var draft = DraftOf(draftId);
             if (draft is null) return (404, []);
             if (!CoordinatorServes(draft.Data.CoordinatorId, draft.Data.Location.CommunityId)) return (403, []);
-            return (200, [.. _world.Services.Where(service => service.Available).Select(service => new ServiceDefinition
+            return (200, ServiceChoices());
+        }
+    }
+
+    internal List<ServiceDefinition> ServiceChoices()
+    {
+        lock (_gate)
+        {
+            return [.. _world.Services.Where(service => service.Available).Select(service => new ServiceDefinition
             {
                 Code = service.Code,
                 Name = service.Name,
@@ -43,7 +51,7 @@ internal sealed partial class MoveInDesk
                 Revision = service.Revision,
                 Available = service.Available,
                 Capacity = service.Capacity,
-            })]);
+            })];
         }
     }
 

@@ -20,7 +20,19 @@ public sealed class MoveInPage
 
     public ContactSection Contacts { get; set; } = new();
 
-    public PayerInput Payer { get; set; } = new();
+    private PayerInput _payer = new();
+
+    public PayerInput Payer
+    {
+        get => _payer;
+        set
+        {
+            _payer = value;
+            IncludesPayer = true;
+        }
+    }
+
+    internal bool IncludesPayer { get; private set; }
 
     public MedicationSection Medications { get; set; } = new();
 

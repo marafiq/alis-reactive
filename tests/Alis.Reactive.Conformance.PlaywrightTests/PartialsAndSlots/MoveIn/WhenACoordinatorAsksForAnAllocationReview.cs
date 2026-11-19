@@ -125,7 +125,9 @@ public sealed class WhenACoordinatorAsksForAnAllocationReview(string host) : Con
         await Expect(failed.Page.Locator("#allocation-status")).ToHaveTextAsync("Not reviewed");
         await Expect(failed.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Busy", Exact = true })).ToHaveTextAsync("Busy: none");
         Assert.That(failed.SentTo(CareEndpoints.MoveInAllocationReview), Is.EqualTo(0));
+        await Expect(failed.Page.Locator("#quote-acceptance")).ToHaveTextAsync("Unaccepted");
         await failed.Page.GotoAsync(CarePages.MoveIn);
+        await Expect(failed.Page.Locator("#quote-acceptance")).ToHaveTextAsync("Unaccepted");
         await Expect(failed.Page.GetByRole(AriaRole.List, new PageGetByRoleOptions { Name = "Allocation reviews", Exact = true }).GetByRole(AriaRole.Listitem)).ToHaveCountAsync(0);
 
         var answered = await NewWorld();

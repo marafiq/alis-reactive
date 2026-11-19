@@ -42,12 +42,21 @@
     </section>
 
     <section id="move-in-payer" aria-label="Payer">
+        @await Html.PartialFor(m => m.Payer, "/Care/MoveIn/PayerDesk.cshtml")
+        <p id="verification-context">@Reads.VerificationContext(Model.DraftId)</p>
+        <div id="primary-payer">
+            @await Html.PartialAsync("/Care/MoveIn/PrimaryPayer.cshtml", Model)
+        </div>
     </section>
 
     <section id="move-in-medications" aria-label="Medications">
     </section>
 
     <section id="move-in-services" aria-label="Services">
+        @if (Reads.OffersServices(Model))
+        {
+            @await Html.PartialFor(m => m.Services, "/Care/MoveIn/Services.cshtml")
+        }
     </section>
 
     <section id="move-in-diet" aria-label="Diet">
@@ -67,7 +76,8 @@
                     .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Container.Read(m => m.CoordinatorId))
                     .Header(MoveInEndpoints.OperationHeader, moveIn.Container.Read(m => m.OperationId))
                     .Json(moveIn.Container, body => { }))
-                .NoValidation()
+                .Validate<MoveInRules>(MoveInRules.PayerCoverage)
+                .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
                 .OnSuccess<SaveReply>((saved, pipeline) =>
                 {
                     pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(reply => reply.Receipt.Version)));
@@ -86,6 +96,7 @@
 </section>
 
 <section id="move-in-service-review" aria-label="Service review">
+    @await Html.PartialAsync("/Care/MoveIn/QuoteDesk.cshtml", Reads.ServiceReviewOf(Model))
 </section>
 
 <section id="move-in-waitlist" aria-label="Waitlist">

@@ -1,5 +1,7 @@
 using System.Globalization;
+using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.TriggersAndPipelines;
+using Alis.Reactive.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Conformance.App.Care;
@@ -18,6 +20,9 @@ public sealed partial class MoveInDeskController
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         if (coordinator is null || !Desk.Knows(coordinator)) return StatusCode(StatusCodes.Status403Forbidden, MoveInErrors.Forbidden());
         if (Desk.IsClosed(draftId)) return StatusCode(StatusCodes.Status410Gone, MoveInErrors.Closed());
+
+        var coverage = this.Validate<MoveInPage, MoveInRules>(moveIn, MoveInRules.PayerCoverage);
+        if (!coverage.IsValid) return coverage.ToErrorResponse();
 
         var verdict = Desk.Save(draftId, version, coordinator, operation, moveIn);
         if (verdict.Stale is { } stale) return Conflict(stale);

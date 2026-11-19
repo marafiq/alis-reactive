@@ -45,6 +45,7 @@ internal sealed partial class MoveInDesk
             KeepTheCare(draft.Data, sent);
             KeepTheContacts(draft.Data, sent);
             KeepThePayer(draft.Data, sent);
+            draft.PayerVerificationId = draft.Data.Payer.VerificationId;
             KeepTheMedications(draft.Data, sent);
             KeepTheServices(draft.Data, sent);
             KeepTheDiet(draft.Data, sent);

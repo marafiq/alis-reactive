@@ -45,11 +45,12 @@ public sealed partial class MoveInDeskController
     }
 
     [HttpGet(MoveInEndpoints.Services)]
-    public IActionResult ServiceCatalogue([FromQuery] ServiceCatalogueQuery query)
+    public async Task<IActionResult> ServiceCatalogue([FromQuery] ServiceCatalogueQuery query)
     {
         if (DropsItsConnection()) return new EmptyResult();
         if (query.DraftId.Length == 0) return Content("Choose a move-in to read the service catalogue.");
         if (!ModelState.IsValid || !Enum.IsDefined(query.CareLevel) || !Enum.IsDefined(query.PayerKind)) return BadRequest();
+        await World.Reach(GateName.Of(CompositionGate.Answer), Request.Path);
         var (status, catalogue) = Desk.ServiceCatalogueOf(query.DraftId);
         return status == 200 ? Json(catalogue) : AvailabilityError(status);
     }

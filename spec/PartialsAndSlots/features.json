@@ -809,6 +809,86 @@
           "id": "M9.X99",
           "rung": "behavior",
           "defect": "Closing the card stops the surviving page stream."
+        },
+        {
+          "id": "M9.X24",
+          "rung": "behavior",
+          "defect": "Closing verification copies its failed consent into the visible main summary."
+        },
+        {
+          "id": "M9.X115",
+          "rung": "behavior",
+          "defect": "The draft save discards the attached secondary coverage."
+        },
+        {
+          "id": "M9.X116",
+          "rung": "behavior",
+          "defect": "The shared secondary contribution rule admits the upper bound."
+        },
+        {
+          "id": "M9.X117",
+          "rung": "behavior",
+          "defect": "The server omits the combined contribution check."
+        },
+        {
+          "id": "M9.X118",
+          "rung": "behavior",
+          "defect": "The secondary GET ignores the failed transport."
+        },
+        {
+          "id": "M9.X119",
+          "rung": "behavior",
+          "defect": "Selecting private funding writes its label while leaving the insurance section and its pending secondary request attached."
+        },
+        {
+          "id": "M9.X120",
+          "rung": "behavior",
+          "defect": "The details GET reads the wrong reference from the successful verification."
+        },
+        {
+          "id": "M9.X121",
+          "rung": "behavior",
+          "defect": "Verification permits an unchecked consent."
+        },
+        {
+          "id": "M9.X122",
+          "rung": "behavior",
+          "defect": "The policy lookup accepts an inactive policy."
+        },
+        {
+          "id": "M9.X123",
+          "rung": "behavior",
+          "defect": "The verification endpoint ignores the dropped connection."
+        },
+        {
+          "id": "M9.X124",
+          "rung": "behavior",
+          "defect": "The drawer leaves Cancel false while verification is pending."
+        },
+        {
+          "id": "M9.X125",
+          "rung": "behavior",
+          "defect": "The quote result marks the joined calculation ready before the catalogue responds."
+        },
+        {
+          "id": "M9.X126",
+          "rung": "behavior",
+          "defect": "The catalogue request is put behind successful pricing."
+        },
+        {
+          "id": "M9.X127",
+          "rung": "behavior",
+          "defect": "Pricing accepts a selected service with zero capacity."
+        },
+        {
+          "id": "M9.X128",
+          "rung": "behavior",
+          "defect": "Pricing suppresses its saved quote when the catalogue transport fails."
+        },
+        {
+          "id": "M9.X129",
+          "rung": "behavior",
+          "defect": "The catalogue declares the quote ready while its assistance response still waits."
         }
       ],
       "promises": [
@@ -1449,6 +1529,134 @@
           "outcome": "The page receives revision 13 after the card leaves. Closing the last failed owner clears its offer. The next opening reads the same holder.",
           "opposite": "An open card receives live updates of its own.",
           "defect": "Closing the card stops the surviving page stream."
+        },
+        {
+          "for": "M9.X24",
+          "page": "Helen Ward’s move-in has a separate verification drawer, the North allocation component and the main draft save.",
+          "gesture": "Close the drawer after its consent failure and verify Helen’s identity.",
+          "outcome": "The resident desk records ID100 for Maya Chen in its own clean summary.",
+          "opposite": "An invalid verification keeps its consent failure in the drawer.",
+          "defect": "Closing verification copies its failed consent into the visible main summary."
+        },
+        {
+          "for": "M9.X115",
+          "page": "Helen Ward’s move-in draft has an insurance payer with 80 percent primary coverage and no secondary policy.",
+          "gesture": "Enable secondary coverage at 20 percent along with the primary 80 percent and save the draft.",
+          "outcome": "Helen’s saved version 8 contains Harbor Mutual POL-100 at 80 percent and the entered secondary policy at 20 percent.",
+          "opposite": "When the primary dates exclude move-in or the allocation panel refuses readiness, no secondary request leaves and the next read still has only the primary policy.",
+          "defect": "The draft save discards the attached secondary coverage."
+        },
+        {
+          "for": "M9.X116",
+          "page": "Helen Ward’s move-in draft has an insurance payer with 80 percent primary coverage and no secondary policy.",
+          "gesture": "Set secondary contribution to 100 percent and save.",
+          "outcome": "The exclusive range message appears without a save. Helen’s saved page remains at version 7 with only the primary policy.",
+          "opposite": "A contribution of 20 percent saves.",
+          "defect": "The shared secondary contribution rule admits the upper bound."
+        },
+        {
+          "for": "M9.X117",
+          "page": "Helen Ward’s move-in draft has an insurance payer with 80 percent primary coverage and no secondary policy.",
+          "gesture": "Set secondary contribution to 30 percent beside 80 percent of primary cover and save.",
+          "outcome": "The server returns both the secondary field error and the payer summary error. Reopening shows the original payer and version.",
+          "opposite": "The two contributions adding to 100 percent save.",
+          "defect": "The server omits the combined contribution check."
+        },
+        {
+          "for": "M9.X118",
+          "page": "Helen Ward’s move-in draft has an insurance payer with 80 percent primary coverage and no secondary policy.",
+          "gesture": "Drop the secondary section GET and enable secondary coverage.",
+          "outcome": "The desk reports the connection failure and reopening shows only the saved primary policy.",
+          "opposite": "A responding secondary section offers the secondary fields.",
+          "defect": "The secondary GET ignores the failed transport."
+        },
+        {
+          "for": "M9.X119",
+          "page": "Helen Ward’s move-in draft has an insurance payer with 80 percent primary coverage and no secondary policy.",
+          "gesture": "Hold the secondary section response, choose private funding and release the old response before saving.",
+          "outcome": "Private funding remains selected without secondary inputs. The next read shows private funding and no secondary policy.",
+          "opposite": "Keeping insurance allows its secondary policy to join.",
+          "defect": "Selecting private funding writes its label while leaving the insurance section and its pending secondary request attached."
+        },
+        {
+          "for": "M9.X120",
+          "page": "Helen Ward’s move-in has a separate verification drawer, the North allocation component and the main draft save.",
+          "gesture": "Open verification, consent and verify POL-100. Save a change to private funding. In independent drafts, omit the allocation reference for insurance and benefits.",
+          "outcome": "Harbor Mutual covers 3500.00 monthly. The saved verification records V100 and its actual allocation reference. Private funding clears it. Insurance can verify without a reference, while benefits refuses that omission.",
+          "opposite": "A refused policy produces no verification.",
+          "defect": "The details GET reads the wrong reference from the successful verification."
+        },
+        {
+          "for": "M9.X121",
+          "page": "Helen Ward’s move-in has a separate verification drawer, the North allocation component and the main draft save.",
+          "gesture": "Open verification and verify without consent.",
+          "outcome": "The drawer shows Consent is required. E11 receives no request and a new draft read has no verification.",
+          "opposite": "With consent E11 accepts POL-100.",
+          "defect": "Verification permits an unchecked consent."
+        },
+        {
+          "for": "M9.X122",
+          "page": "Helen Ward’s move-in has a separate verification drawer, the North allocation component and the main draft save.",
+          "gesture": "Enter POL-200 in the verification drawer, consent and verify.",
+          "outcome": "The drawer identifies the inactive policy and reopening shows no verification.",
+          "opposite": "The active policy is verified.",
+          "defect": "The policy lookup accepts an inactive policy."
+        },
+        {
+          "for": "M9.X123",
+          "page": "Helen Ward’s move-in has a separate verification drawer, the North allocation component and the main draft save.",
+          "gesture": "Drop the verification POST and verify with consent.",
+          "outcome": "The drawer stays usable, the busy indicator clears and reopening the draft shows no verification.",
+          "opposite": "A responding verification shows coverage details.",
+          "defect": "The verification endpoint ignores the dropped connection."
+        },
+        {
+          "for": "M9.X124",
+          "page": "Helen Ward’s move-in has a separate verification drawer, the North allocation component and the main draft save.",
+          "gesture": "Hold verification, try the drawer close button, then save the main draft before releasing verification.",
+          "outcome": "The drawer stays open, the draft saves at version 8 and the subsequent read confirms V100 after release. Saving a different payer while verification waits leaves that payer without the old clearance.",
+          "opposite": "Closing an idle verification drawer releases its form.",
+          "defect": "The drawer leaves Cancel false while verification is pending."
+        },
+        {
+          "for": "M9.X125",
+          "page": "Helen Ward’s unquoted move-in has Dining and Pharmacy support selected, with Transport at capacity zero.",
+          "gesture": "Calculate the selected dining and pharmacy services, releasing the quote and assistance while the catalogue waits.",
+          "outcome": "The assistance amount is 2432.00, and only releasing the catalogue allows Quote ready: 3040.00 USD. The next read holds Q100 at revision 3. Repricing the accepted Ready draft preserves the same terms, and removing Pharmacy support leaves 2980.00 USD unaccepted.",
+          "opposite": "An empty selection cannot produce a quote.",
+          "defect": "The quote result marks the joined calculation ready before the catalogue responds."
+        },
+        {
+          "for": "M9.X126",
+          "page": "Helen Ward’s unquoted move-in has Dining and Pharmacy support selected, with Transport at capacity zero.",
+          "gesture": "Remove all service selections and calculate.",
+          "outcome": "Pricing refuses the empty selection; the catalogue shows three available services and the reopened draft has no quote.",
+          "opposite": "Dining and pharmacy produce Q100.",
+          "defect": "The catalogue request is put behind successful pricing."
+        },
+        {
+          "for": "M9.X127",
+          "page": "Helen Ward’s unquoted move-in has Dining and Pharmacy support selected, with Transport at capacity zero.",
+          "gesture": "Select Transport and calculate.",
+          "outcome": "The desk shows Transport has no capacity. The reopened page retains capacity zero and no quote.",
+          "opposite": "Dining and pharmacy have available capacity.",
+          "defect": "Pricing accepts a selected service with zero capacity."
+        },
+        {
+          "for": "M9.X128",
+          "page": "Helen Ward’s unquoted move-in has Dining and Pharmacy support selected, with Transport at capacity zero.",
+          "gesture": "Drop the catalogue GET and calculate the two available selected services.",
+          "outcome": "The catalogue fails independently and Q100 is still on file at revision 3 after reopening.",
+          "opposite": "A responding catalogue lists the services.",
+          "defect": "Pricing suppresses its saved quote when the catalogue transport fails."
+        },
+        {
+          "for": "M9.X129",
+          "page": "Helen Ward’s unquoted move-in has Dining and Pharmacy support selected, with Transport at capacity zero.",
+          "gesture": "Release pricing first and the catalogue second while the assistance response is held.",
+          "outcome": "Calculating remains until assistance settles. The next read shows the single Q100 at revision 3 for 3040.00 with 2432.00 assistance.",
+          "opposite": "Releasing assistance completes the calculation.",
+          "defect": "The catalogue declares the quote ready while its assistance response still waits."
         }
       ],
       "verdicts": []

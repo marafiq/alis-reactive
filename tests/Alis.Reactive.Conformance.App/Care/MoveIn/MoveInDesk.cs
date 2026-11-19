@@ -85,14 +85,14 @@ internal sealed partial class MoveInDesk : IOwnedByAWorld
     private PersonLabel LabelOfTheCoordinator(string coordinatorId)
         => new(coordinatorId, _world.Coordinators.FirstOrDefault(found => found.Id == coordinatorId)?.Name ?? string.Empty);
 
-    private void Record(DraftState draft, Guid operation, string action, string reference)
+    private void Record(DraftState draft, Guid operation, string action, string reference, string? actor = null)
         => _world.History.Add(new HistoryEntry
         {
             Sequence = _world.History.Count + 1,
             DraftId = draft.Id,
             OperationId = operation,
             Action = action,
-            Actor = draft.SavedBy,
+            Actor = actor ?? draft.SavedBy,
             At = _world.Clock.Now,
             ResultReference = reference,
         });

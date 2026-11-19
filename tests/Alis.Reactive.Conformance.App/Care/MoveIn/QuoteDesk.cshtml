@@ -1,0 +1,77 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ArrayLambdas
+@inject MoveInReads Reads
+@model ServiceReviewPage
+@{
+    var plan = Html.ReactivePlan<ServiceReviewPage>();
+}
+<p>Quote on file: <span id="quote-on-file">@Reads.QuoteOnFile(Model.DraftId)</span></p>
+<p>Price acceptance: <span id="quote-acceptance">@Reads.AcceptedQuote(Model.DraftId)</span></p>
+@(plan.ConformanceComponent("service-panel", Model.ComponentStart))
+<section id="quote-panel" aria-label="Service quote">
+    @(Html.NativeButton("calculate-quote", "Calculate quote").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        var main = pipeline.Container<MoveInPage>("move-in");
+        var review = pipeline.Component<ConformanceComponent>("service-panel");
+        pipeline.Element("quote-status").Text.Set("Calculating");
+        pipeline.Element("monthly-price").Text.Set("");
+        pipeline.Element("pricing-result").Text.Set("");
+        pipeline.Unload("quote-assistance");
+        pipeline.Element("quote-catalogue").Text.Set("");
+        pipeline.Parallel(
+            pipeline => pipeline.Get<ServiceCatalogueQuery>(MoveInEndpoints.Services, request => request
+                .Query(q => q.DraftId, Model.DraftId)
+                .Query(q => q.CareLevel, main.Read(m => m.Care.Level))
+                .Query(q => q.PayerKind, main.Read(m => m.Payer.Kind))
+                .Query(q => q.Culture, System.Globalization.CultureInfo.CurrentCulture.Name))
+                .Busy("quote-panel").NoValidation()
+                .OnSuccess<List<ServiceDefinition>>((available, pipeline) => pipeline.Element("quote-catalogue").Text.Set(pipeline.Concat(available.Body.Count(s => s.Available), " available services")))
+                .OnError((failed, pipeline) => pipeline.Element("quote-catalogue").Text.Set("Service catalogue unavailable.")),
+            pipeline => pipeline.Post<QuoteRequest>(MoveInEndpoints.Quotes, request => request
+                .Path(q => q.DraftId, Model.DraftId)
+                .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+                .Json(body => body.Set(q => q.Version, main.Read(m => m.Version))
+                    .Set(q => q.CareLevel, main.Read(m => m.Care.Level))
+                    .Set(q => q.PayerKind, main.Read(m => m.Payer.Kind))
+                    .Set(q => q.Services, main.Read(m => m.Services))
+                    .Set(q => q.Review.Ready, review.Check())
+                    .Set(q => q.Review.SelectedServiceCount, review.Total())
+                    .Set(q => q.Review.Result, review.Snapshot())))
+                .Busy("quote-panel").Validate<QuoteRequestRules>()
+                .OnSuccess<QuoteReply>((answer, pipeline) =>
+                {
+                    pipeline.Element("pricing-result").Text.Set(pipeline.Concat(answer.Body.Read(r => r.Quote.Id), ": ", answer.Body.Read(r => r.Quote.Pricing.MonthlyTotal), " USD"));
+                    pipeline.Element("monthly-price").Text.Set(answer.Headers.Get(MoveInEndpoints.MonthlyTotalHeader));
+                })
+                .OnError<ErrorEnvelope>(409, (refused, pipeline) => pipeline.Element("pricing-result").Text.Set(refused.Body.Read(r => r.Error.Message)))
+                .Chained((answer, pipeline) => pipeline.When(answer.Body.Read(r => r.Quote.Pricing.Assistance.Required))
+                    .Then(pipeline => pipeline.Get<QuoteAssistanceQuery>(CareEndpoints.MoveInAssistance, request => request
+                        .Query(q => q.DraftId, Model.DraftId)
+                        .Query(q => q.Reference, answer.Body.Read(r => r.Quote.Pricing.Assistance.Reference))
+                        .Query(q => q.Revision, answer.Body.Read(r => r.Quote.Revision)))
+                        .Busy("quote-panel")
+                        .Into("quote-assistance")
+                        .OnError((failed, pipeline) =>
+                        {
+                            pipeline.Element("monthly-price").Text.Set("");
+                            pipeline.Element("pricing-result").Text.Set("Assistance terms unavailable.");
+                        }))));
+        pipeline.When(pipeline.Element("monthly-price").Text.NotEmpty())
+            .Then(pipeline => pipeline.Element("quote-status").Text.Set(pipeline.Concat("Quote ready: ", pipeline.Element("monthly-price").Text, " USD")))
+            .Else(pipeline => pipeline.Element("quote-status").Text.Set("Quote unavailable"));
+    }))
+    <p id="quote-status">Ready to calculate</p>
+    <p id="quote-catalogue"></p>
+    <p id="pricing-result"></p>
+    <p>Monthly price: <span id="monthly-price"></span></p>
+    <div id="quote-assistance"></div>
+</section>
+@Html.RenderPlan(plan)

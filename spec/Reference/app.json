@@ -529,6 +529,45 @@
           "kind": "nativeSlice",
           "role": "the move-in layout's NativeReconnectOffer for its unavailable connections",
           "module": "NativeAppLevelObjects"
+        },
+        {
+          "id": "payer",
+          "kind": "partial",
+          "role": "the chosen payer and its primary and secondary coverage partials"
+        },
+        {
+          "id": "verification",
+          "kind": "form",
+          "role": "the drawer’s independent request container for the policy verification"
+        },
+        {
+          "id": "pricing",
+          "kind": "partial",
+          "role": "the selected services, their component review and the calculated quote with its assistance terms"
+        },
+        {
+          "id": "payerInputs",
+          "kind": "nativeSlice",
+          "role": "the NativeDropDown for funding and the NativeCheckBox and NativeTextBox inputs for primary and secondary coverage",
+          "module": "NativeComponents"
+        },
+        {
+          "id": "coverageDrawer",
+          "kind": "nativeSlice",
+          "role": "the NativeDrawer for the independent payer verification",
+          "module": "NativeAppLevelObjects"
+        },
+        {
+          "id": "pricingInputs",
+          "kind": "nativeSlice",
+          "role": "the NativeCheckList for selected services and NativeTextBox and NativeCheckBox inputs for the visit rows",
+          "module": "NativeComponents"
+        },
+        {
+          "id": "servicePanel",
+          "kind": "conformance",
+          "role": "the separate service review ConformanceComponent with its selected service count, capacity record and readiness",
+          "declares": "ConformanceComponent"
         }
       ]
     },
@@ -12292,6 +12331,395 @@
           "verb": "reopen",
           "action": "Realtime.tla:Connect",
           "on": "the selected bed's stream"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X24",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "verification",
+        "moveInEndpoint",
+        "allocationPanel",
+        "coverageDrawer",
+        "payerInputs",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X115",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "payer",
+        "moveInEndpoint",
+        "allocationPanel",
+        "payerInputs",
+        "moveInValidator",
+        "dayPickers"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X116",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "payer",
+        "moveInEndpoint",
+        "allocationPanel",
+        "payerInputs",
+        "moveInValidator",
+        "dayPickers"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X117",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "payer",
+        "moveInEndpoint",
+        "allocationPanel",
+        "payerInputs",
+        "moveInValidator",
+        "dayPickers"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X118",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "payer",
+        "moveInEndpoint",
+        "allocationPanel",
+        "payerInputs",
+        "moveInValidator",
+        "dayPickers"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the safe read’s retry waits"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X119",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "payer",
+        "moveInEndpoint",
+        "allocationPanel",
+        "payerInputs",
+        "moveInValidator",
+        "dayPickers"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the secondary coverage response"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X120",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "verification",
+        "moveInEndpoint",
+        "allocationPanel",
+        "coverageDrawer",
+        "payerInputs",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X121",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "verification",
+        "moveInEndpoint",
+        "allocationPanel",
+        "coverageDrawer",
+        "payerInputs",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X122",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "verification",
+        "moveInEndpoint",
+        "allocationPanel",
+        "coverageDrawer",
+        "payerInputs",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X123",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "verification",
+        "moveInEndpoint",
+        "allocationPanel",
+        "coverageDrawer",
+        "payerInputs",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X124",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "verification",
+        "moveInEndpoint",
+        "allocationPanel",
+        "coverageDrawer",
+        "payerInputs",
+        "notice"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the independent verification response"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X125",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the service catalogue response"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X126",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X127",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X128",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the safe read’s retry waits"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X129",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the quote response"
+        },
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the assistance response"
+        },
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the service catalogue response"
         }
       ]
     }
