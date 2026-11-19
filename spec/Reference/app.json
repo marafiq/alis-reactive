@@ -574,6 +574,21 @@
           "id": "admissionSteps",
           "kind": "fusion",
           "role": "the admission steps, FusionStepper"
+        },
+        {
+          "id": "contactChannel",
+          "kind": "fusion",
+          "role": "the preferred contact channel, FusionComboBox"
+        },
+        {
+          "id": "leadTime",
+          "kind": "fusion",
+          "role": "the preparation time in minutes, FusionComboBox"
+        },
+        {
+          "id": "interpreterConsent",
+          "kind": "fusion",
+          "role": "the resident's consent to an interpreter, FusionComboBox"
         }
       ]
     },
@@ -3460,6 +3475,120 @@
       "parts": [
         "language",
         "clinicalForm",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1200",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "contactChannel",
+        "leadTime",
+        "interpreterConsent",
+        "language",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1201",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "contactChannel",
+        "leadTime",
+        "interpreterConsent",
+        "language",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1202",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "contactChannel",
+        "leadTime",
+        "interpreterConsent",
+        "language",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1203",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "contactChannel",
+        "leadTime",
+        "interpreterConsent",
+        "language",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1204",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "contactChannel",
+        "leadTime",
+        "interpreterConsent",
+        "language",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X1205",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "contactChannel",
+        "leadTime",
+        "interpreterConsent",
+        "language",
         "clinicalEndpoint"
       ],
       "harness": [

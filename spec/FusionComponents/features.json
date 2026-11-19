@@ -4773,7 +4773,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionComboBox<TValue>.ChangeEventArgs reads Value, a TValue, since EJ2 marks the change payload's value a generic type (@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:9-15), and IsInteracted; Focus and Blur hand a payload EJ2 types as Object, of which the declaration reads no member.",
+     "text": "FusionComboBox<TValue>.ChangeEventArgs reads Value, a TValue, since EJ2 marks the change payload's value a generic type (@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:9-15), and IsInteracted; Focus and Blur hand a payload EJ2 types as Object, of which the declaration reads no member. For a catalogue selection, ItemData<TItem>() and PreviousItemData<TItem>() read the app's current and previous rows. Either row can be null. Item.TextContent reads the selected HTMLLIElement's text where the change carries a list item; the holder can be null. With object binding the selected Value reads the row's typed data paths (M21.X1200 to M21.X1205).",
      "doors": [
       "M21.N13",
       "N5.6"
@@ -4887,6 +4887,36 @@
      "id": "M21.X505",
      "rung": "behavior",
      "defect": "A text field named by a member that carries [JsonPropertyName(\"label\")] shows no text in the redesign: its Fields names label (Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBox.cs:101, Alis.Reactive/Members/JsonMemberName.cs:11 at 65fdf118d) while EJ2 writes the items handed over with the view through Newtonsoft as displayLabel (probe:fusion-ej2-builder-newtonsoft-defaults), and the redesign hands a ComboBox its items through the vendor builder alone. Main has no Fields for ComboBox (Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBoxHtmlExtensions.cs:18-38 at 623dd4a27). The rewrite adds field.FusionComboBox(items, build => ..), which writes the items by the plan's one writer, so the field and the data name each member alike (M21.D1, probe:fusion-ej2-builder-raw-json)."
+    },
+    {
+     "id": "M21.X1200",
+     "rung": "behavior",
+     "defect": "Treating the change value as the old channel leaves telephone routing on screen."
+    },
+    {
+     "id": "M21.X1201",
+     "rung": "behavior",
+     "defect": "Discarding zero keeps the half-hour preparation instruction."
+    },
+    {
+     "id": "M21.X1202",
+     "rung": "behavior",
+     "defect": "Treating false as an absent choice leaves the interpreter authorised."
+    },
+    {
+     "id": "M21.X1203",
+     "rung": "behavior",
+     "defect": "Reading the previous row as the new selection, reading the wrong list element, or discarding one alternative loses the booking or its review."
+    },
+    {
+     "id": "M21.X1204",
+     "rung": "behavior",
+     "defect": "Using the spoken flag for written support, or booking without consent, sends staff to the wrong desk."
+    },
+    {
+     "id": "M21.X1205",
+     "rung": "behavior",
+     "defect": "Keeping the previous row as the selected value or leaving a support panel open retains an instruction that no longer applies."
     }
    ],
    "promises": [
@@ -4897,6 +4927,54 @@
      "outcome": "The list shows Tagalog and Punjabi.",
      "opposite": "Choosing Punjabi shows Punjabi in the box, and the form sends its code pa.",
      "defect": "EJ2 writes the handed items through Newtonsoft as displayLabel while the field names label, so the list shows two empty options."
+    },
+    {
+     "for": "M21.X1200",
+     "page": "Helen Martinez's communication preferences, with telephone contact, thirty minutes of notice, interpreter consent and English selected.",
+     "gesture": "Choose Letter for contact.",
+     "outcome": "Routing changes to the correspondence desk and stays there after saving and reopening.",
+     "opposite": "Telephone directs staff to call the resident.",
+     "defect": "Treating the change value as the old channel leaves telephone routing on screen."
+    },
+    {
+     "for": "M21.X1201",
+     "page": "Helen Martinez's communication preferences, with telephone contact, thirty minutes of notice, interpreter consent and English selected.",
+     "gesture": "Choose No advance notice.",
+     "outcome": "Staff are told to call before arrival and the saved plan retains zero minutes.",
+     "opposite": "Thirty minutes reserves preparation time.",
+     "defect": "Discarding zero keeps the half-hour preparation instruction."
+    },
+    {
+     "for": "M21.X1202",
+     "page": "Helen Martinez's communication preferences, with telephone contact, thirty minutes of notice, interpreter consent and English selected.",
+     "gesture": "Choose Consent withheld.",
+     "outcome": "Staff see the direction to discuss support directly with Helen, also after saving.",
+     "opposite": "Consent given authorises staff to arrange an interpreter.",
+     "defect": "Treating false as an absent choice leaves the interpreter authorised."
+    },
+    {
+     "for": "M21.X1203",
+     "page": "Helen Martinez's communication preferences, with telephone contact, thirty minutes of notice, interpreter consent and English selected.",
+     "gesture": "Choose Punjabi with consent and telephone contact, then save and reopen. Choose Letter with thirty minutes of preparation.",
+     "outcome": "Booking the Punjabi interpreter takes priority over the translated pack. The review names English as the previous language, Punjabi followed by its Gurmukhi script as the selected option and Punjabi scheduling as the team. Both routes to booking retain that guidance.",
+     "opposite": "Removing advance notice while using a letter changes the instruction to prepare the translated pack.",
+     "defect": "Reading the previous row as the new selection, reading the wrong list element, or discarding one alternative loses the booking or its review."
+    },
+    {
+     "for": "M21.X1204",
+     "page": "Helen Martinez's communication preferences, with telephone contact, thirty minutes of notice, interpreter consent and English selected.",
+     "gesture": "Choose Punjabi with consent withheld, save and reopen.",
+     "outcome": "The written support member directs staff to prepare the Punjabi pack. The saved review keeps the previous language and selected label.",
+     "opposite": "Spanish needs a translated pack even with consent given because it needs no spoken interpreter.",
+     "defect": "Using the spoken flag for written support, or booking without consent, sends staff to the wrong desk."
+    },
+    {
+     "for": "M21.X1205",
+     "page": "Helen Martinez's communication preferences, with telephone contact, thirty minutes of notice, interpreter consent and English selected.",
+     "gesture": "Choose Punjabi, then return to English, save and reopen.",
+     "outcome": "Staff use standard guidance, with Punjabi as the previous language and English as the selected option, and neither support panel is open.",
+     "opposite": "Punjabi requires booked support while consent and telephone contact hold.",
+     "defect": "Keeping the previous row as the selected value or leaving a support panel open retains an instruction that no longer applies."
     }
    ],
    "verdicts": [

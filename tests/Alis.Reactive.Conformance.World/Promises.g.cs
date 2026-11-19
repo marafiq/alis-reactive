@@ -645,6 +645,12 @@ public static class Promises
     public static class M21_F13
     {
         public const string M21_X505_0 = "M21.F13 M21.X505 0";
+        public const string M21_X1200_0 = "M21.F13 M21.X1200 0";
+        public const string M21_X1201_0 = "M21.F13 M21.X1201 0";
+        public const string M21_X1202_0 = "M21.F13 M21.X1202 0";
+        public const string M21_X1203_0 = "M21.F13 M21.X1203 0";
+        public const string M21_X1204_0 = "M21.F13 M21.X1204 0";
+        public const string M21_X1205_0 = "M21.F13 M21.X1205 0";
     }
 
     public static class M21_F14

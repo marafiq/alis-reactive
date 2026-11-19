@@ -172,7 +172,9 @@ Each name is gate 2's; each door is the capability it carries.
   generic type (`@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:228`): `Value`, a `Property<TValue>` whose type
   argument admits null, `Text` as `Property<string?>` (M21.X504), `Index` as `Property<int?>`, `DataBind`, `FocusIn`,
   `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input` committed by
-  `Change` (M7.N3); the payload `FusionComboBox<TValue>.ChangeEventArgs` (`Value`, `IsInteracted`), and the focus and
+  `Change` (M7.N3); the payload `FusionComboBox<TValue>.ChangeEventArgs` (`Value`, `IsInteracted`, the catalogue's
+  nullable current and previous rows `ItemData<TItem>()` and `PreviousItemData<TItem>()`, and the selected
+  `Item.TextContent` of its nullable `HTMLLIElement` holder, M21.X1200 to M21.X1205), and the focus and
   blur payloads, which EJ2 types as `Object`, declaring no member (their class name a gate 2 gap); and the render
   helpers `field.FusionComboBox()`, `field.FusionComboBox(build => ..)` and `field.FusionComboBox(items, build => ..)`,
   which render it with the bound member's type and hand EJ2 the items by M21.D1, a door neither line has, with

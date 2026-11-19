@@ -98,6 +98,8 @@ public static partial class CarePages
 
     public const string AdmissionStepsAtRoom = AdmissionClinical + "admission-steps/room";
 
+    public const string CommunicationPreferences = AdmissionClinical + "communication-preferences";
+
     public const string LanguageIntake = AdmissionClinical + "language-intake";
 
     public const string ResidentPreview = AdmissionClinical + "resident-preview";

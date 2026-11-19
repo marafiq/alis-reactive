@@ -244,6 +244,9 @@ Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Change.get -> Alis.
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs.ChangeEventArgs() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs.Item.get -> Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HTMLLIElement!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs.ItemData<TItem>() -> Alis.Reactive.Declarations.ReadOnly<TItem?>!
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs.PreviousItemData<TItem>() -> Alis.Reactive.Declarations.ReadOnly<TItem?>!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<TValue>!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Clear() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.DataBind() -> void
@@ -251,6 +254,9 @@ Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Focus.get -> Alis.R
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FocusIn() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FocusOut() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.FusionComboBox() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HTMLLIElement
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HTMLLIElement.HTMLLIElement() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HTMLLIElement.TextContent.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.HidePopup() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Index.get -> Alis.Reactive.Declarations.Property<int?>!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ShowPopup() -> void

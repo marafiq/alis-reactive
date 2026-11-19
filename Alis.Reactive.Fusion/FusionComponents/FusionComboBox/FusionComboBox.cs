@@ -64,7 +64,32 @@ public sealed class FusionComboBox<TValue> : FusionComponent, IInputComponent
         /// <summary>Gets the value the box holds after the change.</summary>
         public ReadOnly<TValue> Value => ReadOnly<TValue>();
 
+        /// <summary>Gets the catalogue row selected by the change, read with <c>Read</c>.</summary>
+        /// <typeparam name="TItem">The type of the catalogue rows.</typeparam>
+        /// <returns>The selected row, or null when the selection was cleared.</returns>
+        public ReadOnly<TItem?> ItemData<TItem>()
+            where TItem : class
+            => ReadOnly<TItem?>();
+
+        /// <summary>Gets the catalogue row selected before the change, read with <c>Read</c>.</summary>
+        /// <typeparam name="TItem">The type of the catalogue rows.</typeparam>
+        /// <returns>The previous row, or null when no row was selected before the change.</returns>
+        public ReadOnly<TItem?> PreviousItemData<TItem>()
+            where TItem : class
+            => ReadOnly<TItem?>();
+
+        /// <summary>Gets the selected list item. Its members read nothing when the change has no list item.</summary>
+        public HTMLLIElement Item => LiveObject<HTMLLIElement>(nullable: true);
+
         /// <summary>Gets whether a person made the change; a write reads false.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
+    }
+
+    /// <summary>The selected list item a catalogue change hands its listener.</summary>
+    [Mirrors("lib.dom", "HTMLLIElement")]
+    public sealed class HTMLLIElement : JsObject
+    {
+        /// <summary>Gets the text of the selected list item.</summary>
+        public ReadOnly<string> TextContent => ReadOnly<string>();
     }
 }
