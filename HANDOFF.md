@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 03:44:12 EST 2026
+Written at `date`: Thu Nov 19 04:23:52 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -22,33 +22,40 @@ note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUD
 note: open 2026-11-18 | direction | the queue of this file | queue | "I don't need acceptance numbers, sir. I need that
 note: open 2026-11-19 | direction | the queue of this file | queue | "please do not do patch fix, do proper root cause 
 note: open 2026-11-19 | direction | the queue of this file | queue | "Produce the Fusion audit first." Then "we should 
-note: closed 2026-11-19 | quality rule | spec/FusionComponents/module.md and .claude/skills/onboard-component/SKILL.md | : its follow-up FusionAudit landed
-  leaves by: the entry leaves the notes block of `HANDOFF.md`
-  goes to: gone
+note: open 2026-11-19 | quality rule | spec/FusionComponents/module.md and .claude/skills/onboard-component/SKILL.md | 
 note: open 2026-11-19 | direction | the queue of this file | queue | "how about implementing server side search in comb
 note: open 2026-11-19 | direction | the queue of this file | queue | "i would be curious to add more combox where we us
-unit: landed ../fusion-audit FusionAudit
-  next: git worktree remove ../fusion-audit
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
-unit: briefed ../fusion-combobox-equipment-availability FusionComboBoxEquipmentAvailability: it lacks paths.txt or message.txt
-  leaves by: its builder starts: the lead, or the agent handed the brief
-  read first: the brief; each file its "Rules" names; the kinds of `spec/MISTAKES.md`
-  goes to: unit: building
-unit: building ../fusion-combobox-live-catalogue FusionComboBoxLiveCatalogue: it lacks paths.txt or message.txt
+note: open 2026-11-19 | direction | the queue of this file | queue | "showspinner of compobox and hide when it succed" 
+note: open 2026-11-19 | direction | the queue of this file | queue | "use this as refereces to the skill so it works" a
+note: open 2026-11-19 | direction | the queue of this file | queue | "lets onboard datamanager only for combobox and le
+unit: ready ../fusion-audit FusionAudit
+  next: scripts/land-unit.sh ../fusion-audit 9c77fd7d8 "Fusion audit: compare the pinned vendor contract and improve component onboarding" ".landing/FusionAudit"
+  leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
+  exit line: "landed", with the browser run's result line
+  goes to: unit: landed
+unit: waiting ../fusion-combobox-data-manager FusionComboBoxDataManager: for FusionComboBoxEquipmentAvailability
+  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
+  exit line: each line of the brief's "Done"
+  goes to: unit: ready
+unit: returned ../fusion-combobox-equipment-availability FusionComboBoxEquipmentAvailability: reply.md waits for read.md
+  leaves by: the lead writes "read.md"
+  read first: the rule lines "reply.md" opens with, at their source; the change against its base
+  exit line: "verdict: land"
+  goes to: unit: ready
+unit: building ../fusion-combobox-follow-through FusionComboBoxFollowThrough: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
   exit line: each line of the brief's "Done"
   goes to: unit: ready, or unit: returned for an agent
+unit: unbriefed ../fusion-combobox-follow-through IntegrationPrep: brief.md lacks Scope, Rules, Outcome, Done, Commands, Reply
+  leaves by: the brief is completed, before any work
+  read first: the files of a unit, below
+  goes to: unit: briefed
+unit: returned ../fusion-combobox-live-catalogue FusionComboBoxLiveCatalogue: reply.md waits for read.md
+unit: waiting ../fusion-combobox-onboarding-replay FusionComboBoxOnboardingReplay: for FusionComboBoxEquipmentAvailability
 unit: ready ../fusion-combobox-payload FusionComboBoxPayload
   next: scripts/land-unit.sh ../fusion-combobox-payload 9c77fd7d8 "Prove typed ComboBox changes on Helen Martinez's communication plan" ".landing/FusionComboBoxPayload"
-  leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
-  exit line: "landed", with the browser run's result line
-  goes to: unit: landed
-unit: waiting ../fusion-combobox-server-search FusionComboBoxServerSearch: for FusionComboBoxPayload
-  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
-  exit line: each line of the brief's "Done"
-  goes to: unit: ready
+unit: returned ../fusion-combobox-server-search FusionComboBoxServerSearch: reply.md waits for read.md
 unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
@@ -56,11 +63,13 @@ unit: ready ../movein-scope MoveInSessionScope
   next: scripts/land-unit.sh ../movein-scope d13a4ce7f "New move-in sessions start from the app spec and the typed doors already landed. A missing door is recorded with its use case and needs a separate authorization for framework work. The lead reads builders' changes and planted failures at source before accepting the integrated proof. AGENTS.md resolves to the same startup rules as CLAUDE.md." ".landing/MoveInSessionScope"
 unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
-lane: checking at 88bab362a on feature/rewrite
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
+lane: checking at 5f77ce2a6 on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 88bab362a
+ci: unread at 5f77ce2a6
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -69,10 +78,10 @@ file: over CLAUDE.md: holds 326 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 329 lines, its limit 150
+file: over HANDOFF.md: holds 348 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 10 units have landed since .claude/rules/process.md last changed
+machine: review due : 11 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -80,17 +89,17 @@ machine: review due : 10 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 88bab362a Fusion audit: compare the pinned vendor contract and improve component onboarding
-- Full check: .work/logs/spec-check-88bab362a.log: spec check at 88bab362a: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-033235-91857 88bab362a
+- HEAD: 5f77ce2a6 Prove typed ComboBox changes on Helen Martinez's communication plan
+- Full check: .work/logs/spec-check-5f77ce2a6.log: spec check at 5f77ce2a6: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-041104-63024 5f77ce2a6
 
 ## Landed since the commit before the last spec: STATE commit
-88bab362a Fusion audit: compare the pinned vendor contract and improve component onboarding
-9c77fd7d8 spec: STATE and handoff at 240edd3be
+5f77ce2a6 Prove typed ComboBox changes on Helen Martinez's communication plan
+27139f914 spec: STATE and handoff at 88bab362a
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 567; named by a browser test: 548; with no browser test: 19
+feature promises: 573; named by a browser test: 554; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -135,7 +144,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 390 to 391
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 357 to 360
+- A rule or a tool's list not applied before the change: 391 to 394
+- A shell command or a script wrong in its own terms: 551 to 553
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -169,6 +180,9 @@ spec/CLAUDE.md:2007: - The owner, 2026-11-18, on the app that proves the framewo
 - 2026-11-19 | quality rule | spec/FusionComponents/module.md and .claude/skills/onboard-component/SKILL.md | FusionAudit | "each component is vertical slice, and we do not share even event classes, if its complex, it uses nested classes."
 - 2026-11-19 | direction | the queue of this file | queue | "how about implementing server side search in combobox as 5th one" and "use multiple events on one comobobox as well - infact all complex". The server-search unit follows the four-choice payload unit.
 - 2026-11-19 | direction | the queue of this file | queue | "i would be curious to add more combox where we use some of its useful meethods" and "some props as well, especially complex ones.." and "use diff comoboxes so u do not get confused or future readers". Keep the transport catalogue properties and methods, interpreter search, and real vendor Promise examples distinct.
+- 2026-11-19 | direction | the queue of this file | queue | "showspinner of compobox and hide when it succed" and "comobobox has methods showspinner and hidespinner". The interpreter-search fixture holds a request and checks the actual ComboBox spinner.
+- 2026-11-19 | direction | the queue of this file | queue | "use this as refereces to the skill so it works" and "and then test the skill actually" and "yeah lets make skill perform with very high confidence so you can onboard other components". The replay checks the pinned ComboBox and held-out NumericTextBox.
+- 2026-11-19 | direction | the queue of this file | queue | "lets onboard datamanager only for combobox and leave it for the rest, but have it in skill so if i ask onboard for that component". The direct, component-local DataManager example builds in ../fusion-combobox-data-manager.
 <!-- /notes -->
 
 ## Next
@@ -327,9 +341,10 @@ preserved every prior pass. The audit comparison under `spec/FusionComponents/au
 compares changed declarations with both Fusion host manifests. The existing vendor contract extractor still
 needs its synthesized-symbol failure addressed before a Fusion build can consume its table.
 
-The four-value preview ran in Chromium and ended on schedule. The corrected payload unit in
-`../fusion-combobox-payload` passed all seven ComboBox tests, caught eight defects and matched the compiled
-page-doors table. The lead read the code and failures. Integrate and push it through the landing lane.
+The four-value preview ran in Chromium and ended on schedule. The payload unit landed at `5f77ce2a6`
+after eight caught defects and a byte-identical compiled page-doors comparison. The integrated run
+passed all 672 tests, with 6 new passes and all 666 prior passes preserved. Its post-commit check and
+push use the landing lane.
 The separate examples are the fifth interpreter-service box in `../fusion-combobox-server-search`, the
 live transport catalogue in `../fusion-combobox-live-catalogue`, and the real EJ2 Query Promise in
 `../fusion-combobox-equipment-availability`. Each scoped Astra xhigh builder uses the shared build lock.
