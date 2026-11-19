@@ -568,6 +568,18 @@
           "kind": "conformance",
           "role": "the separate service review ConformanceComponent with its selected service count, capacity record and readiness",
           "declares": "ConformanceComponent"
+        },
+        {
+          "id": "admissionDeposit",
+          "kind": "nativeSlice",
+          "module": "NativeComponents",
+          "role": "the independent NativeTextBox, NativeHiddenField and NativeCheckBox deposit form and its operation receipt"
+        },
+        {
+          "id": "kitchenPlan",
+          "kind": "nativeSlice",
+          "module": "NativeComponents",
+          "role": "the NativeDropDown dietary choices, NativeTextBox meals and labels, NativeCheckList documents and confirmed kitchen plan"
         }
       ]
     },
@@ -12979,6 +12991,189 @@
           "verb": "push",
           "action": "Realtime.tla:Message",
           "on": "an older catalogue revision arriving during the current offer read"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X165",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDeposit"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X166",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDeposit"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X167",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDeposit"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X168",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDeposit"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the explicit second authorisation of the recovered operation"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X169",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDeposit"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Request.tla:Attempt",
+          "on": "the payment before the deposit amount is checked"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X170",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "kitchenPlan"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X171",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "kitchenPlan"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X172",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "kitchenPlan"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X173",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "kitchenPlan"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X174",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "kitchenPlan"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the old meal preview after the kitchen reads the working diet"
         }
       ]
     }

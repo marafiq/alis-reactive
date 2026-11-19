@@ -440,6 +440,19 @@ public static class Promises
         [Holds(RequestGate.Attempt)]
         [Holds(CompositionGate.Answer)]
         public const string M9_X149_0 = "M9.F2 M9.X149 0";
+        public const string M9_X165_0 = "M9.F2 M9.X165 0";
+        public const string M9_X166_0 = "M9.F2 M9.X166 0";
+        public const string M9_X167_0 = "M9.F2 M9.X167 0";
+        [Holds(CompositionGate.Answer)]
+        public const string M9_X168_0 = "M9.F2 M9.X168 0";
+        [Holds(RequestGate.Attempt)]
+        public const string M9_X169_0 = "M9.F2 M9.X169 0";
+        public const string M9_X170_0 = "M9.F2 M9.X170 0";
+        public const string M9_X171_0 = "M9.F2 M9.X171 0";
+        public const string M9_X172_0 = "M9.F2 M9.X172 0";
+        public const string M9_X173_0 = "M9.F2 M9.X173 0";
+        [Holds(CompositionGate.Answer)]
+        public const string M9_X174_0 = "M9.F2 M9.X174 0";
     }
 
     public static class M10_F1

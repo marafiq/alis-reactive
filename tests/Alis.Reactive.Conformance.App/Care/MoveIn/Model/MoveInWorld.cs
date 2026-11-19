@@ -60,6 +60,8 @@ public sealed class Community
 
     public string TimeZoneId { get; set; } = string.Empty;
 
+    public DietaryNeeds UnavailableMeals { get; set; }
+
     public List<Building> Buildings { get; set; } = [];
 }
 
@@ -159,6 +161,8 @@ public sealed class DraftState
     public int? AcceptedQuoteRevision { get; set; }
 
     public string? DepositReceiptId { get; set; }
+
+    public DietaryNeeds? ReferralDiet { get; set; }
 
     public string SavedBy { get; set; } = string.Empty;
 

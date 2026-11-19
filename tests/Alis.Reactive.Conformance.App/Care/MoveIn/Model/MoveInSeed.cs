@@ -108,6 +108,7 @@ internal static class MoveInSeed
     {
         Id = "C1",
         Name = "Harbor House",
+        UnavailableMeals = DietaryNeeds.Pureed,
         Site = "North",
         Buildings =
         [
@@ -195,6 +196,7 @@ internal static class MoveInSeed
         Payer = HelensPayer(),
         Medications = HelensMedications(),
         Services = HelensServices(),
+        Documents = new DocumentSelection { RequiredKinds = [DocumentKind.Consent, DocumentKind.MedicationList] },
         Diet = new DietInput { Needs = DietaryNeeds.Vegetarian | DietaryNeeds.LowSodium, KitchenNote = "No added salt", MealCount = 3, Confirmed = true },
         CoordinatorId = "CO1",
         OperationId = Guid.Parse("11111111-1111-4111-8111-111111111111"),

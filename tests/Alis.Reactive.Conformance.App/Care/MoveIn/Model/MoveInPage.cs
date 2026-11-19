@@ -38,7 +38,19 @@ public sealed class MoveInPage
 
     public ServiceInput Services { get; set; } = new();
 
-    public DietInput Diet { get; set; } = new();
+    private DietInput _diet = new();
+
+    public DietInput Diet
+    {
+        get => _diet;
+        set
+        {
+            _diet = value;
+            IncludesDiet = true;
+        }
+    }
+
+    internal bool IncludesDiet { get; private set; }
 
     public DocumentSelection Documents { get; set; } = new();
 
@@ -282,6 +294,10 @@ public sealed class ServiceVisit
 
 public sealed class DietInput
 {
+    internal DietaryNeeds UnavailableMeals { get; set; }
+    internal DietaryNeeds? Referral { get; set; }
+    internal string? ReferralRefusal { get; set; }
+
     public DietaryNeeds Needs { get; set; }
 
     public string KitchenNote { get; set; } = string.Empty;

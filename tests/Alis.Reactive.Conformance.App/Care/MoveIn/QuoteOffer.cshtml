@@ -23,6 +23,7 @@
 {
     using var state = Html.BeginRequestContainer(plan, "offer-state");
     <p id="offered-quote">@FormattableString.Invariant($"{quote.Id} revision {quote.Revision}: {quote.Pricing.MonthlyTotal:0.00} USD")</p>
+    <p id="offered-deposit">@FormattableString.Invariant($"Admission deposit: {quote.Pricing.Deposit:0.00} USD")</p>
     @(Html.NativeHiddenField(plan, m => m.Revision))
     @(Html.NativeHiddenField(plan, m => m.Contribution))
     @if (quote.Pricing.Assistance.Required)

@@ -198,6 +198,7 @@ internal static class AppHost
             .Flags<Components.CareDays>()
             .Flags<Care.CareDays>()
             .Flags<Care.RotaDays>()
+            .Flags<Care.DietaryNeeds>()
             .Add<Bench.CodeRules>()
             .Add<Bench.StrictCodeRules>()
             .Add<Bench.EntriesRules>()

@@ -1,0 +1,3 @@
+@using Alis.Reactive.Conformance.App.Care
+@model DietInput
+<p id="diet-on-file">@(Model.Confirmed ? "Confirmed" : "Unconfirmed"): @MoveInDesk.KitchenNames(Model.Needs) (@((int)Model.Needs)), @Model.MealCount meals. @Model.KitchenNote.</p>

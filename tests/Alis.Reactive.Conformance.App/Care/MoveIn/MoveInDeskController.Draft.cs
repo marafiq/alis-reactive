@@ -24,6 +24,17 @@ public sealed partial class MoveInDeskController
         var coverage = this.Validate<MoveInPage, MoveInRules>(moveIn, MoveInRules.PayerCoverage);
         if (!coverage.IsValid) return coverage.ToErrorResponse();
 
+        if (moveIn.IncludesDiet)
+        {
+            var diet = this.Validate<DietRequest, DietRules>(new DietRequest { Diet = moveIn.Diet });
+            if (!diet.IsValid) return diet.ToErrorResponse();
+            if (Desk.DraftKitchenRefusal(draftId, moveIn) is { } refusal)
+            {
+                ModelState.AddModelError("Diet.Needs", refusal);
+                return ValidationProblem(ModelState);
+            }
+        }
+
         var verdict = Desk.Save(draftId, version, coordinator, operation, moveIn);
         if (verdict.Stale is { } stale) return Conflict(stale);
         if (verdict.Saved is not { } saved) return NotFound(MoveInErrors.Missing());

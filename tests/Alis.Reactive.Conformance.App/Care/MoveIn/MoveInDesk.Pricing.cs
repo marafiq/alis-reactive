@@ -49,7 +49,7 @@ internal sealed partial class MoveInDesk
                 CareLevel = request.CareLevel,
                 PayerKind = request.PayerKind,
                 ExpiresAt = _world.Clock.Now.AddHours(1),
-                Pricing = new QuotePricing { Base = rate.MonthlyBasePrice, Lines = lines, MonthlyTotal = total, Deposit = 500.00m, Assistance = assistance },
+                Pricing = new QuotePricing { Base = rate.MonthlyBasePrice, Lines = lines, MonthlyTotal = total, Deposit = draft.Quote?.Pricing.Deposit ?? 500.00m, Assistance = assistance },
             };
             if (draft.Quote is { } previous)
             {

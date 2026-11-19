@@ -195,6 +195,8 @@ public sealed class SignatureRequest
 
 public sealed class DepositPage
 {
+    public decimal RequiredAmount { get; set; }
+
     public string DraftId { get; set; } = string.Empty;
 
     public Guid OperationId { get; set; }

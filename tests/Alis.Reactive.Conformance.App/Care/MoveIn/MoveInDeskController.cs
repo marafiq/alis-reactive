@@ -1,5 +1,6 @@
 using Alis.Reactive.Conformance.App.World;
 using Alis.Reactive.Conformance.World;
+using Alis.Reactive.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Conformance.App.Care;
@@ -21,7 +22,15 @@ public sealed partial class MoveInDeskController : Controller
     private MoveInDesk Desk => World.Owns(MoveInDesk.Opened);
 
     private IActionResult PageOf(string draftId)
-        => Desk.PageOf(draftId) is { } page ? View(Views + "MoveIn.cshtml", page) : NotFound(MoveInErrors.Missing());
+    {
+        if (Desk.PageOf(draftId) is not { } page) return NotFound(MoveInErrors.Missing());
+        if (page.Diet.Referral is { } imported)
+        {
+            var check = this.Validate<DietRequest, DietRules>(new DietRequest { Diet = new DietInput { Needs = imported, MealCount = page.Diet.MealCount } });
+            page.Diet.ReferralRefusal = check.Errors.FirstOrDefault()?.ErrorMessage;
+        }
+        return View(Views + "MoveIn.cshtml", page);
+    }
 
     private bool DropsItsConnection()
     {

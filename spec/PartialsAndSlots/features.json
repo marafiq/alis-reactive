@@ -939,6 +939,56 @@
           "id": "M9.X149",
           "rung": "behavior",
           "defect": "The superseded offer stays mounted while the new offer is loading and its held acceptance response starts assistance for revision 3."
+        },
+        {
+          "id": "M9.X165",
+          "rung": "behavior",
+          "defect": "The payment is stored with the wrong last four."
+        },
+        {
+          "id": "M9.X166",
+          "rung": "behavior",
+          "defect": "The browser omits the checksum rule."
+        },
+        {
+          "id": "M9.X167",
+          "rung": "behavior",
+          "defect": "The issuer ignores its list of declined cards."
+        },
+        {
+          "id": "M9.X168",
+          "rung": "behavior",
+          "defect": "The replay charges the draft again."
+        },
+        {
+          "id": "M9.X169",
+          "rung": "behavior",
+          "defect": "The payment trusts the amount rendered before the required deposit changed."
+        },
+        {
+          "id": "M9.X170",
+          "rung": "behavior",
+          "defect": "The endpoint keeps the previous kitchen note."
+        },
+        {
+          "id": "M9.X171",
+          "rung": "behavior",
+          "defect": "The imported referral is accepted by its enum check."
+        },
+        {
+          "id": "M9.X172",
+          "rung": "behavior",
+          "defect": "The kitchen accepts its restricted diet."
+        },
+        {
+          "id": "M9.X173",
+          "rung": "behavior",
+          "defect": "The preview stores the unsaved meal count before its connection drops."
+        },
+        {
+          "id": "M9.X174",
+          "rung": "behavior",
+          "defect": "The earlier preview outlives the confirmed care change."
         }
       ],
       "promises": [
@@ -1787,6 +1837,86 @@
           "outcome": "The live page displays revision 4 before the old request returns. Reopening shows revision 4 without an acceptance.",
           "opposite": "A separately accepted unchanged quote retains its revision.",
           "defect": "The superseded offer stays mounted while the new offer is loading and its held acceptance response starts assistance for revision 3."
+        },
+        {
+          "for": "M9.X165",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Authorise the deposit for the accepted quote and read the operation receipt again.",
+          "outcome": "PAY100 records 500.00 USD, last four 1111 and a zero outstanding balance.",
+          "opposite": "An unaccepted quote cannot take a deposit.",
+          "defect": "The payment is stored with the wrong last four."
+        },
+        {
+          "for": "M9.X166",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Enter a card with an invalid checksum and request its operation receipt.",
+          "outcome": "The browser shows the checksum refusal and the operation has no receipt.",
+          "opposite": "A valid card posts successfully.",
+          "defect": "The browser omits the checksum rule."
+        },
+        {
+          "for": "M9.X167",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Enter the declined example card and request its operation receipt.",
+          "outcome": "The issuer declines the deposit and no payment is authorised.",
+          "opposite": "An eligible card is authorised.",
+          "defect": "The issuer ignores its list of declined cards."
+        },
+        {
+          "for": "M9.X168",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Lose the response after paying, look up the operation and authorise it again.",
+          "outcome": "The uncertain response resolves to PAY100 and a repeated payment leaves one charge.",
+          "opposite": "A payment whose amount changed commits nothing.",
+          "defect": "The replay charges the draft again."
+        },
+        {
+          "for": "M9.X169",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Hold payment before its amount check and raise the required deposit.",
+          "outcome": "The conflict leaves the draft unpaid and a fresh read requires 650.00 USD.",
+          "opposite": "An unchanged accepted quote takes the displayed amount.",
+          "defect": "The payment trusts the amount rendered before the required deposit changed."
+        },
+        {
+          "for": "M9.X170",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Change the working meal plan and save the vegetarian and low sodium combination with its kitchen instructions.",
+          "outcome": "The saved revision records three meals and its live preview binds both document kinds and both label positions.",
+          "opposite": "An unsupported referral cannot save.",
+          "defect": "The endpoint keeps the previous kitchen note."
+        },
+        {
+          "for": "M9.X171",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Select the imported referral with an unsupported dietary flag and save it.",
+          "outcome": "The coordinator sees the enum refusal and reopens the confirmed combination.",
+          "opposite": "The supported combination saves.",
+          "defect": "The imported referral is accepted by its enum check."
+        },
+        {
+          "for": "M9.X172",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Choose pureed meals at Harbor House and save and preview the kitchen plan.",
+          "outcome": "Both actions report the kitchen restriction and the original diet reopens.",
+          "opposite": "Harbor House can serve vegetarian and low sodium meals.",
+          "defect": "The kitchen accepts its restricted diet."
+        },
+        {
+          "for": "M9.X173",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Change the working meal count and lose the preview connection.",
+          "outcome": "The coordinator sees the preview failure and reopens the saved three meals.",
+          "opposite": "An available kitchen returns the working preview.",
+          "defect": "The preview stores the unsaved meal count before its connection drops."
+        },
+        {
+          "for": "M9.X174",
+          "page": "Helen Ward has an open move-in at Harbor House with an assisted-care quote and a confirmed three-meal plan.",
+          "gesture": "Hold a new preview, confirm different care and release the former preview before saving.",
+          "outcome": "The new care keeps the confirmed plan after release and both care and diet reopen together.",
+          "opposite": "Without replacement the working preview appears.",
+          "defect": "The earlier preview outlives the confirmed care change."
         }
       ],
       "verdicts": []

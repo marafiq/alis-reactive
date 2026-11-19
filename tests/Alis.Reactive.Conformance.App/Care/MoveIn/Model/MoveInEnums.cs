@@ -91,6 +91,7 @@ public enum ReviewKind
 }
 
 [Flags]
+[JsonConverter(typeof(JsonStringEnumConverter<DietaryNeeds>))]
 public enum DietaryNeeds
 {
     None = 0,

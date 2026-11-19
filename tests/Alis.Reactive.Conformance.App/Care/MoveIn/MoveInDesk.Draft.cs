@@ -15,6 +15,8 @@ internal sealed partial class MoveInDesk
             page.DraftId = draft.Id;
             page.Version = draft.Version;
             page.Today = _world.Clock.Today;
+            page.Diet.Referral = draft.ReferralDiet;
+            page.Diet.UnavailableMeals = CommunityOf(page.Location.CommunityId)?.UnavailableMeals ?? DietaryNeeds.None;
             return page;
         }
     }

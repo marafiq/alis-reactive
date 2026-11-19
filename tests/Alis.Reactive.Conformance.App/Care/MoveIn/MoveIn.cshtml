@@ -60,6 +60,17 @@
     </section>
 
     <section id="move-in-diet" aria-label="Diet">
+        @if (Model.Location.CommunityId.Length != 0)
+        {
+            @await Html.PartialFor(m => m.Diet, "/Care/MoveIn/Diet.cshtml")
+            @(Html.InputField(plan, m => m.Documents.RequiredKinds, o => o.Label("Kitchen documents")).NativeCheckList(list =>
+                list.Items(Enum.GetValues<DocumentKind>().Select(kind => new CheckListItem(kind.ToString(), kind.ToString())))))
+            @for (var index = 0; index < Model.Services.OptionalLabels.Count; index++)
+            {
+                var at = index;
+                @(Html.InputField(plan, m => m.Services.OptionalLabels[at], o => o.Label($"Meal service label {at + 1}")).NativeTextBox())
+            }
+        }
     </section>
 
     <section id="move-in-documents" aria-label="Documents">
@@ -69,6 +80,7 @@
         <button type="button" @Html.Raises(plan, MoveInDraftEvents.Save)>Save draft</button>
         <p id="save-status"></p>
         @{
+            Html.On(plan, trigger => trigger.CustomEvent(MealEvents.Saved, (version, pipeline) => pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(version))));
             Html.On(plan, trigger => trigger.CustomEvent(MoveInDraftEvents.Save, pipeline => pipeline
                 .Put<MoveInPage>(MoveInEndpoints.Draft, request => request
                     .Path(sent => sent.DraftId, moveIn.Container.Read(m => m.DraftId))
@@ -83,6 +95,7 @@
                     pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(reply => reply.Receipt.Version)));
                     pipeline.Element("saved-version").Text.Set(saved.Body.Read(reply => reply.Receipt.Version));
                     pipeline.Element("save-status").Text.Set(pipeline.Concat("Draft saved: version ", saved.Body.Read(reply => reply.Receipt.Version)));
+                    pipeline.Dispatch(MealEvents.Saved, saved.Body.Read(reply => reply.Receipt.Version));
                 })));
         }
     </section>
@@ -114,6 +127,10 @@
 </section>
 
 <section id="move-in-deposit" aria-label="Deposit">
+    @if (Reads.DepositForm(Model.DraftId) is { } deposit)
+    {
+        @await Html.PartialAsync("/Care/MoveIn/Deposit.cshtml", deposit)
+    }
 </section>
 
 <section id="move-in-reception" aria-label="Reception">
