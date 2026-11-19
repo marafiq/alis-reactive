@@ -41,12 +41,14 @@ do, on the same public surface, and the conformance library is the exemplar of e
   vendor TypeScript program on each target. A configured build checks declarations it sees. Compare the vendor
   list against the C# declarations as well to find omitted doors. For Fusion, follow the per-slice inventory in
   `spec/FusionComponents/audit/README.md`, then read the recorded vendor source for the slice's rows.
+  Cite the scoped package path and line in module evidence. The `module_cites` check in
+  `spec/tools/check.py` resolves those citations against the installed declarations.
 - Separate the render helper's initial options from the live object exposed after it renders. For a live
   union, decide reads and writes independently. An array write to ComboBox's inherited dataSource has a
   typed list lane. A list read needs evidence for the active data source because the same property can hold
   a DataManager. Record and prove each exposed read or write lane, including cases that share a vendor name.
-- Onboard DataManager only for the component that needs it. Keep its live declaration, query and result
-  holders with that component's slice. Verify the configured source, query argument and adaptor envelope.
+- Add DataManager only to the component named in the request. Keep its live declaration, query and
+  result holders in that component's slice. Verify the configured source, query argument and adaptor envelope.
   A live browser object passed to a method needs a typed source that carries the same instance. A C# live
   declaration describes the object and its member paths. Read the supported value as a source for an
   argument, and prove the actual Query reaches the vendor call before adding the door.

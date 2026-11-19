@@ -37,8 +37,9 @@ present change.value was found and suppressing that entry failed with the exact 
 | Equipment query | A nullable live Query. Its execute uses MethodAsync and reads the typed result array. | A held vendor request leaves Checking stock visible. After release the ready row's nested dispatch instruction appears. |
 | Supplier DataManager | The manager view of dataSource and the scoped executeQuery promise method with a typed Query source. | Each chosen supplier's real Query crosses into the vendor method. The held response releases a distinct delivery window. |
 
-The current comparison accepted all 16 named operations on both hosts. Deleting DataSource from C# and both
-manifests made the staged source comparison fail at FusionComboBox.dataSource. Replacing MethodAsync with Method
+The current comparison accepted the listed operations on both hosts, including the manager read and
+executeQuery. Deleting DataSource from C# and both manifests made the staged source comparison fail at
+FusionComboBox.dataSource. Replacing MethodAsync with Method
 kept the name and API signature and failed at DataQuery.execute. Both changes were restored byte for byte. The
 equipment fixture independently caught the synchronous substitution and the wrong row predicate through
 visible outcomes.

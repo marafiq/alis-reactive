@@ -189,9 +189,11 @@ Each name is gate 2's; each door is the capability it carries.
   (`@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:92`, `:223`, `:231`, `:360`, `:367`, `:373`, `:380`, `:387`,
   `@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:365`, `:389`, `:395`).
   The live ComboBox accepts a local array through `DataSource<TItem>()`, a `WriteOnly<IReadOnlyList<TItem>>`.
-  EJ2 types its dataSource as an array or a DataManager (drop-down-base.d.ts:390–392). Its `Fields` holds the
-  slice's own live `FieldSettings`. The optional `Text` and `GroupBy` properties name the item members whose JSON
-  holds the list's labels and group headings (drop-down-base.d.ts:331, drop-down-base-model.d.ts:15, :36).
+  EJ2 types its dataSource as an array or a DataManager
+  (`@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:390-392`). Its `Fields` holds the
+  slice's own live `FieldSettings` (`@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:331`).
+  The optional `Text` and `GroupBy` properties name the item members whose JSON holds the list's labels and
+  group headings (`@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:15`, `:36`).
   M21.X1210–M21.X1212 exercise changing catalogues, grouping the services and clearing a provider before saving.
   The box's `Query` is a nullable live EJ2 Query. With a DataManager selected by the query's `using` and an
   adaptor that answers rows, `Query.Execute<TRow>()` waits for EJ2's Promise and reads its `result` as those rows
