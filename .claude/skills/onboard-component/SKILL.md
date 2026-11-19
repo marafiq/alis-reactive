@@ -15,9 +15,15 @@ do, on the same public surface, and the conformance library is the exemplar of e
 
 ## Read the API before declaring
 
-- The typed API is the contract: the vendor's .d.ts, or its source at the version the app pins. Declare what it
-  declares public. A member it marks private or hidden, or one its docs name and its types lack, is a gap to raise
-  with its use case, never a member to declare.
+- Start with the vendor's declarations and source at the version the app pins. Enumerate public instance
+  properties, methods, overloads and events, including inherited members. Follow each event argument and returned
+  object to the members a view reaches. Keep a verdict with the spec for each uncovered member: a typed
+  declaration and proof, evidence still needed, or an exclusion with its reason. Vendor members marked private
+  or hidden, and names found only in docs, need a use case raised to the owner.
+- A weak type such as `Object`, `any` or a loose union needs evidence from the installed vendor. Start with the
+  code that constructs or consumes the value. Run the applicable real gesture on the pinned version and record
+  the member's exact name, shape and presence in each lane the declaration covers. Observe absent, null and
+  falsy values distinctly. An object row and its selected DOM element have different contracts.
 - Presence and nullability come from that API, on every object the declaration reaches, an event's payload
   included. A member the API declares is required: a page whose object lacks it stops the pipeline that reads,
   writes or calls it. A member it marks optional is `optional: true`; a value it types as text or null is
@@ -25,9 +31,10 @@ do, on the same public surface, and the conformance library is the exemplar of e
 - Sync or async is the declaration's, never what the browser finds: a method whose API returns a promise is
   `MethodAsync`. One declared with `Method` that returns a promise stops its pipeline.
 - A member's JavaScript name is its C# name in camel case. When the names differ, pass `name:`.
-- The build writes a table of the vendor's types from the project's own TypeScript before the compiler runs
-  (`Alis.Reactive.Analyzers/Vendors/VendorContract.targets`). Until the rules that read it are built, reading the
-  API is this skill's first step, done by hand.
+- Check whether the project imports `Alis.Reactive.Analyzers/Vendors/VendorContract.targets` and supplies a
+  vendor TypeScript program on each target. A configured build checks declarations it sees. Compare the vendor
+  list against the C# declarations as well to find omitted doors. For Fusion, follow the per-slice inventory in
+  `spec/FusionComponents/audit/README.md`, then read the recorded vendor source for the slice's rows.
 
 ## Find the object
 
@@ -85,9 +92,10 @@ public Event<Raised> Raised => Event<Raised>();
 - An event or a callback: a vendor that ignores what its function returns raises an event; one that uses the
   return asks for an answer, a callback. A callback's answer is an expression the vendor gets at once, so a step or
   an awaited read written in it is refused at build, and an answer that stops throws to the vendor's call.
-- A payload is a live object: declare it as the listener receives it, members and methods alike, as a class of its
-  own beside its component, named for its event. A write to it reaches the vendor only before the handler's first
-  awaited step; a write after one is refused.
+- Declare a live payload as the listener receives it, including its methods. Each Fusion event owns its nested
+  payload types inside its component's declaration. A vendor interface shared by two controls gives each control
+  a starting point for inspection. Check the actual gesture and payload separately for each. A write reaches the
+  vendor only before the handler's first awaited step; a write after one is refused.
 - A callback property holds one listener, so an object and its event take one handler.
 - Versions: declare the version the app pins. A component that ships several builds proves an older one stops at
   the member it lacks, as the conformance component's builds do.
@@ -121,7 +129,8 @@ compiler options and typed lint. It reaches the framework through two events and
 
 ## Prove it
 
-Each member a view uses has a Playwright test of both sides: the member working, and a page that does not match
-the declaration (a member the object lacks stops, a null the API allows reads as null). A component shows what a
-test reads by role: a status, a list, a heading, a button for what the vendor does in its own turn. The defect each
-test names is planted through the prove-behavior skill.
+Use a real render and gesture to exercise the typed read, write or call and assert its visible outcome.
+Cover absence or null as the contract permits. For a loose vendor type, keep the probe that established the
+shape and the Playwright test that uses the resulting C# door. Rerun both on a vendor upgrade. For a payload
+method, exercise the supported argument forms and observe the vendor effect. Plant the defect each test names
+through the prove-behavior skill.
