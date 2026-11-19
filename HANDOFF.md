@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Wed Nov 18 07:39:07 EST 2026
+Written at `date`: Thu Nov 19 02:28:35 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -20,22 +20,30 @@ note: open 2026-11-18 | decision | spec/CLAUDE.md | DecisionsByModule | "where y
 note: open 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses 
 note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSlice1 | "For the app, you
 note: open 2026-11-18 | direction | the queue of this file | queue | "I don't need acceptance numbers, sir. I need that
-unit: ready ../movein-care MoveInCare
-  next: scripts/land-unit.sh ../movein-care fbea584b2 "conformance app: the move-in's level of care, resident details and allocation review (MI.2, MI.3, MI.4)" ".landing/MoveInCare"
+unit: ready ../movein-contacts MoveInContacts
+  next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
   leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
   exit line: "landed", with the browser run's result line
   goes to: unit: landed
-unit: building ../movein-contacts MoveInContacts: it lacks paths.txt or message.txt
+unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
   exit line: each line of the brief's "Done"
   goes to: unit: ready, or unit: returned for an agent
-lane: pushed at e02fafe66 on feature/rewrite: equal to the remote
+unit: waiting ../movein-scope MoveInSessionScope: for MoveInContacts
+  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
+  exit line: each line of the brief's "Done"
+  goes to: unit: ready
+unit: landed ../retire-picomatch-exception RetirePicomatchException
+  next: git worktree remove ../retire-picomatch-exception
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
+lane: pushed at a95511ce6 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at e02fafe66
+ci: unread at a95511ce6
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -44,19 +52,19 @@ file: over CLAUDE.md: holds 326 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 230 lines, its limit 150
+file: over HANDOFF.md: holds 290 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: e02fafe66 conformance app: the move-in's level of care, resident details and allocation review (MI.2, MI.3, MI.4)
-- Full check: .work/logs/spec-check-e02fafe66.log: spec check at e02fafe66: 40 of 40 checks pass
-- .work/last-run.txt: 20261118-072850-44045 e02fafe66
+- HEAD: a95511ce6 build: retire the withdrawn picomatch audit exception
+- Full check: .work/logs/spec-check-a95511ce6.log: spec check at a95511ce6: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-021729-16074 a95511ce6
 
 ## Landed since the commit before the last spec: STATE commit
-e02fafe66 conformance app: the move-in's level of care, resident details and allocation review (MI.2, MI.3, MI.4)
-4b69b305d spec: STATE and handoff at 7b552b3fb
+a95511ce6 build: retire the withdrawn picomatch audit exception
+d13a4ce7f spec: STATE and handoff at e02fafe66
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -105,11 +113,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 346 to 350
-- A rule or a tool's list not applied before the change: 385 to 387
-- A number, a proof line or an absence not read from the run that proves it: 55 to 56
-- A shell command or a script wrong in its own terms: 542 to 548
-- A fault found in an agent's work whose instruction the brief did not give: 5 to 9
+None.
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -142,6 +146,55 @@ spec/CLAUDE.md:2007: - The owner, 2026-11-18, on the app that proves the framewo
 
 ## Next
 <!-- next -->
+The owner, 2026-11-19: "you can not change framework now while working in conformance." At startup, read the
+move-in unit's brief and `spec/Reference/move-in.md`. Build and prove the app through the typed doors already on
+the branch, including the supported MVC `Html.*` partial helpers. If a door falls short, name the use case in
+part 9 of the move-in spec and raise a separate scope decision before any framework edit. The matching startup
+rule is prepared in `../movein-scope` for landing after contacts.
+Each builder on the latest Astra at xhigh reads `AGENTS.md`, `.claude/rules/process.md`, the owner decisions in
+`spec/CLAUDE.md`, `spec/MISTAKES.md`, and the applicable project and file rules before editing. Its reply cites
+the rules it applied by file and line. The lead verifies the source and browser and planted evidence against
+each promise, and owns the integrated gate. The owner, 2026-11-19: "its not check and rubber stamp it- quality
+bar has to be high."
+
+Contacts integration passed the build, page-doors comparison and all move-in browser scenarios on November 19
+(see the contacts landing folder's `note.txt`). The preview stopped on schedule. The contacts landing gate stopped
+at the npm audit, with the batch staged and no contacts commit. The owner had excused GHSA-fc5q-39xc-vjpf in
+`spec/CLAUDE.md`, November 17. The exception expires when npm stops reporting the advisory. GitHub withdrew it on
+November 18 and a live audit confirmed zero findings with picomatch still pinned to 4.0.7. The gate log is
+`.work/logs/land-unit-d13a4ce7f-14028.log`. The owner authorized retiring the exception. The separate audit
+unit landed at `a95511ce6`. The live audit reported no advisories, the three focused cases passed, the full
+browser run printed 651 passed with no failures or over-budget tests, and the committed spec check passed
+40 of 40. Retry contacts from `../movein-contacts` through the landing script. Its previous staged tree is
+verified at `.work/movein-contacts-before-audit-yv_ws7bs/contacts.patch`. Land the startup scope unit after
+contacts.
+
+RESUME UPDATE, 2026-11-19: The owner asked Codex to resume from this handoff. Read the root `CLAUDE.md`/`AGENTS.md`,
+all repo `CLAUDE.md` files and the six `.claude/rules/` files before acting. The rewrite branch is at
+`d13a4ce7f`; remote matched that head at the last read. Preserve the existing modified `HANDOFF.md` until this
+resume note is committed through the prescribed landing path. No implementation or tests were changed by the status
+review.
+
+The owner reports Rider's toolset is now fixed. The previous Rider MCP build (before that correction) selected Mono
+MSBuild 15.0, rejected `/langversion:14.0`, and misread `net10.0` as `.NETFramework,Version=v10.0`. SDK 11.0.100
+is pinned in `global.json` and installed at `/Users/muhammadadnanrafiq/.local/share/alis-toolchain/dotnet11/dotnet`.
+A new Rider MCP build request reported that another build is already running; no result from that run is available
+yet. Read its final Rider MCP build state before treating the IDE build as verified. The UI connection previously
+failed with ScreenCaptureKit error -3811.
+A fresh Rider MCP session on November 19 completed successfully with zero reported problems. The CLI
+Release browser smoke test also passed from the canonical `Documents/Code` worktree path.
+
+Resume the app in order. Contacts MI.5–MI.7 is preserved in `../movein-contacts` and `.landing/MoveInContacts`.
+Its earlier isolated report was 15 tests green and 15 planted defects caught, but integration on the current head
+failed: `MoveInDesk.Today()` and `MoveInReads.Day(DateTime)` duplicate members already supplied by MI.2. The
+page-doors comparison did not run; `read.md`'s land verdict is premature. Read the merged files at source, resolve
+the duplicates, build, compare page-doors, run the unit and full browser/gate checks, then land and push only through
+the prescribed scripts. `../movein-owners` has the MI.18/28/29 brief but no implementation; start a fresh scoped
+builder for it after contacts lands. Continue the app queue recorded below. Saved results (not rerun here): 651
+browser tests and 40/40 spec checks passed for the landed MI.2–MI.4 batch. CI core passed 499/499 on d13a4ce7f;
+overall CI failed net48 browser verification and cancelled the spec job. The pinned Java 27.0.1 is not available
+in the current shell, so TLC readiness must be checked before a spec run.
+
 The owner is away for 24 hours from the early morning of 2026-11-18. The lead works alone, THE APP FIRST AND ONLY,
 and spends little: it acts on a notification, never polls, and adds no process.
 
@@ -159,52 +212,59 @@ THE APP: resident move-in at a senior living community, a vertical slice inside 
 cff7dd154); a unit adds to its ninth part each place the source won over it and each gap it met. 31 features MI.1 to MI.31, five situations a feature, each situation one browser test that reads the
 page, what the model holds after and what the next read shows.
 
-Proven, each by a test green in a browser and caught on its planted defect (landed f4cd5af46, "637 selected, 637
-ran, 637 passed", "40 of 40 checks pass"):
-- The foundation: the domain model and its seed, one test world's own; the main page with one section an area; the
-  draft's read and its save by PUT.
-- MI.1, residence selection, its five situations: each list offers what the choices before it hold and a choice
-  alone saves nothing; an empty community is refused beside its list and sends no lookup; a building the world holds
-  closed is refused by the server with its reason; a lookup whose connection drops says so and offers nothing it did
-  not load; a lookup a newer choice replaced loads nothing, and the draft moves only at its save.
-Not proven: every other feature. Two gaps of the framework the foundation met, no code written for either: a Native
+Proven, each by a test green in a browser when run alone and caught on its planted defect:
+- The foundation (f4cd5af46): the domain model and its seed, one test world's own; the main page with one section an
+  area; the draft's read and its save by PUT.
+- MI.1, residence selection, its five situations (f4cd5af46): each list offers what the choices before it hold and
+  a choice alone saves nothing; an empty community is refused beside its list and sends no lookup; a building the
+  world holds closed is refused by the server with its reason; a lookup whose connection drops says so and offers
+  nothing it did not load; a lookup a newer choice replaced loads nothing, and the draft moves only at its save.
+- MI.2, care-specific admission, its five (e02fafe66, "651 selected, 651 ran, 651 passed", "40 of 40 checks pass"):
+  a confirmed level loads its own questions and a save keeps that level alone; a declined change keeps the answers
+  on the page; a level the server refuses says why and leaves the saved care; questions whose connection drops say
+  so and the saved answers come back at the next read; questions a newer level replaced never join the page.
+- MI.3, resident details, four of its five: a verified identity names who checked it and its receipt opens only
+  where the server asks; an email confirmation that differs is refused in the browser and no review leaves; a
+  resident who already holds an admission is refused by the server with its reason; an identity review whose
+  connection drops says so and leaves no review. Its fifth situation waits on MI.9's drawer.
+- MI.4, allocation review, its five: a review is posted once readiness answers and its reply fills the panel and
+  the instructions; a panel that is not ready asks the server for nothing; a bed taken since it was listed shows who
+  holds it and no review is kept; a readiness call that never answers ends the review and posts nothing; a review a
+  newer selection replaced posts nothing when its readiness answers.
+Inside those, not proven: MI.2.2's condition on contact roles (waits on the contacts); MI.4.3's entry to the
+waitlist (MI.18) and MI.4's fourth situation's quote (MI.13 to MI.15); that a dropped POST is not sent again, which
+M9.X23 asserts and which failed on no planted defect; each endpoint's other refusals, listed in each unit's message.
+The harness's waits were measured again on 2026-11-18 with the move-in page in place: a navigation 704 ms (it was
+204 ms, and no move-in test ran alone under it), a step 740 ms, a test 7.44 s.
+Not proven: every feature from MI.5 on. Two gaps of the framework the foundation met, no code written for either: a Native
 input over a date renders the server's culture text, which the browser's code does not read as a date (Native holds
 no date input); an input over an enum whose zero no name holds. Three members a builder added to the conformance
 component with no test are held out as a patch in the lead's durable scratch, "conformance-members", for the unit
 that brings each with its cell and its test.
 
-In flight, read at 06:20 on 2026-11-18:
-- `.worktrees/movein-care`, ".landing/MoveInCare", its builder's reply standing: MI.2 care-specific admission, MI.3
-  resident details, MI.4 allocation review, fourteen tests (MI.3's fifth situation waits on MI.9's drawer), ids
-  M9.X15 to M9.X29. Each was red before its page; with the unit in place the full run printed "651 selected, 651
-  ran, 651 passed". NOT DONE: no test of the move-in passes when run alone, so no single green line and no planted
-  defect stands. The cause is the harness's navigation wait, 204 ms, measured on 2026-11-16 before this page existed;
-  the page's first render took 170 ms at the base and 243 ms with the unit. CI's core pool failed one of MI.1's
-  tests on the same wait at 4b69b305d. The remedy is the harness's own and is running in that worktree through the
-  lock: `scripts/playwright.sh --measure --pool core`, twenty green runs, its log ".work/logs/measure-core.log".
-  When it ends: the new "measured.json" is copied into `.worktrees/movein-contacts` (never into its paths.txt) and
-  its builder told; the care builder is sent back to run each test alone and its fourteen prepared planted defects
-  ("reply.md" lists each), with "measured.json" and "shard-weights.json" added to its paths; then read.md and the
-  landing. Read by the lead at the source so far: "AllocationDesk.cshtml" and the allocation review's test, whole.
-- `.worktrees/movein-contacts`, ".landing/MoveInContacts": MI.5 contact rows, MI.6 contact authority, MI.7 contact
-  removal; promise ids M9.X40 to M9.X64. Its builder is working and has been told of the wait.
+In flight, two builder agents, each in a worktree with a six-part brief and the foundation's reply beside it:
+- `.worktrees/movein-contacts` at fbea584b2, ".landing/MoveInContacts": MI.5 contact rows, MI.6 contact authority,
+  MI.7 contact removal; promise ids M9.X40 to M9.X64. The new "measured.json" is copied into its worktree and stays
+  out of its paths.
+- `.worktrees/movein-owners` at d13a4ce7f, ".landing/MoveInOwners": MI.18 bed conflict and waitlist, MI.28
+  assessment objects and their owners, MI.29 room handoff callback; promise ids M9.X65 to M9.X89.
 When a "reply.md" stands: read the feature in the spec, read the tests and the views at the source, hold each line
 of "Done", write "read.md", land through the lock, push, remove the worktree; then open the next unit for that
 builder's line from the new head with a fresh agent, by the brief template and the script in the lead's scratchpad
 folder "fanout" (a copy of both is kept in the durable scratch). The lines, in the order the owner's concerns give:
-- after MoveInCare: MI.18 bed conflict and waitlist, MI.28 assessment objects and their owners, MI.29 room handoff
-  callback; then MI.20 and MI.21, bed availability by server push and its reconnect;
+- after MoveInOwners: MI.20 and MI.21, bed availability by server push and its reconnect;
 - after MoveInContacts: MI.8 primary and secondary payer, MI.9 independent payer verification, MI.13 services and
   price calculation; then MI.14 service review component, MI.15 price acceptance, MI.25 deposit, MI.26 diet;
 - then MI.10 to MI.12 medications and pharmacy, MI.16 save draft, MI.17 submit admission, MI.19 discard, MI.22 to
   MI.24 documents and the packet, MI.27 the coordinators' line, MI.30 reception's native form, MI.31 request defaults.
-Promise ids are given in blocks of 25 from M9.X65 on, so two units never take one id.
+Promise ids are given in blocks of 25 from M9.X90 on, so two units never take one id. A new unit is opened by
+"open-unit.sh" of the lead's durable scratch folder "fanout", which fills "brief-template.md" from the lane's head.
 
 THE LANE, nothing in flight. CI at 4b69b305d, each failed job read from its own log
 (`gh api repos/marafiq/alis-reactive/actions/jobs/<id>/logs`):
 - checks and the Syncfusion upgrade pass (cff7dd154).
-- playwright core: one test failed of 485, MI.1's closed building, "Timeout 204ms exceeded" at its navigation: the
-  wait above, on a slower machine. The new measurement is its fix; read the job again after that push.
+- playwright core: one test failed of 485 at 4b69b305d, MI.1's closed building, "Timeout 204ms exceeded" at its
+  navigation. The waits measured again landed in e02fafe66; the job is read again at that push.
 - verify-net48: Visual Studio's MSBuild builds the fresh MVC 5 app with no warning and its 12 consumer tests pass
   (2836ae7e4, cff7dd154); Chromium installs at the pin (7b552b3fb). Its browser run under the twin then fails each of
   its 11 tests: "The conformance app serves no host 'net48'". The harness starts the net10 app under that name;
