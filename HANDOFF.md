@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 12:47:17 EST 2026
+Written at `date`: Thu Nov 19 13:09:15 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -52,6 +52,7 @@ unit: returned ../fusion-combobox-onboarding-replay FusionComboBoxOnboardingRepl
 unit: ready ../fusion-combobox-payload FusionComboBoxPayload
   next: scripts/land-unit.sh ../fusion-combobox-payload 9c77fd7d8 "Prove typed ComboBox changes on Helen Martinez's communication plan" ".landing/FusionComboBoxPayload"
 unit: returned ../fusion-combobox-server-search FusionComboBoxServerSearch: reply.md waits for read.md
+unit: unbriefed ../movein-availability MoveInAvailability: its Rules name LiveRound.cs, LiveDoses.cshtml, LiveOffer.cshtml, LiveBedCard.cshtml, which the worktree lacks
 unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
@@ -67,23 +68,23 @@ unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
   leaves by: `git worktree remove {worktree}`
   goes to: gone
-lane: checking at 2c77b1a04 on feature/rewrite
+lane: checking at 03287bb21 on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 2c77b1a04
+ci: unread at 03287bb21
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over CLAUDE.md: holds 326 lines, its limit 200
+file: over CLAUDE.md: holds 335 lines, its limit 200
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 401 lines, its limit 150
+file: over HANDOFF.md: holds 409 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 14 units have landed since .claude/rules/process.md last changed
+machine: review due : 15 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -91,13 +92,13 @@ machine: review due : 14 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 2c77b1a04 Implement MI.18 waitlisting and MI.28–29 assessment and room owners
-- Full check: .work/logs/spec-check-2c77b1a04.log: spec check at 2c77b1a04: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-123541-51720 2c77b1a04
+- HEAD: 03287bb21 Keep move-in implementation and builder proof within scope
+- Full check: .work/logs/spec-check-03287bb21.log: spec check at 03287bb21: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-125735-13706 03287bb21
 
 ## Landed since the commit before the last spec: STATE commit
-2c77b1a04 Implement MI.18 waitlisting and MI.28–29 assessment and room owners
-f9d5617f7 spec: STATE and handoff at 1b64776dd
+03287bb21 Keep move-in implementation and builder proof within scope
+6a418dc64 spec: STATE and handoff at 2c77b1a04
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -146,9 +147,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 363 to 370
-- A rule or a tool's list not applied before the change: 401 to 403
-- A shell command or a script wrong in its own terms: 559 to 563
+- A rule or a tool's list not applied before the change: 403 to 404
+- A shell command or a script wrong in its own terms: 563 to 564
+- Said to the owner in a way that hid or blurred what holds: 10 to 11
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -382,6 +383,15 @@ the draft stays Open and BED4 remains held. The replaced assessment owner record
 real nested unsubscribe refusal. Room history reopens ROOM7 and the payer contact is a separate
 successful E10 read. The next app batch is MI.20 and MI.21, including the pending X69 availability
 read. Earlier saved proofs retain their original results.
+The committed check passed 40 of 40. The repository scripts pushed the batch and its handoff to
+`6a418dc64` with remote equal to HEAD. A fresh GPT-6.2-Astra xhigh builder is working from that
+base in `../movein-availability`, with the MI.20/21 and X69 brief in `.landing/MoveInAvailability`.
+The new builder passed its fresh one-case baseline within budget. The startup and review rule in
+`../movein-scope` takes the shared lane while the availability builder prepares its failing tests.
+The startup and review rule landed at `03287bb21`. The existing AGENTS.md symlink reads the same
+CLAUDE.md rules. The rule-name check passed its 20 cases and the full local regression preserved
+all 698 prior passes. The availability builder remains confined to app code and its browser proof.
+
 
 
 At the Fusion push the local browser run passed all 682 and the committed spec check passed 40 of 40.
