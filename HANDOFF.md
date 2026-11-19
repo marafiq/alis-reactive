@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 15:08:20 EST 2026
+Written at `date`: Thu Nov 19 16:31:04 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -63,19 +63,21 @@ unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   goes to: unit: ready, or unit: returned for an agent
 unit: ready ../movein-owners-restarted MoveInOwners
   next: scripts/land-unit.sh ../movein-owners-restarted 21d6a2ec4 "Implement MI.18 waitlisting and MI.28–29 assessment and room owners" ".landing/MoveInOwners"
-unit: landed ../movein-payer-pricing MoveInPayerPricing
-  next: git worktree remove ../movein-payer-pricing
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: ready ../movein-payer-pricing MoveInPayerPricing
+  next: scripts/land-unit.sh ../movein-payer-pricing 940dda15b "MI.8, MI.9 and MI.13 — payer coverage, verification and quotes" ".landing/MoveInPayerPricing"
+unit: ready ../movein-review-acceptance MoveInReviewAcceptance
+  next: scripts/land-unit.sh ../movein-review-acceptance c91bae1fc "MI.14 and MI.15. Review the selected services and accept the displayed quote revision" ".landing/MoveInReviewAcceptance"
 unit: ready ../movein-scope MoveInSessionScope
   next: scripts/land-unit.sh ../movein-scope d13a4ce7f "Keep move-in implementation and builder proof within scope" ".landing/MoveInSessionScope"
 unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
-lane: checking at de1d8f40c on feature/rewrite
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
+lane: checking at bfea7b1e4 on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at de1d8f40c
+ci: unread at bfea7b1e4
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -84,10 +86,10 @@ file: over CLAUDE.md: holds 335 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 443 lines, its limit 150
+file: over HANDOFF.md: holds 466 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 17 units have landed since .claude/rules/process.md last changed
+machine: review due : 18 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -95,17 +97,17 @@ machine: review due : 17 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: de1d8f40c Prove move-in payers, verification and quote calculation
-- Full check: .work/logs/spec-check-de1d8f40c.log: spec check at de1d8f40c: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-145553-35099 de1d8f40c
+- HEAD: bfea7b1e4 Prove move-in service review and exact quote acceptance
+- Full check: .work/logs/spec-check-bfea7b1e4.log: spec check at bfea7b1e4: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-161842-6383 bfea7b1e4
 
 ## Landed since the commit before the last spec: STATE commit
-de1d8f40c Prove move-in payers, verification and quote calculation
-940dda15b spec: STATE and handoff at e53943447
+bfea7b1e4 Prove move-in service review and exact quote acceptance
+c91bae1fc spec: STATE and handoff at de1d8f40c
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 626; named by a browser test: 607; with no browser test: 19
+feature promises: 636; named by a browser test: 617; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -150,10 +152,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 373 to 383
-- A rule or a tool's list not applied before the change: 406 to 410
-- A number, a proof line or an absence not read from the run that proves it: 58 to 59
-- A shell command or a script wrong in its own terms: 568 to 574
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 383 to 387
+- A rule or a tool's list not applied before the change: 410 to 411
+- A shell command or a script wrong in its own terms: 574 to 580
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -424,6 +425,26 @@ missing payer document and exemption facts, and the posted funding snapshot.
 
 Next is MI.14 service review and MI.15 acceptance of the exact current quote. Open their scoped
 builder after the checked push. MI.25 deposit and MI.26 diet follow in the existing queue.
+
+MI.14 service review and MI.15 exact quote acceptance landed at `bfea7b1e4`. The scoped
+worktree passed all 87 move-in cases, caught ten new app defects and the strengthened X91 from
+MI.20, and matched 728 compiled page-door entries. The lead replayed all four spec files byte
+for byte. The integrated non-browser gate passed and the full browser run passed all 735,
+preserving all 725 earlier passes without a budget overrun.
+E19's awaited component record and count use the working service selection. Removing pharmacy
+reopens the 2980.00 offer with Dining and two visits. A failed record clears busy, and releasing
+a replaced panel cannot change the new price. Identical terms keep acceptance. A real price
+push retires the previous offer before one refresh. A late revision-3 receipt cannot change
+the replacement's status or start another assistance read. Revision 4 at 3060.00 is unaccepted
+until the coordinator agrees again. A foreign community price event leaves the active offer alone.
+
+Open MI.25 admission deposit and MI.26 diet after this checked push. Keep the working quote
+and its exact accepted revision as the payment authority. The medications and pharmacy batch
+follows in the existing queue.
+At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
+its launcher with “The conformance app serves no host 'net48'.” That existing host work remains
+behind the app.
+
 
 
 
