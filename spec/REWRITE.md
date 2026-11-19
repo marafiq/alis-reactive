@@ -496,9 +496,8 @@ nightly workflow runs, compares Node, Python, Java and TLC with their registries
 finding of NuGet's audit or of `npm audit` fails `scripts/check.sh`, and a package it names moves to its patched
 version by a pin or an override in this table. An advisory with no patched version is the owner's to excuse by its
 id, in `scripts/npm-audit.mjs`, and only while the lock holds the latest published version of its package: the check
-fails once a newer version is published, and once npm no longer reports the advisory. Excused: GHSA-fc5q-39xc-vjpf,
-picomatch's ReDoS through repeated extglobs, every version to 4.0.7, which reaches the repository only through vite,
-vitest and typescript-eslint, whose globs are the repository's own (the owner, 2026-11-17).
+fails once a newer version is published, and once npm no longer reports the advisory. The exception list is empty.
+GitHub withdrew GHSA-fc5q-39xc-vjpf on 2026-11-18 and npm stopped reporting it, ending the owner's 2026-11-17 exception.
 
 The lint beyond its presets is closed. Each rule enforces one line of the spec, which names it, and a rule joins the
 list only with its line, in the unit that brings that line's code:

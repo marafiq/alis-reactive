@@ -2,7 +2,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
-const EXCUSED = new Map([["GHSA-fc5q-39xc-vjpf", "picomatch"]]);
+const EXCUSED = new Map();
 
 function option(name) {
   const at = process.argv.indexOf(name);
@@ -90,4 +90,8 @@ if (problems.length > 0) {
   process.exit(1);
 }
 const excused = findings.map((finding) => finding.excused);
-console.log(`[npm-audit] every finding is excused: ${excused.join("; ")}`);
+if (excused.length === 0) {
+  console.log("[npm-audit] no advisories reported");
+} else {
+  console.log(`[npm-audit] every finding is excused: ${excused.join("; ")}`);
+}
