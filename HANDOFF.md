@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 17:22:55 EST 2026
+Written at `date`: Thu Nov 19 18:21:11 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -58,6 +58,10 @@ unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
 unit: ready ../movein-deposit-diet MoveInDepositDiet
   next: scripts/land-unit.sh ../movein-deposit-diet a46b1ca90 "MI.25 admission deposits and MI.26 dietary plans" ".landing/MoveInDepositDiet"
+unit: landed ../movein-medications-pharmacy MoveInMedicationsPharmacy
+  next: git worktree remove ../movein-medications-pharmacy
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
@@ -73,13 +77,11 @@ unit: ready ../movein-scope MoveInSessionScope
   next: scripts/land-unit.sh ../movein-scope d13a4ce7f "Keep move-in implementation and builder proof within scope" ".landing/MoveInSessionScope"
 unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
-lane: checking at 3666f023d on feature/rewrite
+lane: checking at 86f782c1b on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 3666f023d
+ci: unread at 86f782c1b
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -88,10 +90,10 @@ file: over CLAUDE.md: holds 335 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 486 lines, its limit 150
+file: over HANDOFF.md: holds 507 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 19 units have landed since .claude/rules/process.md last changed
+machine: review due : 20 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -99,17 +101,17 @@ machine: review due : 19 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 3666f023d Prove move-in deposit authorisation and kitchen plans
-- Full check: .work/logs/spec-check-3666f023d.log: spec check at 3666f023d: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-171029-61336 3666f023d
+- HEAD: 86f782c1b Prove move-in medication orders and held pharmacy validation
+- Full check: .work/logs/spec-check-86f782c1b.log: spec check at 86f782c1b: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-180833-98765 86f782c1b
 
 ## Landed since the commit before the last spec: STATE commit
-3666f023d Prove move-in deposit authorisation and kitchen plans
-a46b1ca90 spec: STATE and handoff at bfea7b1e4
+86f782c1b Prove move-in medication orders and held pharmacy validation
+c2ec598d3 spec: STATE and handoff at 3666f023d
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 646; named by a browser test: 627; with no browser test: 19
+feature promises: 661; named by a browser test: 642; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -154,9 +156,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 387 to 391
-- A rule or a tool's list not applied before the change: 411 to 414
-- A shell command or a script wrong in its own terms: 580 to 584
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 391 to 396
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -461,6 +461,25 @@ five-meal preview cannot overwrite the confirmed Memory care or its four-meal pl
 Open MI.10 medication rows, MI.11 pharmacy review and MI.12 late validation from the checked
 push. Twelve feature IDs remain in the app queue, including these three. The earlier specific
 gaps stay in part 9 of the app spec.
+
+MI.10 medication rows, MI.11 pharmacy review and MI.12 late validation landed at
+`86f782c1b`. The scoped move-in screen ran all 112 without overruns, all 19 app plants were
+caught on their specific assertions, and all four files replayed with the 753 compiled
+page-door entries. The integrated check and all 760 browser cases passed, preserving all
+745 prior passes.
+
+An E13 dose or version refusal keeps the saved order. E14 retains the actual edited M2
+while it deletes M1. E15 reads the current recorded allergy and the live review panel's
+awaited record. It clears an eligible order and leaves that clearance on file when the
+instructions fail or the payer changes. A held 400 marks its original input while it lives.
+After replacement or unload, the main summary still receives the failure and the new row
+stays clean. A fresh E15 uses the new row. The tested narrower E15 envelope loses the main
+summary and exact input capture. Part 9 records the current typed main envelope and its
+server-side PharmacyRequest projection.
+
+Open MI.16 save draft and MI.17 submit admission after the checked push. MI.19 discard
+follows. Nine feature IDs remain in the main app queue, including these two.
+
 
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
 its launcher with “The conformance app serves no host 'net48'.” That existing host work remains
