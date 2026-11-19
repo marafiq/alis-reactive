@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 16:31:04 EST 2026
+Written at `date`: Thu Nov 19 17:22:55 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -56,6 +56,8 @@ unit: ready ../movein-availability MoveInAvailability
   next: scripts/land-unit.sh ../movein-availability 6a418dc64 "MI.18.5, MI.20 and MI.21. Publish the world's bed changes to independently owned page and card streams. A held response checks current community access and preserves a newer displayed revision and holder. Reconnect re-reads the bed; the retry offer remains until every failed owner recovers or leaves." ".landing/MoveInAvailability"
 unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
+unit: ready ../movein-deposit-diet MoveInDepositDiet
+  next: scripts/land-unit.sh ../movein-deposit-diet a46b1ca90 "MI.25 admission deposits and MI.26 dietary plans" ".landing/MoveInDepositDiet"
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
@@ -73,11 +75,11 @@ unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
   leaves by: `git worktree remove {worktree}`
   goes to: gone
-lane: checking at bfea7b1e4 on feature/rewrite
+lane: checking at 3666f023d on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at bfea7b1e4
+ci: unread at 3666f023d
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -86,10 +88,10 @@ file: over CLAUDE.md: holds 335 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 466 lines, its limit 150
+file: over HANDOFF.md: holds 486 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 18 units have landed since .claude/rules/process.md last changed
+machine: review due : 19 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -97,17 +99,17 @@ machine: review due : 18 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: bfea7b1e4 Prove move-in service review and exact quote acceptance
-- Full check: .work/logs/spec-check-bfea7b1e4.log: spec check at bfea7b1e4: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-161842-6383 bfea7b1e4
+- HEAD: 3666f023d Prove move-in deposit authorisation and kitchen plans
+- Full check: .work/logs/spec-check-3666f023d.log: spec check at 3666f023d: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-171029-61336 3666f023d
 
 ## Landed since the commit before the last spec: STATE commit
-bfea7b1e4 Prove move-in service review and exact quote acceptance
-c91bae1fc spec: STATE and handoff at de1d8f40c
+3666f023d Prove move-in deposit authorisation and kitchen plans
+a46b1ca90 spec: STATE and handoff at bfea7b1e4
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 636; named by a browser test: 617; with no browser test: 19
+feature promises: 646; named by a browser test: 627; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -152,9 +154,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 383 to 387
-- A rule or a tool's list not applied before the change: 410 to 411
-- A shell command or a script wrong in its own terms: 574 to 580
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 387 to 391
+- A rule or a tool's list not applied before the change: 411 to 414
+- A shell command or a script wrong in its own terms: 580 to 584
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -441,6 +443,25 @@ until the coordinator agrees again. A foreign community price event leaves the a
 Open MI.25 admission deposit and MI.26 diet after this checked push. Keep the working quote
 and its exact accepted revision as the payment authority. The medications and pharmacy batch
 follows in the existing queue.
+
+MI.25 admission deposit and MI.26 diet landed at `3666f023d`. The scoped 97-case move-in
+screen and private gate passed, 11 app-only plants failed at their named observations, and
+all 738 compiled page-door entries matched the four-file spec replay byte for byte. In the
+integrated browser run all 745 passed, preserving every one of the prior 735 passes without
+an overrun.
+
+An unaccepted quote or stale amount cannot charge. A genuine post-commit connection loss
+recovers PAY100 through E39. A second explicit POST yields PAY100 again and the next read
+shows one payment. The updated 650.00 offer can be accepted while the older 500.00 request
+waits and the old amount still cannot charge. Diet saves the working flags, note, repeated
+document kinds and each label position. Invalid imported flags and kitchen restrictions leave
+the stored diet in place. The main Save uses a preceding diet save's new version, and a late
+five-meal preview cannot overwrite the confirmed Memory care or its four-meal plan.
+
+Open MI.10 medication rows, MI.11 pharmacy review and MI.12 late validation from the checked
+push. Twelve feature IDs remain in the app queue, including these three. The earlier specific
+gaps stay in part 9 of the app spec.
+
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
 its launcher with “The conformance app serves no host 'net48'.” That existing host work remains
 behind the app.
