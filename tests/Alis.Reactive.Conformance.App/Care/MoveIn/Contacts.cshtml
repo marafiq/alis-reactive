@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model ContactSection
+@{
+    var plan = Html.ReactivePlan<ContactSection>();
+}
+@for (var position = 0; position < Model.Rows.Count; position++)
+{
+    var at = position;
+    <fieldset>
+        <legend>@Model.Rows[at].Name</legend>
+        @await Html.PartialFor(m => m.Rows[at], "/Care/MoveIn/Contact.cshtml")
+    </fieldset>
+}
+@Html.RenderPlan(plan)

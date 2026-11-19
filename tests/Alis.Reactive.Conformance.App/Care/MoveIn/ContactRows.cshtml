@@ -1,0 +1,39 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+    var contacts = plan.Rows<ContactInput>("contacts");
+    var remove = contacts.NativeActionButton((activated, pipeline) =>
+    {
+        activated.Element.Classes.Add("removing");
+        pipeline.Dispatch(MoveInContactEvents.Command, pipeline.Object<ContactCommand>(command => command
+            .Set(sent => sent.Kind, ContactCommandKind.RemoveContact)
+            .Set(sent => sent.RemoveId, activated.Row.Read(row => row.Id))
+            .Set(sent => sent.Version, pipeline.Container<MoveInPage>("move-in").Read(m => m.Version))));
+    });
+    var onFile = contacts.NativeActionLink((activated, pipeline) => pipeline
+        .Get<SectionQuery>(MoveInEndpoints.AuthorityOnFile, request => request
+            .Query(query => query.DraftId, Model.DraftId)
+            .Query(query => query.ContactId, activated.Row.Read(row => row.Id)))
+        .Into("authority-on-file"));
+}
+<ul aria-label="Contacts on file">
+    @foreach (var held in Reads.ContactsOnFile(Model))
+    {
+        <li aria-label="@held.Contact.Name">
+            <span>@held.Line</span>
+            @remove.Render(held.Contact, "Remove")
+            @if (held.Contact.Authority is not null)
+            {
+                @onFile.Render(held.Contact, "Authority on file")
+            }
+        </li>
+    }
+</ul>
+@await Html.PartialFor(m => m.Contacts, "/Care/MoveIn/Contacts.cshtml")
+@Html.RenderPlan(plan)

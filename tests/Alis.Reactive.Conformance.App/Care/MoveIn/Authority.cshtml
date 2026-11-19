@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@inject MoveInReads Reads
+@model AuthorityInput
+@{
+    var plan = Html.ReactivePlan<AuthorityInput>();
+}
+<fieldset>
+    <legend>Authority</legend>
+    @(Html.InputField(plan, m => m.Reference, options => options.Label("Reference")).NativeTextBox())
+    <fieldset>
+        <legend>Starts on</legend>
+        @(Html.InputField(plan, m => m.StartsOn).ConformanceComponent(new ConformanceStart { Text = "Starts on", Value = Reads.StartOf(Model), Options = Reads.StartsOnOffer(Model) }))
+    </fieldset>
+    <fieldset>
+        <legend>Ends on</legend>
+        @(Html.InputField(plan, m => m.EndsOn).ConformanceComponent(new ConformanceStart { Text = "Ends on", Value = Reads.EndOf(Model), Options = Reads.EndsOnOffer(Model) }))
+    </fieldset>
+    @(Html.InputField(plan, m => m.Consent, options => options.Label("Consent given")).NativeCheckBox())
+</fieldset>
+@Html.RenderPlan(plan)

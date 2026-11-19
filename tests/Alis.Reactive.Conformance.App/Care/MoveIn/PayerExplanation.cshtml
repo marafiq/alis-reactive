@@ -1,0 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model PayerExplanationPage
+@{
+    var plan = Html.ReactivePlan<PayerExplanationPage>();
+}
+<p>@(Model.Explanation ?? "No payer depends on this contact.")</p>
+@Html.RenderPlan(plan)

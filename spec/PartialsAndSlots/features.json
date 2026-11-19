@@ -599,6 +599,81 @@
           "id": "M9.X29",
           "rung": "behavior",
           "defect": "A run a newer event replaced while it awaited a method goes on when its answer arrives: on the move-in, the review of an older bed selection posts a second review once its readiness answers (MI.4, situation 5)."
+        },
+        {
+          "id": "M9.X40",
+          "rung": "behavior",
+          "defect": "A request built from a container's rows loses a row the page holds, what a person typed in one, or the member it adds beside them: on the move-in, after Add contact the rows read two, Alice Ward's phone reads the saved one, or Cara Ward is missing (MI.5, situation 1)."
+        },
+        {
+          "id": "M9.X41",
+          "rung": "behavior",
+          "defect": "A rule of a row a request reads from a container is skipped by the request's check, so a malformed value is sent: on the move-in, Add contact POSTs with Alice Ward's email alice-at-example (MI.5, situation 2)."
+        },
+        {
+          "id": "M9.X42",
+          "rung": "behavior",
+          "defect": "A refusal the server alone decides, answered by a status the request names, shows no reason or changes the page as a success does: on the move-in, a fifth contact shows no word of the limit, or joins the rows (MI.5, situation 3)."
+        },
+        {
+          "id": "M9.X43",
+          "rung": "behavior",
+          "defect": "A POST whose connection drops is sent again, or leaves the page with no word of it or with a saved state it did not reach: on the move-in, the dropped Add contact is sent twice, shows no notice, or reads Contact added (MI.5, situation 4)."
+        },
+        {
+          "id": "M9.X44",
+          "rung": "behavior",
+          "defect": "A command raised while the handler's run of an earlier one is in flight starts a second run under skip: on the move-in, Add contact clicked while Save contacts waits for its answer sends a second POST, and the draft holds Cara Ward (MI.5, situation 5)."
+        },
+        {
+          "id": "M9.X45",
+          "rung": "behavior",
+          "defect": "An attached partial a slot loaded after the page rendered is left out of the page's save: on the move-in, the authority loaded for Ben Ward is not in the saved draft (MI.6, situation 1)."
+        },
+        {
+          "id": "M9.X46",
+          "rung": "behavior",
+          "defect": "A rule that compares two members of a loaded section, one of them nullable, lets an order it refuses through: on the move-in, an authority that ends the day before it starts is sent (MI.6, situation 2)."
+        },
+        {
+          "id": "M9.X47",
+          "rung": "behavior",
+          "defect": "A failure the server's check alone finds, answered 400 to a request that sends no container, shows nowhere: on the move-in, a revoked authority reference is refused with no word (MI.6, situation 3)."
+        },
+        {
+          "id": "M9.X48",
+          "rung": "behavior",
+          "defect": "A slot's load whose connection drops on every attempt leaves a section it did not load, a saved status nothing earned, or no word of it: on the move-in, the failed authority GET shows fields, or no notice (MI.6, situation 4)."
+        },
+        {
+          "id": "M9.X49",
+          "rung": "behavior",
+          "defect": "A slot's load a newer choice replaced lands after the choice that unloads it: on the move-in, the authority asked for Guardian shows in Ben Ward's card after his role went back to Ordinary (MI.6, situation 5)."
+        },
+        {
+          "id": "M9.X50",
+          "rung": "behavior",
+          "defect": "A row action's command loses the row it was raised for, or the rows it keeps: on the move-in, Remove on Ben Ward removes nobody or Alice Ward, or the rows that stay lose what was typed in them (MI.7, situation 1)."
+        },
+        {
+          "id": "M9.X51",
+          "rung": "behavior",
+          "defect": "A request that sends no container and whose check fails is sent, or its failure shows nowhere: on the move-in, Remove on a row that holds no id DELETEs, or shows no notice (MI.7, situation 2)."
+        },
+        {
+          "id": "M9.X52",
+          "rung": "behavior",
+          "defect": "A condition on an error's body, members deep, issues its request for a body that does not hold it, or not for one that does: on the move-in, the payer's explanation is not asked for the contact the payer depends on (MI.7, situation 3)."
+        },
+        {
+          "id": "M9.X53",
+          "rung": "behavior",
+          "defect": "A DELETE whose connection drops on every attempt leaves the page as if it removed, or with no word of it: on the move-in, the dropped removal of Ben Ward shows no notice, reads the rows again, or shows one row (MI.7, situation 4)."
+        },
+        {
+          "id": "M9.X54",
+          "rung": "behavior",
+          "defect": "A request's route is chosen before its answer arrives, so an answer the server decided late is routed as the page expected it: on the move-in, a removal the payer came to depend on while it waited reads as removed (MI.7, situation 5)."
         }
       ],
       "promises": [
@@ -895,6 +970,129 @@
           "opposite": "With no second selection, the held review, once released, reads Cleared: BED4 revision 12, and opened again Allocation reviews lists AR100: BED4 revision 12, Cleared, North allocation desk.",
           "defect": "A run that waits is not cut when a newer event replaces it, so the older review posts a second review once its readiness answers.",
           "observes": "Run.tla:Abort"
+        },
+        {
+          "for": "M9.X40",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, a daughter, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, a son, an ordinary contact. Its request container move-in holds a card for each contact, an attached partial for each row with its name, relationship, email, phones and role, loaded with the list Contacts on file into one slot, each read from the world's model. New contact is a request container of its own inside it. Save contacts and Add contact raise one command, whose handler, under skip, POSTs the contact edit: the version, every row read from the container and, for an add, the new contact. Its success sets the saved version, and its chained GET loads the rows again.",
+          "gesture": "Type 5185550199 as Alice Ward's phone; type Cara Ward, cara@example.test, 5185550301 and 5185550302 in New contact and choose Friend as its relationship; click Add contact; then open the page again.",
+          "outcome": "The contacts line reads Contact added: CONTACTS8, New contact's Name is empty again, Saved version reads 8 and Contacts on file lists Alice Ward with 5185550199, Ben Ward and Cara Ward, Friend, 5185550301, ordinary contact; opened again, the same three and version 8.",
+          "opposite": "With the same typing and no click of Add contact, the page opened again lists Alice Ward with 5185550101 and Ben Ward, and Saved version reads 7.",
+          "defect": "The request chained after the POST's success does not run, so the rows are not read again and the contacts line stays empty."
+        },
+        {
+          "for": "M9.X41",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, a daughter, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, a son, an ordinary contact. Its request container move-in holds a card for each contact, an attached partial for each row with its name, relationship, email, phones and role, loaded with the list Contacts on file into one slot, each read from the world's model. New contact is a request container of its own inside it. Save contacts and Add contact raise one command, whose handler, under skip, POSTs the contact edit: the version, every row read from the container and, for an add, the new contact. Its success sets the saved version, and its chained GET loads the rows again.",
+          "gesture": "Type alice-at-example as Alice Ward's email; type Cara Ward's details in New contact; click Add contact; then open the page again.",
+          "outcome": "Enter a valid contact email. shows in Alice Ward's card, Notices reads Notices: error: Enter a valid contact email., the page has sent no contacts POST, and opened again Contacts on file lists Alice Ward and Ben Ward at version 7.",
+          "opposite": "With Alice Ward's email left as saved, the same Add contact reads Contact added: CONTACTS8 and the page has sent one contacts POST.",
+          "defect": "The email check passes every text, so the POST leaves and the server's own check answers it."
+        },
+        {
+          "for": "M9.X42",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, a daughter, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, a son, an ordinary contact. Its request container move-in holds a card for each contact, an attached partial for each row with its name, relationship, email, phones and role, loaded with the list Contacts on file into one slot, each read from the world's model. New contact is a request container of its own inside it. Save contacts and Add contact raise one command, whose handler, under skip, POSTs the contact edit: the version, every row read from the container and, for an add, the new contact. Its success sets the saved version, and its chained GET loads the rows again.",
+          "gesture": "In a world whose seed gives the draft four contacts, Alice Ward, Ben Ward, Cara Ward and Dan Ward, type Eve Ward's details in New contact and click Add contact; then open the page again.",
+          "outcome": "The refusal line reads An admission has at most four contacts., the page has sent one contacts POST, Contacts on file still lists the four, and opened again the same four at version 7.",
+          "opposite": "In a world whose draft holds two contacts, the same Add contact reads Contact added: CONTACTS8 and Contacts on file lists Eve Ward third.",
+          "defect": "The 422's typed route does not run, so the refusal line stays empty."
+        },
+        {
+          "for": "M9.X43",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, a daughter, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, a son, an ordinary contact. Its request container move-in holds a card for each contact, an attached partial for each row with its name, relationship, email, phones and role, loaded with the list Contacts on file into one slot, each read from the world's model. New contact is a request container of its own inside it. Save contacts and Add contact raise one command, whose handler, under skip, POSTs the contact edit: the version, every row read from the container and, for an add, the new contact. Its success sets the saved version, and its chained GET loads the rows again.",
+          "gesture": "In a world whose seed drops the connection of the contacts POST, type Cara Ward's details in New contact and click Add contact; then open the page again.",
+          "outcome": "Notices reads Notices: error: The request failed., the page has sent one contacts POST, the contacts line stays empty, and opened again Contacts on file lists Alice Ward and Ben Ward at version 7.",
+          "opposite": "In a world that drops nothing, the same Add contact reads Contact added: CONTACTS8 and Notices reads Notices: none.",
+          "defect": "A request the plan sends once is sent a second time when its connection drops, so the page has sent two contacts POSTs."
+        },
+        {
+          "for": "M9.X44",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, a daughter, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, a son, an ordinary contact. Its request container move-in holds a card for each contact, an attached partial for each row with its name, relationship, email, phones and role, loaded with the list Contacts on file into one slot, each read from the world's model. New contact is a request container of its own inside it. Save contacts and Add contact raise one command, whose handler, under skip, POSTs the contact edit: the version, every row read from the container and, for an add, the new contact. Its success sets the saved version, and its chained GET loads the rows again.",
+          "gesture": "Type 5185550199 as Alice Ward's phone and click Save contacts, whose POST is held; type Cara Ward's details in New contact and click Add contact; release the held POST; then open the page again.",
+          "outcome": "The contacts line reads Contacts saved: CONTACTS8, the page has sent one contacts POST, Contacts on file lists Alice Ward with 5185550199 and Ben Ward, and opened again the same two at version 8.",
+          "opposite": "With no POST held, Save contacts reads Contacts saved: CONTACTS8, the Add contact after it reads Contact added: CONTACTS9, and Contacts on file lists Cara Ward third.",
+          "defect": "A skip lane starts the second run while the first is in flight, so a second POST leaves and Cara Ward joins the draft.",
+          "observes": "Lanes.tla:FireSecond"
+        },
+        {
+          "for": "M9.X45",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100, and Ben Ward, CT2, an ordinary contact with no authority. Each contact's card sits in the request container move-in, an attached partial for each row. A card's Role drop-down, on its change, under replace, reads its row's role through the container and, for a power of attorney or a guardian of a resident no admission holds, GETs the authority's section into the card's slot: its reference, its two days, each a ConformanceComponent whose value a person picks, and its consent, attached at the row's Authority. For an ordinary contact it unloads the slot. Save contacts POSTs every row read from the container, Save draft PUTs the container's inputs, and Contacts on file is what the page renders from the saved draft.",
+          "gesture": "Choose Guardian as Ben Ward's role, type GUARD-200 as the reference of the authority that loads, and click Save draft; then open the page again.",
+          "outcome": "The page reads Draft saved: version 8, and opened again Contacts on file lists Ben Ward, Son, 5185550201, guardian GUARD-200 and Saved version reads 8.",
+          "opposite": "With the same role and reference and no save, the page opened again lists Ben Ward as an ordinary contact at version 7.",
+          "defect": "The page's save leaves out the inputs of a partial attached under a row, so the saved draft holds a guardian with no authority."
+        },
+        {
+          "for": "M9.X46",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100, and Ben Ward, CT2, an ordinary contact with no authority. Each contact's card sits in the request container move-in, an attached partial for each row. A card's Role drop-down, on its change, under replace, reads its row's role through the container and, for a power of attorney or a guardian of a resident no admission holds, GETs the authority's section into the card's slot: its reference, its two days, each a ConformanceComponent whose value a person picks, and its consent, attached at the row's Authority. For an ordinary contact it unloads the slot. Save contacts POSTs every row read from the container, Save draft PUTs the container's inputs, and Contacts on file is what the page renders from the saved draft.",
+          "gesture": "Choose Guardian as Ben Ward's role, type GUARD-200 as the reference, pick 2026-11-17 as Ends on, the day before the authority starts, and click Save contacts; then open the page again.",
+          "outcome": "An authority cannot end before it starts. shows in Ben Ward's card, Notices reads Notices: error: An authority cannot end before it starts., the page has sent no contacts POST, and opened again Ben Ward is an ordinary contact at version 7.",
+          "opposite": "With 2027-01-01 picked as Ends on, Save contacts reads Contacts saved: CONTACTS8 and Contacts on file lists Ben Ward as guardian GUARD-200.",
+          "defect": "The comparison holds whichever day is the later, so the POST leaves with an end before its start."
+        },
+        {
+          "for": "M9.X47",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100, and Ben Ward, CT2, an ordinary contact with no authority. Each contact's card sits in the request container move-in, an attached partial for each row. A card's Role drop-down, on its change, under replace, reads its row's role through the container and, for a power of attorney or a guardian of a resident no admission holds, GETs the authority's section into the card's slot: its reference, its two days, each a ConformanceComponent whose value a person picks, and its consent, attached at the row's Authority. For an ordinary contact it unloads the slot. Save contacts POSTs every row read from the container, Save draft PUTs the container's inputs, and Contacts on file is what the page renders from the saved draft.",
+          "gesture": "In a world whose seed revokes the reference GUARD-200, choose Guardian as Ben Ward's role, type GUARD-200 as the reference and click Save contacts; then open the page again.",
+          "outcome": "Notices reads Notices: error: This authority reference was revoked., the page has sent one contacts POST, and opened again Ben Ward is an ordinary contact at version 7.",
+          "opposite": "In a world that revokes no reference, the same save reads Contacts saved: CONTACTS8 and Contacts on file lists Ben Ward as guardian GUARD-200.",
+          "defect": "The 400's failures are shown nowhere, so Notices stays Notices: none."
+        },
+        {
+          "for": "M9.X48",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100, and Ben Ward, CT2, an ordinary contact with no authority. Each contact's card sits in the request container move-in, an attached partial for each row. A card's Role drop-down, on its change, under replace, reads its row's role through the container and, for a power of attorney or a guardian of a resident no admission holds, GETs the authority's section into the card's slot: its reference, its two days, each a ConformanceComponent whose value a person picks, and its consent, attached at the row's Authority. For an ordinary contact it unloads the slot. Save contacts POSTs every row read from the container, Save draft PUTs the container's inputs, and Contacts on file is what the page renders from the saved draft.",
+          "gesture": "In a world whose seed drops the connection of the authority GET, choose Guardian as Ben Ward's role and let the page's clock run until that GET has been sent four times, its first attempt and the three the host's retry default sends again; then open the page again.",
+          "outcome": "Notices reads Notices: error: The request failed., Ben Ward's card shows no Reference box, the contacts line stays empty, and opened again Ben Ward is an ordinary contact at version 7.",
+          "opposite": "In a world that drops nothing, choosing Guardian shows the Reference box in Ben Ward's card and Notices reads Notices: none.",
+          "defect": "The failed load's catch-all route does not run, so Notices stays Notices: none."
+        },
+        {
+          "for": "M9.X49",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100, and Ben Ward, CT2, an ordinary contact with no authority. Each contact's card sits in the request container move-in, an attached partial for each row. A card's Role drop-down, on its change, under replace, reads its row's role through the container and, for a power of attorney or a guardian of a resident no admission holds, GETs the authority's section into the card's slot: its reference, its two days, each a ConformanceComponent whose value a person picks, and its consent, attached at the row's Authority. For an ordinary contact it unloads the slot. Save contacts POSTs every row read from the container, Save draft PUTs the container's inputs, and Contacts on file is what the page renders from the saved draft.",
+          "gesture": "Choose Guardian as Ben Ward's role, whose authority GET is held; choose Ordinary; release the held GET; click Save contacts; then open the page again.",
+          "outcome": "Ben Ward's card shows no Reference box after the release, Save contacts reads Contacts saved: CONTACTS8, and opened again Ben Ward is an ordinary contact at version 8.",
+          "opposite": "With no second choice, the held GET, once released, shows the Reference box in Ben Ward's card.",
+          "defect": "The run a newer choice replaced is not cut, so its late answer loads the authority into the card of an ordinary contact.",
+          "observes": "Lanes.tla:Route"
+        },
+        {
+          "for": "M9.X50",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, an ordinary contact. Contacts on file lists each contact from the world's model with Remove, a row action that marks its button and raises the contacts' command with the row's id. The command's handler, under skip, DELETEs that contact with the version and every row read from the request container move-in. A 409 that names the payer's dependency on that contact GETs the payer's explanation into its slot. Its success sets the saved version, and its chained GET loads the rows again. Authority on file, a row link, GETs what the draft holds of that contact's authority.",
+          "gesture": "Type 5185550199 as Alice Ward's phone and click Remove on Ben Ward; click Authority on file on Alice Ward; then open the page again.",
+          "outcome": "The contacts line reads Contact removed: CONTACTS8, Contacts on file lists Alice Ward alone, with 5185550199, her authority on file reads Alice Ward: power of attorney POA-100, from 2026-01-01 to 2027-01-01, consent given, and opened again the same one contact at version 8.",
+          "opposite": "With no click of Remove, the page opened again lists Alice Ward with 5185550101 and Ben Ward at version 7.",
+          "defect": "The row is not handed to the action's raise, so the command names no contact and the browser's check refuses it."
+        },
+        {
+          "for": "M9.X51",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, an ordinary contact. Contacts on file lists each contact from the world's model with Remove, a row action that marks its button and raises the contacts' command with the row's id. The command's handler, under skip, DELETEs that contact with the version and every row read from the request container move-in. A 409 that names the payer's dependency on that contact GETs the payer's explanation into its slot. Its success sets the saved version, and its chained GET loads the rows again. Authority on file, a row link, GETs what the draft holds of that contact's authority.",
+          "gesture": "In a world whose seed leaves Ben Ward's row with no id, click Remove on Ben Ward; then open the page again.",
+          "outcome": "Notices reads Notices: error: Choose a contact., the page has asked for no rows again, and opened again Contacts on file lists Alice Ward and Ben Ward at version 7.",
+          "opposite": "In a world whose rows hold their ids, Remove on Ben Ward reads Contact removed: CONTACTS8 and the page has sent one DELETE of CT2.",
+          "defect": "A failed check of a request with no container shows no notice, so Notices stays Notices: none."
+        },
+        {
+          "for": "M9.X52",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, an ordinary contact. Contacts on file lists each contact from the world's model with Remove, a row action that marks its button and raises the contacts' command with the row's id. The command's handler, under skip, DELETEs that contact with the version and every row read from the request container move-in. A 409 that names the payer's dependency on that contact GETs the payer's explanation into its slot. Its success sets the saved version, and its chained GET loads the rows again. Authority on file, a row link, GETs what the draft holds of that contact's authority.",
+          "gesture": "Click Remove on Alice Ward; then open the page again.",
+          "outcome": "The explanation reads Alice Ward is the authorised payer contact for POL-100., the page has sent one explanation GET, Contacts on file still lists both, and opened again Alice Ward is still the payer contact for POL-100 at version 7.",
+          "opposite": "Remove on Ben Ward, on whom no payer depends, reads Contact removed: CONTACTS8, and the page has sent no explanation GET.",
+          "defect": "A read three members deep into the 409's body stops at its second, so the returned contact is never the one asked to leave and no explanation is asked for."
+        },
+        {
+          "for": "M9.X53",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, an ordinary contact. Contacts on file lists each contact from the world's model with Remove, a row action that marks its button and raises the contacts' command with the row's id. The command's handler, under skip, DELETEs that contact with the version and every row read from the request container move-in. A 409 that names the payer's dependency on that contact GETs the payer's explanation into its slot. Its success sets the saved version, and its chained GET loads the rows again. Authority on file, a row link, GETs what the draft holds of that contact's authority.",
+          "gesture": "In a world whose seed drops the connection of the DELETE of CT2, click Remove on Ben Ward and let the page's clock run until that DELETE has been sent four times, its first attempt and the three the host's retry default sends again; then open the page again.",
+          "outcome": "Notices reads Notices: error: The request failed., the page has asked for no rows again, the contacts line stays empty, Contacts on file still lists both, and opened again Alice Ward and Ben Ward at version 7.",
+          "opposite": "In a world that drops nothing, Remove on Ben Ward reads Contact removed: CONTACTS8 and Notices reads Notices: none.",
+          "defect": "What is chained after the DELETE's success runs after its failure too, so the rows are read again."
+        },
+        {
+          "for": "M9.X54",
+          "page": "The move-in of draft D100, whose world holds the draft saved at version 7 with two contacts: Alice Ward, CT1, power of attorney under POA-100 and the payer's contact for POL-100, and Ben Ward, CT2, an ordinary contact. Contacts on file lists each contact from the world's model with Remove, a row action that marks its button and raises the contacts' command with the row's id. The command's handler, under skip, DELETEs that contact with the version and every row read from the request container move-in. A 409 that names the payer's dependency on that contact GETs the payer's explanation into its slot. Its success sets the saved version, and its chained GET loads the rows again. Authority on file, a row link, GETs what the draft holds of that contact's authority.",
+          "gesture": "Click Remove on Ben Ward, whose DELETE is held before the server decides it; make Ben Ward the payer's contact in the world; release the held DELETE; then open the page again.",
+          "outcome": "While the DELETE is held, Ben Ward's Remove holds the class removing and the contacts line is empty; released, the explanation reads Ben Ward is the authorised payer contact for POL-100., and opened again Contacts on file lists Alice Ward, power of attorney POA-100, and Ben Ward, ordinary contact, payer contact for POL-100, at version 7.",
+          "opposite": "With no change of the payer's contact, the held DELETE, once released, reads Contact removed: CONTACTS8 and Contacts on file lists Alice Ward alone.",
+          "defect": "The explanation's GET leaves with the first member of its query alone, so the server finds no contact to explain and the slot reads No payer depends on this contact.",
+          "observes": "Lanes.tla:Respond"
         }
       ],
       "verdicts": []

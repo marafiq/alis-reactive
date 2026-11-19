@@ -442,6 +442,44 @@
           "id": "deskSlots",
           "kind": "slot",
           "role": "the slots the resident's desk and the allocation's desk load into at their views' start, each a partial with its own plan"
+        },
+        {
+          "id": "contactInputs",
+          "kind": "nativeSlice",
+          "role": "the contacts' NativeTextBox, NativeDropDown, NativeCheckBox and NativeHiddenField inputs, of each row, of an authority and of the new contact, and the NativeButton of Save contacts and of Add contact",
+          "module": "NativeComponents"
+        },
+        {
+          "id": "contactActions",
+          "kind": "nativeSlice",
+          "role": "each contact's row actions, the NativeActionButton Remove and the NativeActionLink Authority on file",
+          "module": "NativeAppLevelObjects"
+        },
+        {
+          "id": "contactSlots",
+          "kind": "slot",
+          "role": "the slots the contact rows, a contact's authority, the authority on file and the payer's explanation load into"
+        },
+        {
+          "id": "contactEndpoints",
+          "kind": "endpoint",
+          "role": "the contacts' endpoints: the save, the removal, the rows, a contact's authority, the authority on file and the payer's explanation, each answered from the model one world owns"
+        },
+        {
+          "id": "newContactForm",
+          "kind": "form",
+          "role": "the new contact's request container with its summary, inside the move-in's"
+        },
+        {
+          "id": "contactValidators",
+          "kind": "validator",
+          "role": "the contacts' validators: each row's rules under the move-in's, and the contact edit's with its removal rule set"
+        },
+        {
+          "id": "authorityDays",
+          "kind": "conformance",
+          "role": "an authority's Starts on and Ends on, each a ConformanceComponent bound to its date, whose value a person picks",
+          "declares": "ConformanceComponent"
         }
       ]
     },
@@ -5934,6 +5972,385 @@
           "verb": "gate",
           "action": "Run.tla:Settle",
           "on": "the readiness POST of the first review, Window's"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X40",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "newContactForm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X41",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "newContactForm",
+        "contactValidators",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X42",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "newContactForm"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "two more contacts in the draft, Cara Ward and Dan Ward"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X43",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "newContactForm",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the contacts POST, whose connection the world drops"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X44",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "newContactForm",
+        "busy"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the contacts POST of Save contacts"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X45",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "authorityDays"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X46",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "authorityDays",
+        "contactValidators",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X47",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "authorityDays",
+        "contactValidators",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the authority reference GUARD-200, revoked in the world's rules"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X48",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "authorityDays",
+        "notice"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the authority GET, whose connection the world drops"
+        },
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the retry's waits"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X49",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactSlots",
+        "contactEndpoints",
+        "authorityDays",
+        "busy"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the authority GET of Ben Ward's choice of Guardian"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X50",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactInputs",
+        "contactActions",
+        "contactSlots",
+        "contactEndpoints",
+        "authorityDays"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X51",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactActions",
+        "contactSlots",
+        "contactEndpoints",
+        "contactValidators",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "Ben Ward's row, which holds no id"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X52",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactActions",
+        "contactSlots",
+        "contactEndpoints"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X53",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactActions",
+        "contactSlots",
+        "contactEndpoints",
+        "notice"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the DELETE of CT2, whose connection the world drops"
+        },
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the retry's waits"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X54",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "contactActions",
+        "contactSlots",
+        "contactEndpoints",
+        "busy"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the DELETE of CT2"
+        },
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the payer's contact, changed to CT2 while the DELETE is held"
         }
       ]
     },

@@ -1,0 +1,48 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model ContactInput
+@{
+    var plan = Html.ReactivePlan<ContactInput>();
+    var contactId = Model.Id;
+    var authoritySlot = "contact-authority-" + contactId;
+    var authorityStatus = "contact-authority-status-" + contactId;
+}
+@(Html.NativeHiddenField(plan, m => m.Id))
+@(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+@(Html.InputField(plan, m => m.Relationship, options => options.Label("Relationship")).NativeDropDown(build => build.Items(Reads.Relationships())))
+@(Html.InputField(plan, m => m.Email, options => options.Label("Email")).NativeTextBox())
+@(Html.InputField(plan, m => m.Phone, options => options.Label("Phone")).NativeTextBox())
+@(Html.InputField(plan, m => m.AlternatePhone, options => options.Label("Alternate phone")).NativeTextBox())
+@(Html.InputField(plan, m => m.Role, options => options.Label("Role")).NativeDropDown(build => build.Items(Reads.Roles()))
+    .Reactive(role => role.Change, HandlerPolicy.Replace, (changed, pipeline) =>
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        var rows = moveIn.Read(m => m.Contacts.Rows);
+        var chosen = rows.Find(row => row.Id == contactId, row => row.Role);
+        var admitted = moveIn.Read(m => m.ResidentId).In(Reads.AdmittedResidents());
+        pipeline.Element(authorityStatus).Text.Set("");
+        pipeline.When(chosen.In(AuthorityRole.PowerOfAttorney, AuthorityRole.Guardian).And(admitted.Not()))
+            .Then(pipeline => pipeline
+                .Get<SectionQuery>(CareEndpoints.MoveInContactAuthority, request => request
+                    .Query(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                    .Query(query => query.ContactId, rows.Find(row => row.Id == contactId, row => row.Id))
+                    .Query(query => query.Culture, "en-US"))
+                .Into(authoritySlot))
+            .ElseIf(chosen.Eq(AuthorityRole.Ordinary)).Then(pipeline => pipeline.Unload(authoritySlot))
+            .Else(pipeline => pipeline.Element(authorityStatus).Text.Set("An admitted resident's authority changes through the records office."));
+    }))
+<div id="@authoritySlot">
+    @if (Model.Authority is not null)
+    {
+        @await Html.PartialFor(m => m.Authority, "/Care/MoveIn/Authority.cshtml")
+    }
+</div>
+<p id="@authorityStatus"></p>
+@Html.RenderPlan(plan)

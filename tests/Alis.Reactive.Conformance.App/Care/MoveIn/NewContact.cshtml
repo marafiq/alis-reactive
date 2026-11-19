@@ -1,0 +1,34 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model ContactEdit
+@{
+    var plan = Html.ReactivePlan<ContactEdit>();
+}
+@using (var fresh = Html.BeginRequestContainer(plan, "new-contact"))
+{
+    <fieldset>
+        <legend>New contact</legend>
+        @(Html.InputField(plan, m => m.NewContact!.Name, options => options.Label("Name")).NativeTextBox())
+        @(Html.InputField(plan, m => m.NewContact!.Relationship, options => options.Label("Relationship")).NativeDropDown(build => build.Items(Reads.Relationships())))
+        @(Html.InputField(plan, m => m.NewContact!.Email, options => options.Label("Email")).NativeTextBox())
+        @(Html.InputField(plan, m => m.NewContact!.Phone, options => options.Label("Phone")).NativeTextBox())
+        @(Html.InputField(plan, m => m.NewContact!.AlternatePhone, options => options.Label("Alternate phone")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("add-contact", "Add contact").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MoveInContactEvents.Command, pipeline.Object<ContactCommand>(command => command
+        .Set(sent => sent.Kind, ContactCommandKind.AddContact)
+        .Set(sent => sent.NewContact, fresh.Container.Read(m => m.NewContact))
+        .Set(sent => sent.Version, pipeline.Container<MoveInPage>("move-in").Read(m => m.Version))))))
+    Html.On(plan, trigger => trigger.CustomEvent(MoveInContactEvents.Added, pipeline =>
+    {
+        pipeline.Input(m => m.NewContact!.Name).Component<NativeTextBox>().Value.Set("");
+        pipeline.Input(m => m.NewContact!.Relationship).Component<NativeDropDown>().Value.Set(nameof(ContactRelationship.Daughter));
+        pipeline.Input(m => m.NewContact!.Email).Component<NativeTextBox>().Value.Set("");
+        pipeline.Input(m => m.NewContact!.Phone).Component<NativeTextBox>().Value.Set("");
+        pipeline.Input(m => m.NewContact!.AlternatePhone).Component<NativeTextBox>().Value.Set("");
+    }));
+}
+@Html.RenderPlan(plan)

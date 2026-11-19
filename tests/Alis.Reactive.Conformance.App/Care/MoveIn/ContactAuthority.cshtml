@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+    var at = Model.Contacts.Rows.Count - 1;
+}
+@await Html.PartialFor(m => m.Contacts.Rows[at].Authority, "/Care/MoveIn/Authority.cshtml")
+@Html.RenderPlan(plan)

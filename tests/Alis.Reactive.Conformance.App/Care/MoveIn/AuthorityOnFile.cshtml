@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@inject MoveInReads Reads
+@model AuthorityOnFilePage
+@{
+    var plan = Html.ReactivePlan<AuthorityOnFilePage>();
+}
+<p>@Reads.OnFile(Model)</p>
+@Html.RenderPlan(plan)

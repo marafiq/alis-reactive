@@ -1,0 +1,100 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+<div id="contact-rows">
+    @await Html.PartialAsync("/Care/MoveIn/ContactRows.cshtml", Model)
+</div>
+@(Html.NativeButton("save-contacts", "Save contacts").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MoveInContactEvents.Command, pipeline.Object<ContactCommand>(command => command
+    .Set(sent => sent.Kind, ContactCommandKind.SaveContacts)
+    .Set(sent => sent.Version, pipeline.Container<MoveInPage>("move-in").Read(m => m.Version))))))
+<p id="contacts-status"></p>
+<p id="contacts-refusal"></p>
+<div id="payer-explanation"></div>
+<div id="authority-on-file"></div>
+@await Html.PartialAsync("/Care/MoveIn/NewContact.cshtml", Reads.NewContact())
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MoveInContactEvents.Command, HandlerPolicy.Skip, (command, pipeline) =>
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        var kind = command.Read(sent => sent.Kind);
+        pipeline.Element("contacts-status").Text.Set("");
+        pipeline.Element("contacts-refusal").Text.Set("");
+        pipeline.Unload("payer-explanation");
+        pipeline.When(kind.Eq(ContactCommandKind.RemoveContact))
+            .Then(pipeline => pipeline
+                .Delete<ContactEdit>(MoveInEndpoints.Contact, request => request
+                    .Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+                    .Path(sent => sent.RemoveId, command.Read(sent => sent.RemoveId))
+                    .Header(MoveInEndpoints.VersionHeader, command.Read(sent => sent.Version))
+                    .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+                    .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+                    .Json(body => body
+                        .Set(sent => sent.Version, command.Read(sent => sent.Version))
+                        .Set(sent => sent.Contacts, moveIn.Read(m => m.Contacts))))
+                .Validate<ContactEditRules>(ContactEditRules.Removal)
+                .OnSuccess<SaveReply>((removed, pipeline) =>
+                {
+                    pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(removed.Body.Read(reply => reply.Receipt.Version)));
+                    pipeline.Element("saved-version").Text.Set(removed.Body.Read(reply => reply.Receipt.Version));
+                })
+                .OnError<PayerDependency>(409, (held, pipeline) => pipeline
+                    .When(held.Body.Read(refusal => refusal.Dependency.Payer.ContactId).Eq(command.Read(sent => sent.RemoveId))
+                        .And(held.Body.Read(refusal => refusal.Dependency.Payer.Explanation.Required)))
+                    .Then(pipeline => pipeline
+                        .Get<PayerExplanationQuery>(CareEndpoints.MoveInPayerExplanation, request => request
+                            .Query(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                            .Query(query => query.ContactId, held.Body.Read(refusal => refusal.Dependency.Payer.ContactId))
+                            .Query(query => query.PolicyNumber, held.Body.Read(refusal => refusal.Dependency.Payer.PolicyNumber))
+                            .Query(query => query.Culture, "en-US"))
+                        .Into("payer-explanation"))
+                    .Else(pipeline => pipeline.Element("contacts-refusal").Text.Set("The draft changed since this page read it: open it again.")))
+                .Chained((removed, pipeline) =>
+                {
+                    pipeline.Get<SectionQuery>(CareEndpoints.MoveInContactRows, request => request
+                        .Query(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                        .Query(query => query.Culture, "en-US"))
+                        .Into("contact-rows");
+                    pipeline.Element("contacts-status").Text.Set(pipeline.Concat("Contact removed: ", removed.Body.Read(reply => reply.Receipt.Reference)));
+                }))
+            .Else(pipeline => pipeline
+                .Post<ContactEdit>(MoveInEndpoints.Contacts, request => request
+                    .Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+                    .Header(MoveInEndpoints.VersionHeader, command.Read(sent => sent.Version))
+                    .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+                    .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+                    .Json(body => body
+                        .Set(sent => sent.Version, command.Read(sent => sent.Version))
+                        .Set(sent => sent.Contacts, moveIn.Read(m => m.Contacts))
+                        .When(kind.Eq(ContactCommandKind.AddContact)).Then(adding => adding.Set(sent => sent.NewContact, command.Read(sent => sent.NewContact)))))
+                .OnSuccess<SaveReply>((saved, pipeline) =>
+                {
+                    pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(reply => reply.Receipt.Version)));
+                    pipeline.Element("saved-version").Text.Set(saved.Body.Read(reply => reply.Receipt.Version));
+                })
+                .OnError<ErrorEnvelope>(422, (refused, pipeline) => pipeline.Element("contacts-refusal").Text.Set(refused.Body.Read(envelope => envelope.Error.Message)))
+                .Chained((saved, pipeline) =>
+                {
+                    pipeline.Get<SectionQuery>(CareEndpoints.MoveInContactRows, request => request
+                        .Query(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                        .Query(query => query.Culture, "en-US"))
+                        .Into("contact-rows");
+                    pipeline.When(kind.Eq(ContactCommandKind.AddContact))
+                        .Then(pipeline =>
+                        {
+                            pipeline.Dispatch(MoveInContactEvents.Added);
+                            pipeline.Element("contacts-status").Text.Set(pipeline.Concat("Contact added: ", saved.Body.Read(reply => reply.Receipt.Reference)));
+                        })
+                        .Else(pipeline => pipeline.Element("contacts-status").Text.Set(pipeline.Concat("Contacts saved: ", saved.Body.Read(reply => reply.Receipt.Reference))));
+                }));
+    }));
+}
+@Html.RenderPlan(plan)
