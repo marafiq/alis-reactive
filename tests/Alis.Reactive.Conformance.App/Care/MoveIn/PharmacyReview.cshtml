@@ -1,0 +1,67 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+<h3>Pharmacy review</h3>
+<p>Clearance on file: <span id="pharmacy-on-file">@Reads.PharmacyOnFile(Model.DraftId)</span></p>
+<p id="pharmacy-reference">@Reads.PharmacyReviewMessage(Model.DraftId)</p>
+@for (var index = 0; index < Model.Resident.Allergies.Count; index++)
+{
+    var at = index;
+    @(Html.InputField(plan, m => m.Resident.Allergies[at], o => o.Label($"Reported allergy {at + 1}")).NativeTextBox())
+}
+@(plan.ConformanceComponent("pharmacy-panel", Reads.PharmacyPanel(Model)))
+@(Html.NativeButton("check-pharmacy", "Check medications").Reactive(plan, button => button.Click, HandlerPolicy.Skip, (clicked, pipeline) =>
+{
+    var main = pipeline.Container<MoveInPage>("move-in");
+    var panel = pipeline.Component<ConformanceComponent>("pharmacy-panel");
+    var reference = panel.Value;
+    pipeline.Unload("pharmacy-advice");
+    pipeline.Element("pharmacy-advice-error").Text.Set("");
+    pipeline.Element("pharmacy-status").Text.Set("");
+    pipeline.Post<MoveInPage>(MoveInEndpoints.Pharmacy, request => request
+        .Path(m => m.DraftId, main.Read(m => m.DraftId))
+        .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+        .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+        .Json(main, body => body.Set(m => m.Review, pipeline.Object<ReviewInput>(review => review
+            .Set(r => r.Reference, reference)
+            .Set(r => r.VisitCount, panel.Snapshot().Read(r => r.Count))
+            .Set(r => r.SelectedServiceCount, panel.Total())
+            .Set(r => r.Ready, panel.Enabled)
+            .Set(r => r.Result, panel.SettleRecord()))))
+        .When(reference.NotNull()).Then(identified => identified.Query(m => m.Reference, reference).Header(MoveInEndpoints.ReviewHeader, reference)))
+        .Validate<MoveInRules>(MoveInRules.Pharmacy)
+        .WhileLoading(pipeline => pipeline.Element("pharmacy-progress").Text.Set("Checking medications"))
+        .OnSuccess<PharmacyReply>((answer, pipeline) => pipeline.Element("pharmacy-status").Text.Set(pipeline.Concat("Pharmacy cleared: ", answer.Body.Read(r => r.Review.Id))))
+        .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+        .OnError<PharmacyConflict>(409, (refused, pipeline) =>
+        {
+            pipeline.Element("pharmacy-status").Text.Set(pipeline.Concat(refused.Body.Read(r => r.Conflict.MedicationId), " conflicts with ", refused.Body.Read(r => r.Conflict.Allergy.Name), "."));
+            pipeline.When(refused.Body.Read(r => r.Conflict.Allergy.Resolution.HasAlternatives)).Then(pipeline => pipeline
+                .Get<ReceiptQuery>(CareEndpoints.MoveInAlternatives, request => request.Query(q => q.DraftId, Model.DraftId)
+                    .Query(q => q.Reference, refused.Body.Read(r => r.Conflict.Allergy.Resolution.Id)))
+                .Into("pharmacy-advice")
+                .OnError((failed, pipeline) => pipeline.Element("pharmacy-status").Text.Set("Pharmacy alternatives unavailable.")));
+        })
+        .OnError((failed, pipeline) => pipeline.Element("pharmacy-status").Text.Set("Pharmacy review unavailable."))
+        .Finally(pipeline => pipeline.Element("pharmacy-progress").Text.Set("Review finished"))
+        .Chained((answer, pipeline) => pipeline.When(answer.Body.Read(r => r.Review.Clearance.Passed).And(answer.Body.Read(r => r.Review.Clearance.InstructionsRequired)))
+            .Then(pipeline => pipeline.Get<ReceiptQuery>(CareEndpoints.MoveInDirections, request => request.Query(q => q.DraftId, Model.DraftId)
+                .Query(q => q.Reference, answer.Body.Read(r => r.Review.Clearance.Instructions.Id)))
+                .Into("pharmacy-advice")
+                .OnError((failed, pipeline) => pipeline.Element("pharmacy-advice-error").Text.Set("Pharmacy instructions unavailable."))));
+}))
+<p id="pharmacy-status"></p>
+<p id="pharmacy-progress">Ready</p>
+<div id="pharmacy-directions"><div id="pharmacy-advice"></div><span id="pharmacy-advice-error"></span></div>
+@Html.RenderPlan(plan)

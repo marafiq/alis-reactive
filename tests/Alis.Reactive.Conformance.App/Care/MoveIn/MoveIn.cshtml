@@ -50,6 +50,7 @@
     </section>
 
     <section id="move-in-medications" aria-label="Medications">
+        @await Html.PartialAsync("/Care/MoveIn/MedicationDesk.cshtml", Model)
     </section>
 
     <section id="move-in-services" aria-label="Services">
@@ -100,6 +101,8 @@
         }
     </section>
 }
+
+@await Html.PartialAsync("/Care/MoveIn/MedicationProposal.cshtml", new MedicationEdit { NewMedication = new MedicationInput { Unit = "mg", Schedule = ["Morning"] } })
 
 <section id="move-in-desk-options" aria-label="Desk options">
 </section>

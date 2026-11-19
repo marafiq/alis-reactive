@@ -453,6 +453,30 @@ public static class Promises
         public const string M9_X173_0 = "M9.F2 M9.X173 0";
         [Holds(CompositionGate.Answer)]
         public const string M9_X174_0 = "M9.F2 M9.X174 0";
+        public const string M9_X190_0 = "M9.F2 M9.X190 0";
+        public const string M9_X191_0 = "M9.F2 M9.X191 0";
+        public const string M9_X192_0 = "M9.F2 M9.X192 0";
+        public const string M9_X193_0 = "M9.F2 M9.X193 0";
+        [Holds(OwnershipGate.ShowsFailures)]
+        public const string M9_X194_0 = "M9.F2 M9.X194 0";
+        public const string M9_X195_0 = "M9.F2 M9.X195 0";
+        public const string M9_X196_0 = "M9.F2 M9.X196 0";
+        [Holds(LanesGate.SettleTheTail)]
+        public const string M9_X197_0 = "M9.F2 M9.X197 0";
+        [Holds(CompositionGate.Answer)]
+        public const string M9_X198_0 = "M9.F2 M9.X198 0";
+        [Holds(OwnershipGate.SendsSlotInput)]
+        public const string M9_X199_0 = "M9.F2 M9.X199 0";
+        [Holds(OwnershipGate.ShowsFailures)]
+        public const string M9_X200_0 = "M9.F2 M9.X200 0";
+        [Holds(OwnershipGate.ShowsFailures)]
+        public const string M9_X201_0 = "M9.F2 M9.X201 0";
+        [Holds(OwnershipGate.ShowsFailures)]
+        public const string M9_X202_0 = "M9.F2 M9.X202 0";
+        [Holds(OwnershipGate.SendsSlotInput)]
+        public const string M9_X203_0 = "M9.F2 M9.X203 0";
+        [Holds(OwnershipGate.ShowsFailures)]
+        public const string M9_X204_0 = "M9.F2 M9.X204 0";
     }
 
     public static class M10_F1

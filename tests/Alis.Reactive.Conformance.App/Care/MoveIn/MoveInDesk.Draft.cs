@@ -42,6 +42,19 @@ internal sealed partial class MoveInDesk
                 return new SaveVerdict(null, new VersionConflict(new VersionConflictDetail(new ConflictingDraft(draft.Id, draft.Version, LabelOfTheCoordinator(draft.SavedBy), comparison))));
             }
 
+            if (sent.IncludesMedications)
+            {
+                var orders = sent.Medications.Rows;
+                if (!draft.Data.Medications.Rows.Select(row => row.Id).SequenceEqual(orders.Select(row => row.Id), StringComparer.Ordinal))
+                {
+                    return new SaveVerdict(null, null, "Reopen the current medication orders.");
+                }
+                foreach (var row in orders)
+                {
+                    if (DrugRefusal(row) is { } refusal) return new SaveVerdict(null, null, refusal);
+                }
+                if (!SameOrders(draft.Data.Medications, sent.Medications)) draft.PharmacyClearanceId = null;
+            }
             KeepTheLocation(draft.Data, sent);
             KeepTheResident(draft.Data, sent);
             KeepTheCare(draft.Data, sent);
@@ -83,4 +96,4 @@ internal sealed partial class MoveInDesk
     static partial void KeepTheReview(MoveInPage saved, MoveInPage sent);
 }
 
-internal sealed record SaveVerdict(SaveReply? Saved, VersionConflict? Stale);
+internal sealed record SaveVerdict(SaveReply? Saved, VersionConflict? Stale, string? MedicationRefusal = null);

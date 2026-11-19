@@ -1,0 +1,86 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+<h2>Medication orders</h2>
+<div id="medication-rows">
+    @await Html.PartialAsync("/Care/MoveIn/MedicationRows.cshtml", new MedicationEdit { Medications = Model.Medications })
+</div>
+@(Html.NativeButton("save-medications", "Save medications").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MedicationCommands.Change, pipeline.Object<MedicationCommand>(c => c.Set(m => m.Add, false)))))
+@(Html.NativeButton("close-medications", "Close medication editor").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+{
+    pipeline.Unload("medication-rows");
+    pipeline.Element("medication-status").Text.Set("Medication editor closed.");
+}))
+@(Html.NativeButton("open-medications", "Open medication editor").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Get<SectionQuery>(MoveInEndpoints.MedicationRows, request => request.Query(q => q.DraftId, Model.DraftId)).Into("medication-rows")))
+<p id="medication-status"></p>
+@await Html.PartialAsync("/Care/MoveIn/PharmacyReview.cshtml", Model)
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MedicationCommands.Change, HandlerPolicy.Skip, (command, pipeline) =>
+    {
+        var main = pipeline.Container<MoveInPage>("move-in");
+        var editor = pipeline.Container<MedicationEdit>("medication-editor");
+        var proposal = pipeline.Container<MedicationEdit>("proposed-medication");
+        var remove = command.Read(c => c.RemoveId);
+        pipeline.When(remove.NotNull()).Then(pipeline => pipeline
+            .Delete<MedicationEdit>(MoveInEndpoints.Medication, request => request
+                .Path(m => m.DraftId, main.Read(m => m.DraftId))
+                .Path(m => m.RemoveId, remove)
+                .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+                .Header(MoveInEndpoints.VersionHeader, main.Read(m => m.Version))
+                .Json(editor, body => body.Set(m => m.Version, main.Read(m => m.Version))))
+            .Validate<MedicationEditRules>()
+            .OnSuccess<SaveReply>((saved, pipeline) =>
+            {
+                pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(r => r.Receipt.Version)));
+                pipeline.Element("saved-version").Text.Set(saved.Body.Read(r => r.Receipt.Version));
+            })
+            .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+            .OnError<ErrorEnvelope>(409, (stale, pipeline) => pipeline.Element("medication-status").Text.Set(stale.Body.Read(r => r.Error.Message)))
+            .OnError((failed, pipeline) => pipeline.Element("medication-status").Text.Set("Medication removal unavailable."))
+            .Chained((saved, pipeline) =>
+            {
+                pipeline.Get<SectionQuery>(MoveInEndpoints.MedicationRows, request => request.Query(q => q.DraftId, main.Read(m => m.DraftId))).Into("medication-rows");
+                pipeline.Element("medication-status").Text.Set(pipeline.Concat("Medication removed: ", saved.Body.Read(r => r.Receipt.Reference)));
+            }))
+            .Else(pipeline => pipeline.Post<MedicationEdit>(MoveInEndpoints.Medications, request => request
+                .Path(m => m.DraftId, main.Read(m => m.DraftId))
+                .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+                .Header(MoveInEndpoints.VersionHeader, main.Read(m => m.Version))
+                .Inputs(editor)
+                .Set(m => m.Version, main.Read(m => m.Version))
+                    .When(command.Read(c => c.Add)).Then(adding => adding
+                        .Set(m => m.NewMedication!.DrugCode, proposal.Read(m => m.NewMedication!.DrugCode))
+                        .Set(m => m.NewMedication!.Dose, proposal.Read(m => m.NewMedication!.Dose))
+                        .Set(m => m.NewMedication!.Unit, proposal.Read(m => m.NewMedication!.Unit))
+                        .Set(m => m.NewMedication!.Schedule, proposal.Read(m => m.NewMedication!.Schedule))
+                        .Set(m => m.NewMedication!.Instructions, proposal.Read(m => m.NewMedication!.Instructions))
+                        .Set(m => m.NewMedication!.StartsOn, Model.Today)))
+                .Validate<MedicationEditRules>()
+                .OnSuccess<SaveReply>((saved, pipeline) =>
+                {
+                    pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(r => r.Receipt.Version)));
+                    pipeline.Element("saved-version").Text.Set(saved.Body.Read(r => r.Receipt.Version));
+                })
+                .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+                .OnError<ErrorEnvelope>(409, (stale, pipeline) => pipeline.Element("medication-status").Text.Set(stale.Body.Read(r => r.Error.Message)))
+                .OnError((failed, pipeline) => pipeline.Element("medication-status").Text.Set("Medication save unavailable."))
+                .Chained((saved, pipeline) =>
+                {
+                    pipeline.Get<SectionQuery>(MoveInEndpoints.MedicationRows, request => request.Query(q => q.DraftId, main.Read(m => m.DraftId))).Into("medication-rows");
+                    pipeline.Element("medication-status").Text.Set(pipeline.Concat("Medications saved: ", saved.Body.Read(r => r.Receipt.Reference)));
+                }));
+    }));
+}
+@Html.RenderPlan(plan)

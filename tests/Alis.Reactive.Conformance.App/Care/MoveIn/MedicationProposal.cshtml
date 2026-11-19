@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MedicationEdit
+@{
+    var plan = Html.ReactivePlan<MedicationEdit>();
+}
+@using (var proposal = Html.BeginRequestContainer(plan, "proposed-medication"))
+{
+    <fieldset><legend>New prescription</legend>
+        @(Html.InputField(plan, m => m.NewMedication!.DrugCode, o => o.Label("Proposed drug code")).NativeTextBox())
+        @(Html.InputField(plan, m => m.NewMedication!.Dose, o => o.Label("Proposed dose")).NativeTextBox())
+        @(Html.InputField(plan, m => m.NewMedication!.Unit, o => o.Label("Proposed unit")).NativeTextBox())
+        @(Html.InputField(plan, m => m.NewMedication!.Schedule, o => o.Label("Proposed rounds")).NativeCheckList(list => list.Items(new[] { new CheckListItem("Morning", "Morning"), new CheckListItem("Evening", "Evening") })))
+        @(Html.InputField(plan, m => m.NewMedication!.Instructions, o => o.Label("New prescription instructions")).NativeTextBox())
+        @(Html.NativeButton("add-medication", "Add medication").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MedicationCommands.Change, pipeline.Object<MedicationCommand>(m => m.Set(c => c.Add, true)))))
+    </fieldset>
+}
+@Html.RenderPlan(plan)

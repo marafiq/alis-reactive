@@ -1,0 +1,24 @@
+@using System.Globalization
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model MedicationInput
+@{
+    var plan = Html.ReactivePlan<MedicationInput>();
+}
+<fieldset>
+    <legend>Medication @Model.Id</legend>
+    @(Html.NativeHiddenField(plan, m => m.Id))
+    @(Html.InputField(plan, m => m.DrugCode, o => o.Label("Drug code")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Dose, o => o.Label("Dose")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Unit, o => o.Label("Unit")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Schedule, o => o.Label("Scheduled rounds")).NativeCheckList(list => list.Items(new[] { new CheckListItem("Morning", "Morning"), new CheckListItem("Evening", "Evening") })))
+    @(Html.InputField(plan, m => m.StartsOn, o => o.Label("Prescription starts")).ConformanceComponent(Reads.DayPicker("Prescription starts", Model.StartsOn, Model.StartsOn.AddDays(1))))
+    @(Html.InputField(plan, m => m.EndsOn, o => o.Label("Prescription ends")).ConformanceComponent(new ConformanceStart { Text = "Prescription ends", Value = Model.EndsOn?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), Options = ["none", Model.StartsOn.AddDays(7).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)] }))
+    @(Html.InputField(plan, m => m.Instructions, o => o.Label("Prescription instructions")).NativeTextBox())
+    @(Html.NativeButton("remove-medication-" + Model.Id, "Remove " + Model.Id).Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MedicationCommands.Change, pipeline.Object<MedicationCommand>(m => m.Set(c => c.RemoveId, Model.Id)))))
+</fieldset>
+@Html.RenderPlan(plan)

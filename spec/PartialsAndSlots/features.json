@@ -989,6 +989,81 @@
           "id": "M9.X174",
           "rung": "behavior",
           "defect": "The earlier preview outlives the confirmed care change."
+        },
+        {
+          "id": "M9.X190",
+          "rung": "behavior",
+          "defect": "The proposed prescription is discarded before saving."
+        },
+        {
+          "id": "M9.X191",
+          "rung": "behavior",
+          "defect": "The medication validator accepts a third fractional digit."
+        },
+        {
+          "id": "M9.X192",
+          "rung": "behavior",
+          "defect": "The server uses the shared thousand milligram ceiling for Aspirin."
+        },
+        {
+          "id": "M9.X193",
+          "rung": "behavior",
+          "defect": "The server writes the proposed row before losing the connection."
+        },
+        {
+          "id": "M9.X194",
+          "rung": "behavior",
+          "defect": "Deletion saves the stored dose of the retained row."
+        },
+        {
+          "id": "M9.X195",
+          "rung": "behavior",
+          "defect": "The clearance is returned without storing it."
+        },
+        {
+          "id": "M9.X196",
+          "rung": "behavior",
+          "defect": "The browser treats an empty code as a valid prescription."
+        },
+        {
+          "id": "M9.X197",
+          "rung": "behavior",
+          "defect": "The alternative route requests the wrong catalogue reference."
+        },
+        {
+          "id": "M9.X198",
+          "rung": "behavior",
+          "defect": "The failed instructions read hides its unavailable state."
+        },
+        {
+          "id": "M9.X199",
+          "rung": "behavior",
+          "defect": "The held pharmacy clearance is discarded when the current funding source changes."
+        },
+        {
+          "id": "M9.X200",
+          "rung": "behavior",
+          "defect": "The clinical refusal is returned without its submitted drug field."
+        },
+        {
+          "id": "M9.X201",
+          "rung": "behavior",
+          "defect": "The fresh check reuses the former allergy result."
+        },
+        {
+          "id": "M9.X202",
+          "rung": "behavior",
+          "defect": "The old review accepts the replacement in place of the submitted prescription."
+        },
+        {
+          "id": "M9.X203",
+          "rung": "behavior",
+          "defect": "A failed review of an earlier order reports the replacement as cleared."
+        },
+        {
+          "id": "M9.X204",
+          "rung": "behavior",
+          "defect": "Closing the medication section suppresses the late summary."
         }
       ],
       "promises": [
@@ -1917,6 +1992,126 @@
           "outcome": "The new care keeps the confirmed plan after release and both care and diet reopen together.",
           "opposite": "Without replacement the working preview appears.",
           "defect": "The earlier preview outlives the confirmed care change."
+        },
+        {
+          "for": "M9.X190",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Add the proposed AZI 250 mg prescription and reopen the move-in.",
+          "outcome": "Version 8 holds M1 Aspirin 75 mg and M2 Azithromycin 250 mg.",
+          "opposite": "A save without a proposed prescription retains the original rows.",
+          "defect": "The proposed prescription is discarded before saving."
+        },
+        {
+          "for": "M9.X191",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Enter a dose of 12.345, then correct it and enter a round dose below 0.50 before saving.",
+          "outcome": "Each invalid edit shows its own message without a request and the saved doses reopen unchanged.",
+          "opposite": "The seed includes a blank round and two valid round doses.",
+          "defect": "The medication validator accepts a third fractional digit."
+        },
+        {
+          "for": "M9.X192",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Submit 500 mg of Aspirin, then submit a valid edit from a superseded version.",
+          "outcome": "The drug ceiling and stale version refusals retain the prior prescription.",
+          "opposite": "An edit within the current limit saves at the current version.",
+          "defect": "The server uses the shared thousand milligram ceiling for Aspirin."
+        },
+        {
+          "for": "M9.X193",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Drop the medication endpoint connection and add a prescription.",
+          "outcome": "The failure is visible and the reopened chart contains only M1.",
+          "opposite": "An available endpoint saves the additional medication.",
+          "defect": "The server writes the proposed row before losing the connection."
+        },
+        {
+          "for": "M9.X194",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Add AZI, start a review of AMOX, edit AZI and delete M1 while the review is held.",
+          "outcome": "The deletion saves only M2 with its edited dose and the late failure remains in the summary.",
+          "opposite": "A new review of the retained medication clears it.",
+          "defect": "Deletion saves the stored dose of the retained row."
+        },
+        {
+          "for": "M9.X195",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Check Aspirin, submit Amoxicillin with the reported allergy cleared, then check Aspirin without a pharmacy reference.",
+          "outcome": "Aspirin instructions and CL100 reopen. The resident record still blocks Amoxicillin. Each successful review records its actual reference or its omission.",
+          "opposite": "A prescription conflicting with the resident allergy cannot receive clearance.",
+          "defect": "The clearance is returned without storing it."
+        },
+        {
+          "for": "M9.X196",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Clear the drug code and check medications.",
+          "outcome": "The field requests a drug code, no review leaves, and the chart reopens without clearance.",
+          "opposite": "A recognised drug code can be reviewed.",
+          "defect": "The browser treats an empty code as a valid prescription."
+        },
+        {
+          "for": "M9.X197",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Review AMOX for the resident with penicillin allergy and hold the alternatives answer.",
+          "outcome": "M1 names penicillin and the reviewed alternative is Azithromycin. The next read shows no clearance.",
+          "opposite": "The original Aspirin order receives clearance.",
+          "defect": "The alternative route requests the wrong catalogue reference."
+        },
+        {
+          "for": "M9.X198",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Hold the instructions after clearance, revoke the coordinator’s community access and release the read.",
+          "outcome": "The instructions are unavailable with CL100 on file after reopening.",
+          "opposite": "When available the instructions show how to take the cleared prescription.",
+          "defect": "The failed instructions read hides its unavailable state."
+        },
+        {
+          "for": "M9.X199",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Hold the pharmacy response, select private funding, then release it and save the current draft.",
+          "outcome": "The review reports clearance on the original page and the reopened draft has private funding and CL100.",
+          "opposite": "Changing the payer removes the insurance coverage fields.",
+          "defect": "The held pharmacy clearance is discarded when the current funding source changes."
+        },
+        {
+          "for": "M9.X200",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Review AMOX after its alternative is withdrawn and release the held clinical refusal.",
+          "outcome": "Both the surviving main summary and M1 show the allergy and the next read has no clearance.",
+          "opposite": "A conflict with an available alternative opens its resolution.",
+          "defect": "The clinical refusal is returned without its submitted drug field."
+        },
+        {
+          "for": "M9.X201",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Release the AMOX failure, clear its drug code and check again.",
+          "outcome": "The browser requests a drug code without another review and the original saved Aspirin remains.",
+          "opposite": "The previous review sent the nonempty AMOX code.",
+          "defect": "The fresh check reuses the former allergy result."
+        },
+        {
+          "for": "M9.X202",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Hold the refusal for M1, replace the section with M2 in the same binding position, then release it and review again.",
+          "outcome": "The summary keeps the allergy, M2 has no inline error, and the fresh review clears M2.",
+          "opposite": "A retained M1 receives its own inline message.",
+          "defect": "The old review accepts the replacement in place of the submitted prescription."
+        },
+        {
+          "for": "M9.X203",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Drop the held review after replacing M1 with M2.",
+          "outcome": "The same page reports the unavailable review, M2 remains unmarked and reopens unchanged.",
+          "opposite": "An available review of M2 succeeds.",
+          "defect": "A failed review of an earlier order reports the replacement as cleared."
+        },
+        {
+          "for": "M9.X204",
+          "page": "Helen Ward's saved move-in has one Aspirin prescription and a recorded penicillin allergy.",
+          "gesture": "Hold the AMOX refusal, close the medication section, release and save the remaining draft.",
+          "outcome": "The surviving summary shows the conflict, the next save omits the working AMOX edit and the persisted prescription stays Aspirin.",
+          "opposite": "The original input receives the failure while it remains on the page.",
+          "defect": "Closing the medication section suppresses the late summary."
         }
       ],
       "verdicts": []

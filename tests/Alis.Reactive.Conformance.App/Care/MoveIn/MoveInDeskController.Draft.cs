@@ -35,7 +35,18 @@ public sealed partial class MoveInDeskController
             }
         }
 
+        if (moveIn.IncludesMedications)
+        {
+            var medication = this.Validate<MoveInPage, MoveInRules>(moveIn, MoveInRules.Pharmacy);
+            if (!medication.IsValid) return medication.ToErrorResponse();
+        }
+
         var verdict = Desk.Save(draftId, version, coordinator, operation, moveIn);
+        if (verdict.MedicationRefusal is { } medicationRefusal)
+        {
+            ModelState.AddModelError(nameof(MoveInPage.Medications), medicationRefusal);
+            return ValidationProblem(ModelState);
+        }
         if (verdict.Stale is { } stale) return Conflict(stale);
         if (verdict.Saved is not { } saved) return NotFound(MoveInErrors.Missing());
 

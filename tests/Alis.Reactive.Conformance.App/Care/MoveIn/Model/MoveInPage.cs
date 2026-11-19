@@ -34,7 +34,19 @@ public sealed class MoveInPage
 
     internal bool IncludesPayer { get; private set; }
 
-    public MedicationSection Medications { get; set; } = new();
+    private MedicationSection _medications = new();
+
+    public MedicationSection Medications
+    {
+        get => _medications;
+        set
+        {
+            _medications = value;
+            IncludesMedications = true;
+        }
+    }
+
+    internal bool IncludesMedications { get; private set; }
 
     public ServiceInput Services { get; set; } = new();
 
@@ -55,6 +67,8 @@ public sealed class MoveInPage
     public DocumentSelection Documents { get; set; } = new();
 
     public ReviewInput Review { get; set; } = new();
+
+    public string? Reference { get; set; }
 
     public int? AcceptedQuoteRevision { get; set; }
 

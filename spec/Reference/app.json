@@ -580,6 +580,18 @@
           "kind": "nativeSlice",
           "module": "NativeComponents",
           "role": "the NativeDropDown dietary choices, NativeTextBox meals and labels, NativeCheckList documents and confirmed kitchen plan"
+        },
+        {
+          "id": "medicationRows",
+          "kind": "nativeSlice",
+          "module": "NativeComponents",
+          "role": "the indexed prescriptions, their stable medication identifiers and the round doses"
+        },
+        {
+          "id": "pharmacyPanel",
+          "kind": "conformance",
+          "declares": "ConformanceComponent",
+          "role": "the current pharmacy review reference and its synchronous and awaited records"
         }
       ]
     },
@@ -13174,6 +13186,334 @@
           "verb": "gate",
           "action": "Composition.tla:Answer",
           "on": "the old meal preview after the kitchen reads the working diet"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X190",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X191",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X192",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X193",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X194",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Ownership.tla:ShowsFailures",
+          "on": "the pharmacy review of the originally submitted medication rows"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X195",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X196",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X197",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:SettleTheTail",
+          "on": "the alternatives read before its answer"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X198",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the instruction read after pharmacy clearance is on file"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X199",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Ownership.tla:SendsSlotInput",
+          "on": "the pharmacy review of the originally submitted medication rows"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X200",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Ownership.tla:ShowsFailures",
+          "on": "the pharmacy review of the originally submitted medication rows"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X201",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Ownership.tla:ShowsFailures",
+          "on": "the pharmacy review of the originally submitted medication rows"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X202",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Ownership.tla:ShowsFailures",
+          "on": "the pharmacy review of the originally submitted medication rows"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X203",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Ownership.tla:SendsSlotInput",
+          "on": "the pharmacy review of the originally submitted medication rows"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X204",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "medicationRows",
+        "pharmacyPanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Ownership.tla:ShowsFailures",
+          "on": "the pharmacy review of the originally submitted medication rows"
         }
       ]
     }
