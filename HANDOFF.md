@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 13:09:15 EST 2026
+Written at `date`: Thu Nov 19 13:54:30 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -52,7 +52,8 @@ unit: returned ../fusion-combobox-onboarding-replay FusionComboBoxOnboardingRepl
 unit: ready ../fusion-combobox-payload FusionComboBoxPayload
   next: scripts/land-unit.sh ../fusion-combobox-payload 9c77fd7d8 "Prove typed ComboBox changes on Helen Martinez's communication plan" ".landing/FusionComboBoxPayload"
 unit: returned ../fusion-combobox-server-search FusionComboBoxServerSearch: reply.md waits for read.md
-unit: unbriefed ../movein-availability MoveInAvailability: its Rules name LiveRound.cs, LiveDoses.cshtml, LiveOffer.cshtml, LiveBedCard.cshtml, which the worktree lacks
+unit: ready ../movein-availability MoveInAvailability
+  next: scripts/land-unit.sh ../movein-availability 6a418dc64 "MI.18.5, MI.20 and MI.21. Publish the world's bed changes to independently owned page and card streams. A held response checks current community access and preserves a newer displayed revision and holder. Reconnect re-reads the bed; the retry offer remains until every failed owner recovers or leaves." ".landing/MoveInAvailability"
 unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
@@ -68,11 +69,11 @@ unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
   leaves by: `git worktree remove {worktree}`
   goes to: gone
-lane: checking at 03287bb21 on feature/rewrite
+lane: checking at e53943447 on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 03287bb21
+ci: unread at e53943447
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -81,10 +82,10 @@ file: over CLAUDE.md: holds 335 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 409 lines, its limit 150
+file: over HANDOFF.md: holds 425 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 15 units have landed since .claude/rules/process.md last changed
+machine: review due : 16 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -92,17 +93,17 @@ machine: review due : 15 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 03287bb21 Keep move-in implementation and builder proof within scope
-- Full check: .work/logs/spec-check-03287bb21.log: spec check at 03287bb21: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-125735-13706 03287bb21
+- HEAD: e53943447 Prove move-in availability and reconnect lifetimes
+- Full check: .work/logs/spec-check-e53943447.log: spec check at e53943447: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-134246-89248 e53943447
 
 ## Landed since the commit before the last spec: STATE commit
-03287bb21 Keep move-in implementation and builder proof within scope
-6a418dc64 spec: STATE and handoff at 2c77b1a04
+e53943447 Prove move-in availability and reconnect lifetimes
+980dee5ed spec: STATE and handoff at 03287bb21
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 599; named by a browser test: 580; with no browser test: 19
+feature promises: 610; named by a browser test: 591; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -147,9 +148,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 403 to 404
-- A shell command or a script wrong in its own terms: 563 to 564
-- Said to the owner in a way that hid or blurred what holds: 10 to 11
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 370 to 373
+- A rule or a tool's list not applied before the change: 404 to 406
+- A shell command or a script wrong in its own terms: 564 to 568
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -391,6 +392,21 @@ The new builder passed its fresh one-case baseline within budget. The startup an
 The startup and review rule landed at `03287bb21`. The existing AGENTS.md symlink reads the same
 CLAUDE.md rules. The rule-name check passed its 20 cases and the full local regression preserved
 all 698 prior passes. The availability builder remains confined to app code and its browser proof.
+The startup rule passed all 40 committed checks and pushed with its handoff to `980dee5ed`.
+The availability builder then passed the restored move-in screen, 61 cases with zero failures or
+overruns, and the twelve app-only plants. Its compiled page-door table matched all 702 entries.
+The lead reproduced the four spec files from the current lane and read the planted failures and
+the app code. The shared landing gate now takes MI.20, MI.21 and the reserved X69 from MI.18.
+The next app batch after it is MI.8, MI.9 and MI.13 under the existing queue.
+The availability unit landed at `e53943447`. The integrated gate passed with 702 compiled
+page-door entries. The browser run passed all 709 tests, including eleven newly proven cases,
+and preserved every previous pass. The independently owned card can update while the main
+snapshot waits, and releasing an older snapshot preserves the newer bed holder. The access
+check at response release and the two-client reconnect offer are held by their browser cases.
+X69 proves the waitlist join saves W100 and leaves BED4 available at revision 14 on the next read.
+MI.17 still owns the admission conflict entry, and MI.13 extends the E18 catalogue into pricing.
+
+
 
 
 
