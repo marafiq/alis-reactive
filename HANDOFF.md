@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 04:23:52 EST 2026
+Written at `date`: Thu Nov 19 05:18:31 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -33,43 +33,44 @@ unit: ready ../fusion-audit FusionAudit
   leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
   exit line: "landed", with the browser run's result line
   goes to: unit: landed
-unit: waiting ../fusion-combobox-data-manager FusionComboBoxDataManager: for FusionComboBoxEquipmentAvailability
-  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
-  exit line: each line of the brief's "Done"
-  goes to: unit: ready
-unit: returned ../fusion-combobox-equipment-availability FusionComboBoxEquipmentAvailability: reply.md waits for read.md
+unit: returned ../fusion-combobox-data-manager FusionComboBoxDataManager: reply.md waits for read.md
   leaves by: the lead writes "read.md"
   read first: the rule lines "reply.md" opens with, at their source; the change against its base
   exit line: "verdict: land"
   goes to: unit: ready
-unit: building ../fusion-combobox-follow-through FusionComboBoxFollowThrough: it lacks paths.txt or message.txt
-  leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
-  read first: the rule file of each kind of file, as it is opened
-  exit line: each line of the brief's "Done"
-  goes to: unit: ready, or unit: returned for an agent
+unit: returned ../fusion-combobox-equipment-availability FusionComboBoxEquipmentAvailability: reply.md waits for read.md
+unit: ready ../fusion-combobox-follow-through FusionComboBoxFollowThrough
+  next: scripts/land-unit.sh ../fusion-combobox-follow-through 5f77ce2a6 "Prove ComboBox search, live configuration and real EJ2 Promises" ".landing/FusionComboBoxFollowThrough"
 unit: unbriefed ../fusion-combobox-follow-through IntegrationPrep: brief.md lacks Scope, Rules, Outcome, Done, Commands, Reply
   leaves by: the brief is completed, before any work
   read first: the files of a unit, below
   goes to: unit: briefed
 unit: returned ../fusion-combobox-live-catalogue FusionComboBoxLiveCatalogue: reply.md waits for read.md
-unit: waiting ../fusion-combobox-onboarding-replay FusionComboBoxOnboardingReplay: for FusionComboBoxEquipmentAvailability
+unit: landed ../fusion-combobox-onboarding-notes FusionOnboardingNotes
+  next: git worktree remove ../fusion-combobox-onboarding-notes
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
+unit: returned ../fusion-combobox-onboarding-replay FusionComboBoxOnboardingReplay: reply.md waits for read.md
 unit: ready ../fusion-combobox-payload FusionComboBoxPayload
   next: scripts/land-unit.sh ../fusion-combobox-payload 9c77fd7d8 "Prove typed ComboBox changes on Helen Martinez's communication plan" ".landing/FusionComboBoxPayload"
 unit: returned ../fusion-combobox-server-search FusionComboBoxServerSearch: reply.md waits for read.md
 unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
+  leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
+  read first: the rule file of each kind of file, as it is opened
+  exit line: each line of the brief's "Done"
+  goes to: unit: ready, or unit: returned for an agent
+unit: building ../movein-owners-restarted MoveInOwners: it lacks paths.txt or message.txt
 unit: ready ../movein-scope MoveInSessionScope
-  next: scripts/land-unit.sh ../movein-scope d13a4ce7f "New move-in sessions start from the app spec and the typed doors already landed. A missing door is recorded with its use case and needs a separate authorization for framework work. The lead reads builders' changes and planted failures at source before accepting the integrated proof. AGENTS.md resolves to the same startup rules as CLAUDE.md." ".landing/MoveInSessionScope"
+  next: scripts/land-unit.sh ../movein-scope d13a4ce7f "Keep move-in implementation and builder proof within scope" ".landing/MoveInSessionScope"
 unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
-lane: checking at 5f77ce2a6 on feature/rewrite
+lane: checking at 1b64776dd on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 5f77ce2a6
+ci: unread at 1b64776dd
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -78,10 +79,10 @@ file: over CLAUDE.md: holds 326 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 348 lines, its limit 150
+file: over HANDOFF.md: holds 377 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 11 units have landed since .claude/rules/process.md last changed
+machine: review due : 13 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -89,17 +90,18 @@ machine: review due : 11 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 5f77ce2a6 Prove typed ComboBox changes on Helen Martinez's communication plan
-- Full check: .work/logs/spec-check-5f77ce2a6.log: spec check at 5f77ce2a6: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-041104-63024 5f77ce2a6
+- HEAD: 1b64776dd Resolve pinned ComboBox citations and clarify DataManager onboarding
+- Full check: .work/logs/spec-check-1b64776dd.log: spec check at 1b64776dd: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-050725-51051 1b64776dd
 
 ## Landed since the commit before the last spec: STATE commit
-5f77ce2a6 Prove typed ComboBox changes on Helen Martinez's communication plan
-27139f914 spec: STATE and handoff at 88bab362a
+1b64776dd Resolve pinned ComboBox citations and clarify DataManager onboarding
+d67e15d16 Prove ComboBox search, live configuration and real EJ2 Promises
+21d6a2ec4 spec: STATE and handoff at 5f77ce2a6
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 573; named by a browser test: 554; with no browser test: 19
+feature promises: 583; named by a browser test: 564; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -144,9 +146,10 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 357 to 360
-- A rule or a tool's list not applied before the change: 391 to 394
-- A shell command or a script wrong in its own terms: 551 to 553
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 360 to 363
+- A rule or a tool's list not applied before the change: 394 to 401
+- A number, a proof line or an absence not read from the run that proves it: 57 to 58
+- A shell command or a script wrong in its own terms: 553 to 559
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -343,12 +346,30 @@ needs its synthesized-symbol failure addressed before a Fusion build can consume
 
 The four-value preview ran in Chromium and ended on schedule. The payload unit landed at `5f77ce2a6`
 after eight caught defects and a byte-identical compiled page-doors comparison. The integrated run
-passed all 672 tests, with 6 new passes and all 666 prior passes preserved. Its post-commit check and
-push use the landing lane.
+passed all 672 tests, with 6 new passes and all 666 prior passes preserved. The full spec check passed
+40 of 40, and the push reported `5f77ce2a6` and `21d6a2ec4` with remote equal to HEAD.
 The separate examples are the fifth interpreter-service box in `../fusion-combobox-server-search`, the
 live transport catalogue in `../fusion-combobox-live-catalogue`, and the real EJ2 Query Promise in
 `../fusion-combobox-equipment-availability`. Each scoped Astra xhigh builder uses the shared build lock.
-Open each preview and report its URL after real browser proof. Preserve the move-in owners brief for its turn.
+The verified previews opened in the browser and their Razor views in Rider. The combined landing worktree
+is `../fusion-combobox-follow-through`, including the direct DataManager proof from `../fusion-combobox-data-manager`.
+The independent skill replay used ComboBox and NumericTextBox, and the integrated inventory matched 18 operations
+on both host manifests. The checks caught a deleted live dataSource door and a synchronous Query.execute
+declaration. The loopback vendor probes reported zero page errors.
+The combined unit landed at `d67e15d16`. The full browser run passed all 682 tests, with 10 new passes
+and all 672 prior passes preserved. The supplier desk awaited the actual EJ2 DataManager result and
+showed distinct delivery instructions for Northbank and Harbor. Its nested declarations belong to ComboBox.
+The onboarding skill records the same component-local procedure for a future component the owner requests.
+The Fusion implementation and proof used Codex with scoped GPT-6.2-Astra xhigh builders. The content
+commit inherited Claude attribution from the previous session's landing file. The landing file now records Codex.
+The first committed check reported 38 of 40. The unqualified FieldSettingsModel cites broke module_cites
+and its accepted plant. The follow-up uses the installed package paths, makes the DataManager request
+boundary explicit and corrects the replay count by naming the covered operations. The focused citation
+check resolved all 1,052 citations and its three existing plants returned the expected verdicts.
+
+The fresh Astra xhigh builder for MI.18/28/29 has started in `../movein-owners-restarted` at `21d6a2ec4`, with
+the 17 current part 6 situations and the landed Contacts dependency. The original `../movein-owners` brief
+and modified `spec/STATE.json` stay preserved. All proof commands queue behind the same build lock.
 
 Behind the app, the framework's open list: a Native date input and an input over a date (the app's gap 1); a list
 of files in a request form (D14.3; the runtime throws notBuilt); a validation check on a text or a file body (refused
