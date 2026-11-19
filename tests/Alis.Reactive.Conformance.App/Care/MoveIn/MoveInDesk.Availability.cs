@@ -100,7 +100,12 @@ internal sealed partial class MoveInDesk
             MoveInSeed.TakeTheBed(_world);
         }
 
-        var changed = new BedChanged("C1", SnapshotOf("C1", bed.Id)!.Reply.Beds.Single(), _world.Services.Max(service => service.Revision));
+        PublishBedAndPrice(bed.Id);
+    }
+
+    private void PublishBedAndPrice(string bedId)
+    {
+        var changed = new BedChanged("C1", SnapshotOf("C1", bedId)!.Reply.Beds.Single(), _world.Services.Max(service => service.Revision));
         var data = JsonSerializer.Serialize(changed, JsonSerializerOptions.Web);
         foreach (var feed in _availabilityStreams)
             if (feed.Community == changed.CommunityId && AvailabilityAccess(feed.Draft, feed.Community) == 200) feed.Stream.Push("bedChanged", data);

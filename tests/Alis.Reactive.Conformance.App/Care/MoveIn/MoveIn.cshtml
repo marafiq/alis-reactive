@@ -96,7 +96,7 @@
 </section>
 
 <section id="move-in-service-review" aria-label="Service review">
-    @await Html.PartialAsync("/Care/MoveIn/QuoteDesk.cshtml", Reads.ServiceReviewOf(Model))
+    @await Html.PartialAsync("/Care/MoveIn/QuoteSection.cshtml", Reads.ReviewRead(Model.DraftId))
 </section>
 
 <section id="move-in-waitlist" aria-label="Waitlist">

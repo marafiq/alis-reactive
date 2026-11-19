@@ -889,6 +889,56 @@
           "id": "M9.X129",
           "rung": "behavior",
           "defect": "The catalogue declares the quote ready while its assistance response still waits."
+        },
+        {
+          "id": "M9.X140",
+          "rung": "behavior",
+          "defect": "The saved review uses the component total in place of its awaited visit count."
+        },
+        {
+          "id": "M9.X141",
+          "rung": "behavior",
+          "defect": "The empty review proceeds to pricing."
+        },
+        {
+          "id": "M9.X142",
+          "rung": "behavior",
+          "defect": "The desk checks reviewed pharmacy capacity against the old panel."
+        },
+        {
+          "id": "M9.X143",
+          "rung": "behavior",
+          "defect": "The component's record endpoint returns success for the refused review."
+        },
+        {
+          "id": "M9.X144",
+          "rung": "behavior",
+          "defect": "The service selection replaces the contents inside the old quote owner, leaving the old calculation able to overwrite the replacement’s result."
+        },
+        {
+          "id": "M9.X145",
+          "rung": "behavior",
+          "defect": "The success route asks for assistance with the acceptance receipt in place of the assistance reference."
+        },
+        {
+          "id": "M9.X146",
+          "rung": "behavior",
+          "defect": "The assistance guard accepts the unchecked terms."
+        },
+        {
+          "id": "M9.X147",
+          "rung": "behavior",
+          "defect": "The server records acceptance for a superseded price."
+        },
+        {
+          "id": "M9.X148",
+          "rung": "behavior",
+          "defect": "The dropped connection executes the acceptance before failing."
+        },
+        {
+          "id": "M9.X149",
+          "rung": "behavior",
+          "defect": "The superseded offer stays mounted while the new offer is loading and its held acceptance response starts assistance for revision 3."
         }
       ],
       "promises": [
@@ -1657,6 +1707,86 @@
           "outcome": "Calculating remains until assistance settles. The next read shows the single Q100 at revision 3 for 3040.00 with 2432.00 assistance.",
           "opposite": "Releasing assistance completes the calculation.",
           "defect": "The catalogue declares the quote ready while its assistance response still waits."
+        },
+        {
+          "for": "M9.X140",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Review the active dining and pharmacy services and calculate with the visit and record replies held in turn.",
+          "outcome": "The two active services and three visits appear in label order. The reopened quote retains the reached total, visit count and reviewed service record. Removing pharmacy support reopens as one service, two visits and a 2980.00 quote at revision 4.",
+          "opposite": "An inactive list cannot be priced.",
+          "defect": "The saved review uses the component total in place of its awaited visit count."
+        },
+        {
+          "for": "M9.X141",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Deactivate every review item and calculate.",
+          "outcome": "Choose an active service appears and the next read holds the original quote without a new calculation.",
+          "opposite": "Active dining and pharmacy services create a calculation.",
+          "defect": "The empty review proceeds to pricing."
+        },
+        {
+          "for": "M9.X142",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Review the service names and visit records, exhaust pharmacy capacity, then calculate.",
+          "outcome": "The pricing desk refuses Pharmacy support and the reopened catalogue shows zero capacity without a new quote.",
+          "opposite": "Pharmacy support with capacity can be priced.",
+          "defect": "The desk checks reviewed pharmacy capacity against the old panel."
+        },
+        {
+          "for": "M9.X143",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Hold the review record then release the service desk's refusal.",
+          "outcome": "The component reports refusal, the busy indicator clears and reopening shows an unaccepted draft without a quote.",
+          "opposite": "An answered record allows calculation.",
+          "defect": "The component's record endpoint returns success for the refused review."
+        },
+        {
+          "for": "M9.X144",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Remove pharmacy support while the old panel’s record is held, calculate with the replacement dining panel, then release the old record and read the saved review.",
+          "outcome": "The replacement shows one active dining service. Only its own calculation is on file when the old record returns.",
+          "opposite": "The original panel quotes both services if it stays open.",
+          "defect": "The service selection replaces the contents inside the old quote owner, leaving the old calculation able to overwrite the replacement’s result."
+        },
+        {
+          "for": "M9.X145",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Accept the displayed revision and its assistance agreement, holding the assistance follow-up.",
+          "outcome": "Receipt ACCEPT-Q3 precedes the 2432.00 assistance response. Reopening shows the accepted 3040.00 revision 3.",
+          "opposite": "Unchecked assistance stops acceptance.",
+          "defect": "The success route asks for assistance with the acceptance receipt in place of the assistance reference."
+        },
+        {
+          "for": "M9.X146",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Accept the quote without agreeing to its assistance.",
+          "outcome": "The coordinator sees Accept the assistance terms and reopens revision 3 unaccepted.",
+          "opposite": "Agreement allows acceptance.",
+          "defect": "The assistance guard accepts the unchecked terms."
+        },
+        {
+          "for": "M9.X147",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Change the price after displaying revision 3, accept, then explicitly accept the returned revision.",
+          "outcome": "The conflict shows 3060.00 and the reopened revision 4 remains unaccepted until its second explicit agreement.",
+          "opposite": "The original price accepts at revision 3.",
+          "defect": "The server records acceptance for a superseded price."
+        },
+        {
+          "for": "M9.X148",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Drop the acceptance connection before execution, reopen, then restore the endpoint and retry.",
+          "outcome": "Revision 3 and its terms reopen unaccepted after the failed transport and accept on explicit retry.",
+          "opposite": "A connected request records the agreement.",
+          "defect": "The dropped connection executes the acceptance before failing."
+        },
+        {
+          "for": "M9.X149",
+          "page": "Helen Ward’s service desk has Dining and Pharmacy support, three scheduled visits and assistance through Harbor Mutual.",
+          "gesture": "Hold acceptance before checking revision 3 and publish the pharmacy price. In another draft hold its success, publish the price, hold the new offer and release the old receipt.",
+          "outcome": "The live page displays revision 4 before the old request returns. Reopening shows revision 4 without an acceptance.",
+          "opposite": "A separately accepted unchanged quote retains its revision.",
+          "defect": "The superseded offer stays mounted while the new offer is loading and its held acceptance response starts assistance for revision 3."
         }
       ],
       "verdicts": []

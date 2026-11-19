@@ -1,5 +1,6 @@
 using Alis.Reactive.Conformance.App.Components;
 using Alis.Reactive.Conformance.World;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Conformance.App.Care;
 
@@ -27,20 +28,20 @@ internal sealed partial class MoveInDesk
             {
                 var service = _world.Services.Find(s => s.Code == code);
                 if (service is null || !service.Available) return (409, null, "A selected service is no longer available.");
-                var visits = request.Services.Visits.Where(v => v.Code == code && v.Active).Sum(v => v.Count);
-                if (service.Capacity < Math.Max(1, visits)) return (409, null, $"{service.Name} has no capacity.");
+                var capacity = new ServiceCapacityRules(service).Validate(request.Services);
+                if (!capacity.IsValid) return (409, null, capacity.Errors[0].ErrorMessage);
                 lines.Add(new PriceLine { ServiceCode = code, Name = service.Name, Amount = service.MonthlyPrice, Revision = service.Revision });
             }
             if (lines.Count == 0) return (400, null, "Choose at least one service.");
-            var total = rate.MonthlyBasePrice + lines.Sum(l => l.Amount);
-            var policy = _world.Policies.Find(p => p.Number == draft.Data.Payer.Primary.PolicyNumber && p.ResidentId == draft.Data.ResidentId && p.Active && !p.Blocked);
-            var assistance = new AssistanceTerms();
-            if (request.PayerKind == PayerKind.Insurance && policy is not null)
+            var reviewed = ScheduledServices(request.Services);
+            if (request.Review.SelectedServiceCount != reviewed.Count || request.Review.VisitCount != reviewed.Sum(line => line.Visits)
+                || request.Review.Result.Count != reviewed.Count || request.Review.Result.Code != string.Join(", ", reviewed.Select(line => line.Service.Code))
+                || request.Review.Result.Name != string.Join(", ", reviewed.Select(line => line.Service.Name)))
             {
-                assistance.Required = true;
-                assistance.Reference = "AST-" + draft.Id[1..];
-                assistance.Contribution = Math.Min(policy.MonthlyLimit, decimal.Round(total * draft.Data.Payer.Primary.ContributionPercent / 100m, 2));
+                return (409, null, "The reviewed services have changed. Refresh the service review.");
             }
+            var total = rate.MonthlyBasePrice + lines.Sum(l => l.Amount);
+            var assistance = AssistanceTerms.For(_world, draft, request.PayerKind, total);
             var quote = new QuoteState
             {
                 Id = "Q" + draft.Id[1..],
@@ -50,14 +51,24 @@ internal sealed partial class MoveInDesk
                 ExpiresAt = _world.Clock.Now.AddHours(1),
                 Pricing = new QuotePricing { Base = rate.MonthlyBasePrice, Lines = lines, MonthlyTotal = total, Deposit = 500.00m, Assistance = assistance },
             };
-            if (draft.Quote is { } previous && draft.AcceptedQuoteRevision == previous.Revision && SameTerms(previous, quote))
-                quote.Pricing.Assistance.Accepted = previous.Pricing.Assistance.Accepted;
-            else
-                draft.AcceptedQuoteRevision = null;
+            if (draft.Quote is { } previous)
+            {
+                if (SameTerms(previous, quote))
+                {
+                    quote.Revision = previous.Revision;
+                    quote.Pricing.Assistance.Accepted = previous.Pricing.Assistance.Accepted;
+                }
+                else
+                {
+                    quote.Revision = Math.Max(quote.Revision, previous.Revision + 1);
+                    draft.AcceptedQuoteRevision = null;
+                }
+            }
+            draft.Data.Review = request.Review;
             draft.Data.AcceptedQuoteRevision = draft.AcceptedQuoteRevision;
             draft.Quote = quote;
             Record(draft, operation, "quote", quote.Id, coordinator);
-            return (200, new QuoteReply(quote), null);
+            return (200, new QuoteReply(Snapshot(quote)), null);
         }
     }
 
@@ -68,7 +79,7 @@ internal sealed partial class MoveInDesk
 
         var before = previous.Pricing;
         var after = current.Pricing;
-        return previous.Revision == current.Revision && previous.CareLevel == current.CareLevel && previous.PayerKind == current.PayerKind
+        return previous.CareLevel == current.CareLevel && previous.PayerKind == current.PayerKind
             && previous.ExpiresAt == current.ExpiresAt && before.Base == after.Base && before.Deposit == after.Deposit && before.MonthlyTotal == after.MonthlyTotal
             && before.Assistance.Required == after.Assistance.Required && before.Assistance.Reference == after.Assistance.Reference
             && before.Assistance.Contribution == after.Assistance.Contribution && Charges(before).SequenceEqual(Charges(after));
@@ -103,13 +114,19 @@ internal sealed partial class MoveInDesk
     }
 }
 
+internal sealed class ServiceCapacityRules : ReactiveValidator<ServiceInput>
+{
+    internal ServiceCapacityRules(ServiceDefinition service)
+        => RuleFor(input => input.Visits)
+            .Must(visits => service.Capacity >= Math.Max(1, visits.Where(visit => visit.Active && visit.Code == service.Code).Sum(visit => visit.Count)))
+            .WithMessage($"{service.Name} has no capacity.");
+}
+
 internal sealed partial class MoveInReads
 {
     internal bool OffersServices(MoveInPage page) => Desk.CoordinatorServes(page.CoordinatorId, page.Location.CommunityId);
     internal List<ServiceDefinition> ServiceChoices() => Desk.ServiceChoices();
-    internal ServiceReviewPage ServiceReviewOf(MoveInPage page) => new(page.DraftId, ReviewPanelOf(page));
-    internal string QuoteOnFile(string draftId) => Desk.QuoteOnFile(draftId);
-    internal string AcceptedQuote(string draftId) => Desk.AcceptedQuote(draftId);
+    internal ServiceReviewRead ReviewRead(string draftId) => Desk.ReviewRead(draftId) ?? throw new InvalidOperationException("The quote needs its draft.");
 }
 
 public sealed record ServiceReviewPage(string DraftId, ConformanceStart ComponentStart);

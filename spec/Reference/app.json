@@ -12722,6 +12722,265 @@
           "on": "the service catalogue response"
         }
       ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X140",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the component visit count"
+        },
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the component record"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X141",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X142",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X143",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the refused service record"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X144",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the replaced service record"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X145",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the accepted assistance terms"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X146",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X147",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X148",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X149",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "pricing",
+        "moveInEndpoint",
+        "busy",
+        "pricingInputs",
+        "servicePanel",
+        "locationInputs",
+        "lookupSlots",
+        "availabilityStream"
+      ],
+      "harness": [
+        "seed",
+        "gate",
+        "push"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Request.tla:Attempt",
+          "on": "the acceptance before its revision check"
+        },
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the already accepted revision three response"
+        },
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the replacement current offer"
+        },
+        {
+          "verb": "push",
+          "action": "Realtime.tla:Message",
+          "on": "an older catalogue revision arriving during the current offer read"
+        }
+      ]
     }
   ],
   "cells": [

@@ -79,7 +79,7 @@ public sealed class WhenBedAvailabilityChanges(string host) : ConformanceFixture
         await Expect(world.Page.Locator("#availability-bed")).ToHaveTextAsync("BED4 revision 13, held by James Reed");
         await Expect(world.Page.Locator("#availability-services")).ToHaveTextAsync("3 services, price revision 3");
         await world.Push(CareEndpoints.MoveInAvailabilityStream, "bedChanged", """{"communityId":"C1","bed":{"id":"BED4","apartment":{"id":"A7","number":"7","building":{"id":"B1","name":"Cedar","community":{"id":"C1","name":"Harbor House"}}},"revision":12,"available":true},"priceRevision":3}""");
-        await world.Push(CareEndpoints.MoveInAvailabilityStream, "bedChanged", """{"communityId":"C2","bed":{"id":"BED4","apartment":{"id":"A21","number":"21","building":{"id":"B2","name":"East","community":{"id":"C2","name":"Maple House"}}},"revision":16,"available":true},"priceRevision":3}""");
+        await world.Push(CareEndpoints.MoveInAvailabilityStream, "bedChanged", """{"communityId":"C2","bed":{"id":"BED4","apartment":{"id":"A21","number":"21","building":{"id":"B2","name":"East","community":{"id":"C2","name":"Maple House"}}},"revision":16,"available":true},"priceRevision":9}""");
         await world.Push(CareEndpoints.MoveInAvailabilityStream, "bedChanged", """{"communityId":"C1","bed":{"id":"BED5","apartment":{"id":"A7","number":"7","building":{"id":"B1","name":"Cedar","community":{"id":"C1","name":"Harbor House"}}},"revision":19,"available":true},"priceRevision":3}""");
         var dropped = await world.Drop(CareEndpoints.MoveInAvailabilityStream);
         await dropped.NextHeld();
@@ -87,6 +87,7 @@ public sealed class WhenBedAvailabilityChanges(string host) : ConformanceFixture
         await Expect(world.Page.Locator("#availability-bed")).ToHaveTextAsync("BED4 revision 13, held by James Reed");
         Assert.That(world.SentTo(CareEndpoints.MoveInAvailability), Is.EqualTo(2));
         Assert.That(world.SentTo(CareEndpoints.MoveInServices), Is.EqualTo(1));
+        Assert.That(world.SentTo(CareEndpoints.MoveInCurrentOffer), Is.EqualTo(1));
         await dropped.Reopen();
         await Expect(world.Page.Locator("#availability-status")).ToHaveTextAsync("Availability confirmed");
         await world.Seed(MoveInChanges.TheWindowBedIsReleased());

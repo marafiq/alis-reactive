@@ -79,9 +79,10 @@
             .Then(pipeline => Snapshot(pipeline, state.Container.Read(m => m.DisplayedRevision))))
         .ServerPush(stream, feed => feed.BedChanged, (change, pipeline) =>
         {
+            var sameCommunity = change.Read(message => message.CommunityId).Eq(Model.CommunityId);
+            pipeline.When(sameCommunity).Then(pipeline => pipeline.Dispatch(QuoteEvents.PricesChanged, change.Read(message => message.PriceRevision)));
             var revision = change.Read(message => message.Bed.Revision);
-            pipeline.When(change.Read(message => message.CommunityId).Eq(Model.CommunityId)
-                .And(change.Read(message => message.Bed.Id).Eq(Model.BedId))
+            pipeline.When(sameCommunity.And(change.Read(message => message.Bed.Id).Eq(Model.BedId))
                 .And(revision.Gt(state.Container.Read(m => m.DisplayedRevision))))
                 .Then(pipeline =>
                 {

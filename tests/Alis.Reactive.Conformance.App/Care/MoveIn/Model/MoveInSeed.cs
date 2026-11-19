@@ -74,12 +74,17 @@ internal static class MoveInSeed
         var pharmacySupport = world.Services.Single(service => service.Code == "PHA");
         pharmacySupport.MonthlyPrice = 80.00m;
         pharmacySupport.Revision = 4;
-        var quote = QuoteOf(HelensDraftIn(world));
-        var pharmacyLine = quote.Pricing.Lines.Single(line => line.ServiceCode == "PHA");
-        pharmacyLine.Amount = 80.00m;
-        pharmacyLine.Revision = 4;
-        quote.Revision = 4;
-        quote.Pricing.MonthlyTotal = 3060.00m;
+        foreach (var draft in world.Drafts)
+        {
+            if (draft.Quote is not { } quote || quote.Pricing.Lines.Find(line => line.ServiceCode == "PHA") is not { } pharmacyLine) continue;
+            if (pharmacyLine.Revision == pharmacySupport.Revision && pharmacyLine.Amount == pharmacySupport.MonthlyPrice) continue;
+            pharmacyLine.Amount = pharmacySupport.MonthlyPrice;
+            pharmacyLine.Revision = pharmacySupport.Revision;
+            quote.Revision = Math.Max(quote.Revision + 1, pharmacyLine.Revision);
+            quote.Pricing.MonthlyTotal = quote.Pricing.Base + quote.Pricing.Lines.Sum(line => line.Amount);
+            quote.Pricing.Assistance = AssistanceTerms.For(world, draft, quote.PayerKind, quote.Pricing.MonthlyTotal);
+            draft.AcceptedQuoteRevision = draft.Data.AcceptedQuoteRevision = null;
+        }
     }
 
     internal static void TakeTheBed(MoveInWorld world)

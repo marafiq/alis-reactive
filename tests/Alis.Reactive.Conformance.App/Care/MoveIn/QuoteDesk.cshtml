@@ -6,16 +6,63 @@
 @using Alis.Reactive.RenderingAndDelivery
 @using Alis.Reactive.RequestsAndResponses
 @using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
 @using Alis.Reactive.ArrayLambdas
-@inject MoveInReads Reads
 @model ServiceReviewPage
 @{
     var plan = Html.ReactivePlan<ServiceReviewPage>();
 }
-<p>Quote on file: <span id="quote-on-file">@Reads.QuoteOnFile(Model.DraftId)</span></p>
-<p>Price acceptance: <span id="quote-acceptance">@Reads.AcceptedQuote(Model.DraftId)</span></p>
-@(plan.ConformanceComponent("service-panel", Model.ComponentStart))
 <section id="quote-panel" aria-label="Service quote">
+@(plan.ConformanceComponent("service-panel", Model.ComponentStart).Reactive(component => component.Change, (change, pipeline) =>
+{
+    var review = pipeline.Component<ConformanceComponent>("service-panel");
+    pipeline.When(change.IsInteracted.And(review.Matching().Any())).Then(pipeline => pipeline.Element("review-change").Text.Set(
+        pipeline.Concat(change.PreviousValue, " to ", change.Value, ". Current: ", review.Current().Name, " (", review.Current().Value, "). ", review.Matching().Count(), " matching. ", review.Outer.Middle.Inner.Text, ".")));
+}))
+<p id="review-change"></p>
+@(Html.NativeButton("order-services", "Order by visits").Reactive(plan, b => b.Click, (clicked, pipeline) => pipeline.Component<ConformanceComponent>("service-panel").SortItems(item => item.Value)))
+@(Html.NativeButton("review-services", "Review services").Reactive(plan, b => b.Click, (clicked, pipeline) =>
+{
+    var review = pipeline.Component<ConformanceComponent>("service-panel");
+    var active = review.Items.Where(item => item.Active);
+    review.Records.Set(review.Records.OrderBy(r => r.Name, StringComparer.Ordinal));
+    review.Pair.Set(args => pipeline.Concat(args.Record.Read(r => r.Name), " ", args.Key, ": ", args.Record.Read(r => r.Count)));
+    pipeline.When(active.Any()).Then(pipeline =>
+    {
+        var labels = pipeline.Element("review-labels");
+        labels.Text.Set("");
+        foreach (var service in Model.ComponentStart.Records.OrderBy(service => service.Name, StringComparer.Ordinal))
+        {
+            var name = service.Name!;
+            pipeline.When(active.Any(item => item.Name.Eq(name))).Then(pipeline =>
+            {
+                pipeline.When(labels.Text.NotEmpty()).Then(pipeline => labels.Text.Set(pipeline.Concat(labels.Text, ", ")));
+                labels.Text.Set(pipeline.Concat(labels.Text, active.Find(item => item.Name.Eq(name)).Name));
+            });
+        }
+        var visits = active.Select(item => item.Value).Sum(value => value);
+        pipeline.When(active.Count().Eq(1))
+            .Then(pipeline => pipeline.Element("service-summary").Text.Set(pipeline.Concat("1 active service, ", visits, " visits: ", labels.Text)))
+            .Else(pipeline => pipeline.Element("service-summary").Text.Set(pipeline.Concat(active.Count(), " active services, ", visits, " visits: ", labels.Text)));
+        pipeline.When(review.Items.All(item => item.Active)).Then(pipeline => pipeline.Element("scheduled-visits").Text.Set(pipeline.Concat(
+            review.Records.Sum(r => r.Count), " scheduled visits; busiest service: ", review.Records.OrderByDescending(r => r.Count).Find(r => true, r => r.Name))))
+            .Else(pipeline => pipeline.Element("scheduled-visits").Text.Set(pipeline.Concat(visits, " visits under review")));
+        pipeline.Element("review-first").Text.Set(active.At(0).Name);
+    }).Else(pipeline =>
+    {
+        pipeline.Element("service-summary").Text.Set("Choose an active service.");
+        pipeline.Element("review-labels").Text.Set("");
+        pipeline.Element("review-first").Text.Set("");
+        pipeline.Element("scheduled-visits").Text.Set("");
+    });
+}))
+<p id="service-summary"></p>
+<p>Active services: <span id="review-labels"></span></p>
+<p>First in review: <span id="review-first"></span></p>
+<p id="scheduled-visits"></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Component<ConformanceComponent>("service-panel").Answer.Set(item => item.Name)));
+}
     @(Html.NativeButton("calculate-quote", "Calculate quote").Reactive(plan, button => button.Click, (clicked, pipeline) =>
     {
         var main = pipeline.Container<MoveInPage>("move-in");
@@ -34,7 +81,9 @@
                 .Busy("quote-panel").NoValidation()
                 .OnSuccess<List<ServiceDefinition>>((available, pipeline) => pipeline.Element("quote-catalogue").Text.Set(pipeline.Concat(available.Body.Count(s => s.Available), " available services")))
                 .OnError((failed, pipeline) => pipeline.Element("quote-catalogue").Text.Set("Service catalogue unavailable.")),
-            pipeline => pipeline.Post<QuoteRequest>(MoveInEndpoints.Quotes, request => request
+            pipeline => pipeline.When(review.Items.Any(item => item.Active).Or(main.Read(m => m.Services.Codes).Count().Eq(0))).Then(pipeline => pipeline
+                .Get<DeskQuery>(MoveInEndpoints.ReviewContext, request => request.Query(q => q.DraftId, Model.DraftId)).Busy("quote-panel")
+                .OnSuccess<ServiceReviewRead>((context, pipeline) => pipeline.Post<QuoteRequest>(MoveInEndpoints.Quotes, request => request
                 .Path(q => q.DraftId, Model.DraftId)
                 .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
                 .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
@@ -44,12 +93,18 @@
                     .Set(q => q.Services, main.Read(m => m.Services))
                     .Set(q => q.Review.Ready, review.Check())
                     .Set(q => q.Review.SelectedServiceCount, review.Total())
-                    .Set(q => q.Review.Result, review.Snapshot())))
+                    .Set(q => q.Review.VisitCount, review.SettleCount())
+                    .Set(q => q.Review.ReviewedAt, context.Body.Read(r => r.ReviewedAt))
+                    .Set(q => q.Review.Result, review.SettleRecord())))
                 .Busy("quote-panel").Validate<QuoteRequestRules>()
                 .OnSuccess<QuoteReply>((answer, pipeline) =>
                 {
                     pipeline.Element("pricing-result").Text.Set(pipeline.Concat(answer.Body.Read(r => r.Quote.Id), ": ", answer.Body.Read(r => r.Quote.Pricing.MonthlyTotal), " USD"));
                     pipeline.Element("monthly-price").Text.Set(answer.Headers.Get(MoveInEndpoints.MonthlyTotalHeader));
+                    pipeline.Element("acceptance-status").Text.Set("");
+                    pipeline.Element("acceptance-receipt").Text.Set("");
+                    pipeline.Unload("accepted-assistance");
+                    pipeline.Dispatch(QuoteEvents.Calculated);
                 })
                 .OnError<ErrorEnvelope>(409, (refused, pipeline) => pipeline.Element("pricing-result").Text.Set(refused.Body.Read(r => r.Error.Message)))
                 .Chained((answer, pipeline) => pipeline.When(answer.Body.Read(r => r.Quote.Pricing.Assistance.Required))
@@ -63,7 +118,7 @@
                         {
                             pipeline.Element("monthly-price").Text.Set("");
                             pipeline.Element("pricing-result").Text.Set("Assistance terms unavailable.");
-                        }))));
+                        }))))).Else(pipeline => pipeline.Element("pricing-result").Text.Set("Choose an active service.")));
         pipeline.When(pipeline.Element("monthly-price").Text.NotEmpty())
             .Then(pipeline => pipeline.Element("quote-status").Text.Set(pipeline.Concat("Quote ready: ", pipeline.Element("monthly-price").Text, " USD")))
             .Else(pipeline => pipeline.Element("quote-status").Text.Set("Quote unavailable"));

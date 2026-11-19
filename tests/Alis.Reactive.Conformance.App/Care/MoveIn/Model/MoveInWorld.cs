@@ -236,6 +236,19 @@ public sealed class PriceLine
 
 public sealed class AssistanceTerms
 {
+    internal static AssistanceTerms For(MoveInWorld world, DraftState draft, PayerKind payer, decimal total)
+    {
+        var coverage = draft.Data.Payer.Primary;
+        var policy = world.Policies.Find(p => p.Number == coverage.PolicyNumber && p.ResidentId == draft.Data.ResidentId && p.Active && !p.Blocked);
+        if (payer != PayerKind.Insurance || policy is null) return new AssistanceTerms();
+        return new AssistanceTerms
+        {
+            Required = true,
+            Reference = "AST-" + draft.Id[1..],
+            Contribution = Math.Min(policy.MonthlyLimit, decimal.Round(total * coverage.ContributionPercent / 100m, 2)),
+        };
+    }
+
     public bool Required { get; set; }
 
     public string Reference { get; set; } = string.Empty;
