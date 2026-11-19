@@ -1,0 +1,54 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.Realtime
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model AvailabilityCard
+@{
+    var plan = Html.ReactivePlan<AvailabilityCard>();
+    var selectedBed = Model.BedId;
+    var stream = ServerPushStream.At<BedAvailabilityFeed>(BedAvailabilityFeed.Address(Model.DraftId, Model.CommunityId, true));
+    void Show(Pipeline<AvailabilityCard> pipeline, TypedSource<int> revision, TypedSource<bool> available)
+    {
+        pipeline.Input(m => m.Revision).Component<NativeHiddenField>().Value.Set(pipeline.Concat(revision));
+        pipeline.When(available)
+            .Then(pipeline => pipeline.Element("card-bed").Text.Set(pipeline.Concat(Model.BedId, " revision ", revision, ", available")))
+            .Else(pipeline => pipeline.Element("card-bed").Text.Set(pipeline.Concat(Model.BedId, " revision ", revision, ", unavailable")));
+    }
+}
+<h3>Bed card</h3>
+@using (var card = Html.BeginRequestContainer(plan, "availability-card-state"))
+{
+    @(Html.NativeHiddenField(plan, m => m.Revision))
+    <p id="card-bed">Reading bed availability</p>
+    <p id="card-connection">Connecting bed card</p>
+    Html.On(plan, trigger => trigger
+        .ServerPush(stream, feed => feed.Opened, (opened, pipeline) =>
+        {
+            pipeline.Element("card-connection").Text.Set("Bed card connected");
+            pipeline.Get<AvailabilityQuery>(MoveInEndpoints.Availability, request => request
+                .Query(query => query.DraftId, Model.DraftId)
+                .Query(query => query.CommunityId, Model.CommunityId)
+                .Query(query => query.BedId, Model.BedId)
+                .Query(query => query.SinceRevision, card.Container.Read(m => m.Revision)))
+                .NoBusy()
+                .OnSuccess<AvailabilityReply>((snapshot, pipeline) => pipeline
+                    .When(snapshot.Body.Read(reply => reply.Revision).Gte(card.Container.Read(m => m.Revision)))
+                    .Then(pipeline => Show(pipeline, snapshot.Body.Read(reply => reply.Revision), snapshot.Body.Read(reply => reply.Beds).Find(bed => bed.Id == selectedBed, bed => bed.Available))));
+        })
+        .ServerPush(stream, feed => feed.BedChanged, (change, pipeline) =>
+        {
+            var revision = change.Read(message => message.Bed.Revision);
+            pipeline.When(change.Read(message => message.CommunityId).Eq(Model.CommunityId)
+                .And(change.Read(message => message.Bed.Id).Eq(Model.BedId))
+                .And(revision.Gt(card.Container.Read(m => m.Revision))))
+                .Then(pipeline => Show(pipeline, revision, change.Read(message => message.Bed.Available)));
+        })
+        .ServerPush(stream, feed => feed.Reconnecting, pipeline => pipeline.Element("card-connection").Text.Set("Bed card reconnecting"))
+        .ServerPush(stream, feed => feed.Closed, pipeline => pipeline.Element("card-connection").Text.Set("Bed card unavailable")));
+}
+@Html.RenderPlan(plan)

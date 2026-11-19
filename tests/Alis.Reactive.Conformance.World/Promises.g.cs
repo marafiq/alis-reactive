@@ -390,6 +390,20 @@ public static class Promises
         public const string M9_X79_0 = "M9.F2 M9.X79 0";
         public const string M9_X80_0 = "M9.F2 M9.X80 0";
         public const string M9_X81_0 = "M9.F2 M9.X81 0";
+        public const string M9_X69_0 = "M9.F2 M9.X69 0";
+        public const string M9_X90_0 = "M9.F2 M9.X90 0";
+        public const string M9_X91_0 = "M9.F2 M9.X91 0";
+        [Holds(RealtimeGate.Answer)]
+        public const string M9_X92_0 = "M9.F2 M9.X92 0";
+        public const string M9_X93_0 = "M9.F2 M9.X93 0";
+        [Holds(RealtimeGate.Answer)]
+        public const string M9_X94_0 = "M9.F2 M9.X94 0";
+        [Holds(RealtimeGate.Answer)]
+        public const string M9_X95_0 = "M9.F2 M9.X95 0";
+        public const string M9_X96_0 = "M9.F2 M9.X96 0";
+        public const string M9_X97_0 = "M9.F2 M9.X97 0";
+        public const string M9_X98_0 = "M9.F2 M9.X98 0";
+        public const string M9_X99_0 = "M9.F2 M9.X99 0";
     }
 
     public static class M10_F1

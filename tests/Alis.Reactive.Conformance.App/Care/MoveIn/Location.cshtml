@@ -40,6 +40,7 @@
             pipeline.Unload("buildings");
             pipeline.Unload("apartments");
             pipeline.Unload("beds");
+            pipeline.Unload("availability-owner");
             pipeline.Element("building-status").Text.Set("");
             pipeline.Element("bed-status").Text.Set("No bed chosen");
             pipeline.When(moveIn.Read(m => m.Location.CommunityId).NotEmpty())

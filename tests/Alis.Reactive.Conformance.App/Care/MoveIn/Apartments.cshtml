@@ -15,6 +15,7 @@
     {
         var moveIn = pipeline.Container<MoveInPage>("move-in");
         pipeline.Unload("beds");
+        pipeline.Unload("availability-owner");
         pipeline.Element("bed-status").Text.Set("No bed chosen");
         pipeline.When(moveIn.Read(m => m.Location.BuildingId).NotEmpty().And(moveIn.Read(m => m.Location.ApartmentId).NotEmpty()))
             .Then(pipeline => pipeline

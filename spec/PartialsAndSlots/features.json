@@ -754,6 +754,61 @@
           "id": "M9.X81",
           "rung": "behavior",
           "defect": "A room handoff with the prior callback throwing misses the admission owner's write."
+        },
+        {
+          "id": "M9.X69",
+          "rung": "behavior",
+          "defect": "Joining the waitlist puts a new hold on a bed released while the terms were open."
+        },
+        {
+          "id": "M9.X90",
+          "rung": "behavior",
+          "defect": "The accepted bed change skips the service catalogue refresh."
+        },
+        {
+          "id": "M9.X91",
+          "rung": "behavior",
+          "defect": "The page starts a refresh for a stale bed message."
+        },
+        {
+          "id": "M9.X92",
+          "rung": "behavior",
+          "defect": "A forbidden availability request conceals the loss of access."
+        },
+        {
+          "id": "M9.X93",
+          "rung": "behavior",
+          "defect": "A failed availability transport claims its snapshot is confirmed."
+        },
+        {
+          "id": "M9.X94",
+          "rung": "behavior",
+          "defect": "An older availability answer replaces the newer revision and its holder."
+        },
+        {
+          "id": "M9.X95",
+          "rung": "behavior",
+          "defect": "Reconnection announces confirmation before its snapshot answers."
+        },
+        {
+          "id": "M9.X96",
+          "rung": "behavior",
+          "defect": "The refresh button sends a request after the stream is closed."
+        },
+        {
+          "id": "M9.X97",
+          "rung": "behavior",
+          "defect": "The closed stream reports availability as confirmed."
+        },
+        {
+          "id": "M9.X98",
+          "rung": "behavior",
+          "defect": "When the page reconnects, it unloads the independently held bed card and removes the remaining offer."
+        },
+        {
+          "id": "M9.X99",
+          "rung": "behavior",
+          "defect": "Closing the card stops the surviving page stream."
         }
       ],
       "promises": [
@@ -1306,6 +1361,94 @@
           "outcome": "The vendor error appears. Desk Admission Payer is still appended and the next read lists a single accepted ROOM7 review.",
           "opposite": "With the prior callback returning normally the same review is accepted.",
           "defect": "A room handoff with the prior callback throwing misses the admission owner's write."
+        },
+        {
+          "for": "M9.X69",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Join the waitlist after the offered bed becomes free.",
+          "outcome": "W100 is saved. The next availability read still shows BED4 revision 14 available.",
+          "opposite": "Holding the bed while joining leaves it held.",
+          "defect": "Joining the waitlist puts a new hold on a bed released while the terms were open."
+        },
+        {
+          "for": "M9.X90",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Open availability for the window bed, then have another coordinator hold it.",
+          "outcome": "The page shows BED4 revision 13 held by James Reed and the current service catalogue. A fresh availability read agrees.",
+          "opposite": "Before the hold the selected bed is available at revision 12.",
+          "defect": "The accepted bed change skips the service catalogue refresh."
+        },
+        {
+          "for": "M9.X91",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "After the bed is held, deliver an older revision and a change from another community before releasing the bed.",
+          "outcome": "Only the two genuine changes refresh the catalogue. The bed stays at revision 13 until its release and the next read shows revision 14.",
+          "opposite": "A newer change for the selected bed advances the display.",
+          "defect": "The page starts a refresh for a stale bed message."
+        },
+        {
+          "for": "M9.X92",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Hold the availability answer for a new bed change, revoke the coordinator’s community access and release the answer. Restore access and refresh.",
+          "outcome": "The coordinator sees a forbidden notice and the original bed state. The authorised read shows revision 13 held by James Reed.",
+          "opposite": "Access to the community allows reading its updated bed.",
+          "defect": "A forbidden availability request conceals the loss of access."
+        },
+        {
+          "for": "M9.X93",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Drop the availability transport for the next bed change, restore it and ask to refresh.",
+          "outcome": "Availability unconfirmed appears over the old revision. The next read shows James Reed at revision 13.",
+          "opposite": "A working availability connection confirms the current revision.",
+          "defect": "A failed availability transport claims its snapshot is confirmed."
+        },
+        {
+          "for": "M9.X94",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Hold the page's availability answer, open the bed card, hold the message answer and change the bed. Release the message then the page.",
+          "outcome": "The card shows the new hold while the page shows revision 12. Releasing the message updates the page to revision 13 while it stays busy. Releasing the older page answer clears busy and preserves revision 13 and its holder.",
+          "opposite": "The released older answer cannot replace the accepted newer revision.",
+          "defect": "An older availability answer replaces the newer revision and its holder."
+        },
+        {
+          "for": "M9.X95",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Drop the page stream, hold its reconnect snapshot and reopen the stream.",
+          "outcome": "Availability stays unconfirmed until the snapshot answers. The bed remains available at revision 12 and a fresh read agrees.",
+          "opposite": "Reconnecting alone keeps the page idle.",
+          "defect": "Reconnection announces confirmation before its snapshot answers."
+        },
+        {
+          "for": "M9.X96",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Close live availability and ask for a refresh, then open the saved draft again.",
+          "outcome": "Open availability before refreshing. appears and no extra request leaves. Reopening reads the same available revision 12.",
+          "opposite": "While the connection is open a refresh reads the bed.",
+          "defect": "The refresh button sends a request after the stream is closed."
+        },
+        {
+          "for": "M9.X97",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Remove community access while the next connection is held and reopen it. Restore access and retry.",
+          "outcome": "Unavailable status and the offer remain after refusal. Authorised retry confirms BED4 at revision 12.",
+          "opposite": "A coordinator with community access reconnects.",
+          "defect": "The closed stream reports availability as confirmed."
+        },
+        {
+          "for": "M9.X98",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Open the nested bed card and refuse both connections. Allow only the page to reopen and retry, then allow the card and retry.",
+          "outcome": "The page confirms its unchanged bed while the offer remains. Only the card's recovery clears the offer. The next availability read shows revision 12.",
+          "opposite": "With both connections open the offer is hidden.",
+          "defect": "When the page reconnects, it unloads the independently held bed card and removes the remaining offer."
+        },
+        {
+          "for": "M9.X99",
+          "page": "The coordinator opens live availability for a selected bed. The page and its nested card use the world's bed service and independently owned connections.",
+          "gesture": "Close the nested card, change the bed, refuse the surviving page and close its connection.",
+          "outcome": "The page receives revision 13 after the card leaves. Closing the last failed owner clears its offer. The next opening reads the same holder.",
+          "opposite": "An open card receives live updates of its own.",
+          "defect": "Closing the card stops the surviving page stream."
         }
       ],
       "verdicts": []

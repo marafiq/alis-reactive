@@ -513,6 +513,22 @@
           "id": "waitlistTerms",
           "kind": "slot",
           "role": "the slot where the allocation conflict loads the offered community's waitlist terms"
+        },
+        {
+          "id": "availabilityStream",
+          "kind": "stream",
+          "role": "the page's bed availability stream for its draft and community"
+        },
+        {
+          "id": "availabilityCard",
+          "kind": "slot",
+          "role": "the nested bed card with its own live connection"
+        },
+        {
+          "id": "availabilityOffer",
+          "kind": "nativeSlice",
+          "role": "the move-in layout's NativeReconnectOffer for its unavailable connections",
+          "module": "NativeAppLevelObjects"
         }
       ]
     },
@@ -11952,6 +11968,332 @@
         "moveInEndpoint"
       ],
       "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X69",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream",
+        "waitlistForm",
+        "waitlistTerms",
+        "allocationPanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X90",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X91",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream"
+      ],
+      "harness": [
+        "seed",
+        "push",
+        "drop",
+        "reopen"
+      ],
+      "held": [
+        {
+          "verb": "push",
+          "action": "Realtime.tla:Message",
+          "on": "BED4 on the page's stream"
+        },
+        {
+          "verb": "drop",
+          "action": "Realtime.tla:Drop",
+          "on": "the page's availability stream"
+        },
+        {
+          "verb": "reopen",
+          "action": "Realtime.tla:Reconnected",
+          "on": "the page's availability stream"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X92",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream",
+        "notice"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Realtime.tla:Answer",
+          "on": "the selected bed's availability snapshot"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X93",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the availability GET’s retry waits"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X94",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream",
+        "busy",
+        "availabilityCard"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Realtime.tla:Answer",
+          "on": "the selected bed's availability snapshot"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X95",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream",
+        "busy",
+        "availabilityOffer"
+      ],
+      "harness": [
+        "gate",
+        "drop",
+        "reopen"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Realtime.tla:Answer",
+          "on": "the selected bed's availability snapshot"
+        },
+        {
+          "verb": "drop",
+          "action": "Realtime.tla:Drop",
+          "on": "the page's availability stream"
+        },
+        {
+          "verb": "reopen",
+          "action": "Realtime.tla:Reconnected",
+          "on": "the page's availability stream"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X96",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream",
+        "notice",
+        "availabilityOffer"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X97",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream",
+        "availabilityOffer"
+      ],
+      "harness": [
+        "seed",
+        "drop",
+        "reopen"
+      ],
+      "held": [
+        {
+          "verb": "drop",
+          "action": "Realtime.tla:Drop",
+          "on": "the page's availability stream"
+        },
+        {
+          "verb": "reopen",
+          "action": "Realtime.tla:Reconnected",
+          "on": "the page's availability stream"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X98",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream",
+        "availabilityCard",
+        "availabilityOffer"
+      ],
+      "harness": [
+        "refuse",
+        "reopen"
+      ],
+      "held": [
+        {
+          "verb": "refuse",
+          "action": "Realtime.tla:GiveUp",
+          "on": "the selected bed's stream"
+        },
+        {
+          "verb": "reopen",
+          "action": "Realtime.tla:Connect",
+          "on": "the selected bed's stream"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X99",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "locationInputs",
+        "lookupSlots",
+        "moveInEndpoint",
+        "availabilityStream",
+        "availabilityCard",
+        "availabilityOffer"
+      ],
+      "harness": [
+        "seed",
+        "refuse",
+        "reopen"
+      ],
+      "held": [
+        {
+          "verb": "refuse",
+          "action": "Realtime.tla:GiveUp",
+          "on": "the selected bed's stream"
+        },
+        {
+          "verb": "reopen",
+          "action": "Realtime.tla:Connect",
+          "on": "the selected bed's stream"
+        }
+      ]
     }
   ],
   "cells": [

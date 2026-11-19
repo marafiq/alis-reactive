@@ -100,7 +100,6 @@ internal sealed partial class MoveInDesk
     partial void TakeForTheAllocationReview(MoveInChange change)
     {
         if (change.CoordinatorWithoutAdmission is { } coordinator) _world.Coordinators.Single(found => found.Id == coordinator).CanAdmit = false;
-        if (change.BedTaken is true) MoveInSeed.TakeTheBed(_world);
     }
 
     private bool Admits(string coordinatorId) => _world.Coordinators.Any(coordinator => coordinator.Id == coordinatorId && coordinator.CanAdmit);

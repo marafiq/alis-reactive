@@ -1,0 +1,108 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.Realtime
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model AvailabilityPanel
+@{
+    var plan = Html.ReactivePlan<AvailabilityPanel>();
+    var selectedBed = Model.BedId;
+    var stream = ServerPushStream.At<BedAvailabilityFeed>(BedAvailabilityFeed.Address(Model.DraftId, Model.CommunityId, false));
+    void Snapshot(Pipeline<AvailabilityPanel> pipeline, TypedSource<int> since)
+    {
+        pipeline.Get<AvailabilityQuery>(MoveInEndpoints.Availability, request => request
+            .Query(query => query.DraftId, Model.DraftId)
+            .Query(query => query.CommunityId, Model.CommunityId)
+            .Query(query => query.BedId, Model.BedId)
+            .Query(query => query.SinceRevision, since))
+            .OnSuccess<AvailabilityReply>((snapshot, pipeline) =>
+            {
+                var revision = snapshot.Body.Read(reply => reply.Revision);
+                var shown = pipeline.Container<AvailabilityPanel>("availability-state").Read(m => m.DisplayedRevision);
+                pipeline.When(revision.Gte(shown)).Then(pipeline =>
+                {
+                    pipeline.Input(m => m.DisplayedRevision).Component<NativeHiddenField>().Value.Set(pipeline.Concat(revision));
+                    var id = snapshot.Body.Read(reply => reply.Beds).Find(bed => bed.Id == selectedBed, bed => bed.Id);
+                    pipeline.When(snapshot.Body.Read(reply => reply.Beds).Find(bed => bed.Id == selectedBed, bed => bed.Available))
+                        .Then(pipeline => pipeline.Element("availability-bed").Text.Set(pipeline.Concat(id, " revision ", revision, ", available")))
+                        .ElseIf(snapshot.Headers.Get(MoveInEndpoints.BedStateHeader).Eq("Held"))
+                        .Then(pipeline => pipeline.Element("availability-bed").Text.Set(pipeline.Concat(id, " revision ", revision, ", held by ", snapshot.Headers.Get(MoveInEndpoints.BedHolderHeader))))
+                        .ElseIf(snapshot.Headers.Get(MoveInEndpoints.BedStateHeader).Eq("Occupied"))
+                        .Then(pipeline => pipeline.Element("availability-bed").Text.Set(pipeline.Concat(id, " revision ", revision, ", occupied by ", snapshot.Headers.Get(MoveInEndpoints.BedHolderHeader))))
+                        .Else(pipeline => pipeline.Element("availability-bed").Text.Set(pipeline.Concat(id, " revision ", revision, ", closed")));
+                    pipeline.Element("availability-status").Text.Set("Availability confirmed");
+                });
+            })
+            .OnError<ErrorEnvelope>(403, (refused, pipeline) =>
+            {
+                pipeline.Element("availability-status").Text.Set(refused.Body.Read(reply => reply.Error.Message));
+                pipeline.Notice().Error(refused.Body.Read(reply => reply.Error.Message));
+            })
+            .OnError((failed, pipeline) => pipeline.Element("availability-status").Text.Set("Availability unconfirmed"));
+    }
+}
+<h2>Bed availability</h2>
+@using (var state = Html.BeginRequestContainer(plan, "availability-state"))
+{
+    @(Html.NativeHiddenField(plan, m => m.DisplayedRevision))
+    <p id="availability-bed">Reading bed availability</p>
+    <p id="availability-status">Availability unconfirmed</p>
+    <p id="availability-services"></p>
+    @(Html.NativeButton("refresh-availability", "Refresh availability").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .When(pipeline.Stream(stream).State.Eq(ConnectionState.Closed))
+        .Then(pipeline =>
+        {
+            pipeline.Notice().Warning("Open availability before refreshing.");
+            pipeline.Element("availability-status").Text.Set("Open availability before refreshing.");
+        })
+        .Else(pipeline => Snapshot(pipeline, state.Container.Read(m => m.DisplayedRevision)))))
+    @(Html.NativeButton("close-availability", "Close availability").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        pipeline.Stream(stream).Close();
+        pipeline.Element("availability-status").Text.Set("Availability closed");
+    }))
+    @(Html.NativeButton("open-bed-card", "Open bed card").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Get<AvailabilityQuery>(MoveInEndpoints.AvailabilityCard, request => request
+            .Query(query => query.DraftId, Model.DraftId)
+            .Query(query => query.CommunityId, Model.CommunityId)
+            .Query(query => query.BedId, Model.BedId))
+        .Into("nested-bed-card")))
+    @(Html.NativeButton("close-bed-card", "Close bed card").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Unload("nested-bed-card")))
+    <div id="nested-bed-card"></div>
+    Html.On(plan, trigger => trigger
+        .ServerPush(stream, feed => feed.Opened, (opened, pipeline) => pipeline
+            .When(state.Container.Read(m => m.DisplayedRevision).Eq(0))
+            .Then(pipeline => Snapshot(pipeline, state.Container.Read(m => m.DisplayedRevision))))
+        .ServerPush(stream, feed => feed.BedChanged, (change, pipeline) =>
+        {
+            var revision = change.Read(message => message.Bed.Revision);
+            pipeline.When(change.Read(message => message.CommunityId).Eq(Model.CommunityId)
+                .And(change.Read(message => message.Bed.Id).Eq(Model.BedId))
+                .And(revision.Gt(state.Container.Read(m => m.DisplayedRevision))))
+                .Then(pipeline =>
+                {
+                    pipeline.When(change.Read(message => message.Bed.Available))
+                        .Then(pipeline => pipeline.Element("availability-status").Text.Set("Confirming reported availability"))
+                        .Else(pipeline => pipeline.Element("availability-status").Text.Set("Confirming reported loss of availability"));
+                    pipeline.Parallel(
+                        pipeline => Snapshot(pipeline, revision),
+                        pipeline => pipeline.Get<ServiceCatalogueQuery>(MoveInEndpoints.Services, request => request
+                            .Query(query => query.DraftId, Model.DraftId)
+                            .Query(query => query.CareLevel, pipeline.Container<MoveInPage>("move-in").Read(m => m.Care.Level))
+                            .Query(query => query.PayerKind, Model.PayerKind)
+                            .Query(query => query.Culture, System.Globalization.CultureInfo.CurrentCulture.Name))
+                            .NoValidation()
+                            .OnSuccess<List<ServiceDefinition>>((catalogue, pipeline) => pipeline.Element("availability-services").Text.Set(
+                                pipeline.Concat(catalogue.Body.Count(service => service.Available), " services, price revision ", change.Read(message => message.PriceRevision))))
+                            .OnError((failed, pipeline) => pipeline.Element("availability-services").Text.Set("Service catalogue unavailable")));
+                });
+        })
+        .ServerPush(stream, feed => feed.Reconnecting, pipeline => pipeline.Element("availability-status").Text.Set("Availability unconfirmed"))
+        .ServerPush(stream, feed => feed.Reconnected, pipeline => Snapshot(pipeline, state.Container.Read(m => m.DisplayedRevision)))
+        .ServerPush(stream, feed => feed.Closed, pipeline => pipeline.Element("availability-status").Text.Set("Availability unavailable")));
+}
+@Html.RenderPlan(plan)

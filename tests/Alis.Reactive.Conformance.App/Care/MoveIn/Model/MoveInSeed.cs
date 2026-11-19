@@ -86,7 +86,7 @@ internal static class MoveInSeed
     {
         var windowBed = BedsOf(world).Single(bed => bed.Id == "BED4");
         windowBed.State = BedState.Held;
-        windowBed.Revision = 13;
+        windowBed.Revision++;
         windowBed.Holder = new BedHolder { ResidentId = "R104", Name = "James Reed" };
         windowBed.Hold = new BedHold { CoordinatorId = "CO2", ExpiresAt = new DateTimeOffset(2026, 11, 18, 9, 45, 0, TimeSpan.FromHours(-5)) };
     }
