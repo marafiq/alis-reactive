@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 02:28:35 EST 2026
+Written at `date`: Thu Nov 19 02:47:11 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -20,6 +20,9 @@ note: open 2026-11-18 | decision | spec/CLAUDE.md | DecisionsByModule | "where y
 note: open 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses 
 note: open 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSlice1 | "For the app, you
 note: open 2026-11-18 | direction | the queue of this file | queue | "I don't need acceptance numbers, sir. I need that
+note: open 2026-11-19 | direction | the queue of this file | queue | "please do not do patch fix, do proper root cause 
+note: open 2026-11-19 | direction | the queue of this file | queue | "Produce the Fusion audit first." Then "we should 
+note: open 2026-11-19 | quality rule | spec/FusionComponents/module.md and .claude/skills/onboard-component/SKILL.md | 
 unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
   leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
@@ -38,12 +41,12 @@ unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
   leaves by: `git worktree remove {worktree}`
   goes to: gone
-lane: pushed at a95511ce6 on feature/rewrite: equal to the remote
+lane: pushed at 240edd3be on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at a95511ce6
+ci: unread at 240edd3be
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -52,23 +55,23 @@ file: over CLAUDE.md: holds 326 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 290 lines, its limit 150
+file: over HANDOFF.md: holds 308 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: a95511ce6 build: retire the withdrawn picomatch audit exception
-- Full check: .work/logs/spec-check-a95511ce6.log: spec check at a95511ce6: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-021729-16074 a95511ce6
+- HEAD: 240edd3be conformance app: add contacts, record authority and remove contacts from a move-in (MI.5–MI.7)
+- Full check: .work/logs/spec-check-240edd3be.log: spec check at 240edd3be: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-023531-61179 240edd3be
 
 ## Landed since the commit before the last spec: STATE commit
-a95511ce6 build: retire the withdrawn picomatch audit exception
-d13a4ce7f spec: STATE and handoff at e02fafe66
+240edd3be conformance app: add contacts, record authority and remove contacts from a move-in (MI.5–MI.7)
+89488f935 spec: STATE and handoff at a95511ce6
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 552; named by a browser test: 533; with no browser test: 19
+feature promises: 567; named by a browser test: 548; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -113,7 +116,11 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-None.
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 350 to 357
+- A rule or a tool's list not applied before the change: 387 to 390
+- A number, a proof line or an absence not read from the run that proves it: 56 to 57
+- A shell command or a script wrong in its own terms: 548 to 551
+- A fault found in an agent's work whose instruction the brief did not give: 9 to 12
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -142,6 +149,9 @@ spec/CLAUDE.md:2007: - The owner, 2026-11-18, on the app that proves the framewo
 - 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses a plan opened over dynamic or object | TypedDoors | "Dude, why would you use dynamic? The whole point of the framework is tight, and you end up using dynamic. What a pity."
 - 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSlice1 | "For the app, you need to build fake data ... Sending request isn't enough. It has to send the correct payload so you can observe what is being returned, what is being changed ... you gotta build the domain model of the apps in memory so that you can observe real behavior rather than just assume, oh, I sent the request."
 - 2026-11-18 | direction | the queue of this file | queue | "I don't need acceptance numbers, sir. I need that complex app behavior asserted and proved. I am done with hearing excuses or fake numbers."
+- 2026-11-19 | direction | the queue of this file | queue | "please do not do patch fix, do proper root cause fix with proof, this is super important quality bar" for Fusion member and payload onboarding.
+- 2026-11-19 | direction | the queue of this file | queue | "Produce the Fusion audit first." Then "we should be doing audit, and fixing skill, and checks, so we do not re-work like crazy all the time."
+- 2026-11-19 | quality rule | spec/FusionComponents/module.md and .claude/skills/onboard-component/SKILL.md | FusionAudit | "each component is vertical slice, and we do not share even event classes, if its complex, it uses nested classes."
 <!-- /notes -->
 
 ## Next
@@ -165,9 +175,11 @@ November 18 and a live audit confirmed zero findings with picomatch still pinned
 `.work/logs/land-unit-d13a4ce7f-14028.log`. The owner authorized retiring the exception. The separate audit
 unit landed at `a95511ce6`. The live audit reported no advisories, the three focused cases passed, the full
 browser run printed 651 passed with no failures or over-budget tests, and the committed spec check passed
-40 of 40. Retry contacts from `../movein-contacts` through the landing script. Its previous staged tree is
-verified at `.work/movein-contacts-before-audit-yv_ws7bs/contacts.patch`. Land the startup scope unit after
-contacts.
+40 of 40. Contacts resumed from the preserved worktree and landed at `240edd3be`. The full browser run
+printed 666 passed, 0 failed and 0 over budget. The comparison preserved all 651 previous passes and added
+15 for contact rows, contact authority and removal. The full spec check passed 40 of 40. MI.16 still owns the
+shared Save draft command, and MI.2.2's care eligibility condition remains open. The startup scope rule is ready
+in `../movein-scope`, and the owner asked for the Fusion audit before the skill and check changes.
 
 RESUME UPDATE, 2026-11-19: The owner asked Codex to resume from this handoff. Read the root `CLAUDE.md`/`AGENTS.md`,
 all repo `CLAUDE.md` files and the six `.claude/rules/` files before acting. The rewrite branch is at
@@ -284,6 +296,15 @@ third fixes; the app's spec, `spec/Reference/move-in.md`.
 Deferred, no process work goes ahead of the app: the decisions split by module (`spec/CLAUDE.md` is over 2,000 lines;
 its brief is written); root CLAUDE.md cut to its limit; this file cut to its limit; the conformance component's
 three members with their cells.
+
+The November 19 Fusion audit found that EJ2 33.1.47 ComboBox inherits the live `dataSource` property from
+`DropDownBase`. The rewrite's two public API surfaces omit a typed live data-source door for ComboBox, and
+M21.N13 covers the initial Razor builder and other live members. ComboBox's `Change` exposes `Value` and
+`IsInteracted`. The pinned code also emits `itemData` and `previousItemData`, which its types describe as
+`FieldSettingsModel`. Fusion's project references the analyzers and does not import `VendorContract.targets`.
+`RootMemberDoor` skips those checks when the table is absent. The Fusion audit behind the app compares each
+inherited public member and each payload recursively against the pinned API, using live evidence where the type is
+ambiguous. Schedule's typed popup data and MultiSelect's typed tagging data are existing examples.
 
 Behind the app, the framework's open list: a Native date input and an input over a date (the app's gap 1); a list
 of files in a request form (D14.3; the runtime throws notBuilt); a validation check on a text or a file body (refused
