@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 05:18:31 EST 2026
+Written at `date`: Thu Nov 19 12:47:17 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -46,10 +46,8 @@ unit: unbriefed ../fusion-combobox-follow-through IntegrationPrep: brief.md lack
   read first: the files of a unit, below
   goes to: unit: briefed
 unit: returned ../fusion-combobox-live-catalogue FusionComboBoxLiveCatalogue: reply.md waits for read.md
-unit: landed ../fusion-combobox-onboarding-notes FusionOnboardingNotes
-  next: git worktree remove ../fusion-combobox-onboarding-notes
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: ready ../fusion-combobox-onboarding-notes FusionOnboardingNotes
+  next: scripts/land-unit.sh ../fusion-combobox-onboarding-notes d67e15d16 "Resolve pinned ComboBox citations and clarify DataManager onboarding" ".landing/FusionOnboardingNotes"
 unit: returned ../fusion-combobox-onboarding-replay FusionComboBoxOnboardingReplay: reply.md waits for read.md
 unit: ready ../fusion-combobox-payload FusionComboBoxPayload
   next: scripts/land-unit.sh ../fusion-combobox-payload 9c77fd7d8 "Prove typed ComboBox changes on Helen Martinez's communication plan" ".landing/FusionComboBoxPayload"
@@ -61,16 +59,19 @@ unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   read first: the rule file of each kind of file, as it is opened
   exit line: each line of the brief's "Done"
   goes to: unit: ready, or unit: returned for an agent
-unit: building ../movein-owners-restarted MoveInOwners: it lacks paths.txt or message.txt
+unit: ready ../movein-owners-restarted MoveInOwners
+  next: scripts/land-unit.sh ../movein-owners-restarted 21d6a2ec4 "Implement MI.18 waitlisting and MI.28–29 assessment and room owners" ".landing/MoveInOwners"
 unit: ready ../movein-scope MoveInSessionScope
   next: scripts/land-unit.sh ../movein-scope d13a4ce7f "Keep move-in implementation and builder proof within scope" ".landing/MoveInSessionScope"
 unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
-lane: checking at 1b64776dd on feature/rewrite
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
+lane: checking at 2c77b1a04 on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 1b64776dd
+ci: unread at 2c77b1a04
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -79,10 +80,10 @@ file: over CLAUDE.md: holds 326 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 377 lines, its limit 150
+file: over HANDOFF.md: holds 401 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 13 units have landed since .claude/rules/process.md last changed
+machine: review due : 14 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -90,18 +91,17 @@ machine: review due : 13 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 1b64776dd Resolve pinned ComboBox citations and clarify DataManager onboarding
-- Full check: .work/logs/spec-check-1b64776dd.log: spec check at 1b64776dd: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-050725-51051 1b64776dd
+- HEAD: 2c77b1a04 Implement MI.18 waitlisting and MI.28–29 assessment and room owners
+- Full check: .work/logs/spec-check-2c77b1a04.log: spec check at 2c77b1a04: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-123541-51720 2c77b1a04
 
 ## Landed since the commit before the last spec: STATE commit
-1b64776dd Resolve pinned ComboBox citations and clarify DataManager onboarding
-d67e15d16 Prove ComboBox search, live configuration and real EJ2 Promises
-21d6a2ec4 spec: STATE and handoff at 5f77ce2a6
+2c77b1a04 Implement MI.18 waitlisting and MI.28–29 assessment and room owners
+f9d5617f7 spec: STATE and handoff at 1b64776dd
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 583; named by a browser test: 564; with no browser test: 19
+feature promises: 599; named by a browser test: 580; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -146,10 +146,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 360 to 363
-- A rule or a tool's list not applied before the change: 394 to 401
-- A number, a proof line or an absence not read from the run that proves it: 57 to 58
-- A shell command or a script wrong in its own terms: 553 to 559
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 363 to 370
+- A rule or a tool's list not applied before the change: 401 to 403
+- A shell command or a script wrong in its own terms: 559 to 563
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -370,6 +369,27 @@ check resolved all 1,052 citations and its three existing plants returned the ex
 The fresh Astra xhigh builder for MI.18/28/29 has started in `../movein-owners-restarted` at `21d6a2ec4`, with
 the 17 current part 6 situations and the landed Contacts dependency. The original `../movein-owners` brief
 and modified `spec/STATE.json` stay preserved. All proof commands queue behind the same build lock.
+The retry completed the builder work. The isolated screen passed all 50 cases and the 16 new situations
+caught their planted defects. The compiled file matched all 681 page-door entries in the builder worktree.
+The integrated replay carries 691 entries and adds exactly 16 MoveIn promises. The landing lane now
+takes the waitlist, nested assessment owners and room handoff batch. E25 follows in MI.17, E30 and the
+reserved waitlist scenario X69 follow in MI.20, and the authority-specific E44 shape is recorded in part 9.
+The original worktrees and saved evidence stay available.
+The integrated lane landed the batch at `2c77b1a04`. The full browser run passed all 698 with zero
+failures or overruns, including all 682 prior passes and the 16 new situations. The root build had
+zero warnings or errors and matched all 691 compiled page-door entries. Waitlist history rereads W100,
+the draft stays Open and BED4 remains held. The replaced assessment owner records once after the
+real nested unsubscribe refusal. Room history reopens ROOM7 and the payer contact is a separate
+successful E10 read. The next app batch is MI.20 and MI.21, including the pending X69 availability
+read. Earlier saved proofs retain their original results.
+
+
+At the Fusion push the local browser run passed all 682 and the committed spec check passed 40 of 40.
+CI on that pushed state had one host test over its 7.44 second budget at 7.69 seconds. The Windows
+browser job is still refused at startup because the conformance harness has no net48 host. The spec job
+was cancelled and the proof job reported its cancelled prerequisite. This app batch leaves the harness
+and framework unchanged.
+
 
 Behind the app, the framework's open list: a Native date input and an input over a date (the app's gap 1); a list
 of files in a request form (D14.3; the runtime throws notBuilt); a validation check on a text or a file body (refused
