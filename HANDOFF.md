@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Fri Nov 20 17:24:43 EST 2026
+Written at `date`: Fri Nov 20 17:53:50 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -35,14 +35,16 @@ unit: ready ../ci-tlc-cold SpecCiCold
   goes to: unit: landed
 unit: ready ../ci-tlc-mac MacTlc
   next: scripts/land-unit.sh ../ci-tlc-mac bbe7e4869 "Run model checking on the Mac and validate its evidence in CI" ".landing/MacTlc"
-unit: landed ../framework-multipart-file-list MultipartFileList
-  next: git worktree remove ../framework-multipart-file-list
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: ready ../framework-multipart-file-list MultipartFileList
+  next: scripts/land-unit.sh ../framework-multipart-file-list 41c752166 "Send a bound list of files as repeated multipart parts" ".landing/MultipartFileList"
 unit: unbriefed ../framework-native-date NativeDateInput: its Rules name DateWire.tla, which the worktree lacks
   leaves by: the brief is completed, before any work
   read first: the files of a unit, below
   goes to: unit: briefed
+unit: landed ../framework-native-date-value NativeDateValue
+  next: git worktree remove ../framework-native-date-value
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
 unit: ready ../fusion-audit FusionAudit
   next: scripts/land-unit.sh ../fusion-audit 9c77fd7d8 "Fusion audit: compare the pinned vendor contract and improve component onboarding" ".landing/FusionAudit"
 unit: returned ../fusion-combobox-data-manager FusionComboBoxDataManager: reply.md waits for read.md
@@ -97,12 +99,12 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: pushed at 76452da4c on feature/rewrite: equal to the remote
+lane: pushed at 16bafe33d on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 76452da4c
+ci: unread at 16bafe33d
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -111,10 +113,10 @@ file: over CLAUDE.md: holds 338 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2080 lines, its limit 150
-file: over HANDOFF.md: holds 858 lines, its limit 150
+file: over HANDOFF.md: holds 865 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 32 units have landed since .claude/rules/process.md last changed
+machine: review due : 33 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -122,17 +124,17 @@ machine: review due : 32 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 76452da4c Send a bound list of files as repeated multipart parts
-- Full check: .work/logs/spec-check-76452da4c.log: spec check at 76452da4c: 40 of 40 checks pass
-- .work/last-run.txt: 20261120-171125-65955 76452da4c
+- HEAD: 16bafe33d Preserve saved DateTime values in Native textboxes
+- Full check: .work/logs/spec-check-16bafe33d.log: spec check at 16bafe33d: 40 of 40 checks pass
+- .work/last-run.txt: 20261120-174004-48382 16bafe33d
 
 ## Landed since the commit before the last spec: STATE commit
-76452da4c Send a bound list of files as repeated multipart parts
-41c752166 spec: STATE and handoff at 574cfb8e8
+16bafe33d Preserve saved DateTime values in Native textboxes
+1733be893 spec: STATE and handoff at 76452da4c
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 718; named by a browser test: 699; with no browser test: 19
+feature promises: 719; named by a browser test: 700; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -177,8 +179,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 433 to 435
-- A shell command or a script wrong in its own terms: 608 to 610
+- A rule or a tool's list not applied before the change: 435 to 436
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
@@ -229,11 +230,14 @@ consult when the contract is unclear and a scoped builder when the source and fa
    writer. The real MVC endpoint bound the two selected files in order and zero for an empty
    selection. The scalar-only plant failed the same test. The old separate-row upload passed and
    the compiled page comparison preserved all 809 prior rows. The new browser proof runs on net10.
+   GitHub run 44828753072 accounted for all 830 cases exactly once. Both delivery hosts passed.
 2. **Native textbox date preservation.** The move-in foundation gap 1 recorded a saved DateTime
-   rendered as culture text and lost on Reactive save. D17.13 gives the existing Native helper the
-   plan's literal model value. The scoped source consult in the NativeDateInput worktree identifies
-   a correction on the two MVC render helpers, with their attempted-text precedence preserved.
-   Use a real saved admission, an unchanged prefilling and MVC's bound receipt to prove it.
+   rendered as culture text and lost on Reactive save. The existing Native textbox now uses the
+   plan's ISO live date for the initial value of a DateTime or DateTime? and keeps MVC's attempted
+   text. M24.X15 proves the actual MVC receipt holds the saved day, 14:35:08.123 orientation and
+   null discharge under de-DE. The old culture format failed before the change and on its plant.
+   The existing attempted-text regression passed on net10. The Native package built both targets.
+   Read the net48 execution from the Windows job at the pushed commit.
 3. **MVC 5 date response proof.** X3.7 separately promises that the framework JSON response carries
    a date of birth to a browser in a different time zone. The placement is net48. Prove it under
    Windows IIS before counting that promise closed.
