@@ -1,0 +1,54 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionPacketDesk
+@{
+    var plan = Html.ReactivePlan<AdmissionPacketDesk>();
+}
+<h3>Admission packet</h3>
+<a href="@Url.Action(nameof(MoveInDeskController.DownloadPacket), new { draftId = Model.DraftId, requirements = true })">Packet requirements</a>
+<p id="packet-quote">@(Model.AcceptedRevision is { } revision ? $"Accepted quote revision {revision}." : "No accepted quote.")</p>
+<p id="packet-note-file">@Model.Note</p>
+<p id="packet-print-file">@Model.Print</p>
+@(Html.NativeButton("download-packet", "Download packet").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+{
+    var revision = pipeline.Container<MoveInPage>("move-in").Read(m => m.AcceptedQuoteRevision);
+    pipeline.When(revision.Gt(0)).Then(pipeline => pipeline
+        .Get<AdmissionPacketQuery>(MoveInEndpoints.Packet, request => request.Path(m => m.DraftId, Model.DraftId)
+            .Query(m => m.QuoteRevision, revision).Query(m => m.Culture, "en-US"))
+        .NoRetry().Download()
+        .OnError((failed, pipeline) => pipeline.Element("packet-status").Text.Set("Packet download unavailable."))
+        .Chained((file, pipeline) => pipeline.Element("packet-download").Text.Set(pipeline.Concat(
+            file.Body.Read(r => r.Name), " · ", file.Body.Read(r => r.Type), " · ", file.Body.Read(r => r.Size), " bytes"))))
+        .Else(pipeline => pipeline.Element("packet-status").Text.Set("Accept a quote before creating the packet."));
+}))
+@(Html.NativeButton("preview-packet", "Preview packet").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+{
+    var revision = pipeline.Container<MoveInPage>("move-in").Read(m => m.AcceptedQuoteRevision);
+    pipeline.When(revision.Gt(0)).Then(pipeline => pipeline
+        .Get<AdmissionPacketQuery>(CareEndpoints.MoveInPacketPreview, request => request.Query(m => m.DraftId, Model.DraftId)
+            .Query(m => m.QuoteRevision, revision)).Into("packet-preview"))
+        .Else(pipeline => pipeline.Element("packet-status").Text.Set("Accept a quote before creating the packet."));
+}))
+@(Html.NativeButton("save-packet-note", "Save packet note").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+{
+    var draft = pipeline.Container<MoveInPage>("move-in");
+    pipeline.Post<AdmissionPacketQuery>(MoveInEndpoints.PacketNotes, request => request
+            .Path(m => m.DraftId, Model.DraftId).Query(m => m.CoordinatorId, draft.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.CoordinatorHeader, draft.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, draft.Read(m => m.OperationId))
+            .Header(MoveInEndpoints.PageUrl, pipeline.Plugin<AdmissionPagePlugin>().Url)
+            .Text(draft.Read(m => m.Resident.Notes)))
+        .NoValidation()
+        .OnSuccess(Content.Text, (note, pipeline) => pipeline.Element("packet-note-status").Text.Set(note.Body))
+        .OnError(422, Content.Text, (refused, pipeline) => pipeline.Element("packet-note-status").Text.Set(refused.Body));
+}))
+<p id="packet-status">Ready to prepare the packet.</p>
+<p id="packet-download">No packet downloaded.</p>
+<p id="packet-note-status"></p>
+<div id="packet-preview"></div>
+@Html.RenderPlan(plan)

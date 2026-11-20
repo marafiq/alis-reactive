@@ -1,3 +1,5 @@
+import { initials } from "../../Components/initials";
+
 class ShiftLog extends EventTarget {
   override addEventListener(type: "signed", callback: ((event: Event) => void) | null, options?: boolean | AddEventListenerOptions): void;
   override addEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void;
@@ -48,14 +50,6 @@ const bedStore: BedStore = {
     };
   },
 };
-
-function initials(name: string): string {
-  return name
-    .split(" ")
-    .filter((word) => word !== "")
-    .map((word) => word.charAt(0))
-    .join("");
-}
 
 function provide(name: string, instance: unknown): void {
   const queue: unknown = Reflect.get(window, "__alisPlugins");

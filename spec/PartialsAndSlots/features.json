@@ -1139,6 +1139,81 @@
           "id": "M9.X229",
           "rung": "behavior",
           "defect": "The refresh replaces the draft actions markup without releasing the owner of the open question."
+        },
+        {
+          "id": "M9.X230",
+          "rung": "behavior",
+          "defect": "The second repeated multipart file part is omitted."
+        },
+        {
+          "id": "M9.X231",
+          "rung": "behavior",
+          "defect": "The file selection accepts an executable extension or media type."
+        },
+        {
+          "id": "M9.X232",
+          "rung": "behavior",
+          "defect": "The scan accepts a quarantined second file."
+        },
+        {
+          "id": "M9.X233",
+          "rung": "behavior",
+          "defect": "The dropped upload reaches the document store before transport failure."
+        },
+        {
+          "id": "M9.X234",
+          "rung": "behavior",
+          "defect": "Closing the upload card before commit rolls back a batch the server already received."
+        },
+        {
+          "id": "M9.X235",
+          "rung": "behavior",
+          "defect": "The committed document uses the old consent bytes instead of the selected whole file."
+        },
+        {
+          "id": "M9.X236",
+          "rung": "behavior",
+          "defect": "An empty picker bypasses the file selection refusal."
+        },
+        {
+          "id": "M9.X237",
+          "rung": "behavior",
+          "defect": "The replacement ignores the If-Match header."
+        },
+        {
+          "id": "M9.X238",
+          "rung": "behavior",
+          "defect": "A failed metadata read reports that the signature is ready."
+        },
+        {
+          "id": "M9.X239",
+          "rung": "behavior",
+          "defect": "Closing the signature picker retains its file source for the pending replacement."
+        },
+        {
+          "id": "M9.X240",
+          "rung": "behavior",
+          "defect": "The downloaded packet uses a filename from a different draft."
+        },
+        {
+          "id": "M9.X241",
+          "rung": "behavior",
+          "defect": "The download guard lets an unaccepted quote request a packet."
+        },
+        {
+          "id": "M9.X242",
+          "rung": "behavior",
+          "defect": "A sealed packet still records the note."
+        },
+        {
+          "id": "M9.X243",
+          "rung": "behavior",
+          "defect": "A failed packet download writes a success receipt."
+        },
+        {
+          "id": "M9.X244",
+          "rung": "behavior",
+          "defect": "The print-intent endpoint accepts the superseded packet revision."
         }
       ],
       "promises": [
@@ -2307,6 +2382,126 @@
           "outcome": "The new owner shows version 8 and the old question closes. No DELETE was sent. Reopening reads Open and Luis's saved notes.",
           "opposite": "A question whose owner stays open accepts a person's explicit answer.",
           "defect": "The refresh replaces the draft actions markup without releasing the owner of the open question."
+        },
+        {
+          "for": "M9.X230",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Select Helen's consent and medication list, caption them, upload and reopen the draft.",
+          "outcome": "The receipt names both accepted files and the draft lists the two 14-byte documents with their submitted caption and kind.",
+          "opposite": "An unopened upload has no stored files.",
+          "defect": "The second repeated multipart file part is omitted."
+        },
+        {
+          "for": "M9.X231",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Select an executable, then replace a supported file while its upload policy is held.",
+          "outcome": "Unsupported files show the file type refusal and send no POST, including when the policy has already been requested. Reopening shows an empty document register.",
+          "opposite": "Plain text consent can be selected.",
+          "defect": "The file selection accepts an executable extension or media type."
+        },
+        {
+          "for": "M9.X232",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Upload a consent together with a text file containing the quarantined bytes.",
+          "outcome": "The document scan refuses the batch and the reopened register is empty.",
+          "opposite": "A clean second document commits with the first.",
+          "defect": "The scan accepts a quarantined second file."
+        },
+        {
+          "for": "M9.X233",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Send a signed consent after the upload connection is lost.",
+          "outcome": "The upload error appears and reopening the register shows no accepted documents.",
+          "opposite": "A delivered batch creates its receipt.",
+          "defect": "The dropped upload reaches the document store before transport failure."
+        },
+        {
+          "for": "M9.X234",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Hold the upload before commit, close its card, reopen it and release the upload.",
+          "outcome": "The replacement keeps its own status and a subsequent read shows the batch the server committed.",
+          "opposite": "A card kept open receives the acceptance and chains its receipt.",
+          "defect": "Closing the upload card before commit rolls back a batch the server already received."
+        },
+        {
+          "for": "M9.X235",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Inspect the consent, choose Helen's signed text and replace the signature, then inspect the saved document.",
+          "outcome": "The coordinator reads 14 bytes on the consent and 11 bytes on the stored revision 2 signature. The reopened register shows Helen's signed text.",
+          "opposite": "An empty picker keeps the consent revision.",
+          "defect": "The committed document uses the old consent bytes instead of the selected whole file."
+        },
+        {
+          "for": "M9.X236",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Inspect the consent, then ask to replace it with an empty picker and inspect after reopening.",
+          "outcome": "Choose a signature file appears. No PUT is sent and consent still has 14 bytes at revision 1.",
+          "opposite": "Selecting the signature sends its bytes.",
+          "defect": "An empty picker bypasses the file selection refusal."
+        },
+        {
+          "for": "M9.X237",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Send Helen's signature, pause before commit and let another coordinator revise the consent metadata.",
+          "outcome": "The version conflict keeps the original consent bytes and the next HEAD reports the other coordinator's revision.",
+          "opposite": "An unchanged revision accepts the signature.",
+          "defect": "The replacement ignores the If-Match header."
+        },
+        {
+          "for": "M9.X238",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Try to replace the consent while its metadata service returns 503.",
+          "outcome": "Document metadata unavailable appears, no replacement is sent and the reopened document still contains the consent.",
+          "opposite": "A successful HEAD allows a selected signature to be sent.",
+          "defect": "A failed metadata read reports that the signature is ready."
+        },
+        {
+          "for": "M9.X239",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Hold the metadata reply of a selected signature and remove its picker or select an executable before releasing the reply.",
+          "outcome": "An absent or invalid required signature sends no PUT, and the next read still shows the consent bytes.",
+          "opposite": "A picker that remains mounted supplies its selected file.",
+          "defect": "Closing the signature picker retains its file source for the pending replacement."
+        },
+        {
+          "for": "M9.X240",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Download the accepted revision, save the resident's note from a referred page, request printing and reopen the draft.",
+          "outcome": "The browser saves admission-D100.txt. The saved packet preview has the literal admission text, PN100 holds the entered note and page address, and PRINT100 identifies HW and revision 3.",
+          "opposite": "An unaccepted quote cannot produce a packet.",
+          "defect": "The downloaded packet uses a filename from a different draft."
+        },
+        {
+          "for": "M9.X241",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Ask for the unaccepted draft's packet and reopen the draft.",
+          "outcome": "Accept a quote before creating the packet appears, the packet endpoint sees no request, and the reopened draft shows unaccepted.",
+          "opposite": "An accepted current quote yields the packet.",
+          "defect": "The download guard lets an unaccepted quote request a packet."
+        },
+        {
+          "for": "M9.X242",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Seal the packet before saving the resident's note, then reopen the draft.",
+          "outcome": "Packet is sealed appears. The reopened history contains no packet note.",
+          "opposite": "An open packet records PN100.",
+          "defect": "A sealed packet still records the note."
+        },
+        {
+          "for": "M9.X243",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Request a packet after the service becomes unavailable and reopen the draft.",
+          "outcome": "The unnamed 503 reaches the failure route. No download receipt appears and the draft still has its accepted revision.",
+          "opposite": "A successful file response creates a download receipt.",
+          "defect": "A failed packet download writes a success receipt."
+        },
+        {
+          "for": "M9.X244",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Open the accepted packet preview, let pharmacy reprice the quote, request printing and reopen the draft.",
+          "outcome": "The stale intent is refused. The current quote reads 3060.00 and history has no PRINT100.",
+          "opposite": "Printing the unchanged revision records PRINT100 and invokes the page print operation.",
+          "defect": "The print-intent endpoint accepts the superseded packet revision."
         }
       ],
       "verdicts": []

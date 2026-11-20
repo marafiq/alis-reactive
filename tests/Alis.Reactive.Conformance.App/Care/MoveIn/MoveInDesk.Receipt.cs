@@ -9,6 +9,7 @@ internal sealed partial class MoveInDesk
     {
         lock (_gate)
         {
+            if (_documentReceipts.TryGetValue((draftId, reference), out var documents)) return new ReceiptPage { Reference = reference, Text = documents };
             if (_draftReceipts.TryGetValue((draftId, reference), out var receipt))
                 return new ReceiptPage { Reference = reference, Text = $"{reference}: version {receipt.Version} saved by {receipt.SavedBy.Name}." };
             var review = _world.Reviews.FirstOrDefault(found => found.DraftId == draftId && ReferenceOfTheReceiptOf(found) == reference);

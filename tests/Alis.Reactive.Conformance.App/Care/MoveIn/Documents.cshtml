@@ -1,0 +1,93 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Declarations
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model DocumentsPage
+@{
+    var plan = Html.ReactivePlan<DocumentsPage>();
+    LiveObjects<BrowserFile> Selected(Pipeline<DocumentsPage> pipeline) => pipeline.Component<AdmissionFileInput>("admission-files").Files.Items;
+    TypedSource<bool> Supported(BrowserFile file) => file.Name.EndsWith(".txt").And(file.Type.Eq("text/plain"))
+        .Or(file.Name.EndsWith(".pdf").And(file.Type.Eq("application/pdf")));
+}
+@using (var documents = Html.BeginRequestContainer(plan, "admission-documents"))
+{
+    @(Html.NativeHiddenField(plan, m => m.Version))
+    @(Html.InputField(plan, m => m.Caption, o => o.Label("Document caption")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Kind, o => o.Label("Document kind")).NativeDropDown(o => o.Items(Enum.GetValues<DocumentKind>().Select(kind => new SelectListItem(kind.ToString(), kind.ToString())))))
+    <label for="admission-files">Admission files</label>
+    @(plan.AdmissionFiles("admission-files", true).Reactive(input => input.Change, (changed, pipeline) =>
+    {
+        var files = Selected(pipeline);
+        pipeline.When(files.Any().And(files.All(Supported)))
+            .Then(pipeline =>
+            {
+                var total = files.Select(file => file.Size).Sum(size => (double)size);
+                var newest = files.Select(file => file.LastModified).OrderByDescending(modified => modified).Find(modified => true);
+                pipeline.Element("selected-documents").Text.Set(pipeline.Concat(files.Count(), " files selected · ", total, " bytes"));
+                pipeline.Element("latest-document").Text.Set(pipeline.Concat("Most recently modified: ", files.Find(file => file.LastModified.Eq(newest)).Name));
+            })
+            .Else(pipeline =>
+            {
+                pipeline.Element("selected-documents").Text.Set("Unsupported document type.");
+                pipeline.Element("latest-document").Text.Set("");
+            });
+    }))
+    <p id="selected-documents">Choose admission files.</p>
+    <p id="latest-document"></p>
+    @(Html.InputField(plan, m => m.IncludeAuthority, o => o.Label("Include authority document")).NativeCheckBox())
+    <label for="authority-file">Authority document</label>
+    @plan.AdmissionFiles("authority-file", false)
+    @(Html.NativeButton("upload-documents", "Upload documents").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        var files = Selected(pipeline);
+        var authority = pipeline.Component<AdmissionFileInput>("authority-file").Files.Items;
+        var draft = pipeline.Container<MoveInPage>("move-in");
+        var includeAuthority = documents.Container.Read(m => m.IncludeAuthority);
+        var supported = files.Any().And(files.All(Supported)).And(includeAuthority.Not().Or(authority.Any().And(authority.All(Supported))));
+        pipeline.When(supported).Then(pipeline => pipeline
+            .Options<DocumentPolicyQuery>(MoveInEndpoints.Documents, request => request
+                .Path(m => m.DraftId, Model.DraftId)
+                .Query(m => m.Kind, documents.Container.Read(m => m.Kind))
+                .Query(m => m.Culture, "en-US"))
+            .NoValidation().NoRetry()
+            .OnSuccess<UploadPolicyReply>((policy, pipeline) =>
+            {
+                TypedSource<bool> Fits(BrowserFile file) => file.Size.Lte(policy.Body.Read(r => r.Upload.MaximumBytes))
+                    .And(file.Type.In(policy.Body.Read(r => r.Upload.Types)));
+                var permitted = policy.Body.Read(r => r.Upload.Allowed).And(files.All(Fits)).And(includeAuthority.Not().Or(authority.All(Fits)));
+                pipeline.When(supported.And(permitted))
+                .Then(pipeline => pipeline
+                    .Post<DocumentsPage>(MoveInEndpoints.Documents, request => request
+                        .Path(m => m.DraftId, Model.DraftId)
+                        .Header(MoveInEndpoints.CoordinatorHeader, draft.Read(m => m.CoordinatorId))
+                        .Header(MoveInEndpoints.OperationHeader, draft.Read(m => m.OperationId))
+                        .Multipart(documents.Container, body => body
+                            .Set<IReadOnlyList<long>>(m => m.LastModified, files.Select(file => file.LastModified))
+                            .File(m => m.Files, files)
+                            .When(documents.Container.Read(m => m.IncludeAuthority))
+                            .Then(part => part
+                                .Set(m => m.AuthorityLastModified, pipeline.Component<AdmissionFileInput>("authority-file").Files.Items.At(0).LastModified)
+                                .File(m => m.AuthorityFile, pipeline.Component<AdmissionFileInput>("authority-file").Files.Items.At(0)))))
+                    .NoValidation()
+                    .OnSuccess<DocumentReply>((saved, pipeline) => pipeline.Element("document-status").Text.Set(
+                        pipeline.Concat(saved.Body.Read(r => r.Admission.Documents.Accepted).Count(), " documents accepted")))
+                    .OnError<ErrorEnvelope>(422, (failed, pipeline) => pipeline.Element("document-status").Text.Set(failed.Body.Read(r => r.Error.Message)))
+                    .OnError((failed, pipeline) => pipeline.Element("document-status").Text.Set("Documents could not be uploaded."))
+                    .Chained((saved, pipeline) => pipeline.Get<ReceiptQuery>(CareEndpoints.MoveInReceipts, request => request
+                        .Query(m => m.DraftId, saved.Body.Read(r => r.Admission.DraftId))
+                        .Query(m => m.Reference, saved.Body.Read(r => r.Admission.Documents.Receipt.Id))).Into("document-receipt")))
+                .Else(pipeline => pipeline.Element("document-status").Text.Set(supported.Choose("The upload policy refused these files.", "Choose supported admission files.")));
+            })
+            .OnError((failed, pipeline) => pipeline.Element("document-status").Text.Set("Document uploads are unavailable.")))
+            .Else(pipeline => pipeline.Element("document-status").Text.Set("Choose supported admission files."));
+    }))
+}
+<p id="document-status">Ready to upload</p>
+<div id="document-receipt"></div>
+@Html.RenderPlan(plan)

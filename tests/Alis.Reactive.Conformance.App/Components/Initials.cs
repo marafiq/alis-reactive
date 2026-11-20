@@ -2,9 +2,9 @@ using Alis.Reactive.Declarations;
 using Alis.Reactive.Plugins;
 using Alis.Reactive.ValuesAndSources;
 
-namespace Alis.Reactive.Conformance.App.Bench;
+namespace Alis.Reactive.Conformance.App.Components;
 
-[Mirrors("Bench/Plugins/shift-log-desk", "initials")]
+[Mirrors("Components/initials", "initials")]
 public sealed class Initials : Plugin
 {
     public Initials()

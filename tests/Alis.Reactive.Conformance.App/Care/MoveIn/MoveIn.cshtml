@@ -122,6 +122,37 @@
 </section>
 
 <section id="move-in-documents-upload" aria-label="Documents upload">
+    <h2>Admission documents</h2>
+    @if (Reads.PacketDeskOf(Model.DraftId) is { } packet)
+    {
+        @await Html.PartialAsync("/Care/MoveIn/PacketDesk.cshtml", packet)
+    }
+    @if (Reads.SignatureOf(Model.DraftId) is { } signature)
+    {
+        @await Html.PartialAsync("/Care/MoveIn/Signature.cshtml", signature)
+    }
+    <div id="stored-documents">
+        @if (Reads.DocumentsOnFile(Model.DraftId) is { Count: > 0 } register)
+        {
+            @foreach (var entry in register)
+            {
+                <p id="document-@entry.Id">@entry.Id · @entry.Name · @entry.Size bytes · @entry.Kind · @entry.Caption</p>
+            }
+        }
+        else
+        {
+            <p>No documents on file.</p>
+        }
+    </div>
+    @(Html.NativeButton("open-upload-card", "Open upload card").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Get<DeskQuery>(CareEndpoints.MoveInDocumentCard, request => request.Query(q => q.DraftId, Model.DraftId)).Into("upload-card")))
+    @(Html.NativeButton("close-upload-card", "Close upload card").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Unload("upload-card")))
+    <div id="upload-card">
+        @if (Reads.DocumentForm(Model.DraftId) is { } documents)
+        {
+            @await Html.PartialAsync("/Care/MoveIn/Documents.cshtml", documents)
+        }
+    </div>
 </section>
 
 <section id="move-in-deposit" aria-label="Deposit">

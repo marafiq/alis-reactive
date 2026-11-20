@@ -63,8 +63,8 @@ internal static class MoveInSeed
         draft.AcceptedQuoteRevision = 3;
         draft.Data.AcceptedQuoteRevision = 3;
         QuoteOf(draft).Pricing.Assistance.Accepted = true;
-        world.Documents.Add(new DocumentState { Id = "DOC1", DraftId = "D100", Kind = DocumentKind.Consent, Name = "consent.txt", ContentType = "text/plain", Size = 14, LastModified = 1730000000000, Bytes = Encoding.UTF8.GetBytes("Helen agrees.\n"), Scan = DocumentScan.Accepted });
-        world.Documents.Add(new DocumentState { Id = "DOC2", DraftId = "D100", Kind = DocumentKind.MedicationList, Name = "medications.txt", ContentType = "text/plain", Size = 14, LastModified = 1730000000001, Bytes = Encoding.UTF8.GetBytes("Aspirin 75 mg\n"), Scan = DocumentScan.Accepted });
+        world.Documents.Add(new DocumentState { Id = "DOC1", DraftId = "D100", Kind = DocumentKind.Consent, Name = "consent.txt", ContentType = "text/plain", Size = 14, LastModified = 1730000000000, Revision = 1, Bytes = Encoding.UTF8.GetBytes("Helen agrees.\n"), Scan = DocumentScan.Accepted });
+        world.Documents.Add(new DocumentState { Id = "DOC2", DraftId = "D100", Kind = DocumentKind.MedicationList, Name = "medications.txt", ContentType = "text/plain", Size = 14, LastModified = 1730000000001, Revision = 1, Bytes = Encoding.UTF8.GetBytes("Aspirin 75 mg\n"), Scan = DocumentScan.Accepted });
         draft.Data.Documents.Ids = ["DOC1", "DOC2"];
         world.Payments.Add(new PaymentState { ReceiptId = "PAY0", DraftId = "D100", Amount = 500.00m, Currency = "USD", LastFour = "1111", Status = PaymentStatus.Authorised });
         draft.DepositReceiptId = "PAY0";

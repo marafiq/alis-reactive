@@ -171,6 +171,10 @@ public sealed class DocumentsPage
 
     public string Caption { get; set; } = string.Empty;
 
+    public List<long> LastModified { get; set; } = [];
+
+    public long? AuthorityLastModified { get; set; }
+
     public List<IFormFile> Files { get; set; } = [];
 
     public IFormFile? AuthorityFile { get; set; }
@@ -180,6 +184,8 @@ public sealed class DocumentsPage
 
 public sealed class SignatureRequest
 {
+    public string? Caption { get; set; }
+
     public string DraftId { get; set; } = string.Empty;
 
     public string DocumentId { get; set; } = string.Empty;

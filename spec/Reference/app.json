@@ -597,6 +597,28 @@
           "id": "draftActions",
           "kind": "slot",
           "role": "the current draft actions with their own confirmation, replaced when the coordinator refreshes the saved draft status"
+        },
+        {
+          "id": "admissionDocuments",
+          "kind": "slot",
+          "role": "the independent upload card and the admission document register"
+        },
+        {
+          "id": "documentInputs",
+          "kind": "nativeSlice",
+          "module": "NativeComponents",
+          "role": "the document caption, kind, optional authority checkbox, signature document ID and action buttons beside the native browser file pickers"
+        },
+        {
+          "id": "admissionPacket",
+          "kind": "slot",
+          "role": "the packet desk, its printable preview, its document requirements and its accepted note and print references"
+        },
+        {
+          "id": "packetPrinter",
+          "kind": "plugin",
+          "module": "Plugins",
+          "role": "the admission page address and print methods and the shared Initials function for the signer"
         }
       ]
     },
@@ -13812,6 +13834,311 @@
           "action": "Composition.tla:Answer",
           "on": "the fresh draft actions before replacing the owner of the open discard question"
         }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X230",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X231",
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Request.tla:Route",
+          "on": "the upload policy before its permitted file selection is captured"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X232",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X233",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X234",
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Request.tla:Attempt",
+          "on": "the accepted upload before committing its bound batch"
+        },
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the completed batch before the closed card receives its answer"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X235",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X236",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X237",
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Request.tla:Attempt",
+          "on": "the signature PUT before comparing the document revision"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X238",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "documentInputs"
+      ],
+      "for": "M9.X239",
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the HEAD reply before reading the selected browser file"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionPacket",
+        "packetPrinter"
+      ],
+      "for": "M9.X240",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionPacket"
+      ],
+      "for": "M9.X241",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionPacket",
+        "packetPrinter"
+      ],
+      "for": "M9.X242",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionPacket"
+      ],
+      "for": "M9.X243",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionPacket",
+        "packetPrinter"
+      ],
+      "for": "M9.X244",
+      "harness": [
+        "seed"
       ]
     }
   ],
