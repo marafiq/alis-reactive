@@ -66,8 +66,8 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .tools/tlc-cache.json
-          key: tlc-${{ hashFiles('spec/**/*.tla', 'spec/**/*.cfg', 'spec/tools/tla2tools.lock') }}
-          restore-keys: tlc-
+          key: tlc-${{ hashFiles('spec/tools/tla2tools.lock') }}-${{ hashFiles('spec/**/*.tla', 'spec/**/*.cfg') }}
+          restore-keys: tlc-${{ hashFiles('spec/tools/tla2tools.lock') }}-
       - name: The spec's checks
         run: python3 spec/tools/check.py --ci
 

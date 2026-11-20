@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '30 3 * * 1-5'
   workflow_dispatch:
+    inputs:
+      tlc-baseline-only:
+        description: Run every TLC configuration and publish its results for CI.
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -19,18 +24,19 @@ env:
 jobs:
   ci:
     name: ci
+    needs: tlc-baseline
+    if: ${{ inputs.tlc-baseline-only != true }}
     uses: ./.github/workflows/ci.yml
     secrets:
       SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
 
-  every-model-and-probe:
-    name: every TLC config uncached, every probe
+  tlc-baseline:
+    name: every TLC config uncached
     runs-on: ubuntu-latest
-    timeout-minutes: 240
-    container:
-      image: mcr.microsoft.com/playwright/dotnet:v1.64.1-noble@sha256:6955861f6e17b2580c00f0970198e446f006cdae6c34fb8f9ad5318aaab50da0
+    timeout-minutes: 360
     env:
       TLA2TOOLS_JAR: ${{ github.workspace }}/.tools/tla2tools.jar
+      TLC_CACHE: ${{ github.workspace }}/.tools/tlc-cache.json
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -50,11 +56,31 @@ jobs:
           echo "$sha  $TLA2TOOLS_JAR" | sha256sum --check
       - name: The spec's checks, every TLC config run
         run: python3 spec/tools/check.py --ci
+      - name: Publish the TLC results that passed
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .tools/tlc-cache.json
+          key: tlc-${{ hashFiles('spec/tools/tla2tools.lock') }}-${{ hashFiles('spec/**/*.tla', 'spec/**/*.cfg') }}
+
+  every-probe:
+    name: every probe
+    needs: tlc-baseline
+    if: ${{ inputs.tlc-baseline-only != true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    container:
+      image: mcr.microsoft.com/playwright/dotnet:v1.64.1-noble@sha256:6955861f6e17b2580c00f0970198e446f006cdae6c34fb8f9ad5318aaab50da0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-toolchain
       - name: Every probe
         run: python3 spec/tools/check.py --check probes
 
   latest:
     name: every tool against its registry's latest
+    if: ${{ inputs.tlc-baseline-only != true }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -76,8 +102,8 @@ jobs:
 
   report-failure:
     name: an issue on failure
-    needs: [ci, every-model-and-probe, latest]
-    if: ${{ failure() }}
+    needs: [ci, tlc-baseline, every-probe, latest]
+    if: ${{ failure() && inputs.tlc-baseline-only != true }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

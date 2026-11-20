@@ -573,8 +573,8 @@ An app whose bundle is missing refuses to start.
 
 `check.py --ci`, which U1 adds, runs every check but survival, a spec session's own hook and branch, and probes,
 which run nightly and on a changed probe or pin, and the plants of those two. It runs a TLC config only when the
-cache file the `TLC_CACHE` variable names holds no result for its hash, and writes every result back to that file;
-with no cache file every config runs, the nightly run's way. It reads java from `JAVA_HOME` and the jar from
+cache file the `TLC_CACHE` variable names holds no result for its hash, and writes every result back to that file.
+With no cache file every config runs. The checker reads java from `JAVA_HOME` and the jar from
 `TLA2TOOLS_JAR`, as every mode does where they are set, and refuses to run with either unset; it refuses a jar whose
 SHA-256 is not the lock's, writes no `spec/STATE.json`, and exits 1 on any failure. The checks that read code keep reading the SHAs their cites
 pin, except kinds, which from U3 on reads the rewrite's grammar at HEAD: a kind `spec/Core/schema.md` does not list
@@ -612,7 +612,7 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
 - **`.github/workflows/ci.yml`** on every pull request and push to main, and called by the nightly and the publish
   workflows: `pack`, once, at the version its caller names or one of the run's own, its expected ids 2.9's six, whose
   files verify-net48 and delivery-net10 restore; `checks` (`scripts/check.sh` without check.py); `spec`
-  (`check.py --ci`, TLC only for a spec whose hash CI has not checked); `playwright` per pool and shard in the
+  (`check.py --ci`, TLC only for a configuration whose hash CI has not checked); `playwright` per pool and shard in the
   Playwright image; `verify-net48` on Windows (pack, the twin and the fresh MVC 5 app built against the packs with
   warnings as errors, WhenAConsumerAppIsBuilt over the fresh app, the tests under net48 and consumerNet48 under IIS
   Express); `delivery-net10` (pack, the fresh net10 app restored from the packs, WhenAConsumerAppIsBuilt over it, the
@@ -623,7 +623,12 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
   twin's and a fresh app's among them. Before its timed browser tests, the MVC 5 twin serves its readiness page
   and the contact move-in page through IIS Express. The second response carries the NextOfKin.Name input from the
   partial, so MVC has compiled and rendered that view and its partial. Neither readiness request opens a test world.
-- **`.github/workflows/nightly.yml`**: everything, every TLC config uncached, every probe, `scripts/doctor.sh --latest`; an issue on failure.
+  CI first restores the exact model and config set's TLC cache, then falls back to results from the same TLC jar
+  lock. Each restored result still has to match its model and config contents.
+- **`.github/workflows/nightly.yml`** runs every TLC config uncached and publishes the results on the branch that ran it.
+  Its CI call waits for that baseline. It also runs every probe and `scripts/doctor.sh --latest` and opens an issue
+  on failure. A manual dispatch with `tlc-baseline-only` runs the cold spec job alone, giving the pull request a baseline
+  on its branch without waiting for a nightly run on main.
 - **`.github/workflows/syncfusion-upgrade.yml`**, on a change to the pins: `pin-syncfusion.mjs --check`, the EJ2 browser probes, then the
   fusion pool.
 - **`.github/workflows/nuget-publish.yml`**, on a `v*` tag: `verify-release-tag.sh`; ci on the tag; one pack job, its expected ids 2.9's six; verify-net48 and
