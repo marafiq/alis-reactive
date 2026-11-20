@@ -1668,7 +1668,7 @@
         "unrefused": 0
       },
       "detail": "248 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "8fce7606669496579afc9abd34bd1b556c5f4b1c0b1aa449823c39d5c048de37",
+      "digest": "eb60173f786578b82f5fa5b3b3999110137c2a9a86547de679ad384a86f7b945",
       "pass": true
     },
     "probes": {
@@ -4357,7 +4357,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "39111d56ac1d93fa85565d6ee1f5c8e5d53926cc",
+  "read_at_head": "aaa45ea9a34f9dd7b244e2c655c5913ec55a7c9c",
   "step": {
     "failing": [],
     "name": "End of session",

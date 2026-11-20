@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Fri Nov 20 03:53:49 EST 2026
+Written at `date`: Fri Nov 20 12:00:54 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -28,6 +28,10 @@ note: open 2026-11-19 | direction | the queue of this file | queue | "i would be
 note: open 2026-11-19 | direction | the queue of this file | queue | "showspinner of compobox and hide when it succed" 
 note: open 2026-11-19 | direction | the queue of this file | queue | "use this as refereces to the skill so it works" a
 note: open 2026-11-19 | direction | the queue of this file | queue | "lets onboard datamanager only for combobox and le
+unit: landed ../ci-tlc-cold SpecCiCold
+  next: git worktree remove ../ci-tlc-cold
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
 unit: ready ../fusion-audit FusionAudit
   next: scripts/land-unit.sh ../fusion-audit 9c77fd7d8 "Fusion audit: compare the pinned vendor contract and improve component onboarding" ".landing/FusionAudit"
   leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
@@ -60,10 +64,7 @@ unit: waiting ../movein-coordinators MoveInCoordinators: for MoveInDocuments
   leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
   exit line: each line of the brief's "Done"
   goes to: unit: ready
-unit: landed ../movein-defaults MoveInDefaults
-  next: git worktree remove ../movein-defaults
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: waiting ../movein-defaults MoveInDefaults: for MoveInReception
 unit: ready ../movein-deposit-diet MoveInDepositDiet
   next: scripts/land-unit.sh ../movein-deposit-diet a46b1ca90 "MI.25 admission deposits and MI.26 dietary plans" ".landing/MoveInDepositDiet"
 unit: waiting ../movein-discard MoveInDiscard: for MoveInNavigationReadiness
@@ -91,11 +92,12 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: checking at 39111d56a on feature/rewrite
-  leaves by: the last line `scripts/full-check.sh` prints
-  exit line: "spec check at" its commit
-  goes to: lane: checked
-ci: unread at 39111d56a
+lane: pushed at aaa45ea9a on feature/rewrite: equal to the remote
+  leaves by: the landing of a unit that is ready
+  read first: the queue of `HANDOFF.md`
+  exit line: "landed"
+  goes to: lane: landed
+ci: unread at aaa45ea9a
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -104,10 +106,10 @@ file: over CLAUDE.md: holds 336 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2077 lines, its limit 150
-file: over HANDOFF.md: holds 742 lines, its limit 150
+file: over HANDOFF.md: holds 760 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 29 units have landed since .claude/rules/process.md last changed
+machine: review due : 30 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -115,13 +117,13 @@ machine: review due : 29 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 39111d56a Prove move-in admissions request defaults and recovery (MI.31)
-- Full check: .work/logs/spec-check-39111d56a.log: spec check at 39111d56a: 40 of 40 checks pass
-- .work/last-run.txt: 20261120-034112-5987 39111d56a
+- HEAD: aaa45ea9a Publish independent TLC baselines for spec CI
+- Full check: .work/logs/spec-check-aaa45ea9a.log: spec check at aaa45ea9a: 40 of 40 checks pass
+- .work/last-run.txt: 20261120-114727-9003 aaa45ea9a
 
 ## Landed since the commit before the last spec: STATE commit
-39111d56a Prove move-in admissions request defaults and recovery (MI.31)
-29807a28e spec: STATE and handoff at 1c09bcf83
+aaa45ea9a Publish independent TLC baselines for spec CI
+2ab0d5f00 spec: STATE and handoff at 39111d56a
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -170,9 +172,8 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 427 to 431
-- A rule or a tool's list not applied before the change: 430 to 432
-- A shell command or a script wrong in its own terms: 597 to 604
+- A rule or a tool's list not applied before the change: 432 to 433
+- A shell command or a script wrong in its own terms: 604 to 606
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
@@ -205,6 +206,23 @@ spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain
 
 ## Next
 <!-- next -->
+
+All 31 scheduled move-in features have landed. MI.24 still needs a browser assertion of the saved artifact bytes.
+Its filename, rendered preview and literal 107-byte server response have proof. The framework scope stays with
+the owner decision below. Rider MCP returned a completed successful build with zero problems.
+
+At 2ab0d5f00, GitHub run 44706199614 passed the Windows IIS Express job. The MVC 5 twin ran 11 cases and the
+fresh app ran one, all green and within budget. Replaying the six existing CI browser artifacts printed
+"[playwright:proof] 6 runs: 829 of the full list, 829 ran, each once". GitHub spec job 136186459527 missed
+its TLC cache and reached its two-hour limit. Required job 136243837975 failed on that cancelled prerequisite.
+On this Mac the exact CI spec command passed 38 of 38 using the 286 prior config outcomes with matching hashes.
+
+The CI-only batch at aaa45ea9a passed the gate and all 816 local browser cases, with zero failures, zero
+over budget and all prior passes preserved. The nightly TLC job starts cold and publishes successful outcomes
+under the pinned jar. The check still verifies every model and config hash and verdict. After the push, dispatch
+Nightly on feature/rewrite with tlc-baseline-only=true. Read the GitHub baseline run and cache by their actual
+outputs. When the cache is available, rerun the failed PR jobs and confirm the cache restore and final proof.
+
 The owner, 2026-11-19: "you can not change framework now while working in conformance." At startup, read the
 move-in unit's brief and `spec/Reference/move-in.md`. Build and prove the app through the typed doors already on
 the branch, including the supported MVC `Html.*` partial helpers. If a door falls short, name the use case in
