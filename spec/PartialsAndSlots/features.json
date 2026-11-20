@@ -1214,6 +1214,31 @@
           "id": "M9.X244",
           "rung": "behavior",
           "defect": "The print-intent endpoint accepts the superseded packet revision."
+        },
+        {
+          "id": "M9.X245",
+          "rung": "behavior",
+          "defect": "The ward service acknowledges the preparation without saving the selected bed's water request."
+        },
+        {
+          "id": "M9.X246",
+          "rung": "behavior",
+          "defect": "The browser permits a two-character message to reach Post."
+        },
+        {
+          "id": "M9.X247",
+          "rung": "behavior",
+          "defect": "Post trusts the membership granted when the coordinator first joined."
+        },
+        {
+          "id": "M9.X248",
+          "rung": "behavior",
+          "defect": "The failed ward request displays the instruction of a successful preparation."
+        },
+        {
+          "id": "M9.X249",
+          "rung": "behavior",
+          "defect": "Closing the line also releases the still-calculating quote panel."
         }
       ],
       "promises": [
@@ -2502,6 +2527,46 @@
           "outcome": "The stale intent is refused. The current quote reads 3060.00 and history has no PRINT100.",
           "opposite": "Printing the unchanged revision records PRINT100 and invokes the page print operation.",
           "defect": "The print-intent endpoint accepts the superseded packet revision."
+        },
+        {
+          "for": "M9.X245",
+          "page": "Helen Ward's move-in desk has an independent coordinators' line.",
+          "gesture": "Open two worlds' lines, send Helen's arrival, post the store's ward update, reconnect and reopen the draft.",
+          "outcome": "Only the sender's line shows MSG1 and sequence 1. The new connection reads the same message, and the next bed read shows the water requested.",
+          "opposite": "An untouched world retains sequence 0 and the bed has no water request.",
+          "defect": "The ward service acknowledges the preparation without saving the selected bed's water request."
+        },
+        {
+          "for": "M9.X246",
+          "page": "Helen Ward's move-in desk has an independent coordinators' line.",
+          "gesture": "Send a two-character message and a forbidden message and reopen the line.",
+          "outcome": "The card refuses both messages and the reopened line still shows sequence 0 and no messages.",
+          "opposite": "Helen's arrival message is accepted.",
+          "defect": "The browser permits a two-character message to reach Post."
+        },
+        {
+          "for": "M9.X247",
+          "page": "Helen Ward's move-in desk has an independent coordinators' line.",
+          "gesture": "Join the line, revoke the coordinator's membership during that connection and send an arrival message. Restore access and read the snapshot.",
+          "outcome": "The hub refuses Post, no posted receipt appears and the authorised snapshot shows sequence 0 and no messages.",
+          "opposite": "A current member posts and reads MSG1.",
+          "defect": "Post trusts the membership granted when the coordinator first joined."
+        },
+        {
+          "for": "M9.X248",
+          "page": "Helen Ward's move-in desk has an independent coordinators' line.",
+          "gesture": "Select the window bed, interrupt the ward request and post the store's update. Read the bed again.",
+          "outcome": "The card reports the service unavailable and the window bed has no water request on the next read.",
+          "opposite": "An answered ward request sets the bed's water request.",
+          "defect": "The failed ward request displays the instruction of a successful preparation."
+        },
+        {
+          "for": "M9.X249",
+          "page": "Helen Ward's move-in desk has an independent coordinators' line.",
+          "gesture": "Send a ward update from the open line, hold the quote answer, close the line and post to the surviving store. Release the quote and reopen the line and the draft.",
+          "outcome": "The hub owner and the store subscription leave. Posting while closed sends no second water request. The reopened line listens once, the quote settles at 3040.00 USD and the next read shows Q100 and a line with no messages.",
+          "opposite": "The live line can receive a message while its card is open.",
+          "defect": "Closing the line also releases the still-calculating quote panel."
         }
       ],
       "verdicts": []

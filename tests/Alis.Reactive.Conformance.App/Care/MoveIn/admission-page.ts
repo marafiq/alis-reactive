@@ -1,4 +1,5 @@
 import { initials } from "../../Components/initials";
+import { CoordinatorLineFormat } from "./coordinator-line-format";
 
 interface AdmissionPrintReference {
   readonly draftId: string;
@@ -33,6 +34,6 @@ class AdmissionPage {
 }
 
 const plugins: unknown = Reflect.get(window, "__alisPlugins");
-const entries = [{ name: "initials", instance: initials }, { name: "admission-page", instance: new AdmissionPage() }];
+const entries = [{ name: "initials", instance: initials }, { name: "admission-page", instance: new AdmissionPage() }, { name: "coordinator-line-format", instance: new CoordinatorLineFormat() }];
 if (Array.isArray(plugins)) plugins.push(...entries);
 else Reflect.set(window, "__alisPlugins", entries);

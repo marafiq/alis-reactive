@@ -46,6 +46,7 @@ public sealed class Program
         AppHost.UseTracing(host, app);
         app.MapControllers();
         app.MapLiveLines();
+        app.MapHub<MoveInCoordinatorHub>(Alis.Reactive.Conformance.World.CareEndpoints.MoveInCoordinatorLine);
         app.MapBenchLine();
         if (app.Configuration[TestHost] is { } testHost) StopWith(testHost, app.Lifetime);
         app.Run();

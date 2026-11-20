@@ -619,6 +619,23 @@
           "kind": "plugin",
           "module": "Plugins",
           "role": "the admission page address and print methods and the shared Initials function for the signer"
+        },
+        {
+          "id": "coordinatorLine",
+          "kind": "hub",
+          "role": "the coordinator hub joined by the line card for the current draft"
+        },
+        {
+          "id": "wardUpdates",
+          "kind": "conformance",
+          "declares": "ConformanceStore",
+          "role": "the ward preparation store whose Posted message requests water for the selected bed"
+        },
+        {
+          "id": "lineFormat",
+          "kind": "plugin",
+          "module": "Plugins",
+          "role": "the coordinator line formatter that presents the members and messages from the current snapshot"
         }
       ]
     },
@@ -14139,6 +14156,133 @@
       "for": "M9.X244",
       "harness": [
         "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X245",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "coordinatorLine",
+        "wardUpdates",
+        "locationInputs",
+        "lookupSlots",
+        "lineFormat"
+      ],
+      "harness": [
+        "drop",
+        "reopen"
+      ],
+      "held": [
+        {
+          "verb": "drop",
+          "action": "Realtime.tla:Drop",
+          "on": "the coordinators' line"
+        },
+        {
+          "verb": "reopen",
+          "action": "Realtime.tla:Reconnected",
+          "on": "the coordinators' line"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X246",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "coordinatorLine",
+        "lineFormat"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X247",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "coordinatorLine",
+        "lineFormat"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the hub Post after the membership decision"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X248",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "coordinatorLine",
+        "wardUpdates",
+        "locationInputs",
+        "lookupSlots",
+        "lineFormat"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X249",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "coordinatorLine",
+        "pricing",
+        "servicePanel",
+        "lineFormat",
+        "wardUpdates",
+        "locationInputs",
+        "lookupSlots"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the draft's quote response"
+        }
       ]
     }
   ],

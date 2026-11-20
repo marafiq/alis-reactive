@@ -29,7 +29,7 @@ internal static class WorldLines
 
     private static string? LineOf(PathString path)
     {
-        string[] lines = [CareEndpoints.WardLine, CareEndpoints.RoundFeed, CareEndpoints.BedLine, CareEndpoints.Line, CareEndpoints.NurseLine];
+        string[] lines = [CareEndpoints.WardLine, CareEndpoints.RoundFeed, CareEndpoints.BedLine, CareEndpoints.Line, CareEndpoints.NurseLine, CareEndpoints.MoveInCoordinatorLine];
         return lines.FirstOrDefault(line => path.StartsWithSegments(line, StringComparison.Ordinal));
     }
 }
