@@ -36,7 +36,8 @@ Selectors, one a run:
 
 Options:
   --host <name>   Take that host alone. Without it a run takes the hosts the conformance app serves on this machine.
-                  Under a fresh app's host (consumerNet10) the run builds that app on the packs and starts its own
+                  The net48 and consumerNet48 hosts run under IIS Express on Windows. Under a fresh app's host
+                  the run builds that app on the packs and starts its own
                   server: with no PACKAGE_VERSION set it packs at a version of its own first (scripts/pack.sh), so
                   what the shipped projects hold reaches the app's page; with it set it takes the packs in nupkgs/.
                   Before it builds a fresh app it removes every version restored in the app's obj/packages/ but
@@ -125,6 +126,14 @@ fresh_apps=()
 while IFS= read -r fresh_app; do fresh_apps+=("$fresh_app"); done < <(
   node -e 'for (const app of JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).freshApps) console.log(app);' "$run/selection.json")
 
+selected_host="${host[1]:-default}"
+packed_apps=(${fresh_apps[@]+"${fresh_apps[@]}"})
+case "$selected_host" in
+  net48|consumerNet48)
+    [ "${OS:-}" = Windows_NT ] || refuse "$selected_host needs IIS Express on Windows."
+    if [ "$selected_host" = net48 ]; then packed_apps+=("tests/$app.Net48"); fi ;;
+esac
+
 remove_every_restored_version_but_the_runs() {
   local version
   for version in "$1"/obj/packages/alisreactive*/*; do
@@ -137,7 +146,7 @@ remove_the_packs_this_run_wrote() {
   for pack in nupkgs/*."$PACKAGE_VERSION".nupkg nupkgs/*."$PACKAGE_VERSION".snupkg; do
     if [ -f "$pack" ]; then rm -f "$pack"; fi
   done
-  for fresh_app in "${fresh_apps[@]}"; do
+  for fresh_app in "${packed_apps[@]}"; do
     for version in "$fresh_app"/obj/packages/alisreactive*/"$PACKAGE_VERSION"; do
       if [ -d "$version" ]; then rm -rf "$version"; fi
     done
@@ -149,19 +158,32 @@ build_failed() {
   exit 4
 }
 
-if [ "${#fresh_apps[@]}" -gt 0 ]; then
+if [ "${#packed_apps[@]}" -gt 0 ]; then
   if [ -z "${PACKAGE_VERSION:-}" ]; then
     PACKAGE_VERSION="$own_versions.$(date -u +%Y%m%d%H%M%S)"
     export PACKAGE_VERSION
     trap remove_the_packs_this_run_wrote EXIT
-    echo "[playwright:runner] packing at $PACKAGE_VERSION, which ${fresh_apps[*]} builds on"
+    echo "[playwright:runner] packing at $PACKAGE_VERSION, which ${packed_apps[*]} builds on"
     scripts/pack.sh "$PACKAGE_VERSION" || build_failed
   else
-    echo "[playwright:runner] ${fresh_apps[*]} builds on the packs in nupkgs/ at $PACKAGE_VERSION"
+    echo "[playwright:runner] ${packed_apps[*]} builds on the packs in nupkgs/ at $PACKAGE_VERSION"
   fi
-  for fresh_app in "${fresh_apps[@]}"; do
-    remove_every_restored_version_but_the_runs "$fresh_app"
-    dotnet build "$fresh_app" -c Release -warnaserror --no-incremental --nologo || build_failed
+  for packed_app in "${packed_apps[@]}"; do
+    if [[ "$selected_host" = net48 || "$selected_host" = consumerNet48 ]] && [ "${ALIS_PREBUILT_MVC5:-}" = "$selected_host" ]; then
+      echo "[playwright:runner] using the CI build of $packed_app at $PACKAGE_VERSION"
+    else
+      remove_every_restored_version_but_the_runs "$packed_app"
+      if [ "$selected_host" = consumerNet48 ]; then
+        pwsh -NoProfile -Command '
+          $ErrorActionPreference = "Stop"
+          $msbuild = $env:MSBUILD_EXE
+          if (!$msbuild) { $msbuild = (Get-Command MSBuild.exe -ErrorAction Stop).Source }
+          & $msbuild tests/Alis.Reactive.Consumer.Net48/Alis.Reactive.Consumer.Net48.csproj -restore -t:Rebuild -p:Configuration=Release -warnaserror
+          exit $LASTEXITCODE' || build_failed
+      else
+        dotnet build "$packed_app" -c Release -warnaserror --no-incremental --nologo || build_failed
+      fi
+    fi
   done
 fi
 
@@ -179,15 +201,29 @@ run_the_tests() {
     --logger "console;verbosity=normal" --logger "trx;LogFileName=$1.trx" --results-directory "$run")
   if [ -n "$filter" ]; then command+=(--filter "$filter"); fi
   command+=(-- "NUnit.NumberOfTestWorkers=$2")
-  "${command[@]}" 2>&1 || true
+  if [ "${OS:-}" = Windows_NT ]; then
+    pwsh -NoProfile -File scripts/playwright-windows.ps1 "$run/$1-hosts" "$selected_host" "${command[@]:1}" 2>&1
+  else
+    "${command[@]}" 2>&1
+  fi
+}
+
+read_servers_left() {
+  if [ "${OS:-}" = Windows_NT ]; then
+    read -r left fresh_left < "$run/$1-hosts/servers-left" || refuse "the Windows runner did not report server cleanup for $1."
+  else
+    stop_every_server_whose_test_process_ended "$2"
+  fi
 }
 
 run_measured() {
   export ALIS_MEASURED_STEPS="$PWD/$run/$1.steps.tsv"
-  run_the_tests "$1" "$2" > "$run/$1.log"
+  local test_exit=0
+  run_the_tests "$1" "$2" > "$run/$1.log" || test_exit=$?
   unset ALIS_MEASURED_STEPS
-  stop_every_server_whose_test_process_ended "a server left alive after the measured run $1"
+  read_servers_left "$1" "a server left alive after the measured run $1"
   [ "$((left + fresh_left))" -eq 0 ] || refuse "the measured run $1 left $((left + fresh_left)) server alive; nothing is written."
+  [ "$test_exit" -eq 0 ] || refuse "the measured run $1 exited $test_exit; read $run/$1.log."
 }
 
 at_once=""
@@ -196,7 +232,9 @@ if [ "$parallelism" -eq 0 ]; then
     || refuse "no count of tests at once is measured in $budget; scripts/playwright.sh --measure-parallelism writes it."
 fi
 
-stop_every_server_whose_test_process_ended "stopped a server an earlier run left alive"
+if [ "${OS:-}" != Windows_NT ]; then
+  stop_every_server_whose_test_process_ended "stopped a server an earlier run left alive"
+fi
 
 if [ "$parallelism" -eq 1 ]; then
   measured=()
@@ -217,8 +255,10 @@ elif [ "$measure" -eq 1 ]; then
   done
   node scripts/playwright-result.mjs --measure --selection "$run/selection.json" --budget "$budget" --weights "$weights" "$run"/measure-*.trx
 else
-  run_the_tests run "$at_once" | tee "$run/run.log"
-  stop_every_server_whose_test_process_ended "a server left alive after this run"
+  test_exit=0
+  run_the_tests run "$at_once" | tee "$run/run.log" || test_exit=$?
+  read_servers_left run "a server left alive after this run"
   echo "[playwright:runner] log: $run/run.log"
   node scripts/playwright-result.mjs --selection "$run/selection.json" --trx "$run/run.trx" --budget "$budget" --servers-left "$left" --fresh-servers-left "$fresh_left"
+  exit "$test_exit"
 fi

@@ -34,6 +34,8 @@
     <Compile Include="$(ConformanceApp)Refusals/RequestsAndResponses/RoundsBoard.cs" Link="ConformanceApp/Refusals/RequestsAndResponses/RoundsBoard.cs" />
     <Compile Include="$(ConformanceApp)Care/Record/VisitBoard.cs" Link="ConformanceApp/Care/Record/VisitBoard.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/AdmitResident.cs" Link="ConformanceApp/Care/Admission/AdmitResident.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/IntakeDocuments.cs" Link="ConformanceApp/Care/Admission/IntakeDocuments.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/RoomNumbering.cs" Link="ConformanceApp/Care/Admission/RoomNumbering.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/RoomIntake.cs" Link="ConformanceApp/Care/Admission/RoomIntake.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/ContactMoveIn.cs" Link="ConformanceApp/Care/Admission/ContactMoveIn.cs" />
     <TwinView Include="$(ConformanceApp)**/*.Net48.cshtml" Exclude="$(ConformanceApp)bin/**;$(ConformanceApp)obj/**" />
@@ -42,6 +44,8 @@
     <TwinView Include="$(ConformanceApp)Care/Record/VisitBoard.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Record/VisitBoardDesk.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/AdmitResident.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/IntakeDocuments.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/RoomNumbering.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/RoomIntake.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/ContactMoveInKinCard.cshtml" />
   </ItemGroup>
@@ -50,7 +54,7 @@
     <ItemGroup>
       <TwinSiteView Include="@(TwinView)" SitePath="$([MSBuild]::MakeRelative('$(ConformanceApp)', '%(FullPath)'))" />
       <TwinSiteOwnFile Include="Web.config;Global.asax;Shared/**/*.cshtml;Content/**/*" />
-      <TwinSiteScript Include="$(ConformanceApp)wwwroot/js/alis-reactive-conformance.js" Condition="Exists('$(ConformanceApp)wwwroot/js/alis-reactive-conformance.js')" />
+      <TwinSiteScript Include="$(ConformanceApp)wwwroot/js/alis-reactive-conformance.js" />
       <TwinSiteAssembly Include="$(OutDir)**/*" />
     </ItemGroup>
     <Copy SourceFiles="@(TwinSiteView)" DestinationFiles="@(TwinSiteView->'$(TwinSite)%(SitePath)')" SkipUnchangedFiles="true" />

@@ -548,6 +548,7 @@ analyzer cases, the test rules' cases and the module tests; `check.py --ci`, whi
 its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (the bundle and the build, then run, with the selectors
 below, the result line and the leftover-server check), with `scripts/list-tests.cs`, `scripts/playwright-select.mjs`
 and `scripts/playwright-result.mjs`, which list the built tests, select a run's cases and read its result;
+`scripts/playwright-windows.ps1` launches IIS Express for an MVC 5 selection and checks the servers the Windows run started;
 `scripts/test.sh` (both, its browser leg every test or, with `--through`, the tests landed through a unit); `scripts/build.sh`,
 `scripts/run.sh`, `scripts/pack.sh` (the six packages at one version, each read back from its nuspec),
 `scripts/delivery.sh` (`scripts/pack.sh` at a version of its own, then WhenAConsumerAppIsBuilt over the small apps its

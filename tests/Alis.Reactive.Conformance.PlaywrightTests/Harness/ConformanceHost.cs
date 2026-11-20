@@ -14,9 +14,9 @@ internal sealed class ConformanceHost
 
     private static readonly ConcurrentDictionary<string, Lazy<Task<ConformanceHost>>> Started = new(StringComparer.Ordinal);
 
-    private readonly Process _server;
+    private readonly Process? _server;
 
-    private ConformanceHost(Process server, Uri address)
+    private ConformanceHost(Process? server, Uri address)
     {
         _server = server;
         Address = address;
@@ -25,15 +25,27 @@ internal sealed class ConformanceHost
     internal Uri Address { get; }
 
     internal static Task<ConformanceHost> Of(string host)
-        => Started.GetOrAdd(host, name => new Lazy<Task<ConformanceHost>>(() => Start(name))).Value;
+    {
+        if (host is not (HostNames.Net48 or HostNames.ConsumerNet48))
+        {
+            return Started.GetOrAdd(host, name => new Lazy<Task<ConformanceHost>>(() => Start(name))).Value;
+        }
+
+        if (!OperatingSystem.IsWindows() || Environment.GetEnvironmentVariable("ALIS_IIS_HOST") != host
+            || !Uri.TryCreate(Environment.GetEnvironmentVariable("ALIS_IIS_ADDRESS"), UriKind.Absolute, out var address)
+            || !address.IsLoopback || address.Scheme != Uri.UriSchemeHttp)
+        {
+            throw new InvalidOperationException($"The {host} fixture needs its running IIS Express site from scripts/playwright.sh --host {host}.");
+        }
+
+        return Task.FromResult(new ConformanceHost(null, address));
+    }
 
     internal static void StopAll()
     {
         foreach (var started in Started.Values.Where(started => started.IsValueCreated && started.Value.IsCompletedSuccessfully))
         {
-            var server = started.Value.Result._server;
-            if (!server.HasExited) server.Kill(entireProcessTree: true);
-            server.Dispose();
+            if (started.Value.Result._server is { } server) Stop(server);
         }
 
         Started.Clear();
@@ -66,12 +78,37 @@ internal sealed class ConformanceHost
         server.OutputDataReceived += (_, line) => Heard(line.Data, said, listening, host);
         server.ErrorDataReceived += (_, line) => Heard(line.Data, said, listening, host);
         server.Start();
-        server.BeginOutputReadLine();
-        server.BeginErrorReadLine();
-        var address = await listening.Task;
-        using var answering = new HttpClient { BaseAddress = address };
-        (await answering.GetAsync(ready)).EnsureSuccessStatusCode();
-        return new ConformanceHost(server, address);
+        try
+        {
+            if (OperatingSystem.IsWindows() && Environment.GetEnvironmentVariable("ALIS_SERVER_RECORDS") is { } records)
+            {
+                var file = Path.Combine(records, $"{server.Id}.{host}.server");
+                File.WriteAllText(file, server.StartTime.ToUniversalTime().ToFileTimeUtc().ToString(CultureInfo.InvariantCulture));
+            }
+
+            server.BeginOutputReadLine();
+            server.BeginErrorReadLine();
+            var address = await listening.Task;
+            using var answering = new HttpClient { BaseAddress = address };
+            using var response = await answering.GetAsync(ready);
+            response.EnsureSuccessStatusCode();
+            return new ConformanceHost(server, address);
+        }
+        catch
+        {
+            Stop(server);
+            throw;
+        }
+    }
+
+    private static void Stop(Process server)
+    {
+        using (server)
+        {
+            if (server.HasExited) return;
+            server.Kill(entireProcessTree: true);
+            if (!server.WaitForExit(TimeSpan.FromSeconds(10))) throw new InvalidOperationException($"Server PID {server.Id} is still alive after termination.");
+        }
     }
 
     private static void Heard(string? line, ConcurrentQueue<string> said, TaskCompletionSource<Uri> listening, string host)

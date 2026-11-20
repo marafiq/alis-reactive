@@ -320,7 +320,8 @@ slip is about you invented so you can avoid accountability about mistakes").
   (compare browser runs), `scripts/stamp.py` (stamp a message with its run), `scripts/tlc.sh` (pause or resume TLC),
   `scripts/open.py` (list unwritten promises and unbuilt code), `scripts/handoff.py` (write the handoff from facts),
   `scripts/state.py` (the state of every note, unit, lane, CI reading and file, with the command that leaves it),
-  `scripts/ci.py` (read the jobs of the remote head's run, each by its result).
+  `scripts/ci.py` (read the jobs of the remote head's run, each by its result), `scripts/playwright-windows.ps1`
+  (serve the selected MVC 5 site under IIS Express and account for the Windows run's servers).
   A script joins this list with the commit that writes it.
 - Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a hold names its
   reason in `spec/REWRITE.md` section 2.7, and Syncfusion's is the owner's (`node scripts/pin-syncfusion.mjs <version>`).

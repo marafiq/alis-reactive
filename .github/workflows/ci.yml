@@ -146,6 +146,8 @@ jobs:
         with:
           name: packages
           path: nupkgs
+      - name: The conformance script the twin layout serves
+        run: node build.mjs
       - name: The twin, built against the packs with warnings as errors
         run: dotnet build tests/Alis.Reactive.Conformance.App.Net48 -c Release -warnaserror
       - name: Visual Studio's MSBuild, which builds a classic MVC 5 project, on the PATH
@@ -163,15 +165,23 @@ jobs:
       - name: What a build wrote into the fresh app, and the analyzers that reach it
         run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt"
       - name: Chromium, at the version the browser tests' Playwright pins
+        id: browser
         shell: pwsh
         run: |
+          Set-TimeZone -Id UTC
           dotnet restore tests/Alis.Reactive.Conformance.PlaywrightTests
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $pin = (Select-Xml -Path Directory.Packages.props -XPath "//PackageVersion[@Include='Microsoft.Playwright']").Node.Version
           $playwright = Join-Path $HOME ".nuget/packages/microsoft.playwright/$pin/.playwright"
           & (Join-Path $playwright "node/win32_x64/node.exe") (Join-Path $playwright "package/cli.js") install chromium
       - name: The tests under the twin
+        env:
+          ALIS_PREBUILT_MVC5: net48
         run: scripts/playwright.sh --all --host net48
       - name: The tests under the fresh MVC 5 app
+        if: ${{ !cancelled() && steps.browser.outcome == 'success' }}
+        env:
+          ALIS_PREBUILT_MVC5: consumerNet48
         run: scripts/playwright.sh --all --host consumerNet48
       - name: The runs' folders
         if: always()

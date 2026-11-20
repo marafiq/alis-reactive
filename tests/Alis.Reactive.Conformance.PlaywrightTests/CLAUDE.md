@@ -102,7 +102,8 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   shard unit (`FusionTemplates/BedBoard/WhenARowsWardIsNullOrMissing.cs`).
 - A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
   `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
-  alone and a module's tests sit in the module's.
+  alone and a module's tests sit in the module's. On Windows, `scripts/playwright-windows.ps1` starts the selected MVC 5
+  site and hands its address to the test process. A fixture opening a net10 world still starts its own Kestrel server.
 - A test whose page asks for Syncfusion's script, an address that ends in `"/ej2.min.js"`, fails at its teardown,
   which names the address: a core test's page holds no component library, and `ConformanceFixture` reads every
   request of a world's page and of a person's. The last command below plants that script's link on the World area's

@@ -1780,6 +1780,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   their own that maps the AlisReactive ids to the packs' folder and keeps the restored packages under the app's own
   obj folder, beside an empty `Directory.Build.targets`; the twin's resolver wraps the one MVC starts with;
   verify-net48 sets the runner's zone to UTC before the twin starts. The owner can overrule each.
+- The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
+  cases under IIS Express on the packed twin and the fresh consumer. Each run starts its site, waits until MVC
+  renders its readiness page and reports its own browser results and server cleanup.
 - The lead, 2026-11-16, deciding N3.5's door, a form the line of 2026-11-15 gives the lead, from a Fable designer's
   work read at the source: `RequestTimeZone.RendersUnder` on the request's context, HttpContext on net10 and
   HttpContextBase on net48, keeps the chosen TimeZoneInfo in the request's Items under a key of its own, and each
