@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 18:21:11 EST 2026
+Written at `date`: Thu Nov 19 19:19:44 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -58,10 +58,12 @@ unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
 unit: ready ../movein-deposit-diet MoveInDepositDiet
   next: scripts/land-unit.sh ../movein-deposit-diet a46b1ca90 "MI.25 admission deposits and MI.26 dietary plans" ".landing/MoveInDepositDiet"
-unit: landed ../movein-medications-pharmacy MoveInMedicationsPharmacy
-  next: git worktree remove ../movein-medications-pharmacy
+unit: landed ../movein-draft-admission MoveInDraftAdmission
+  next: git worktree remove ../movein-draft-admission
   leaves by: `git worktree remove {worktree}`
   goes to: gone
+unit: ready ../movein-medications-pharmacy MoveInMedicationsPharmacy
+  next: scripts/land-unit.sh ../movein-medications-pharmacy c2ec598d3 "Prove medication editing, pharmacy clearance and held validation in move-in" ".landing/MoveInMedicationsPharmacy"
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
@@ -75,13 +77,14 @@ unit: ready ../movein-review-acceptance MoveInReviewAcceptance
   next: scripts/land-unit.sh ../movein-review-acceptance c91bae1fc "MI.14 and MI.15. Review the selected services and accept the displayed quote revision" ".landing/MoveInReviewAcceptance"
 unit: ready ../movein-scope MoveInSessionScope
   next: scripts/land-unit.sh ../movein-scope d13a4ce7f "Keep move-in implementation and builder proof within scope" ".landing/MoveInSessionScope"
+unit: unbriefed ../net48-browser-host Net48BrowserHost: brief.md lacks Scope, Rules, Outcome, Done, Commands, Reply
 unit: landed ../retire-picomatch-exception RetirePicomatchException
   next: git worktree remove ../retire-picomatch-exception
-lane: checking at 86f782c1b on feature/rewrite
+lane: checking at 5440174c6 on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 86f782c1b
+ci: unread at 5440174c6
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -90,10 +93,10 @@ file: over CLAUDE.md: holds 335 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 507 lines, its limit 150
+file: over HANDOFF.md: holds 532 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 20 units have landed since .claude/rules/process.md last changed
+machine: review due : 21 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -101,17 +104,17 @@ machine: review due : 20 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 86f782c1b Prove move-in medication orders and held pharmacy validation
-- Full check: .work/logs/spec-check-86f782c1b.log: spec check at 86f782c1b: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-180833-98765 86f782c1b
+- HEAD: 5440174c6 Prove move-in draft saving and admission submission (MI.16 and MI.17)
+- Full check: .work/logs/spec-check-5440174c6.log: spec check at 5440174c6: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-190326-42350 5440174c6
 
 ## Landed since the commit before the last spec: STATE commit
-86f782c1b Prove move-in medication orders and held pharmacy validation
-c2ec598d3 spec: STATE and handoff at 3666f023d
+5440174c6 Prove move-in draft saving and admission submission (MI.16 and MI.17)
+fa45060db spec: STATE and handoff at 86f782c1b
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 661; named by a browser test: 642; with no browser test: 19
+feature promises: 671; named by a browser test: 652; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -156,7 +159,8 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 391 to 396
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 396 to 399
+- A rule or a tool's list not applied before the change: 414 to 417
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
@@ -193,6 +197,7 @@ spec/CLAUDE.md:2007: - The owner, 2026-11-18, on the app that proves the framewo
 - 2026-11-19 | direction | the queue of this file | queue | "showspinner of compobox and hide when it succed" and "comobobox has methods showspinner and hidespinner". The interpreter-search fixture holds a request and checks the actual ComboBox spinner.
 - 2026-11-19 | direction | the queue of this file | queue | "use this as refereces to the skill so it works" and "and then test the skill actually" and "yeah lets make skill perform with very high confidence so you can onboard other components". The replay checks the pinned ComboBox and held-out NumericTextBox.
 - 2026-11-19 | direction | the queue of this file | queue | "lets onboard datamanager only for combobox and leave it for the rest, but have it in skill so if i ask onboard for that component". The direct, component-local DataManager example builds in ../fusion-combobox-data-manager.
+2026-11-19 | direction | spec/CLAUDE.md | Net48BrowserHost | "well fix net48 as well so we gain high confidence"
 <!-- /notes -->
 
 ## Next
@@ -479,6 +484,30 @@ server-side PharmacyRequest projection.
 
 Open MI.16 save draft and MI.17 submit admission after the checked push. MI.19 discard
 follows. Nine feature IDs remain in the main app queue, including these two.
+
+MI.16 save draft and MI.17 submit admission landed at `5440174c6`. The two feature fixtures
+passed ten cases. The move-in screen passed 122 of 122 with zero overruns. Sixteen app
+plants failed at their named assertions, and the four-file replay matched the 763 compiled
+page-door entries. The integrated gate and all 770 browser cases passed. All 760 prior
+passes remain. The optional cross-command plant's initial navigation timeout is preserved
+in its worktree. A quiet repeat and restored run passed with the existing budgets.
+
+A well-formed draft without a bed saves version 8, returns its ETag and referral, and
+reopens with its recorded notes. A real contact edit followed by a later save proves the
+compare panel reads the exact stale version without overwriting current edits. Admission
+rejects an ineligible building or mismatched pharmacy review. The successful E25 writes
+ADM100 and occupies BED4 atomically. The held E26 checklist blocks an additional POST
+and PUT at the shared handler. Explicit replay returns the same admission and the next
+read shows one allocation and one history entry. A held bed takes the existing waitlist.
+
+The owner requested Windows net48 proof before the remaining app work. Use the scoped
+Net48BrowserHost brief after this push. Windows job 135959330912 built both MVC 5 projects.
+The twin's 11 written cases failed at startup because the Core launcher refused the net48
+host. The fresh browser step was skipped. The read-only review found the late bundle
+copy, unsupported Windows process listing, and two missing twin routes used by written
+cases. Verify both MVC 5 browser suites under IIS Express on the checked Windows job.
+MI.19 discard then resumes the app queue. Seven feature IDs remain, and the earlier
+specific gaps stay in part 9 of the app spec.
 
 
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
