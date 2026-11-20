@@ -6,6 +6,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
+  and records their results with the verified jar's SHA-256. Hosted CI verifies the current inputs and required
+  verdict of every recorded result. The model-executing plants run with TLC on the Mac.
 - The owner, 2026-11-05: this is a complete rewrite, not a rebuild, and it has to be right.
 - The owner, 2026-11-05: no module and no feature on either line is lost, and the session improves every
   aspect. A door whose form is refused names the doors that carry its capability; `spec/tools/check.py`

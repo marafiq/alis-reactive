@@ -4,11 +4,6 @@ on:
   schedule:
     - cron: '30 3 * * 1-5'
   workflow_dispatch:
-    inputs:
-      tlc-baseline-only:
-        description: Run every TLC configuration and publish its results for CI.
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -24,48 +19,12 @@ env:
 jobs:
   ci:
     name: ci
-    needs: tlc-baseline
-    if: ${{ inputs.tlc-baseline-only != true }}
     uses: ./.github/workflows/ci.yml
     secrets:
       SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
 
-  tlc-baseline:
-    name: every TLC config uncached
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-    env:
-      TLA2TOOLS_JAR: ${{ github.workspace }}/.tools/tla2tools.jar
-      TLC_CACHE: ${{ github.workspace }}/.tools/tlc-cache.json
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/setup-toolchain
-      - name: The Java of .java-version
-        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
-        with:
-          distribution: temurin
-          java-version-file: .java-version
-      - name: The TLC jar its lock pins, by its SHA-256
-        run: |
-          mkdir -p .tools
-          url="$(python3 -c "import json; print(json.load(open('spec/tools/tla2tools.lock'))['url'])")"
-          sha="$(python3 -c "import json; print(json.load(open('spec/tools/tla2tools.lock'))['sha256'])")"
-          curl --fail --location --silent --show-error --output "$TLA2TOOLS_JAR" "$url"
-          echo "$sha  $TLA2TOOLS_JAR" | sha256sum --check
-      - name: The spec's checks, every TLC config run
-        run: python3 spec/tools/check.py --ci
-      - name: Publish the TLC results that passed
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .tools/tlc-cache.json
-          key: tlc-${{ hashFiles('spec/tools/tla2tools.lock') }}-${{ hashFiles('spec/**/*.tla', 'spec/**/*.cfg') }}
-
   every-probe:
     name: every probe
-    needs: tlc-baseline
-    if: ${{ inputs.tlc-baseline-only != true }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     container:
@@ -80,7 +39,6 @@ jobs:
 
   latest:
     name: every tool against its registry's latest
-    if: ${{ inputs.tlc-baseline-only != true }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -102,8 +60,8 @@ jobs:
 
   report-failure:
     name: an issue on failure
-    needs: [ci, tlc-baseline, every-probe, latest]
-    if: ${{ failure() && inputs.tlc-baseline-only != true }}
+    needs: [ci, every-probe, latest]
+    if: ${{ failure() }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

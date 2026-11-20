@@ -30,8 +30,7 @@ TLC_GREEN = "Model checking completed. No error has been found."
 SETTINGS = REPO / ".claude" / "settings.json"
 HOOK_COMMAND = 'python3 "$CLAUDE_PROJECT_DIR/spec/tools/check.py" --orient'
 CI_SKIPPED = ("survival", "probes")
-CI_TOOLS = ("JAVA_HOME", "TLA2TOOLS_JAR")
-CI_CACHE = "TLC_CACHE"
+TLC_CHECKS = ("core_tlc", "tlc")
 SKIPPED = ()
 HANDOFF = REPO / "HANDOFF.md"
 OWNER_LINE = re.compile(r"^- The owner, (\d{4}-\d{2}-\d{2})")
@@ -515,18 +514,43 @@ def tlc_configs(name):
     return main, violating, holding
 
 
+def tlc_pin():
+    return json.loads(TLA_LOCK.read_text())["sha256"]
+
+
 def tla_jar_problems():
-    pinned = json.loads(TLA_LOCK.read_text())["sha256"]
+    pinned = tlc_pin()
     if not TLA_JAR.exists():
         return [f"{TLA_JAR} missing, the lock pins {pinned}"]
     found = hashlib.sha256(TLA_JAR.read_bytes()).hexdigest()
     return [] if found == pinned else [f"{TLA_JAR} has SHA-256 {found}, the lock pins {pinned}"]
 
 
-def check_tlc(brief, previous, step):
-    cached = previous.get("checks", {}).get("tlc", {}).get("runs", {})
+def cached_tlc(previous):
+    evidence = previous.get("checks", {}).get("tlc", {})
+    if not isinstance(evidence, dict) or evidence.get("jar_sha256") != tlc_pin():
+        return None
+    runs = evidence.get("runs")
+    if not isinstance(runs, dict) or not all(isinstance(configs, dict) for configs in runs.values()):
+        return None
+    return runs
+
+
+def tlc_result_line(run, recorded):
+    if recorded:
+        return f"recorded green={run.get('green')!r}, violations={run.get('violated')!r}"
+    return run.get("line", "no TLC result line")
+
+
+def check_tlc(brief, cached, step, *, recorded=False):
+    pin = tlc_pin()
     runs = {}
-    problems = tla_jar_problems()
+    problems = [] if recorded else tla_jar_problems()
+    if recorded and cached is None:
+        problems.append(f"spec/STATE.json has no recorded TLC outcomes for jar SHA-256 {pin}")
+    if problems:
+        return {**result(False, "; ".join(problems)), "jar_sha256": pin, "runs": runs}
+    cached = cached or {}
     specs = {name: expectation for name, expectation in TLC_SPECS.items() if expectation["step"] <= step}
     met = 0
     for name, expectation in specs.items():
@@ -537,28 +561,28 @@ def check_tlc(brief, previous, step):
             continue
         planned = ([main] if expectation["expect"] == "green" else []) + list(violating.values()) + holding
         spec_runs = {}
-        stale = False
+        stale = []
         for cfg in planned:
             if not cfg.exists():
                 continue
             digest = spec_hash(tla, cfg)
             run = cached.get(name, {}).get(cfg.name)
-            if not run or run.get("hash") != digest:
-                if brief:
-                    stale = True
+            if not isinstance(run, dict) or run.get("hash") != digest:
+                if brief or recorded:
+                    stale.append(cfg.name)
                     continue
                 run = {"hash": digest, **run_tlc(tla, cfg)}
             spec_runs[cfg.name] = run
         runs[name] = spec_runs
         if stale:
-            problems.append(f"{name} changed since its last run")
+            problems.append(f"{name} has missing or stale TLC outcomes: {', '.join(stale[:3])}")
             continue
         own = []
         if expectation["expect"] == "green":
             if not main.exists():
                 own.append("no main cfg")
-            elif not spec_runs[main.name]["green"]:
-                own.append(spec_runs[main.name]["line"])
+            elif spec_runs[main.name].get("green") is not True or spec_runs[main.name].get("violated") != []:
+                own.append(tlc_result_line(spec_runs[main.name], recorded))
             _, listed = tla_invariants(name)
             unmutated = sorted(invariant for invariant in listed if invariant not in violating)
             if unmutated:
@@ -568,16 +592,17 @@ def check_tlc(brief, previous, step):
         elif len(violating) != expectation["gaps"]:
             own.append(f"{len(violating)} gap cfgs, expected {expectation['gaps']}")
         for invariant, cfg in violating.items():
-            if spec_runs[cfg.name]["violated"] != [invariant]:
-                own.append(f"{cfg.name}: expected {invariant} violated, saw {spec_runs[cfg.name]['line']}")
+            if spec_runs[cfg.name].get("green") is not False or spec_runs[cfg.name].get("violated") != [invariant]:
+                own.append(f"{cfg.name}: expected {invariant} violated, saw {tlc_result_line(spec_runs[cfg.name], recorded)}")
         for cfg in holding:
-            if not spec_runs[cfg.name]["green"]:
-                own.append(f"{cfg.name}: expected green, saw {spec_runs[cfg.name]['line']}")
+            if spec_runs[cfg.name].get("green") is not True or spec_runs[cfg.name].get("violated") != []:
+                own.append(f"{cfg.name}: expected green, saw {tlc_result_line(spec_runs[cfg.name], recorded)}")
         if own:
             problems.append(f"{name}: " + "; ".join(own[:3]))
         else:
             met += 1
     outcome = result(not problems, "; ".join(problems[:6]) or "every spec green, every invariant killed by its mutant, every witness reached", specs=len(specs), met=met)
+    outcome["jar_sha256"] = pin
     outcome["runs"] = runs
     return outcome
 
@@ -3112,7 +3137,7 @@ def plant_sets():
 
 def plants_digest(sets):
     planted = sorted({edit["file"] for plants in sets.values() for plant in plants for edit in plant.get("edits", [])})
-    sources = [Path(__file__).resolve(), *sorted(PLANTS.glob("*.json")), *(REPO / name for name in planted)]
+    sources = [Path(__file__).resolve(), *sorted(PLANTS.glob("*.json")), *(REPO / name for name in planted if REPO / name != STATE)]
     digest = hashlib.sha256()
     for path in sources:
         digest.update(str(path.relative_to(REPO) if path.is_relative_to(REPO) else path.name).encode() + b"\0")
@@ -3129,6 +3154,8 @@ def plant_shape_problems(check_id, plants):
             problems.append(f"spec/plants/{check_id}.json holds a plant with no name or no edits")
         elif any(not plant_edit_shaped(edit) for edit in edits):
             problems.append(f"spec/plants/{check_id}.json: {plant['name']} has an edit outside the repository or none of file, old and new text, file and new text for a file it adds, or file and remove")
+        elif "recorded" in plant and (check_id not in TLC_CHECKS or plant["recorded"] is not True):
+            problems.append(f"spec/plants/{check_id}.json: {plant['name']} records outcomes only for TLC checks")
         elif plant.get("expect") is not None and not is_prose(plant.get("expect")):
             problems.append(f"spec/plants/{check_id}.json: {plant['name']} expects no text; an accepted plant expects null")
     return problems
@@ -3194,7 +3221,8 @@ def planted_outcome(tree, check_id, plant):
             path.write_text(text.replace(edit["old"], edit["new"]))
         try:
             workers = str(max(1, (os.cpu_count() or 1) // PLANT_WORKERS))
-            completed = subprocess.run([sys.executable, str(tree / "spec" / "tools" / "check.py"), "--check", check_id],
+            options = ["--recorded"] if plant.get("recorded") else []
+            completed = subprocess.run([sys.executable, str(tree / "spec" / "tools" / "check.py"), "--check", check_id, *options],
                                        capture_output=True, text=True, cwd=tree, timeout=PLANT_TIMEOUT,
                                        env={**os.environ, TLC_WORKERS: workers})
         except subprocess.TimeoutExpired:
@@ -3216,7 +3244,7 @@ def plant_verdict(plant, outcome):
     return "CAUGHT" if outcome["pass"] is False and plant["expect"] in outcome["detail"] else "MISSED"
 
 
-def run_plants(sets, tlc_runs=None):
+def run_plants(sets, tlc_evidence=None):
     jobs = [(check_id, plant) for check_id, plants in sets.items() for plant in plants]
     if not jobs:
         return []
@@ -3234,8 +3262,8 @@ def run_plants(sets, tlc_runs=None):
     try:
         for tree in trees:
             snapshot_worktree(tree)
-            if tlc_runs:
-                (tree / "spec" / "STATE.json").write_text(json.dumps({"checks": {"tlc": {"runs": tlc_runs}}}, indent=2, sort_keys=True) + "\n")
+            if tlc_evidence:
+                (tree / "spec" / "STATE.json").write_text(json.dumps({"checks": {"tlc": tlc_evidence}}, indent=2, sort_keys=True) + "\n")
         with ThreadPoolExecutor(len(trees)) as pool:
             return [verdict for found in pool.map(work, range(len(trees))) for verdict in found]
     finally:
@@ -3245,11 +3273,11 @@ def run_plants(sets, tlc_runs=None):
         subprocess.run(["git", "-C", str(REPO), "worktree", "prune"], capture_output=True)
 
 
-def check_plants(previous=None, tlc_runs=None):
+def check_plants(previous=None, tlc_evidence=None, *, ci=False):
     sets = plant_sets()
     digest = plants_digest(sets)
     prior = (previous or {}).get("checks", {}).get("plants", {})
-    if prior.get("pass") and prior.get("digest") == digest:
+    if not ci and prior.get("pass") and prior.get("digest") == digest:
         return {**prior, "detail": prior["detail"].split("; check.py and its plants unchanged")[0] + "; check.py and its plants unchanged since that run"}
     known = [check_id for check_id, _, _ in CHECKS if check_id not in PLANT_EXEMPT and check_id not in SKIPPED]
     problems = [f"spec/plants/{name}.json names no check of check.py" for name in sets if name not in known and name not in SKIPPED]
@@ -3257,10 +3285,12 @@ def check_plants(previous=None, tlc_runs=None):
         problems += plant_shape_problems(check_id, plants)
     if problems:
         return result(False, "; ".join(problems[:6]), problems=len(problems))
-    verdicts = run_plants({name: plants for name, plants in sets.items() if name in known}, tlc_runs)
+    selected = {name: [plant for plant in plants if not ci or name not in TLC_CHECKS or plant.get("recorded")]
+                for name, plants in sets.items() if name in known}
+    verdicts = run_plants(selected, tlc_evidence)
     problems += [f"{check_id} {verdict} {name}: {detail[:140]}" for check_id, name, verdict, detail in verdicts if verdict not in PLANT_PASSED]
-    unrefused = [check_id for check_id in known if not any(plant.get("expect") for plant in sets.get(check_id, []))]
-    unaccepted = [check_id for check_id in known if not any(plant.get("expect") is None for plant in sets.get(check_id, []))]
+    unrefused = [check_id for check_id in known if not any(plant.get("expect") for plant in selected.get(check_id, []))]
+    unaccepted = [check_id for check_id in known if not any(plant.get("expect") is None for plant in selected.get(check_id, []))]
     problems += [f"{len(unrefused)} checks have no refused plant: {', '.join(unrefused)}"] if unrefused else []
     problems += [f"{len(unaccepted)} checks have no accepted plant: {', '.join(unaccepted)}"] if unaccepted else []
     caught = sum(1 for verdict in verdicts if verdict[2] == "CAUGHT")
@@ -3409,17 +3439,19 @@ STEPS = [
 ]
 
 
-def run_checks(brief, previous):
+def run_checks(brief, previous, *, ci=False):
     outcomes = {}
+    cached = cached_tlc(previous)
     for check_id, _, function in CHECKS:
         if check_id in SKIPPED:
             continue
         if check_id == "core_tlc":
-            outcomes[check_id] = check_tlc(brief, previous, 4)
+            outcomes[check_id] = check_tlc(brief, cached, 4, recorded=ci)
         elif check_id == "tlc":
-            outcomes[check_id] = check_tlc(brief, {"checks": {"tlc": {"runs": {**previous.get("checks", {}).get("tlc", {}).get("runs", {}), **outcomes["core_tlc"]["runs"]}}}}, 5)
+            runs = None if ci and cached is None else {**(cached or {}), **outcomes["core_tlc"]["runs"]}
+            outcomes[check_id] = check_tlc(brief, runs, 5, recorded=ci)
         elif check_id == "plants":
-            outcomes[check_id] = check_plants(previous, outcomes.get("tlc", {}).get("runs"))
+            outcomes[check_id] = check_plants(previous, outcomes.get("tlc"), ci=ci)
         else:
             outcomes[check_id] = function()
     return outcomes
@@ -3513,10 +3545,10 @@ def orient():
     ]))
 
 
-def run_one(check_id):
+def run_one(check_id, *, recorded=False):
     previous = json.loads(STATE.read_text()) if STATE.exists() else {}
-    if check_id in ("core_tlc", "tlc"):
-        return check_tlc(False, previous, 4 if check_id == "core_tlc" else 5)
+    if check_id in TLC_CHECKS:
+        return check_tlc(False, cached_tlc(previous), 4 if check_id == "core_tlc" else 5, recorded=recorded)
     return next(function for name, _, function in CHECKS if name == check_id)()
 
 
@@ -3539,16 +3571,10 @@ def report_plants(names):
 
 def run_ci():
     global SKIPPED
-    unset = [name for name in CI_TOOLS if not os.environ.get(name)]
-    if unset:
-        print(f"check.py --ci reads java from JAVA_HOME and the jar from TLA2TOOLS_JAR; {' and '.join(unset)} is not set")
-        return 1
     SKIPPED = CI_SKIPPED
-    cache = Path(os.environ[CI_CACHE]) if os.environ.get(CI_CACHE) else None
-    previous = json.loads(cache.read_text()) if cache and cache.is_file() else {}
-    outcomes = run_checks(False, previous)
-    if cache:
-        cache.write_text(json.dumps({"checks": {"tlc": {"runs": outcomes["tlc"]["runs"]}}}, indent=2, sort_keys=True) + "\n")
+    previous = json.loads(STATE.read_text()) if STATE.exists() else {}
+    print("TLC: verifying outcomes in spec/STATE.json recorded on the Mac")
+    outcomes = run_checks(False, previous, ci=True)
     report(outcomes, None, False)
     return 0 if all(outcome["pass"] for outcome in outcomes.values()) else 1
 
@@ -3562,7 +3588,7 @@ def main():
     if "--generate" in sys.argv[1:]:
         return generate()
     if sys.argv[1:2] == ["--check"]:
-        print(json.dumps(run_one(sys.argv[2])))
+        print(json.dumps(run_one(sys.argv[2], recorded="--recorded" in sys.argv[3:])))
         return 0
     if sys.argv[1:2] == ["--plants"]:
         return report_plants(sys.argv[2:])

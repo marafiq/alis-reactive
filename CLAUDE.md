@@ -189,7 +189,9 @@ kind (`spec/REWRITE.md`, section 1.2), printed on the committed tree and read wh
 fact changes. Nothing is run twice to feel safer, nothing waits on a run that gates no unit, and a question the TLA+
 specs, the principles or the owner's decisions answer is decided from them and held. A report says what was run, by
 its line, and what was not: MVC 5 on net48 is run by CI's Windows job when the rewrite is done, and this Mac is the
-loop until then. Drift is stopped where it starts: one meaning changes in one commit, with every place it is in.
+loop until then. The Mac runs TLC and its model-executing plants. CI checks the results recorded in
+`spec/STATE.json` against the current specs and tool pin (the owner, 2026-11-20).
+Drift is stopped where it starts: one meaning changes in one commit, with every place it is in.
 
 ## Sessions
 

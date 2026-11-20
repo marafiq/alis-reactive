@@ -21,7 +21,7 @@ Runs every check that needs no browser, in order, and stops at the first that fa
   7. dotnet format --verify-no-changes over the solution
   8. the architecture tests but WhenAConsumerAppIsBuilt, which scripts/delivery.sh runs on the packs,
      the analyzer cases, the test rules' cases and the module tests
-  9. python3 spec/tools/check.py --ci, which reads JAVA_HOME and TLA2TOOLS_JAR
+  9. python3 spec/tools/check.py --ci, with recorded TLC outcomes from spec/STATE.json
 
 Options:
   --no-spec   Leave step 9 out: CI runs it as a job of its own.

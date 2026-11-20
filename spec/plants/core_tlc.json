@@ -47,5 +47,29 @@
    }
   ],
   "expect": null
+ },
+ {
+  "name": "recorded results for a changed core config",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/PathsAndWire/DateWire.cfg",
+    "old": "CONSTANT Mutant = \"none\"",
+    "new": "CONSTANT Mutant = \"DayWritesTime\""
+   }
+  ],
+  "expect": "DateWire has missing or stale TLC outcomes: DateWire.cfg"
+ },
+ {
+  "name": "recorded results for the current jar with a different lock format",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/tools/tla2tools.lock",
+    "old": "{\n",
+    "new": "{  \n"
+   }
+  ],
+  "expect": null
  }
 ]

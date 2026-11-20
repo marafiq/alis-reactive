@@ -42,5 +42,41 @@
    }
   ],
   "expect": null
+ },
+ {
+  "name": "recorded results for another jar pin",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/tools/tla2tools.lock",
+    "old": "  \"sha256\": \"",
+    "new": "  \"sha256\": \"0000000000000000000000000000000000000000000000000000000000000000\",\n  \"original_sha256\": \""
+   }
+  ],
+  "expect": "spec/STATE.json has no recorded TLC outcomes for jar SHA-256"
+ },
+ {
+  "name": "a recorded counterexample marked green",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/STATE.json",
+    "old": "          \"Tracing.violates.ChildEndsBeforeParent.cfg\": {\n            \"green\": false,",
+    "new": "          \"Tracing.violates.ChildEndsBeforeParent.cfg\": {\n            \"green\": true,"
+   }
+  ],
+  "expect": "Tracing.violates.ChildEndsBeforeParent.cfg: expected ChildEndsBeforeParent violated"
+ },
+ {
+  "name": "recorded results for the current jar with a different lock format",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/tools/tla2tools.lock",
+    "old": "{\n",
+    "new": "{  \n"
+   }
+  ],
+  "expect": null
  }
 ]
