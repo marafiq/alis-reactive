@@ -37,6 +37,7 @@
     <Compile Include="$(ConformanceApp)Care/Admission/IntakeDocuments.cs" Link="ConformanceApp/Care/Admission/IntakeDocuments.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/RoomNumbering.cs" Link="ConformanceApp/Care/Admission/RoomNumbering.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/RoomIntake.cs" Link="ConformanceApp/Care/Admission/RoomIntake.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/SavedIntake.cs" Link="ConformanceApp/Care/Admission/SavedIntake.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/ContactMoveIn.cs" Link="ConformanceApp/Care/Admission/ContactMoveIn.cs" />
     <TwinView Include="$(ConformanceApp)**/*.Net48.cshtml" Exclude="$(ConformanceApp)bin/**;$(ConformanceApp)obj/**" />
     <TwinView Include="$(ConformanceApp)World/Ready.cshtml" />
@@ -47,6 +48,7 @@
     <TwinView Include="$(ConformanceApp)Care/Admission/IntakeDocuments.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/RoomNumbering.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/RoomIntake.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/SavedIntake.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/ContactMoveInKinCard.cshtml" />
   </ItemGroup>
 

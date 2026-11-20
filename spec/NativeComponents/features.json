@@ -2412,6 +2412,11 @@
           "id": "M24.X10",
           "rung": "behavior",
           "defect": "Both lines render the box by MVC's TextBoxFor (Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxBuilder.cs:119 at 623dd4a27; Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxBuilder.cs:111 at 65fdf118d), which holds the member's text and, after a failed post, MVC's attempted text, as D17.13 states for a text box. A helper that writes the member's value in its place shows the model's 0 and drops the 2a the person typed; one that writes no value shows an empty box over a member that holds one."
+        },
+        {
+          "id": "M24.X15",
+          "rung": "behavior",
+          "defect": "A NativeTextBox bound to a DateTime uses MVC's current culture for the initial model text. The plan's declared date input reads ISO text, so an untouched saved date binds as the member's start after a Reactive save. D17.13 gives the helper the plan's live literal for the initial value and keeps MVC's attempted text on redisplay."
         }
       ],
       "promises": [
@@ -2422,6 +2427,14 @@
           "outcome": "The intake page shows again with 2a in the room box.",
           "opposite": "Opened for a model whose Room is 12, the room box shows 12.",
           "defect": "The box shows 0, the model's value, so the person's 2a is lost; or it shows empty on a model whose Room is 12."
+        },
+        {
+          "for": "M24.X15",
+          "page": "A saved intake in de-DE has NativeTextBox inputs holding a move-in date of 2026-11-18 at midnight, a nullable orientation date and time of 2026-11-18T14:35:08.123, and a nullable discharge date with no value. An existing Reactive Form request saves the unchanged fields, and the MVC endpoint answers with the actual dates it bound.",
+          "gesture": "Click Save without editing the saved fields.",
+          "outcome": "The receipt shows Moving in 2026-11-18; orientation 2026-11-18 14:35:08.123; discharge not set.",
+          "opposite": "The unfilled discharge date binds as null.",
+          "defect": "The initial MVC culture text is passed to the plan's ISO date read, so the actual saved move-in day or orientation time is lost."
         }
       ],
       "verdicts": [

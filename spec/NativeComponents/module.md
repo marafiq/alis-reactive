@@ -75,7 +75,8 @@ Each name is gate 2's; each door is the capability it carries.
   `Change` as `Event<Changed>`, `Changed` nested in it and mirroring lib.dom's `Event`, an input. The render helpers render MVC's `TextAreaFor` with `Rows`, `Placeholder` and `CssClass`.
 - `M24.N9` kept: `NativeTextBox`, mirroring `HTMLInputElement`: `Value` as `Property<string>`, `Focus()` and
   `Change` as `Event<Changed>`, `Changed` nested in it and mirroring lib.dom's `Event`, an input. The render helpers render MVC's `TextBoxFor` with `Placeholder` and `CssClass`, its `Type`
-  module 16's.
+  module 16's. For a DateTime or its nullable form, the initial text is the plan's ISO wall date and time, including
+  midnight and any fractional seconds it writes (D17.13, D3.9, M24.X15). MVC still renders attempted text.
 
 On each input slice, main's `ValueMember` is refused (M7.N3); main's events class, its getters and `Instance` are
 renamed to the slice's door; main's extensions over `ComponentRef` are renamed to the slice's door and M12.N2; main's

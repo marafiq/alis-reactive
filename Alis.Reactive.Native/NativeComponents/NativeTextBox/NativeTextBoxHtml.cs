@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using Alis.Reactive.RenderingAndDelivery;
 
 namespace Alis.Reactive.Native.NativeComponents;
@@ -10,14 +11,14 @@ namespace Alis.Reactive.Native.NativeComponents;
 public static partial class NativeTextBoxHtml
 {
     /// <summary>Renders a text box for the field's member, holding the member's text.</summary>
-    /// <remarks>After a post that failed, the box holds the text the person sent.</remarks>
+    /// <remarks>A <see cref="DateTime"/> starts as ISO 8601 text without an offset. After a post that failed, the box holds the text the person sent.</remarks>
     /// <param name="field">The input field the box is rendered for.</param>
     /// <returns>The rendered text box, which writes its markup where the view puts it.</returns>
     public static Rendered<NativeTextBox, TModel> NativeTextBox<TModel, TValue>(this InputField<TModel, TValue> field)
         => field.NativeTextBox(_ => { });
 
     /// <summary>Renders a text box for the field's member, holding the member's text, with what the view sets on it.</summary>
-    /// <remarks>After a post that failed, the box holds the text the person sent.</remarks>
+    /// <remarks>A <see cref="DateTime"/> starts as ISO 8601 text without an offset. After a post that failed, the box holds the text the person sent.</remarks>
     /// <param name="field">The input field the box is rendered for.</param>
     /// <param name="build">What the view sets on the box.</param>
     /// <returns>The rendered text box, which writes its markup where the view puts it.</returns>
@@ -25,10 +26,12 @@ public static partial class NativeTextBoxHtml
     {
         var builder = new NativeTextBoxBuilder();
         build(builder);
-        return MvcTextBox(field, builder.AttributesUnder(field.Id));
+        var isWallTime = typeof(TValue) == typeof(DateTime) || typeof(TValue) == typeof(DateTime?);
+        var format = isWallTime ? JsonSerializer.Deserialize<string>(field.ValueJson) : null;
+        return MvcTextBox(field, format, builder.AttributesUnder(field.Id));
     }
 
-    private static partial Rendered<NativeTextBox, TModel> MvcTextBox<TModel, TValue>(InputField<TModel, TValue> field, Dictionary<string, object> attributes);
+    private static partial Rendered<NativeTextBox, TModel> MvcTextBox<TModel, TValue>(InputField<TModel, TValue> field, string? format, Dictionary<string, object> attributes);
 }
 
 /// <summary>

@@ -1395,6 +1395,9 @@ view a browser test runs (`.claude/rules/docs.md`).
 ### U23. Native components
 Features: M24.F1, M24.F2, M24.F3, M24.F4, M24.F5, M24.F6, M24.F7, M24.F8, M24.F9
 
+A Native text box starts a DateTime or its nullable value from the plan's ISO wall time (D17.13, D3.9),
+and MVC still holds attempted text. M24.X15 proves the unchanged dates bind on Save.
+
 Written to the highest bar: a component-writing expert's review of each slice before its commit, bounded as root
 CLAUDE.md bounds every review, and the strictest lint and TypeScript options of section 2.7 with no exemption.
 

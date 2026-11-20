@@ -10980,6 +10980,23 @@
       ]
     },
     {
+      "feature": "M24.F9",
+      "for": "M24.X15",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10",
+        "net48"
+      ],
+      "parts": [
+        "inputs",
+        "intakeForm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M25.F7",
       "for": "M25.X11",
       "index": 0,

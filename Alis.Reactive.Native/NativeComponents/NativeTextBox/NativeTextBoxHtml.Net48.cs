@@ -7,7 +7,7 @@ namespace Alis.Reactive.Native.NativeComponents;
 
 public static partial class NativeTextBoxHtml
 {
-    private static partial Rendered<NativeTextBox, TModel> MvcTextBox<TModel, TValue>(InputField<TModel, TValue> field, Dictionary<string, object> attributes)
-        => field.Render<NativeTextBox>(field.Html.TextBoxFor(field.Member, attributes));
+    private static partial Rendered<NativeTextBox, TModel> MvcTextBox<TModel, TValue>(InputField<TModel, TValue> field, string? format, Dictionary<string, object> attributes)
+        => field.Render<NativeTextBox>(field.Html.TextBoxFor(field.Member, format, attributes));
 }
 #endif

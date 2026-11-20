@@ -1172,6 +1172,7 @@ public static class Promises
     public static class M24_F9
     {
         public const string M24_X10_0 = "M24.F9 M24.X10 0";
+        public const string M24_X15_0 = "M24.F9 M24.X15 0";
     }
 
     public static class M25_F1
