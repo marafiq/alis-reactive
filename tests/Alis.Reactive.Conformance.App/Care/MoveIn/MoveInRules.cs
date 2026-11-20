@@ -4,6 +4,9 @@ namespace Alis.Reactive.Conformance.App.Care;
 
 public sealed partial class MoveInRules : ReactiveValidator<MoveInPage>
 {
+    internal const string Draft = "Draft";
+    internal const string Submit = "Submit";
+
     public MoveInRules()
     {
         TheLocation();
@@ -15,6 +18,12 @@ public sealed partial class MoveInRules : ReactiveValidator<MoveInPage>
         TheServices();
         TheDiet();
         TheDocuments();
+        RuleSet(Submit, () =>
+        {
+            RuleFor(m => m.Location.BedId).NotEmpty().WithMessage("Choose a bed.");
+            RuleFor(m => m.Services.Codes).NotEmpty().WithMessage("Choose at least one service.");
+            RuleFor(m => m.AcceptedQuoteRevision).NotNull().WithMessage("Accept the current quote.");
+        });
     }
 
     partial void TheLocation();

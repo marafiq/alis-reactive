@@ -477,6 +477,18 @@ public static class Promises
         public const string M9_X203_0 = "M9.F2 M9.X203 0";
         [Holds(OwnershipGate.ShowsFailures)]
         public const string M9_X204_0 = "M9.F2 M9.X204 0";
+        public const string M9_X215_0 = "M9.F2 M9.X215 0";
+        public const string M9_X216_0 = "M9.F2 M9.X216 0";
+        [Holds(LanesGate.SettleTheTail)]
+        public const string M9_X217_0 = "M9.F2 M9.X217 0";
+        public const string M9_X218_0 = "M9.F2 M9.X218 0";
+        public const string M9_X219_0 = "M9.F2 M9.X219 0";
+        public const string M9_X220_0 = "M9.F2 M9.X220 0";
+        public const string M9_X221_0 = "M9.F2 M9.X221 0";
+        public const string M9_X222_0 = "M9.F2 M9.X222 0";
+        public const string M9_X223_0 = "M9.F2 M9.X223 0";
+        [Holds(LanesGate.SettleTheTail)]
+        public const string M9_X224_0 = "M9.F2 M9.X224 0";
     }
 
     public static class M10_F1

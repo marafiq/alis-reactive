@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Alis.Reactive.Conformance.World;
 using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.TriggersAndPipelines;
@@ -82,28 +81,7 @@ public static partial class MoveInEndpoints
 
 public static class MoveInContactEvents
 {
-    public static readonly AppEvent<ContactCommand> Command = AppEvent.Declare<ContactCommand>();
-
     public static readonly AppEvent Added = AppEvent.Declare();
-}
-
-public sealed class ContactCommand
-{
-    public ContactCommandKind Kind { get; set; }
-
-    public ContactInput? NewContact { get; set; }
-
-    public string RemoveId { get; set; } = string.Empty;
-
-    public int Version { get; set; }
-}
-
-[JsonConverter(typeof(JsonStringEnumConverter<ContactCommandKind>))]
-public enum ContactCommandKind
-{
-    SaveContacts,
-    AddContact,
-    RemoveContact,
 }
 
 public sealed class PayerExplanationQuery

@@ -19,6 +19,7 @@
     @(Html.NativeHiddenField(plan, m => m.ResidentId))
     @(Html.NativeHiddenField(plan, m => m.CoordinatorId))
     @(Html.NativeHiddenField(plan, m => m.OperationId))
+    @(Html.NativeHiddenField(plan, m => m.AcceptedQuoteRevision))
 
     <section id="move-in-location" aria-label="Location">
         @await Html.PartialFor(m => m.Location, "/Care/MoveIn/Location.cshtml")
@@ -78,26 +79,10 @@
     </section>
 
     <section id="move-in-draft" aria-label="Draft">
-        <button type="button" @Html.Raises(plan, MoveInDraftEvents.Save)>Save draft</button>
-        <p id="save-status"></p>
+        @await Html.PartialAsync("/Care/MoveIn/DraftCommands.cshtml", Model)
         @{
+            Html.On(plan, trigger => trigger.CustomEvent(QuoteEvents.Accepted, (revision, pipeline) => pipeline.Input(m => m.AcceptedQuoteRevision).Component<NativeHiddenField>().Value.Set(pipeline.Concat(revision))));
             Html.On(plan, trigger => trigger.CustomEvent(MealEvents.Saved, (version, pipeline) => pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(version))));
-            Html.On(plan, trigger => trigger.CustomEvent(MoveInDraftEvents.Save, pipeline => pipeline
-                .Put<MoveInPage>(MoveInEndpoints.Draft, request => request
-                    .Path(sent => sent.DraftId, moveIn.Container.Read(m => m.DraftId))
-                    .Header(MoveInEndpoints.VersionHeader, moveIn.Container.Read(m => m.Version))
-                    .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Container.Read(m => m.CoordinatorId))
-                    .Header(MoveInEndpoints.OperationHeader, moveIn.Container.Read(m => m.OperationId))
-                    .Json(moveIn.Container, body => { }))
-                .Validate<MoveInRules>(MoveInRules.PayerCoverage)
-                .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
-                .OnSuccess<SaveReply>((saved, pipeline) =>
-                {
-                    pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(reply => reply.Receipt.Version)));
-                    pipeline.Element("saved-version").Text.Set(saved.Body.Read(reply => reply.Receipt.Version));
-                    pipeline.Element("save-status").Text.Set(pipeline.Concat("Draft saved: version ", saved.Body.Read(reply => reply.Receipt.Version)));
-                    pipeline.Dispatch(MealEvents.Saved, saved.Body.Read(reply => reply.Receipt.Version));
-                })));
         }
     </section>
 }

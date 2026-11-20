@@ -8,7 +8,13 @@ internal sealed partial class MoveInDesk
 {
     partial void TakeForTheServices(MoveInChange change)
     {
-        if (change.ReadyForAdmission) MoveInSeed.MakeReady(_world);
+        if (change.ReadyForAdmission)
+        {
+            MoveInSeed.MakeReady(_world);
+            var ready = _world.Drafts.Single(d => d.Id == HelensDraft);
+            var allergies = _world.Residents.Single(r => r.Id == ready.Data.ResidentId).Allergies.Concat(ready.Data.Resident.Allergies);
+            _pharmacyFacts[ready.Id] = new(ready.Data.Medications, ready.Data.Medications, allergies.ToHashSet(StringComparer.OrdinalIgnoreCase));
+        }
         if (change.AwaitsFirstQuote && DraftOf("D100") is { } draft) draft.Quote = null;
     }
 

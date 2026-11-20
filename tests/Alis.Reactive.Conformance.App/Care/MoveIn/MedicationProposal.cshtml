@@ -14,7 +14,7 @@
         @(Html.InputField(plan, m => m.NewMedication!.Unit, o => o.Label("Proposed unit")).NativeTextBox())
         @(Html.InputField(plan, m => m.NewMedication!.Schedule, o => o.Label("Proposed rounds")).NativeCheckList(list => list.Items(new[] { new CheckListItem("Morning", "Morning"), new CheckListItem("Evening", "Evening") })))
         @(Html.InputField(plan, m => m.NewMedication!.Instructions, o => o.Label("New prescription instructions")).NativeTextBox())
-        @(Html.NativeButton("add-medication", "Add medication").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MedicationCommands.Change, pipeline.Object<MedicationCommand>(m => m.Set(c => c.Add, true)))))
+        @(Html.NativeButton("add-medication", "Add medication").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MoveInDraftEvents.Command, pipeline.Object<DraftCommand>(m => m.Set(c => c.Kind, DraftCommandKind.AddMedication)))))
     </fieldset>
 }
 @Html.RenderPlan(plan)

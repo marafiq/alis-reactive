@@ -9,6 +9,8 @@ public sealed class ReceiptPage
 
 public sealed class ReceiptQuery
 {
+    public string? Referral { get; set; }
+
     public string DraftId { get; set; } = string.Empty;
 
     public string Reference { get; set; } = string.Empty;

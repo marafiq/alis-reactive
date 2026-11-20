@@ -123,15 +123,4 @@ public static partial class MoveInEndpoints
     public const string ReviewHeader = "X-Review";
 }
 
-public static class MedicationCommands
-{
-    public static readonly AppEvent<MedicationCommand> Change = AppEvent.Declare<MedicationCommand>();
-}
-
-public sealed class MedicationCommand
-{
-    public string? RemoveId { get; set; }
-    public bool Add { get; set; }
-}
-
 public sealed record PharmacyAdvice(string Text);

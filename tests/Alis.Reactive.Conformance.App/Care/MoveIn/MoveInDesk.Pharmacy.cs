@@ -47,6 +47,10 @@ internal sealed partial class MoveInDesk
         lock (_gate) return DraftOf(draftId)?.PharmacyClearanceId ?? "No pharmacy clearance on file.";
     }
 
+    private readonly Dictionary<string, PharmacyFacts> _pharmacyFacts = new(StringComparer.Ordinal);
+
+    private sealed record PharmacyFacts(MedicationSection OnFile, MedicationSection Cleared, HashSet<string> Allergies);
+
     internal PharmacyDecision CheckPharmacy(string draftId, PharmacyRequest request, string? reference, string? reviewHeader, string? coordinator, Guid operation)
     {
         lock (_gate)
@@ -98,6 +102,7 @@ internal sealed partial class MoveInDesk
             var clearance = "CL" + draft.Id[1..];
             var instructions = "INSTRUCTIONS-" + clearance;
             _pharmacyInstructions[draftId] = (instructions, string.Join(" ", directions));
+            _pharmacyFacts[draftId] = new(draft.Data.Medications, request.Medications, allergies);
             draft.PharmacyClearanceId = clearance;
             _world.Reviews.Add(new ReviewState
             {

@@ -57,6 +57,7 @@
                 {
                     pipeline.Element("acceptance-receipt").Text.Set(accepted.Body.Read(r => r.Receipt.Reference));
                     pipeline.Element("quote-acceptance").Text.Set($"Accepted revision {quote.Revision}");
+                    pipeline.Dispatch(QuoteEvents.Accepted, quote.Revision);
                     pipeline.When(accepted.Body.Read(r => r.Review.Required))
                         .Then(pipeline => pipeline.Element("acceptance-status").Text.Set("Reading assistance terms"))
                         .Else(pipeline => pipeline.Element("acceptance-status").Text.Set("Quote accepted"));

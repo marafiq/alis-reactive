@@ -1064,6 +1064,56 @@
           "id": "M9.X204",
           "rung": "behavior",
           "defect": "Closing the medication section suppresses the late summary."
+        },
+        {
+          "id": "M9.X215",
+          "rung": "behavior",
+          "defect": "The receipt shows a different ETag from the saved version."
+        },
+        {
+          "id": "M9.X216",
+          "rung": "behavior",
+          "defect": "Draft validation omits the medication precision rule."
+        },
+        {
+          "id": "M9.X217",
+          "rung": "behavior",
+          "defect": "The version conflict loads a comparison for the page version."
+        },
+        {
+          "id": "M9.X218",
+          "rung": "behavior",
+          "defect": "The save proceeds after the transport has been dropped."
+        },
+        {
+          "id": "M9.X219",
+          "rung": "behavior",
+          "defect": "The saved payer retains a secondary policy after its section was unloaded."
+        },
+        {
+          "id": "M9.X220",
+          "rung": "behavior",
+          "defect": "E25 does not occupy the admitted bed."
+        },
+        {
+          "id": "M9.X221",
+          "rung": "behavior",
+          "defect": "Submit validation accepts an empty bed."
+        },
+        {
+          "id": "M9.X222",
+          "rung": "behavior",
+          "defect": "The bed conflict omits the eligible waitlist offer."
+        },
+        {
+          "id": "M9.X223",
+          "rung": "behavior",
+          "defect": "The admission is committed before handling the dropped connection."
+        },
+        {
+          "id": "M9.X224",
+          "rung": "behavior",
+          "defect": "The shared draft handler replaces the admission while its checklist is held."
         }
       ],
       "promises": [
@@ -2112,6 +2162,86 @@
           "outcome": "The surviving summary shows the conflict, the next save omits the working AMOX edit and the persisted prescription stays Aspirin.",
           "opposite": "The original input receives the failure while it remains on the page.",
           "defect": "Closing the medication section suppresses the late summary."
+        },
+        {
+          "for": "M9.X215",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Clear the bed, enter coordinator notes and save the draft from the referral address.",
+          "outcome": "Version 8, SAVE8, ETag 8 and the sent referral accompany the receipt. Reopening shows the saved notes and empty bed.",
+          "opposite": "A submitted admission requires a bed.",
+          "defect": "The receipt shows a different ETag from the saved version."
+        },
+        {
+          "for": "M9.X216",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Enter a dose with three decimal places and save the draft.",
+          "outcome": "The medication field explains the precision failure. The world keeps version 7 and the original dose.",
+          "opposite": "A well-formed dose saves.",
+          "defect": "Draft validation omits the medication precision rule."
+        },
+        {
+          "for": "M9.X217",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Edit the notes while Luis saves his changes, then save the open page.",
+          "outcome": "The comparison names Luis Ortiz and version 8 while the working notes stay visible. Reopening reads his saved notes.",
+          "opposite": "A fresh page can save the current version.",
+          "defect": "The version conflict loads a comparison for the page version."
+        },
+        {
+          "for": "M9.X218",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Change the notes, lose the PUT before execution and save.",
+          "outcome": "The page reports that saving failed. Reopening reads version 7 and the prior notes.",
+          "opposite": "A delivered PUT advances the saved version.",
+          "defect": "The save proceeds after the transport has been dropped."
+        },
+        {
+          "for": "M9.X219",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Enter a secondary policy, clear its checkbox and save the draft.",
+          "outcome": "The receipt confirms version 8. Reopening shows the primary policy and no secondary coverage.",
+          "opposite": "A secondary policy left in the form saves with the draft.",
+          "defect": "The saved payer retains a secondary policy after its section was unloaded."
+        },
+        {
+          "for": "M9.X220",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Submit the ready admission and reopen the draft.",
+          "outcome": "ADM100 displays its monthly charge and checklist. Version 8 is submitted and BED4 belongs to Helen.",
+          "opposite": "Changing a cleared medication or losing eligibility leaves the admission open.",
+          "defect": "E25 does not occupy the admitted bed."
+        },
+        {
+          "for": "M9.X221",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Clear the bed on the ready draft and submit.",
+          "outcome": "Choose a bed appears before the request leaves. Reopening shows the open draft and saved bed.",
+          "opposite": "The ready draft with BED4 submits.",
+          "defect": "Submit validation accepts an empty bed."
+        },
+        {
+          "for": "M9.X222",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Submit after James takes the selected bed and open the offered waitlist.",
+          "outcome": "The hold names James Reed and its expiration. The waitlist accepts the entry and the open draft still has no admission.",
+          "opposite": "An available bed admits the resident.",
+          "defect": "The bed conflict omits the eligible waitlist offer."
+        },
+        {
+          "for": "M9.X223",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Submit the ready draft after its admission transport is lost.",
+          "outcome": "The coordinator sees a failure and reopens version 7 with BED4 available and no admission.",
+          "opposite": "A delivered POST commits the admission.",
+          "defect": "The admission is committed before handling the dropped connection."
+        },
+        {
+          "for": "M9.X224",
+          "page": "Helen Ward's move-in draft at the senior-living admission desk.",
+          "gesture": "Hold the checklist, submit again and try saving. Release the checklist, then submit again.",
+          "outcome": "The held tail permits one POST and no PUT. The explicit replay returns ADM100. Reopening finds one allocation and one admission history entry.",
+          "opposite": "A new gesture after the tail sends another POST.",
+          "defect": "The shared draft handler replaces the admission while its checklist is held."
         }
       ],
       "verdicts": []

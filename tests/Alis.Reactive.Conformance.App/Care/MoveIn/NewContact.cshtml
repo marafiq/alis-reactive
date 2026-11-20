@@ -18,8 +18,8 @@
         @(Html.InputField(plan, m => m.NewContact!.Phone, options => options.Label("Phone")).NativeTextBox())
         @(Html.InputField(plan, m => m.NewContact!.AlternatePhone, options => options.Label("Alternate phone")).NativeTextBox())
     </fieldset>
-    @(Html.NativeButton("add-contact", "Add contact").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MoveInContactEvents.Command, pipeline.Object<ContactCommand>(command => command
-        .Set(sent => sent.Kind, ContactCommandKind.AddContact)
+    @(Html.NativeButton("add-contact", "Add contact").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MoveInDraftEvents.Command, pipeline.Object<DraftCommand>(command => command
+        .Set(sent => sent.Kind, DraftCommandKind.AddContact)
         .Set(sent => sent.NewContact, fresh.Container.Read(m => m.NewContact))
         .Set(sent => sent.Version, pipeline.Container<MoveInPage>("move-in").Read(m => m.Version))))))
     Html.On(plan, trigger => trigger.CustomEvent(MoveInContactEvents.Added, pipeline =>

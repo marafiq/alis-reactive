@@ -10,6 +10,7 @@ public sealed partial class MoveInDeskController
     {
         if (DropsItsConnection()) return new EmptyResult();
 
-        return PartialView(Views + "Receipt.cshtml", Desk.ReceiptOf(query.DraftId, query.Reference));
+        if (ReviewAccess(query.DraftId) is { } refusal) return refusal;
+        return Desk.ReceiptOf(query.DraftId, query.Reference) is { } receipt ? PartialView(Views + "Receipt.cshtml", receipt) : NotFound(MoveInErrors.Missing());
     }
 }

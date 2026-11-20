@@ -74,6 +74,8 @@ public sealed class MoveInPage
 
     public string CoordinatorId { get; set; } = string.Empty;
 
+    public string? Referral { get; set; }
+
     public bool Rehearsal { get; set; }
 
     public Guid OperationId { get; set; }

@@ -5,12 +5,14 @@ internal sealed partial class MoveInDesk
     private const string TheAllocationsReceipts = "ALLOC";
     private const string TheAllocationsReviews = "AR";
 
-    internal ReceiptPage ReceiptOf(string draftId, string reference)
+    internal ReceiptPage? ReceiptOf(string draftId, string reference)
     {
         lock (_gate)
         {
+            if (_draftReceipts.TryGetValue((draftId, reference), out var receipt))
+                return new ReceiptPage { Reference = reference, Text = $"{reference}: version {receipt.Version} saved by {receipt.SavedBy.Name}." };
             var review = _world.Reviews.FirstOrDefault(found => found.DraftId == draftId && ReferenceOfTheReceiptOf(found) == reference);
-            return new ReceiptPage { Reference = reference, Text = review is null ? "No receipt of that reference is on file." : TheReceiptOf(review) };
+            return review is null ? null : new ReceiptPage { Reference = reference, Text = TheReceiptOf(review) };
         }
     }
 

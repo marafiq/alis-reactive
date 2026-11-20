@@ -97,6 +97,7 @@ public static partial class MoveInEndpoints
 public static class QuoteEvents
 {
     public static readonly AppEvent ServicesEdited = AppEvent.Declare();
+    public static readonly AppEvent<int> Accepted = AppEvent.Declare<int>();
     public static readonly AppEvent Calculated = AppEvent.Declare();
     public static readonly AppEvent<int> CheckCurrentPrice = AppEvent.Declare<int>();
     public static readonly AppEvent<int> PricesChanged = AppEvent.Declare<int>();

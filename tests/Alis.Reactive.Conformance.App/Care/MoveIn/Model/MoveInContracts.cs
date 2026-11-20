@@ -6,7 +6,7 @@ public sealed class MoveInPageAddress
 
     public string CommunityId { get; set; } = string.Empty;
 
-    public string Referral { get; set; } = string.Empty;
+    public string? Referral { get; set; }
 
     public bool ReviewOnly { get; set; }
 
@@ -328,7 +328,10 @@ public sealed record BedConflictDetail(ConflictingBed Bed, WaitlistOffer Waitlis
 
 public sealed record ConflictingBed(string Id, PersonLabel Holder, ConflictHold Hold);
 
-public sealed record ConflictHold(DateTimeOffset ExpiresAt);
+public sealed record ConflictHold(DateTimeOffset ExpiresAt)
+{
+    public string LocalTime => ExpiresAt.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+}
 
 public sealed record WaitlistOffer(bool Allowed, string TermsId);
 

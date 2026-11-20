@@ -1,0 +1,252 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Declarations
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+
+    void Compare(Pipeline<MoveInPage> pipeline, TypedSource<int> revision)
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Get<DraftComparisonQuery>(CareEndpoints.MoveInComparisons, request => request
+            .Query(q => q.DraftId, Model.DraftId).Query(q => q.Revision, revision)).Into("move-in-comparison");
+        pipeline.Element("working-comparison").Text.Set(pipeline.Concat("Your notes: ", moveIn.Read(m => m.Resident.Notes)));
+    }
+
+    void Save(Pipeline<MoveInPage> pipeline)
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        var address = pipeline.PageUrl<MoveInPageAddress>(MoveInEndpoints.Page);
+        pipeline.Put<MoveInPage>(MoveInEndpoints.Draft, request => request
+            .Path(sent => sent.DraftId, address.Read(a => a.DraftId))
+            .Query(sent => sent.Referral, address.Read(a => a.Referral).IfNull(""))
+            .Query(sent => sent.Rehearsal, Model.Rehearsal)
+            .Header(MoveInEndpoints.VersionHeader, moveIn.Read(m => m.Version))
+            .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+            .Json(moveIn, body => body.When(moveIn.Read(m => m.Reference).NotNull()).Then(part => part
+                .Set(sent => sent.Review.Reference, moveIn.Read(m => m.Reference)))))
+            .NoRetry()
+            .Validate<MoveInRules>(MoveInRules.Draft)
+            .WhileLoading(pipeline => pipeline.Element("draft-progress").Text.Set("Saving admission"))
+            .OnSuccess<SaveReply>((saved, pipeline) =>
+            {
+                var version = saved.Body.Read(reply => reply.Receipt.Version);
+                pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(version));
+                pipeline.Element("saved-version").Text.Set(version);
+                pipeline.Element("save-status").Text.Set(pipeline.Concat("Draft saved: version ", version));
+                pipeline.Element("draft-receipt").Text.Set(pipeline.Concat(saved.Body.Read(reply => reply.Receipt.Reference), ", ETag ", saved.Headers.Get("ETag"), ", referral ", saved.Request.Read(sent => sent.Referral)));
+                pipeline.Dispatch(MealEvents.Saved, version);
+            })
+            .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+            .OnError<ErrorEnvelope>(410, (closed, pipeline) => pipeline.Notice().Error(closed.Body.Read(r => r.Error.Message)))
+            .OnError<VersionConflict>(409, (stale, pipeline) => pipeline.When(stale.Body.Read(c => c.Conflict.Draft.Comparison.Required))
+                .Then(pipeline => Compare(pipeline, stale.Body.Read(c => c.Conflict.Draft.Revision))))
+            .OnError((failed, pipeline) => pipeline.Notice().Error("Draft could not be saved."))
+            .Finally(pipeline => pipeline.Element("draft-progress").Text.Set("Ready"))
+            .Chained((saved, pipeline) => pipeline.Get<ReceiptQuery>(CareEndpoints.MoveInReceipts, request => request
+                .Query(q => q.DraftId, saved.Body.Read(r => r.Receipt.DraftId))
+                .Query(q => q.Reference, saved.Body.Read(r => r.Receipt.Reference))
+                .Query(q => q.Referral, saved.Request.Read(sent => sent.Referral))).Into("move-in-receipt"));
+    }
+
+    void Submit(Pipeline<MoveInPage> pipeline)
+    {
+        var main = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Post<MoveInPage>(MoveInEndpoints.Admissions, request => request
+            .Path(sent => sent.DraftId, pipeline.PageUrl<MoveInPageAddress>(MoveInEndpoints.Page).Read(a => a.DraftId))
+            .Header(MoveInEndpoints.VersionHeader, main.Read(m => m.Version))
+            .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+            .Json(main, body => { }))
+            .Validate<MoveInRules>(MoveInRules.Submit)
+            .OnSuccess<AdmissionReply>((reply, pipeline) =>
+            {
+                pipeline.Element("admission-receipt").Text.Set(pipeline.Concat(reply.Body.Read(r => r.Admission.Id), ", monthly total ", reply.Body.Read(r => r.Admission.MonthlyTotal), " USD"));
+                pipeline.When(reply.Status.Eq(201))
+                    .Then(pipeline => pipeline.Element("admission-status").Text.Set(pipeline.Concat(reply.Body.Read(r => r.Admission.ResidentName), " admitted to apartment ", reply.Body.Read(r => r.Admission.ApartmentNumber))))
+                    .Else(pipeline => pipeline.Element("admission-status").Text.Set(pipeline.Concat("Existing admission ", reply.Body.Read(r => r.Admission.Id))));
+            })
+            .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+            .OnError<AdmissionConflict>(409, (taken, pipeline) => pipeline.When(taken.Body.Read(c => c.Conflict.Draft).NotNull())
+                .Then(pipeline => Compare(pipeline, taken.Body.Read(c => c.Conflict.Draft!.Revision)))
+                .Else(pipeline =>
+                {
+                    pipeline.Element("admission-status").Text.Set(pipeline.Concat("Bed held by ", taken.Body.Read(c => c.Conflict.Bed!.Holder.Name), " until ", taken.Body.Read(c => c.Conflict.Bed!.Hold.LocalTime)));
+                    pipeline.When(taken.Body.Read(c => c.Conflict.Waitlist!.Allowed)).Then(pipeline => pipeline.Get<WaitlistTermsQuery>(MoveInEndpoints.WaitlistTerms, request => request
+                        .Path(q => q.DraftId, Model.DraftId)
+                        .Path(q => q.TermsId, taken.Body.Read(c => c.Conflict.Waitlist!.TermsId))
+                        .Query(q => q.BedId, taken.Body.Read(c => c.Conflict.Bed!.Id))).Into("waitlist-terms"));
+                }))
+            .OnError<ErrorEnvelope>(422, (refused, pipeline) => pipeline.Element("admission-status").Text.Set(refused.Body.Read(r => r.Error.Message)))
+            .OnError((failed, pipeline) => pipeline.Notice().Error("Admission could not be submitted."))
+            .Chained((admitted, pipeline) => pipeline.When(admitted.Body.Read(r => r.Admission.Arrival.ChecklistRequired))
+                .Then(pipeline => pipeline.Get<ChecklistQuery>(CareEndpoints.MoveInArrivalChecklist, request => request
+                    .Query(q => q.DraftId, admitted.Body.Read(r => r.Admission.DraftId))
+                    .Query(q => q.ChecklistId, admitted.Body.Read(r => r.Admission.Arrival.ChecklistId))).Into("move-in-checklist")));
+    }
+
+    void Contacts(Data<DraftCommand> command, Pipeline<MoveInPage> pipeline)
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        var kind = command.Read(sent => sent.Kind);
+        pipeline.Element("contacts-status").Text.Set("");
+        pipeline.Element("contacts-refusal").Text.Set("");
+        pipeline.Unload("payer-explanation");
+        pipeline.When(kind.Eq(DraftCommandKind.RemoveContact))
+            .Then(pipeline => pipeline
+                .Delete<ContactEdit>(MoveInEndpoints.Contact, request => request
+                    .Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+                    .Path(sent => sent.RemoveId, command.Read(sent => sent.RemoveId))
+                    .Header(MoveInEndpoints.VersionHeader, command.Read(sent => sent.Version))
+                    .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+                    .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+                    .Json(body => body
+                        .Set(sent => sent.Version, command.Read(sent => sent.Version))
+                        .Set(sent => sent.Contacts, moveIn.Read(m => m.Contacts))))
+                .Validate<ContactEditRules>(ContactEditRules.Removal)
+                .OnSuccess<SaveReply>((removed, pipeline) =>
+                {
+                    pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(removed.Body.Read(reply => reply.Receipt.Version)));
+                    pipeline.Element("saved-version").Text.Set(removed.Body.Read(reply => reply.Receipt.Version));
+                })
+                .OnError<PayerDependency>(409, (held, pipeline) => pipeline
+                    .When(held.Body.Read(refusal => refusal.Dependency.Payer.ContactId).Eq(command.Read(sent => sent.RemoveId))
+                        .And(held.Body.Read(refusal => refusal.Dependency.Payer.Explanation.Required)))
+                    .Then(pipeline => pipeline
+                        .Get<PayerExplanationQuery>(CareEndpoints.MoveInPayerExplanation, request => request
+                            .Query(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                            .Query(query => query.ContactId, held.Body.Read(refusal => refusal.Dependency.Payer.ContactId))
+                            .Query(query => query.PolicyNumber, held.Body.Read(refusal => refusal.Dependency.Payer.PolicyNumber))
+                            .Query(query => query.Culture, "en-US"))
+                        .Into("payer-explanation"))
+                    .Else(pipeline => pipeline.Element("contacts-refusal").Text.Set("The draft changed since this page read it: open it again.")))
+                .Chained((removed, pipeline) =>
+                {
+                    pipeline.Get<SectionQuery>(CareEndpoints.MoveInContactRows, request => request
+                        .Query(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                        .Query(query => query.Culture, "en-US"))
+                        .Into("contact-rows");
+                    pipeline.Element("contacts-status").Text.Set(pipeline.Concat("Contact removed: ", removed.Body.Read(reply => reply.Receipt.Reference)));
+                }))
+            .Else(pipeline => pipeline
+                .Post<ContactEdit>(MoveInEndpoints.Contacts, request => request
+                    .Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+                    .Header(MoveInEndpoints.VersionHeader, command.Read(sent => sent.Version))
+                    .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+                    .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+                    .Json(body => body
+                        .Set(sent => sent.Version, command.Read(sent => sent.Version))
+                        .Set(sent => sent.Contacts, moveIn.Read(m => m.Contacts))
+                        .When(kind.Eq(DraftCommandKind.AddContact)).Then(adding => adding.Set(sent => sent.NewContact, command.Read(sent => sent.NewContact)))))
+                .OnSuccess<SaveReply>((saved, pipeline) =>
+                {
+                    pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(reply => reply.Receipt.Version)));
+                    pipeline.Element("saved-version").Text.Set(saved.Body.Read(reply => reply.Receipt.Version));
+                })
+                .OnError<ErrorEnvelope>(422, (refused, pipeline) => pipeline.Element("contacts-refusal").Text.Set(refused.Body.Read(envelope => envelope.Error.Message)))
+                .Chained((saved, pipeline) =>
+                {
+                    pipeline.Get<SectionQuery>(CareEndpoints.MoveInContactRows, request => request
+                        .Query(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                        .Query(query => query.Culture, "en-US"))
+                        .Into("contact-rows");
+                    pipeline.When(kind.Eq(DraftCommandKind.AddContact))
+                        .Then(pipeline =>
+                        {
+                            pipeline.Dispatch(MoveInContactEvents.Added);
+                            pipeline.Element("contacts-status").Text.Set(pipeline.Concat("Contact added: ", saved.Body.Read(reply => reply.Receipt.Reference)));
+                        })
+                        .Else(pipeline => pipeline.Element("contacts-status").Text.Set(pipeline.Concat("Contacts saved: ", saved.Body.Read(reply => reply.Receipt.Reference))));
+                }));
+    }
+
+    void Medications(Data<DraftCommand> command, Pipeline<MoveInPage> pipeline)
+    {
+        var main = pipeline.Container<MoveInPage>("move-in");
+        var editor = pipeline.Container<MedicationEdit>("medication-editor");
+        var proposal = pipeline.Container<MedicationEdit>("proposed-medication");
+        var remove = command.Read(c => c.RemoveId);
+        pipeline.When(command.Read(c => c.Kind).Eq(DraftCommandKind.RemoveMedication)).Then(pipeline => pipeline
+            .Delete<MedicationEdit>(MoveInEndpoints.Medication, request => request
+                .Path(m => m.DraftId, main.Read(m => m.DraftId))
+                .Path(m => m.RemoveId, remove)
+                .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+                .Header(MoveInEndpoints.VersionHeader, main.Read(m => m.Version))
+                .Json(editor, body => body.Set(m => m.Version, main.Read(m => m.Version))))
+            .Validate<MedicationEditRules>()
+            .OnSuccess<SaveReply>((saved, pipeline) =>
+            {
+                pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(r => r.Receipt.Version)));
+                pipeline.Element("saved-version").Text.Set(saved.Body.Read(r => r.Receipt.Version));
+            })
+            .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+            .OnError<ErrorEnvelope>(409, (stale, pipeline) => pipeline.Element("medication-status").Text.Set(stale.Body.Read(r => r.Error.Message)))
+            .OnError((failed, pipeline) => pipeline.Element("medication-status").Text.Set("Medication removal unavailable."))
+            .Chained((saved, pipeline) =>
+            {
+                pipeline.Get<SectionQuery>(MoveInEndpoints.MedicationRows, request => request.Query(q => q.DraftId, main.Read(m => m.DraftId))).Into("medication-rows");
+                pipeline.Element("medication-status").Text.Set(pipeline.Concat("Medication removed: ", saved.Body.Read(r => r.Receipt.Reference)));
+            }))
+            .Else(pipeline => pipeline.Post<MedicationEdit>(MoveInEndpoints.Medications, request => request
+                .Path(m => m.DraftId, main.Read(m => m.DraftId))
+                .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+                .Header(MoveInEndpoints.VersionHeader, main.Read(m => m.Version))
+                .Inputs(editor)
+                .Set(m => m.Version, main.Read(m => m.Version))
+                    .When(command.Read(c => c.Kind).Eq(DraftCommandKind.AddMedication)).Then(adding => adding
+                        .Set(m => m.NewMedication!.DrugCode, proposal.Read(m => m.NewMedication!.DrugCode))
+                        .Set(m => m.NewMedication!.Dose, proposal.Read(m => m.NewMedication!.Dose))
+                        .Set(m => m.NewMedication!.Unit, proposal.Read(m => m.NewMedication!.Unit))
+                        .Set(m => m.NewMedication!.Schedule, proposal.Read(m => m.NewMedication!.Schedule))
+                        .Set(m => m.NewMedication!.Instructions, proposal.Read(m => m.NewMedication!.Instructions))
+                        .Set(m => m.NewMedication!.StartsOn, Model.Today)))
+                .Validate<MedicationEditRules>()
+                .OnSuccess<SaveReply>((saved, pipeline) =>
+                {
+                    pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(saved.Body.Read(r => r.Receipt.Version)));
+                    pipeline.Element("saved-version").Text.Set(saved.Body.Read(r => r.Receipt.Version));
+                })
+                .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+                .OnError<ErrorEnvelope>(409, (stale, pipeline) => pipeline.Element("medication-status").Text.Set(stale.Body.Read(r => r.Error.Message)))
+                .OnError((failed, pipeline) => pipeline.Element("medication-status").Text.Set("Medication save unavailable."))
+                .Chained((saved, pipeline) =>
+                {
+                    pipeline.Get<SectionQuery>(MoveInEndpoints.MedicationRows, request => request.Query(q => q.DraftId, main.Read(m => m.DraftId))).Into("medication-rows");
+                    pipeline.Element("medication-status").Text.Set(pipeline.Concat("Medications saved: ", saved.Body.Read(r => r.Receipt.Reference)));
+                }));
+    }
+}
+@(Html.NativeButton("save-draft", "Save draft").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Dispatch(MoveInDraftEvents.Command, pipeline.Object<DraftCommand>(c => c.Set(m => m.Kind, DraftCommandKind.SaveDraft)))))
+@(Html.NativeButton("submit-admission", "Submit admission").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Dispatch(MoveInDraftEvents.Command, pipeline.Object<DraftCommand>(c => c.Set(m => m.Kind, DraftCommandKind.SubmitAdmission)))))
+<p id="saved-draft-notes">Saved notes: @Model.Resident.Notes</p>
+<p id="save-status"></p>
+<p id="draft-receipt"></p>
+<p id="draft-progress">Ready</p>
+<p id="working-comparison"></p>
+<p id="admission-status"></p>
+<p id="admission-receipt"></p>
+<p id="admission-on-file">@Reads.AdmissionOnFile(Model.DraftId)</p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MoveInDraftEvents.Command, HandlerPolicy.Skip, (command, pipeline) =>
+    {
+        var kind = command.Read(c => c.Kind);
+        pipeline.When(kind.Eq(DraftCommandKind.SaveDraft)).Then(Save)
+            .ElseIf(kind.Eq(DraftCommandKind.SubmitAdmission)).Then(Submit)
+            .ElseIf(kind.Eq(DraftCommandKind.SaveContacts).Or(kind.Eq(DraftCommandKind.AddContact)).Or(kind.Eq(DraftCommandKind.RemoveContact)))
+                .Then(pipeline => Contacts(command, pipeline))
+            .Else(pipeline => Medications(command, pipeline));
+    }));
+}
+@Html.RenderPlan(plan)

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json.Serialization;
 using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.Validation;
@@ -17,11 +18,11 @@ public sealed partial class MoveInDeskController
         [FromHeader(Name = MoveInEndpoints.CoordinatorHeader)] string? coordinator,
         [FromHeader(Name = MoveInEndpoints.OperationHeader)] Guid operation)
     {
+        if (DropsItsConnection()) return new EmptyResult();
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         if (coordinator is null || !Desk.Knows(coordinator)) return StatusCode(StatusCodes.Status403Forbidden, MoveInErrors.Forbidden());
-        if (Desk.IsClosed(draftId)) return StatusCode(StatusCodes.Status410Gone, MoveInErrors.Closed());
 
-        var coverage = this.Validate<MoveInPage, MoveInRules>(moveIn, MoveInRules.PayerCoverage);
+        var coverage = this.Validate<MoveInPage, MoveInRules>(moveIn, MoveInRules.Draft);
         if (!coverage.IsValid) return coverage.ToErrorResponse();
 
         if (moveIn.IncludesDiet)
@@ -35,13 +36,8 @@ public sealed partial class MoveInDeskController
             }
         }
 
-        if (moveIn.IncludesMedications)
-        {
-            var medication = this.Validate<MoveInPage, MoveInRules>(moveIn, MoveInRules.Pharmacy);
-            if (!medication.IsValid) return medication.ToErrorResponse();
-        }
-
         var verdict = Desk.Save(draftId, version, coordinator, operation, moveIn);
+        if (verdict.Closed) return StatusCode(StatusCodes.Status410Gone, MoveInErrors.Closed());
         if (verdict.MedicationRefusal is { } medicationRefusal)
         {
             ModelState.AddModelError(nameof(MoveInPage.Medications), medicationRefusal);
@@ -68,5 +64,26 @@ public static partial class MoveInEndpoints
 
 public static class MoveInDraftEvents
 {
-    public static readonly AppEvent Save = AppEvent.Declare();
+    public static readonly AppEvent<DraftCommand> Command = AppEvent.Declare<DraftCommand>();
+}
+
+public sealed class DraftCommand
+{
+    public DraftCommandKind Kind { get; set; }
+    public ContactInput? NewContact { get; set; }
+    public string RemoveId { get; set; } = string.Empty;
+    public int Version { get; set; }
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter<DraftCommandKind>))]
+public enum DraftCommandKind
+{
+    SaveDraft,
+    SubmitAdmission,
+    SaveContacts,
+    AddContact,
+    RemoveContact,
+    SaveMedications,
+    AddMedication,
+    RemoveMedication,
 }

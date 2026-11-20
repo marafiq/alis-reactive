@@ -18,6 +18,7 @@ internal sealed partial class MoveInDesk : IOwnedByAWorld
         lock (_gate)
         {
             if (change.DroppedEndpoint is { } endpoint) _dropped.Add(endpoint);
+            TakeForTheDraft(change);
             TakeForTheLocation(change);
             TakeForTheResident(change);
             TakeForTheCare(change);

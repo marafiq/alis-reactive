@@ -13516,6 +13516,199 @@
           "on": "the pharmacy review of the originally submitted medication rows"
         }
       ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "locationInputs",
+        "residentInputs",
+        "receiptSlots"
+      ],
+      "for": "M9.X215",
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "moveInValidator",
+        "medicationRows"
+      ],
+      "for": "M9.X216",
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "residentInputs",
+        "receiptSlots"
+      ],
+      "for": "M9.X217",
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:SettleTheTail",
+          "on": "the comparison read after a stale draft response"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "residentInputs",
+        "notice"
+      ],
+      "for": "M9.X218",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "payerInputs",
+        "receiptSlots"
+      ],
+      "for": "M9.X219",
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "locationInputs",
+        "receiptSlots",
+        "pharmacyPanel"
+      ],
+      "for": "M9.X220",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "locationInputs",
+        "moveInValidator"
+      ],
+      "for": "M9.X221",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "locationInputs",
+        "waitlistForm",
+        "waitlistTerms"
+      ],
+      "for": "M9.X222",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "locationInputs",
+        "notice"
+      ],
+      "for": "M9.X223",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "locationInputs",
+        "receiptSlots"
+      ],
+      "for": "M9.X224",
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:SettleTheTail",
+          "on": "the arrival checklist read after admission"
+        }
+      ]
     }
   ],
   "cells": [

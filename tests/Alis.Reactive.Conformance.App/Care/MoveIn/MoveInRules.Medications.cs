@@ -50,7 +50,9 @@ public sealed partial class MoveInRules
 {
     internal const string Pharmacy = "Pharmacy";
 
-    partial void TheMedications() => RuleSet(Pharmacy, () => RuleFor(m => m.Medications).SetValidator(new MedicationSectionRules(Pharmacy)));
+    private const string MedicationSets = Pharmacy + ", " + Draft + ", " + Submit;
+
+    partial void TheMedications() => RuleSet(MedicationSets, () => RuleFor(m => m.Medications).SetValidator(new MedicationSectionRules(MedicationSets)));
 }
 
 internal sealed class PharmacyAllergyRules : ReactiveValidator<PharmacyRequest>

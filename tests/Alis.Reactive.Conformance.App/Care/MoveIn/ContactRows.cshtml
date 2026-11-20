@@ -11,8 +11,8 @@
     var remove = contacts.NativeActionButton((activated, pipeline) =>
     {
         activated.Element.Classes.Add("removing");
-        pipeline.Dispatch(MoveInContactEvents.Command, pipeline.Object<ContactCommand>(command => command
-            .Set(sent => sent.Kind, ContactCommandKind.RemoveContact)
+        pipeline.Dispatch(MoveInDraftEvents.Command, pipeline.Object<DraftCommand>(command => command
+            .Set(sent => sent.Kind, DraftCommandKind.RemoveContact)
             .Set(sent => sent.RemoveId, activated.Row.Read(row => row.Id))
             .Set(sent => sent.Version, pipeline.Container<MoveInPage>("move-in").Read(m => m.Version))));
     });

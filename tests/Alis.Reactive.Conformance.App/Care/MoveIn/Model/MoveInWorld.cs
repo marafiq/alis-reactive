@@ -342,6 +342,10 @@ public sealed class PaymentState
 
 public sealed class AdmissionState
 {
+    public string ResidentName { get; set; } = string.Empty;
+
+    public string ApartmentNumber { get; set; } = string.Empty;
+
     public string Id { get; set; } = string.Empty;
 
     public string DraftId { get; set; } = string.Empty;

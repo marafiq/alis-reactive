@@ -6,7 +6,9 @@ public sealed partial class MoveInRules
 {
     internal const string PayerCoverage = "Payer";
 
-    partial void ThePayer() => RuleSet(PayerCoverage, () =>
+    internal const string CoverageSets = PayerCoverage + ", " + Draft + ", " + Submit;
+
+    partial void ThePayer() => RuleSet(CoverageSets, () =>
     {
         When(m => m.Payer.Kind != PayerKind.Private, () =>
         {
@@ -18,7 +20,7 @@ public sealed partial class MoveInRules
         When(m => m.Payer.HasSecondary, () =>
         {
             RuleFor(m => m.Payer.Secondary).NotNull().WithMessage("Enter the secondary coverage.");
-            RuleFor(m => m.Payer.Secondary!).ChildRules(rules => rules.RuleSet(PayerCoverage, () =>
+            RuleFor(m => m.Payer.Secondary!).ChildRules(rules => rules.RuleSet(CoverageSets, () =>
             {
                 rules.RuleFor(s => s.PolicyNumber).NotEmpty().WithMessage("Enter the secondary policy number.").Matches("^POL-[0-9]+$").WithMessage("Enter a policy number starting with POL-.");
                 rules.RuleFor(s => s.Provider).NotEmpty().WithMessage("Enter the secondary provider.");
@@ -43,7 +45,7 @@ public sealed partial class MoveInRules
 
 internal sealed class CoverageRules : ReactiveValidator<CoverageInput>
 {
-    public CoverageRules() => RuleSet(MoveInRules.PayerCoverage, () =>
+    public CoverageRules() => RuleSet(MoveInRules.CoverageSets, () =>
     {
         RuleFor(m => m.PolicyNumber).NotEmpty().WithMessage("Enter the primary policy number.").Matches("^POL-[0-9]+$").WithMessage("Enter a policy number starting with POL-.");
         RuleFor(m => m.ContributionPercent).InclusiveBetween(0m, 100m).WithMessage("Primary contribution must be between 0 and 100 percent.");

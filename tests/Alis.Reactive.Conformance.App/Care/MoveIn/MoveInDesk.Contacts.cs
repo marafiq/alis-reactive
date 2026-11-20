@@ -93,12 +93,6 @@ internal sealed partial class MoveInDesk
         return new SaveReply(new SaveReceipt(draft.Id, draft.Version, reference, LabelOfTheCoordinator(draft.SavedBy), draft.SavedAt), new ReceiptReview(false, string.Empty));
     }
 
-    private VersionConflict StaleAt(DraftState draft)
-    {
-        var comparison = new InstructionReference(true, "CMP" + draft.Version.ToString(CultureInfo.InvariantCulture));
-        return new VersionConflict(new VersionConflictDetail(new ConflictingDraft(draft.Id, draft.Version, LabelOfTheCoordinator(draft.SavedBy), comparison)));
-    }
-
     private static string NextContactIdOf(DraftState draft)
     {
         var last = draft.Data.Contacts.Rows.Select(NumberOf).DefaultIfEmpty().Max();
