@@ -615,7 +615,9 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
   over budget, and the executed names equal the full list, each once. Each run uploads its folder, its selection
   and its TRX; `proof` reads them with `scripts/playwright-result.mjs --proof` against the full list, which
   `scripts/playwright-select.mjs --all --every-host` writes: every case the spec lands that a test carries, the
-  twin's and a fresh app's among them.
+  twin's and a fresh app's among them. Before its timed browser tests, the MVC 5 twin serves its readiness page
+  and the contact move-in page through IIS Express. The second response carries the NextOfKin.Name input from the
+  partial, so MVC has compiled and rendered that view and its partial. Neither readiness request opens a test world.
 - **`.github/workflows/nightly.yml`**: everything, every TLC config uncached, every probe, `scripts/doctor.sh --latest`; an issue on failure.
 - **`.github/workflows/syncfusion-upgrade.yml`**, on a change to the pins: `pin-syncfusion.mjs --check`, the EJ2 browser probes, then the
   fusion pool.

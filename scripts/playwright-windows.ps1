@@ -85,6 +85,9 @@ try {
             -RedirectStandardOutput "$records/iis.log" -RedirectStandardError "$records/iis.err.log"
         Write-Host "[playwright:runner] $hostName IIS Express PID $($iis.Id) serves $site at $address with CLR v4.0"
         Wait-ForMvc $iis "$address$ready" $marker
+        if ($hostName -eq 'net48') {
+            Wait-ForMvc $iis "$address/care/admission/contact-move-in" 'name="NextOfKin.Name"'
+        }
         $test.Environment['ALIS_IIS_HOST'] = $hostName
         $test.Environment['ALIS_IIS_ADDRESS'] = $address
     }

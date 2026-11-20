@@ -13,11 +13,11 @@
 <h1>Intake</h1>
 @using (var intake = Html.BeginRequestForm(plan, "intake"))
 {
-    @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
-    <button type="button" @Html.Raises(plan, NameIntakes.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(NameIntakes.Save, pipeline => pipeline
         .Post<NameIntake>(CareEndpoints.NameIntakeNames, request => request.Form(intake.Form))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("intake-status").Text.Set(saved.Body))));
+    @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, NameIntakes.Save)>Save</button>
 }
 <p id="intake-status">Not saved</p>
 @Html.RenderPlan(plan)
