@@ -1239,6 +1239,31 @@
           "id": "M9.X249",
           "rung": "behavior",
           "defect": "Closing the line also releases the still-calculating quote panel."
+        },
+        {
+          "id": "M9.X250",
+          "rung": "behavior",
+          "defect": "The native sign-in loses the external desk or stays on the draft instead of opening its receipt."
+        },
+        {
+          "id": "M9.X251",
+          "rung": "behavior",
+          "defect": "An invalid copy count sends the reception request."
+        },
+        {
+          "id": "M9.X252",
+          "rung": "behavior",
+          "defect": "A visitor barred by the desk receives a sign-in."
+        },
+        {
+          "id": "M9.X253",
+          "rung": "behavior",
+          "defect": "A dropped reception request still creates the visitor's acknowledgement."
+        },
+        {
+          "id": "M9.X254",
+          "rung": "behavior",
+          "defect": "An invalid medication prevents an independent reception sign-in."
         }
       ],
       "promises": [
@@ -2567,6 +2592,46 @@
           "outcome": "The hub owner and the store subscription leave. Posting while closed sends no second water request. The reopened line listens once, the quote settles at 3040.00 USD and the next read shows Q100 and a line with no messages.",
           "opposite": "The live line can receive a message while its card is open.",
           "defect": "Closing the line also releases the still-calculating quote panel."
+        },
+        {
+          "for": "M9.X250",
+          "page": "Helen Ward's move-in has a separate reception desk.",
+          "gesture": "Sign Alice in by native submission at the North desk, then follow the receipt's admission history link.",
+          "outcome": "E46 opens the HTML receipt for Helen. The successful controls bind once. E47 reads REC100, the visitor and the selected badge details.",
+          "opposite": "The reactive save leaves the draft open.",
+          "defect": "The native sign-in loses the external desk or stays on the draft instead of opening its receipt."
+        },
+        {
+          "for": "M9.X251",
+          "page": "Helen Ward's move-in has a separate reception desk.",
+          "gesture": "Enter zero copies, save reception and read admission history.",
+          "outcome": "The range message appears and the browser sends no reception request. History has no sign-in.",
+          "opposite": "One copy is accepted.",
+          "defect": "An invalid copy count sends the reception request."
+        },
+        {
+          "for": "M9.X252",
+          "page": "Helen Ward's move-in has a separate reception desk.",
+          "gesture": "Bar Alice at the desk, save her reception form and read admission history.",
+          "outcome": "The server refuses her sign-in and explains the restriction. History has no sign-in.",
+          "opposite": "A visitor with no restriction receives REC100.",
+          "defect": "A visitor barred by the desk receives a sign-in."
+        },
+        {
+          "for": "M9.X253",
+          "page": "Helen Ward's move-in has a separate reception desk.",
+          "gesture": "Lose the connection to reception while saving Alice and open admission history.",
+          "outcome": "Reception reports the failed transport and the next read shows no sign-in.",
+          "opposite": "An answered request records REC100.",
+          "defect": "A dropped reception request still creates the visitor's acknowledgement."
+        },
+        {
+          "for": "M9.X254",
+          "page": "Helen Ward's move-in has a separate reception desk.",
+          "gesture": "Leave a rejected dose in Helen's editor, use the reception apartment reader and save the visitor in the page. Send a native intake document and reopen the draft and its history.",
+          "outcome": "The room reader distinguishes an absent room and Enter. Reception saves independently, the document is filed, the original prescription remains and history lists REC100.",
+          "opposite": "Zero copies blocks reception's own request.",
+          "defect": "An invalid medication prevents an independent reception sign-in."
         }
       ],
       "verdicts": []

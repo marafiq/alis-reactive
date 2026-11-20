@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@model AdmissionHistoryPage
+@{
+    var plan = Html.ReactivePlan<AdmissionHistoryPage>();
+    Layout = "/Care/MoveIn/_MoveInLayout.cshtml";
+    ViewData["Title"] = "Admission history";
+}
+<h1>Admission history</h1>
+<section id="admission-history">
+    @if (Model.Entries.Count == 0)
+    {
+        <p>No admission history.</p>
+    }
+    else
+    {
+        <ol>
+            @foreach (var entry in Model.Entries)
+            {
+                <li>@entry</li>
+            }
+        </ol>
+    }
+</section>
+<a href="@Url.Content("~" + CarePages.MoveIns + Model.DraftId)">Return to move-in</a>
+@Html.RenderPlan(plan)

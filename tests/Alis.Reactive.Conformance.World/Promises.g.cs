@@ -522,6 +522,11 @@ public static class Promises
         public const string M9_X248_0 = "M9.F2 M9.X248 0";
         [Holds(CompositionGate.Answer)]
         public const string M9_X249_0 = "M9.F2 M9.X249 0";
+        public const string M9_X250_0 = "M9.F2 M9.X250 0";
+        public const string M9_X251_0 = "M9.F2 M9.X251 0";
+        public const string M9_X252_0 = "M9.F2 M9.X252 0";
+        public const string M9_X253_0 = "M9.F2 M9.X253 0";
+        public const string M9_X254_0 = "M9.F2 M9.X254 0";
     }
 
     public static class M10_F1

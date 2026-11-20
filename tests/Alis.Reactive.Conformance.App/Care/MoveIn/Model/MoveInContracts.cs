@@ -253,6 +253,12 @@ public sealed class MobilityRequest
 
 public sealed class ReceptionPage
 {
+    public string CoordinatorId { get; set; } = string.Empty;
+
+    public Guid OperationId { get; set; }
+
+    public string Apartment { get; set; } = string.Empty;
+
     public string DraftId { get; set; } = string.Empty;
 
     public string ResidentId { get; set; } = string.Empty;

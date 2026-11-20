@@ -636,6 +636,43 @@
           "kind": "plugin",
           "module": "Plugins",
           "role": "the coordinator line formatter that presents the members and messages from the current snapshot"
+        },
+        {
+          "id": "receptionForm",
+          "kind": "form",
+          "role": "the visitor sign-in and native successful controls at the reception desk"
+        },
+        {
+          "id": "receptionReceipt",
+          "kind": "slot",
+          "role": "the visitor receipt the reactive sign-in loads beside its status message"
+        },
+        {
+          "id": "receptionValidator",
+          "kind": "validator",
+          "role": "the visitor name and badge copy rules checked on the reception form"
+        },
+        {
+          "id": "receptionInputs",
+          "kind": "nativeSlice",
+          "module": "NativeComponents",
+          "role": "the native visitor, badge and identity controls beside the independent sign-in button"
+        },
+        {
+          "id": "receptionDocuments",
+          "kind": "form",
+          "role": "the native reception intake for an admission document"
+        },
+        {
+          "id": "receptionRoom",
+          "kind": "conformance",
+          "declares": "ConformanceElement",
+          "role": "the reception reader that opens the visitor's apartment"
+        },
+        {
+          "id": "admissionHistory",
+          "kind": "endpoint",
+          "role": "the authorised read of the draft's admission history"
         }
       ]
     },
@@ -14284,6 +14321,105 @@
           "on": "the draft's quote response"
         }
       ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X250",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "receptionForm",
+        "admissionHistory",
+        "receptionInputs",
+        "receptionValidator"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X251",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "receptionForm",
+        "admissionHistory",
+        "receptionInputs",
+        "receptionValidator"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X252",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "receptionForm",
+        "admissionHistory",
+        "receptionInputs",
+        "receptionValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X253",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "receptionForm",
+        "admissionHistory",
+        "receptionInputs",
+        "receptionValidator",
+        "notice"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X254",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "receptionForm",
+        "admissionHistory",
+        "receptionInputs",
+        "receptionValidator",
+        "medicationRows",
+        "receptionDocuments",
+        "receptionRoom",
+        "receptionReceipt"
+      ],
+      "harness": []
     }
   ],
   "cells": [

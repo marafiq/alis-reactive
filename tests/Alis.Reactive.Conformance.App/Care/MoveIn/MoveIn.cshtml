@@ -164,6 +164,11 @@
 </section>
 
 <section id="move-in-reception" aria-label="Reception">
+    @if (Reads.ReceptionOf(Model.DraftId) is { } reception)
+    {
+        @await Html.PartialAsync("/Care/MoveIn/Reception.cshtml", reception)
+        @await Html.PartialAsync("/Care/MoveIn/ReceptionDocuments.cshtml", new DocumentsPage { DraftId = Model.DraftId, Version = Model.Version, Kind = DocumentKind.Consent, LastModified = [0] })
+    }
 </section>
 
 <section id="move-in-bed-card" aria-label="Bed card">
