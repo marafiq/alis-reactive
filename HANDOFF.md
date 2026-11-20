@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 19:59:11 EST 2026
+Written at `date`: Thu Nov 19 20:43:05 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -62,6 +62,7 @@ unit: ready ../movein-draft-admission MoveInDraftAdmission
   next: scripts/land-unit.sh ../movein-draft-admission fa45060db "Prove move-in draft saving and admission submission" ".landing/MoveInDraftAdmission"
 unit: ready ../movein-medications-pharmacy MoveInMedicationsPharmacy
   next: scripts/land-unit.sh ../movein-medications-pharmacy c2ec598d3 "Prove medication editing, pharmacy clearance and held validation in move-in" ".landing/MoveInMedicationsPharmacy"
+unit: unbriefed ../movein-navigation-readiness MoveInNavigationReadiness: brief.md lacks Scope, Rules, Outcome, Done, Commands, Reply
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
@@ -75,17 +76,21 @@ unit: ready ../movein-review-acceptance MoveInReviewAcceptance
   next: scripts/land-unit.sh ../movein-review-acceptance c91bae1fc "MI.14 and MI.15. Review the selected services and accept the displayed quote revision" ".landing/MoveInReviewAcceptance"
 unit: ready ../movein-scope MoveInSessionScope
   next: scripts/land-unit.sh ../movein-scope d13a4ce7f "Keep move-in implementation and builder proof within scope" ".landing/MoveInSessionScope"
-unit: landed ../net48-browser-host Net48BrowserHost
-  next: git worktree remove ../net48-browser-host
+unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
+  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
+  exit line: each line of the brief's "Done"
+  goes to: unit: ready
+unit: landed ../net48-twin-followthrough Net48TwinFollowThrough
+  next: git worktree remove ../net48-twin-followthrough
   leaves by: `git worktree remove {worktree}`
   goes to: gone
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: checking at 926994175 on feature/rewrite
+lane: checking at 117368f44 on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 926994175
+ci: unread at 117368f44
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -94,10 +99,10 @@ file: over CLAUDE.md: holds 336 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2077 lines, its limit 150
-file: over HANDOFF.md: holds 552 lines, its limit 150
+file: over HANDOFF.md: holds 564 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 235 lines, its limit 150
-machine: review due : 22 units have landed since .claude/rules/process.md last changed
+machine: review due : 23 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -105,13 +110,13 @@ machine: review due : 22 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 926994175 Restore Windows browser proof for both MVC 5 apps
-- Full check: .work/logs/spec-check-926994175.log: spec check at 926994175: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-194628-56560 926994175
+- HEAD: 117368f44 Prove MVC 5 contact readiness and intake startup refusal
+- Full check: .work/logs/spec-check-117368f44.log: spec check at 117368f44: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-202907-79810 117368f44
 
 ## Landed since the commit before the last spec: STATE commit
-926994175 Restore Windows browser proof for both MVC 5 apps
-3270630df spec: STATE and handoff at 5440174c6
+117368f44 Prove MVC 5 contact readiness and intake startup refusal
+ebeb77cd0 spec: STATE and handoff at 926994175
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -160,10 +165,8 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 399 to 401
-- A rule or a tool's list not applied before the change: 417 to 418
-- A shell command or a script wrong in its own terms: 584 to 585
-- Said to the owner in a way that hid or blurred what holds: 11 to 12
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 401 to 405
+- A shell command or a script wrong in its own terms: 585 to 586
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
@@ -518,6 +521,24 @@ runtime result. A repeat Linux core run on the preceding app state also stopped 
 revoked-contact case during initial navigation at the unchanged 704 ms wait, before
 its validation gesture. Local app and landing runs pass that case. Read the newest
 run before deciding what either host still needs.
+
+The first repaired Windows job, 136003981430, started and stopped both IIS Express
+sites. The fresh MVC 5 app passed its single browser case. The twin ran all 11 and
+passed nine, including multipart binding and the shared room validator. X14.11 stopped
+on the first contact navigation at the 704 ms wait. M19.X4 reached the JSON startup
+refusal in its resolver-unset world before the intended request-registration refusal.
+
+The follow-through landed locally at `117368f44`. The twin's HTTP readiness now reads
+Contact move-in and requires its nested name input before browser timing starts.
+The intake declares its existing request before the typed field so the unchanged
+missing-resolver world can reach the request guard. The packed build had zero warnings
+and errors, the related net10 submission passed, and the integrated gate passed all
+770 browser cases with zero overruns and no lost passes. Read the new Windows job's
+two result lines and process exits before claiming the Windows proof.
+
+The current Linux and two preceding core runs failed the same first D100 navigation
+before the revoked-authority gesture. All later move-in cases passed. Measure document
+render and browser load on the same Linux host before changing that path.
 
 
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
