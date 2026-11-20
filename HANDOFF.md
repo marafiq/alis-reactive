@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Fri Nov 20 12:00:54 EST 2026
+Written at `date`: Fri Nov 20 16:11:42 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -28,15 +28,17 @@ note: open 2026-11-19 | direction | the queue of this file | queue | "i would be
 note: open 2026-11-19 | direction | the queue of this file | queue | "showspinner of compobox and hide when it succed" 
 note: open 2026-11-19 | direction | the queue of this file | queue | "use this as refereces to the skill so it works" a
 note: open 2026-11-19 | direction | the queue of this file | queue | "lets onboard datamanager only for combobox and le
-unit: landed ../ci-tlc-cold SpecCiCold
-  next: git worktree remove ../ci-tlc-cold
+unit: ready ../ci-tlc-cold SpecCiCold
+  next: scripts/land-unit.sh ../ci-tlc-cold 2ab0d5f00 "Publish independent TLC baselines for spec CI" ".landing/SpecCiCold"
+  leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
+  exit line: "landed", with the browser run's result line
+  goes to: unit: landed
+unit: landed ../ci-tlc-mac MacTlc
+  next: git worktree remove ../ci-tlc-mac
   leaves by: `git worktree remove {worktree}`
   goes to: gone
 unit: ready ../fusion-audit FusionAudit
   next: scripts/land-unit.sh ../fusion-audit 9c77fd7d8 "Fusion audit: compare the pinned vendor contract and improve component onboarding" ".landing/FusionAudit"
-  leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
-  exit line: "landed", with the browser run's result line
-  goes to: unit: landed
 unit: returned ../fusion-combobox-data-manager FusionComboBoxDataManager: reply.md waits for read.md
   leaves by: the lead writes "read.md"
   read first: the rule lines "reply.md" opens with, at their source; the change against its base
@@ -92,24 +94,24 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: pushed at aaa45ea9a on feature/rewrite: equal to the remote
+lane: pushed at 574cfb8e8 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at aaa45ea9a
+ci: unread at 574cfb8e8
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over CLAUDE.md: holds 336 lines, its limit 200
+file: over CLAUDE.md: holds 338 lines, its limit 200
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over spec/CLAUDE.md: holds 2077 lines, its limit 150
-file: over HANDOFF.md: holds 760 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2080 lines, its limit 150
+file: over HANDOFF.md: holds 823 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 30 units have landed since .claude/rules/process.md last changed
+machine: review due : 31 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -117,13 +119,13 @@ machine: review due : 30 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: aaa45ea9a Publish independent TLC baselines for spec CI
-- Full check: .work/logs/spec-check-aaa45ea9a.log: spec check at aaa45ea9a: 40 of 40 checks pass
-- .work/last-run.txt: 20261120-114727-9003 aaa45ea9a
+- HEAD: 574cfb8e8 Run TLC on the Mac and verify its evidence in CI
+- Full check: .work/logs/spec-check-574cfb8e8.log: spec check at 574cfb8e8: 40 of 40 checks pass
+- .work/last-run.txt: 20261120-155813-3928 574cfb8e8
 
 ## Landed since the commit before the last spec: STATE commit
-aaa45ea9a Publish independent TLC baselines for spec CI
-2ab0d5f00 spec: STATE and handoff at 39111d56a
+574cfb8e8 Run TLC on the Mac and verify its evidence in CI
+bbe7e4869 spec: STATE and handoff at aaa45ea9a
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -172,11 +174,10 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 432 to 433
-- A shell command or a script wrong in its own terms: 604 to 606
+- A shell command or a script wrong in its own terms: 606 to 608
 
 ## The owner's latest decisions
-spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
+spec/CLAUDE.md:9: - The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -206,6 +207,68 @@ spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain
 
 ## Next
 <!-- next -->
+
+### TLC and CI
+
+The owner chose the Mac for TLA+ model checking to conserve hosted hours. Two PR spec jobs spent their
+two-hour budgets on cold TLC. The separate cold GitHub run 44779126837 was cancelled after more than
+three and a half hours without a published cache. Results written after the whole run made a timed-out
+or superseded PR start from scratch. The Mac already runs the spec-first checks and can reuse measured
+verdicts across commits under the same jar pin.
+
+The Mac refreshed 53 configurations whose results predated jar verification and retained 233 outcomes
+recorded after that check was introduced. The pinned run confirmed all expected outcomes for 17 models
+and 286 configurations. The recorded verification path accepted those outcomes without Java and all
+five evidence plants behaved as expected. The owner decision is in the standing decisions of
+`spec/CLAUDE.md` and verbatim in `spec/NOTES.md`. The workflow contract is `spec/REWRITE.md` sections
+2.7 and 2.8.
+
+- **Mac before push.** Source the pinned toolchain, keep builds serial and wrap long runs in `caffeinate`.
+  When a model or config changes, run it with its mutants on the Mac before implementing behavior.
+  Run `scripts/full-check.sh` on the landed commit. It verifies the installed jar, reruns changed model
+  and configuration pairs and writes `spec/STATE.json`. A changed jar pin invalidates the entire set.
+  `scripts/push.sh` pushes the checked content and the STATE and handoff commit.
+- **GitHub CI.** Pull requests and their updates, pushes to main, and reusable calls from Nightly and
+  NuGet publishing run `.github/workflows/ci.yml`. The spec job reads the committed Mac evidence and
+  checks the jar SHA-256, each current model and config hash, and each required verdict, including the
+  exact invariant every mutant must violate. It runs the rest of the hosted spec checks and evidence
+  plants. GitHub still checks the packages, the browser pools, Windows net48 and fresh net10 delivery.
+  The required proof job accounts for every browser case once and enforces the measured budgets. Read
+  the jobs at the pushed commit with `python3 scripts/ci.py`. PR updates cancel superseded runs.
+  For a model change, the second push carries the matching STATE evidence.
+- **Nightly and delivery.** Nightly runs on weekdays at 03:30 UTC and supports manual dispatch. It calls
+  CI, runs every probe and checks the latest tool pins. The Syncfusion pin workflow runs on relevant
+  package and lock changes or manual dispatch, checking the pin, probes and Fusion browser pool.
+  Publishing starts on a version tag and uses the verified artifacts from its CI call.
+
+### Next framework session
+
+Use this worktree and start with the repo orientation, owner decisions, applicable file and project
+rules, and the mistake log. `python3 scripts/open.py` reports 19 unwritten browser promises, seven
+runtime cases to resolve and 14 unimplemented doors. They overlap. Follow the plan in
+`spec/REWRITE.md` section 4 and the retained framework queue below.
+
+1. Start with the Native date input and date-bound input use case from the queue below. Read
+   `spec/PathsAndWire/module.md`, `spec/NativeComponents/module.md` and the move-in use case.
+   Settle the exact spec lines, host coverage and proof before opening a scoped builder.
+2. Continue the core items in queue order. They cover request form file lists, validation of text
+   and file bodies, the approved Conditions operator removal, narrowing the plan contract, and an
+   enum member in a pushed message. Read the owner decisions before each item, including the
+   changes reserved for after 1.0.
+3. Continue the second U3 piece and the Fusion template and slice gaps. The remaining Fusion work
+   includes template member equality, the Grid validation and export cases, and SmartPaste. Finish
+   U27 by closing the Confirm and Toast doors and their browser promises.
+
+Each scoped builder uses the latest Astra at xhigh, reads the rules and reports the exact proof
+lines. The lead checks the source, required red and green runs, and planted failures before
+landing. Preserve the committed conformance coverage. MI.24's saved file bytes are a separate
+test-harness decision. The app's existing browser filename, preview and server bytes stay proved.
+
+For the next slice, use the repository's build-a-screen skill for a conformance proof and its
+onboard-component skill when a Fusion slice needs a new typed vendor member.
+
+### Earlier handoff notes
+
 
 All 31 scheduled move-in features have landed. MI.24 still needs a browser assertion of the saved artifact bytes.
 Its filename, rendered preview and literal 107-byte server response have proof. The framework scope stays with
