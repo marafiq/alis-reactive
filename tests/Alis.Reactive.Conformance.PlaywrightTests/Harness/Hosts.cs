@@ -46,6 +46,14 @@ public static class Hosts
 
     public static readonly string[] NoAntiforgeryChoice = [NoAntiforgeryChoiceName];
 
+    public const string AdmissionsName = HostNames.Admissions;
+
+    public static readonly string[] Admissions = [AdmissionsName];
+
+    public const string PublicInformationName = HostNames.PublicInformation;
+
+    public static readonly string[] PublicInformation = [PublicInformationName];
+
     public const string SiteHeaderName = HostNames.SiteHeader;
 
     public static readonly string[] SiteHeader = [SiteHeaderName];

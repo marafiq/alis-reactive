@@ -11,6 +11,10 @@ public sealed class CareSession : Plugin
     {
     }
 
+    public Event Expired => Event();
+
+    public Event FlushFailed => Event();
+
     public void Renew() => MethodAsync();
 
     public void Flush() => MethodAsync();

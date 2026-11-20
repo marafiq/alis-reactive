@@ -1,4 +1,6 @@
+@using Alis.Reactive.Conformance.App.Care
 @using Alis.Reactive.Conformance.App.Components
+@inject AdmissionDeskProfile Admissions
 @using Alis.Reactive.Native.NativeAppLevelObjects
 <!doctype html>
 <html lang="en">
@@ -25,6 +27,10 @@
     @Html.ConformanceBusy()
     @Html.ConformanceNotice()
     <script src="~/js/alis-reactive-conformance.js" asp-append-version="true"></script>
+    @if (Admissions.UsesSession)
+    {
+        <script src="~/js/world/care-session.js" asp-append-version="true"></script>
+    }
     <script src="~/js/care/movein/admission-page.js" asp-append-version="true"></script>
     <script src="~/_content/AlisReactive.Native/js/alis-reactive-native.js" asp-append-version="true"></script>
     <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>

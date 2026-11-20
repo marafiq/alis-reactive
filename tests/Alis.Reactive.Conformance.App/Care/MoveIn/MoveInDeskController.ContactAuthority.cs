@@ -15,13 +15,16 @@ public sealed partial class MoveInDeskController
     }
 
     [HttpGet(MoveInEndpoints.AuthorityOnFile)]
-    public IActionResult AuthorityOnFile([FromQuery] SectionQuery query)
-        => PartialView(Views + "AuthorityOnFile.cshtml", Desk.AuthorityOnFile(query.DraftId, query.ContactId ?? string.Empty));
+    public async Task<IActionResult> AuthorityOnFile([FromQuery] SectionQuery query)
+    {
+        await World.Reach(GateName.Of(CompositionGate.Answer), Request.Path);
+        return PartialView(Views + "AuthorityOnFile.cshtml", Desk.AuthorityOnFile(query.DraftId, query.ContactId ?? string.Empty));
+    }
 }
 
 public static partial class MoveInEndpoints
 {
-    public const string AuthorityOnFile = CarePages.MoveIns + "authority-on-file";
+    public const string AuthorityOnFile = CareEndpoints.AdmissionContactAuthority;
 }
 
 public sealed class AuthorityOnFilePage

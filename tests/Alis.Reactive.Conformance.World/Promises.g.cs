@@ -527,6 +527,36 @@ public static class Promises
         public const string M9_X252_0 = "M9.F2 M9.X252 0";
         public const string M9_X253_0 = "M9.F2 M9.X253 0";
         public const string M9_X254_0 = "M9.F2 M9.X254 0";
+        [Holds(RunGate.Settle)]
+        [Holds(CompositionGate.Answer)]
+        public const string M9_X255_0 = "M9.F2 M9.X255 0";
+        [Holds(RunGate.Settle)]
+        public const string M9_X256_0 = "M9.F2 M9.X256 0";
+        [Holds(RunGate.Settle)]
+        public const string M9_X257_0 = "M9.F2 M9.X257 0";
+        [Holds(CompositionGate.Answer)]
+        public const string M9_X258_0 = "M9.F2 M9.X258 0";
+        [Holds(CompositionGate.Answer)]
+        [Holds(RealtimeGate.Answer)]
+        public const string M9_X259_0 = "M9.F2 M9.X259 0";
+        [Holds(RunGate.Settle)]
+        public const string M9_X260_0 = "M9.F2 M9.X260 0";
+        public const string M9_X261_0 = "M9.F2 M9.X261 0";
+        public const string M9_X262_0 = "M9.F2 M9.X262 0";
+        public const string M9_X263_0 = "M9.F2 M9.X263 0";
+        public const string M9_X265_0 = "M9.F2 M9.X265 0";
+        [Holds(RequestGate.Route)]
+        [Holds(RunGate.Settle)]
+        public const string M9_X264_0 = "M9.F2 M9.X264 0";
+        [Holds(RealtimeGate.Answer)]
+        public const string M9_X266_0 = "M9.F2 M9.X266 0";
+        public const string M9_X267_0 = "M9.F2 M9.X267 0";
+        [Holds(CompositionGate.Answer)]
+        public const string M9_X268_0 = "M9.F2 M9.X268 0";
+        [Holds(CompositionGate.Answer)]
+        public const string M9_X269_0 = "M9.F2 M9.X269 0";
+        [Holds(RunGate.Settle)]
+        public const string M9_X270_0 = "M9.F2 M9.X270 0";
     }
 
     public static class M10_F1

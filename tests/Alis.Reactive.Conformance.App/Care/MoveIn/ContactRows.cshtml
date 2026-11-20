@@ -4,6 +4,7 @@
 @using Alis.Reactive.RenderingAndDelivery
 @using Alis.Reactive.TriggersAndPipelines
 @inject MoveInReads Reads
+@inject AdmissionDeskProfile Admissions
 @model MoveInPage
 @{
     var plan = Html.ReactivePlan<MoveInPage>();
@@ -16,11 +17,24 @@
             .Set(sent => sent.RemoveId, activated.Row.Read(row => row.Id))
             .Set(sent => sent.Version, pipeline.Container<MoveInPage>("move-in").Read(m => m.Version))));
     });
-    var onFile = contacts.NativeActionLink((activated, pipeline) => pipeline
-        .Get<SectionQuery>(MoveInEndpoints.AuthorityOnFile, request => request
+    var onFile = contacts.NativeActionLink((activated, pipeline) =>
+    {
+        var authority = pipeline.Get<SectionQuery>(MoveInEndpoints.AuthorityOnFile, request => request
             .Query(query => query.DraftId, Model.DraftId)
-            .Query(query => query.ContactId, activated.Row.Read(row => row.Id)))
-        .Into("authority-on-file"));
+            .Query(query => query.ContactId, activated.Row.Read(row => row.Id)));
+        if (Admissions.UsesSession)
+        {
+            authority.OnSuccess(Content.Html, (record, pipeline) =>
+            {
+                pipeline.Into("authority-on-file", record.Body);
+                activated.Element.Text.Set("Authority opened");
+            });
+        }
+        else
+        {
+            authority.Into("authority-on-file");
+        }
+    });
 }
 <ul aria-label="Contacts on file">
     @foreach (var held in Reads.ContactsOnFile(Model))

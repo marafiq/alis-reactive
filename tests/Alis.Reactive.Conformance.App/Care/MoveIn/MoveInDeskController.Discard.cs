@@ -24,6 +24,7 @@ public sealed partial class MoveInDeskController
         [FromHeader(Name = MoveInEndpoints.CoordinatorHeader)] string? coordinator,
         [FromHeader(Name = MoveInEndpoints.OperationHeader)] Guid operation)
     {
+        if (World.NextAnswer(Request.Path) == 503) return StatusCode(503);
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         if (DropsItsConnection()) return new EmptyResult();
         var result = Desk.Discard(draftId, version, coordinator ?? string.Empty, operation);

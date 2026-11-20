@@ -36,6 +36,8 @@ internal static class AppHost
     {
         switch (host)
         {
+            case HostNames.Admissions:
+            case HostNames.PublicInformation:
             case HostNames.Net10:
             case HostNames.NoRequests:
             case HostNames.NoAntiforgeryChoice:
@@ -94,6 +96,12 @@ internal static class AppHost
     {
         switch (host)
         {
+            case HostNames.Admissions:
+                Care.AdmissionRequestPolicy.Register(services);
+                return;
+            case HostNames.PublicInformation:
+                services.AddReactiveRequests(requests => requests.NoAntiforgery());
+                return;
             case HostNames.NoRequests:
                 return;
             case HostNames.NoAntiforgeryChoice:

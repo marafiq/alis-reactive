@@ -12,6 +12,8 @@ public static class HostNames
     public const string JsonContract = "jsonContract";
     public const string NoRequests = "noRequests";
     public const string NoAntiforgeryChoice = "noAntiforgeryChoice";
+    public const string Admissions = "admissions";
+    public const string PublicInformation = "publicInformation";
     public const string SiteHeader = "siteHeader";
     public const string AntiforgeryField = "antiforgeryField";
     public const string NoShowValidationErrors = "noShowValidationErrors";

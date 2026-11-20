@@ -5,6 +5,7 @@
 @using Alis.Reactive.RequestsAndResponses
 @using Alis.Reactive.TriggersAndPipelines
 @using Microsoft.AspNetCore.Mvc.Rendering
+@inject AdmissionDeskProfile Admissions
 @model DietInput
 @{
     var plan = Html.ReactivePlan<DietInput>();
@@ -60,9 +61,11 @@
 @(Html.NativeButton("preview-diet", "Preview meals").Reactive(plan, b => b.Click, (clicked, pipeline) => WithKnownDiet(pipeline, "meal-preview", pipeline => pipeline.Dispatch(MealEvents.Preview, true))))
 <div id="meal-slot"><p id="meal-preview">Preview the working kitchen plan.</p></div>
 @{
-    Html.On(plan, trigger => trigger.CustomEvent(MealEvents.Saved, (version, pipeline) => pipeline
-        .Get<DeskQuery>(MoveInEndpoints.ConfirmedDiet, request => request.Query(q => q.DraftId, pipeline.Container<MoveInPage>("move-in").Read(m => m.DraftId)))
-        .NoBusy().NoValidation().Into("confirmed-diet"))
+    Html.On(plan, trigger => trigger.CustomEvent(MealEvents.Saved, (version, pipeline) =>
+    {
+        var confirmed = pipeline.Get<DeskQuery>(MoveInEndpoints.ConfirmedDiet, request => request.Query(q => q.DraftId, pipeline.Container<MoveInPage>("move-in").Read(m => m.DraftId)));
+        (Admissions.UsesSession ? confirmed.NoDefaults() : confirmed).NoBusy().NoValidation().Into("confirmed-diet");
+    })
         .CustomEvent(MoveInCareEvents.AnswersReplaced, pipeline => pipeline.Dispatch(MealEvents.Preview, false))
         .CustomEvent(MealEvents.Preview, HandlerPolicy.Replace, (preview, pipeline) => pipeline.When(preview)
             .Then(pipeline =>

@@ -1264,6 +1264,86 @@
           "id": "M9.X254",
           "rung": "behavior",
           "defect": "An invalid medication prevents an independent reception sign-in."
+        },
+        {
+          "id": "M9.X255",
+          "rung": "behavior",
+          "defect": "The receipt read begins before the saved admission's history is flushed."
+        },
+        {
+          "id": "M9.X256",
+          "rung": "behavior",
+          "defect": "An invalid dose starts an admissions request lifecycle."
+        },
+        {
+          "id": "M9.X257",
+          "rung": "behavior",
+          "defect": "An expired coordinator session reaches the admission write."
+        },
+        {
+          "id": "M9.X258",
+          "rung": "behavior",
+          "defect": "A temporary desk outage ends the check before its successful retry."
+        },
+        {
+          "id": "M9.X259",
+          "rung": "behavior",
+          "defect": "The first reading to finish hides the busy indicator while the second is pending."
+        },
+        {
+          "id": "M9.X260",
+          "rung": "behavior",
+          "defect": "The desk writes a draft after its filing tray has closed."
+        },
+        {
+          "id": "M9.X261",
+          "rung": "behavior",
+          "defect": "Reception uses a header instead of its selected form-field antiforgery policy."
+        },
+        {
+          "id": "M9.X262",
+          "rung": "behavior",
+          "defect": "The public information startup exposes a private admissions action."
+        },
+        {
+          "id": "M9.X263",
+          "rung": "behavior",
+          "defect": "An ineligible failure starts the recovery read or a failed recovery reenters the default route."
+        },
+        {
+          "id": "M9.X264",
+          "rung": "behavior",
+          "defect": "The policy inspection inherits the default session renewal and cannot return the upload policy's own refusal."
+        },
+        {
+          "id": "M9.X265",
+          "rung": "behavior",
+          "defect": "A temporary failure retries an admission write without the coordinator asking again."
+        },
+        {
+          "id": "M9.X266",
+          "rung": "behavior",
+          "defect": "The background bed snapshot acquires a busy indicator."
+        },
+        {
+          "id": "M9.X267",
+          "rung": "behavior",
+          "defect": "The default catch-all handles a status for which admissions registered a specific route."
+        },
+        {
+          "id": "M9.X268",
+          "rung": "behavior",
+          "defect": "The catalogue preselects an element that only its success condition can choose."
+        },
+        {
+          "id": "M9.X269",
+          "rung": "behavior",
+          "defect": "Opening authority on file never marks the clicked row's own link busy."
+        },
+        {
+          "id": "M9.X270",
+          "rung": "behavior",
+          "defect": "A failed handover flush reads the chained receipt or treats the saved draft as already handed over."
         }
       ],
       "promises": [
@@ -2632,6 +2712,134 @@
           "outcome": "The room reader distinguishes an absent room and Enter. Reception saves independently, the document is filed, the original prescription remains and history lists REC100.",
           "opposite": "Zero copies blocks reception's own request.",
           "defect": "An invalid medication prevents an independent reception sign-in."
+        },
+        {
+          "for": "M9.X255",
+          "page": "The admissions desk prepares Helen Ward's move-in and the next coordinator's handover.",
+          "gesture": "Save the draft, releasing the session renewal, write and history flush in turn. Read the saved history.",
+          "outcome": "Saving admission appears only after renewal. SAVE8 appears before Ready, the flush records SAVE8 before the chained receipt read, and the next read retains version 8.",
+          "opposite": "A refused renewal leaves version 7.",
+          "defect": "The receipt read begins before the saved admission's history is flushed."
+        },
+        {
+          "for": "M9.X256",
+          "page": "The admissions desk prepares Helen Ward's move-in and the next coordinator's handover.",
+          "gesture": "Enter an invalid dose, save the draft, then reopen it.",
+          "outcome": "The dose message appears before any new renewal, write or flush. The saved version is 7.",
+          "opposite": "A valid dose permits the renewal and the write.",
+          "defect": "An invalid dose starts an admissions request lifecycle."
+        },
+        {
+          "for": "M9.X257",
+          "page": "The admissions desk prepares Helen Ward's move-in and the next coordinator's handover.",
+          "gesture": "Expire the coordinator's session before saving, then read the saved draft.",
+          "outcome": "Renewal returns 401 before either loading layer finishes. No request cleanup or flush runs. The draft remains at version 7.",
+          "opposite": "An authorised coordinator can save version 8.",
+          "defect": "An expired coordinator session reaches the admission write."
+        },
+        {
+          "for": "M9.X258",
+          "page": "The admissions desk prepares Helen Ward's move-in and the next coordinator's handover.",
+          "gesture": "Check desk availability while the desk returns two temporary failures, then read the draft.",
+          "outcome": "Three attempts share one busy hold, renewal, final route and flush. The desk is available and the saved draft remains at version 7.",
+          "opposite": "Exhausted attempts use the unavailable notice.",
+          "defect": "A temporary desk outage ends the check before its successful retry."
+        },
+        {
+          "for": "M9.X259",
+          "page": "The admissions desk prepares Helen Ward's move-in and the next coordinator's handover.",
+          "gesture": "Refresh the quote and bed together, releasing their answers separately, then reopen their saved records.",
+          "outcome": "The remaining request keeps the shared handover panel busy. The quoted price and selected bed agree with the next read.",
+          "opposite": "Once both answers arrive, the shared panel is available.",
+          "defect": "The first reading to finish hides the busy indicator while the second is pending."
+        },
+        {
+          "for": "M9.X260",
+          "page": "The admissions desk prepares Helen Ward's move-in and the next coordinator's handover.",
+          "gesture": "Start saving and close the filing tray while renewal waits. Reopen the draft after cleanup.",
+          "outcome": "The missing target prevents the write. Eligible cleanup restores Ready and flushes, and the next read is version 7.",
+          "opposite": "Leaving the tray open allows version 8 to be saved.",
+          "defect": "The desk writes a draft after its filing tray has closed."
+        },
+        {
+          "for": "M9.X261",
+          "page": "The admissions desk prepares Helen Ward's move-in and the next coordinator's handover.",
+          "gesture": "Save a visitor through the reception profile and read the sign-in history.",
+          "outcome": "The posted form carries exactly one token field and no token header. MVC accepts the form, and history records REC100.",
+          "opposite": "The admissions profile uses the configured header.",
+          "defect": "Reception uses a header instead of its selected form-field antiforgery policy."
+        },
+        {
+          "for": "M9.X262",
+          "page": "The admissions desk prepares Helen Ward's move-in and the next coordinator's handover.",
+          "gesture": "Check the public desk status and follow the private draft address.",
+          "outcome": "The public information page reads Admission desk available without a token. The public profile does not expose Helen's private draft.",
+          "opposite": "The private admissions desk can read the saved draft.",
+          "defect": "The public information startup exposes a private admissions action."
+        },
+        {
+          "for": "M9.X263",
+          "page": "The admissions desk prepares Helen Ward's move-in and the next coordinator's handover.",
+          "gesture": "Read the service catalogue under a recoverable and an ineligible status, a lost connection, a redirect and an unreadable reply. Read the next saved draft.",
+          "outcome": "Only an authorised error starts desk-status recovery. The notice distinguishes the remaining outcomes, failed recovery finishes once, and the draft remains at version 7.",
+          "opposite": "A healthy catalogue lists the available services.",
+          "defect": "An ineligible failure starts the recovery read or a failed recovery reenters the default route."
+        },
+        {
+          "for": "M9.X265",
+          "page": "The admissions desk prepares Helen Ward's move-in.",
+          "gesture": "Save and discard the draft while the admissions service is unavailable, then read the saved draft.",
+          "outcome": "Neither mutation retries the 503. Both leave version 7 open and the staff member reads the temporary outage warning.",
+          "opposite": "An answered save writes version 8.",
+          "defect": "A temporary failure retries an admission write without the coordinator asking again."
+        },
+        {
+          "for": "M9.X264",
+          "page": "The admissions desk prepares Helen Ward's move-in.",
+          "gesture": "Leave a malformed dose and ask the desk to check a visitor document's upload policy. Read the saved draft.",
+          "outcome": "The independent policy request sends no site header, renewal or flush. The revoked coordinator receives the explicit upload refusal. No file is stored and the saved medication is unchanged.",
+          "opposite": "An authorised upload can file the document.",
+          "defect": "The policy inspection inherits the default session renewal and cannot return the upload policy's own refusal."
+        },
+        {
+          "for": "M9.X266",
+          "page": "The admissions desk prepares Helen Ward's move-in.",
+          "gesture": "Open the bed card while its background snapshot waits. Release the answer and read the saved bed again.",
+          "outcome": "The background snapshot confirms BED4 at revision 12 without acquiring busy. The saved bed is available.",
+          "opposite": "The quote and bed review does acquire the shared panel.",
+          "defect": "The background bed snapshot acquires a busy indicator."
+        },
+        {
+          "for": "M9.X267",
+          "page": "The admissions desk prepares Helen Ward's move-in.",
+          "gesture": "Ask for the catalogue while its admission session is unauthorized, then check desk availability throughout an outage.",
+          "outcome": "401 shows a session warning. An exhausted 503 shows the desk outage notice and makes no recovery request. The next handover still shows version 7.",
+          "opposite": "Availability is shown when the desk answers successfully.",
+          "defect": "The default catch-all handles a status for which admissions registered a specific route."
+        },
+        {
+          "for": "M9.X268",
+          "page": "The admissions desk prepares Helen Ward's move-in.",
+          "gesture": "Read the service catalogue while the service desk holds its answer.",
+          "outcome": "The whole page is busy until the catalogue selects the available services. Three services are available and the next saved draft is version 7.",
+          "opposite": "A request with an explicit placement panel holds that panel.",
+          "defect": "The catalogue preselects an element that only its success condition can choose."
+        },
+        {
+          "for": "M9.X269",
+          "page": "The admissions desk prepares Helen Ward's move-in.",
+          "gesture": "Open Alice's authority from her contact row while its response waits and reopen the draft.",
+          "outcome": "Alice's action is busy and Ben's Remove is available. After the read Alice's link shows her authority was opened, and her saved POA-100 is still on file.",
+          "opposite": "Ben's independent action remains available.",
+          "defect": "Opening authority on file never marks the clicked row's own link busy."
+        },
+        {
+          "for": "M9.X270",
+          "page": "The coordinator saves Helen Ward's move-in before handing work to the next shift.",
+          "gesture": "Refuse the history flush after saving and open the handover and admission histories.",
+          "outcome": "Save records SAVE8, restores Ready and explains the failed handover. No chained receipt was requested. Handover shows version 8 and no handed over work; the separate admission history retains SAVE8.",
+          "opposite": "A successful flush makes the saved history available to the next shift.",
+          "defect": "A failed handover flush reads the chained receipt or treats the saved draft as already handed over."
         }
       ],
       "verdicts": []

@@ -198,11 +198,32 @@ public class WhenAPlaywrightRunStarts
         string[] assembly = [.. TheAssembly, "M9.F2 M9.X47 0\tTests.PartialsAndSlots.WhenAContactsRoleNeedsItsAuthority\ta_revoked_authority_reference_is_refused_by_the_server_with_its_reason\tPartialsAndSlots/MoveIn"];
         const string weights = "{ \"PartialsAndSlots\": 5, \"Residents\": 3, \"Harness\": 1 }";
 
-        Assert.That(Select(written, spec, assembly, "--test", "M9_F2.M9_X47_0").PrepareMoveIn, Is.True);
-        Assert.That(Select(written, spec, assembly, weights, "--pool", "core", "--shard", "1/2").PrepareMoveIn, Is.True);
-        Assert.That(Select(written, spec, assembly, weights, "--pool", "core", "--shard", "2/2").PrepareMoveIn, Is.False);
-        Assert.That(Select(written, spec, assembly, "--all", "--host", "net48").PrepareMoveIn, Is.False);
-        Assert.That(Select(written, spec, assembly, "--test", "M1_F1.X1_1_0").PrepareMoveIn, Is.False);
+        Assert.That(Select(written, spec, assembly, "--test", "M9_F2.M9_X47_0").PrepareMoveIn, Is.EqualTo(new[] { "net10" }));
+        Assert.That(Select(written, spec, assembly, weights, "--pool", "core", "--shard", "1/2").PrepareMoveIn, Is.EqualTo(new[] { "net10" }));
+        Assert.That(Select(written, spec, assembly, weights, "--pool", "core", "--shard", "2/2").PrepareMoveIn, Is.Empty);
+        Assert.That(Select(written, spec, assembly, "--all", "--host", "net48").PrepareMoveIn, Is.Empty);
+        Assert.That(Select(written, spec, assembly, "--test", "M1_F1.X1_1_0").PrepareMoveIn, Is.Empty);
+    }
+
+    [AcceptedCase]
+    public void the_selected_admissions_move_in_requests_readiness_while_other_variants_skip_it()
+    {
+        using var written = new WrittenFolder();
+        string[] spec = [.. TheSpec,
+            "M9.F2 M9.X270 0\tM9_F2.M9_X270_0\tU23\tmoveIn\tadmissions\tpool",
+            "M9.F2 M9.X262 0\tM9_F2.M9_X262_0\tU23\tmoveIn\tpublicInformation\tpool",
+            "M9.F2 M9.X261 0\tM9_F2.M9_X261_0\tU23\tmoveIn\tantiforgeryField\tpool",
+            "M9.F2 M9.X47 0\tM9_F2.M9_X47_0\tU23\tmoveIn\tnet10\tpool"];
+        string[] assembly = [.. TheAssembly,
+            "M9.F2 M9.X270 0\tTests.PartialsAndSlots.WhenAdmissionSaves\ta_refused_flush_leaves_handover_pending\tPartialsAndSlots/MoveIn",
+            "M9.F2 M9.X262 0\tTests.PartialsAndSlots.WhenThePublicReads\tthe_desk_is_available\tPartialsAndSlots/MoveIn",
+            "M9.F2 M9.X261 0\tTests.PartialsAndSlots.WhenReceptionSignsIn\tthe_visitor_is_registered\tPartialsAndSlots/MoveIn",
+            "M9.F2 M9.X47 0\tTests.PartialsAndSlots.WhenAContactNeedsAuthority\tthe_authority_is_available\tPartialsAndSlots/MoveIn"];
+
+        Assert.That(Select(written, spec, assembly, "--test", "M9_F2.M9_X270_0").PrepareMoveIn, Is.EqualTo(new[] { "admissions" }));
+        Assert.That(Select(written, spec, assembly, "--screen", "moveIn").PrepareMoveIn, Is.EqualTo(new[] { "admissions", "net10" }));
+        Assert.That(Select(written, spec, assembly, "--host", "publicInformation", "--screen", "moveIn").PrepareMoveIn, Is.Empty);
+        Assert.That(Select(written, spec, assembly, "--host", "antiforgeryField", "--screen", "moveIn").PrepareMoveIn, Is.Empty);
     }
 
     [AcceptedCase]
@@ -399,7 +420,7 @@ public class WhenAPlaywrightRunStarts
         Assert.That(Select(written, TheSpec, TheAssembly).Errors, Does.StartWith("[playwright:select] a run takes one selector, and 0 were given."));
     }
 
-    private sealed record Selected(IReadOnlyList<string> Cases, IReadOnlyList<string> Units, string Filter, string Label, string Shard, IReadOnlyList<string> FreshApps, IReadOnlyList<string> Fusion, bool? PrepareMoveIn, string Errors, int ExitCode);
+    private sealed record Selected(IReadOnlyList<string> Cases, IReadOnlyList<string> Units, string Filter, string Label, string Shard, IReadOnlyList<string> FreshApps, IReadOnlyList<string> Fusion, IReadOnlyList<string> PrepareMoveIn, string Errors, int ExitCode);
 
     private static Selected Select(WrittenFolder written, string[] spec, string[] assembly, params string[] selector)
     {
@@ -412,7 +433,7 @@ public class WhenAPlaywrightRunStarts
             "--assembly", written.Write("tests.tsv", string.Join("\n", assembly) + "\n"), "--weights", weights, "--out", selection,
             .. selector.Skip(holdsWeights ? 1 : 0),
         ]);
-        if (run.ExitCode != 0) return new Selected([], [], "", "", "", [], [], null, run.Errors, run.ExitCode);
+        if (run.ExitCode != 0) return new Selected([], [], "", "", "", [], [], [], run.Errors, run.ExitCode);
 
         using var read = JsonDocument.Parse(File.ReadAllText(selection));
         var filter = read.RootElement.GetProperty("filter").GetString()!;
@@ -426,7 +447,7 @@ public class WhenAPlaywrightRunStarts
             read.RootElement.GetProperty("shard").GetString()!,
             read.RootElement.GetProperty("freshApps").EnumerateArray().Select(one => one.GetString()!).ToList(),
             read.RootElement.GetProperty("fusion").EnumerateArray().Select(one => one.GetString()!).ToList(),
-            read.RootElement.GetProperty("prepareMoveIn").GetBoolean(),
+            read.RootElement.GetProperty("prepareMoveIn").EnumerateArray().Select(one => one.GetString()!).ToList(),
             run.Errors,
             0);
     }

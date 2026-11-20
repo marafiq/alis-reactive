@@ -1,5 +1,6 @@
 @using Alis.Reactive.Conditions
 @using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.World
 @using Alis.Reactive.Conformance.World
 @using Alis.Reactive.Declarations
 @using Alis.Reactive.Native.NativeComponents
@@ -8,9 +9,15 @@
 @using Alis.Reactive.TriggersAndPipelines
 @using Alis.Reactive.ValuesAndSources
 @inject MoveInReads Reads
+@inject AdmissionDeskProfile Admissions
 @model MoveInPage
 @{
     var plan = Html.ReactivePlan<MoveInPage>();
+    if (Admissions.UsesSession)
+    {
+        plan.Plugin<CareSession>().Reactive(session => session.Expired, pipeline => pipeline.Element("admission-session").Text.Set("Session expired. Reopen the admission before saving."));
+        plan.Plugin<CareSession>().Reactive(session => session.FlushFailed, pipeline => pipeline.Element("admission-session").Text.Set("Handover history could not be updated."));
+    }
 
     void Compare(Pipeline<MoveInPage> pipeline, TypedSource<int> revision)
     {
@@ -24,7 +31,7 @@
     {
         var moveIn = pipeline.Container<MoveInPage>("move-in");
         var address = pipeline.PageUrl<MoveInPageAddress>(MoveInEndpoints.Page);
-        pipeline.Put<MoveInPage>(MoveInEndpoints.Draft, request => request
+        var save = pipeline.Put<MoveInPage>(MoveInEndpoints.Draft, request => request
             .Path(sent => sent.DraftId, address.Read(a => a.DraftId))
             .Query(sent => sent.Referral, address.Read(a => a.Referral).IfNull(""))
             .Query(sent => sent.Rehearsal, Model.Rehearsal)
@@ -33,7 +40,8 @@
             .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
             .Json(moveIn, body => body.When(moveIn.Read(m => m.Reference).NotNull()).Then(part => part
                 .Set(sent => sent.Review.Reference, moveIn.Read(m => m.Reference)))))
-            .NoRetry()
+            .NoRetry();
+        (Admissions.UsesSession ? save.Busy("filing-tray") : save)
             .Validate<MoveInRules>(MoveInRules.Draft)
             .WhileLoading(pipeline => pipeline.Element("draft-progress").Text.Set("Saving admission"))
             .OnSuccess<SaveReply>((saved, pipeline) =>
@@ -234,6 +242,25 @@
 <p id="save-status"></p>
 <p id="draft-receipt"></p>
 <p id="draft-progress">Ready</p>
+@if (Admissions.UsesSession)
+{
+    <p id="admission-session" role="status"></p>
+    <div id="filing-tray-owner">
+        @await Html.PartialAsync("/Care/MoveIn/FilingTray.cshtml", Model)
+    </div>
+    @(Html.NativeButton("close-filing-tray", "Close filing tray").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        pipeline.Unload("filing-tray-owner");
+        pipeline.Element("filing-tray-status").Text.Set("Filing tray closed");
+    }))
+    @(Html.NativeButton("reopen-filing-tray", "Reopen filing tray").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Get<DeskQuery>(CareEndpoints.AdmissionFilingTray, request => request.Query(q => q.DraftId, Model.DraftId))
+        .Into("filing-tray-owner")
+        .Chained((tray, pipeline) => pipeline.Element("filing-tray-status").Text.Set("Filing tray open"))))
+    <p id="filing-tray-status">Filing tray open</p>
+    <p id="handover-history">@Reads.HandoverHistory(Model.DraftId)</p>
+    <a href="@CarePages.AdmissionHandover">Read admission handover</a>
+}
 <p id="working-comparison"></p>
 <p id="admission-status"></p>
 <p id="admission-receipt"></p>

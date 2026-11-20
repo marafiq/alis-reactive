@@ -163,6 +163,16 @@
       "id": "consumerNet48",
       "what": "tests/Alis.Reactive.Consumer.Net48, a fresh classic MVC 5 project restored by PackageReference and wired by README.md's net48 steps alone on the run's packs, served from IIS Express by verify-net48",
       "framework": "net48"
+    },
+    {
+      "id": "admissions",
+      "what": "the private admissions desk's header token, North site, standard retry, busy, validation, session hooks and typed recovery",
+      "framework": "net10"
+    },
+    {
+      "id": "publicInformation",
+      "what": "the public admissions information service with an explicit NoAntiforgery choice and no private admission routes",
+      "framework": "net10"
     }
   ],
   "screens": [
@@ -673,6 +683,12 @@
           "id": "admissionHistory",
           "kind": "endpoint",
           "role": "the authorised read of the draft's admission history"
+        },
+        {
+          "id": "session",
+          "kind": "plugin",
+          "module": "Plugins",
+          "role": "the coordinator session that renews access and flushes recorded work to handover history"
         }
       ]
     },
@@ -14420,6 +14436,415 @@
         "receptionReceipt"
       ],
       "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X255",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "moveInValidator",
+        "session",
+        "receiptSlots",
+        "kitchenPlan",
+        "admissionHistory"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the Save and chained receipt renewals and flushes, with the separate saved-diet display readable"
+        },
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the draft write before it commits"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X256",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInValidator",
+        "medicationRows",
+        "session"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the five original draft lookups completing their session flushes"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X257",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "session"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the five original draft lookups completing their session flushes"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X258",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInEndpoint",
+        "session",
+        "busy",
+        "notice"
+      ],
+      "harness": [
+        "seed",
+        "gate",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the two temporary desk responses"
+        },
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the retry delays"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X259",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInEndpoint",
+        "pricing",
+        "busy",
+        "session"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the saved quote"
+        },
+        {
+          "verb": "gate",
+          "action": "Realtime.tla:Answer",
+          "on": "the selected bed snapshot"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X260",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "busy",
+        "session",
+        "draftActions"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the session renewal and cleanup after the filing tray closes"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X261",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "antiforgeryField"
+      ],
+      "parts": [
+        "receptionForm",
+        "receptionReceipt",
+        "receptionInputs",
+        "admissionHistory"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X262",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "publicInformation"
+      ],
+      "parts": [
+        "moveInEndpoint"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X263",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInEndpoint",
+        "session",
+        "notice",
+        "pricing"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the catalogue's retry delays"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X265",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "draftActions",
+        "notice"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the admissions write retry interval"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X264",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "admissionDocuments",
+        "session"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Request.tla:Route",
+          "on": "the reception document policy answer"
+        },
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the five original draft lookups completing their session flushes"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X266",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "availabilityCard",
+        "busy",
+        "session"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Realtime.tla:Answer",
+          "on": "the nested bed card snapshot"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X267",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInEndpoint",
+        "session",
+        "notice"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the four desk attempts throughout the outage"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X268",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInEndpoint",
+        "pricing",
+        "busy"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the catalogue answer"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X269",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInEndpoint",
+        "contactActions",
+        "busy"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the contact authority answer"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X270",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "admissions"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "receiptSlots",
+        "admissionHistory",
+        "session"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the admission history flush after SAVE8"
+        }
+      ]
     }
   ],
   "cells": [

@@ -311,6 +311,7 @@ public class WhenAnAppRendersItsPages
         try
         {
             using var read = JsonDocument.Parse(plan);
+            if (ThePlansSchema.Evaluate(read.RootElement, new EvaluationOptions { OutputFormat = OutputFormat.Flag }).IsValid) return [];
             return WhatFails(ThePlansSchema.Evaluate(read.RootElement, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical })).ToList();
         }
         catch (JsonException)

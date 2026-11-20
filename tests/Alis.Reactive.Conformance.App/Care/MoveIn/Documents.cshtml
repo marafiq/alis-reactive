@@ -55,7 +55,7 @@
                 .Path(m => m.DraftId, Model.DraftId)
                 .Query(m => m.Kind, documents.Container.Read(m => m.Kind))
                 .Query(m => m.Culture, "en-US"))
-            .NoValidation().NoRetry()
+            .NoDefaults().NoValidation().NoRetry()
             .OnSuccess<UploadPolicyReply>((policy, pipeline) =>
             {
                 TypedSource<bool> Fits(BrowserFile file) => file.Size.Lte(policy.Body.Read(r => r.Upload.MaximumBytes))

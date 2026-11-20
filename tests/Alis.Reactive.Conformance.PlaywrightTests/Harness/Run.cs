@@ -30,7 +30,8 @@ internal static class Run
     {
         try
         {
-            if (Environment.GetEnvironmentVariable("ALIS_PREPARE_MOVE_IN") == "true") await ConformanceHost.PrepareMoveIn();
+            foreach (var host in (Environment.GetEnvironmentVariable("ALIS_PREPARE_MOVE_IN") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries))
+                await ConformanceHost.PrepareMoveIn(host);
             _playwright = await Playwright.CreateAsync();
             _browser = await _playwright.Chromium.LaunchAsync();
         }

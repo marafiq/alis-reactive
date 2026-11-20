@@ -51,7 +51,7 @@ expects none.
   app's own table is held by `scripts/check.sh`'s step after its build.
 - `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` run the browser runner's two readers, the selection and the
   result, over the tables and TRX files their cases write, and expect each refusal's own line; a selection names the
-  fresh apps its cases run on and whether its host and shard take a net10 move-in case. A result counts a fresh app's server left alive on a line of its own. A case's tables
+  fresh apps its cases run on and each net10 or admissions host whose move-in cases the selected shard takes. A result counts a fresh app's server left alive on a line of its own. A case's tables
   hold what the real tools write: a fixture in the namespace of its first folder, as ALIS011 holds every test,
   beside the folder `scripts/list-tests.cs` reads from the assembly's portable PDB (the lead's mistake, 2026-11-13).
 - `WhenAConsumerAppIsBuilt` builds small apps its cases write on the packs in nupkgs/, each restored by its own

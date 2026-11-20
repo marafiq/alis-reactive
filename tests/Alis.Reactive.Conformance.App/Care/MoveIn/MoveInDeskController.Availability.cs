@@ -51,6 +51,21 @@ public sealed partial class MoveInDeskController
         if (query.DraftId.Length == 0) return Content("Choose a move-in to read the service catalogue.");
         if (!ModelState.IsValid || !Enum.IsDefined(query.CareLevel) || !Enum.IsDefined(query.PayerKind)) return BadRequest();
         await World.Reach(GateName.Of(CompositionGate.Answer), Request.Path);
+        switch (World.NextAnswer(Request.Path))
+        {
+            case 401:
+                return Unauthorized();
+            case 409:
+                return Conflict(new ErrorEnvelope(new ErrorDetail("catalogue-recoverable", "The service catalogue is being refreshed.", new RecoveryAdvice(true, "desk"))));
+            case 403:
+                return StatusCode(403, MoveInErrors.Forbidden());
+            case 404:
+                return NotFound();
+            case 302:
+                return Redirect($"{Request.Scheme}://localhost:{Request.Host.Port}{CarePages.MoveIns}catalogue-directory");
+            case 206:
+                return Content("The directory did not supply a catalogue.", "text/plain");
+        }
         var (status, catalogue) = Desk.ServiceCatalogueOf(query.DraftId);
         return status == 200 ? Json(catalogue) : AvailabilityError(status);
     }

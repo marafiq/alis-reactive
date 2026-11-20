@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
+using Alis.Reactive.Conformance.World;
 using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.Validation;
@@ -11,7 +12,7 @@ public sealed partial class MoveInDeskController
 {
     [HttpPut(MoveInEndpoints.Draft)]
     [ValidateAntiForgeryToken]
-    public IActionResult Save(
+    public async Task<IActionResult> Save(
         [FromRoute] string draftId,
         [FromBody] MoveInPage moveIn,
         [FromHeader(Name = MoveInEndpoints.VersionHeader)] int version,
@@ -36,6 +37,8 @@ public sealed partial class MoveInDeskController
             }
         }
 
+        await World.Reach(GateName.Of(CompositionGate.Answer), Request.Path);
+        if (World.NextAnswer(Request.Path) == 503) return StatusCode(503);
         var verdict = Desk.Save(draftId, version, coordinator, operation, moveIn);
         if (verdict.Closed) return StatusCode(StatusCodes.Status410Gone, MoveInErrors.Closed());
         if (verdict.MedicationRefusal is { } medicationRefusal)
