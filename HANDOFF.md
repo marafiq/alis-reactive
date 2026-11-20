@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 19:19:44 EST 2026
+Written at `date`: Thu Nov 19 19:59:11 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -58,10 +58,8 @@ unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
 unit: ready ../movein-deposit-diet MoveInDepositDiet
   next: scripts/land-unit.sh ../movein-deposit-diet a46b1ca90 "MI.25 admission deposits and MI.26 dietary plans" ".landing/MoveInDepositDiet"
-unit: landed ../movein-draft-admission MoveInDraftAdmission
-  next: git worktree remove ../movein-draft-admission
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: ready ../movein-draft-admission MoveInDraftAdmission
+  next: scripts/land-unit.sh ../movein-draft-admission fa45060db "Prove move-in draft saving and admission submission" ".landing/MoveInDraftAdmission"
 unit: ready ../movein-medications-pharmacy MoveInMedicationsPharmacy
   next: scripts/land-unit.sh ../movein-medications-pharmacy c2ec598d3 "Prove medication editing, pharmacy clearance and held validation in move-in" ".landing/MoveInMedicationsPharmacy"
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
@@ -77,26 +75,29 @@ unit: ready ../movein-review-acceptance MoveInReviewAcceptance
   next: scripts/land-unit.sh ../movein-review-acceptance c91bae1fc "MI.14 and MI.15. Review the selected services and accept the displayed quote revision" ".landing/MoveInReviewAcceptance"
 unit: ready ../movein-scope MoveInSessionScope
   next: scripts/land-unit.sh ../movein-scope d13a4ce7f "Keep move-in implementation and builder proof within scope" ".landing/MoveInSessionScope"
-unit: unbriefed ../net48-browser-host Net48BrowserHost: brief.md lacks Scope, Rules, Outcome, Done, Commands, Reply
-unit: landed ../retire-picomatch-exception RetirePicomatchException
-  next: git worktree remove ../retire-picomatch-exception
-lane: checking at 5440174c6 on feature/rewrite
+unit: landed ../net48-browser-host Net48BrowserHost
+  next: git worktree remove ../net48-browser-host
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
+unit: ready ../retire-picomatch-exception RetirePicomatchException
+  next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
+lane: checking at 926994175 on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 5440174c6
+ci: unread at 926994175
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over CLAUDE.md: holds 335 lines, its limit 200
+file: over CLAUDE.md: holds 336 lines, its limit 200
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over spec/CLAUDE.md: holds 2074 lines, its limit 150
-file: over HANDOFF.md: holds 532 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2077 lines, its limit 150
+file: over HANDOFF.md: holds 552 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
-file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 234 lines, its limit 150
-machine: review due : 21 units have landed since .claude/rules/process.md last changed
+file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 235 lines, its limit 150
+machine: review due : 22 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -104,13 +105,13 @@ machine: review due : 21 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 5440174c6 Prove move-in draft saving and admission submission (MI.16 and MI.17)
-- Full check: .work/logs/spec-check-5440174c6.log: spec check at 5440174c6: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-190326-42350 5440174c6
+- HEAD: 926994175 Restore Windows browser proof for both MVC 5 apps
+- Full check: .work/logs/spec-check-926994175.log: spec check at 926994175: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-194628-56560 926994175
 
 ## Landed since the commit before the last spec: STATE commit
-5440174c6 Prove move-in draft saving and admission submission (MI.16 and MI.17)
-fa45060db spec: STATE and handoff at 86f782c1b
+926994175 Restore Windows browser proof for both MVC 5 apps
+3270630df spec: STATE and handoff at 5440174c6
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -159,20 +160,13 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 396 to 399
-- A rule or a tool's list not applied before the change: 414 to 417
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 399 to 401
+- A rule or a tool's list not applied before the change: 417 to 418
+- A shell command or a script wrong in its own terms: 584 to 585
+- Said to the owner in a way that hid or blurred what holds: 11 to 12
 
 ## The owner's latest decisions
-spec/CLAUDE.md:1927: - The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
-spec/CLAUDE.md:1937: - The owner, 2026-11-18, after the lead reported that the hook a compaction runs printed a file of the lead's private
-spec/CLAUDE.md:1946: - The owner, 2026-11-18, of that machine (both verbatim in `spec/NOTES.md`): "Is there a mistake read part of the state
-spec/CLAUDE.md:1957: - The owner, 2026-11-18, the same hour (verbatim in `spec/NOTES.md`): "What other steps are missing? How about quality
-spec/CLAUDE.md:1967: - The owner, 2026-11-18, on the machine as built (verbatim in `spec/NOTES.md`): the mistakes are condensed past a
-spec/CLAUDE.md:1980: - The owner, 2026-11-18, after a unit's delivery proof stopped before its browser step (verbatim in `spec/NOTES.md`):
-spec/CLAUDE.md:1987: - The owner, 2026-11-18, on the machine as the lead had written it, one table with sentences around it and checks
-spec/CLAUDE.md:1994: - The owner, 2026-11-18 (verbatim in `spec/NOTES.md`): "I want you to build a skill out of that TLA plus and schema,
-spec/CLAUDE.md:2001: - The owner, 2026-11-18, on README's first example and both fresh apps' home views (verbatim in `spec/NOTES.md`):
-spec/CLAUDE.md:2007: - The owner, 2026-11-18, on the app that proves the framework as an app uses it (verbatim in `spec/NOTES.md`): "you
+spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -508,6 +502,22 @@ copy, unsupported Windows process listing, and two missing twin routes used by w
 cases. Verify both MVC 5 browser suites under IIS Express on the checked Windows job.
 MI.19 discard then resumes the app queue. Seven feature IDs remain, and the earlier
 specific gaps stay in part 9 of the app spec.
+
+The Windows launch repair landed locally at `926994175`. The private gate, 70 focused
+runner and delivery cases, the three net10 browser controls and the integrated 770-case
+regression all passed. The SDK twin compiled on its packed dependencies with zero
+warnings and errors. Its site contains the two shared views, the MVC assembly, the Razor
+compiler and three required scripts. Removing the conformance bundle failed the layout
+build. The multipart and room validation browser cases caught their named plants.
+
+Windows CI still owns the live evidence. The twin and the classic consumer start as
+separate sites under CLR v4 IIS Express, wait for their real MVC readiness pages and
+report exit of the servers they started. The same Windows job must show 11 written twin
+cases and the one fresh MVC 5 case. Source selection and Mac checks establish no Windows
+runtime result. A repeat Linux core run on the preceding app state also stopped the
+revoked-contact case during initial navigation at the unchanged 704 ms wait, before
+its validation gesture. Local app and landing runs pass that case. Read the newest
+run before deciding what either host still needs.
 
 
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in

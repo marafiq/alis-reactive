@@ -1651,10 +1651,10 @@
     },
     "paths": {
       "counts": {
-        "paths": 214,
+        "paths": 215,
         "problems": 0
       },
-      "detail": "each of 214 paths of the staged tree and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
+      "detail": "each of 215 paths of the staged tree and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
       "pass": true
     },
     "plants": {
@@ -1667,8 +1667,8 @@
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "248 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways; check.py and its plants unchanged since that run",
-      "digest": "ab2527a9b683ff62c7934ae53fb0bd28b3a8f9b574a1542e79efe8aca760c666",
+      "detail": "248 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
+      "digest": "34959529ceac63db320473919b53c36d570bb0d893b3ac2a3a60864da4c9a218",
       "pass": true
     },
     "probes": {
@@ -4357,7 +4357,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "5440174c6d7a5264dbb271baa5d6a17f626cf11c",
+  "read_at_head": "926994175ad4e063b098b1f275c111a678831d6f",
   "step": {
     "failing": [],
     "name": "End of session",
