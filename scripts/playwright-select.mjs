@@ -191,5 +191,6 @@ const selection = selector.kind === "through" ? `through ${selector.value}` : se
 const label = options.everyHost === true ? `${selection}@every host` : options.host === undefined ? selection : `${selection}@${options.host}`;
 const units = Object.fromEntries(cases.map(one => [one.id, one.unit]).sort(([one], [other]) => (one < other ? -1 : 1)));
 const freshApps = [...new Set(taken.filter(row => row.served === "fresh").map(row => freshAppOf[row.host]))].sort();
-writeFileSync(options.out, `${JSON.stringify({ label, shard: `${shard.index}/${shard.count}`, filter, cases: cases.map(one => one.id).sort(), units, fusion: cases.filter(one => one.fusion).map(one => one.id).sort(), freshApps }, null, 2)}\n`);
+const prepareMoveIn = taken.some(row => row.screen === "moveIn" && row.host === theAppsOwnHost);
+writeFileSync(options.out, `${JSON.stringify({ label, shard: `${shard.index}/${shard.count}`, filter, cases: cases.map(one => one.id).sort(), units, fusion: cases.filter(one => one.fusion).map(one => one.id).sort(), freshApps, prepareMoveIn }, null, 2)}\n`);
 console.log(filter);

@@ -376,6 +376,10 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   that world by `NewWorldInZone`, its zone a constant of `Zones`, as `NewWorldUnder` opens another host's. The hosts consumerNet10 and consumerNet48 are the fresh
   apps' own servers, which hold no World area: a test under one runs on app.json's `fresh` screen, sets no world and
   uses no harness verb, and its server starts with no `--host` and is ready once the app's home page answers.
+  When the run takes a net10 moveIn placement, assembly setup starts that same net10 server and reads the whole
+  `CarePages.MoveIn` document over HTTP with a new world cookie. It checks the heading "Move-in D100" and always
+  ends that world through `WorldEndpoints.End`, requiring zero parked gates before a fixture runs. A preparation
+  failure stops the server and fails the run.
 - **Request culture.** A request names the culture its page binds and renders under in its address's query
   "culture", on the host it runs under, apart from its world and the browser's locale: "en-US", "de-DE", "tr-TR",
   "haw-US", "de-DE_phoneb" and "invariant", the invariant culture; none means "en-US", and any other value, or two,
@@ -603,7 +607,8 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
   2, 4 and 8 whose 20 runs are green and took, together, no more than the 20 runs at one divided by 1.6, else one.
   Fixtures run beside each other and a fixture's tests one after another. Every run takes the kept count, and the
   budget and the waits are measured at it: the result reader refuses a count a hand chose and a budget measured at
-  another count.
+  another count. The cases remaining after host and shard selection decide whether the net10 move-in page is
+  prepared before the browser tests.
 - **`.github/workflows/ci.yml`** on every pull request and push to main, and called by the nightly and the publish
   workflows: `pack`, once, at the version its caller names or one of the run's own, its expected ids 2.9's six, whose
   files verify-net48 and delivery-net10 restore; `checks` (`scripts/check.sh` without check.py); `spec`

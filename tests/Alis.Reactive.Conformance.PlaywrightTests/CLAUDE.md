@@ -104,6 +104,8 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
   alone and a module's tests sit in the module's. On Windows, `scripts/playwright-windows.ps1` starts the selected MVC 5
   site and hands its address to the test process. A fixture opening a net10 world still starts its own Kestrel server.
+  When the selected shard takes a net10 move-in case, the assembly first reads the D100 page from that server in a
+  separate HTTP world, checks its heading and ends the world with zero parked gates. Each test opens its own world.
 - A test whose page asks for Syncfusion's script, an address that ends in `"/ej2.min.js"`, fails at its teardown,
   which names the address: a core test's page holds no component library, and `ConformanceFixture` reads every
   request of a world's page and of a person's. The last command below plants that script's link on the World area's

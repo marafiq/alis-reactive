@@ -28,8 +28,17 @@ internal static class Run
 
     internal static async Task OpenTheBrowser()
     {
-        _playwright = await Playwright.CreateAsync();
-        _browser = await _playwright.Chromium.LaunchAsync();
+        try
+        {
+            if (Environment.GetEnvironmentVariable("ALIS_PREPARE_MOVE_IN") == "true") await ConformanceHost.PrepareMoveIn();
+            _playwright = await Playwright.CreateAsync();
+            _browser = await _playwright.Chromium.LaunchAsync();
+        }
+        catch
+        {
+            await CloseTheBrowserAndStopEveryHost();
+            throw;
+        }
     }
 
     internal static async Task CloseTheBrowserAndStopEveryHost()

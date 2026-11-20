@@ -191,6 +191,21 @@ public class WhenAPlaywrightRunStarts
     }
 
     [AcceptedCase]
+    public void only_a_net10_move_in_placement_taken_on_this_shard_prepares_the_move_in_page()
+    {
+        using var written = new WrittenFolder();
+        string[] spec = [.. TheSpec, "M9.F2 M9.X47 0\tM9_F2.M9_X47_0\tU23\tmoveIn\tnet10\tpool", "M9.F2 M9.X47 0\tM9_F2.M9_X47_0\tU23\tmoveIn\tnet48\ttwin"];
+        string[] assembly = [.. TheAssembly, "M9.F2 M9.X47 0\tTests.PartialsAndSlots.WhenAContactsRoleNeedsItsAuthority\ta_revoked_authority_reference_is_refused_by_the_server_with_its_reason\tPartialsAndSlots/MoveIn"];
+        const string weights = "{ \"PartialsAndSlots\": 5, \"Residents\": 3, \"Harness\": 1 }";
+
+        Assert.That(Select(written, spec, assembly, "--test", "M9_F2.M9_X47_0").PrepareMoveIn, Is.True);
+        Assert.That(Select(written, spec, assembly, weights, "--pool", "core", "--shard", "1/2").PrepareMoveIn, Is.True);
+        Assert.That(Select(written, spec, assembly, weights, "--pool", "core", "--shard", "2/2").PrepareMoveIn, Is.False);
+        Assert.That(Select(written, spec, assembly, "--all", "--host", "net48").PrepareMoveIn, Is.False);
+        Assert.That(Select(written, spec, assembly, "--test", "M1_F1.X1_1_0").PrepareMoveIn, Is.False);
+    }
+
+    [AcceptedCase]
     public void a_pool_takes_its_tests_of_the_assembly_under_the_hosts_a_pool_serves()
     {
         using var written = new WrittenFolder();
@@ -384,7 +399,7 @@ public class WhenAPlaywrightRunStarts
         Assert.That(Select(written, TheSpec, TheAssembly).Errors, Does.StartWith("[playwright:select] a run takes one selector, and 0 were given."));
     }
 
-    private sealed record Selected(IReadOnlyList<string> Cases, IReadOnlyList<string> Units, string Filter, string Label, string Shard, IReadOnlyList<string> FreshApps, IReadOnlyList<string> Fusion, string Errors, int ExitCode);
+    private sealed record Selected(IReadOnlyList<string> Cases, IReadOnlyList<string> Units, string Filter, string Label, string Shard, IReadOnlyList<string> FreshApps, IReadOnlyList<string> Fusion, bool? PrepareMoveIn, string Errors, int ExitCode);
 
     private static Selected Select(WrittenFolder written, string[] spec, string[] assembly, params string[] selector)
     {
@@ -397,7 +412,7 @@ public class WhenAPlaywrightRunStarts
             "--assembly", written.Write("tests.tsv", string.Join("\n", assembly) + "\n"), "--weights", weights, "--out", selection,
             .. selector.Skip(holdsWeights ? 1 : 0),
         ]);
-        if (run.ExitCode != 0) return new Selected([], [], "", "", "", [], [], run.Errors, run.ExitCode);
+        if (run.ExitCode != 0) return new Selected([], [], "", "", "", [], [], null, run.Errors, run.ExitCode);
 
         using var read = JsonDocument.Parse(File.ReadAllText(selection));
         var filter = read.RootElement.GetProperty("filter").GetString()!;
@@ -411,6 +426,7 @@ public class WhenAPlaywrightRunStarts
             read.RootElement.GetProperty("shard").GetString()!,
             read.RootElement.GetProperty("freshApps").EnumerateArray().Select(one => one.GetString()!).ToList(),
             read.RootElement.GetProperty("fusion").EnumerateArray().Select(one => one.GetString()!).ToList(),
+            read.RootElement.GetProperty("prepareMoveIn").GetBoolean(),
             run.Errors,
             0);
     }

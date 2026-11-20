@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
+using System.Net.Http.Json;
 using Alis.Reactive.Conformance.World;
 using NUnit.Framework;
 
@@ -39,6 +40,31 @@ internal sealed class ConformanceHost
         }
 
         return Task.FromResult(new ConformanceHost(null, address));
+    }
+
+    internal static async Task PrepareMoveIn()
+    {
+        const string heading = "Move-in D100";
+        var host = await Of(HostNames.Net10);
+        using var client = new HttpClient { BaseAddress = host.Address };
+        client.DefaultRequestHeaders.Add("Cookie", $"{WorldKey.Cookie}={Guid.NewGuid():N}");
+        try
+        {
+            using var page = await client.GetAsync(CarePages.MoveIn);
+            var body = await page.Content.ReadAsStringAsync();
+            if (!page.IsSuccessStatusCode || !body.Contains($"<h1>{heading}</h1>", StringComparison.Ordinal))
+                throw new InvalidOperationException($"Move-in readiness GET {CarePages.MoveIn} returned HTTP {(int)page.StatusCode}. Expected the heading '{heading}'.");
+            TestContext.Progress.WriteLine($"[playwright:ready] GET {CarePages.MoveIn} rendered '{heading}'.");
+        }
+        finally
+        {
+            using var response = await client.PostAsync(WorldEndpoints.End, content: null);
+            if (!response.IsSuccessStatusCode) throw new HttpRequestException($"Move-in readiness POST {WorldEndpoints.End} returned HTTP {(int)response.StatusCode}.");
+            var ended = await response.Content.ReadFromJsonAsync<WorldEnd>();
+            if (ended is not { GatesStillParked.Count: 0 })
+                throw new InvalidOperationException($"Move-in readiness POST {WorldEndpoints.End} did not confirm zero parked gates.");
+            TestContext.Progress.WriteLine($"[playwright:ready] POST {WorldEndpoints.End} ended the move-in readiness world with zero parked gates.");
+        }
     }
 
     internal static void StopAll()

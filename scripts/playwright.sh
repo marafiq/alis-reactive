@@ -126,6 +126,8 @@ fresh_apps=()
 while IFS= read -r fresh_app; do fresh_apps+=("$fresh_app"); done < <(
   node -e 'for (const app of JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).freshApps) console.log(app);' "$run/selection.json")
 
+ALIS_PREPARE_MOVE_IN="$(node -p 'JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).prepareMoveIn' "$run/selection.json")"
+export ALIS_PREPARE_MOVE_IN
 selected_host="${host[1]:-default}"
 packed_apps=(${fresh_apps[@]+"${fresh_apps[@]}"})
 case "$selected_host" in
