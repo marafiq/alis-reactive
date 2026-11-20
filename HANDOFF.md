@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 20:43:05 EST 2026
+Written at `date`: Thu Nov 19 21:30:00 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -62,7 +62,10 @@ unit: ready ../movein-draft-admission MoveInDraftAdmission
   next: scripts/land-unit.sh ../movein-draft-admission fa45060db "Prove move-in draft saving and admission submission" ".landing/MoveInDraftAdmission"
 unit: ready ../movein-medications-pharmacy MoveInMedicationsPharmacy
   next: scripts/land-unit.sh ../movein-medications-pharmacy c2ec598d3 "Prove medication editing, pharmacy clearance and held validation in move-in" ".landing/MoveInMedicationsPharmacy"
-unit: unbriefed ../movein-navigation-readiness MoveInNavigationReadiness: brief.md lacks Scope, Rules, Outcome, Done, Commands, Reply
+unit: landed ../movein-navigation-readiness MoveInNavigationReadiness
+  next: git worktree remove ../movein-navigation-readiness
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
@@ -80,17 +83,14 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
   leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
   exit line: each line of the brief's "Done"
   goes to: unit: ready
-unit: landed ../net48-twin-followthrough Net48TwinFollowThrough
-  next: git worktree remove ../net48-twin-followthrough
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: checking at 117368f44 on feature/rewrite
+lane: checking at 75e986a5a on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 117368f44
+ci: unread at 75e986a5a
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -99,10 +99,10 @@ file: over CLAUDE.md: holds 336 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2077 lines, its limit 150
-file: over HANDOFF.md: holds 564 lines, its limit 150
+file: over HANDOFF.md: holds 591 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
-file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 235 lines, its limit 150
-machine: review due : 23 units have landed since .claude/rules/process.md last changed
+file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
+machine: review due : 24 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -110,13 +110,13 @@ machine: review due : 23 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 117368f44 Prove MVC 5 contact readiness and intake startup refusal
-- Full check: .work/logs/spec-check-117368f44.log: spec check at 117368f44: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-202907-79810 117368f44
+- HEAD: 75e986a5a Prepare selected move-in browser runs before timing
+- Full check: .work/logs/spec-check-75e986a5a.log: spec check at 75e986a5a: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-211651-98694 75e986a5a
 
 ## Landed since the commit before the last spec: STATE commit
-117368f44 Prove MVC 5 contact readiness and intake startup refusal
-ebeb77cd0 spec: STATE and handoff at 926994175
+75e986a5a Prepare selected move-in browser runs before timing
+0e88caf33 spec: STATE and handoff at 117368f44
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -165,8 +165,8 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 401 to 405
-- A shell command or a script wrong in its own terms: 585 to 586
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 405 to 409
+- A shell command or a script wrong in its own terms: 586 to 588
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
@@ -539,6 +539,30 @@ two result lines and process exits before claiming the Windows proof.
 The current Linux and two preceding core runs failed the same first D100 navigation
 before the revoked-authority gesture. All later move-in cases passed. Measure document
 render and browser load on the same Linux host before changing that path.
+
+Windows job 136022062883 verified both MVC 5 sites under IIS Express. The twin passed
+11 of 11 and the fresh MVC 5 app passed one of one, each with zero overruns. The
+contact partial readiness returned HTTP 200 with NextOfKin.Name, and the run reported
+both IIS processes and the nested net10 server exiting. The written Windows proof is
+complete. Two unwritten net48 placements remain in the existing rewrite work.
+
+A probe in the pinned Linux ARM64 image reproduced the first D100 timeout. Document
+headers arrived at 648 ms and the load event came at 706 ms. The next browser
+context loaded in 211 ms. Scripts finished shortly after the document both times.
+On a fresh process, an isolated HTTP render took 666 ms and ended its world with
+zero parked gates. The first and next browser loads then took 231 and 225 ms.
+The first MVC render took 596.9778 ms, and the first subsequent render took
+164.1887 ms. Prepare only runs that select the actual net10 move-in screen, then
+run the original authority test and the Linux core gate. MI.19 follows.
+
+Move-in browser readiness landed locally at `75e986a5a`. Runs that select the net10
+move-in screen prepare the actual D100 view and end the separate readiness world before
+browser timing begins. The selector control proved the request is skipped for unrelated
+screens, shards and hosts. A wrong-heading plant failed before the browser and still
+ended the readiness world. The integrated run passed all 770 cases, including the
+revoked-authority submission, with zero overruns and all 770 prior passes preserved.
+The browser wait budgets are unchanged. Read Linux CI after the checked push. Resume
+MI.19 discard from that pushed base. Seven feature IDs are open in the app queue.
 
 
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
