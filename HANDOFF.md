@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 21:30:00 EST 2026
+Written at `date`: Thu Nov 19 22:23:14 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -58,14 +58,18 @@ unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
 unit: ready ../movein-deposit-diet MoveInDepositDiet
   next: scripts/land-unit.sh ../movein-deposit-diet a46b1ca90 "MI.25 admission deposits and MI.26 dietary plans" ".landing/MoveInDepositDiet"
+unit: landed ../movein-discard MoveInDiscard
+  next: git worktree remove ../movein-discard
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
 unit: ready ../movein-draft-admission MoveInDraftAdmission
   next: scripts/land-unit.sh ../movein-draft-admission fa45060db "Prove move-in draft saving and admission submission" ".landing/MoveInDraftAdmission"
 unit: ready ../movein-medications-pharmacy MoveInMedicationsPharmacy
   next: scripts/land-unit.sh ../movein-medications-pharmacy c2ec598d3 "Prove medication editing, pharmacy clearance and held validation in move-in" ".landing/MoveInMedicationsPharmacy"
-unit: landed ../movein-navigation-readiness MoveInNavigationReadiness
-  next: git worktree remove ../movein-navigation-readiness
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: waiting ../movein-navigation-readiness MoveInNavigationReadiness: for Net48TwinFollowThrough
+  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
+  exit line: each line of the brief's "Done"
+  goes to: unit: ready
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
@@ -80,17 +84,14 @@ unit: ready ../movein-review-acceptance MoveInReviewAcceptance
 unit: ready ../movein-scope MoveInSessionScope
   next: scripts/land-unit.sh ../movein-scope d13a4ce7f "Keep move-in implementation and builder proof within scope" ".landing/MoveInSessionScope"
 unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
-  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
-  exit line: each line of the brief's "Done"
-  goes to: unit: ready
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: checking at 75e986a5a on feature/rewrite
+lane: checking at e1047be7d on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 75e986a5a
+ci: unread at e1047be7d
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -99,10 +100,10 @@ file: over CLAUDE.md: holds 336 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2077 lines, its limit 150
-file: over HANDOFF.md: holds 591 lines, its limit 150
+file: over HANDOFF.md: holds 616 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 24 units have landed since .claude/rules/process.md last changed
+machine: review due : 25 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -110,17 +111,17 @@ machine: review due : 24 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 75e986a5a Prepare selected move-in browser runs before timing
-- Full check: .work/logs/spec-check-75e986a5a.log: spec check at 75e986a5a: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-211651-98694 75e986a5a
+- HEAD: e1047be7d Prove confirmed move-in draft discard and owner disposal (MI.19)
+- Full check: .work/logs/spec-check-e1047be7d.log: spec check at e1047be7d: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-221022-85640 e1047be7d
 
 ## Landed since the commit before the last spec: STATE commit
-75e986a5a Prepare selected move-in browser runs before timing
-0e88caf33 spec: STATE and handoff at 117368f44
+e1047be7d Prove confirmed move-in draft discard and owner disposal (MI.19)
+26d1b178b spec: STATE and handoff at 75e986a5a
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 671; named by a browser test: 652; with no browser test: 19
+feature promises: 676; named by a browser test: 657; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -165,8 +166,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 405 to 409
-- A shell command or a script wrong in its own terms: 586 to 588
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 409 to 413
+- A rule or a tool's list not applied before the change: 418 to 419
+- A shell command or a script wrong in its own terms: 588 to 591
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
@@ -563,6 +565,31 @@ ended the readiness world. The integrated run passed all 770 cases, including th
 revoked-authority submission, with zero overruns and all 770 prior passes preserved.
 The browser wait budgets are unchanged. Read Linux CI after the checked push. Resume
 MI.19 discard from that pushed base. Seven feature IDs are open in the app queue.
+
+The full check at `75e986a5a` passed 40 of 40, and the push checked the remote at
+`26d1b178b`. Linux core job 136039900515 logged the actual D100 render and world
+closure with zero parked gates. The original revoked-authority case passed, and the
+602-case shard finished with zero failures and zero overruns.
+Windows job 136040754074 at the same pushed state passed the 11 twin cases and
+one fresh MVC 5 case with zero overruns. Both IIS Express sites and the nested
+net10 server exited.
+
+MI.19 discard landed locally at `e1047be7d`. The integrated browser gate ran all
+775 cases with zero failures or overruns and preserved all 770 prior passes. The final
+scoped screen passed 127 cases. Five app plants caught their named defects and the
+four-file replay matched all 768 compiled page-door entries.
+
+The coordinator sees the stored resident name and only Yes sends a bodyless DELETE
+with the current If-Match value. A stale version retains Luis's notes. Successful
+discard advances the version once, unloads the editing workspace and reopens as
+Discarded. Cancel and connection loss before the server acts preserve the open draft.
+D300 stays Submitted at version 9 with ADM203, BED12 and Omar King's saved name.
+Replacing the real draft-actions partial closes its open question without a DELETE.
+
+After the checked push, open MI.22 documents, MI.23 document metadata, and MI.24
+packet in that order. MI.27 coordinators, MI.30 reception and MI.31 request defaults
+follow. Six feature IDs remain. Keep the app on the landed typed doors and record
+any missing capability in part 9 of the app spec.
 
 
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
