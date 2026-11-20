@@ -489,6 +489,12 @@ public static class Promises
         public const string M9_X223_0 = "M9.F2 M9.X223 0";
         [Holds(LanesGate.SettleTheTail)]
         public const string M9_X224_0 = "M9.F2 M9.X224 0";
+        public const string M9_X225_0 = "M9.F2 M9.X225 0";
+        public const string M9_X226_0 = "M9.F2 M9.X226 0";
+        public const string M9_X227_0 = "M9.F2 M9.X227 0";
+        public const string M9_X228_0 = "M9.F2 M9.X228 0";
+        [Holds(CompositionGate.Answer)]
+        public const string M9_X229_0 = "M9.F2 M9.X229 0";
     }
 
     public static class M10_F1

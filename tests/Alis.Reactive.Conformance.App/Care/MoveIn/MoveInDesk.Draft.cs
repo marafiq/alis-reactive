@@ -31,6 +31,7 @@ internal sealed partial class MoveInDesk
             var page = JsonSerializer.Deserialize<MoveInPage>(JsonSerializer.Serialize(draft.Data)) ?? throw new InvalidOperationException($"Draft {draft.Id} holds no page.");
             page.DraftId = draft.Id;
             page.Version = draft.Version;
+            page.Status = draft.Status;
             page.Today = _world.Clock.Today;
             page.Diet.Referral = draft.ReferralDiet;
             page.Diet.UnavailableMeals = CommunityOf(page.Location.CommunityId)?.UnavailableMeals ?? DietaryNeeds.None;

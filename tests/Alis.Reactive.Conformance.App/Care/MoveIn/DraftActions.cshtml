@@ -1,0 +1,41 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model DraftActionsPage
+@{
+    var plan = Html.ReactivePlan<DraftActionsPage>();
+
+    void Discard(Pipeline<DraftActionsPage> pipeline)
+    {
+        var draft = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Delete<MoveInPage>(MoveInEndpoints.Draft, request => request
+                .Path(sent => sent.DraftId, draft.Read(m => m.DraftId))
+                .Header(MoveInEndpoints.VersionHeader, draft.Read(m => m.Version))
+                .Header(MoveInEndpoints.CoordinatorHeader, draft.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, draft.Read(m => m.OperationId)))
+            .NoValidation()
+            .NoRetry()
+            .OnSuccess(Content.None, (discarded, pipeline) => pipeline.Dispatch(DraftActionEvents.Discarded))
+            .OnError<VersionConflict>(409, (stale, pipeline) => pipeline.Notice().Error(pipeline.Concat(
+                "Version ", stale.Body.Read(reply => reply.Conflict.Draft.Revision),
+                " was saved by ", stale.Body.Read(reply => reply.Conflict.Draft.SavedBy.Name),
+                ". Reopen the draft.")))
+            .OnError<ErrorEnvelope>(422, (refused, pipeline) => pipeline.Notice().Error(refused.Body.Read(reply => reply.Error.Message)))
+            .OnError<ErrorEnvelope>(410, (closed, pipeline) => pipeline.Notice().Error(closed.Body.Read(reply => reply.Error.Message)))
+            .OnError((failed, pipeline) => pipeline.Notice().Error("Draft could not be discarded."));
+    }
+}
+<p id="draft-actions-status">@Model.ResidentName · @Model.Status · version @Model.Version</p>
+@if (Model.Status != DraftStatus.Discarded)
+{
+    @(Html.NativeButton("discard-draft", "Discard draft")
+        .Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+            .When(pipeline.Component<NativeConfirm>().Ask($"Discard {Model.ResidentName}’s draft?"))
+            .Then(Discard)
+            .Else(pipeline => pipeline.Notice().Info("Draft kept"))))
+}
+@Html.RenderPlan(plan)

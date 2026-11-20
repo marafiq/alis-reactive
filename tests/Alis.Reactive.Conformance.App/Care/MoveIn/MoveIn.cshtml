@@ -1,4 +1,5 @@
 @using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
 @using Alis.Reactive.Native.NativeComponents
 @using Alis.Reactive.RequestsAndResponses
 @using Alis.Reactive.RenderingAndDelivery
@@ -11,6 +12,7 @@
     var plan = Html.ReactivePlan<MoveInPage>();
 }
 <h1>Move-in @Model.DraftId</h1>
+<div id="draft-workspace">
 <p>Saved version: <span id="saved-version">@Model.Version</span></p>
 @using (var moveIn = Html.BeginRequestContainer(plan, "move-in"))
 {
@@ -80,6 +82,14 @@
 
     <section id="move-in-draft" aria-label="Draft">
         @await Html.PartialAsync("/Care/MoveIn/DraftCommands.cshtml", Model)
+        @(Html.NativeButton("refresh-draft-actions", "Refresh draft actions")
+            .Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+                .Get<DeskQuery>(CareEndpoints.MoveInDraftActions, request => request
+                    .Query(query => query.DraftId, Model.DraftId))
+                .Into("draft-actions")))
+        <div id="draft-actions">
+            @await Html.PartialAsync("/Care/MoveIn/DraftActions.cshtml", Reads.DraftActionsOf(Model.DraftId))
+        </div>
         @{
             Html.On(plan, trigger => trigger.CustomEvent(QuoteEvents.Accepted, (revision, pipeline) => pipeline.Input(m => m.AcceptedQuoteRevision).Component<NativeHiddenField>().Value.Set(pipeline.Concat(revision))));
             Html.On(plan, trigger => trigger.CustomEvent(MealEvents.Saved, (version, pipeline) => pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(version))));
@@ -153,4 +163,13 @@
 <section id="move-in-terms" aria-label="Terms">
 </section>
 
+</div>
+<a href="@Context.Request.Path">Read saved draft</a>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DraftActionEvents.Discarded, pipeline =>
+    {
+        pipeline.Notice().Success("Draft discarded");
+        pipeline.Unload("draft-workspace");
+    }));
+}
 @Html.RenderPlan(plan)

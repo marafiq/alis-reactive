@@ -592,6 +592,11 @@
           "kind": "conformance",
           "declares": "ConformanceComponent",
           "role": "the current pharmacy review reference and its synchronous and awaited records"
+        },
+        {
+          "id": "draftActions",
+          "kind": "slot",
+          "role": "the current draft actions with their own confirmation, replaced when the coordinator refreshes the saved draft status"
         }
       ]
     },
@@ -13707,6 +13712,105 @@
           "verb": "gate",
           "action": "Lanes.tla:SettleTheTail",
           "on": "the arrival checklist read after admission"
+        }
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "draftActions",
+        "confirm",
+        "notice"
+      ],
+      "for": "M9.X225",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "draftActions",
+        "confirm",
+        "notice"
+      ],
+      "for": "M9.X226",
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "draftActions",
+        "confirm",
+        "notice"
+      ],
+      "for": "M9.X227",
+      "harness": []
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "draftActions",
+        "confirm",
+        "notice"
+      ],
+      "for": "M9.X228",
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "index": 0,
+      "screen": "moveIn",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "moveInForm",
+        "moveInEndpoint",
+        "draftActions",
+        "confirm",
+        "notice"
+      ],
+      "for": "M9.X229",
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the fresh draft actions before replacing the owner of the open discard question"
         }
       ]
     }

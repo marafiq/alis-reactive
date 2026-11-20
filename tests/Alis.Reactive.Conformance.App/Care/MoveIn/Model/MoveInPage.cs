@@ -4,6 +4,8 @@ namespace Alis.Reactive.Conformance.App.Care;
 
 public sealed class MoveInPage
 {
+    internal DraftStatus Status { get; set; }
+
     public string DraftId { get; set; } = string.Empty;
 
     public int Version { get; set; }

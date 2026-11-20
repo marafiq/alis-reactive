@@ -1114,6 +1114,31 @@
           "id": "M9.X224",
           "rung": "behavior",
           "defect": "The shared draft handler replaces the admission while its checklist is held."
+        },
+        {
+          "id": "M9.X225",
+          "rung": "behavior",
+          "defect": "E29 advances the saved draft version twice for one discard."
+        },
+        {
+          "id": "M9.X226",
+          "rung": "behavior",
+          "defect": "Declining the confirmation sends the discard request."
+        },
+        {
+          "id": "M9.X227",
+          "rung": "behavior",
+          "defect": "The submitted admission is allowed through the discard guard."
+        },
+        {
+          "id": "M9.X228",
+          "rung": "behavior",
+          "defect": "E29 mutates the draft before the connection drops."
+        },
+        {
+          "id": "M9.X229",
+          "rung": "behavior",
+          "defect": "The refresh replaces the draft actions markup without releasing the owner of the open question."
         }
       ],
       "promises": [
@@ -2242,6 +2267,46 @@
           "outcome": "The held tail permits one POST and no PUT. The explicit replay returns ADM100. Reopening finds one allocation and one admission history entry.",
           "opposite": "A new gesture after the tail sends another POST.",
           "defect": "The shared draft handler replaces the admission while its checklist is held."
+        },
+        {
+          "for": "M9.X225",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Confirm discarding the open draft, then reopen it. Try again in a world where Luis saved a newer version.",
+          "outcome": "The 204 closes the editing workspace and reports Draft discarded. Reopening reads Discarded, version 8. A stale confirmation keeps Luis's revision, and reopening that revision permits discard.",
+          "opposite": "An old version leaves the draft open.",
+          "defect": "E29 advances the saved draft version twice for one discard."
+        },
+        {
+          "for": "M9.X226",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Decline the question for Helen's open draft, then reopen it.",
+          "outcome": "Draft kept appears. The coordinator can still save and reopens the Open draft at version 7.",
+          "opposite": "Explicit Yes discards the open draft.",
+          "defect": "Declining the confirmation sends the discard request."
+        },
+        {
+          "for": "M9.X227",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Open Omar King's submitted draft and confirm discard.",
+          "outcome": "The refusal names the submitted admission. Reopening still reads Submitted, version 9 and ADM203 for R203 in BED12.",
+          "opposite": "An open draft can be discarded.",
+          "defect": "The submitted admission is allowed through the discard guard."
+        },
+        {
+          "for": "M9.X228",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Confirm discard after the draft DELETE loses its connection before execution.",
+          "outcome": "The error notice appears. Reopening reads Open, version 7.",
+          "opposite": "A delivered DELETE closes the draft.",
+          "defect": "E29 mutates the draft before the connection drops."
+        },
+        {
+          "for": "M9.X229",
+          "page": "The resident's move-in draft at the senior-living admission desk.",
+          "gesture": "Start a refresh after Luis saves, hold its response, ask to discard, then release the new draft actions.",
+          "outcome": "The new owner shows version 8 and the old question closes. No DELETE was sent. Reopening reads Open and Luis's saved notes.",
+          "opposite": "A question whose owner stays open accepts a person's explicit answer.",
+          "defect": "The refresh replaces the draft actions markup without releasing the owner of the open question."
         }
       ],
       "verdicts": []

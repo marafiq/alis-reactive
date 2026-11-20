@@ -7,6 +7,7 @@ internal static class MoveInSeed
     internal static MoveInWorld World()
     {
         var clock = Clock();
+        var omar = OmarsDetails();
         return new MoveInWorld
         {
             Clock = clock,
@@ -22,7 +23,7 @@ internal static class MoveInSeed
             [
                 new ResidentState { Id = "R101", Identity = HelenWard(), Address = Albany("18 Oak Street"), Allergies = ["penicillin"] },
                 new ResidentState { Id = "R202", Identity = new ResidentIdentity { Name = "Nora Patel", BirthDate = new DateTime(1940, 2, 3), Email = "nora@example.test" }, Address = Albany("2 River Road") },
-                new ResidentState { Id = "R203", Identity = new ResidentIdentity { Name = "Omar King", BirthDate = new DateTime(1938, 7, 11), Email = "omar@example.test" }, Address = Albany("9 Lake Road"), ActiveAdmissionId = "ADM203" },
+                new ResidentState { Id = "R203", Identity = omar.Identity, Address = omar.Address, ActiveAdmissionId = "ADM203" },
                 new ResidentState { Id = "R104", Identity = new ResidentIdentity { Name = "James Reed", BirthDate = new DateTime(1945, 1, 2), Email = "james@example.test" }, Address = Albany("5 Pine Road") },
             ],
             Drafts = [HelensDraft(clock), TheEmptyDraft(clock), OmarsSubmittedDraft(clock)],
@@ -292,12 +293,20 @@ internal static class MoveInSeed
         Data = OmarsPage(clock),
     };
 
+    private static ResidentInput OmarsDetails() => new()
+    {
+        Identity = new ResidentIdentity { Name = "Omar King", BirthDate = new DateTime(1938, 7, 11), Email = "omar@example.test" },
+        Address = Albany("9 Lake Road"),
+    };
+
     private static MoveInPage OmarsPage(WorldClock clock) => new()
     {
         DraftId = "D300",
         Version = 9,
         Today = clock.Today,
         ResidentId = "R203",
+        Resident = OmarsDetails(),
+        CoordinatorId = "CO1",
         Location = new LocationInput { CommunityId = "C1", BuildingId = "B1", ApartmentId = "A12", BedId = "BED12", BedRevision = 4 },
         Care = new CareInput { Level = CareLevel.Memory },
     };

@@ -24,6 +24,7 @@ public sealed partial class MoveInDeskController : Controller
     private IActionResult PageOf(string draftId)
     {
         if (Desk.PageOf(draftId) is not { } page) return NotFound(MoveInErrors.Missing());
+        if (page.Status == DraftStatus.Discarded) return View(Views + "DiscardedDraft.cshtml", Desk.DraftActionsOf(draftId));
         if (page.Diet.Referral is { } imported)
         {
             var check = this.Validate<DietRequest, DietRules>(new DietRequest { Diet = new DietInput { Needs = imported, MealCount = page.Diet.MealCount } });
