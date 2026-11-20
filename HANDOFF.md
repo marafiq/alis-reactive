@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 19 22:23:14 EST 2026
+Written at `date`: Fri Nov 20 00:00:08 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -58,8 +58,12 @@ unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
 unit: ready ../movein-deposit-diet MoveInDepositDiet
   next: scripts/land-unit.sh ../movein-deposit-diet a46b1ca90 "MI.25 admission deposits and MI.26 dietary plans" ".landing/MoveInDepositDiet"
-unit: landed ../movein-discard MoveInDiscard
-  next: git worktree remove ../movein-discard
+unit: waiting ../movein-discard MoveInDiscard: for MoveInNavigationReadiness
+  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
+  exit line: each line of the brief's "Done"
+  goes to: unit: ready
+unit: landed ../movein-documents MoveInDocuments
+  next: git worktree remove ../movein-documents
   leaves by: `git worktree remove {worktree}`
   goes to: gone
 unit: ready ../movein-draft-admission MoveInDraftAdmission
@@ -67,9 +71,6 @@ unit: ready ../movein-draft-admission MoveInDraftAdmission
 unit: ready ../movein-medications-pharmacy MoveInMedicationsPharmacy
   next: scripts/land-unit.sh ../movein-medications-pharmacy c2ec598d3 "Prove medication editing, pharmacy clearance and held validation in move-in" ".landing/MoveInMedicationsPharmacy"
 unit: waiting ../movein-navigation-readiness MoveInNavigationReadiness: for Net48TwinFollowThrough
-  leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
-  exit line: each line of the brief's "Done"
-  goes to: unit: ready
 unit: building ../movein-owners MoveInOwners: it lacks paths.txt or message.txt
   leaves by: the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh`
   read first: the rule file of each kind of file, as it is opened
@@ -87,11 +88,11 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: checking at e1047be7d on feature/rewrite
+lane: checking at 56741aa3d on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at e1047be7d
+ci: unread at 56741aa3d
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -100,10 +101,10 @@ file: over CLAUDE.md: holds 336 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2077 lines, its limit 150
-file: over HANDOFF.md: holds 616 lines, its limit 150
+file: over HANDOFF.md: holds 650 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 25 units have landed since .claude/rules/process.md last changed
+machine: review due : 26 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -111,17 +112,17 @@ machine: review due : 25 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: e1047be7d Prove confirmed move-in draft discard and owner disposal (MI.19)
-- Full check: .work/logs/spec-check-e1047be7d.log: spec check at e1047be7d: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-221022-85640 e1047be7d
+- HEAD: 56741aa3d Prove move-in documents, signature replacement and packet handling (MI.22–MI.24)
+- Full check: .work/logs/spec-check-56741aa3d.log: spec check at 56741aa3d: 40 of 40 checks pass
+- .work/last-run.txt: 20261119-234658-15644 56741aa3d
 
 ## Landed since the commit before the last spec: STATE commit
-e1047be7d Prove confirmed move-in draft discard and owner disposal (MI.19)
-26d1b178b spec: STATE and handoff at 75e986a5a
+56741aa3d Prove move-in documents, signature replacement and packet handling (MI.22–MI.24)
+63d678f50 spec: STATE and handoff at e1047be7d
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 676; named by a browser test: 657; with no browser test: 19
+feature promises: 691; named by a browser test: 672; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -166,9 +167,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 409 to 413
-- A rule or a tool's list not applied before the change: 418 to 419
-- A shell command or a script wrong in its own terms: 588 to 591
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 413 to 420
+- A rule or a tool's list not applied before the change: 419 to 424
+- A shell command or a script wrong in its own terms: 591 to 594
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
@@ -590,6 +591,38 @@ After the checked push, open MI.22 documents, MI.23 document metadata, and MI.24
 packet in that order. MI.27 coordinators, MI.30 reception and MI.31 request defaults
 follow. Six feature IDs remain. Keep the app on the landed typed doors and record
 any missing capability in part 9 of the app spec.
+
+The spec check at `e1047be7d` passed 40 of 40, and the push checked the remote at
+`63d678f50`. Linux core job 136059969843 passed all 607 cases, including all five
+MI.19 cases, with zero overruns. Windows job 136060885899 passed all 11 twin cases
+and the fresh MVC 5 case, each with zero overruns. It reported both IIS Express
+sites and the nested net10 server exiting.
+
+MI.22 document upload, MI.23 signature metadata and replacement, and the MI.24 packet
+app work landed locally at `56741aa3d`. The integrated run passed all 790 cases, with
+no overruns or lost passes. The final move-in screen passed all 142. Fifteen named
+plants and two capture-time plants failed at their actual observations. The four-file
+replay matched all 783 entries in the compiled page-door table.
+
+A real FileList supplies repeated multipart files and their metadata. The upload
+policy and signature HEAD can wait while a file changes, and the fresh guard refuses
+the changed selection before transport. The server stores an accepted batch atomically
+and the receipt reads the committed files. A closed upload owner receives no later
+route, while a next read resolves the committed batch. The signature PUT uses the
+stored ETag and the actual file body. Changing the server version keeps the original
+until the next successful replacement. The next read asserts the saved text and line
+feed. The real packet filename and printable preview are visible. Notes and accepted
+print intents persist. A superseded quote cannot print.
+
+The isolated E36 response matched all 107 literal bytes and its world and server
+exited. Inspection of the browser-saved file itself is still open under the current
+Playwright allowlist. Part 9 records this exact evidence gap. The pending decision is
+whether the harness may read that downloaded artifact with its existing Playwright
+stream API. The app code and tests use the current rules.
+
+After the checked push, take MI.27 coordinators, then MI.30 reception, then MI.31
+request defaults. Three application feature IDs and the one MI.24 download observation
+remain. Use the landed typed framework APIs and MVC partial composition.
 
 
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
