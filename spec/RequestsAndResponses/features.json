@@ -656,6 +656,14 @@
           "defect": "The files sent as text or keyed by their input's id, so the endpoint binds no document; or the name past US-ASCII mangled, so the second document's name is not Überweisung.pdf."
         },
         {
+          "for": "X9.27",
+          "page": "The admission attachments form binds a multi-file input to the request model's list of files. Its Save button sends the registered form as multipart. The real endpoint shows the resident name, the count of bound files, and each file's name and byte length in order.",
+          "gesture": "Enter Ada Byron, select consent.pdf of 1,024 bytes and Überweisung.pdf of 2,048 bytes in the same Attachments input, then click Save. In another world enter Ada Byron and save with no attachments.",
+          "outcome": "Saved shows Ada Byron; 2 attachments; consent.pdf 1024; Überweisung.pdf 2048 for the selected list and Ada Byron; 0 attachments for the empty list.",
+          "opposite": "With no selected file the endpoint binds an empty list, with no placeholder file.",
+          "defect": "A bound file list is routed through the text scalar writer, so the multipart POST stops before the endpoint binds the selected files or an empty list."
+        },
+        {
           "for": "X9.28",
           "page": "A notes page under request defaults that send the app's header Care-Site: North. Its Refresh notes button GETs the notes with no header of its own; its Refresh from South button sends the same GET with its own header care-site holding South. The endpoint answers the Care-Site values it received, as the request carried them, and the page shows them in notes-site.",
           "gesture": "Click Refresh from South and wait until notes-site has text.",

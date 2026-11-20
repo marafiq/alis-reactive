@@ -3111,6 +3111,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F1 X9.27 1": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/IntakeAttachments.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F1 X9.28 0": {
     "modules": [],
     "views": [

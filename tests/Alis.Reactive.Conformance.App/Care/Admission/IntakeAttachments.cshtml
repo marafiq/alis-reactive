@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model IntakeAttachments
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission attachments";
+    var plan = Html.ReactivePlan<IntakeAttachments>();
+}
+<h1>Admission attachments</h1>
+@using (var intake = Html.BeginRequestForm(plan, "intake-attachments"))
+{
+    @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Attachments, options => options.Label("Attachments")).AttachmentPicker())
+    @(Html.NativeButton("save-attachments", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<IntakeAttachments>(CarePages.IntakeAttachments, request => request.Form(intake.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p>Saved: <output id="saved" aria-label="Saved">-</output></p>
+@Html.RenderPlan(plan)

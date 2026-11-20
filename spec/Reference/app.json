@@ -10602,6 +10602,23 @@
     },
     {
       "feature": "M6.F1",
+      "for": "X9.27",
+      "index": 1,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "documents",
+        "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
       "for": "X9.28",
       "index": 0,
       "screen": "record",

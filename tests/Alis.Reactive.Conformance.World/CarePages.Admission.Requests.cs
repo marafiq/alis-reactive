@@ -17,6 +17,7 @@ public static partial class CarePages
     public const string BedCommitWithAConflictRoute = Admission + "bed-commit/conflict-route";
     public const string AdmissionApplication = Admission + "admission-application";
     public const string IntakeDocuments = Admission + "intake-documents";
+    public const string IntakeAttachments = Admission + "intake-attachments";
     public const string QuickAdmission = Admission + "quick-admission";
     public const string AdmissionDesk = Admission + "admission-desk";
 }

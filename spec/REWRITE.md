@@ -1251,7 +1251,9 @@ check and option FluentValidation 12.1.1 defines, with its messages. Its second 
 in the browser by the rules its validator's set carries, over the body its request sends, each member read as the
 endpoint binds it; M8.F3's browser tests land with M8.F4's showing of failures.
 U18's first piece is landed: the C# request writer for Get, Head and Options, with the URL's parts, the query, the
-headers and the reply's success and error scopes, on both hosts. U20's app events are landed: `AppEvent.Declare`, the
+headers and the reply's success and error scopes, on both hosts. A captured multipart form sends each entry of a
+bound file list under its binding name (D9.8, D9.15, D14.3), proved by X9.27's registered list placement.
+U20's app events are landed: `AppEvent.Declare`, the
 document's load and custom-event triggers under a handler's policy, a payload member read at the event's detail, and a
 raise from markup; most of the browser tests U20 lands wait on U18's other methods. A date shown as an element's text is
 its declared type's, C# writing on the `string` shape whether it holds a `DateTime` or a `DateTimeOffset`. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built

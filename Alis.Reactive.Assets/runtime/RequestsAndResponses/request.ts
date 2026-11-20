@@ -187,7 +187,7 @@ function setInput(form: URLSearchParams | FormData, input: SentInput, value: unk
   const binding = input.entry.binding;
   const shape = convertedShape(binding);
   form.delete(input.name);
-  if (shape.kind === "file") {
+  if (shape.kind === "file" || (shape.kind === "array" && shape.item.kind === "file")) {
     appendFiles(form, input.name, value);
     return;
   }
