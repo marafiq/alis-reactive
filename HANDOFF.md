@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Fri Nov 20 16:11:42 EST 2026
+Written at `date`: Fri Nov 20 17:24:43 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -33,10 +33,16 @@ unit: ready ../ci-tlc-cold SpecCiCold
   leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
   exit line: "landed", with the browser run's result line
   goes to: unit: landed
-unit: landed ../ci-tlc-mac MacTlc
-  next: git worktree remove ../ci-tlc-mac
+unit: ready ../ci-tlc-mac MacTlc
+  next: scripts/land-unit.sh ../ci-tlc-mac bbe7e4869 "Run model checking on the Mac and validate its evidence in CI" ".landing/MacTlc"
+unit: landed ../framework-multipart-file-list MultipartFileList
+  next: git worktree remove ../framework-multipart-file-list
   leaves by: `git worktree remove {worktree}`
   goes to: gone
+unit: unbriefed ../framework-native-date NativeDateInput: its Rules name DateWire.tla, which the worktree lacks
+  leaves by: the brief is completed, before any work
+  read first: the files of a unit, below
+  goes to: unit: briefed
 unit: ready ../fusion-audit FusionAudit
   next: scripts/land-unit.sh ../fusion-audit 9c77fd7d8 "Fusion audit: compare the pinned vendor contract and improve component onboarding" ".landing/FusionAudit"
 unit: returned ../fusion-combobox-data-manager FusionComboBoxDataManager: reply.md waits for read.md
@@ -48,9 +54,6 @@ unit: returned ../fusion-combobox-equipment-availability FusionComboBoxEquipment
 unit: ready ../fusion-combobox-follow-through FusionComboBoxFollowThrough
   next: scripts/land-unit.sh ../fusion-combobox-follow-through 5f77ce2a6 "Prove ComboBox search, live configuration and real EJ2 Promises" ".landing/FusionComboBoxFollowThrough"
 unit: unbriefed ../fusion-combobox-follow-through IntegrationPrep: brief.md lacks Scope, Rules, Outcome, Done, Commands, Reply
-  leaves by: the brief is completed, before any work
-  read first: the files of a unit, below
-  goes to: unit: briefed
 unit: returned ../fusion-combobox-live-catalogue FusionComboBoxLiveCatalogue: reply.md waits for read.md
 unit: ready ../fusion-combobox-onboarding-notes FusionOnboardingNotes
   next: scripts/land-unit.sh ../fusion-combobox-onboarding-notes d67e15d16 "Resolve pinned ComboBox citations and clarify DataManager onboarding" ".landing/FusionOnboardingNotes"
@@ -94,12 +97,12 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: pushed at 574cfb8e8 on feature/rewrite: equal to the remote
+lane: pushed at 76452da4c on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 574cfb8e8
+ci: unread at 76452da4c
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -108,10 +111,10 @@ file: over CLAUDE.md: holds 338 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2080 lines, its limit 150
-file: over HANDOFF.md: holds 823 lines, its limit 150
+file: over HANDOFF.md: holds 858 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 31 units have landed since .claude/rules/process.md last changed
+machine: review due : 32 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -119,17 +122,17 @@ machine: review due : 31 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 574cfb8e8 Run TLC on the Mac and verify its evidence in CI
-- Full check: .work/logs/spec-check-574cfb8e8.log: spec check at 574cfb8e8: 40 of 40 checks pass
-- .work/last-run.txt: 20261120-155813-3928 574cfb8e8
+- HEAD: 76452da4c Send a bound list of files as repeated multipart parts
+- Full check: .work/logs/spec-check-76452da4c.log: spec check at 76452da4c: 40 of 40 checks pass
+- .work/last-run.txt: 20261120-171125-65955 76452da4c
 
 ## Landed since the commit before the last spec: STATE commit
-574cfb8e8 Run TLC on the Mac and verify its evidence in CI
-bbe7e4869 spec: STATE and handoff at aaa45ea9a
+76452da4c Send a bound list of files as repeated multipart parts
+41c752166 spec: STATE and handoff at 574cfb8e8
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 717; named by a browser test: 698; with no browser test: 19
+feature promises: 718; named by a browser test: 699; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -174,7 +177,8 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A shell command or a script wrong in its own terms: 606 to 608
+- A rule or a tool's list not applied before the change: 433 to 435
+- A shell command or a script wrong in its own terms: 608 to 610
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
@@ -207,6 +211,40 @@ spec/CLAUDE.md:9: - The owner, 2026-11-20: run TLC on the Mac to conserve hosted
 
 ## Next
 <!-- next -->
+
+### Framework quality priorities
+
+The owner, 2026-11-20: "lets priortize framework open items, list for me, and close any gaps on
+quality of framework, that is focus, but not imagnitive improvements or for the sake of it".
+Use a reproduced defect, a reachable incomplete contract, or an existing unproved promise to open a
+slice. Review the source and the appropriate failed proof before a fix.
+
+Classify the gap before editing. A design gap leaves the contract undecided. An implementation
+defect fails an existing contract. A proof gap leaves promised behavior unverified. The owner's
+direction is to fit the agent workflow to the problem and keep the required proof. Use a focused
+consult when the contract is unclear and a scoped builder when the source and failure decide it.
+
+1. **Multipart file-list capture.** The net10 Chromium test X9.27 index 1 first failed on the actual
+   scalar conversion of a registered list input. The runtime dispatch now uses the existing file
+   writer. The real MVC endpoint bound the two selected files in order and zero for an empty
+   selection. The scalar-only plant failed the same test. The old separate-row upload passed and
+   the compiled page comparison preserved all 809 prior rows. The new browser proof runs on net10.
+2. **Native textbox date preservation.** The move-in foundation gap 1 recorded a saved DateTime
+   rendered as culture text and lost on Reactive save. D17.13 gives the existing Native helper the
+   plan's literal model value. The scoped source consult in the NativeDateInput worktree identifies
+   a correction on the two MVC render helpers, with their attempted-text precedence preserved.
+   Use a real saved admission, an unchanged prefilling and MVC's bound receipt to prove it.
+3. **MVC 5 date response proof.** X3.7 separately promises that the framework JSON response carries
+   a date of birth to a browser in a different time zone. The placement is net48. Prove it under
+   Windows IIS before counting that promise closed.
+4. **Promised Fusion behavior.** Finish the template member-equality and Grid validation cases
+   before the exports. Follow the landed order through the remaining Breadcrumb, Menu, Sidebar,
+   Toolbar, and SmartPaste placements and then U27 Confirm and Toast.
+5. **Plan contract alignment.** Verify the raw text and file body validation boundary and the
+   reported pushed enum case before authoring code. Retire the seven unused operators as already
+   approved and narrow the generated plan to the shapes C# writes. Confirm a case is reachable
+   before assigning a browser test to it.
+
 
 ### TLC and CI
 
