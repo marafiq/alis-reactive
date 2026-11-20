@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Fri Nov 20 02:23:52 EST 2026
+Written at `date`: Fri Nov 20 03:53:49 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -60,6 +60,10 @@ unit: waiting ../movein-coordinators MoveInCoordinators: for MoveInDocuments
   leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
   exit line: each line of the brief's "Done"
   goes to: unit: ready
+unit: landed ../movein-defaults MoveInDefaults
+  next: git worktree remove ../movein-defaults
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
 unit: ready ../movein-deposit-diet MoveInDepositDiet
   next: scripts/land-unit.sh ../movein-deposit-diet a46b1ca90 "MI.25 admission deposits and MI.26 dietary plans" ".landing/MoveInDepositDiet"
 unit: waiting ../movein-discard MoveInDiscard: for MoveInNavigationReadiness
@@ -78,10 +82,7 @@ unit: ready ../movein-owners-restarted MoveInOwners
   next: scripts/land-unit.sh ../movein-owners-restarted 21d6a2ec4 "Implement MI.18 waitlisting and MI.28–29 assessment and room owners" ".landing/MoveInOwners"
 unit: ready ../movein-payer-pricing MoveInPayerPricing
   next: scripts/land-unit.sh ../movein-payer-pricing 940dda15b "MI.8, MI.9 and MI.13 — payer coverage, verification and quotes" ".landing/MoveInPayerPricing"
-unit: landed ../movein-reception MoveInReception
-  next: git worktree remove ../movein-reception
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: waiting ../movein-reception MoveInReception: for MoveInCoordinators
 unit: ready ../movein-review-acceptance MoveInReviewAcceptance
   next: scripts/land-unit.sh ../movein-review-acceptance c91bae1fc "MI.14 and MI.15. Review the selected services and accept the displayed quote revision" ".landing/MoveInReviewAcceptance"
 unit: ready ../movein-scope MoveInSessionScope
@@ -90,11 +91,11 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: checking at 1c09bcf83 on feature/rewrite
+lane: checking at 39111d56a on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 1c09bcf83
+ci: unread at 39111d56a
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -103,10 +104,10 @@ file: over CLAUDE.md: holds 336 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2077 lines, its limit 150
-file: over HANDOFF.md: holds 706 lines, its limit 150
+file: over HANDOFF.md: holds 742 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 28 units have landed since .claude/rules/process.md last changed
+machine: review due : 29 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -114,17 +115,17 @@ machine: review due : 28 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 1c09bcf83 Prove native and reactive reception sign-in (MI.30)
-- Full check: .work/logs/spec-check-1c09bcf83.log: spec check at 1c09bcf83: 40 of 40 checks pass
-- .work/last-run.txt: 20261120-021105-78367 1c09bcf83
+- HEAD: 39111d56a Prove move-in admissions request defaults and recovery (MI.31)
+- Full check: .work/logs/spec-check-39111d56a.log: spec check at 39111d56a: 40 of 40 checks pass
+- .work/last-run.txt: 20261120-034112-5987 39111d56a
 
 ## Landed since the commit before the last spec: STATE commit
-1c09bcf83 Prove native and reactive reception sign-in (MI.30)
-06b369941 spec: STATE and handoff at 0cb3d7355
+39111d56a Prove move-in admissions request defaults and recovery (MI.31)
+29807a28e spec: STATE and handoff at 1c09bcf83
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 701; named by a browser test: 682; with no browser test: 19
+feature promises: 717; named by a browser test: 698; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -169,9 +170,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 422 to 427
-- A rule or a tool's list not applied before the change: 428 to 430
-- A shell command or a script wrong in its own terms: 596 to 597
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 427 to 431
+- A rule or a tool's list not applied before the change: 430 to 432
+- A shell command or a script wrong in its own terms: 597 to 604
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
@@ -675,10 +676,45 @@ transport leave history empty. The room reader distinguishes absent detail and E
 The companion multipart sends a real file and the next draft read retains the
 original prescription.
 
+The spec check at `1c09bcf83` passed all 40 checks and its checked push ended at
+`29807a28e`. Linux core job 136148623507 passed all 632 cases, including the new
+reception cases, with zero overruns. Windows job 136149430173 passed the 11 MVC 5
+twin cases and one fresh MVC 5 case with zero overruns. Both IIS Express sites and
+the nested net10 server exited.
+
 After the checked push, take MI.31 request defaults and recovery. One application
 feature remains in the queue. The MI.24 browser-saved artifact observation remains
 open under the installed test rule. Use the landed typed framework APIs and MVC
 partial composition.
+
+MI.31 request defaults and recovery landed locally at `39111d56a`. The integrated
+gate passed all 816 browser cases with zero failures or overruns and preserved the
+800 prior passes. The 16 new browser cases cover the admissions, reception and
+public information profiles. The 152 earlier net10 move-in cases and both original
+default-hook controls passed. All 19 named plants failed at their observations and
+were restored. The four-file replay matched the 809 compiled page-door entries.
+
+The private desk proved the real Care-Site and antiforgery headers, the held E52,
+E22 and E53 order and the separately renewed and flushed E23 receipt read. A
+signed-out session or invalid draft makes no admission attempt. A failed E53
+leaves SAVE8 committed and handover empty. The public desk status and independent
+form-field reception run under their own profiles. The named retry, policy opt-outs,
+typed status and recovery routes, shared, page and row busy indicators and removed
+target each have browser proof.
+
+The isolated readiness check now prepares only the selected net10 and admissions
+move-in hosts. Both actual D100 renders and two zero-parked-gate world exits were
+read in the integrated run. The architecture sweep retains the same schema
+verdict and invalid-plan diagnostics. The previous detailed evaluation exhausted
+a 4 GiB diagnostic heap bound. The positive sweep with the same bound passed in
+18 seconds and about 434 MiB peak resident memory. The normal integrated gate
+passed all 328 architecture cases in 1 minute 37 seconds without a heap cap.
+
+MI.31 is the last scheduled app batch. The open MI.24 observation is the bytes of
+the saved browser artifact. The filename, preview, and literal 107-byte HTTP
+response were verified. The test-rule decision remains open. Part 9 holds the
+other precise scope and capability gaps. App, proof and harness work since the
+separately requested Fusion onboarding uses the landed framework source.
 
 
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
