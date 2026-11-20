@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Fri Nov 20 00:00:08 EST 2026
+Written at `date`: Fri Nov 20 01:09:06 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -56,16 +56,17 @@ unit: ready ../movein-availability MoveInAvailability
   next: scripts/land-unit.sh ../movein-availability 6a418dc64 "MI.18.5, MI.20 and MI.21. Publish the world's bed changes to independently owned page and card streams. A held response checks current community access and preserves a newer displayed revision and holder. Reconnect re-reads the bed; the retry offer remains until every failed owner recovers or leaves." ".landing/MoveInAvailability"
 unit: ready ../movein-contacts MoveInContacts
   next: scripts/land-unit.sh ../movein-contacts d13a4ce7f "The move-in page gains its contacts: MI.5 contact rows, MI.6 contact authority and MI.7 contact removal, on the foundation at fbea584b2." ".landing/MoveInContacts"
+unit: landed ../movein-coordinators MoveInCoordinators
+  next: git worktree remove ../movein-coordinators
+  leaves by: `git worktree remove {worktree}`
+  goes to: gone
 unit: ready ../movein-deposit-diet MoveInDepositDiet
   next: scripts/land-unit.sh ../movein-deposit-diet a46b1ca90 "MI.25 admission deposits and MI.26 dietary plans" ".landing/MoveInDepositDiet"
 unit: waiting ../movein-discard MoveInDiscard: for MoveInNavigationReadiness
   leaves by: the unit it names lands; then it moves to the new head and each command of its "Done" runs there
   exit line: each line of the brief's "Done"
   goes to: unit: ready
-unit: landed ../movein-documents MoveInDocuments
-  next: git worktree remove ../movein-documents
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: waiting ../movein-documents MoveInDocuments: for MoveInDiscard
 unit: ready ../movein-draft-admission MoveInDraftAdmission
   next: scripts/land-unit.sh ../movein-draft-admission fa45060db "Prove move-in draft saving and admission submission" ".landing/MoveInDraftAdmission"
 unit: ready ../movein-medications-pharmacy MoveInMedicationsPharmacy
@@ -88,11 +89,11 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: checking at 56741aa3d on feature/rewrite
+lane: checking at 0cb3d7355 on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 56741aa3d
+ci: unread at 0cb3d7355
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -101,10 +102,10 @@ file: over CLAUDE.md: holds 336 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2077 lines, its limit 150
-file: over HANDOFF.md: holds 650 lines, its limit 150
+file: over HANDOFF.md: holds 676 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 26 units have landed since .claude/rules/process.md last changed
+machine: review due : 27 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -112,17 +113,17 @@ machine: review due : 26 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 56741aa3d Prove move-in documents, signature replacement and packet handling (MI.22–MI.24)
-- Full check: .work/logs/spec-check-56741aa3d.log: spec check at 56741aa3d: 40 of 40 checks pass
-- .work/last-run.txt: 20261119-234658-15644 56741aa3d
+- HEAD: 0cb3d7355 Prove the move-in coordinators line and ward preparation (MI.27)
+- Full check: .work/logs/spec-check-0cb3d7355.log: spec check at 0cb3d7355: 40 of 40 checks pass
+- .work/last-run.txt: 20261120-005626-55462 0cb3d7355
 
 ## Landed since the commit before the last spec: STATE commit
-56741aa3d Prove move-in documents, signature replacement and packet handling (MI.22–MI.24)
-63d678f50 spec: STATE and handoff at e1047be7d
+0cb3d7355 Prove the move-in coordinators line and ward preparation (MI.27)
+245eaf302 spec: STATE and handoff at 56741aa3d
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 691; named by a browser test: 672; with no browser test: 19
+feature promises: 696; named by a browser test: 677; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -167,9 +168,9 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 413 to 420
-- A rule or a tool's list not applied before the change: 419 to 424
-- A shell command or a script wrong in its own terms: 591 to 594
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 420 to 422
+- A rule or a tool's list not applied before the change: 424 to 428
+- A shell command or a script wrong in its own terms: 594 to 596
 
 ## The owner's latest decisions
 spec/CLAUDE.md:1783: - The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
@@ -623,6 +624,31 @@ stream API. The app code and tests use the current rules.
 After the checked push, take MI.27 coordinators, then MI.30 reception, then MI.31
 request defaults. Three application feature IDs and the one MI.24 download observation
 remain. Use the landed typed framework APIs and MVC partial composition.
+
+The full check at `56741aa3d` passed 40 of 40, and the checked push ended at
+`245eaf302`. Linux core job 136094794931 passed all 622 cases with zero overruns.
+Windows job 136095665659 passed all 11 MVC 5 twin cases and the fresh MVC 5 case
+with zero overruns. Both IIS sites and the nested net10 server exited.
+
+MI.27 coordinators and ward preparation landed locally at `0cb3d7355`. The integrated
+run passed all 795 cases with zero failures or overruns and preserved all 790 prior
+passes. The scoped move-in screen passed all 147. Six app plants failed at the named
+observations, and the independent four-file replay matched 788 compiled page-door
+entries.
+
+The real SignalR card joins the draft, reads the Maya and Luis roster, records MSG1
+with sequence 1, and rejoins after a changed connection ID. A separate world remains
+empty. Short and forbidden messages and a revoked membership cannot post. The real
+ward store sends the multipart request with CO1 and the operation header, and the next
+bed read distinguishes an accepted instruction from a lost request. Closing the card
+releases the hub and removes its subscription from the surviving store while the held
+quote finishes. Reopening attaches once. Both the quote-owner defect and the retained
+subscriber failed independently. The app uses the existing located returned-unsubscriber
+behavior, as recorded in part 9.
+
+After the checked push take MI.30 reception, then MI.31 request defaults. Two app
+feature IDs remain, plus the separately open direct browser download observation from
+MI.24. Keep the closed Playwright rule pending the owner’s decision.
 
 
 At c91bae1fc CI reported seven passing jobs, the spec job running, and verify-net48 failed in
