@@ -1375,6 +1375,26 @@
           ]
         }
       ]
+    },
+    {
+      "id": "review-worklist",
+      "area": "care",
+      "under": "residents",
+      "title": "Resident review worklist",
+      "user": "prepares the coordinator’s review list and checks an incoming referral against the current filter",
+      "parts": [
+        {
+          "id": "reviewFilter",
+          "kind": "fusion",
+          "role": "the review criteria and resident filter, FusionQueryBuilder"
+        },
+        {
+          "id": "worklist",
+          "kind": "native",
+          "role": "the matching resident roster and referral decision",
+          "module": "Elements"
+        }
+      ]
     }
   ],
   "placements": [
@@ -14878,6 +14898,54 @@
           "action": "Run.tla:Settle",
           "on": "the admission history flush after SAVE8"
         }
+      ]
+    },
+    {
+      "feature": "M21.F53",
+      "for": "M21.X1301",
+      "index": 0,
+      "screen": "review-worklist",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "reviewFilter",
+        "worklist"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F53",
+      "for": "M21.X1302",
+      "index": 0,
+      "screen": "review-worklist",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "reviewFilter",
+        "worklist"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F53",
+      "for": "M21.X1303",
+      "index": 0,
+      "screen": "review-worklist",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "reviewFilter",
+        "worklist"
+      ],
+      "harness": [
+        "seed"
       ]
     }
   ],

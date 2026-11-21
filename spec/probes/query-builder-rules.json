@@ -1,0 +1,373 @@
+{
+  "versions": {
+    "ej2": "33.1.47",
+    "ej2-querybuilder": "33.1.46",
+    "ej2-data": "33.1.45"
+  },
+  "initial": {
+    "raw": {
+      "condition": "and",
+      "rules": [
+        {
+          "label": "Wing",
+          "field": "wing",
+          "operator": "equal",
+          "type": "string",
+          "value": "North"
+        },
+        {
+          "condition": "or",
+          "rules": [
+            {
+              "label": "Days overdue",
+              "field": "days",
+              "operator": "greaterthanorequal",
+              "type": "number",
+              "value": 7
+            },
+            {
+              "label": "Escalated",
+              "field": "escalated",
+              "operator": "equal",
+              "type": "boolean",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "valid": {
+      "condition": "and",
+      "rules": [
+        {
+          "label": "Wing",
+          "field": "wing",
+          "operator": "equal",
+          "type": "string",
+          "value": "North"
+        },
+        {
+          "condition": "or",
+          "rules": [
+            {
+              "label": "Days overdue",
+              "field": "days",
+              "operator": "greaterthanorequal",
+              "type": "number",
+              "value": 7
+            },
+            {
+              "label": "Escalated",
+              "field": "escalated",
+              "operator": "equal",
+              "type": "boolean",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "editorsValid": true,
+    "predicateMatches": [
+      "Ada",
+      "Ben"
+    ],
+    "isPromise": true,
+    "resultIsArray": true,
+    "filtered": [
+      "Ada",
+      "Ben"
+    ],
+    "queryOperations": [
+      "onSelect",
+      "onWhere"
+    ],
+    "dataManagerMatches": [
+      "Ada",
+      "Ben"
+    ]
+  },
+  "edited": {
+    "raw": {
+      "condition": "and",
+      "rules": [
+        {
+          "label": "Wing",
+          "field": "wing",
+          "operator": "equal",
+          "type": "string",
+          "value": "South"
+        },
+        {
+          "condition": "or",
+          "rules": [
+            {
+              "label": "Days overdue",
+              "field": "days",
+              "operator": "greaterthanorequal",
+              "type": "number",
+              "value": 7
+            },
+            {
+              "label": "Escalated",
+              "field": "escalated",
+              "operator": "equal",
+              "type": "boolean",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "valid": {
+      "condition": "and",
+      "rules": [
+        {
+          "label": "Wing",
+          "field": "wing",
+          "operator": "equal",
+          "type": "string",
+          "value": "South"
+        },
+        {
+          "condition": "or",
+          "rules": [
+            {
+              "label": "Days overdue",
+              "field": "days",
+              "operator": "greaterthanorequal",
+              "type": "number",
+              "value": 7
+            },
+            {
+              "label": "Escalated",
+              "field": "escalated",
+              "operator": "equal",
+              "type": "boolean",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "editorsValid": true,
+    "predicateMatches": [
+      "Dev",
+      "Eve"
+    ],
+    "isPromise": true,
+    "resultIsArray": true,
+    "filtered": [
+      "Dev",
+      "Eve"
+    ],
+    "queryOperations": [
+      "onSelect",
+      "onWhere"
+    ],
+    "dataManagerMatches": [
+      "Dev",
+      "Eve"
+    ]
+  },
+  "incomplete": {
+    "raw": {
+      "condition": "and",
+      "rules": [
+        {
+          "label": "Wing",
+          "field": "wing",
+          "operator": "equal",
+          "type": "string",
+          "value": ""
+        },
+        {
+          "condition": "or",
+          "rules": [
+            {
+              "label": "Days overdue",
+              "field": "days",
+              "operator": "greaterthanorequal",
+              "type": "number",
+              "value": 7
+            },
+            {
+              "label": "Escalated",
+              "field": "escalated",
+              "operator": "equal",
+              "type": "boolean",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "valid": {
+      "condition": "and",
+      "rules": [
+        {
+          "condition": "or",
+          "rules": [
+            {
+              "label": "Days overdue",
+              "field": "days",
+              "operator": "greaterthanorequal",
+              "type": "number",
+              "value": 7
+            },
+            {
+              "label": "Escalated",
+              "field": "escalated",
+              "operator": "equal",
+              "type": "boolean",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "editorsValid": false,
+    "predicateMatches": [
+      "Ada",
+      "Ben",
+      "Dev",
+      "Eve"
+    ],
+    "isPromise": true,
+    "resultIsArray": true,
+    "filtered": [
+      "Ada",
+      "Ben",
+      "Dev",
+      "Eve"
+    ],
+    "queryOperations": [
+      "onSelect",
+      "onWhere"
+    ],
+    "dataManagerMatches": [
+      "Ada",
+      "Ben",
+      "Dev",
+      "Eve"
+    ]
+  },
+  "cases": {
+    "validLeaves": [
+      {
+        "label": "days",
+        "field": "days",
+        "operator": "between",
+        "type": "number",
+        "value": [
+          0,
+          7
+        ]
+      },
+      {
+        "label": "wing",
+        "field": "wing",
+        "operator": "in",
+        "type": "string",
+        "value": [
+          "North",
+          "South"
+        ]
+      },
+      {
+        "label": "days",
+        "field": "days",
+        "operator": "equal",
+        "type": "number",
+        "value": 0
+      },
+      {
+        "label": "escalated",
+        "field": "escalated",
+        "operator": "equal",
+        "type": "boolean",
+        "value": false
+      },
+      {
+        "label": "wing",
+        "field": "wing",
+        "operator": "isnull",
+        "type": "string",
+        "value": null
+      }
+    ],
+    "unrecognized": {
+      "condition": "and",
+      "rules": [
+        {
+          "label": "unlisted",
+          "field": "unlisted",
+          "operator": "unrecognizedOperator",
+          "type": "string",
+          "value": "retained"
+        }
+      ]
+    },
+    "empty": {},
+    "emptyPredicateType": "undefined",
+    "ignoreCase": true,
+    "matchCase": false,
+    "emptyEditorWithValidation": false,
+    "emptyEditorWithoutValidation": true,
+    "insideRange": [
+      false,
+      true,
+      true,
+      false
+    ],
+    "insideList": [
+      true,
+      true,
+      false
+    ],
+    "dateMatches": [
+      true,
+      false
+    ],
+    "notGroup": {
+      "condition": "and",
+      "rules": [
+        {
+          "label": "wing",
+          "field": "wing",
+          "operator": "equal",
+          "type": "string",
+          "value": "North",
+          "isLocked": true
+        }
+      ],
+      "not": true,
+      "isLocked": false
+    },
+    "notGroupMatches": [
+      true,
+      false
+    ],
+    "separate": {
+      "condition": "and",
+      "rules": [
+        {
+          "label": "wing",
+          "field": "wing",
+          "operator": "equal",
+          "type": "string",
+          "value": "North",
+          "condition": "or"
+        },
+        {
+          "label": "days",
+          "field": "days",
+          "operator": "greaterthan",
+          "type": "number",
+          "value": 7
+        }
+      ]
+    },
+    "connectorMatches": false
+  }
+}

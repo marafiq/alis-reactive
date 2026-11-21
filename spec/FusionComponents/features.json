@@ -24002,6 +24002,113 @@
      ]
     }
    ]
+  },
+  {
+   "id": "M21.F53",
+   "summary": "FusionQueryBuilder applies a resident review filter and previews one referral against the complete rules of an unfinished filter.",
+   "status": "new",
+   "types": [],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "proposed",
+     "text": "Html.FusionQueryBuilder renders the EJ2 rule editor over the application’s rows. ValidateFields checks the editors, GetValidRules returns the complete rule tree, GetPredicate compiles it to a record predicate, and GetFilteredRecords waits for the data manager to execute the current filter.",
+     "doors": [
+      "M21.N53",
+      "N5.4",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "call",
+    "let",
+    "get",
+    "lit",
+    "do"
+   ],
+   "writes": [
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive/Components/JsObject.cs:116-121"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive/Components/JsObject.cs:214-225"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive/Components/JsObject.cs:252-255"
+    }
+   ],
+   "executes": [
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/grammar/evaluate.ts:45-54"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/grammar/evaluate.ts:60-71"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "The pinned EJ2 QueryBuilder and data package declarations, their implementations and the browser running the local row and editor gestures.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X1301",
+     "rung": "behavior",
+     "defect": "Joining the two review reasons with AND loses the residents who qualify through a single reason."
+    },
+    {
+     "id": "M21.X1302",
+     "rung": "behavior",
+     "defect": "Checking an existing North resident in place of the incoming referral reverses her eligibility."
+    },
+    {
+     "id": "M21.X1303",
+     "rung": "behavior",
+     "defect": "Disabling editor validation lets the unfinished filter replace the worklist."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X1301",
+     "page": "A coordinator has six residents across North and South. The review filter selects one wing and, within it, either at least seven days overdue or an escalation.",
+     "gesture": "Apply the North filter, edit the wing to South in the rule editor, then apply it again. Change the nested group to AND, apply, then restore OR and apply again.",
+     "outcome": "The North worklist contains Ada Brooks and Ben Ortiz. The South worklist contains Dev Singh and Eve Moss.",
+     "opposite": "Cora Bell and Finn Ward have fewer than seven days overdue and no escalation. Neither appears on its wing’s worklist. Requiring both reasons gives zero South residents. Restoring OR returns Dev and Eve.",
+     "defect": "Joining the two review reasons with AND loses the residents who qualify through a single reason."
+    },
+    {
+     "for": "M21.X1302",
+     "page": "Inez Shaw is an incoming South-wing referral with nine days overdue and no escalation. The coordinator previews her against the complete rules in the current draft.",
+     "gesture": "Check the referral against the North filter, clear the wing value and check again, then set North and recheck.",
+     "outcome": "The unfinished wing condition drops out of the preview and the remaining overdue-or-escalated group includes Inez.",
+     "opposite": "Both complete North filters exclude Inez.",
+     "defect": "Checking an existing North resident in place of the incoming referral reverses her eligibility."
+    },
+    {
+     "for": "M21.X1303",
+     "page": "A coordinator has already applied the North resident review filter. Wing is a required query editor column.",
+     "gesture": "Clear the wing editor and apply the filter, then fill in South and apply again.",
+     "outcome": "The coordinator sees Complete the required filter values. The existing North worklist stays available.",
+     "opposite": "Completing the editor with South updates the worklist to Dev Singh and Eve Moss.",
+     "defect": "Disabling editor validation lets the unfinished filter replace the worklist."
+    }
+   ],
+   "verdicts": []
   }
  ]
 }

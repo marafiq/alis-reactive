@@ -1,0 +1,173 @@
+context	owner	name	kind	signature	optional	defaultNull	package location	C# declaration	verdict
+$	QueryBuilder	actionBegin	event	EmitType<ActionEventArgs>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:376		Outside the demonstrated worklist operations
+$	Base	addEventListener	method	(eventName: string, handler: Function) => void	false	false	@syncfusion/ej2-base/src/base.d.ts:86		Separate gesture and shape evidence required
+$	QueryBuilder	addGroups	method	(groups: RuleModel[], groupID: string) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:759		Outside the demonstrated worklist operations
+$	QueryBuilder	addRuleToNewGroups	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:563		Outside the demonstrated worklist operations
+$	QueryBuilder	addRules	method	(rule: RuleModel[], groupID: string) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:751		Outside the demonstrated worklist operations
+$	QueryBuilder	allowDragAndDrop	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:614		Outside the demonstrated worklist operations
+$	Base	allowServerDataBinding	read/write	boolean	false	false	@syncfusion/ej2-base/src/base.d.ts:26		Outside the demonstrated worklist operations
+$	QueryBuilder	allowValidation	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:441		Builder option used to enable required editor checks
+$	Component	appendTo	method	(selector?: string | HTMLElement | undefined) => void	false	false	@syncfusion/ej2-base/src/component.d.ts:116		Separate gesture and shape evidence required
+$	QueryBuilder	autoSelectField	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:572		Outside the demonstrated worklist operations
+$	QueryBuilder	autoSelectOperator	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:581		Outside the demonstrated worklist operations
+$	QueryBuilder	beforeChange	event	EmitType<ChangeEventArgs>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:383		Outside the demonstrated worklist operations
+$	QueryBuilder	change	event	EmitType<ChangeEventArgs>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:390		Outside the demonstrated worklist operations
+$	QueryBuilder	cloneGroup	method	(groupID: string, parentGroupID: string, index: number) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:974		Outside the demonstrated worklist operations
+$	QueryBuilder	cloneRule	method	(ruleID: string, groupID: string, index: number) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:965		Outside the demonstrated worklist operations
+$	QueryBuilder	columns	read/write	ColumnsModel[]	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:453		Builder option used for the permitted fields, types and editors
+$	QueryBuilder	created	event	EmitType<Event>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:363		Outside the demonstrated worklist operations
+$	QueryBuilder	cssClass	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:485		Outside the demonstrated worklist operations
+$	Component	currentContext	read/write	{ calls?: Function; args?: any; }	false	false	@syncfusion/ej2-base/src/component.d.ts:45		Separate gesture and shape evidence required
+$	Component	dataBind	method	() => void	false	false	@syncfusion/ej2-base/src/component.d.ts:129		Outside the demonstrated worklist operations
+$	QueryBuilder	dataBound	event	EmitType<Object>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:397		Separate gesture and shape evidence required
+$	QueryBuilder	dataSource	read/write	Object[] | Object | DataManager	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:492		Local data supplied by the typed render helper
+$	QueryBuilder	deleteGroup	method	(target: string | Element) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:787		Separate gesture and shape evidence required
+$	QueryBuilder	deleteGroups	method	(groupIdColl: string[]) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:838		Outside the demonstrated worklist operations
+$	QueryBuilder	deleteRules	method	(ruleIdColl: string[]) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:852		Outside the demonstrated worklist operations
+$	QueryBuilder	destroy	method	() => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:743		Outside the demonstrated worklist operations
+$	QueryBuilder	destroyed	event	EmitType<Object>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:369		Separate gesture and shape evidence required
+$	QueryBuilder	displayMode	read/write	DisplayMode	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:498		Outside the demonstrated worklist operations
+$	QueryBuilder	drag	event	EmitType<DragEventArgs>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:416		Outside the demonstrated worklist operations
+$	QueryBuilder	dragStart	event	EmitType<DragEventArgs>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:410		Outside the demonstrated worklist operations
+$	QueryBuilder	drop	event	EmitType<DropEventArgs>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:422		Outside the demonstrated worklist operations
+$	Component	ej2StatePersistenceVersion	read/write	string	false	false	@syncfusion/ej2-base/src/component.d.ts:20		Outside the demonstrated worklist operations
+$	Component	element	read/write	ElementType	false	false	@syncfusion/ej2-base/src/component.d.ts:17		DOM object outside the worklist
+$	QueryBuilder	enableNotCondition	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:548		Outside the demonstrated worklist operations
+$	QueryBuilder	enablePersistence	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:505		Outside the demonstrated worklist operations
+$	Component	enableRtl	read/write	boolean	false	false	@syncfusion/ej2-base/src/component.d.ts:32		Outside the demonstrated worklist operations
+$	QueryBuilder	enableSeparateConnector	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:598		Outside the demonstrated worklist operations
+$	QueryBuilder	fieldMode	read/write	FieldMode	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:447		Outside the demonstrated worklist operations
+$	QueryBuilder	fieldModel	read/write	DropDownListModel | DropDownTreeModel	false	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:459		Separate gesture and shape evidence required
+$	QueryBuilder	getDataManagerQuery	method	(rule: RuleModel) => Query	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:859		Probe executes the projected local Query. No screen asks for a Query object
+$	QueryBuilder	getFilteredRecords	method	() => object | Promise<Object>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:845	Alis.Reactive.Fusion/FusionComponents/FusionQueryBuilder/FusionQueryBuilder.cs:28	Typed asynchronous call with local array rows. Other adaptor envelopes remain unproven
+$	QueryBuilder	getGroup	method	(target: string | Element) => RuleModel	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:831		Separate gesture and shape evidence required
+$	QueryBuilder	getMongoQuery	method	(rule?: RuleModel | undefined) => string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:956		Outside the demonstrated worklist operations
+$	QueryBuilder	getOperators	method	(field: string) => { [key: string]: Object; }[]	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:874		Separate gesture and shape evidence required
+$	QueryBuilder	getParameterizedNamedSql	method	(rule?: RuleModel | undefined) => ParameterizedNamedSql	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:934		Outside the demonstrated worklist operations
+$	QueryBuilder	getParameterizedSql	method	(rule?: RuleModel | undefined) => ParameterizedSql	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:920		Outside the demonstrated worklist operations
+$	QueryBuilder	getPredicate	method	(rule: RuleModel) => Predicate	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:866	Alis.Reactive.Fusion/FusionComponents/FusionQueryBuilder/FusionQueryBuilder.cs:24	Exposed and exercised by the worklist
+$	Component	getRootElement	method	() => HTMLElement	false	false	@syncfusion/ej2-base/src/component.d.ts:81		Outside the demonstrated worklist operations
+$	QueryBuilder	getRule	method	(elem: string | HTMLElement) => RuleModel	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:824		Separate gesture and shape evidence required
+$	QueryBuilder	getRules	method	() => RuleModel	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:817		Probe observes the editing tree including incomplete rules
+$	QueryBuilder	getRulesFromSql	method	(sqlString: string, sqlLocale?: boolean | undefined) => RuleModel	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:904		Outside the demonstrated worklist operations
+$	QueryBuilder	getSqlFromRules	method	(rule?: RuleModel | undefined, allowEscape?: boolean | undefined, sqlLocale?: boolean | undefined) => string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:913		Outside the demonstrated worklist operations
+$	QueryBuilder	getValidRules	method	(currentRule?: RuleModel | undefined) => RuleModel	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:803	Alis.Reactive.Fusion/FusionComponents/FusionQueryBuilder/FusionQueryBuilder.cs:19	Typed zero-argument call on the current draft. Explicit source tree is probe-only
+$	QueryBuilder	getValues	method	(field: string) => object[]	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:705		Separate gesture and shape evidence required
+$	QueryBuilder	headerTemplate	read/write	string | Function	false	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:478		Separate gesture and shape evidence required
+$	QueryBuilder	height	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:523		Outside the demonstrated worklist operations
+$	Base	ignoreCollectionWatch	read/write	boolean	false	false	@syncfusion/ej2-base/src/base.d.ts:41		Outside the demonstrated worklist operations
+$	QueryBuilder	immediateModeDelay	read/write	number	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:542		Outside the demonstrated worklist operations
+$	Component	isAngular	read/write	boolean	false	false	@syncfusion/ej2-base/src/component.d.ts:51		Outside the demonstrated worklist operations
+$	Base	isDestroyed	read/write	boolean	false	false	@syncfusion/ej2-base/src/base.d.ts:22		Outside the demonstrated worklist operations
+$	Component	isReact	read/write	boolean	false	false	@syncfusion/ej2-base/src/component.d.ts:52		Outside the demonstrated worklist operations
+$	Base	isServerRendered	read/write	boolean	false	false	@syncfusion/ej2-base/src/base.d.ts:25		Outside the demonstrated worklist operations
+$	Component	isVue	read/write	boolean	false	false	@syncfusion/ej2-base/src/component.d.ts:53		Outside the demonstrated worklist operations
+$	Component	locale	read/write	string	false	false	@syncfusion/ej2-base/src/component.d.ts:38		Outside the demonstrated worklist operations
+$	QueryBuilder	lockGroup	method	(groupID: string) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:988		Outside the demonstrated worklist operations
+$	QueryBuilder	lockRule	method	(ruleID: string) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:981		Outside the demonstrated worklist operations
+$	QueryBuilder	matchCase	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:536		Outside the demonstrated worklist operations
+$	QueryBuilder	maxGroupCount	read/write	number	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:517		Outside the demonstrated worklist operations
+$	QueryBuilder	notifyChange	method	(value: string | number | boolean | string[] | number[] | Date | Date[], element: Element, type?: string | undefined) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:680		Separate gesture and shape evidence required
+$	QueryBuilder	onPropertyChanged	method	(newProp: QueryBuilderModel, oldProp: QueryBuilderModel) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:767		Outside the demonstrated worklist operations
+$	QueryBuilder	operatorModel	read/write	DropDownListModel	false	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:465		Outside the demonstrated worklist operations
+$	Component	portals	read/write	any	false	false	@syncfusion/ej2-base/src/component.d.ts:54		Separate gesture and shape evidence required
+$	QueryBuilder	readonly	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:554		Outside the demonstrated worklist operations
+$	Component	refresh	method	() => void	false	false	@syncfusion/ej2-base/src/component.d.ts:74		Outside the demonstrated worklist operations
+$	Base	removeEventListener	method	(eventName: string, handler: Function) => void	false	false	@syncfusion/ej2-base/src/base.d.ts:94		Separate gesture and shape evidence required
+$	QueryBuilder	requiredModules	method	() => ModuleDeclaration[]	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:625		Outside the demonstrated worklist operations
+$	QueryBuilder	reset	method	() => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:622		Outside the demonstrated worklist operations
+$	Component	root	read/write	any	false	false	@syncfusion/ej2-base/src/component.d.ts:18		Separate gesture and shape evidence required
+$	QueryBuilder	rule	read/write	RuleModel	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:605		Initial tree supplied through the pinned EJ2 builder
+$	QueryBuilder	ruleChange	event	EmitType<RuleChangeEventArgs>	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:404		Outside the demonstrated worklist operations
+$	QueryBuilder	separator	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:587		Outside the demonstrated worklist operations
+$	Base	serverDataBind	method	(newChanges?: { [key: string]: any; } | undefined) => void	false	false	@syncfusion/ej2-base/src/base.d.ts:74		Separate gesture and shape evidence required
+$	QueryBuilder	setMongoQuery	method	(mongoQuery: string, mongoLocale?: boolean | undefined) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:949		Outside the demonstrated worklist operations
+$	QueryBuilder	setParameterizedNamedSql	method	(sqlQuery: ParameterizedNamedSql) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:941		Outside the demonstrated worklist operations
+$	QueryBuilder	setParameterizedSql	method	(sqlQuery: ParameterizedSql) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:927		Outside the demonstrated worklist operations
+$	QueryBuilder	setRules	method	(rule: RuleModel) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:811		Probe imports a vendor tree. The worklist starts its filter through the render helper
+$	QueryBuilder	setRulesFromSql	method	(sqlString: string, sqlLocale?: boolean | undefined) => void	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:896		Outside the demonstrated worklist operations
+$	QueryBuilder	showButtons	read/write	ShowButtonsModel	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:429		Outside the demonstrated worklist operations
+$	QueryBuilder	sortDirection	read/write	SortDirection	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:511		Outside the demonstrated worklist operations
+$	QueryBuilder	summaryView	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:435		Outside the demonstrated worklist operations
+$	QueryBuilder	validateFields	method	() => boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:661	Alis.Reactive.Fusion/FusionComponents/FusionQueryBuilder/FusionQueryBuilder.cs:15	Exposed and exercised by the worklist
+$	QueryBuilder	valueModel	read/write	ValueModel	false	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:471		Outside the demonstrated worklist operations
+$	QueryBuilder	width	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:529		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	action	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1093		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	columns	read/write	ColumnsModel[]	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1096		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	condition	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1103		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	field	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1101		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	fields	read/write	Object	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1095		Separate gesture and shape evidence required
+event.actionBegin	ActionEventArgs	groupID	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1106		Outside the demonstrated worklist operations
+event.actionBegin	BaseEventArgs	name	read/write	string	true	false	@syncfusion/ej2-base/src/event-handler.d.ts:69		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	notCondition	read/write	boolean	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1104		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	operator	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1102		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	operatorFields	read/write	Object	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1100		Separate gesture and shape evidence required
+event.actionBegin	ActionEventArgs	operators	read/write	{ [key: string]: Object; }[]	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1097		Separate gesture and shape evidence required
+event.actionBegin	ActionEventArgs	renderTemplate	read/write	boolean	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1105		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	requestType	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1092		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	rule	read/write	RuleModel	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1094		Outside the demonstrated worklist operations
+event.actionBegin	ActionEventArgs	ruleID	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1091		Outside the demonstrated worklist operations
+event.beforeChange	ChangeEventArgs	cancel	read/write	boolean	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1075		Outside the demonstrated worklist operations
+event.beforeChange	ChangeEventArgs	childGroupID	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1071		Outside the demonstrated worklist operations
+event.beforeChange	ChangeEventArgs	groupID	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1069		Outside the demonstrated worklist operations
+event.beforeChange	BaseEventArgs	name	read/write	string	true	false	@syncfusion/ej2-base/src/event-handler.d.ts:69		Outside the demonstrated worklist operations
+event.beforeChange	ChangeEventArgs	not	read/write	boolean	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1077		Outside the demonstrated worklist operations
+event.beforeChange	ChangeEventArgs	ruleID	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1070		Outside the demonstrated worklist operations
+event.beforeChange	ChangeEventArgs	selectedField	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1074		Outside the demonstrated worklist operations
+event.beforeChange	ChangeEventArgs	selectedIndex	read/write	number	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1073		Outside the demonstrated worklist operations
+event.beforeChange	ChangeEventArgs	type	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1076		Outside the demonstrated worklist operations
+event.beforeChange	ChangeEventArgs	value	read/write	string | number | Date | boolean | string[]	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1072		Separate gesture and shape evidence required
+event.change	ChangeEventArgs	cancel	read/write	boolean	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1075		Outside the demonstrated worklist operations
+event.change	ChangeEventArgs	childGroupID	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1071		Outside the demonstrated worklist operations
+event.change	ChangeEventArgs	groupID	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1069		Outside the demonstrated worklist operations
+event.change	BaseEventArgs	name	read/write	string	true	false	@syncfusion/ej2-base/src/event-handler.d.ts:69		Outside the demonstrated worklist operations
+event.change	ChangeEventArgs	not	read/write	boolean	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1077		Outside the demonstrated worklist operations
+event.change	ChangeEventArgs	ruleID	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1070		Outside the demonstrated worklist operations
+event.change	ChangeEventArgs	selectedField	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1074		Outside the demonstrated worklist operations
+event.change	ChangeEventArgs	selectedIndex	read/write	number	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1073		Outside the demonstrated worklist operations
+event.change	ChangeEventArgs	type	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1076		Outside the demonstrated worklist operations
+event.change	ChangeEventArgs	value	read/write	string | number | Date | boolean | string[]	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1072		Separate gesture and shape evidence required
+event.drag	DragEventArgs	cancel	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1159		Outside the demonstrated worklist operations
+event.drag	DragEventArgs	dragGroupID	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1152		Outside the demonstrated worklist operations
+event.drag	DragEventArgs	dragRuleID	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1146		Outside the demonstrated worklist operations
+event.dragStart	DragEventArgs	cancel	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1159		Outside the demonstrated worklist operations
+event.dragStart	DragEventArgs	dragGroupID	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1152		Outside the demonstrated worklist operations
+event.dragStart	DragEventArgs	dragRuleID	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1146		Outside the demonstrated worklist operations
+event.drop	DropEventArgs	cancel	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1171		Outside the demonstrated worklist operations
+event.drop	DropEventArgs	dropGroupID	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1183		Outside the demonstrated worklist operations
+event.drop	DropEventArgs	dropRuleID	read/write	string	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1177		Outside the demonstrated worklist operations
+event.ruleChange	BaseEventArgs	name	read/write	string	true	false	@syncfusion/ej2-base/src/event-handler.d.ts:69		Outside the demonstrated worklist operations
+event.ruleChange	RuleChangeEventArgs	previousRule	read/write	RuleModel	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1083		Outside the demonstrated worklist operations
+event.ruleChange	RuleChangeEventArgs	rule	read/write	RuleModel	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1084		Outside the demonstrated worklist operations
+event.ruleChange	RuleChangeEventArgs	type	read/write	string	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1085		Outside the demonstrated worklist operations
+class.RuleModel	RuleModel	condition	read/write	string	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:116		Root or group connector, or per-rule connector in separate mode
+class.RuleModel	RuleModel	field	read/write	string	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:130		Field of the local application record
+class.RuleModel	RuleModel	isLocked	read/write	boolean	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:173		Editor state preserved by getValidRules
+class.RuleModel	RuleModel	label	read/write	string	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:137		User-facing editor label
+class.RuleModel	RuleModel	not	read/write	boolean	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:165		Group flag preserved by getValidRules and ignored by getPredicate on the pinned build
+class.RuleModel	RuleModel	operator	read/write	string	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:151		Comparison chosen for the field and its data type
+class.RuleModel	RuleModel	rules	read/write	RuleModel[]	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:123	Alis.Reactive.Fusion/FusionComponents/FusionQueryBuilder/FusionQueryBuilder.cs:35	Exposed and exercised by the worklist
+class.RuleModel	RuleModel	type	read/write	string	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:144		Editor data type
+class.RuleModel	RuleModel	value	read/write	string[] | number[] | string | number | boolean	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:158		Heterogeneous scalar, homogeneous array or null. Retained in the vendor tree
+class.Predicate	Predicate	and	method	(field: string | Predicate, operator?: string | undefined, value?: string | number | boolean | Date | null | undefined, ignoreCase?: boolean | undefined, ignoreAccent?: boolean | undefined) => Predicate	false	false	@syncfusion/ej2-data/src/query.d.ts:300		Separate gesture and shape evidence required
+class.Predicate	Predicate	andnot	method	(field: string | Predicate, operator?: string | undefined, value?: string | number | boolean | Date | null | undefined, ignoreCase?: boolean | undefined, ignoreAccent?: boolean | undefined) => Predicate	false	false	@syncfusion/ej2-data/src/query.d.ts:354		Separate gesture and shape evidence required
+class.Predicate	Predicate	or	method	(field: string | Predicate, operator?: string | undefined, value?: string | number | boolean | Date | null | undefined, ignoreCase?: boolean | undefined, ignoreAccent?: boolean | undefined) => Predicate	false	false	@syncfusion/ej2-data/src/query.d.ts:318		Separate gesture and shape evidence required
+class.Predicate	Predicate	ornot	method	(field: string | Predicate, operator?: string | undefined, value?: string | number | boolean | Date | null | undefined, ignoreCase?: boolean | undefined, ignoreAccent?: boolean | undefined) => Predicate	false	false	@syncfusion/ej2-data/src/query.d.ts:336		Separate gesture and shape evidence required
+class.Predicate	Predicate	toJson	method	() => Object	false	false	@syncfusion/ej2-data/src/query.d.ts:371		Separate gesture and shape evidence required
+class.Predicate	Predicate	validate	method	(record: Object) => boolean	false	false	@syncfusion/ej2-data/src/query.d.ts:366	Alis.Reactive.Fusion/FusionComponents/FusionQueryBuilder/FusionQueryBuilder.cs:46	Exposed and exercised by the worklist
+ColumnsModel	ColumnsModel	category	read/write	string	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:95		Outside the demonstrated worklist operations
+ColumnsModel	ColumnsModel	columns	read/write	ColumnsModel[]	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:102		Outside the demonstrated worklist operations
+ColumnsModel	ColumnsModel	field	read/write	string	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:15		Configured with the row member's JSON path
+ColumnsModel	ColumnsModel	format	read/write	string | FormatObject	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:74		Separate gesture and shape evidence required
+ColumnsModel	ColumnsModel	label	read/write	string	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:22		Configured with the coordinator's label
+ColumnsModel	ColumnsModel	operators	read/write	{ [key: string]: Object }[]	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:43		Separate gesture and shape evidence required
+ColumnsModel	ColumnsModel	ruleTemplate	read/write	string | Function	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:51		Separate gesture and shape evidence required
+ColumnsModel	ColumnsModel	step	read/write	number	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:81		Outside the demonstrated worklist operations
+ColumnsModel	ColumnsModel	template	read/write	TemplateColumn | string | Function	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:58		Separate gesture and shape evidence required
+ColumnsModel	ColumnsModel	type	read/write	string	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:29		Configured with the EJ2 editor data type
+ColumnsModel	ColumnsModel	validation	read/write	Validation	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:65		Column editor validation settings. The demo uses EJ2 defaults
+ColumnsModel	ColumnsModel	value	read/write	string[] | number[] | string | number | boolean | Date	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:88		Separate gesture and shape evidence required
+ColumnsModel	ColumnsModel	values	read/write	string[] | number[] | boolean[]	true	true	@syncfusion/ej2-querybuilder/src/query-builder/query-builder-model.d.ts:36		Separate gesture and shape evidence required
+Validation	Validation	isRequired	read/write	boolean	false	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1063		Checked by validateFields when allowValidation is enabled
+Validation	Validation	max	read/write	number	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1057		Numeric editor bound
+Validation	Validation	min	read/write	number	true	false	@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:1051		Numeric editor bound

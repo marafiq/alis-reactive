@@ -1,0 +1,129 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Elements
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@using Syncfusion.EJ2.QueryBuilder
+@model ReviewWorklist
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident review worklist";
+    var plan = Html.ReactivePlan<ReviewWorklist>();
+    string wing = string.Join(".", plan.JsonPath((ReviewResident r) => r.Wing));
+    string days = string.Join(".", plan.JsonPath((ReviewResident r) => r.DaysOverdue));
+    string escalated = string.Join(".", plan.JsonPath((ReviewResident r) => r.Escalated));
+    List<QueryBuilderColumn> columns =
+    [
+        new() { Field = wing, Label = "Wing", Type = "string" },
+        new() { Field = days, Label = "Days overdue", Type = "number" },
+        new() { Field = escalated, Label = "Escalated", Type = "boolean" }
+    ];
+    var filter = new QueryBuilderRule
+    {
+        Condition = "and",
+        Rules = new List<QueryBuilderRule>
+        {
+            new() { Field = wing, Label = "Wing", Type = "string", Operator = "equal", Value = "North" },
+            new()
+            {
+                Condition = "or",
+                Rules = new List<QueryBuilderRule>
+                {
+                    new() { Field = days, Label = "Days overdue", Type = "number", Operator = "greaterthanorequal", Value = 7 },
+                    new() { Field = escalated, Label = "Escalated", Type = "boolean", Operator = "equal", Value = true }
+                }
+            }
+        }
+    };
+
+    void Apply(Pipeline<ReviewWorklist> pipeline)
+    {
+        var editor = pipeline.Component<FusionQueryBuilder<ReviewResident>>("review-criteria");
+        pipeline.When(editor.ValidateFields())
+            .Then(pipeline =>
+            {
+                var matching = pipeline.Component<FusionQueryBuilder<ReviewResident>>("review-criteria").GetFilteredRecords().Read(answer => answer.Result);
+                foreach (var resident in Model.Residents)
+                {
+                    var reference = resident.Reference;
+                    var rowId = $"review-{reference}";
+                    pipeline.When(matching.Any(row => row.Reference == reference))
+                        .Then(pipeline => pipeline.Element(rowId).Show())
+                        .Else(pipeline => pipeline.Element(rowId).Hide());
+                }
+                var count = matching.Count();
+                pipeline.When(count.Eq(1))
+                    .Then(pipeline => pipeline.Element("worklist-status").Text.Set("1 resident on the worklist."))
+                    .Else(pipeline => pipeline.Element("worklist-status").Text.Set(pipeline.Concat(count, " residents on the worklist.")));
+            })
+            .Else(pipeline => pipeline.Element("worklist-status").Text.Set("Complete the required filter values."));
+    }
+
+    void CheckReferral(Pipeline<ReviewWorklist> pipeline)
+    {
+        var rules = pipeline.Component<FusionQueryBuilder<ReviewResident>>("review-criteria").GetValidRules();
+        var groups = rules.Read(group => group.Rules).IfNull(Array.Empty<FusionQueryBuilder<ReviewResident>.RuleModel>());
+        pipeline.When(groups.Any())
+            .Then(pipeline =>
+            {
+                var predicate = pipeline.Component<FusionQueryBuilder<ReviewResident>>("review-criteria").GetPredicate(rules);
+                pipeline.When(predicate.Validate(Model.Referral))
+                    .Then(pipeline => pipeline.Element("referral-eligibility").Text.Set($"{Model.Referral.Name} matches the complete conditions."))
+                    .Else(pipeline => pipeline.Element("referral-eligibility").Text.Set($"{Model.Referral.Name} does not match the complete conditions."));
+            })
+            .Else(pipeline => pipeline.Element("referral-eligibility").Text.Set("Enter a complete condition to check this referral."));
+    }
+}
+<style>
+    .review-desk { max-width: 66rem; margin: 2.5rem auto; padding: 0 1.25rem; color: #192b38; font: 1rem/1.55 system-ui, sans-serif; }
+    .review-desk h1 { margin: 0; font-size: clamp(1.9rem, 4vw, 2.8rem); line-height: 1.15; }
+    .review-desk h2 { margin: 1.6rem 0 .6rem; font-size: 1.3rem; }
+    .review-desk p { margin: .4rem 0 1rem; }
+    .review-desk #apply-filter, .review-desk #check-referral { border-radius: .35rem; padding: .55rem 1rem; margin: .8rem .5rem .7rem 0; font: 600 .95rem system-ui, sans-serif; cursor: pointer; }
+    .review-desk #apply-filter { border: 1px solid #115e59; background: #115e59; color: white; }
+    .review-desk #check-referral { border: 1px solid #668781; color: #174d49; background: white; }
+    .review-desk .results { border-top: 1px solid #d5dfdd; display: grid; grid-template-columns: minmax(0, 2fr) minmax(13rem, 1fr); gap: 2rem; }
+    .review-desk .roster { overflow-x: auto; }
+    .review-desk table { border-collapse: collapse; width: 100%; text-align: left; font-size: .94rem; }
+    .review-desk th, .review-desk td { border-bottom: 1px solid #dce5e3; padding: .55rem .4rem; }
+    .review-desk thead th { color: #506467; font-weight: 600; }
+    .review-desk aside output { display: block; }
+    @@media (max-width: 45rem) { .review-desk { margin: 1.25rem auto; } .review-desk .results { grid-template-columns: 1fr; gap: 0; } }
+</style>
+<div class="review-desk">
+    <h1>Resident review worklist</h1>
+    <p>Choose the residents for this review round by wing, days overdue, or escalation.</p>
+    <h2>Review criteria</h2>
+    @(Html.FusionQueryBuilder(plan, "review-criteria", Model.Residents, build => build.Columns(columns).Rule(filter).AllowValidation(true)))
+    @(Html.NativeButton("apply-filter", "Apply filter").Reactive(plan, button => button.Click, (_, pipeline) => Apply(pipeline)))
+    <div class="results">
+        <section class="roster" aria-label="Review worklist">
+            <h2>Matching residents</h2>
+            <p><output id="worklist-status" aria-label="Worklist status">Apply the filter to prepare the worklist.</output></p>
+            <table aria-label="Residents on the worklist">
+                <thead><tr><th scope="col">Resident</th><th scope="col">Wing</th><th scope="col">Days overdue</th><th scope="col">Escalated</th></tr></thead>
+                <tbody>
+                @foreach (var resident in Model.Residents)
+                {
+                    <tr id="review-@resident.Reference" hidden>
+                        <th scope="row">@resident.Name</th><td>@resident.Wing</td><td>@resident.DaysOverdue</td><td>@(resident.Escalated ? "Yes" : "No")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </section>
+        <aside aria-label="Incoming referral">
+            <h2>Incoming referral</h2>
+            <strong>@Model.Referral.Name</strong>
+            <p>@Model.Referral.Wing wing · @Model.Referral.DaysOverdue days overdue · No escalation</p>
+            <p>Preview this referral against the completed conditions while editing the filter.</p>
+            @(Html.NativeButton("check-referral", "Check referral").Reactive(plan, button => button.Click, (_, pipeline) => CheckReferral(pipeline)))
+            <output id="referral-eligibility" aria-label="Referral eligibility">Referral has not been checked.</output>
+        </aside>
+    </div>
+</div>
+@Html.RenderPlan(plan)

@@ -1857,6 +1857,27 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F53 M21.X1301 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/ReviewWorklist.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F53 M21.X1302 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/ReviewWorklist.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F53 M21.X1303 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/ReviewWorklist.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F7 M21.X1003 0": {
     "modules": [],
     "views": [

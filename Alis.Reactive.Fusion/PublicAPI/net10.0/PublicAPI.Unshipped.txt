@@ -1057,6 +1057,24 @@ Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Start() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Start(Alis.Reactive.ValuesAndSources.Arg<double>! percent) -> void
 Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Stop() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionProgressButtonHtml
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.FusionQueryBuilder() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.GetFilteredRecords() -> Alis.Reactive.Declarations.MethodResult<Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.QueryResult!>!
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.GetPredicate(Alis.Reactive.ValuesAndSources.TypedSource<Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.RuleModel!>! rules) -> Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.Predicate!
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.GetValidRules() -> Alis.Reactive.Declarations.MethodResult<Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.RuleModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.Predicate
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.Predicate.Predicate() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.Predicate.Validate(Alis.Reactive.ValuesAndSources.Arg<TRow>! record) -> Alis.Reactive.Declarations.MethodResult<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.QueryResult
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.QueryResult.QueryResult() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.QueryResult.Result.get -> System.Collections.Generic.IReadOnlyList<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.QueryResult.Result.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.RuleModel
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.RuleModel.RuleModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.RuleModel.Rules.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.RuleModel!>?
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.RuleModel.Rules.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>.ValidateFields() -> Alis.Reactive.Declarations.MethodResult<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilderHtml
 Alis.Reactive.Fusion.FusionComponents.FusionRadioButton
 Alis.Reactive.Fusion.FusionComponents.FusionRadioButton.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionRadioButton.ChangeArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionRadioButton.ChangeArgs
@@ -1579,6 +1597,7 @@ static Alis.Reactive.Fusion.FusionComponents.FusionOtpInputHtml.FusionOtpInput<T
 static Alis.Reactive.Fusion.FusionComponents.FusionPivotViewFields.Of<TRow>() -> Alis.Reactive.Fusion.FusionComponents.FusionPivotViewFields<TRow>!
 static Alis.Reactive.Fusion.FusionComponents.FusionPivotViewHtml.FusionPivotView<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.PivotView.PivotViewBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionPivotView!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionProgressButtonHtml.FusionProgressButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.SplitButtons.ProgressButtonBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionProgressButton!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilderHtml.FusionQueryBuilder<TModel, TRow>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Collections.Generic.IReadOnlyList<TRow>! rows, System.Action<Syncfusion.EJ2.QueryBuilder.QueryBuilderBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionQueryBuilder<TRow>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionRadioButtonHtml.FusionRadioButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.RadioButtonBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionRadioButton!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionRatingHtml.FusionRating<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, double>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionRating!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionRatingHtml.FusionRating<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, double>! field, System.Action<Syncfusion.EJ2.Inputs.RatingBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionRating!, TModel>!

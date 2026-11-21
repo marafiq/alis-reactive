@@ -29,7 +29,7 @@ whole: FusionGrid's edit templates (`FusionGridEditTemplates`) and its exports s
 code (N17.2) is module 20's; the rules it holds a Fusion declaration to are this module's defects.
 
 Each slice is one feature, `M21.F<k>`, and one door, `M21.N<k>`, with the same k: 1 FusionMultiSelect, 2 the package
-(FusionComponent and ReactiveFusionServiceCollectionExtensions), 3 to 52 the other slices in alphabetical order. A
+(FusionComponent and ReactiveFusionServiceCollectionExtensions), 3 to 52 the other original slices in alphabetical order, and 53 QueryBuilder. A
 slice's door is its declaration class, its payload declarations and its render helpers; every member of the slice is a
 member of that door. Main's slice is seven files of a marker class, an events class, `ComponentRef` extensions, payload
 classes with setters, payload extensions, a `Reactive` extension on the vendor's builder and a render helper
@@ -596,6 +596,8 @@ Each name is gate 2's; each door is the capability it carries.
 
 The meaning `M21.D1` and the defects `M21.X1` to `M21.X3` are in `spec/FusionComponents/features.json`, on the
 features they give.
+
+- `M21.N53` new: `FusionQueryBuilder<TRow>` renders EJ2’s QueryBuilder over local rows. `ValidateFields` checks the required editors, `GetValidRules` prunes the draft tree, `GetPredicate` returns the record predicate, and `GetFilteredRecords` waits for the data manager’s matching rows (M21.X1301, M21.X1302, M21.X1303). The predicate’s `Validate` checks one supplied record. The recursive RuleModel and its heterogeneous leaf values are described in the [pinned contract](audit/query-builder.md). The vendor calls are declared at `@syncfusion/ej2-querybuilder/src/query-builder/query-builder.d.ts:661`, `:803`, `:845`, `:866`, and `@syncfusion/ej2-data/src/query.d.ts:366`.
 
 ## Improvements
 
