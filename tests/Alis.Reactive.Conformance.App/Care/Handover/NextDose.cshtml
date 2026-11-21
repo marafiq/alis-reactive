@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model NextDose
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Dose record";
+    var plan = Html.ReactivePlan<NextDose>();
+}
+<h1>Dose record</h1>
+<fieldset>
+    <legend>Next dose</legend>
+    @(Html.InputField(plan, m => m.NextDoseAt, options => options.Label("Next dose")).FusionTimePicker())
+</fieldset>
+@Html.RenderPlan(plan)

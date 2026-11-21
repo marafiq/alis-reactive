@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model RoomIntake
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Room intake";
+    var plan = Html.ReactivePlan<RoomIntake>();
+}
+<h1>Room intake</h1>
+<form method="get" action="@CarePages.RoomIntake">
+    @(Html.InputField(plan, m => m.Room, options => options.Label("Room")).NativeTextBox())
+    <button type="submit">Save</button>
+</form>
+@Html.RenderPlan(plan)

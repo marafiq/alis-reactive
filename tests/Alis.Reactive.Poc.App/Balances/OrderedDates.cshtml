@@ -1,0 +1,16 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Ordered dates";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Ordered dates</h1>
+
+@plan.FluidBalance("balance")
+
+@(plan.Button("assess", "Assess the record")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.When(pipeline.Component<FluidBalance>("balance").RecordedAt.Gt(new DateTime(2026, 1, 1)))
+            .Then(recent => recent.Element("assess").Text.Set("recent"))))
+
+@Html.RenderPlan(plan)

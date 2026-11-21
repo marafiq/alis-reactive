@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NotesRefresh
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Notes";
+    var plan = Html.ReactivePlan<NotesRefresh>();
+}
+<h1>Notes of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, NotesRefreshes.Refresh)>Refresh notes</button>
+<button type="button" @Html.Raises(plan, NotesRefreshes.RefreshFromSouth)>Refresh from South</button>
+<p>Notes of the site: <span id="notes-site"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(NotesRefreshes.Refresh, pipeline => pipeline
+        .Get(NotesRefreshEndpoints.Notes)
+        .OnSuccess(Content.Text, (refreshed, pipeline) => pipeline.Element("notes-site").Text.Set(refreshed.Body))));
+    Html.On(plan, trigger => trigger.CustomEvent(NotesRefreshes.RefreshFromSouth, pipeline => pipeline
+        .Get<NoModel>(NotesRefreshEndpoints.Notes, request => request.Header("care-site", "South"))
+        .OnSuccess(Content.Text, (refreshed, pipeline) => pipeline.Element("notes-site").Text.Set(refreshed.Body))));
+}
+@Html.RenderPlan(plan)

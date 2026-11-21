@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomChoice
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Choose a room";
+    var plan = Html.ReactivePlan<RoomChoice>();
+}
+<h1>Choose a room</h1>
+@(Html.InputField(plan, m => m.Ward, options => options.Label("Ward")).NativeDropDown(build => build.Placeholder("Choose a ward").Items(Model.Wards))
+    .Reactive(ward => ward.Change, Model.Policy, (changed, pipeline) => pipeline
+        .Get<RoomChoiceQuery>(CareEndpoints.RoomChoiceRooms, request => request.Input(rooms => rooms.Ward, pipeline.Input(m => m.Ward)))
+        .Into("room-list")))
+<section id="room-list" aria-label="Rooms"></section>
+@Html.RenderPlan(plan)

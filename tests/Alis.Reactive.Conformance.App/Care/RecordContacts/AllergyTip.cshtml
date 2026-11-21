@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AllergyTip
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident";
+    var plan = Html.ReactivePlan<AllergyTip>();
+}
+<h1>Resident</h1>
+@(Html.FusionTooltip(plan, "allergy-tip", build => build.Content(Model.Tip)))
+<button type="button" @Html.Raises(plan, AllergyTips.Show)>Show the tip</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(AllergyTips.Show, pipeline => pipeline.Component<FusionTooltip>("allergy-tip").Open()));
+}
+@Html.RenderPlan(plan)

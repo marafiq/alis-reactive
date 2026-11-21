@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HallNoticesBoard
+@{
+    var plan = Html.ReactivePlan<HallNoticesBoard>();
+}
+<h2>@Model.Title</h2>
+<button type="button" @Html.Raises(plan, HallNoticesButtons.PinANote)>Pin a note to the board</button>
+<section id="note-slot" aria-label="Pinned note"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(HallBells.Rang, (ring, pipeline) => pipeline.Element("board-heard").Text.Set(ring.Read(rung => rung.Count)))
+        .CustomEvent(HallNoticesButtons.PinANote, pipeline => pipeline.Get(HallNoticesEndpoints.Note).Into("note-slot")));
+}
+@Html.RenderPlan(plan)

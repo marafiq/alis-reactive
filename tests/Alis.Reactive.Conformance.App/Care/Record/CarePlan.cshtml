@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CarePlan
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care plan";
+    var plan = Html.ReactivePlan<CarePlan>();
+}
+<h1>Care plan</h1>
+@using (var carePlan = Html.BeginRequestContainer(plan, "care-plan"))
+{
+    <details name="care-plan-tabs" open>
+        <summary>Personal</summary>
+        <fieldset>
+            <legend>Preferred name</legend>
+            @(Html.InputField(plan, m => m.PreferredName, options => options.Label("Preferred name")).NativeTextBox())
+        </fieldset>
+    </details>
+    <details name="care-plan-tabs">
+        <summary>Medical</summary>
+        <fieldset>
+            <legend>Allergies</legend>
+            @(Html.InputField(plan, m => m.Allergies, options => options.Label("Allergies")).NativeTextBox())
+        </fieldset>
+    </details>
+    @(Html.NativeButton("save-care-plan", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<CarePlan>(CarePlanEndpoints.Plans, request => request.Inputs(carePlan.Container))
+        .Validate<CarePlanRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model FirstVisitBooking
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "First visit";
+    var plan = Html.ReactivePlan<FirstVisitBooking>();
+}
+<h1>First visit</h1>
+<fieldset>
+    <legend>First visit</legend>
+    @(Html.InputField(plan, m => m.FirstVisit, options => options.Label("First visit")).FusionDateTimePicker(build => build.Format("yyyy-MM-dd HH:mm")))
+</fieldset>
+@Html.RenderPlan(plan)

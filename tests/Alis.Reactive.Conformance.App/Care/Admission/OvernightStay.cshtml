@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model OvernightStay
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Overnight stay";
+    var plan = Html.ReactivePlan<OvernightStay>();
+}
+<h1>Overnight stay</h1>
+@using (var stay = Html.BeginRequestForm(plan, "overnight-stay"))
+{
+    @(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
+    <div id="overnight"></div>
+    <button type="button" @Html.Raises(plan, OvernightStays.AddTheOvernight)>Add the overnight</button>
+    <button type="button" @Html.Raises(plan, OvernightStays.RemoveTheOvernight)>Remove the overnight</button>
+    <button type="button" @Html.Raises(plan, OvernightStays.Quote)>Quote</button>
+    Html.On(plan, trigger => trigger.CustomEvent(OvernightStays.Quote, pipeline => pipeline.Element("quote").Text.Set(stay.Form.Read(m => m.Nights))));
+}
+<p>Nights quoted: <span id="quote">-</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(OvernightStays.AddTheOvernight, pipeline => pipeline.Get(OvernightStayEndpoints.Overnight).Into("overnight"))
+        .CustomEvent(OvernightStays.RemoveTheOvernight, pipeline => pipeline.Unload("overnight")));
+}
+@Html.RenderPlan(plan)

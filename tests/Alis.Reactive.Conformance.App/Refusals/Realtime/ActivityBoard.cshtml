@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ActivityBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Activities";
+    var plan = Html.ReactivePlan<ActivityBoard>();
+}
+<h1>Activities in the @Model.Lounge</h1>
+<p>News: <span id="activity-news"></span></p>
+@{
+    Html.On(plan, trigger => trigger.ServerPush(ActivityNews.Live, news => news.News, (news, pipeline) => pipeline.Element("activity-news").Text.Set(news.Read(n => n.Name))));
+}
+@Html.RenderPlan(plan)

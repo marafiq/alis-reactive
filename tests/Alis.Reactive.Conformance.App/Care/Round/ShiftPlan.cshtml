@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftPlan
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Rota";
+    var plan = Html.ReactivePlan<ShiftPlan>();
+}
+<h1>Rota</h1>
+@using (var shift = Html.BeginRequestForm(plan, "shift"))
+{
+    <fieldset>
+        <legend>Starts</legend>
+        @(Html.InputField(plan, m => m.Starts, options => options.Label("Starts")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>Length</legend>
+        @(Html.InputField(plan, m => m.Length, options => options.Label("Length")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-shift", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<ShiftPlan>(CareEndpoints.ShiftPlanShifts, request => request.Form(shift.Form))
+        .Validate<ShiftPlanRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))
+        .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))
+}
+<p>Saved: <span id="saved"></span></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionByName
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<AdmissionByName>();
+}
+<h1>Admission</h1>
+@using (var admission = Html.BeginRequestContainer(plan, "admission"))
+{
+    @(Html.InputField(plan, m => m.GivenName, options => options.Label("Given name")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, AdmitByGivenNames.Admit)>Admit</button>
+    Html.On(plan, trigger => trigger.CustomEvent(AdmitByGivenNames.Admit, pipeline => pipeline
+        .Post<AdmissionByName>(AdmitByGivenNameEndpoints.Admissions, request => request.Json(admission.Container, body => { }))
+        .OnSuccess(Content.Json<AdmissionNamesSent>(), (sent, pipeline) =>
+        {
+            pipeline.Element("sent-names").Text.Set(sent.Body.Read(names => names.SentNames));
+            pipeline.Element("admitted-name").Text.Set(sent.Body.Read(names => names.Admitted));
+        })));
+}
+<p>Sent: <span id="sent-names"></span></p>
+<p>Admitted: <span id="admitted-name"></span></p>
+@Html.RenderPlan(plan)

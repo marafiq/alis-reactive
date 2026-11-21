@@ -1,0 +1,136 @@
+{
+  "version": "33.1.47",
+  "change": [
+    {
+      "kind": "string",
+      "value": "letter",
+      "itemData": {
+        "label": "Second option",
+        "id": "letter",
+        "support": {
+          "interpreter": true
+        }
+      },
+      "previousItemData": {
+        "label": "First option",
+        "id": "call",
+        "support": {
+          "interpreter": false
+        }
+      },
+      "item": "HTMLLIElement",
+      "previousItem": "HTMLLIElement",
+      "selectedOptionText": "Second option",
+      "interaction": true
+    },
+    {
+      "kind": "number",
+      "value": 0,
+      "itemData": {
+        "label": "Second option",
+        "id": 0,
+        "support": {
+          "interpreter": true
+        }
+      },
+      "previousItemData": {
+        "label": "First option",
+        "id": 30,
+        "support": {
+          "interpreter": false
+        }
+      },
+      "item": "HTMLLIElement",
+      "previousItem": "HTMLLIElement",
+      "selectedOptionText": "Second option",
+      "interaction": true
+    },
+    {
+      "kind": "boolean",
+      "value": false,
+      "itemData": {
+        "label": "Second option",
+        "id": false,
+        "support": {
+          "interpreter": true
+        }
+      },
+      "previousItemData": {
+        "label": "First option",
+        "id": true,
+        "support": {
+          "interpreter": false
+        }
+      },
+      "item": "HTMLLIElement",
+      "previousItem": "HTMLLIElement",
+      "selectedOptionText": "Second option",
+      "interaction": true
+    },
+    {
+      "kind": "object",
+      "value": {
+        "label": "Second option",
+        "id": "pa",
+        "support": {
+          "interpreter": true
+        }
+      },
+      "itemData": {
+        "label": "Second option",
+        "id": "pa",
+        "support": {
+          "interpreter": true
+        }
+      },
+      "previousItemData": {
+        "label": "First option",
+        "id": "en",
+        "support": {
+          "interpreter": false
+        }
+      },
+      "item": "HTMLLIElement",
+      "previousItem": "HTMLLIElement",
+      "selectedOptionText": "Second option",
+      "interaction": true
+    }
+  ],
+  "filtering": [
+    {
+      "control": "ComboBox",
+      "text": "lat",
+      "members": {
+        "baseEventArgs": "KeyboardEvent",
+        "cancel": "boolean",
+        "name": "string",
+        "preventDefaultAction": "boolean",
+        "text": "string",
+        "updateData": "function"
+      }
+    },
+    {
+      "control": "AutoComplete",
+      "text": "lat",
+      "members": {
+        "cancel": "boolean",
+        "name": "string",
+        "preventDefaultAction": "boolean",
+        "text": "string",
+        "updateData": "function"
+      }
+    },
+    {
+      "control": "MultiSelect",
+      "text": "lat",
+      "members": {
+        "cancel": "boolean",
+        "event": "KeyboardEvent",
+        "name": "string",
+        "preventDefaultAction": "boolean",
+        "text": "string",
+        "updateData": "function"
+      }
+    }
+  ]
+}

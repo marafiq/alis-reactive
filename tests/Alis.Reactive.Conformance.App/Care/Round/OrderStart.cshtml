@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model OrderStart
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Medication order";
+    var plan = Html.ReactivePlan<OrderStart>();
+}
+<h1>Medication order: @Model.Medication</h1>
+@(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner" }))
+<button type="button" @Html.Raises(plan, OrderStarts.Start)>Start</button>
+<section id="order-busy" aria-label="Order">
+    <p>Scanner: <span id="settle-status"></span></p>
+    <p>Order: <span id="order-status"></span></p>
+</section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(OrderStarts.Start, pipeline => pipeline
+        .Post(OrderStartEndpoints.Orders)
+        .Busy("order-busy")
+        .OnSuccess(Content.Text, (ordered, pipeline) =>
+        {
+            pipeline.Element("settle-status").Text.Set("Settling");
+            pipeline.Component<ConformanceComponent>("scanner").Settle();
+            pipeline.Element("settle-status").Text.Set("Settled");
+        })
+        .Finally(pipeline => pipeline.Element("order-status").Text.Set("Finished"))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,46 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentDeskPage
+@{
+    var plan = Html.ReactivePlan<ResidentDeskPage>();
+}
+@(Html.NativeButton("review-resident", "Review resident details").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+{
+    pipeline.Validate(pipeline.Container<MoveInPage>("move-in"));
+    pipeline.Element("resident-status").Text.Set("Resident details ready");
+}))
+<button type="button" @Html.Raises(plan, MoveInResidentEvents.VerifyIdentity)>Verify identity</button>
+<p id="resident-status"></p>
+<p id="identity-status"></p>
+<div id="identity-receipt"></div>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MoveInResidentEvents.VerifyIdentity, pipeline =>
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Element("identity-status").Text.Set("");
+        pipeline.Unload("identity-receipt");
+        pipeline.Post<MoveInPage>(MoveInEndpoints.IdentityReview, request => request
+                .Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+                .Query(sent => sent.ResidentId, moveIn.Read(m => m.ResidentId))
+                .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+                .Json(moveIn, body => { }))
+            .Validate<MoveInRules>(MoveInRules.Identity)
+            .OnSuccess<SaveReply>((reviewed, pipeline) =>
+            {
+                pipeline.Element("identity-status").Text.Set(pipeline.Concat("Identity checked by ", reviewed.Body.Read(reply => reply.Receipt.SavedBy.Name)));
+                pipeline.When(reviewed.Body.Read(reply => reply.Review.Required)).Then(pipeline => pipeline
+                    .Get<ReceiptQuery>(CareEndpoints.MoveInReceipts, request => request
+                        .Query(query => query.DraftId, reviewed.Body.Read(reply => reply.Receipt.DraftId))
+                        .Query(query => query.Reference, reviewed.Body.Read(reply => reply.Review.Reference)))
+                    .Into("identity-receipt"));
+            })
+            .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+            .OnError<ErrorEnvelope>(409, (duplicate, pipeline) => pipeline.Element("identity-status").Text.Set(duplicate.Body.Read(envelope => envelope.Error.Message)));
+    }));
+}
+@Html.RenderPlan(plan)

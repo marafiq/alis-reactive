@@ -1,0 +1,16 @@
+@using Alis.Reactive.Poc.App.Desks
+@model MonitorWatch
+@{
+    var plan = Html.ReactivePlan<MonitorWatch>();
+}
+<h2>Watch</h2>
+
+@(plan.MonitorDesk("watch-desk", ["ada-monitor", "ben-monitor"])
+    .Reactive(desk => desk.Picked, (monitor, pipeline) =>
+        pipeline.Listen(monitor, picked => picked.Alarm, (alarm, heard) =>
+        {
+            heard.Component<CallLog>("calls").Note("The watch heard an alarm");
+            heard.Element("alarm-from").Text.Set(alarm.Resident);
+        })))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.MultiColumnComboBox
+@model BedLabels
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed labels";
+    var plan = Html.ReactivePlan<BedLabels>();
+    var bed = FusionMultiColumnComboBoxColumns.Of<CareBed>();
+}
+<h1>Bed labels</h1>
+<fieldset>
+    <legend>Bed</legend>
+    @(Html.InputField(plan, m => m.BedCode, options => options.Label("Bed"))
+        .FusionMultiColumnComboBox<BedLabels, string?, CareBed, string>(Model.Beds, build => build
+            .Fields((CareBed b) => b.DisplayLabel, b => b.BedCode)
+            .Columns([new Column { Field = bed.Field(b => b.DisplayLabel), Header = "Bed" }, new Column { Field = bed.Field(b => b.BedCode), Header = "Code" }])))
+</fieldset>
+@Html.RenderPlan(plan)

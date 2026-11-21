@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FrozenCallbacksBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<FrozenCallbacksBoard>();
+}
+<h1>The bench</h1>
+<h2>@Model.Caption</h2>
+@(plan.ConformanceCallbacks("callbacks-a", new CallbacksStart { Own = "callbacks-a", Raise = "Raise A", Freeze = "Freeze A" }))
+@(plan.ConformanceCallbacks("callbacks-b", new CallbacksStart { Own = "callbacks-b", Raise = "Raise B", Freeze = "Freeze B" }))
+<button type="button" @Html.Raises(plan, FrozenCallbacksButtons.OpenCardA)>Open card A</button>
+<button type="button" @Html.Raises(plan, FrozenCallbacksButtons.OpenCardB)>Open card B</button>
+<button type="button" @Html.Raises(plan, FrozenCallbacksButtons.CloseCardB)>Close card B</button>
+<button type="button" @Html.Raises(plan, FrozenCallbacksButtons.OpenTheNotes)>Open the notes</button>
+<section id="card-a" aria-label="Card A"></section>
+<section id="card-b" aria-label="Card B"></section>
+<section id="notes" aria-label="Notes"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(FrozenCallbacksButtons.OpenCardA, pipeline => pipeline.Get(VendorSlotCards.CardA).Into("card-a"))
+        .CustomEvent(FrozenCallbacksButtons.OpenCardB, pipeline => pipeline.Get(VendorSlotCards.CardB).Into("card-b"))
+        .CustomEvent(FrozenCallbacksButtons.CloseCardB, pipeline => pipeline.Unload("card-b"))
+        .CustomEvent(FrozenCallbacksButtons.OpenTheNotes, pipeline => pipeline.Get(VendorSlotCards.WingNotes).Into("notes")));
+}
+@Html.RenderPlan(plan)

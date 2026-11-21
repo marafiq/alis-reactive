@@ -1,0 +1,11 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model MedicationEdit
+@{
+    var plan = Html.ReactivePlan<MedicationEdit>();
+}
+@using (var editor = Html.BeginRequestContainer(plan, "medication-editor"))
+{
+    @await Html.PartialFor(m => m.Medications, "/Care/MoveIn/Medications.cshtml")
+}
+@Html.RenderPlan(plan)

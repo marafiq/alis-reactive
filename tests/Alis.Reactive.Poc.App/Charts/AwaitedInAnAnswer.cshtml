@@ -1,0 +1,18 @@
+@using Alis.Reactive.Poc.App.Charts
+@model ChartsPage
+@{
+    ViewData["Title"] = "Awaited in an answer";
+    var plan = Html.ReactivePlan<ChartsPage>();
+}
+<h1>Awaited in an answer</h1>
+
+@plan.DoseChart("chart")
+
+@(plan.Button("by-legend", "Label the ticks by the legend")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var chart = pipeline.Component<DoseChart>("chart");
+        chart.TickLabel.Set(tick => chart.Legend());
+    }))
+
+@Html.RenderPlan(plan)

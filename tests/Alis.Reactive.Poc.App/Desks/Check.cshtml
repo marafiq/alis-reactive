@@ -1,0 +1,22 @@
+@using Alis.Reactive.Poc.App.Desks
+@model MonitorDeskShift
+@{
+    ViewData["Title"] = "Monitor checks";
+    var plan = Html.ReactivePlan<MonitorDeskShift>();
+}
+<h1>Monitor checks</h1>
+
+@plan.DeskMonitor("ada-monitor", "Ada")
+@plan.DeskMonitor("ben-monitor", "Ben")
+
+<p>Last check: <span id="checked">none</span></p>
+
+@(plan.MonitorDesk("desk", ["ada-monitor", "ben-monitor"])
+    .Reactive(desk => desk.Picked, (monitor, pipeline) =>
+    {
+        var reading = monitor.Check();
+        pipeline.Element("checked").Text.Set(reading);
+        monitor.Status.Set("checked");
+    }))
+
+@Html.RenderPlan(plan)

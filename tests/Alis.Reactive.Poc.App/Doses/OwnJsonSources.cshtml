@@ -1,0 +1,61 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Values
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Values read in their own JSON form";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Values read in their own JSON form</h1>
+
+@plan.MedicationCartFeaturing("cart", DoseRound.Doses(), DoseRound.Doses()[1])
+
+@plan.StationCensus("census")
+
+<p>Verdict: <span id="verdict">unchecked</span></p>
+
+@(plan.Button("check-digoxin", "Check the digoxin's chart")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var cart = pipeline.Component<MedicationCart>("cart");
+        pipeline.When(cart.Doses.Find(d => d.Medicine == "Digoxin", d => d.Charted).Eq(DoseStatus.Given))
+            .Then(given => given.Element("verdict").Text.Set("charted as given"))
+            .Else(other => other.Element("verdict").Text.Set("not charted as given"));
+    }))
+
+@(plan.Button("count-given-charts", "Count the charts that read given")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var cart = pipeline.Component<MedicationCart>("cart");
+        pipeline.Component<StationCensus>("census").Count.Set(cart.Doses.Select(d => d.Charted).Count(charted => charted == DoseStatus.Given));
+    }))
+
+@(plan.Button("check-unfound", "Check an unfound dose's chart")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var cart = pipeline.Component<MedicationCart>("cart");
+        pipeline.When(cart.Doses.Find(d => d.Medicine == "Warfarin", d => d.Charted).OrNull().IfNull(DoseStatus.Given).Eq(DoseStatus.Given))
+            .Then(given => given.Element("verdict").Text.Set("charted as given"))
+            .Else(other => other.Element("verdict").Text.Set("not charted as given"));
+    }))
+
+@(plan.Button("check-chosen", "Check the chosen chart")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var cart = pipeline.Component<MedicationCart>("cart");
+        pipeline.When(cart.Doses.Count().Eq(0).Choose(cart.Doses.Find(d => d.Medicine == "Aspirin", d => d.Charted), DoseStatus.Given).Eq(DoseStatus.Given))
+            .Then(given => given.Element("verdict").Text.Set("charted as given"))
+            .Else(other => other.Element("verdict").Text.Set("not charted as given"));
+    }))
+
+@(plan.Button("check-featured", "Check the featured dose's chart")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var cart = pipeline.Component<MedicationCart>("cart");
+        pipeline.When(cart.Featured.Read(d => d.Charted).Eq(DoseStatus.Given))
+            .Then(given => given.Element("verdict").Text.Set("charted as given"))
+            .Else(other => other.Element("verdict").Text.Set("not charted as given"));
+    }))
+
+@Html.RenderPlan(plan)

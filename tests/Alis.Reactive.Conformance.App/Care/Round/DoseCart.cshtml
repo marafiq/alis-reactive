@@ -1,0 +1,28 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseCart
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose cart";
+    var plan = Html.ReactivePlan<DoseCart>();
+}
+<h1>Dose cart of ward @Model.Ward</h1>
+<button type="button" @Html.Raises(plan, DoseCarts.CheckThePrice)>Check the price</button>
+<button type="button" @Html.Raises(plan, DoseCarts.CheckTheNote)>Check the note</button>
+<p>Aspirin copay: <span id="copay-price">-</span></p>
+<p>Against ten pence: <span id="copay-note">-</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(DoseCarts.CheckThePrice, pipeline => pipeline.Get(Model.Cart)
+            .OnSuccess<CartContents>((cart, pipeline) => pipeline.When(cart.Body.Read(c => c.Doses).Find(d => d.Medicine == "Aspirin", d => d.Copay).Eq(0.10m))
+                .Then(pipeline => pipeline.Element("copay-price").Text.Set("Ten pence"))
+                .Else(pipeline => pipeline.Element("copay-price").Text.Set("Other"))))
+        .CustomEvent(DoseCarts.CheckTheNote, pipeline => pipeline.Get(Model.Cart)
+            .OnSuccess<CartContents>((cart, pipeline) => pipeline.When(cart.Body.Read(c => c.Doses).Find(d => d.Medicine == "Aspirin", d => d.Copay).NotEq(0.10m))
+                .Then(pipeline => pipeline.Element("copay-note").Text.Set("Differs"))
+                .Else(pipeline => pipeline.Element("copay-note").Text.Set("Same")))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,15 @@
+@using Alis.Reactive.Poc.App.Desks
+@model MonitorDeskShift
+@{
+    var plan = Html.ReactivePlan<MonitorDeskShift>();
+}
+
+@plan.DeskMonitor("ada-monitor", "Ada")
+
+@(plan.MonitorDesk("desk", ["ada-monitor"])
+    .Reactive(desk => desk.Picked, (monitor, pipeline) =>
+        pipeline.Listen(pipeline.Component<DeskMonitor>("ada-monitor"), ada => ada.Alarm, (alarm, heard) => heard.Element("alarm-from").Text.Set(alarm.Resident))))
+
+<p>Last alarm: <span id="alarm-from">none</span></p>
+
+@Html.RenderPlan(plan)

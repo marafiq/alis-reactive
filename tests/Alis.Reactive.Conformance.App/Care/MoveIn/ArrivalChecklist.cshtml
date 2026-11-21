@@ -1,0 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model ArrivalChecklist
+@{
+    var plan = Html.ReactivePlan<ArrivalChecklist>();
+}
+<p id="arrival-checklist">@Model.Welcome</p>
+@Html.RenderPlan(plan)

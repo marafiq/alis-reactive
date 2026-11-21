@@ -1,0 +1,35 @@
+[
+ {
+  "name": "the verdict's cite at a line the file lacks",
+  "edits": [
+   {
+    "file": "spec/FusionComponents/module.md",
+    "old": "(`Alis.Reactive.Fusion/css/fusion.css:23-24`",
+    "new": "(`Alis.Reactive.Fusion/css/fusion.css:93-94`"
+   }
+  ],
+  "expect": "fusion.css:93-94"
+ },
+ {
+  "name": "main's theme cited at the redesign",
+  "edits": [
+   {
+    "file": "spec/FusionComponents/module.md",
+    "old": "(`Alis.Reactive.Assets/fusion/syncfusion.entry.css:8-10` at 623dd4a27",
+    "new": "(`Alis.Reactive.Assets/fusion/syncfusion.entry.css:8-10` at 65fdf118d"
+   }
+  ],
+  "expect": "syncfusion.entry.css"
+ },
+ {
+  "name": "a cite narrowed to a line it still holds",
+  "edits": [
+   {
+    "file": "spec/FusionComponents/module.md",
+    "old": "fusion.css:23-24",
+    "new": "fusion.css:23"
+   }
+  ],
+  "expect": null
+ }
+]

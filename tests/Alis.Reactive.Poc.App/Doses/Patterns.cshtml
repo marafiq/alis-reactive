@@ -1,0 +1,51 @@
+@using System.Text.RegularExpressions
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Dose patterns";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+    var initials = "^[AD]";
+}
+<h1>Dose patterns</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-starting-a-to-d", "Count doses whose medicine starts with A to D")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => Regex.IsMatch(d.Medicine, "^[A-D]")))))
+
+@(plan.Button("count-with-food-last", "Count doses whose instruction ends with food")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => Regex.IsMatch(d.Instruction, "food$")))))
+
+@(plan.Button("count-blank-notes", "Count doses whose note is blank")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => Regex.IsMatch(d.Note!, "^ *$")))))
+
+@(plan.Button("count-starting-a-to-d-invariant", "Count doses whose medicine starts with A to D, culture invariant")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => Regex.IsMatch(d.Medicine, "^[A-D]", RegexOptions.CultureInvariant)))))
+
+@(plan.Button("count-with-a-dollar", "Count doses whose instruction holds a dollar sign")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => Regex.IsMatch(d.Instruction, "\\$")))))
+
+@(plan.Button("count-held-initials", "Count doses whose medicine starts with the initials the view holds")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => Regex.IsMatch(d.Medicine, initials)))))
+
+@(plan.Button("count-doctor-i", "Count doses whose prescriber is a Dr I")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => Regex.IsMatch(d.Prescriber, "(?<=Dr )I")))))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Elements
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model EscortDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Escort desk";
+    var plan = Html.ReactivePlan<EscortDesk>();
+}
+<h1>Escorts for @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, EscortDesks.Requested, new EscortRequest { Guide = null, Note = "Late" })>Late, no guide</button>
+<button type="button" @Html.Raises(plan, EscortDesks.Requested, new EscortRequest { Guide = null, Note = null })>Nothing known</button>
+<button type="button" @Html.Raises(plan, EscortDesks.Requested)>No details</button>
+<button type="button" @Html.Raises(plan, EscortDesks.SendAgain)>Send again</button>
+<button type="button" @Html.Raises(plan, EscortDesks.Requested, new EscortRequest { Guide = "Ruth" })>Ruth escorts</button>
+<p>Guide: <span id="guide"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(EscortDesks.Requested, (requested, pipeline) =>
+        {
+            var guide = requested.Read(request => request.Guide);
+            pipeline.When(guide.IsNull())
+                .Then(pipeline => pipeline.Element("guide").Text.Set("No guide"))
+                .Else(pipeline => pipeline.Element("guide").Text.Set(guide));
+        })
+        .CustomEvent(EscortDesks.SendAgain, pipeline => pipeline.Dispatch(EscortDesks.Requested, new EscortRequest { Guide = null, Note = "Late" })));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,106 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ArrivalDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Arrival desk";
+    var plan = Html.ReactivePlan<ArrivalDesk>();
+}
+<h1>Arrival desk</h1>
+<section aria-label="Desk">
+    <h2>Desk</h2>
+    @(Html.InputField(plan, m => m.Rehearsal, options => options.Label("Rehearsal only")).NativeCheckBox())
+</section>
+<section aria-label="Arrival">
+    <h2>Arrival</h2>
+    @using (var arrival = Html.BeginRequestContainer(plan, "arrival"))
+    {
+        <fieldset>
+            <legend>Resident</legend>
+            @(Html.InputField(plan, m => m.Resident.Name, options => options.Label("Name")).NativeTextBox())
+        </fieldset>
+        <fieldset>
+            <legend>Ward</legend>
+            @(Html.InputField(plan, m => m.Ward, options => options.Label("Ward")).NativeDropDown(build => build.Placeholder("Choose a ward").Items(ArrivalDeskLists.Wards()))
+                .Reactive(ward => ward.Change, HandlerPolicy.Replace, (changed, pipeline) => pipeline
+                    .Get<ArrivalRoomsQuery>(ArrivalDeskEndpoints.Rooms, request => request.Input(rooms => rooms.Ward, pipeline.Input(m => m.Ward)))
+                    .Into("arrival-room")))
+        </fieldset>
+        <fieldset>
+            <legend>Room</legend>
+            <div id="arrival-room"></div>
+        </fieldset>
+        <fieldset>
+            <legend>Funding</legend>
+            @(Html.InputField(plan, m => m.Funded, options => options.Label("Publicly funded")).NativeCheckBox()
+                .Reactive(funded => funded.Change, (changed, pipeline) => pipeline
+                    .When(pipeline.Input(m => m.Funded).Component<NativeCheckBox>().Checked)
+                    .Then(pipeline => pipeline.Get(ArrivalDeskEndpoints.Funding).Into("arrival-funding"))
+                    .Else(pipeline => pipeline.Unload("arrival-funding"))))
+            <div id="arrival-funding"></div>
+        </fieldset>
+        @(Html.InputField(plan, m => m.Desk, options => options.Label("Desk").Hidden()).NativeTextBox())
+        <button type="button" @Html.Raises(plan, ArrivalDeskButtons.Arrive)>Record the arrival</button>
+        Html.On(plan, trigger => trigger.CustomEvent(ArrivalDeskButtons.Arrive, pipeline => pipeline
+            .Post<ArrivalDesk>(ArrivalDeskEndpoints.Arrivals, request => request
+                .Header(ArrivalDeskEndpoints.WardHeader, pipeline.Input(m => m.Ward).Component<NativeDropDown>().Value)
+                .Query(sent => sent.Rehearsal, pipeline.Input(m => m.Rehearsal).Component<NativeCheckBox>().Checked)
+                .Inputs(arrival.Container))
+            .OnSuccess<ArrivalReply>((arrived, pipeline) =>
+            {
+                pipeline.Element("arrived-room").Text.Set(arrived.Body.Read(reply => reply.Bed.Room.Number));
+                pipeline.When(arrived.Body.Read(reply => reply.Bed.NeedsCleaning)).Then(pipeline =>
+                    pipeline.When(arrived.Body.Read(reply => reply.Bed.Isolation))
+                        .Then(pipeline => pipeline
+                            .Get<ArrivalCleaningQuery>(ArrivalDeskEndpoints.Cleaning, request => request
+                                .Query(cleaning => cleaning.Room, arrived.Body.Read(reply => reply.Bed.Room.Number))
+                                .Query(cleaning => cleaning.Deep, true))
+                            .OnSuccess(Content.Text, (booked, pipeline) => pipeline.Element("arrival-cleaning").Text.Set(booked.Body)))
+                        .Else(pipeline => pipeline
+                            .Get<ArrivalCleaningQuery>(ArrivalDeskEndpoints.Cleaning, request => request
+                                .Query(cleaning => cleaning.Room, arrived.Body.Read(reply => reply.Bed.Room.Number))
+                                .Query(cleaning => cleaning.Deep, false))
+                            .OnSuccess(Content.Text, (booked, pipeline) => pipeline.Element("arrival-cleaning").Text.Set(booked.Body))))
+                    .Else(pipeline => pipeline.Element("arrival-cleaning").Text.Set("No cleaning needed"));
+            })
+            .OnError<ArrivalConflict>(409, (taken, pipeline) =>
+            {
+                pipeline.Element("arrival-conflict").Text.Set(taken.Body.Read(conflict => conflict.Holder.Resident));
+                pipeline.When(taken.Body.Read(conflict => conflict.Holder.AtThisDesk)).Then(pipeline => pipeline
+                    .Get(ArrivalDeskEndpoints.Holder)
+                    .OnSuccess(Content.Text, (holder, pipeline) => pipeline.Element("arrival-holder").Text.Set(holder.Body)));
+            })
+            .Finally(pipeline => pipeline.Element("arrival-desk-state").Text.Set("Ready for the next arrival"))
+            .Chained((arrived, pipeline) => pipeline
+                .Get<ArrivalBedCardQuery>(ArrivalDeskEndpoints.BedCard, request => request.Query(card => card.Room, arrived.Body.Read(reply => reply.Bed.Room.Number)))
+                .Into("arrival-bed-card"))));
+    }
+    <p>Room given: <span id="arrived-room">none yet</span></p>
+    <p>Cleaning: <span id="arrival-cleaning">not booked</span></p>
+    <p>Held by: <span id="arrival-conflict">nobody</span> <span id="arrival-holder"></span></p>
+    <p>Desk: <span id="arrival-desk-state">Taking an arrival</span></p>
+    <section id="arrival-bed-card" aria-label="Bed card"></section>
+</section>
+<section aria-label="Next of kin">
+    <h2>Next of kin</h2>
+    <button type="button" @Html.Raises(plan, ArrivalDeskButtons.AddKin)>Add next of kin</button>
+    <div id="arrival-kin"></div>
+    <p>Saved: <span id="arrival-kin-saved">nobody</span></p>
+</section>
+<section aria-label="Ward board">
+    <h2>Ward board</h2>
+    <button type="button" @Html.Raises(plan, ArrivalDeskButtons.RefreshBoard)>Refresh the board</button>
+    <p>Census: <span id="board-census">not loaded</span></p>
+    <p>Alerts: <span id="board-alerts">not loaded</span></p>
+</section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ArrivalDeskButtons.AddKin, pipeline => pipeline.Get(ArrivalDeskEndpoints.Kin).Into("arrival-kin"))
+        .CustomEvent(ArrivalDeskButtons.RefreshBoard, pipeline => pipeline.Parallel(
+            pipeline => pipeline.Get(ArrivalDeskEndpoints.Census).OnSuccess(Content.Text, (census, pipeline) => pipeline.Element("board-census").Text.Set(census.Body)),
+            pipeline => pipeline.Get(ArrivalDeskEndpoints.Alerts).OnSuccess(Content.Text, (alerts, pipeline) => pipeline.Element("board-alerts").Text.Set(alerts.Body)))));
+}
+@Html.RenderPlan(plan)

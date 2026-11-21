@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.PivotView
+@model UnitOccupancy
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Unit occupancy";
+    var plan = Html.ReactivePlan<UnitOccupancy>();
+    var entry = FusionPivotViewFields.Of<UnitEntry>();
+}
+<h1>Unit occupancy</h1>
+@(Html.FusionPivotView(plan, "unit-occupancy", build => build
+    .DisplayOption(new PivotViewDisplayOption { View = View.Table })
+    .DataSourceSettings(new PivotViewDataSourceSettings
+    {
+        DataSource = Model.Residents,
+        Rows = new List<PivotViewRow> { new() { Name = entry.Field(e => e.Ward), Caption = "Unit" } },
+        Values = new List<PivotViewRow> { new() { Name = entry.Field(e => e.Beds), Caption = "Beds" } },
+    })))
+@Html.RenderPlan(plan)

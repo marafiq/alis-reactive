@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BatchNotes
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<BatchNotes>();
+}
+<h1>The bench</h1>
+@using (var notes = Html.BeginRequestForm(plan, "notes"))
+{
+    <input type="hidden" name="Batch" value="@Model.Batch">
+    @(Html.InputField(plan, m => m.Code).ConformanceComponent(new ConformanceStart { Text = Model.Board.Text, Value = Model.Code, Options = Model.Board.Codes }))
+    <button type="button" @Html.Raises(plan, HttpCells.Load)>Load</button>
+    Html.On(plan, trigger => trigger.CustomEvent(HttpCells.Load, pipeline => pipeline
+        .Post<BatchNotes>(BenchEndpoints.BatchNotes, request => request.Form(notes.Form))
+        .OnSuccess(Content.Text, (answered, pipeline) => pipeline.Element("shown").Text.Set(answered.Body))));
+}
+<p id="shown"></p>
+@Html.RenderPlan(plan)

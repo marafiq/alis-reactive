@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WeightCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Weight check";
+    var plan = Html.ReactivePlan<WeightCheck>();
+}
+<h1>Weight of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, WeightChecks.Check)>Check</button>
+<p>Weight band: <span id="weight-badge"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WeightChecks.Check, pipeline => pipeline.Get(Model.Weighing)
+        .OnSuccess<WeighedResident>((resident, pipeline) => pipeline.When(resident.Body.Read(weighed => weighed.Weight).IfNull(70).Gt(65))
+            .Then(pipeline => pipeline.Element("weight-badge").Text.Set("Heavy"))
+            .Else(pipeline => pipeline.Element("weight-badge").Text.Set("Light")))));
+}
+@Html.RenderPlan(plan)

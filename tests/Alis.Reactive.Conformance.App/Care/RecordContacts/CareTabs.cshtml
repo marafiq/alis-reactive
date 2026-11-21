@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Navigations
+@model CareTabs
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Care record";
+    var plan = Html.ReactivePlan<CareTabs>();
+}
+<h1>Care record</h1>
+@(Html.FusionTab(plan, "care-tabs", build => build
+    .Items(new List<TabItem>
+    {
+        new() { Header = new TabHeader { Text = "Contacts" }, Content = "Daughter, Mei Chen" },
+        new() { Header = new TabHeader { Text = "Visits" }, Content = "Tuesday and Saturday afternoons" },
+        new() { Header = new TabHeader { Text = "Medications" }, Content = "Morning and evening rounds" },
+    })
+    .SelectedItem(Model.OpenTab)))
+<button type="button" @Html.Raises(plan, CareTabReads.Which)>Which tab</button>
+<p id="tab-shown">No tab</p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CareTabReads.Which, pipeline => pipeline
+        .Element("tab-shown").Text.Set(pipeline.Component<FusionTab>("care-tabs").SelectedItem)));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,23 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "ElseIf result after its When";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>ElseIf result after its When</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("assess", "Assess the intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        var branches = pipeline.When(balance.Intake.Gt(500)).Then(high => high.Element("verdict").Text.Set("high"));
+        var measured = balance.Measure();
+        branches.ElseIf(measured.Gt(50)).Then(taken => taken.Element("verdict").Text.Set("measured"));
+        balance.Intake.Set(measured);
+    }))
+
+@Html.RenderPlan(plan)

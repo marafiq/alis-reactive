@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NullableTextBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents raised";
+    var plan = Html.ReactivePlan<NullableTextBoard>();
+    var raises = new[]
+    {
+        new RaiseStart { Button = "Raise Ben", Text = Model.FirstResident, NullableText = Model.FirstCountry },
+        new RaiseStart { Button = "Raise Ada", Text = Model.SecondResident },
+    };
+}
+<h1>Residents raised</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Raises = raises })
+    .Reactive(component => component.Raised, (raised, pipeline) =>
+    {
+        pipeline.Element("nullable-text").Text.Set(raised.NullableText);
+        pipeline.Element("raised-text").Text.Set(raised.Text);
+    }))
+<dl>
+    <dt>Country</dt>
+    <dd id="nullable-text"></dd>
+    <dt>Resident</dt>
+    <dd id="raised-text"></dd>
+</dl>
+@Html.RenderPlan(plan)

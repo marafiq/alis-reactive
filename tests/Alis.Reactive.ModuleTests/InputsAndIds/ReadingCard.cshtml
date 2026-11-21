@@ -1,0 +1,9 @@
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.ModuleTests.InputsAndIds
+@model ChartEntry<FluidsReading>
+@{
+    var plan = Html.ReactivePlan<ChartEntry<FluidsReading>>();
+    var field = Html.InputField(plan, m => m.Initials);
+}
+@(field.Render<IntakeBox>(Html.TextBoxFor(m => m.Initials, new { id = field.Id })))
+@Html.RenderPlan(plan)

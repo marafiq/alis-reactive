@@ -1,0 +1,25 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ReadyPage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ready";
+    var plan = Html.ReactivePlan<ReadyPage>();
+    var ward = Model.Ward;
+    var sendsRequests = Model.SendsRequests;
+}
+<h1>Ready</h1>
+<p id="ready"></p>
+<p>Doses given on @ward: <span id="ready-doses"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline =>
+    {
+        pipeline.Element("ready").Text.Set("ready");
+        if (sendsRequests)
+            pipeline.Get(ReadyEndpoints.Doses)
+                .OnSuccess<List<ReadyDose>>((doses, pipeline) => pipeline.Element("ready-doses").Text.Set(doses.Body.Count(d => d.Ward == ward && d.Given)));
+    }));
+}
+@Html.RenderPlan(plan)

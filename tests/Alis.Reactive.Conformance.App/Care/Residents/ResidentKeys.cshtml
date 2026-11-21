@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentKeys
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents";
+    var plan = Html.ReactivePlan<ResidentKeys>();
+    var open = plan.Rows<ResidentKeyRow>("residents").NativeActionLink((activated, pipeline) => pipeline
+        .Get<ResidentKeyQuery>(WardRowsEndpoints.ResidentByKey, request => request.Set(query => query.Key, activated.Row.Read(row => row.Key)))
+        .OnSuccess(Content.Json<KeyReceived>(), (received, pipeline) => pipeline.Element("received").Text.Set(received.Body.Read(bound => bound.Key))));
+}
+<h1>Residents</h1>
+<ul aria-label="Residents">
+    @foreach (var row in Model.Rows)
+    {
+        <li>@open.Render(row, row.Key)</li>
+    }
+</ul>
+<p>Received: <span id="received"></span></p>
+@Html.RenderPlan(plan)

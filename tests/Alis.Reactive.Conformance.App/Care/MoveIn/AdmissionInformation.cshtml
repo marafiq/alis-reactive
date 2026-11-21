@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionInformation
+@{
+    Layout = "/Care/MoveIn/_MoveInLayout.cshtml";
+    ViewData["Title"] = "Admissions information";
+    var plan = Html.ReactivePlan<AdmissionInformation>();
+}
+<h1>Admissions information</h1>
+@(Html.NativeButton("check-desk", "Check desk availability").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Get(CareEndpoints.AdmissionDeskStatus).OnSuccess(Content.Text, (status, pipeline) => pipeline.Element("desk-status").Text.Set(status.Body))))
+<p id="desk-status" role="status">Check the desk before visiting.</p>
+@Html.RenderPlan(plan)

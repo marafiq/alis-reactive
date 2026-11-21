@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model ResidentInput
+@{
+    var plan = Html.ReactivePlan<ResidentInput>();
+}
+@await Html.PartialFor(m => m.Identity, "/Care/MoveIn/Identity.cshtml")
+@await Html.PartialFor(m => m.Address, "/Care/MoveIn/Address.cshtml")
+<fieldset>
+    <legend>Move-in date</legend>
+    @(Html.InputField(plan, m => m.MoveInDate, options => options.Label("Move-in date")).ConformanceComponent(Reads.DayPicker("Move-in date", Model.MoveInDate, Reads.Today().AddDays(7), Reads.Today().AddDays(-1))))
+</fieldset>
+<fieldset>
+    <legend>Notes</legend>
+    @(Html.InputField(plan, m => m.Notes, options => options.Label("Notes")).NativeTextArea())
+</fieldset>
+<div id="resident-desk"></div>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline
+        .Get<DeskQuery>(CareEndpoints.MoveInResidentDesk, request => request.Query(query => query.DraftId, pipeline.PageUrl<MoveInPageAddress>(MoveInEndpoints.Page).Read(address => address.DraftId)))
+        .Into("resident-desk")));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Open a room";
+    var plan = Html.ReactivePlan<RoomDesk>();
+}
+<h1>Open a room of the @Model.Floor</h1>
+@(Html.InputField(plan, m => m.Code, options => options.Label("Room code")).NativeTextBox())
+<button type="button" @Html.Raises(plan, RoomDesks.Open)>Open room</button>
+<p>Room: <span id="room">-</span></p>
+<p>Status: <span id="room-status">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RoomDesks.Open, pipeline => pipeline
+        .Get<RoomQuery>(CareEndpoints.Room, request => request.Path(room => room.Code, pipeline.Input(m => m.Code).Component<NativeTextBox>().Value))
+        .OnSuccess(Content.Text, (opened, pipeline) => pipeline.Element("room").Text.Set(opened.Body))
+        .OnError((failed, pipeline) => pipeline.Element("room").Text.Set("No such room"))
+        .Finally(pipeline => pipeline.Element("room-status").Text.Set("Done"))));
+}
+@Html.RenderPlan(plan)

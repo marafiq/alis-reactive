@@ -1,0 +1,18 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardRoster
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The wing's bindings";
+    var plan = Html.ReactivePlan<WardRoster>();
+}
+<h1>@Model.Wing</h1>
+<p>Ada's ward: <span id="ignored"></span></p>
+<button type="button" @Html.Raises(plan, IgnoredMembers.Show)>Show the ignored member</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(IgnoredMembers.Show, pipeline => pipeline.Get(TypeKnowledgeEndpoints.WardBindings)
+        .OnSuccess<List<WardBinding>>((bindings, pipeline) => pipeline.Element("ignored").Text.Set(bindings.Body.Find(b => b.Name == "Ada", b => b.Ignored)))));
+}
+@Html.RenderPlan(plan)

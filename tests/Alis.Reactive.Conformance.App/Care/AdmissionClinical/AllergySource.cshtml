@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AllergySource
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Helen Martinez's intake";
+    var plan = Html.ReactivePlan<AllergySource>();
+}
+<h1>Helen Martinez's intake</h1>
+<fieldset>
+    <legend>Allergies</legend>
+    @(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies"))
+        .FusionMultiSelect(HelensAllergies.Offered(), build => build.Fields((HelenAllergy a) => a.Name, a => a.Code))
+        .Reactive(box => box.Change, (changed, pipeline) => pipeline
+            .When(changed.IsInteracted)
+            .Then(pipeline => pipeline.Element("source").Text.Set("user"))
+            .Else(pipeline => pipeline.Element("source").Text.Set("system"))))
+</fieldset>
+<button type="button" @Html.Raises(plan, AllergySources.LoadFromDischarge)>Load from discharge</button>
+<p>Changed by: <output id="source">No change</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(AllergySources.LoadFromDischarge, pipeline => pipeline
+        .Input(m => m.AllergyCodes).Component<FusionMultiSelect<int[]?>>().Value.Set([7])));
+}
+@Html.RenderPlan(plan)

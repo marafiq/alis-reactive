@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model IntakeBed
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Intake";
+    var plan = Html.ReactivePlan<IntakeBed>();
+}
+<h1>Intake</h1>
+@using (Html.BeginRequestForm(plan, "intake"))
+{
+    @(Html.NativeHiddenField(plan, m => m.AssignedBed).Reactive(field => field.Change, (changed, pipeline) => pipeline
+        .Element("bed-echo").Text.Set(pipeline.Input(m => m.AssignedBed).Component<NativeHiddenField>().Value)))
+    <button type="button" @Html.Raises(plan, IntakeBeds.AssignB12)>Assign B-12</button>
+}
+<p>Assigned bed: <span id="bed-echo"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(IntakeBeds.AssignB12, pipeline => pipeline
+        .Input(m => m.AssignedBed).Component<NativeHiddenField>().Value.Set("B-12")));
+}
+@Html.RenderPlan(plan)

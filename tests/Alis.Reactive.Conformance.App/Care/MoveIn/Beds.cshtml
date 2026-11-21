@@ -1,0 +1,44 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+    var beds = Reads.BedsOf(Model.Location.CommunityId, Model.Location.BuildingId, Model.Location.ApartmentId);
+}
+@(Html.InputField(plan, m => m.Location.BedId, options => options.Label("Bed")).NativeDropDown(build => build.Placeholder("Choose a bed").Items(beds.Select(bed => new SelectListItem(bed.Offered, bed.Id))))
+    .Reactive(bed => bed.Change, (changed, pipeline) =>
+    {
+        pipeline.Unload("availability-owner");
+        var chosen = pipeline.Input(m => m.Location.BedId).Component<NativeDropDown>().Value;
+        var told = pipeline.When(chosen.IsEmpty()).Then(pipeline =>
+        {
+            pipeline.Input(m => m.Location.BedRevision).Component<NativeHiddenField>().Value.Set("0");
+            pipeline.Element("bed-status").Text.Set("No bed chosen");
+        });
+        foreach (var bed in beds)
+        {
+            told = told.ElseIf(chosen.Eq(bed.Id)).Then(pipeline =>
+            {
+                pipeline.Input(m => m.Location.BedRevision).Component<NativeHiddenField>().Value.Set(bed.Revision);
+                pipeline.Element("bed-status").Text.Set(bed.Told);
+            });
+        }
+    }))
+@(Html.NativeHiddenField(plan, m => m.Location.BedRevision))
+@(Html.NativeButton("open-availability", "Open availability").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+{
+    var moveIn = pipeline.Container<MoveInPage>("move-in");
+    pipeline.When(moveIn.Read(m => m.Location.BedId).NotEmpty())
+        .Then(pipeline => pipeline.Get<AvailabilityQuery>(MoveInEndpoints.AvailabilityPanel, request => request
+            .Query(query => query.DraftId, moveIn.Read(m => m.DraftId))
+            .Query(query => query.CommunityId, moveIn.Read(m => m.Location.CommunityId))
+            .Query(query => query.BedId, moveIn.Read(m => m.Location.BedId)))
+            .Into("availability-owner"));
+}))
+@Html.RenderPlan(plan)

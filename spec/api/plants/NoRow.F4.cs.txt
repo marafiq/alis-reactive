@@ -1,0 +1,10 @@
+using System;
+
+namespace Alis.Reactive.Plants;
+
+internal sealed class Ledger
+{
+    internal static void Open(Action<Ledger> entries) => entries(new Ledger());
+
+    internal static void Use() => Open(entries => { });
+}

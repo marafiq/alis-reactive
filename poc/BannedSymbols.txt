@@ -1,0 +1,5 @@
+N:System.Reflection;The framework runs no reflection of its own (D18.4)
+T:System.Activator;The framework runs no reflection of its own (D18.4)
+M:System.Type.GetType(System.String);The framework runs no reflection of its own (D18.4)
+M:System.Linq.Expressions.LambdaExpression.Compile;An expression is read, never compiled (D18.4)
+T:System.Text.RegularExpressions.Regex;The framework writes no regular expression (D16.10)

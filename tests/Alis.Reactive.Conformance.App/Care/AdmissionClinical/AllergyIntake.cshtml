@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AllergyIntake
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Clinical intake";
+    var plan = Html.ReactivePlan<AllergyIntake>();
+}
+<h1>Clinical intake</h1>
+@using (var clinical = Html.BeginRequestForm(plan, "clinical"))
+{
+    <fieldset>
+        <legend>Allergies</legend>
+        @(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies"))
+            .FusionMultiSelect(Model.Allergies, build => build.Fields((Allergy a) => a.DisplayLabel, a => a.AllergyCode)))
+    </fieldset>
+    <button type="button" @Html.Raises(plan, AllergyIntakes.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(AllergyIntakes.Save, pipeline => pipeline
+        .Post<AllergyIntake>(AllergyIntakeEndpoints.Intakes, request => request.Form(clinical.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+<p id="saved">Not saved</p>
+@Html.RenderPlan(plan)

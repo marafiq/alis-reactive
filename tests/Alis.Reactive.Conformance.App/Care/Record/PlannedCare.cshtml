@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PlannedCare
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Planned care";
+    var plan = Html.ReactivePlan<PlannedCare>();
+}
+<h1>Planned care of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Care panel" }))
+<button type="button" @Html.Raises(plan, PanelWeeks.Load)>Load</button>
+<button type="button" @Html.Raises(plan, PanelWeeks.Send)>Send care</button>
+<p>Day planned: <span id="day-planned">-</span></p>
+<p>Care sent: <span id="care-echo"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PanelWeeks.Load, pipeline => pipeline.Get(Model.Plan)
+        .OnSuccess<PanelWeekPlan>((loaded, pipeline) =>
+        {
+            pipeline.Element("day-planned").Text.Set(loaded.Body.Read(week => week.Care));
+            pipeline.Component<ConformanceComponent>("care-panel").Days.Set(loaded.Body.Read(week => week.Care));
+        })));
+    Html.On(plan, trigger => trigger.CustomEvent(PanelWeeks.Send, pipeline => pipeline
+        .Get<PanelWeekQuery>(PanelWeekEndpoints.Care, request => request.Set(r => r.Care, pipeline.Component<ConformanceComponent>("care-panel").Days))
+        .OnSuccess(Content.Text, (sent, pipeline) => pipeline.Element("care-echo").Text.Set(sent.Body))));
+}
+@Html.RenderPlan(plan)

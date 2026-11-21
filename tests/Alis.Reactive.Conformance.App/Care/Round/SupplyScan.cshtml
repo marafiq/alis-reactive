@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SupplyScan
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Supply scan";
+    var plan = Html.ReactivePlan<SupplyScan>();
+}
+<h1>Dose round: the supply</h1>
+@(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner", Amount = 1m }))
+<button type="button" @Html.Raises(plan, SupplyScans.FindTheSupply)>Find the supply</button>
+<button type="button" @Html.Raises(plan, SupplyScans.Add)>Add</button>
+<p>Supply found: <span id="supply-name">-</span></p>
+<p>Scan: <span id="scan-status">Not added</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(SupplyScans.FindTheSupply, pipeline => pipeline.Get(Model.Supply)
+            .OnSuccess<FoundSupply>((found, pipeline) => pipeline.Element("supply-name").Text.Set(found.Body.Read(supply => supply.Name))))
+        .CustomEvent(SupplyScans.Add, pipeline => pipeline.Get(Model.Supply)
+            .OnSuccess<FoundSupply>((found, pipeline) =>
+            {
+                pipeline.Component<ConformanceComponent>("scanner").Add(found.Body.Read(supply => supply.VialCount));
+                pipeline.Element("scan-status").Text.Set("Added");
+            })));
+}
+@Html.RenderPlan(plan)

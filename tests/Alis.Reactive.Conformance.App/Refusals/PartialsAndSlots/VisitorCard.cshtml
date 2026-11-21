@@ -1,0 +1,14 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitorCard
+@{
+    var plan = Html.ReactivePlan<VisitorCard>();
+}
+<h2>@Model.Visitor</h2>
+<p id="card-pass"></p>
+<button type="button" @Html.Raises(plan, PassDesks.PrintThePass)>Print the pass</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PassDesks.PrintThePass, pipeline => pipeline.Element("card-pass").Text.Set("Pass printed")));
+}
+@Html.RenderPlan(plan)

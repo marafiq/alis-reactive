@@ -1,0 +1,18 @@
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Last alarm noted";
+    var plan = Html.ReactivePlan<InfusionPage>();
+}
+<h1>Last alarm noted</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+
+@(plan.Button("note", "Note the last alarm")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        pump.Note(pump.LastAlarm().IfNull("no alarm"));
+    }))
+
+@Html.RenderPlan(plan)

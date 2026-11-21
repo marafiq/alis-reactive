@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model RoomStates
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed board";
+    var plan = Html.ReactivePlan<RoomStates>();
+    var columns = FusionGridColumns.Of<StatedRoom>();
+    var state = FusionTemplate.Create<StatedRoom>()
+        .When(m => m.State == RoomState.Open, then: t => t.Span("open"), @else: e => e.Span("closed"))
+        .Render(plan);
+}
+<h1>Bed board</h1>
+@(Html.FusionGrid(plan, "room-states", Model.Rooms, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.Room), HeaderText = "Room" },
+        new() { HeaderText = "State", Template = state },
+    })))
+@Html.RenderPlan(plan)

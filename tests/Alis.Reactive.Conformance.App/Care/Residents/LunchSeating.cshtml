@@ -1,0 +1,74 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Declarations
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LunchSeating
+@{
+    Layout = "/Care/Residents/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Lunch seating";
+    var plan = Html.ReactivePlan<LunchSeating>();
+}
+<h1>Lunch seating</h1>
+@foreach (var table in Model.Tables)
+{
+    var card = $"table-{table.Number}";
+    <section id="@card" class="table-card @(string.Join(" ", table.Flags))" aria-label="Table @table.Number">
+        <h2>Table @table.Number</h2>
+        <ul id="@(card)-seats">
+            @foreach (var seat in table.Seats)
+            {
+                <li data-supervision="@seat.Supervision">@seat.Resident</li>
+            }
+        </ul>
+        <dl>
+            <dt>Seated</dt>
+            <dd id="@(card)-seated"></dd>
+            <dt>Close supervision</dt>
+            <dd id="@(card)-close-supervision"></dd>
+            <dt>Risk flags</dt>
+            <dd id="@(card)-risk-count"></dd>
+        </dl>
+        <button type="button" @Html.Raises(plan, table.FallRisk)>Fall risk</button>
+    </section>
+}
+<section aria-label="Serving station">
+    <h2>Serving station</h2>
+    <dl>
+        <dt>Plates on order</dt>
+        <dd id="plates-on-order">-</dd>
+        <dt>Plates ready</dt>
+        <dd id="plates-ready">-</dd>
+    </dl>
+    <p id="station-status">Not counted</p>
+    <button type="button" @Html.Raises(plan, LunchSeatings.CountThePlates)>Count the plates</button>
+</section>
+@{
+    Html.On(plan, trigger =>
+    {
+        foreach (var table in Model.Tables)
+        {
+            var card = $"table-{table.Number}";
+            trigger
+                .DomReady(pipeline =>
+                {
+                    pipeline.Element($"{card}-seated").Text.Set(pipeline.Element($"{card}-seats").Children.Count());
+                    pipeline.Element($"{card}-close-supervision").Text.Set(pipeline.Element($"{card}-seats").Children.Count(seat => seat.GetAttribute("data-supervision").Eq("close")));
+                    pipeline.Element($"{card}-risk-count").Text.Set(pipeline.Element(card).Classes.Count(flag => flag.StartsWith("risk-", StringComparison.Ordinal)));
+                })
+                .CustomEvent(table.FallRisk, pipeline =>
+                {
+                    pipeline.Element(card).Classes.Add("risk-fall");
+                    pipeline.Element($"{card}-risk-count").Text.Set(pipeline.Element(card).Classes.Count(flag => flag.StartsWith("risk-", StringComparison.Ordinal)));
+                });
+        }
+
+        trigger.CustomEvent(LunchSeatings.CountThePlates, pipeline =>
+        {
+            pipeline.Element("plates-on-order").Text.Set(pipeline.Plugin<ServingStation>().Plates.Total);
+            pipeline.Element("plates-ready").Text.Set(pipeline.Plugin<ServingStation>().Plates.Count());
+            pipeline.Element("station-status").Text.Set("Counted");
+        });
+    });
+}
+@Html.RenderPlan(plan)

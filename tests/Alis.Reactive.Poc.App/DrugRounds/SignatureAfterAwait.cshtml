@@ -1,0 +1,15 @@
+@using Alis.Reactive.Poc.App.DrugRounds
+@model DrugRound
+@{
+    var plan = Html.ReactivePlan<DrugRound>();
+}
+
+@(plan.MedicineRound("round")
+    .Reactive(round => round.Started, (started, pipeline) =>
+    {
+        var chart = started.Chart();
+        pipeline.Component<MedicineRound>("round").Resident.Set(chart.Read(found => found.Resident));
+        started.Signature.Set(dose => dose.Drug);
+    }))
+
+@Html.RenderPlan(plan)

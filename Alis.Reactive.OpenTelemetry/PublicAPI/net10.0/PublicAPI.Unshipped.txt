@@ -1,0 +1,3 @@
+#nullable enable
+Alis.Reactive.OpenTelemetry.Tracing.OpenTelemetryHtml
+static Alis.Reactive.OpenTelemetry.Tracing.OpenTelemetryHtml.OpenTelemetryExporter(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, string! tracesUrl, string! serviceName) -> Microsoft.AspNetCore.Html.IHtmlContent!

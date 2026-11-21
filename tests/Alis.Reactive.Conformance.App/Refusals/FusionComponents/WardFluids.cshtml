@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model WardFluids
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward fluids";
+    var plan = Html.ReactivePlan<WardFluids>();
+}
+<h1>Ward fluids</h1>
+@(Html.FusionBulletChart(plan, "ward-fluids", Model.Wards, build => build.Title("Fluid intake").Fields((WardIntake w) => w.Taken, w => w.Target, w => w.Ward)))
+@Html.RenderPlan(plan)

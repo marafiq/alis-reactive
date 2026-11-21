@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundHandover
+@{
+    var plan = Html.ReactivePlan<RoundHandover>();
+}
+<h2>Handover</h2>
+<p>@Model.Note</p>
+<p id="handover-status">Handover closed</p>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Dispatch(RoundBoards.SlotOpened))
+        .CustomEvent(RoundBoards.SlotOpened, pipeline => pipeline.Element("handover-status").Text.Set("Slot opened")));
+}
+@Html.RenderPlan(plan)

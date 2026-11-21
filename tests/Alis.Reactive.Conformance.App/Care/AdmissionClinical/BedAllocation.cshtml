@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedAllocation
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed allocation";
+    var plan = Html.ReactivePlan<BedAllocation>();
+}
+<h1>Bed allocation</h1>
+@using (var allocation = Html.BeginRequestForm(plan, "bed-allocation"))
+{
+    <fieldset>
+        <legend>Bed</legend>
+        @(Html.InputField(plan, m => m.BedCode, options => options.Label("Bed"))
+            .FusionMultiColumnComboBox<BedAllocation, string?, CareBed, string>(Model.Beds, build => build.Fields((CareBed b) => b.DisplayLabel, b => b.BedCode)))
+    </fieldset>
+    <button type="button" @Html.Raises(plan, BedAllocations.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(BedAllocations.Save, pipeline => pipeline
+        .Post<BedAllocation>(BedAllocationEndpoints.Allocations, request => request.Form(allocation.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+<p id="saved">Not saved</p>
+@Html.RenderPlan(plan)

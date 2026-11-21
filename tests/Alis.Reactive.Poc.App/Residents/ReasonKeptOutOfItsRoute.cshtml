@@ -1,0 +1,21 @@
+@using Alis.Reactive.Poc.App.Residents
+@model ResidentLookup
+@{
+    ViewData["Title"] = "Resident lookup";
+    var plan = Html.ReactivePlan<ResidentLookup>();
+}
+<h1>Resident lookup</h1>
+
+@(Html.InputField(plan, m => m.Name).TextBox("Resident name")
+    .Reactive(box => box.Blur, (_, pipeline) =>
+    {
+        var name = pipeline.Input(m => m.Name).Component<NativeTextBox>().Value;
+        TypedSource<string>? reason = null;
+        pipeline.Get<ResidentQuery>("/Residents/Summary/{name}", request => request.Path(r => r.Name, name))
+            .OnError<NoResident>(404, (missing, notFound) => reason = missing.Body.Read(m => m.Reason));
+        pipeline.Get<ResidentQuery>("/Residents/Summary/{name}", request => request.Path(r => r.Name, name).Query(r => r.Ward, reason!))
+            .OnSuccess<ResidentSummary>((summary, found) => found.Element("room").Text.Set(summary.Body.Read(s => s.Room)));
+    }))
+<p>Room: <strong id="room">not looked up</strong></p>
+
+@Html.RenderPlan(plan)

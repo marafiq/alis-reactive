@@ -1,0 +1,23 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Buttons
+@model AllergyTags
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Allergy tags";
+    var plan = Html.ReactivePlan<AllergyTags>();
+}
+<h1>Allergy tags of @Model.Resident</h1>
+@(Html.FusionChipList(plan, "allergy-chips", build => build.Chips(new[] { "Penicillin", "Latex", "Peanuts" }).Selection(Selection.Multiple)))
+<button type="button" @Html.Raises(plan, AllergyTagChecks.ShowSelected)>Show selected</button>
+<p>Selected allergies: <output id="chip-status">Not read</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(AllergyTagChecks.ShowSelected, pipeline => pipeline
+        .When(pipeline.Component<FusionChipList>("allergy-chips").GetSelectedChips<string>().Read(chosen => chosen.Indexes).Any())
+        .Then(pipeline => pipeline.Element("chip-status").Text.Set("Indexes held"))
+        .Else(pipeline => pipeline.Element("chip-status").Text.Set("No indexes"))));
+}
+@Html.RenderPlan(plan)

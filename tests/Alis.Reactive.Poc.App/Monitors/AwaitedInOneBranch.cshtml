@@ -1,0 +1,15 @@
+@using Alis.Reactive.Poc.App.Monitors
+@model MonitorsPage
+@{
+    ViewData["Title"] = "Awaited in one branch";
+    var plan = Html.ReactivePlan<MonitorsPage>();
+}
+<h1>Awaited in one branch</h1>
+
+@(plan.VitalsMonitor("monitor")
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+        pipeline.When(alarm.Note.Eq("after surgery"))
+            .Then(noted => noted.Component<VitalsMonitor>("monitor").Acknowledge())
+            .Else(unnoted => alarm.Cancel.Set(true))))
+
+@Html.RenderPlan(plan)

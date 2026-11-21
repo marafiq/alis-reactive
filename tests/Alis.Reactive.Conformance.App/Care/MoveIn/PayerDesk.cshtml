@@ -1,0 +1,45 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject MoveInReads Reads
+@model PayerInput
+@{
+    var plan = Html.ReactivePlan<PayerInput>();
+    void LoadPayer(Pipeline<PayerInput> pipeline, PayerKind kind)
+    {
+        pipeline.Get<SectionQuery>(MoveInEndpoints.PrimaryCoverage, request => request
+            .Query(q => q.DraftId, pipeline.Container<MoveInPage>("move-in").Read(m => m.DraftId))
+            .Query(q => q.PayerKind, kind)
+            .Query(q => q.Section, SectionKind.PrimaryPayer)
+            .Query(q => q.Culture, System.Globalization.CultureInfo.CurrentCulture.Name))
+            .Into("primary-payer");
+    }
+}
+<p>Payer on file: <span id="payer-on-file">@Reads.PayerOnFile(Model)</span></p>
+<p>Verification on file: <span id="verification-on-file">@(Model.VerificationId ?? "No verification")</span></p>
+@(Html.InputField(plan, m => m.Kind, o => o.Label("Funding source"))
+    .NativeDropDown(o => o.Items(Enum.GetValues<PayerKind>().Select(kind => new SelectListItem(kind.ToString(), kind.ToString()))))
+    .Reactive(payer => payer.Change, (changed, pipeline) =>
+    {
+        var kind = pipeline.Container<MoveInPage>("move-in").Read(m => m.Payer.Kind);
+        pipeline.Unload("primary-payer");
+        pipeline.When(kind.Eq(PayerKind.Insurance)).Then(pipeline => LoadPayer(pipeline, PayerKind.Insurance))
+            .ElseIf(kind.Eq(PayerKind.Benefits)).Then(pipeline => LoadPayer(pipeline, PayerKind.Benefits))
+            .Else(pipeline => LoadPayer(pipeline, PayerKind.Private));
+    }))
+@(Html.NativeButton("open-payer-verification", "Open payer verification").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+{
+    pipeline.Element(NativeDrawer.TitleId).Text.Set("Payer verification");
+    pipeline.Component<NativeDrawer>().Size.Set(DrawerSize.Lg);
+    pipeline.Component<NativeDrawer>().Open();
+    pipeline.Get<DeskQuery>(MoveInEndpoints.VerificationForm, request => request.Query(q => q.DraftId, pipeline.Container<MoveInPage>("move-in").Read(m => m.DraftId))).Into(NativeDrawer.ContentId);
+}))
+@{
+    plan.Component<NativeDrawer>().Reactive(drawer => drawer.Closed, pipeline => pipeline.Unload(NativeDrawer.ContentId));
+}
+@Html.RenderPlan(plan)

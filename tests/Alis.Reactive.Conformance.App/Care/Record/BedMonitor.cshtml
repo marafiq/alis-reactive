@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedMonitor
+@{
+    Layout = "/Care/Record/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Bed monitor";
+    var plan = Html.ReactivePlan<BedMonitor>();
+}
+<h1>Record of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, BedMonitorButtons.OpenTheCard)>Open the card</button>
+<button type="button" @Html.Raises(plan, BedMonitorButtons.CloseTheCard)>Close the card</button>
+<dl>
+    <dt>Raises heard</dt>
+    <dd id="raised-heard"></dd>
+    <dt>Listeners removed</dt>
+    <dd id="off-calls"></dd>
+</dl>
+<section id="panel-card" aria-label="Panel card"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(BedMonitorButtons.OpenTheCard, pipeline => pipeline.Get(BedMonitorEndpoints.Card).Into("panel-card"))
+        .CustomEvent(BedMonitorButtons.CloseTheCard, pipeline => pipeline.Unload("panel-card")));
+}
+@Html.RenderPlan(plan)

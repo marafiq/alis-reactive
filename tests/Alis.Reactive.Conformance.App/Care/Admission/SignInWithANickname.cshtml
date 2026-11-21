@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SignIn
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Sign in";
+    var plan = Html.ReactivePlan<SignIn>();
+}
+<h1>Sign in</h1>
+@using (var signIn = Html.BeginRequestForm(plan, "sign-in"))
+{
+    @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    @await Html.PartialAsync("/Care/Admission/SignInGuestNickname.cshtml", new SignInGuest())
+    <button type="button" @Html.Raises(plan, SignIns.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(SignIns.Save, pipeline => pipeline
+        .Post<SignIn>(SignInEndpoints.SignIns, request => request.Form(signIn.Form))
+        .OnSuccess(Content.Text, (bound, pipeline) => pipeline.Element("bound").Text.Set(bound.Body))));
+}
+<p>Signed in: <span id="bound">-</span></p>
+@Html.RenderPlan(plan)

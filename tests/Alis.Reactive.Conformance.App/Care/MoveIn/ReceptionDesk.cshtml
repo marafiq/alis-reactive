@@ -1,0 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
+@model ReceptionPage
+@{
+    Layout = "/Care/MoveIn/_MoveInLayout.cshtml";
+    ViewData["Title"] = "Visitor reception";
+}
+<h1>Visitor reception</h1>
+@await Html.PartialAsync("/Care/MoveIn/Reception.cshtml", Model)

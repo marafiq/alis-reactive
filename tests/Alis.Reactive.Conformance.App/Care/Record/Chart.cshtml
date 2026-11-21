@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ChartPage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Chart";
+    var plan = Html.ReactivePlan<ChartPage>();
+}
+<h1>Chart</h1>
+<p>Open tab: <span id="open-tab"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("open-tab").Text.Set(pipeline.PageUrl<ChartPage>().Read(page => page.Tab))));
+}
+@Html.RenderPlan(plan)

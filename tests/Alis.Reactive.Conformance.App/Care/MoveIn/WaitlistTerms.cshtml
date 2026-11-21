@@ -1,0 +1,13 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model WaitlistTermsPage
+@{
+    var plan = Html.ReactivePlan<WaitlistTermsPage>();
+}
+<p>No bed is reserved by joining the waitlist.</p>
+@if (Model.Entry is { } entry)
+{
+    <p id="waitlist-hold">@Model.Hold</p>
+    @await Html.PartialAsync("/Care/MoveIn/WaitlistEntry.cshtml", entry)
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,58 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model LocationInput
+@{
+    var plan = Html.ReactivePlan<LocationInput>();
+    var saved = Model.BedId.Length == 0 ? "none" : $"{Model.CommunityId} / {Model.BuildingId} / {Model.ApartmentId} / {Model.BedId} revision {Model.BedRevision}";
+}
+<p>Saved location: <span id="saved-location">@saved</span></p>
+<fieldset>
+    <legend>Community</legend>
+    @(Html.InputField(plan, m => m.CommunityId, options => options.Label("Community")).NativeDropDown(build => build.Placeholder("Choose a community").Items(Reads.Communities()))
+        .Reactive(community => community.Change, (changed, pipeline) => pipeline.Dispatch(MoveInLocationEvents.CommunityChosen)))
+</fieldset>
+<fieldset>
+    <legend>Building</legend>
+    <div id="buildings"></div>
+    <p id="building-status"></p>
+</fieldset>
+<fieldset>
+    <legend>Apartment</legend>
+    <div id="apartments"></div>
+</fieldset>
+<fieldset>
+    <legend>Bed</legend>
+    <div id="beds"></div>
+    <p id="bed-status">No bed chosen</p>
+</fieldset>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(MoveInLocationEvents.CommunityChosen, HandlerPolicy.Replace, pipeline =>
+        {
+            var moveIn = pipeline.Container<MoveInPage>("move-in");
+            pipeline.Unload("buildings");
+            pipeline.Unload("apartments");
+            pipeline.Unload("beds");
+            pipeline.Unload("availability-owner");
+            pipeline.Element("building-status").Text.Set("");
+            pipeline.Element("bed-status").Text.Set("No bed chosen");
+            pipeline.When(moveIn.Read(m => m.Location.CommunityId).NotEmpty())
+                .Then(pipeline => pipeline
+                    .Get<LocationQuery>(CareEndpoints.MoveInBuildings, request => request
+                        .Query(query => query.DraftId, pipeline.PageUrl<MoveInPageAddress>(MoveInEndpoints.Page).Read(address => address.DraftId))
+                        .Query(query => query.CommunityId, moveIn.Read(m => m.Location.CommunityId))
+                        .Query(query => query.Level, moveIn.Read(m => m.Care.Level))
+                        .Query(query => query.Culture, "en-US")
+                        .Header(MoveInEndpoints.CommunityHeader, pipeline.Component<ConformanceComponent>("allocation-panel").ReadOnlyText))
+                    .Into("buildings"));
+        })
+        .DomReady(pipeline => pipeline.Dispatch(MoveInLocationEvents.CommunityChosen)));
+}
+@Html.RenderPlan(plan)

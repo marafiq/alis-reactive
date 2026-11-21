@@ -1,0 +1,68 @@
+[
+ {
+  "name": "a promise observes an action its spec lacks",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/features.json",
+    "old": "\"observes\": \"Ownership.tla:Raise\"",
+    "new": "\"observes\": \"Ownership.tla:Rise\""
+   }
+  ],
+  "expect": "M9.F2 promise for X12.2 observes 'Ownership.tla:Rise', no action of its spec's Next"
+ },
+ {
+  "name": "the one promise of an action retargeted",
+  "edits": [
+   {
+    "file": "spec/Execution/features.json",
+    "old": "\"observes\": \"Composition.tla:Unload\"",
+    "new": "\"observes\": \"Run.tla:Settle\""
+   }
+  ],
+  "expect": "named by no promise: Composition.tla:Unload"
+ },
+ {
+  "name": "a new action in a spec's Next",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.tla",
+    "old": "Next == Trigger \\/ Attempt \\/ Respond \\/ Route \\/ Abort",
+    "new": "Next == Trigger \\/ Attempt \\/ Respond \\/ Route \\/ Abort \\/ Pause"
+   }
+  ],
+  "expect": "named by no promise: Tracing.tla:Pause"
+ },
+ {
+  "name": "a reference cell observes an action its spec lacks",
+  "edits": [
+   {
+    "file": "spec/Reference/syncfusion.json",
+    "old": "\"observes\": \"Ownership.tla:HostDestroys\"",
+    "new": "\"observes\": \"Ownership.tla:HostDestroyed\""
+   }
+  ],
+  "expect": "spec/Reference/syncfusion.json lane.slot.hostDestroyed observes 'Ownership.tla:HostDestroyed', no action of its spec's Next"
+ },
+ {
+  "name": "two actions of Next swapped",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.tla",
+    "old": "Next == Trigger \\/ Attempt \\/ Respond",
+    "new": "Next == Attempt \\/ Trigger \\/ Respond"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "Next rewrapped one disjunct group per line",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.tla",
+    "old": "Next == Trigger \\/ Attempt \\/ Respond \\/ Route \\/ Abort",
+    "new": "Next ==\n    \\/ Trigger \\/ Attempt\n    \\/ Respond \\/ Route \\/ Abort"
+   }
+  ],
+  "expect": null
+ }
+]

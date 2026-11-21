@@ -1,0 +1,8 @@
+using Alis.Reactive.Pipelines;
+
+namespace Intake;
+
+public static class AntiforgeryPlaceFromAnInteger
+{
+    public static RequestDefaults Refused(RequestDefaults requests) => requests.Antiforgery((AntiforgeryIn)2);
+}

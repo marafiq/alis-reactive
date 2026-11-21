@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseStrengths
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose board";
+    var plan = Html.ReactivePlan<DoseStrengths>();
+}
+<h1>Dose board</h1>
+<section aria-label="Dose board">
+    @using (var board = Html.BeginRequestForm(plan, "dose-board"))
+    {
+        @(Html.InputField(plan, m => m.Strength, options => options.Label("Strength")).NativeTextBox())
+        <button type="button" @Html.Raises(plan, DoseStrengthButtons.SaveBoard)>Save</button>
+        Html.On(plan, trigger => trigger.CustomEvent(DoseStrengthButtons.SaveBoard, pipeline => pipeline
+            .Post<DoseStrengths>(DoseStrengthEndpoints.BoardStrength, request => request.Form(board.Form))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("board-strength").Text.Set(saved.Body))));
+    }
+    <p>Saved strength: <span id="board-strength">Not saved</span></p>
+</section>
+<button type="button" @Html.Raises(plan, DoseStrengthButtons.OpenBostonDesk)>Open Boston desk</button>
+<section id="desk" aria-label="Desk"></section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DoseStrengthButtons.OpenBostonDesk, pipeline => pipeline.Get(Model.Desk).Into("desk")));
+}
+@Html.RenderPlan(plan)

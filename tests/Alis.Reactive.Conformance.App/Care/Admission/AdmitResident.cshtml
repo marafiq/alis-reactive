@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentAdmittance
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admit a resident";
+    var plan = Html.ReactivePlan<ResidentAdmittance>();
+}
+<h1>Admit a resident</h1>
+@using (var admission = Html.BeginRequestForm(plan, "admission"))
+{
+    <section aria-label="Resident">
+        <h2>Resident</h2>
+        @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    </section>
+    <section aria-label="Room">
+        <h2>Room</h2>
+        @(Html.InputField(plan, m => m.Room.Number, options => options.Label("Room number")).NativeTextBox())
+    </section>
+    <button type="button" @Html.Raises(plan, AdmitResidentButtons.Admit)>Admit</button>
+    Html.On(plan, trigger => trigger.CustomEvent(AdmitResidentButtons.Admit, pipeline => pipeline
+        .Post<ResidentAdmittance>(AdmitResidentEndpoints.Admissions, request => request.Form(admission.Form))
+        .OnSuccess(Content.Text, (admitted, pipeline) => pipeline.Element("admission-status").Text.Set(admitted.Body))
+        .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))));
+}
+<p id="admission-status">Not admitted</p>
+@Html.RenderPlan(plan)

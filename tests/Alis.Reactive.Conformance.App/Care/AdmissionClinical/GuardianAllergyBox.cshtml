@@ -1,0 +1,11 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model GuardianAllergies
+@{
+    var plan = Html.ReactivePlan<GuardianAllergies>();
+}
+@(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies"))
+    .FusionMultiSelect(HelensAllergies.Offered(), build => build.Fields((HelenAllergy a) => a.Name, a => a.Code)))
+@Html.RenderPlan(plan)

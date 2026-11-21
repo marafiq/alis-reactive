@@ -1,0 +1,19 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SpotRoster
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The wing's bindings";
+    var plan = Html.ReactivePlan<SpotRoster>();
+}
+<h1>@Model.Wing</h1>
+@(plan.ConformanceComponent("roster", new ConformanceStart()))
+<p>Bindings Ruth converted: <span id="converted-count"></span></p>
+<button type="button" @Html.Raises(plan, ConvertedNames.Count)>Count</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ConvertedNames.Count, pipeline => pipeline.Element("converted-count").Text.Set(pipeline.Component<ConformanceComponent>("roster").Bindings.Count(b => b.Converted.Name == "Ruth"))));
+}
+@Html.RenderPlan(plan)

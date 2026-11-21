@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomCodeChangeDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Room change";
+    var plan = Html.ReactivePlan<RoomCodeChangeDesk>();
+}
+<h1>Room change of @Model.Resident</h1>
+<p>Answer: <span id="changed">-</span></p>
+<button type="button" @Html.Raises(plan, RoomCodeChanges.Change)>Change the room</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RoomCodeChanges.Change, pipeline => pipeline.Get(Model.Room)
+        .OnSuccess<RoomCodeReply>((found, pipeline) => pipeline
+            .Post<RoomCodeSent>(RoomCodeChanges.Changed, request => request.Json(body => body.Set(r => r.Code, found.Body.Read(reply => reply.Room!.Code))))
+            .OnSuccess(Content.Text, (changed, pipeline) => pipeline.Element("changed").Text.Set(changed.Body)))));
+}
+@Html.RenderPlan(plan)

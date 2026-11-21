@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.RequestsAndResponses
+@model AllergySearch
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Helen Martinez's intake";
+    var plan = Html.ReactivePlan<AllergySearch>();
+}
+<h1>Helen Martinez's intake</h1>
+<fieldset>
+    <legend>Allergies</legend>
+    @(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies"))
+        .FusionMultiSelect(HelensAllergies.Offered(), build => build.Fields((HelenAllergy a) => a.Name, a => a.Code).AllowFiltering(true))
+        .Reactive(box => box.Filtering, (filtering, pipeline) =>
+        {
+            filtering.PreventDefaultAction.Set(true);
+            pipeline.Get<AllergyQuery>(AllergySearchEndpoints.Allergies, request => request.Query(query => query.Text, filtering.Text))
+                .OnSuccess<IReadOnlyList<HelenAllergy>>((found, pipeline) => filtering.UpdateData<HelenAllergy>(found.Body));
+        }))
+</fieldset>
+@Html.RenderPlan(plan)

@@ -1,543 +1,338 @@
-# Alis.Reactive Framework
+# Alis.Reactive
 
-> **Branches and releases.** `main` is the trunk and the release line. Work
-> happens on short-lived branches in worktrees (Rule 14) and lands by pull
-> request; a release is an annotated `vX.Y.Z[-rc.N]` tag on `main`, never a
-> branch. Model and cutover: `docs/BRANCHING.md`. Release runbook:
-> `docs/RELEASING.md`. CI design: `docs/CI.md`. A `pre-commit` guard
-> (`scripts/install-git-hooks.sh`, re-run after clone) refuses direct commits
-> on `main` and `release/*`. `main` became the release line on 2026-09-26
-> (fast-forwarded to `0a1dca3e`, the `v1.0.0-rc.3` commit); the remaining
-> cutover steps are listed in `docs/BRANCHING.md`.
+Alis.Reactive lets developers author dynamic UI in ASP.NET MVC (.NET Framework 4.8 MVC 5 and .NET 10) with fluent,
+fully typed C#. The compiler catches a mistake before the browser does, and defaults mean less typing.
 
-## Architecture
+This branch is the rewrite. `spec/` is its design, and `spec/REWRITE.md` is the repository it builds and the 27 units
+it builds it in. Read its section 1 first: the layout on one screen, the kinds of proof with their commands, and the
+one place of every other answer. Main, the redesign and `poc/` are evidence of features and of the mechanisms the
+POCs proved, never the design: the unit that lands a door writes it from its spec lines, and where the rewrite meets
+an older line the rewrite's piece is written as its spec states it and the older line gives way.
 
-A developer expresses reactive intent with the C# DSL. The plan domain
-captures that intent. `Html.RenderPlan(plan)` serializes that intent as plan
-JSON inside the view. In the browser, the TypeScript runtime has one job: execute
-that plan. The generated contract (`runtime/types/plan.ts`) mirrors the C#
-domain, so plan-shape drift fails typecheck before it reaches the browser.
+## How you work
 
-C# never executes browser behavior. TypeScript never invents behavior the
-plan does not carry. Invalid behavior is made unrepresentable in the C# plan
-domain. The runtime guards external boundaries only: DOM lookup, browser
-APIs, network, and JSON the framework did not produce.
+The bar comes before the mechanics. What done means for a unit is "Spec-first" below: its spec lines, TLC green with
+each mutant failing, its browser tests written from their promises and failing, the code until they pass, each test
+failing on its planted defect, then the commit. What governs a piece of work is "What governs what"; each forbidden
+practice and the tool that refuses it is the table under "What is forbidden, and what refuses it"; how confidence is
+determined is "Confidence", and where a correction goes is "Corrections". The standard of one kind of file is its
+file under `.claude/rules/`: `tests.md`, `csharp.md`, `views.md`, `docs.md` and `analyzers.md`; a project's own
+standard is its own `CLAUDE.md`. The owner's decisions are `spec/CLAUDE.md`, verbatim in `spec/NOTES.md`; each kind
+of mistake and what holds it is `spec/MISTAKES.md`; the one place of every other answer is `spec/REWRITE.md`,
+section 1.3. These are read before the first edit of a unit: the commands below carry the work and are never what
+makes it good (the owner, 2026-11-17: "he does not mention any quality rules where they were living").
 
-Five layers, four boundaries. Every rules file, dispatch table, and memory
-document uses this numbering.
-
+The process is `.claude/rules/process.md`: one state machine, whose table `scripts/state.py` reads as its data. The
+script prints the state of each of the owner's notes, of each unit, of the landing lane, of CI and of each file a
+reader is given, and for each what to read first, the one command that leaves it and its exit line. A unit starts
+from its brief, whoever builds it; a note of the owner's is homed the turn it arrives; a mistake is counted where it
+is found and read at every start. Nothing a session reads to resume lives outside the repo (the owner, 2026-11-18).
+```bash
+scripts/doctor.sh
+. scripts/toolchain-env.sh
+python3 scripts/state.py
+python3 scripts/open.py
 ```
-Layer 1  C# DSL & Plan Domain (frozen public authoring surface + rich domain)
-         Quality: typed authoring, compile-time component/member APIs, value objects,
-                  invariants, no string magic except the plugin boundary
-         Harness: domain behavior tests; plans proven end-to-end by Playwright slices using the DSL
-         ↓
-         BOUNDARY: plan shape change → regenerate runtime/types/plan.ts (PlanContractGenerator)
-         ↓
-Layer 2  Generated TS Plan Contract (runtime/types/plan.ts)
-         Quality: generated discriminated unions — never hand-edited (hook-enforced)
-         Harness: npm run typecheck (generation runs first; drift is a typecheck failure)
-         ↓
-         BOUNDARY: contract change → failing vitest drives the runtime handler
-         ↓
-Layer 3  TS Runtime Executor
-         Quality: direct executor, sync/async lanes, no fallback behavior, vendor isolation
-         Harness: vitest + boot(), architecture enforcement tests
-         ↓
-         BOUNDARY: eyes first in a real browser, then Playwright — browser is truth
-         ↓
-Layer 4  Browser Verification
-         Quality: real interactions, visible outcomes, no page.evaluate()
-         Harness: manual smoke → Playwright BDD slices
-         ↓
-         BOUNDARY: working sandbox example before writing docs
-         ↓
-Layer 5  Documentation & Skills
-         Quality: dev-facing language, question-driven, glossary aligned with code
-         Harness: sandbox-verified examples, Rider diagnostics
+Builds run one at a time, with a read-only consult beside the build (the owner, 2026-11-17: "Work serially once current work lands and pushed").
+Commands on this Mac: git grep's extended expressions take no \b and no \s; zsh ties the variable path to PATH, expands $var:A and runs a command held in a variable as one word, so a script is bash and writes ${var}; BSD sed's in-place edit takes ''; a tool that reads its input is started with < /dev/null.
+The browser runner takes --test or --all here and no --filter.
+```bash
+git grep -E '<pattern>' -- '<glob>'
+sed -i '' '<expression>' '<file>'
+"<tool>" < /dev/null
+scripts/playwright.sh --test "<promise>"
+scripts/playwright.sh --all
 ```
+A script bash is running is never edited; a planted file is restored by cp and touch, since mv keeps the old time.
 
-## Must Do
+## Vision: typed access to JavaScript objects
 
-- Read the DSL source before shared plan and runtime edits. The source is the
-  requirement.
-- Close one matrix row per commit. Report progress only from committed,
-  verified work.
-- Use typed component APIs and object-member contracts. Strings belong only
-  at the plugin boundary.
-- Keep the runtime a direct executor of generated plans.
-- Keep sync reactions sync.
-- Generate the TS plan contract from the C# plan domain. Regenerate and
-  typecheck on every plan-shape change.
-- Delete wrappers, helpers, and syntax-pinning tests that map to no DSL graph
-  node.
-- Prove page-visible behavior with Playwright through real interactions.
+Everything the browser runs (a Syncfusion component, a native input, a plugin, an app service like Toast or Drawer)
+is a JavaScript object with properties, methods and events. The framework gives typed C# access to them through one
+fluent API, and any member that returns a value is a source wherever the DSL takes one. A component, the framework's
+own or an app's, is a consumer: one declaration class that mirrors the object's typed API member for member by its
+JavaScript names, and one render helper, built on the core's public surface with zero TypeScript runtime changes. A
+component that seems to need one means the plan is missing information, and the C# side carries it. The core names
+no consumer, Fusion and Native get nothing an app does not, and any developer onboards a component
+(`.claude/skills/onboard-component/SKILL.md`).
 
-## Never Do
+## What governs what
 
-- Infer behavior from old tests, docs, memories, or comments.
-- Claim progress from uncommitted local edits.
-- Add stringly component APIs outside the plugin boundary.
-- Add plan-shape validators, fallback paths, registries, claims, or rejects
-  for framework-generated plans.
-- Make the runtime async by default.
-- Hand-edit `runtime/types/plan.ts`.
-- Revive JSON schema as a contract: no schema drift gates, no
-  `AssertSchemaValid`, no schema-first process.
-- Use `page.evaluate()` to simulate user behavior.
-- Preserve confusing code because it already exists.
+- **TLA+ governs every ordering.** Each async lane is a spec under `spec/` that TLC checks, with the mutants that must
+  fail (`spec/REWRITE.md`, section 2.6). A lane changes in its spec first, a browser test holds the machine at one
+  named action through the harness and never provokes a race by timing, and a question a spec answers is decided
+  from it. A commit whose piece meets an ordering names the invariants it rests on, and an ordering no spec holds
+  is written as one before its door (the owner, 2026-11-13: "I'm not seeing any traces of it").
+- **The schema governs the seam.** C# builders write the plan, a closed grammar of sealed nodes
+  (`spec/Core/schema.md`); the view renders it as JSON; the TypeScript contract is generated from the grammar; the
+  runtime executes it and invents no behavior the plan does not carry. C# states what a sentence means when the page
+  does not match its declaration: a state left to a runtime default is a gap, and no field of the plan is optional
+  or nullable. The runtime trusts a framework-generated plan and fails loud only at real boundaries: DOM lookup,
+  browser APIs, the network, component or plugin lookup, and JSON the framework did not produce. A new behavior is a
+  builder method and the node it writes; a new production is the owner's decision. Views carry no JavaScript: no
+  inline `<script>`, no `addEventListener`, no `window.alis`.
+- **The map governs where a thing lives.** The module table (`spec/CLAUDE.md`) names 26 modules. The core is one
+  assembly; a module is one folder and one namespace of the same name in every tree; a slice uses only the rows
+  before its own in its project's slice table (`Alis.Reactive/SliceTree.txt` is the core's). A meaning has one home,
+  its D line in `spec/Core/DESIGN.md` or its module's own under `spec/`; `.claude/rules/views.md` restates the two every
+  view meets, a member's name and absent data.
+- **The doors govern the surface.** A door is public only when a view author, a validator author or a component
+  author needs it. A shipped package's surface is the text in its `PublicAPI/<tfm>/PublicAPI.Unshipped.txt`, and a
+  change to it is a reviewed diff of that file. A door is typed: no `object`, no `System.Type`, no string that names a
+  member, field, event, method or path; strings stay for text people read, URLs, element ids the developer chose,
+  header names, CSS classes, and JavaScript names at the vendor and plugin boundary, and a deliberate exception
+  carries the exemption of M20.N1. No door of either line is lost: one whose form is refused names the doors that
+  carry its capability. Code that new code replaces is evidence of intent: each throw, guard and default it holds
+  gets a verdict in the replacement, and "nothing references it" is none.
+- **Encapsulation is the heart.** One place owns each concept's data and meaning, internal by default. The grammar's
+  nodes are sealed, with `internal` constructors, and developers author through builders. No internal is exposed to a
+  test or to a consumer. Slices are self-contained: duplication between slices beats a shared base class.
+- **A defect is prevented on the highest rung that holds it:** the type, an analyzer, a refusal where the view
+  renders, then behavior in the browser. A defect a type or an analyzer prevents gets no browser test, and a shape
+  the compiler already refuses gets nothing below it: no analyzer condition, no refusal where the view renders and
+  no case, its refused case compiled once without them to read the compiler's error (the owner, 2026-11-14:
+  "Refusing where Types itself refuse it").
 
-## Key Concepts
+## Spec-first
 
-These terms stay consistent across C#, generated TS, runtime code, tests, and
-docs.
-
-**Browser object model.** Every object the runtime touches is a JavaScript
-object with members: properties, methods, and events with callbacks.
-Properties are read and written. Methods take arguments and may return
-values. Events fire callbacks. Components, plugins, and app-level objects all
-share this shape. Any member that returns a value can serve as a source
-wherever the DSL accepts one: reaction values, conditions, gather payloads,
-route params, headers, dispatch payloads, and plugin arguments. Component
-slices expose members through typed APIs.
-
-**ValueExpression.** One concept reads every value: component member, plugin
-member, URL parameter, event payload, success body, error body, request
-snapshot, literal, object, and array. A module that needs a value uses this
-shared path. A second resolver is a defect.
-
-**Rich domain model.** The fewest concepts that name DSL behavior. Wrappers,
-registries, fallback paths, claims, and validators for generated plans do not
-qualify. Delete or inline a type that only carries parameters, hides a
-branch, needs explanation before its value shows, or maps to no DSL graph
-node.
-
-**The runtime.** The TypeScript code in `Alis.Reactive.Assets/runtime/` that
-executes plans in the browser. esbuild bundles it into
-`Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` (IIFE). It ships
-inside the AlisReactive NuGet. The shipped `AlisReactive.targets` copies it
-into the consumer's `wwwroot/scripts/` with the package version in the
-filename.
-
-**The plan contract.** C# `Render()` serializes the plan to JSON inside a
-`<script type="application/json" data-reactive-plan>` element. The runtime
-discovers these elements, parses the JSON, merges partials by `planId`, and
-boots each composed plan. `PlanNodeDiscriminator<T>` delegates polymorphic
-serialization to the concrete type; each plan model class carries its own
-`kind` property (e.g., `public string Kind => "set"`), matched by TypeScript
-discriminated unions. Type generation runs at the front of `npm run
-typecheck`. When plan shape changes: update the C# domain, regenerate
-`runtime/types/plan.ts`, run `npm run typecheck`, and prove runtime behavior.
-
-**Plan-driven IDs.** `IdGenerator` produces every input element ID at C#
-render time from the model type and property expression. Format:
-`{Namespace_TypeName}__{MemberPath}`.
-
-```
-Model:      Alis.Reactive.SandboxApp.Models.OrderModel
-Expression: m => m.Address.City
-ID:         Alis_Reactive_SandboxApp_Models_OrderModel__Address_City
-```
-
-Every vendor produces the same ID for the same expression, so IDs are
-deterministic and collision-free by construction. Non-input IDs (buttons,
-elements, containers) are the developer's choice, made explicit through
-`p.Element("my-id")` or `Html.NativeButton("btn-id", ...)`. A collision there
-is a developer error. No fallback IDs. No generated suffixes. The plan
-carries every ID the runtime needs. The runtime resolves each one with
-`getElementById`. A wide DOM query (`querySelectorAll`, tag or class scans,
-traversal) means the plan is missing information; fix the C# plan model to
-carry it. Two wide-query categories are justified, both external boundaries:
-
-- **Plan discovery** — finding `[data-reactive-plan]` script elements in HTML
-  the runtime did not author (initial boot, injected partials).
-- **Self-stamped cleanup** — finding elements by a data attribute the runtime
-  itself wrote (retry indicators and similar).
-
-Any other wide query fails the architecture enforcement test. Its allowlist
-is the only registry of boundary files; this document carries the principle,
-never the file list.
-
-**Sync and async lanes.** Sync reactions stay sync: property set, method
-call, dispatch, branch evaluation, and component update. Async boundaries:
-HTTP, parallel HTTP, remote triggers, confirm/user decisions, and partial
-injection.
-
-**HTTP, gather, response.** Gather is `target <- source`: payload, header,
-and route-param targets read through `ValueExpression`. GET emits query
-string values; POST, PUT, and DELETE emit a JSON or form-data body as
-declared. Response routes create success and error scopes. The request
-snapshot creates request scope. A chained request runs only after success and
-may gather from that success response. Parallel starts branches concurrently
-and runs completion after all settle.
-
-**Conditions.** Conditions are deterministic graphs over the same value
-sources. Condition blocks appear in authored order, mixed with sets, calls,
-dispatches, HTTP, parallel, and injection. Else-if and default routing
-preserve first-match behavior. Nested branch behavior exists only where the
-DSL source defines it.
-
-**Partial slots.** SSR composition joins plan scripts by `PlanId`. Browser
-partial injection uses `SlotId` as the load and unload handle. Active Plans
-are recomposed from the boot snapshot plus loaded slots. Component id,
-vendor, and type remain the runtime object join keys. Slot unload aborts
-slot-owned behavior and validation wiring, removes slot-owned components and
-rules, and keeps boot-level and app-level objects mounted.
-
-**Validation.** FluentValidation is the server authority. Browser validation
-is client metadata recorded through `ReactiveValidator<T>` and DI. Async,
-MustAsync, and server-only rules stay on the server. Client metadata stays
-deterministic, supports arrays and objects, and binds by component ID. The
-client rule layer does not rebuild FluentValidation and does not extract
-rules through reflection.
-
-**Plugins.** A plugin is the escape hatch where the JSON DSL cannot express
-the work: URL APIs, DOM APIs, array manipulation beyond the DSL. Plugin names
-may be strings at the plugin boundary; component APIs stay typed. Plugin
-reads and calls integrate through object members and `ValueExpression`.
-
-**App-level objects.** Drawer, Toast, Confirm, Loader, ActionLink, and
-similar page services use fixed identifiers. They are browser objects with
-typed members, not runtime globals.
-
-## Build & Run
-
-Use the root script wrappers. They are the supported CLI surface for
-framework developers and LLM agents. The command guide is
-`docs/developer-cli.md`.
+`spec/BRIEF.md` states the thesis (section 2), the closed principles (section 3) and the stability rules every test
+keeps (section 10); the modules and the owner's decisions are `spec/CLAUDE.md`'s.
+- A unit runs in this order: its spec lines, TLC green with each mutant failing, its Playwright tests written from
+  their promises and failing, the code until they pass, each test failing on its planted defect, commit.
+- From U3 on every Playwright test stands written and failing, save one that waits on a later unit: a startup call
+  that throws until its unit, a host its startup builds, a door or a harness verb it builds, or a fact no spec line
+  states; that unit writes it first, failing, before its code (the owner, 2026-11-14). A module's unit writes its pure
+  tests from the schema's lines before the half they prove, and turns green the browser tests `spec/tools/check.py`
+  lands in it.
+- The server decides when async work happens and the test releases it through the harness; a test waits for the
+  state it names, never for time, in a world of its own, and asserts literal outcomes.
+- Every unit closes one loop, and each exit is a line a tool printed, read when it printed:
+  1. Restate the goal in your own words; a new direction waits for the owner's yes.
+  2. Read the owner's decisions (`spec/CLAUDE.md`), then every file the unit touches, whole, at HEAD, and the rules
+     that file states: a line enters a spec file, a rule file or a test only after it is held against each. Before
+     an edit, name its row: the spec line, the door, the node it writes, the runtime that executes it, the test.
+  3. Decide from the proof in hand: the TLA+ specs, the principles and the owner's decisions. A decision on a
+     principle, a closed rule or the scope goes to the owner as one line with its cost and its risk; no other does.
+     The line opens with what already holds and the one thing a yes changes, then the lead's recommendation; code
+     follows it (the owner, 2026-11-14: "you made it confusing for me").
+  4. Change one meaning in one commit, with every place that carries it. A batch of slices a builder finished
+     lands as one commit, each slice named in its message (the owner, 2026-11-17: "One commit per batch").
+  5. Prove it on the rung that holds it, once. Behavior: a `scripts/playwright.sh` result line, the test first failing
+     on its planted defect (`scripts/plant-defect.sh`). A rule (an analyzer, a test rule, a lint rule, an architecture
+     test, a check): a refused case it reports by name and an accepted case one fact away, both kept in the repo.
+     A pin: a restore or an install, and a run. A failure goes back to 4, twice at most; then stop and research.
+  6. Stage the unit by path and run `scripts/check.sh --no-spec`; commit behind its last line,
+     `"[check] every check passed."`; run the full check once at that head; push behind its first line, then the
+     unit's STATE. `git ls-remote` equals HEAD after each push.
+  7. The commit says what changed, its proof lines and what did not run, and a unit's last commit rewrites where
+     the rewrite stands (`spec/REWRITE.md`, section 4). A mistake is said in one line and fixed in every place
+     that shares its cause, with no new mechanism built for it.
+- `spec/tools/check.py` and `spec/plants` change in two cases: a check reports wrongly on correct content, or it passes
+  a defect met in content. A new check waits for the owner's yes.
 
 ```bash
-scripts/doctor.sh          # read-only CLI preflight
-scripts/build.sh           # npm deps -> browser assets -> dotnet build
-scripts/run.sh             # browser assets -> sandbox at http://localhost:5220
-scripts/test.sh            # full gate, including observable Playwright
-scripts/test.sh --parallel # same gate, Playwright as the five CI shards side by side (~20 min)
-scripts/test.sh --no-e2e   # skip only the browser leg
-scripts/pack.sh <version>  # browser assets -> Release build -> six NuGets (local; publishing is tag-driven: docs/RELEASING.md)
+python3 spec/tools/check.py
+python3 spec/tools/check.py --orient
+scripts/playwright.sh --unit U2
 ```
 
-Full gate order:
-
-```text
-npm run typecheck -> npm run build:all -> npm test -> gate-script self-tests -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build -> behavioral coverage gate (0b)
-```
-
-Playwright runs through `scripts/playwright.sh`, never raw `dotnet test`. The
-wrapper prints active-test progress markers, writes live log/TRX/diag
-artifacts, and rejects browser assets or `--no-build` binaries that predate
-the current source.
-
-Watch loop for active editing:
-
-```bash
-npm run watch:runtime
-npm run watch:design-system
-dotnet watch --project Alis.Reactive.SandboxApp
-```
-
-For UI work, use `docs/developer-cli.md#ui-developer-workflows` to choose the
-watcher and the proof command. Framework assets ship from
-`Alis.Reactive.Assets/`; sandbox-only assets live under
-`Alis.Reactive.SandboxApp/`.
-
-## Onboard / Audit / Upgrade Fusion components (deterministic)
-
-```text
-/onboard-fusion-component {"component":"switch","fusionType":"FusionSwitch"}   # one component to 100%
-/onboard-fusion-component {"all":true}                                          # all incomplete to 100%
-node .claude/skills/onboard-fusion-component/scripts/verify-onboarding-complete.mjs --all   # audit/upgrade: the 100% gate
-```
-
-Pipeline (deterministic): discover → audit (every typed member → core DSL primitive,
-`audit-primitive-coverage.mjs`) → observe (`observe-plan.mjs`) → author from the plan →
-Playwright → `verify-onboarding-complete.mjs`. A component is "onboarded" IFF that gate
-exits 0; the driver loops authoring until it does or fails loud. Never claim done otherwise.
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| C# | C# 14, compiled for BOTH `net48` and `net10.0` — every shipped package dual-targets (TagHelpers: net10-only by design). A net48 language-feature error (CS8xxx/CS90xx) means rework the feature to what PolySharp polyfills — never work around it. Host-type splits go behind `#if NET48`. |
-| TS | TypeScript + esbuild ESM bundles, Tailwind CSS v4. Versions pinned in `package.json`. |
-| Components | Syncfusion EJ2 33.1.47 (Fusion; npm `@syncfusion/ej2` and NuGet `Syncfusion.EJ2.*` pinned to the same version; upgrade with `node scripts/pin-syncfusion.mjs <version>`) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
-| Validation | FluentValidation as server authority (version per target framework, pinned in the csproj); `ReactiveValidator<T>` records browser validation metadata through DI |
-| Tests | NUnit, Vitest + jsdom, Playwright. Versions pinned in the test csproj and `package.json`. |
-
-## Skills
-
-Skills live in `.claude/skills/`. Load applicable skills when useful. DSL
-source and this root file override skill guidance that has drifted.
-
-| Skill | Use for |
-|-------|---------|
-| `reactive-dsl` | Plan, triggers, Element, Dispatch, Component, InputField, .Reactive() |
-| `http-pipeline` | Get/Post, Gather, Response, Chained, Parallel, WhileLoading, Into |
-| `conditions-dsl` | When/Then/ElseIf/Else, operators, guard composition, source types |
-| `validation-rules` | FluentValidation rules, Validate, ValidationErrors, WhenField |
-| `onboard-fusion-component` | Onboard/audit Syncfusion components — artifact gate chain + fail-closed verifier |
-| `solid-ts-audit` | SOLID analysis of TypeScript runtime modules |
-| `modern-csharp` | C# 14 patterns that clarify the plan domain model |
-| `dotnet-xml-docs` | XML doc comments on the C# public surface — tags, formatting, Alis patterns |
-| `bdd-testing` | Playwright BDD tests — nested vertical slices, 5 rules, 7-behavior contract, blind reviewer |
-
-Two deterministic PreToolUse hooks are live in `.claude/settings.json`
-(scripts in `.claude/hooks/`): generated files are protected from hand-edits
-(`runtime/types/plan.ts`, generated onboarding JSON/traces), and Playwright
-must go through `scripts/playwright.sh` instead of raw `dotnet test`. Hooks
-gate; the one-line rules here teach.
-
-Hookify rule templates live in `.claude/hookify.*.local.md`. **All are
-disabled (`enabled: false`)** — they document candidate quality gates and
-enforce nothing. Enable one by setting `enabled: true`. The
-public-contract-freeze rules (`protect-api-surface`, `no-public-in-libraries`)
-were removed as noise.
-
-Localized `CLAUDE.md` files live beside the work they govern — Fusion slices,
-Playwright tests, the sandbox, the TS runtime, and the onboarding artifact
-tree. Each loads when files in its directory are touched and adds only
-directory-specific constraints; this root file remains authoritative. Loading
-is discovered at session start (verified): guidance created mid-session takes
-effect in the NEXT session. Research subagents (Explore/Plan) do not load
-this hierarchy at startup, though directory CLAUDE.mds still attach when the
-subagents read files there — inline critical constraints into agent prompts
-rather than relying on either.
-
-## Rules
-
-### 1. DSL Source Before Code
-
-The public DSL source is the requirement. Samples, XML docs, old unit tests,
-`.claude` memory, the current runtime, and schema history are not. Archived
-design documents and remembered plans are historical context, never
-requirements. For shared plan and runtime work: read the DSL source files,
-write the matrix row (see Process), name the domain term and the runtime
-behavior, then edit. Local cleanup may proceed when the matrix row is already
-clear.
-
-### 2. Plan Is the Only Contract
-
-Views carry no JavaScript. No `document.addEventListener` in `.cshtml`, no
-`window.alis`, no inline `<script>` blocks. `root.ts` discovers and boots
-every plan.
-
-### 3. New or Changed Primitive — All Layers
-
-1. C# plan model class — sealed class, `internal` constructor
-2. Polymorphic registration — `PlanNodeDiscriminator<T>` delegates to concrete type
-3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
-4. Generated TS plan contract — regenerate; typecheck proves alignment with C#
-5. Runtime handler — new switch case + `assertNever`
-6. C# domain behavior test — prove DSL intent becomes the right plan model
-7. TS runtime behavior test — `Alis.Reactive.Assets/runtime/__tests__/*.test.ts`
-8. Playwright test — browser behavior with sandbox view
-9. Sandbox view — demonstrate the primitive
-
-### 4. Vertical Slices — Duplication Over Abstraction
-
-Each component module is self-contained. Behavior never moves into shared
-base classes. Duplication between slices is intentional.
-
-### 5. Vendor Isolation
-
-A new component is a C# vertical slice with `IInputComponent` and zero TS
-runtime changes. Vendor knowledge lives in three runtime roles: the
-per-vendor driver (vendor → component root + event wiring), the per-vendor
-event adapter, and vendor component modules. Everything else stays
-vendor-blind and dispatches through the registered driver. Adding a vendor
-means registering a driver and adding its adapter. The architecture test
-enforces this isolation; its allowlist is the only registry of exceptions.
-
-### 6. Trust Generated Plans — Boundary Errors Only
-
-The runtime and plan domain trust framework-generated plans. If the plan
-says source A is assigned to target B, the runtime reads A and writes B. Do
-not add defensive throws, validators, rejects, claims, or fallback paths for
-shapes the typed DSL already controls. Errors belong at boundaries:
-developer-authored DSL misuse, DOM/component/plugin lookup, browser APIs,
-network, and JSON the framework did not produce. When such JSON reaches the
-browser, the failure must expose the drift with context instead of becoming
-control flow. Execution bookkeeping is not validation: names describe what is
-remembered for execution or unload, never suspicion of the plan. A fallback
-is a deliberate, justified exception, never the default response to
-uncertainty.
-
-**Null escape hatches require justification.** Every NEW per-property
-`[JsonIgnore(WhenWritingNull)]`, nullable property declaration, or
-`?? fallback` must be PROVEN necessary by answering in writing: "Could this
-be a sentinel/empty/default instead? If yes, why am I taking the shortcut?
-If no, what domain meaning would `Empty`/`None` collide with?" Mechanical
-addition of null markers during a refactor is a recorded failure pattern —
-when removing tech debt, if the count of null markers on ANY surface goes
-UP, stop and audit each new marker for sentinel-replaceability before
-committing.
-
-### 7. Plan-Driven IDs — No DOM Scanning
-
-The plan carries every ID the runtime needs (see Key Concepts → Plan-driven
-IDs). The runtime resolves each one with `getElementById`. Non-input IDs are
-the developer's choice. No fallback IDs. No scanning.
-
-### 8. API Surface Is Frozen
-
-No `public` constructors on plan model classes. All plan model class
-constructors are `internal`. All plan model properties use `internal set`.
-Developers interact through builder APIs and factory methods (`Html.On`,
-`Html.InputField`, `p.Get`, `p.When`), never through constructors.
-
-### 9. Root Cause, Not Patch
-
-Trace the code path. Identify the line. Understand WHY before changing WHAT.
-After 2 failed attempts: research online, save findings, dispatch agents with
-input evidence and output criteria. Fix the cause. Report "done" in past
-tense with what the browser showed: the gesture performed and the visible
-result.
-
-A patch fixes a symptom without understanding the cause. Ten patches are ten
-mistakes. Leave every touched file cleaner than you found it; fix the code
-smell you see instead of walking past it.
-
-### 10. Tests Are Production Code
-
-Tests prove behavior and protect domain language. Delete or rewrite a test
-that pins helper classes, old JSON shape, dropped vocabulary, or internal
-syntax. A test that changes whenever implementation changes is design debt.
-Runtime tests cover executor behavior; Playwright covers page-visible DSL
-behavior, on runtime assets built from the current source.
-
-### 11. Code Hygiene
-
-These practices compound — each prevents a category of bugs. Worked examples
-live in `.claude/memory/coding-principles.md` (Code Hygiene).
-
-- **Revealing names over complex conditions** — extract booleans into named variables; the name is the documentation.
-- **Variables close to usage** — declare where first needed; if used once, inline it.
-- **No nesting** — early returns and guard clauses; flat control flow.
-- **No dead code** — delete unused/unreachable/commented-out code; git has history.
-- **Small methods, single responsibility** — if a block needs a comment, extract it into a named method.
-
-### 12. Prefer BDD Vertical Slice Playwright Tests
-
-Every Playwright test is one user-visible behavior: isolated (its own page,
-no ordering, no shared state), vertical (full stack, no mocking, no
-`page.evaluate()` — the one exception: framework gather-pipeline tests may
-assert `request.PostData`), and named for what the user sees. Load the
-`bdd-testing` skill before writing any Playwright test — it carries the
-nested-vertical-slice method and points to the 5 BDD rules and 7-behavior
-contract;
-`tests/Alis.Reactive.PlaywrightTests/CLAUDE.md` carries the local rules.
-
-### 13. Quality Aspirations
-
-Known weaknesses are tracked in `.claude/memory/quality-principles.md`
-(Quality Aspirations ledger) — DDD depth, serialization contracts, TS tracing.
-
-### 14. Git Worktrees for Feature Work
-
-Branch from `origin/main`, work in a worktree, land by pull request.
-Prefixes: `feature/`, `fix/`, `chore/`, `docs/`.
-
-```bash
-git worktree add .worktrees/<feature-name> -b feature/<feature-name> origin/main
-cd .worktrees/<feature-name>
-```
-
-## Process
-
-### Pass Protocol
-
-Every plan or runtime pass starts with this row:
-
-```text
-Close matrix row: <DSL source call> -> <domain term> -> <runtime behavior>
-```
-
-The row names the source files, the developer intent, the C# domain term, the
-JSON and generated TS term, the runtime executor behavior, the sync or async
-lane, the behavior proof, and the commit boundary. If the row cannot be
-written from source, stop and read more source.
-
-Then list:
-
-1. DSL source files used as requirements.
-2. Sync or async lane expectation.
-3. Code to delete or simplify.
-4. Tests that prove behavior before commit.
-5. The commit boundary.
-
-A module is done when its matrix rows are covered, focused tests pass,
-generated TS is checked when plan shape changed, and the slice is committed.
-Do not start a second module before that commit.
-
-### Source-Grounded Design Loop
-
-1. Read the public DSL source for the row.
-2. Draw/update the graph: trigger -> pipeline -> reaction, condition -> branch,
-   request -> gather, gather target <- value source, response -> scope,
-   partial slot load/unload -> Active Plan composition.
-3. Fill the input/output matrix: DSL call -> developer intent -> C# domain ->
-   JSON/generated TS -> runtime executor -> proof.
-4. Delete helpers and tests that map to no graph node.
-5. Implement the smallest domain/runtime change that closes the row.
-6. Run focused runtime/domain tests.
-7. Run `npm run typecheck` when C# plan or generated TS shape changed.
-8. Build runtime assets before Playwright.
-9. Commit the closed row.
-
-### Wrong Plan Protocol
-
-If a pass touches the same module repeatedly without closing it, stop editing
-and redraw the graph from DSL source. Repeated local patches mean the design
-is not clear enough.
-
-If an implementation needs a fallback, registry, generated-plan validator, or
-generic lifecycle concept, prove the DSL graph node that requires it. If none
-exists, delete the concept.
-
-If a pass touches an unexpected layer, the matrix row is incomplete. Stop
-immediately, save what you learned (to memory — context loss is the real
-cost), record the new edge, and redesign before continuing. Present the
-problem concisely, step by step. Why: one session made 3 architecture changes
-in 30 minutes with no plan; another took 26 fix commits in a day because
-design was discovered by coding.
-
-### Pre-Flight Checklist
-
-- [ ] DSL source read, not inferred from tests or old docs.
-- [ ] Matrix row written with source file, DSL input, domain term, generated TS term, runtime output.
-- [ ] Sync/async lane named.
-- [ ] API surface unchanged unless the task explicitly requires a public contract change.
-- [ ] Code to delete/simplify identified.
-- [ ] Behavior proof selected before editing.
-- [ ] Rejected alternative named, with the one fact that killed it.
-
-### Post-Flight Checklist
-
-Each checked box carries its evidence: the command run and one line of what
-it printed.
-
-- [ ] Focused behavior tests pass.
-- [ ] Generated TS checked when C# plan shape changed.
-- [ ] Runtime assets rebuilt before Playwright when TS changed.
-- [ ] Playwright behavior proved for page-visible changes.
-- [ ] `git status` inspected.
-- [ ] Commit message names the closed behavior row.
-- [ ] No dropped vocabulary, dead code, defensive plan validation, or schema-contract references left behind.
-
-### Review Loop — Every Change
-
-**Review the live tree, and name it.** Every review — agent or human,
-adversarial or routine — runs against the current branch's working tree at HEAD,
-never a frozen historical commit. The reviewer confirms the target up front
-(`git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, clean `git status`) and
-states that branch + SHA in its output; a dispatched review agent is given the
-branch and HEAD SHA and told to verify it before reading code. Why: a review
-pinned to an already-merged commit raised four "unpaid debt" findings, every one
-already closed by later commits on the branch — stale-tree false alarms and a
-misleading verdict are the cost of an unnamed, out-of-date review target. A
-finding only counts when its `file:line` still exists at HEAD.
-
-Review against the matrix, not against implementation preference:
-
-1. **Design Review**: Does the DSL graph fully explain the chosen domain terms?
-2. **Implementation Review**: Does every new type/method map to a DSL node or edge?
-3. **Behavior Review**: Do tests prove the row through the correct boundary?
+Behavior is done when a Playwright test proves it in a real browser, and not before: a real gesture and a visible
+outcome, on a page a developer would write. A test finds an element as a user does and expects a literal: no
+`page.evaluate()`, no read of a component's object, no DOM poking (`.claude/rules/tests.md`). A build, a typecheck and
+a module's pure tests are no proof of behavior. A non-browser project runs when it is named first
+(`dotnet test tests/Alis.Reactive.ArchitectureTests`). A unit runs the tests the spec lands in it (`--unit`) and, before
+its commit, every test landed through it (`--through`). Since `--through` refuses while a unit before it holds an
+unwritten test, every commit waits on `--all` at its tree, every written test in about two minutes, and a test that
+passed at the run before and fails stops the commit (the owner, 2026-11-15: "Did you clearly throw the conformist
+browser testing out of the window?", after the branch's one full run found four landed tests that had never run
+against the component they read). `poc/playwright.sh` runs the POC's suites, and `poc/` leaves last.
+
+## What is forbidden, and what refuses it
+
+A standard is held by the tool on its rung, with a refused case it reports by name and an accepted case. A rule in
+prose alone is a gap to close; a guard for a defect nobody met is not built.
+
+| Forbidden | Refused by |
+|---|---|
+| A comment in any language; an XML doc off a shipped package's public surface | `WhenCodeIsWritten` |
+| A rule file that names code the repo does not hold | `tests/Alis.Reactive.ArchitectureTests/WhenARuleNamesTheCode.cs` |
+| A hand edit of the generated contract | `.claude/hooks/protect-generated.mjs`, held by `WhenClaudeRunsAHook` |
+| A command in a shape this machine gets wrong: a `git grep` extended expression with a class it lacks, the browser runner by a filter, `grep --include`, Codex started with its input open, a variable split into words as bash splits it | `.claude/hooks/refuse-known-traps.mjs`, held by `WhenClaudeRunsAHook` |
+| A commit the landing script did not make, where `scripts/land.sh` stands | the pre-commit hook `scripts/install-git-hooks.sh` installs |
+| An untyped public door | `ALIS009` |
+| A door of the framework handed `dynamic` as a type argument, a plan opened over `object`, or a door's call bound at run time by a `dynamic` argument | `ALIS044` |
+| A slice that uses a later row; a namespace off its folder; an open public class; a table off its project | `ALIS010`, `ALIS011`, `ALIS012`, `ALIS013` |
+| A project that holds folders, or a shipped package, built without its slice table | `WhenAProjectHoldsFolders`, `WhenAPackageShips` |
+| A friend assembly: an internal opened to a test or to a consumer | `WhenAnInternalIsExposed` |
+| JavaScript in a view: an inline script, a handler attribute, a script URL | `WhenAViewIsWritten` |
+| In a shipped project, a conditional directive inside a file: one host's code is a file of its own | `WhenCodeCompilesForBothHosts` |
+| A public symbol outside the PublicAPI text, or a line with no symbol; an analyzer off its release row, or one that reads a file or the environment; in the core, reflection, a compiled expression, a regular expression, a read of type information off the owner's list | the build (RS0016, RS0017, RS2000, RS1035, RS0030); `WhenTheCoreIsCompiled` |
+| In a browser test: a reference, a member of Playwright or an attribute of NUnit beyond what a test takes; a wait on time; a branch or a loop; an expected value that is computed, partial, what the test typed or only an absence; an assertion in a helper; no promise or no gesture of its own | `TEST001` to `TEST013` (`spec/REWRITE.md`, section 2.10) |
+| In the runtime: a default for plan data, a floating promise, a switch that misses a kind, a condition that is no boolean, a loose equality, an enum, an inline lint directive, an import of a later row of its slice table, a pure test that imports past its module's index | the lint and the TypeScript compiler, held by `WhenTheLintIsConfigured` |
+| A rule with no refused or no accepted case | `WhenAnArchitectureTestIsWritten`; `spec/plants` for a check |
+| A door or a feature lost; a defect below its rung; a meaning with no carrier; a kind outside the grammar; a unit that proves nothing; a path with no verdict; a pin off its version; a generated binding off the spec; a hedge word in the spec | `spec/tools/check.py`, each check with its plants |
+| C# off the formatter; a private member nothing uses or reads; an unread parameter | `dotnet format --verify-no-changes` and the build, in `scripts/check.sh` |
+| A package off its lock, a tool off its pin, a package with a known vulnerability | the locked restore, `scripts/doctor.sh` and both audits, npm's past the advisories the owner excuses (`WhenThePackagesAreAudited`) |
+| A browser run that ran other than the spec selected, retried a test, ran one over the measured budget or left a server alive | `scripts/playwright.sh`, held by `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` |
+| A raw `dotnet test` of a Playwright project or the solution; `git stash`; a listing of user secrets; a commit on `main` | the deny rules of `.claude/settings.json`; the pre-commit hook `scripts/install-git-hooks.sh` installs |
+
+Kept by the loop, with no tool: a new direction without the owner's yes; a gap worked around by an invented member,
+syntax or runtime behavior, where the gap is raised with its use case and a member's real shape is read from the
+installed package; a patch where the symptom shows; a meaning decided by analogy, where no real case and no matrix of
+`spec/Reference/` raises it; a gate, coverage map, checklist or proof artifact outside `spec/`; reading a file that
+holds a credential, a machine's NuGet or npm configuration among them.
+
+## Confidence
+
+The confidence of a piece of work is determined, never felt: it is the result line of the command that proves its
+kind (`spec/REWRITE.md`, section 1.2), printed on the committed tree and read when it printed, and it stands until a
+fact changes. Nothing is run twice to feel safer, nothing waits on a run that gates no unit, and a question the TLA+
+specs, the principles or the owner's decisions answer is decided from them and held. A report says what was run, by
+its line, and what was not: MVC 5 on net48 is run by CI's Windows job when the rewrite is done, and this Mac is the
+loop until then. The Mac runs TLC and its model-executing plants. CI checks the results recorded in
+`spec/STATE.json` against the current specs and tool pin (the owner, 2026-11-20).
+Drift is stopped where it starts: one meaning changes in one commit, with every place it is in.
+
+## Sessions
+
+- A session starts and ends at a stable state: every unit pushed, `git ls-remote` equal to HEAD, nothing uncommitted.
+  The owner starts a new session; the lead ends none, and a reply to continue, given to a go or no-go ask, is the go:
+  work that needs no answer never waits. A status to the owner says what is completed and what is open, in the plan's
+  own words, never where a head is (the owner, 2026-11-11). It says what works, how many of the plan's units are left
+  and what of the unit in work is left, each by its count, and a TLA+ run by its spec, what it reads and its count.
+  What is open is a piece of a unit; the lead's own checking is no handoff's next and holds no finished piece (the
+  owner, 2026-11-14: "you keep saying that it's open when your behavior must be finishing the rewrite", then "you can
+  keep reporting [TLA+], but you gotta be specific what you're saying and how many units are left"). Progress is
+  units closed: the open units close before another opens, a fork's build takes what is left of a unit's half, and a
+  consult runs only where no line decides (the owner, 2026-11-15: "Wow we were saying same thing 24 hours ago 3 units
+  done", after 112 commits spread over eight open units had closed three). Work is pushed when a unit lands and when
+  a session ends, each push behind the full check; a commit between pushes is behind the gate. A long run is wrapped
+  in `caffeinate`.
+- A handoff is written after every push, since the harness compacts without warning. It holds the head, what landed
+  with its proof line, what is next, and no time but one `date` printed then (the lead's mistake, 2026-11-11);
+  `HANDOFF.md` is the handoff, written by `scripts/push.sh`, and a session ends with it and the next prompt in the clipboard, read back.
+- To begin: `scripts/doctor.sh`, then the orient command above, which prints the branch against its remote, what is
+  uncommitted, the last committed STATE and the owner's latest decisions. Read `HANDOFF.md` and run `python3 scripts/open.py`. Then read this file,
+  `spec/REWRITE.md` sections 1 and 4, `spec/CLAUDE.md`'s standing decisions, the latest first, and the rule file of
+  what the unit touches. Section 4 says where the rewrite stands and which unit is next.
+- For a move-in session, read the unit's brief and `spec/Reference/move-in.md` before editing. Conformance work
+  uses the framework's landed typed doors and MVC's `Html.*` partial composition. Record a missing door and its
+  use case in part 9 of the move-in spec. A framework change requires its own authorized unit (the owner, 2026-11-19:
+  "you can not change framework now while working in conformance").
+  Each builder on the latest Astra at xhigh reads `AGENTS.md`, `.claude/rules/process.md`, the owner decisions in
+  `spec/CLAUDE.md`, the kinds in `spec/MISTAKES.md`, and the file and project rules named in its brief before editing.
+  The reply cites the rules it applied by file and line at the base. The lead reads the changed source against the
+  brief, checks that each test and its planted failure prove the named behavior, and reads the integrated landing
+  gate before accepting the batch (the owner, 2026-11-19: "its not check and rubber stamp it- quality bar has to be high").
+- To reorient after a compaction: read what the compact hook printed, the same orient output, whole, then the owner's
+  latest decisions and the rule file of the file in hand, before the next edit. A claim stands on what is run now.
+
+## Corrections
+
+A correction has one home, where the work happens. An owner's correction and a reversal of the lead's with no new fact
+each become, the turn they happen, a line of the rule file that owns the subject: a test's in `.claude/rules/tests.md`
+or its project's own file, an analyzer's in `.claude/rules/analyzers.md`, C#'s in `.claude/rules/csharp.md` or its
+project's own file, the runtime's in `Alis.Reactive.Assets/CLAUDE.md`, the spec's and the owner's decisions in
+`spec/CLAUDE.md`, the plan's, the loop's, a session's and a fork's here. The line states the rule as a plain fact,
+with its date and whose words it is. A mistake, the lead's, a fork's or an agent's, is fixed where it is found and
+counted in its kind in `spec/MISTAKES.md` the same turn: one count, or one new row, and nothing more (the owner,
+2026-11-14: "Mistakes are supposed to be caught very quickly, not that they become their own maintenance"). A kind
+whose count keeps growing gets one fix, in the tool or the rule file that owns it. A mistake is called a mistake, in a
+rule line, a log entry, a commit and a message to the owner, never by a softer word (the owner, 2026-11-13: "know that
+slip is about you invented so you can avoid accountability about mistakes").
+
+## Forks, agents and reviews
+
+- Codex runs a consult read-only and a scoped build with full permissions when its sandbox blocks the brief's commands, its input closed (the owner, 2026-11-17: "scope has to be accurate ... Otherwise, it's just free fall of tokens").
+
+- A fork or an agent takes one bounded task that has a spec line, a landed exemplar and a command that proves it: one
+  test rule to a landed rule's pattern, one module's half against the schema. Six at a time at most, three of Codex
+  and three Opus agents at xhigh, each in a worktree of its own (the owner, 2026-11-15: "Spin more agents ver clear
+  scope and outcome of opus xhigh as well"). None words a rule, and each decides the forms its own task meets, as
+  the line below on quality states. Its brief names the base SHA and carries the full bar, finished before anything
+  reads it, and every spec file, D line and TLA+ action it cites is found at that SHA by a command before it goes out
+  (the lead's mistake, 2026-11-14); it reads no secret or file that holds a credential, runs no git command beyond
+  its own worktree and branch, and runs no command its brief does not name (the lead's correction of a fork,
+  2026-11-13). A brief that runs TLC caps it at two workers, and an agent's TLC pauses while a landing's browser run
+  runs, whose budgets were measured on a quiet Mac (the lead's mistake, 2026-11-16: TLC on every core pushed four
+  tests over their first navigation's budget).
+- An agent starts from a definition of `.claude/agents/`, which carries the harness its kind of task meets and the
+  reply it returns: `.claude/agents/designer.md` for a complex task or a critical decision, on the latest Fable model
+  at xhigh, `.claude/agents/page-writer.md` for pages and their tests, and `.claude/agents/builder.md` for a piece
+  to build, on Opus at xhigh. It reads this file, `spec/CLAUDE.md`'s owner decisions, the kinds of `spec/MISTAKES.md`,
+  and the rule file and the project's own `CLAUDE.md` of each kind of file it reads, writes or proposes, and its reply
+  opens with the rule lines it applied, by file and line at the base SHA, which the lead reads at the source before a
+  word of it lands. A brief adds the task alone, and a task no definition covers gets its definition first (the owner,
+  2026-11-13: "Are you making your agents actually read the harness, like all the setup we have, or you are just
+  going, do whatever you want?", and the owner's yes to the definitions the same night). A definition loads as an
+  agent type from the `.claude/agents/` of the folder the session starts in, and a session started in the main
+  checkout lists the architect's alone; until the owner chooses where the definitions load, a brief names its
+  definition file as the agent's first read and the call passes the model and effort the definition names (the lead's
+  mistake, 2026-11-14).
+- A complex task or a critical decision, one whose error would drift the schema, spread across tests, a harness door
+  or a spec line, or lower the bar, goes first to an agent on the latest Fable model at xhigh effort, briefed with its
+  spec lines, the files and the constraints; the lead lands it from its answer, read at the source (the owner,
+  2026-11-13: "for complex tasks, use fabe xhigh, also for critical decisions use fable xhigh"). While the owner is
+  away, a decision the work needs is made so: by quality, from the TLA+ specs, the agent's answer read at the source,
+  and never by a shortcut around the spec (the owner, 2026-11-14: "if a decision is needed, Quality and fable xhigh
+  will decide with tla+ - step back and do the right - never do the hack"). One such agent runs at a time, on the
+  task the specs leave open; what a spec line and a landed exemplar already shape, an analyzer or a test among
+  them, the lead writes itself (the owner, 2026-11-14: "U r overusing fable"). Codex's top model at max effort
+  consults on such a task or takes it, scoped as a fork's task is: one decision or one piece, its spec lines, files and
+  proving command named in the brief, the repository read at the base SHA and nothing written outside its own folder;
+  its answer is a lead, read at the source (the owner, 2026-11-14: "you can use codex astra max to consult or do the
+  work but must be scoped work with clearly defined so you do not waste or drift"). Critical thinking, a decision or a
+  piece of the core, goes to the highest model at max effort; the efficiency is in the scope and the ask: one question
+  or one piece, its lines and files named, a reply of bounded length, and a sandbox a low-effort probe proved runs the
+  brief's build and test commands before a run that needs them (the owner, 2026-11-14: "please use codex efficiently,
+  do not waste very priced resources, show some responsiblity", then "no, use highest model at critical thinking so u
+  get best results - but efficieny in scope and what you want"). Codex's top model advises as well as builds, and the
+  lead keeps it working: a piece a landed exemplar shapes goes to it as a build while the open question beside it goes
+  to it as a consult, the two at once, so the lead's own reading is never the bottleneck (the owner, 2026-11-15: "use
+  codex highes tmodel think for advising as well sir", then "lets move quicker , i am giving you resources, bottlneck
+  is on your side"). A run whose scope is clean runs in fast mode too, the CLI's service tier "fast", which the CLI
+  sends for its top model and drops with a warning for a tier the model does not offer (the owner, 2026-11-15: "when
+  scope is clean - u can use codex top model and max effort in fast mode as well").
+- The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
+  session, with the reason. A task whose check costs what the work costs is the lead's own. Quality is each
+  worker's own, never the next reader's: an agent runs every check its files meet before it replies, decides each
+  form the specs leave open by quality and names it decided, and returns no list of what it did not check; the lead
+  reads its answer at the source, runs the gate once where it lands, and re-runs none of its plants or commands (the
+  owner, 2026-11-14: "I am not liking each one throwing it over the wall like quality is someone else business").
+- No review is planned behind a writer. A review that runs is bounded before it starts: a fixed list of questions,
+  each with the answer that passes; a finding is an answer that fails; one fix in the page it was read from, one
+  second reading, then it ends, and what still fails, or anything raised outside the list, is one line to the owner.
+  It names the branch and HEAD SHA it read, and a finding counts only if its `file:line` exists at HEAD.
+
+## Workflow
+
+- `main` is the trunk and the release line. A release is an annotated `vX.Y.Z[-rc.N]` tag on `main`:
+  `scripts/verify-release-tag.sh` checks it and `.github/workflows/nuget-publish.yml` publishes it.
+- The rewrite runs on `feature/rewrite` and lands on `main` by pull request; other work branches from `origin/main` in
+  a worktree (`feature/`, `fix/`, `chore/`): `git worktree add .worktrees/<name> -b feature/<name> origin/main`. A
+  SessionStart hook installs the pre-commit guard. `git stash` is never run: `stash@{0}` holds work that stays put.
+- `scripts/check.sh` (every check that needs no browser and no pack), `scripts/test.sh` (that, then the browser
+  tests), `scripts/doctor.sh` (every pin against this machine), `scripts/build.sh`, `scripts/run.sh` (the conformance
+  app at http://localhost:5220), `scripts/pack.sh <version>`, `scripts/delivery.sh` (the six packages at a version of
+  its own, then the apps `WhenAConsumerAppIsBuilt` builds on them, then the browser tests under consumerNet10 on the
+  fresh net10 app), `scripts/toolchain-env.sh` (the sourced toolchain environment), `scripts/gate.sh` (the staged
+  unit's checks), `scripts/land.sh` (the gate, browser run and regression comparison before a commit),
+  `scripts/land-unit.sh` (merge a worktree's landing folders and land one commit), `scripts/full-check.sh` (the full
+  spec check at HEAD), `scripts/push.sh` (push the checked branch, STATE and handoff), `scripts/regressions.py`
+  (compare browser runs), `scripts/stamp.py` (stamp a message with its run), `scripts/tlc.sh` (pause or resume TLC),
+  `scripts/open.py` (list unwritten promises and unbuilt code), `scripts/handoff.py` (write the handoff from facts),
+  `scripts/state.py` (the state of every note, unit, lane, CI reading and file, with the command that leaves it),
+  `scripts/ci.py` (read the jobs of the remote head's run, each by its result), `scripts/playwright-windows.ps1`
+  (serve the selected MVC 5 site under IIS Express and account for the Windows run's servers).
+  A script joins this list with the commit that writes it.
+- Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a hold names its
+  reason in `spec/REWRITE.md` section 2.7, and Syncfusion's is the owner's (`node scripts/pin-syncfusion.mjs <version>`).
+- C# 14, compiled for `net48` and `net10.0`; `Alis.Reactive/CLAUDE.md` holds the one rule for a host's own code.
+
+## Local guidance
+
+The spec is the reference for a door that is not built; the code and its XML docs are the reference for one that is.
+Rules for one kind of file live in `.claude/rules/` and load with such a file: `tests.md` (`tests/`), `views.md`
+(`.cshtml`), `csharp.md` (`.cs`), `analyzers.md` (an analyzer project and its cases), `docs.md` (docs) and
+`process.md` (the process, with every file). A project's
+own `CLAUDE.md` holds its standard, its command and what it refuses. This file wins. `AGENTS.md` is a symlink to it.

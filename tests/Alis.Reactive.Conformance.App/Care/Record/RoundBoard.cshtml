@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Round board";
+    var plan = Html.ReactivePlan<RoundBoard>();
+}
+<h1>Round board of @Model.Ward</h1>
+@await Html.PartialAsync("/Care/Record/RoundBell.cshtml", Model.Bell)
+<p id="round-status">No round yet</p>
+<button type="button" @Html.Raises(plan, RoundBoards.OpenTheHandover)>Open the handover</button>
+<button type="button" @Html.Raises(plan, RoundBoards.CallThePorter)>Call the porter</button>
+<section id="handover" aria-label="Handover"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(RoundBoards.RoundStarted, pipeline => pipeline.Element("round-status").Text.Set("Round started"))
+        .CustomEvent(RoundBoards.SlotOpened, pipeline => pipeline.Element("round-status").Text.Set("Slot opened"))
+        .CustomEvent(RoundBoards.OpenTheHandover, pipeline => pipeline.Get(RoundBoardEndpoints.Handover).Into("handover"))
+        .CustomEvent(RoundBoards.CallThePorter, pipeline => pipeline.Dispatch(RoundBoards.PorterCalled)));
+}
+@Html.RenderPlan(plan)

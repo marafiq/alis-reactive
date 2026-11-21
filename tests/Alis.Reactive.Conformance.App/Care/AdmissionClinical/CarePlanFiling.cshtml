@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model CarePlanFiling
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Care plan filing";
+    var plan = Html.ReactivePlan<CarePlanFiling>();
+}
+<h1>Care plan filing</h1>
+<form method="post" enctype="multipart/form-data" action="@CarePages.CarePlanFiling">
+    <fieldset>
+        <legend>Care plan</legend>
+        @(Html.InputField(plan, m => m.CarePlan, options => options.Label("Care plan")).FusionUploader())
+    </fieldset>
+    <button type="submit">File</button>
+</form>
+@Html.RenderPlan(plan)

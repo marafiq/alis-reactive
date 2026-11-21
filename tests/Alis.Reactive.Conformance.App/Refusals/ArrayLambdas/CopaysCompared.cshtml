@@ -1,0 +1,17 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CopayRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The round's copays";
+    var plan = Html.ReactivePlan<CopayRound>();
+}
+<h1>@Model.Name round: the copays</h1>
+<p>Doses at a standard copay: <span id="count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(ArrayLambdaEndpoints.Copays)
+        .OnSuccess<List<CopayDose>>((doses, pipeline) => pipeline.Element("count").Text.Set(doses.Body.Count(d => d.Copay == 0.10m || d.Copay == 0.25m)))));
+}
+@Html.RenderPlan(plan)

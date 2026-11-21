@@ -1,0 +1,38 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FluidBalance
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Fluid balance";
+    var plan = Html.ReactivePlan<FluidBalance>();
+}
+<h1>Fluid balance of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Fluid balance" }))
+<button type="button" @Html.Raises(plan, FluidBalances.Check)>Check</button>
+<button type="button" @Html.Raises(plan, FluidBalances.Restore)>Restore</button>
+<p>Balance: <span id="balance-status"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(FluidBalances.Check, pipeline =>
+    {
+        var panel = pipeline.Component<ConformanceComponent>("care-panel");
+        panel.Count.Set(100);
+        var measured = panel.Total();
+        panel.Count.Set(999);
+        pipeline.When(measured.Lt(500)).Then(pipeline => pipeline.Element("balance-status").Text.Set("Low"));
+    }));
+    Html.On(plan, trigger => trigger.CustomEvent(FluidBalances.Restore, pipeline =>
+    {
+        var panel = pipeline.Component<ConformanceComponent>("care-panel");
+        panel.Count.Set(600);
+        var measured = panel.Total();
+        pipeline.When(measured.Gt(500)).Then(pipeline =>
+        {
+            pipeline.Component<ConformanceComponent>("care-panel").Count.Set(999);
+            pipeline.Component<ConformanceComponent>("care-panel").Count.Set(measured);
+        });
+    }));
+}
+@Html.RenderPlan(plan)

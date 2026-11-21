@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model WorldsNotice
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Today's notice";
+}
+<h1>Today's notice</h1>
+<a href="@Url.AppendVersion("~/Content/World/" + Model.World + "/notice.txt")">Open the world's notice</a>

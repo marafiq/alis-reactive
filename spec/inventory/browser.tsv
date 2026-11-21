@@ -1,0 +1,17 @@
+line	file	elements	mount
+main	Alis.Reactive.Assets/runtime/components/fusion/confirm.ts		
+main	Alis.Reactive.Assets/runtime/components/native/drawer.ts		
+main	Alis.Reactive.Assets/runtime/components/native/loader.ts	alis-loader	
+main	Alis.Reactive.Assets/runtime/components/native/native-action-link.ts		
+redesign	Alis.Reactive.Assets/components/fusion/confirm.ts		
+redesign	Alis.Reactive.Assets/components/fusion/file-upload.ts		
+redesign	Alis.Reactive.Assets/components/fusion/mention.ts		
+redesign	Alis.Reactive.Assets/components/fusion/smart-paste-button.ts		
+redesign	Alis.Reactive.Assets/components/fusion/smart-text-area.ts		
+redesign	Alis.Reactive.Assets/components/hooks.ts		mount
+redesign	Alis.Reactive.Assets/components/index.ts		
+redesign	Alis.Reactive.Assets/components/native/check-list.ts		
+redesign	Alis.Reactive.Assets/components/native/drawer.ts		
+redesign	Alis.Reactive.Assets/components/native/hidden-field.ts		
+redesign	Alis.Reactive.Assets/components/native/loader.ts	alis-loader	
+redesign	Alis.Reactive.Assets/components/native/radio-group.ts		

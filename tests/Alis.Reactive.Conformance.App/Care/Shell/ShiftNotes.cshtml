@@ -1,0 +1,41 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftNotesPage
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Shift notes";
+    var plan = Html.ReactivePlan<ShiftNotesPage>();
+}
+@section Styles {
+    @if (Model.Motion == DrawerMotion.Sliding)
+    {
+        <style>
+            .alis-drawer { position: fixed; inset: 0 0 0 auto; width: 24rem; background: Canvas; transform: translateX(100%); transition: transform 50ms; }
+            .alis-drawer--visible { transform: none; }
+        </style>
+    }
+    else
+    {
+        <style>
+            .alis-drawer { position: fixed; inset: 0 0 0 auto; width: 24rem; background: Canvas; transform: translateX(100%); }
+            .alis-drawer--visible { transform: none; }
+        </style>
+    }
+}
+<h1>Shift notes</h1>
+<button type="button" @Html.Raises(plan, ShiftNotesButtons.OpenNotes)>Open notes</button>
+<button type="button" @Html.Raises(plan, ShiftNotesButtons.OpenEmpty)>Open empty</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ShiftNotesButtons.OpenNotes, pipeline =>
+        {
+            pipeline.Element(NativeDrawer.TitleId).Text.Set("Care notes");
+            pipeline.Get(ShiftNotesEndpoints.Notes).Into(NativeDrawer.ContentId);
+            pipeline.Component<NativeDrawer>().Open();
+        })
+        .CustomEvent(ShiftNotesButtons.OpenEmpty, pipeline => pipeline.Component<NativeDrawer>().Open()));
+    plan.Component<NativeDrawer>().Reactive(drawer => drawer.Closed, pipeline => pipeline.Unload(NativeDrawer.ContentId));
+}
+@Html.RenderPlan(plan)

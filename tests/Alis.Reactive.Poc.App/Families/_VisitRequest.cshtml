@@ -1,0 +1,14 @@
+@using Alis.Reactive.Poc.App.Families
+@model VisitRequest
+@{
+    var plan = Html.ReactivePlan<VisitRequest>();
+}
+<section>
+    <h2>Visit request</h2>
+    @Html.InputField(plan, m => m.ResidentName).TextBox("Resident to visit")
+    @(plan.Button("confirm-visit", "Confirm the visit")
+        .Reactive(button => button.Click, pipeline =>
+            pipeline.Element("visit-resident").Text.Set(pipeline.Input(m => m.ResidentName).Component<NativeTextBox>().Value)))
+    <p>Visit for: <strong id="visit-resident">not confirmed</strong></p>
+</section>
+@Html.RenderPlan(plan)

@@ -1,0 +1,19 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Dose list";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Dose list</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("list-doses", "List doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.OrderBy(d => d.Status).Select(d => d.Medicine))))
+
+@Html.RenderPlan(plan)

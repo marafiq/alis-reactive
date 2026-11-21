@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CareRota
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care rota";
+    var plan = Html.ReactivePlan<CareRota>();
+}
+<h1>Care rota</h1>
+@using (var careRota = Html.BeginRequestForm(plan, "care-rota"))
+{
+    <fieldset>
+        <legend>Name</legend>
+        @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-care", "Save care").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<CareRota>(CareRotaEndpoints.CareSaves, request => request.Form(careRota.Form))
+        .Validate<CareRotaRules>(CareRotaRules.Care)
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+    @(Html.NativeButton("save-rota", "Save rota").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<CareRota>(CareRotaEndpoints.RotaSaves, request => request.Form(careRota.Form))
+        .Validate<CareRotaRules>(CareRotaRules.Rota)
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p>Saved: <span id="saved"></span></p>
+@Html.RenderPlan(plan)

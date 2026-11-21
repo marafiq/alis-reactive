@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Kanban
+@model NursedRound
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Nursed round";
+    var plan = Html.ReactivePlan<NursedRound>();
+    var card = FusionKanbanFields.Of<NursedDose>();
+}
+<h1>Nursed round</h1>
+@(Html.FusionKanban(plan, "nursed-round", build => build
+    .KeyField(card.Field(c => c.Status))
+    .Columns([new KanbanColumn { HeaderText = "To give", KeyField = "Due" }, new KanbanColumn { HeaderText = "Given", KeyField = "Given" }])
+    .CardSettings(new KanbanCardSettings { HeaderField = Model.HeadedByNurse ? card.Field(c => c.Nurse.Name) : card.Field(c => c.Medicine) })
+    .DataSource(Model.Doses)))
+@Html.RenderPlan(plan)

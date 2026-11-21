@@ -1,0 +1,8 @@
+using System;
+
+namespace Alis.Reactive.Plants;
+
+public sealed class NewNamePlant
+{
+    public void Fetch() => throw new NotSupportedException();
+}

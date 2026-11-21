@@ -1,0 +1,38 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseOrders
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose orders";
+    var plan = Html.ReactivePlan<DoseOrders>();
+}
+<h1>@Model.Round round: the first dose of each order</h1>
+<dl>
+    <dt>By milligrams</dt>
+    <dd id="first-by-milligrams">-</dd>
+    <dt>By priority</dt>
+    <dd id="first-by-priority">-</dd>
+    <dt>By urgency</dt>
+    <dd id="first-by-urgency">-</dd>
+    <dt>By code</dt>
+    <dd id="first-by-code">-</dd>
+    <dt>By priority, highest first</dt>
+    <dd id="first-by-priority-descending">-</dd>
+    <dt>By milligrams, most first</dt>
+    <dd id="first-by-milligrams-descending">-</dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<OrderedDose>>((doses, pipeline) =>
+        {
+            pipeline.Element("first-by-milligrams").Text.Set(doses.Body.OrderBy(d => d.Milligrams).Find(d => true, d => d.Name));
+            pipeline.Element("first-by-priority").Text.Set(doses.Body.OrderBy(d => d.Priority).Find(d => true, d => d.Name));
+            pipeline.Element("first-by-urgency").Text.Set(doses.Body.OrderBy(d => d.Urgent).Find(d => true, d => d.Name));
+            pipeline.Element("first-by-code").Text.Set(doses.Body.OrderBy(d => d.Code, StringComparer.Ordinal).Find(d => true, d => d.Name));
+            pipeline.Element("first-by-priority-descending").Text.Set(doses.Body.OrderByDescending(d => d.Priority).Find(d => true, d => d.Name));
+            pipeline.Element("first-by-milligrams-descending").Text.Set(doses.Body.OrderByDescending(d => d.Milligrams).Find(d => true, d => d.Name));
+        })));
+}
+@Html.RenderPlan(plan)

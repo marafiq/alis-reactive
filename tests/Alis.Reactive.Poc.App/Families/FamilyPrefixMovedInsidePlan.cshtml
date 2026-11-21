@@ -1,0 +1,16 @@
+@using Alis.Reactive.Poc.App.Families
+@model FamilyForm
+@{
+    ViewData["Title"] = "Family";
+    var plan = Html.ReactivePlan<FamilyForm>();
+    ViewData.TemplateInfo.HtmlFieldPrefix = "NextOfKin";
+}
+<h1>Family</h1>
+
+@using (Html.BeginForm("Family", "Families", FormMethod.Post))
+{
+    @Html.EditorFor(m => m.Guardian)
+    <button type="submit">Save family</button>
+}
+
+@Html.RenderPlan(plan)

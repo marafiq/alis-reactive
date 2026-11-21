@@ -1,0 +1,23 @@
+@using System.Globalization
+@using Alis.Reactive.Poc.App.Rounds
+@model RoundForm
+@{
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<RoundForm>();
+}
+<h1>Medication round</h1>
+
+@using (Html.BeginForm("Round", "Rounds", new { culture = CultureInfo.CurrentCulture.Name }, FormMethod.Post))
+{
+    @Html.InputField(plan, m => m.Dose).DoseCard("Dose", RoundSchedule.Digoxin)
+    @Html.ValidationMessageFor(m => m.Dose)
+    @Html.InputField(plan, m => m.Rescue!.Dose).DoseCard("Rescue dose", RoundSchedule.Digoxin)
+    @Html.InputField(plan, m => m.Note).TextBox("Note")
+    <button type="submit">Save the round</button>
+}
+
+@(plan.Button("rescue-as-dose", "Use the dose as the rescue dose")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Input(m => m.Rescue!.Dose).Component<DoseCard>().Value.Set(pipeline.Input(m => m.Dose).Component<DoseCard>().Value)))
+
+@Html.RenderPlan(plan)

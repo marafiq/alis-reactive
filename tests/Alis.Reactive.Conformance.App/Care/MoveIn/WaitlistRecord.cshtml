@@ -1,0 +1,10 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model WaitlistRecordPage
+@{
+    var plan = Html.ReactivePlan<WaitlistRecordPage>();
+}
+<p>Waitlist record: <span id="waitlist-record">@Model.Record</span></p>
+<p>Draft status: <span id="waitlist-draft">@Model.Draft</span></p>
+<p id="waitlist-community">@Model.Community</p>
+@Html.RenderPlan(plan)

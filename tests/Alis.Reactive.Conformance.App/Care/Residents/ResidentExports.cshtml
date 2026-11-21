@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentExportsPage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Exports";
+    var plan = Html.ReactivePlan<ResidentExportsPage>();
+}
+<h1>Exports of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, ResidentExports.Export)>Export</button>
+<button type="button" @Html.Raises(plan, ResidentExports.ExportCensus)>Export census</button>
+<button type="button" @Html.Raises(plan, ResidentExports.ExportPlan)>Export plan</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentExports.Export, pipeline => pipeline.Get(ResidentExportEndpoints.Resume).Download()));
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentExports.ExportCensus, pipeline => pipeline.Get(ResidentExportEndpoints.Census).Download()));
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentExports.ExportPlan, pipeline => pipeline.Get(ResidentExportEndpoints.Plan).Download()));
+}
+@Html.RenderPlan(plan)

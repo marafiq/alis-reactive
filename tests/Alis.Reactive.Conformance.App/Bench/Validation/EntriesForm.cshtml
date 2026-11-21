@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ConformanceEntries
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<ConformanceEntries>();
+}
+<h1>The bench</h1>
+@using (var entries = Html.BeginRequestForm(plan, "entries"))
+{
+    <fieldset>
+        <legend>First entry</legend>
+        @(Html.InputField(plan, m => m.Entries[0].Code).ConformanceComponent(new ConformanceStart { Text = "Codes", Value = Model.Entries[0].Code, Options = ["a-1", "a-2"] }))
+    </fieldset>
+    <fieldset>
+        <legend>Second entry</legend>
+        @(Html.InputField(plan, m => m.Entries[1].Code).ConformanceComponent(new ConformanceStart { Text = "Codes", Value = Model.Entries[1].Code, Options = ["a-1", "a-2"] }))
+    </fieldset>
+    @(Html.NativeButton("save", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<ConformanceEntries>(BenchEndpoints.FormEntries, request => request.Form(entries.Form))
+        .Validate<EntriesRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("shown").Text.Set(saved.Body))))
+}
+<p id="shown"></p>
+@Html.RenderPlan(plan)

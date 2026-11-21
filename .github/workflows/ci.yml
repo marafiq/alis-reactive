@@ -1,60 +1,231 @@
 name: CI
 
-# Verification for every pull request and for pushes to main / release/*. This workflow NEVER
-# publishes — releasing is a pushed v* tag handled by nuget-publish.yml (docs/RELEASING.md), so
-# merging to main can never accidentally ship a package. The gate itself is defined once, in
-# gate.yml; this file only decides when it runs. Design and evidence: docs/CI.md.
 on:
-  push:
-    branches: [main, 'release/*']
-    paths:
-      - 'Alis.Reactive/**'
-      - 'Alis.Reactive.Assets/**'
-      - 'Alis.Reactive.Native/**'
-      - 'Alis.Reactive.DesignSystem/**'
-      - 'Alis.Reactive.Fusion/**'
-      - 'Alis.Reactive.FluentValidator/**'
-      - 'Alis.Reactive.NativeTagHelpers/**'
-      - 'Alis.Reactive.Analyzers/**'
-      - 'Alis.Reactive.SandboxApp/**'
-      - 'tests/**'
-      - 'build/**'
-      - 'Alis.Reactive.slnx'
-      - 'Directory.Build.props'
-      - 'global.json'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'scripts/**'
-      # The behavioral coverage gate (0b) and the coverage maps it reads.
-      - '.claude/skills/onboard-fusion-component/**'
-      - 'tools/FusionOnboarding/**'
-      - '.github/workflows/ci.yml'
-      - '.github/workflows/gate.yml'
-      - '.github/actions/**'
-  # No path filter on pull requests: a required check must always report (docs/CI.md, "Gating").
   pull_request:
-  workflow_dispatch:
+  push:
+    branches: [main]
+  workflow_call:
+    inputs:
+      version:
+        description: The version the packages are packed at; a run that is no release packs a version of its own.
+        type: string
+        default: ''
+    secrets:
+      SYNCFUSION_LICENSE_KEY:
+        required: false
 
-# One live run per pull request: a new push supersedes the previous run, so a stale commit never
-# keeps five browser shards busy. Pushes to main and release/* are never cancelled (each commit is
-# a signal), and release tags have their own workflow with cancel-in-progress: false.
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  PACKAGE_VERSION: ${{ inputs.version || format('0.0.0-ci.{0}', github.run_number) }}
+  TESTS: tests/Alis.Reactive.Conformance.PlaywrightTests
+
 jobs:
-  gate:
-    name: gate
-    uses: ./.github/workflows/gate.yml
-    permissions:
-      contents: read
-      checks: write
-    with:
-      configuration: Release
-      playwright: true
-      retry-failed: 1
-    secrets:
-      SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: Every check that needs no browser, but the spec's
+        run: scripts/check.sh --no-spec
+
+  spec:
+    name: spec
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-toolchain
+      - name: The spec's checks
+        run: python3 spec/tools/check.py --ci
+
+  playwright:
+    name: playwright ${{ matrix.pool }} ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container:
+      image: mcr.microsoft.com/playwright/dotnet:v1.64.1-noble@sha256:6955861f6e17b2580c00f0970198e446f006cdae6c34fb8f9ad5318aaab50da0
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - pool: core
+            shard: 1/1
+            run: core-1-of-1
+          - pool: hosts
+            shard: 1/1
+            run: hosts-1-of-1
+          - pool: fusion
+            shard: 1/1
+            run: fusion-1-of-1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: The pool's shard
+        env:
+          SYNCFUSION_LICENSE_KEY: ${{ matrix.pool == 'fusion' && secrets.SYNCFUSION_LICENSE_KEY || '' }}
+        run: scripts/playwright.sh --pool "${{ matrix.pool }}" --shard "${{ matrix.shard }}"
+      - name: The run's folder
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: run-${{ matrix.run }}
+          path: ${{ env.TESTS }}/TestResults/
+          if-no-files-found: error
+
+  pack:
+    name: pack
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: The six packages at one version
+        run: scripts/pack.sh "$PACKAGE_VERSION"
+      - name: Each of the six ids is packed, and nothing else
+        run: |
+          expected=(AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.OpenTelemetry AlisReactive.DesignSystem AlisReactive.NativeTagHelpers)
+          for id in "${expected[@]}"; do
+            [ -f "nupkgs/$id.$PACKAGE_VERSION.nupkg" ] || { echo "::error::nupkgs/$id.$PACKAGE_VERSION.nupkg is not packed"; exit 1; }
+          done
+          packed="$(find nupkgs -name '*.nupkg' | wc -l)"
+          [ "$packed" -eq "${#expected[@]}" ] || { echo "::error::$packed packages are packed and ${#expected[@]} ids ship"; ls -1 nupkgs; exit 1; }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: packages
+          path: |
+            nupkgs/*.nupkg
+            nupkgs/*.snupkg
+          if-no-files-found: error
+
+  verify-net48:
+    name: verify-net48
+    needs: [pack]
+    runs-on: windows-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: The packed packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: nupkgs
+      - name: The conformance script the twin layout serves
+        run: node build.mjs
+      - name: The twin, built against the packs with warnings as errors
+        run: dotnet build tests/Alis.Reactive.Conformance.App.Net48 -c Release -warnaserror
+      - name: Visual Studio's MSBuild, which builds a classic MVC 5 project, on the PATH
+        shell: pwsh
+        run: |
+          $found = vswhere -latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
+          if (-not $found) { Write-Output "::error::vswhere found no MSBuild.exe under Visual Studio"; exit 1 }
+          Split-Path $found | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "MSBUILD_EXE=$found" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          & $found -version
+      - name: The fresh MVC 5 app, built against the packs with warnings as errors
+        shell: pwsh
+        run: |
+          & $env:MSBUILD_EXE tests/Alis.Reactive.Consumer.Net48/Alis.Reactive.Consumer.Net48.csproj -restore "-p:Configuration=Release" -warnaserror
+      - name: What a build wrote into the fresh app, and the analyzers that reach it
+        run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt"
+      - name: Chromium, at the version the browser tests' Playwright pins
+        id: browser
+        shell: pwsh
+        run: |
+          Set-TimeZone -Id UTC
+          dotnet restore tests/Alis.Reactive.Conformance.PlaywrightTests
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $pin = (Select-Xml -Path Directory.Packages.props -XPath "//PackageVersion[@Include='Microsoft.Playwright']").Node.Version
+          $playwright = Join-Path $HOME ".nuget/packages/microsoft.playwright/$pin/.playwright"
+          & (Join-Path $playwright "node/win32_x64/node.exe") (Join-Path $playwright "package/cli.js") install chromium
+      - name: The tests under the twin
+        env:
+          ALIS_PREBUILT_MVC5: net48
+        run: scripts/playwright.sh --all --host net48
+      - name: The tests under the fresh MVC 5 app
+        if: ${{ !cancelled() && steps.browser.outcome == 'success' }}
+        env:
+          ALIS_PREBUILT_MVC5: consumerNet48
+        run: scripts/playwright.sh --all --host consumerNet48
+      - name: The runs' folders
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: run-net48
+          path: ${{ env.TESTS }}/TestResults/
+          if-no-files-found: error
+
+  delivery-net10:
+    name: delivery-net10
+    needs: [pack]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container:
+      image: mcr.microsoft.com/playwright/dotnet:v1.64.1-noble@sha256:6955861f6e17b2580c00f0970198e446f006cdae6c34fb8f9ad5318aaab50da0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: The packed packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: nupkgs
+      - name: Git reads the checkout the job's container holds
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: The fresh net10 app, restored from the packs and built with warnings as errors
+        run: dotnet build tests/Alis.Reactive.Consumer.Net10 -c Release -warnaserror
+      - name: What a build wrote into the fresh app, the analyzers that reach it and the browser files it serves
+        run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt&FullyQualifiedName!~fresh_net48_app"
+      - name: The tests under the fresh net10 app
+        run: scripts/playwright.sh --all --host consumerNet10
+      - name: The run's folder
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: run-consumer-net10
+          path: ${{ env.TESTS }}/TestResults/
+          if-no-files-found: error
+
+  proof:
+    name: proof
+    if: always()
+    needs: [checks, spec, playwright, pack, verify-net48, delivery-net10]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Every job before this one passed
+        run: |
+          for result in ${{ join(needs.*.result, ' ') }}; do
+            [ "$result" = success ] || { echo "::error::a job this proof needs ended as $result"; exit 1; }
+          done
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: The Node of .node-version
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - name: Every run's folder
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: run-*
+          path: runs
+      - name: Every run is green, and the tests that ran are the full list, each once
+        run: |
+          set -- runs/*/*
+          node scripts/playwright-select.mjs --spec "$1/landings.tsv" --assembly "$1/tests.tsv" \
+            --weights "$TESTS/shard-weights.json" --out full.json --all --every-host > /dev/null
+          node scripts/playwright-result.mjs --proof --full full.json --budget "$TESTS/Harness/measured.json" "$@"

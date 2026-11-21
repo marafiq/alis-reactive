@@ -1,0 +1,45 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftClock
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Shift clock";
+    var plan = Html.ReactivePlan<ShiftClock>();
+    var now = Model.Now;
+    var local = Model.Local;
+    var stampsAt = Model.StampsAt;
+}
+<h1>Shift clock</h1>
+<dl>
+    <dt>Logged, UTC</dt>
+    <dd id="server-utc">@ShiftClock.WallTimeOf(Model.Now)</dd>
+    <dt>Logged, the home's clock</dt>
+    <dd id="server-local">@ShiftClock.WallTimeOf(Model.Local)</dd>
+    <dt>Shown, UTC</dt>
+    <dd id="utc-shown"></dd>
+    <dt>Shown, the home's clock</dt>
+    <dd id="local-shown"></dd>
+    <dt>Stamped at</dt>
+    <dd id="stamped-at"></dd>
+    <dt>Seen at</dt>
+    <dd id="stamped-seen"></dd>
+</dl>
+<button type="button" @Html.Raises(plan, ShiftClockButtons.ShowTheTimes)>Show the times</button>
+<button type="button" @Html.Raises(plan, ShiftClockButtons.Stamp)>Stamp</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ShiftClockButtons.ShowTheTimes, pipeline =>
+        {
+            pipeline.Element("utc-shown").Text.Set(now);
+            pipeline.Element("local-shown").Text.Set(local);
+        })
+        .CustomEvent(ShiftClockButtons.Stamp, pipeline => pipeline
+            .Post<ShiftStamp>(ShiftClockEndpoints.Stamps, request => request.Set(r => r.At, stampsAt).Set(r => r.Seen, local))
+            .OnSuccess<StampedShift>((stamped, pipeline) =>
+            {
+                pipeline.Element("stamped-at").Text.Set(stamped.Body.Read(shift => shift.At));
+                pipeline.Element("stamped-seen").Text.Set(stamped.Body.Read(shift => shift.Seen));
+            })));
+}
+@Html.RenderPlan(plan)

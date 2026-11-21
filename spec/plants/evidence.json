@@ -1,0 +1,62 @@
+[
+ {
+  "name": "an evidence item's id dropped",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- G4: a promise is declared and awaited",
+    "new": "- A promise is declared and awaited"
+   }
+  ],
+  "expect": "unplaced: G4"
+ },
+ {
+  "name": "an evidence item's id moved out of Evidence into Decision",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- B1: each item is spelled three ways:",
+    "new": "- Each item is spelled three ways:"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- D1.1 A path is a list of steps,",
+    "new": "- D1.1 (B1) A path is a list of steps,"
+   }
+  ],
+  "expect": "unplaced: B1"
+ },
+ {
+  "name": "a section's Evidence label lost",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "`Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:120-121`).\n\n**Evidence.**",
+    "new": "`Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:120-121`).\n\nEvidence:"
+   }
+  ],
+  "expect": "unplaced: G7, B7"
+ },
+ {
+  "name": "an evidence item placed in a second section's Evidence too",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "**Evidence.**\n- B3: a second resolver beside `get` parses a member path with a regex: `Alis.Reactive/PlanModel/Validation/FormRead.cs:36`,",
+    "new": "**Evidence.**\n- B1: a read's path is spelled as Q1's items are (`Alis.Reactive/WireTerms/Path.cs:31`).\n- B3: a second resolver beside `get` parses a member path with a regex: `Alis.Reactive/PlanModel/Validation/FormRead.cs:36`,"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "an evidence item reworded",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- B1: each item is spelled three ways:",
+    "new": "- B1: an item is spelled in three ways:"
+   }
+  ],
+  "expect": null
+ }
+]

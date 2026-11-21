@@ -1,0 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model CoverageTerms
+@{
+    var plan = Html.ReactivePlan<CoverageTerms>();
+}
+<p>@Model.Description</p>
+@Html.RenderPlan(plan)

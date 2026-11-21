@@ -1,0 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model ReceiptPage
+@{
+    var plan = Html.ReactivePlan<ReceiptPage>();
+}
+<p id="receipt-@Model.Reference">@Model.Text</p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,16 @@
+@using Alis.Reactive.Poc.App.Cards
+@model CardsWard
+@{
+    ViewData["Title"] = "Bedside";
+    var plan = Html.ReactivePlan<CardsWard>();
+}
+<h1>Bedside</h1>
+
+<section id="card">
+    @BedsideMonitorHtml.BedsideMonitorHost("spare-monitor", "The spare bed")
+</section>
+
+@(plan.Button("close", "Close the card")
+    .Reactive(button => button.Click, pipeline => pipeline.Unload("card")))
+
+@Html.RenderPlan(plan)

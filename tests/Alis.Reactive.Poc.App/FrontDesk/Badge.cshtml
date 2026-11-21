@@ -1,0 +1,20 @@
+@using Alis.Reactive.Poc.App.FrontDesk
+@model BadgePage
+@{
+    ViewData["Title"] = "Visitor badge";
+    var plan = Html.ReactivePlan<BadgePage>();
+}
+<h1>Visitor badge</h1>
+
+@plan.TextBox("visitor-name", "Visitor name", Model.VisitorName)
+
+@(plan.Button("print-badge", "Print badge")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var visitor = pipeline.Component<NativeTextBox>("visitor-name").Value;
+        pipeline.Element("badge-name").Text.Set(visitor);
+    }))
+
+<p>Badge: <strong id="badge-name"></strong></p>
+
+@Html.RenderPlan(plan)

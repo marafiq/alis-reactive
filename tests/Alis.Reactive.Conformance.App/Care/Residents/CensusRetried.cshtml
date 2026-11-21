@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusRetry
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Census";
+    var plan = Html.ReactivePlan<CensusRetry>();
+}
+<h1>Census of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, ResidentsBusyEvents.Load)>Load census</button>
+<p>Census: <span id="census">-</span></p>
+<p>Log: <output id="census-log"></output></p>
+<p>Error: <span id="census-error">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentsBusyEvents.Load, pipeline => pipeline.Get(CareEndpoints.RetriedCensus)
+        .WhileLoading(pipeline => pipeline.Element("census-log").Text.Append("loading "))
+        .Finally(pipeline => pipeline.Element("census-log").Text.Append("done "))
+        .OnSuccess(Content.Json<PanelCensus>(), (census, pipeline) => pipeline.Element("census").Text.Set(census.Body.Read(counted => counted.Count)))
+        .OnError(503, Content.None, (unavailable, pipeline) => pipeline.Element("census-error").Text.Set("Unavailable"))));
+}
+@Html.RenderPlan(plan)

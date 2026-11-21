@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model PreviousStayCard
+@{
+    var plan = Html.ReactivePlan<PreviousStayCard>();
+}
+@(Html.InputField(plan, m => m.Nights, options => options.Label("Previous nights")).NativeTextBox())
+@Html.RenderPlan(plan)

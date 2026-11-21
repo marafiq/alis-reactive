@@ -1,0 +1,33 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model EmptyPayloadsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<EmptyPayloadsBoard>();
+    var raises = new[]
+    {
+        new RaiseStart { Button = "Raise with no payload", NoArgument = true },
+        new RaiseStart { Button = "Raise with text 7", Text = "7" },
+    };
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Raises = raises })
+    .Reactive(component => component.Raised, (raised, pipeline) =>
+    {
+        pipeline.Element("raise-tried").Text.Set("raising");
+        pipeline.Element("raise-text").Text.Set(raised.Text);
+    }))
+@(plan.ConformanceRegistered("registered-1", new RegisteredStart { Reading = Model.Reading })
+    .Reactive(gauge => gauge.Alarmed, pipeline => pipeline.Element("alarm-heard").Text.Set("alarmed")))
+<dl>
+    <dt>Raise tried</dt>
+    <dd id="raise-tried"></dd>
+    <dt>Raised text</dt>
+    <dd id="raise-text"></dd>
+    <dt>Alarm heard</dt>
+    <dd id="alarm-heard"></dd>
+</dl>
+@Html.RenderPlan(plan)

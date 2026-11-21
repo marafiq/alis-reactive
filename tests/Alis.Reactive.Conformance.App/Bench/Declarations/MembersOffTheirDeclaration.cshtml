@@ -1,0 +1,82 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model OffDeclarationBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Three builds";
+    var plan = Html.ReactivePlan<OffDeclarationBoard>();
+}
+<h1>Three builds</h1>
+@(plan.ConformanceComponent("conformance-older", new ConformanceStart { Version = ComponentVersion.Older, Text = Model.Text }))
+@(plan.ConformanceComponent("conformance-promised", new ConformanceStart { Version = ComponentVersion.Promised, Text = Model.Text }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Record = new RecordStart { Name = null } }))
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.LogOlder)>Log older</button>
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.EchoOlder)>Echo older</button>
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.PingPromised)>Ping promised</button>
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.TotalPromised)>Total promised</button>
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.ShowOldersText)>Show older's text</button>
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.ShowPromisedsText)>Show promised's text</button>
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.TakeNothing)>Take nothing</button>
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.TakeTheSnapshotsName)>Take the snapshot's name</button>
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.TakeTheMissingItemsName)>Take the missing item's name</button>
+<button type="button" @Html.Raises(plan, OffDeclarationButtons.Ping)>Ping</button>
+<dl>
+    <dt>Call tried</dt>
+    <dd id="tried"></dd>
+    <dt>Call done</dt>
+    <dd id="done"></dd>
+    <dt>Text shown</dt>
+    <dd id="text-read"></dd>
+    <dt>Ping done</dt>
+    <dd id="b-done"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(OffDeclarationButtons.LogOlder, pipeline =>
+        {
+            pipeline.Element("tried").Text.Set("Log older");
+            pipeline.Component<ConformanceComponent>("conformance-older").Log("Handover");
+            pipeline.Element("done").Text.Set("Log older");
+        })
+        .CustomEvent(OffDeclarationButtons.EchoOlder, pipeline =>
+        {
+            pipeline.Element("tried").Text.Set("Echo older");
+            pipeline.Component<ConformanceComponent>("conformance-older").Echo("Handover");
+            pipeline.Element("done").Text.Set("Echo older");
+        })
+        .CustomEvent(OffDeclarationButtons.PingPromised, pipeline =>
+        {
+            pipeline.Element("tried").Text.Set("Ping promised");
+            pipeline.Component<ConformanceComponent>("conformance-promised").Ping();
+            pipeline.Element("done").Text.Set("Ping promised");
+        })
+        .CustomEvent(OffDeclarationButtons.TotalPromised, pipeline =>
+        {
+            pipeline.Element("tried").Text.Set("Total promised");
+            pipeline.Component<ConformanceComponent>("conformance-promised").Total();
+            pipeline.Element("done").Text.Set("Total promised");
+        })
+        .CustomEvent(OffDeclarationButtons.ShowOldersText, pipeline => pipeline.Element("text-read").Text.Set(pipeline.Component<ConformanceComponent>("conformance-older").Text))
+        .CustomEvent(OffDeclarationButtons.ShowPromisedsText, pipeline => pipeline.Element("text-read").Text.Set(pipeline.Component<ConformanceComponent>("conformance-promised").Text))
+        .CustomEvent(OffDeclarationButtons.TakeNothing, pipeline => pipeline.Component<ConformanceComponent>("conformance").TakeText((string?)null))
+        .CustomEvent(OffDeclarationButtons.TakeTheSnapshotsName, pipeline =>
+        {
+            var conformance = pipeline.Component<ConformanceComponent>("conformance");
+            conformance.TakeText(conformance.Snapshot().Read(record => record.Name).OrNull());
+        })
+        .CustomEvent(OffDeclarationButtons.TakeTheMissingItemsName, pipeline =>
+        {
+            var conformance = pipeline.Component<ConformanceComponent>("conformance");
+            conformance.TakeText(conformance.MaybeItem().Name.OrNull());
+        })
+        .CustomEvent(OffDeclarationButtons.Ping, pipeline =>
+        {
+            pipeline.Component<ConformanceComponent>("conformance").Ping();
+            pipeline.Element("b-done").Text.Set("pinged");
+        }));
+}
+@Html.RenderPlan(plan)

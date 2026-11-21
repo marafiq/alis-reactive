@@ -1,0 +1,14 @@
+@using Alis.Reactive.Poc.App.Cards
+@model CardsWard
+@{
+    var plan = Html.ReactivePlan<CardsWard>();
+    plan.Plugin<WardPager>().Reactive(pager => pager.Paged, (paged, pipeline) =>
+    {
+        CallAnswered? answer = null;
+        pipeline.Listen(paged.Call, call => call.Answered, (answered, heard) => answer = answered);
+        pipeline.Element("answered-by").Text.Set(answer!.By);
+    });
+}
+<p>Answered by: <span id="answered-by">nobody</span></p>
+
+@Html.RenderPlan(plan)

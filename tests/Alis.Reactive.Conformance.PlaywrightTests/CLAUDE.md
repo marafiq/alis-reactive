@@ -1,0 +1,237 @@
+# Alis.Reactive.Conformance.PlaywrightTests
+
+The browser tests: each is one promise of the spec, proven by a gesture and its visible outcome in Chromium, on a
+screen of the conformance app, or for a delivery test on a fresh app's page (`tests/Alis.Reactive.Consumer.Net10`).
+`.claude/rules/tests.md` holds the ten rules and loads with any file here. A test is
+written once, at the full bar, from its promise and before its code: it fails until the code lands, proves the
+behavior when it turns green, and then fails on its planted defect (`scripts/plant-defect.sh`).
+
+## What this project adds
+
+- It compiles against Playwright, NUnit and the world contract (`tests/Alis.Reactive.Conformance.World`) and against
+  no assembly of the framework or of the app, so a test finds an element as a user does, by its role, label or text,
+  or by an id written as a literal, and expects a literal.
+- A test carries one `[FailsFor]` naming its constant in `tests/Alis.Reactive.Conformance.World/Promises.g.cs`. Its
+  fixture is `When` and its situation, takes its hosts by `TestFixtureSource`, and sits in the folder of the module
+  whose test it is, under the screen it runs on. `Harness/` holds what every module's tests use, and `SliceTree.txt`
+  orders the folders: `Harness/`, then one row of module folders, each entry a module's screens (`Schema/*`), so no
+  module's tests use another's helpers.
+- The build holds a test to `.claude/rules/tests.md`: the project imports
+  `tests/Alis.Reactive.TestRules/Alis.Reactive.TestRules.targets`, and each test rule, `TEST001` to `TEST013`, refuses
+  its defect where the test is written, with the cure in its message (`spec/REWRITE.md`, section 2.10). Until U3
+  writes the last test the project says its tests are still being written; after that a promise no test carries
+  fails the build.
+- Each test runs in a world of its own: `ConformanceFixture` opens it, and `TestWorld` seeds it through the world
+  contract's typed builders and keeps the errors its page's console holds, which a test reads with `Assert.That`.
+  Teardown ends the world and fails a gate still parked. An opposite case that holds under another host's options
+  opens its world by `NewWorldUnder` with that host's name of `Hosts`, its variable named in the promise's words, and
+  the fixture keeps the hosts its placement lists (`Harness/WhenAWorldOpensUnderAnotherHost.cs`). A world whose
+  browser runs in the zone a promise names opens by `NewWorldInZone`, the zone a constant of `Zones`; every other
+  world's browser runs in America/Los_Angeles (`Harness/WhenAWorldOpensInAnotherZone.cs`).
+  A fixture placed under two hosts takes `Hosts.Net10AndNet48`, whose data carries each host as the category of its
+  own instance, and carries no `[Category]` of its own
+  (`Validation/Admission/WhenARoomNumberIsCheckedByItsPattern.cs`). A case with JavaScript off opens its page by
+  `NewPersonWithJavaScriptOff`, a person's context with no world.
+- A test names the server's culture and time zone in its page's address, a constant of the world contract, and the
+  browser's locale stays "en-US"; a culture's opposite case opens a second world at the other culture's address
+  (`ArrayLambdas/Refusals/WhenATextKeyIsOrderedUnderAnAlternateSort.cs`).
+- A refusal where the view renders is read as its developer reads it: the heading of the page ASP.NET shows for
+  an exception, the exception's name, a colon and the whole message, found by its role and its exact name.
+  `ValuesAndSources/Refusals/WhenALiteralIsPastTheNumbersJavaScriptHolds.cs` is the pattern, the page that renders
+  beside it in a second world. A message names a component's member as its declaration does, the class, a dot and
+  the member.
+- A bench cell's test is written from its cell's promise in `spec/Reference/native.json`, in `Vendors/Bench/`:
+  `Vendors/Bench/WhenAStepReadsAComponentsProperty.cs` is the pattern. The page's own element is found by the id
+  the promise names, a button by its role and name, and what the component shows by its role: its heading, and a
+  line the promise names, a status named for the line with its first letter a capital (the raise line is the
+  status Raise, the count of raises the status Raises, the payload line the status Payload, the held line the
+  status Held, the value line the status Value, the line of what TakeNullable took the status Took; a peer's ratio is
+  the status Ratio inside the region Peer), its whole text the promise's words for what it shows ("Raised 1",
+  "Took 25"), or the value alone where the promise states the value alone. What the component lists is a list named for
+  what it lists, found inside the component's element by its id and read item by item, whole and in order: its
+  records' names are the list Records, which stands beside the status Records, the records line
+  (`Declarations/Bench/WhenAFieldNamesAMemberUnderTheAppsNaming.cs`). A name that opens another's is matched whole. An outcome
+  that an element stays empty is read after the status that shows the handler returned, and stands beside the
+  opposite case that fills it (`Vendors/Bench/WhenAnEventsPayloadHoldsAPromiseWhereAValueWasDeclared.cs`). A cell that holds the settle gate
+  arms it before its gesture and reads the held state before its release; its refused case runs ungated and reads
+  the status Settle first (`Vendors/Bench/WhenAStepAwaitsAComponentsMethod.cs`). A value picked in the component
+  is two presses on its listbox named Value, the down arrow and Enter
+  (`Vendors/Bench/WhenAComponentsMemberIsSetAsAnElementsText.cs`). A text box is found by its role and its
+  label's name, matched whole, and typed into by a fill
+  (`Vendors/Bench/WhenAConditionComparesATextBoxWithAComponentsMember.cs`). A form's submission set leaves as
+  multipart, whose text no literal states, so its test reads what the endpoint bound, shown by the page
+  (`Vendors/Bench/WhenAFormSendsAHiddenInputBesideAComponentsMember.cs`). A request a promise states is read as it leaves the
+  page: the test waits for it around its gesture and asserts its method, the end of its address, the path and
+  query the promise states, since its origin is the host's, and its body
+  (`Vendors/Bench/WhenAGetSendsAComponentsMemberInItsQuery.cs`). The opposite case runs in a second world, seeded through a
+  typed builder of the world contract where the promise changes what the component holds.
+- A check's failure shows twice, beside its input and in its form's summary (D16.13, MVC's own pattern), so a test
+  reads each in its own scope. The message beside an input is read inside the group its page gives the field, a
+  fieldset or a region found by its role and its name, matched whole, by `GetByText` with the whole message; one
+  absent beside another input is that group's `ToBeHiddenAsync`, beside the group that shows it. The summary is
+  read as the page's list items where it is the page's one list, else inside the region the page gives its form,
+  their texts whole (`ToHaveTextAsync` with the array of messages), and an
+  empty summary as a count of none, read after the answer line that shows the save was taken. That a failed check
+  sends nothing is read as the answer line staying empty after the message shows. Two components on one page are
+  each reached inside their own group (`Vendors/Bench/WhenEachEntryOfAListHasItsRule.cs`).
+- A click a promise lands behind an open modal dialog, where a person's pointer meets the dialog's backdrop, takes
+  Playwright's force option, so the actionability check, which waits for a button the backdrop covers, does not
+  stand in for the browser, and the browser delivers the click at the button's place; the outcome is read straight
+  after it, beside the opposite case that clicks the button once the dialog has closed
+  (`NativeAppLevelObjects/Shell/WhenAClickLandsBehindTheConfirm.cs`). The drawer, whose heading a close empties, is
+  the page's one complementary region, found by its role with no name, and its heading and content are read by the
+  ids M25.D1 names.
+- A care screen's test sits in its module's folder under the screen it runs on, and reads its page by its
+  address of `CarePages` in the world contract: `ArrayLambdas/Residents/WhenALambdaComparesWithAValueTheViewHolds.cs`
+  is the pattern, the page of the opposite case opened in a second world.
+- A text that holds lines the handlers of more than one plan write is read whole only where the promise states
+  their order, as D11.5 orders an app event's handlers; where it states none, each plan writes to an element of its
+  own and each element is read whole (the lead's mistake, 2026-11-14: X12.2's test read the page's line before the
+  card's before its promise stated that order).
+- A Fusion slice's test sits in a folder named for its slice under `FusionComponents/`, in the namespace of
+  `FusionComponents/` alone, its first folder, as ALIS011 holds every file; the runner reads the slice of its shard
+  unit from that folder, and the test opens a care screen's page
+  (`FusionComponents/FusionMultiSelect/WhenAMultiSelectsItemsAreHandedOverWithTheView.cs`). EJ2 33.1.47's
+  multi-select names its box "multiselect" and links no label to it, so the test finds the box as the combobox
+  inside the group its page gives the field, the box's list as the listbox's options, and the chosen item's text
+  inside that group, whole and kept to the visible element, since EJ2 keeps a hidden chip beside the text it shows.
+  A list the page loads is read after the page's own line that the same success pipeline sets after the items,
+  since EJ2 33.1.47 drew no item set while a multi-select's list stood open, in three seconds of the lead's probe
+  (`FusionComponents/FusionMultiSelect/WhenAMultiSelectsItemsAreLoadedFromAnEndpoint.cs`). A module 22 test sits in a
+  folder named for its screen under `FusionTemplates/`, in that folder's namespace, and its module folder is its
+  shard unit (`FusionTemplates/BedBoard/WhenARowsWardIsNullOrMissing.cs`).
+- A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
+  `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
+  alone and a module's tests sit in the module's. On Windows, `scripts/playwright-windows.ps1` starts the selected MVC 5
+  site and hands its address to the test process. A fixture opening a net10 world still starts its own Kestrel server.
+  For each net10 or admissions host whose move-in cases the selected shard takes, the assembly first reads the D100
+  page from that server in a separate HTTP world, checks its heading and ends the world with zero parked gates. Each test opens its own world.
+- A test whose page asks for Syncfusion's script, an address that ends in `"/ej2.min.js"`, fails at its teardown,
+  which names the address: a core test's page holds no component library, and `ConformanceFixture` reads every
+  request of a world's page and of a person's. The last command below plants that script's link on the World area's
+  pages and reads the refusal; the same plant with another script's name passes. A test of a Fusion slice or of a
+  Fusion screen is the one that takes the script: its fixture derives from `FusionFixture`, the only fixture
+  `ConformanceFixture` does not refuse it to, and every fixture under `FusionComponents/` and `FusionTemplates/` does
+  (U25, section 2.5 of `spec/REWRITE.md`).
+- A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits until
+  the harness reports it held, asserts the held state, and releases the held gate that wait returned. It never
+  provokes an ordering by timing, by a stubbed network or by a control on the page. A test that holds one action at
+  two endpoints arms a hold for each, naming the endpoint by its constant of the world contract, and releases each on
+  its own (`Harness/WhenAGateIsHeldAtTwoEndpoints.cs`). A test whose held request leaves as its page loads arms the
+  gate before it opens the page and reads the page's own heading before it waits for the hold, so a page that does not
+  render fails at that line and not at the hold's wait, which no measured wait bounds (the lead's correction of a
+  fork, 2026-11-14).
+- A tracing test (`Tracing/`) reads the spans on the collector's page, `WorldPages.Collector`, after its page's last
+  outcome shows, by its list items as a whole array of literals, then the echo, `WorldPages.Echo`, whose lines name
+  the spans the collector holds, so the echo is read after the collector's lines stand.
+- `Harness/measured.json` holds what 20 green runs measured: the budget of one test, four times the slowest test,
+  and the two waits, each four times the slowest step of its kind, a navigation's and every other step's. The runner
+  writes it (`--measure`) and fails a run that holds a test over the budget. `Harness/Waits.cs` sets the waits on
+  every browser context and on every expectation, so a test sets no wait of its own; in a measured run it sets none
+  and records each step from Playwright's trace. The file also holds the count of tests a run takes at once, which
+  `--measure-parallelism` measures: 20 runs at each of 1, 2, 4 and 8, and a count above one is kept only when its
+  runs are green and took no more than the runs at one divided by 1.6. Fixtures run beside each other at that count,
+  a fixture's tests one after another, and the budget is measured at it. A hand never edits the file: the runner
+  refuses a budget or a wait that is not four times what it measured, a count its wall times do not keep, and a
+  budget measured at another count. A Fusion fixture's page loads EJ2's whole script, so its budget and its waits are
+  the file's fusion block, the same fields measured over the Fusion fixtures' tests alone, which `Harness/Waits.cs`
+  sets for a `FusionFixture` and the runner reads its tests against; the core's stay what the core's tests took. A
+  measurement writes the fusion block when every test it selects is a Fusion fixture's, the core's when none is, and
+  refuses a selection that mixes them before it runs (the lead, 2026-11-17).
+- `shard-weights.json` holds the seconds each shard unit took in one run, which `--measure` writes: a module folder,
+  a slice under FusionComponents, and the host variants' tests as one unit. CI runs a pool in shards (`--pool`,
+  `--shard`), its units placed longest first, each on the lightest shard; a unit with no weight is placed last.
+- `Harness/WhenAGateHoldsAnAnswer.cs` is the pattern: the page, the gesture and the outcome are in the test's body,
+  and the opposite case stands beside it.
+
+## Bad tests, each beside the rule it breaks
+
+Read from main at 7b9e987cc and from the redesign at 65fdf118d, in tests/Alis.Reactive.PlaywrightTests and
+tests/Alis.Reactive.Framework.PlaywrightTests. Each passed there, and each is refused here.
+
+Rule 7, no tautology: the id the code computes. Redesign,
+Components/AppLevel/PharmacyDelivery/WhenTheNightNurseReceivesADelivery.cs line 35; 51 files of the redesign and 14
+of main do it. The generator that writes the input's id also finds it, so a wrong id passes. Here the test names the
+input by its label, and the tests of InputsAndIds expect each derived id as a literal.
+
+```csharp illustration
+private ILocator ReceivedBy => Page.Locator($"#{IdGenerator.For<PharmacyDeliveryModel>(m => m.ReceivedBy)}");
+```
+
+Rules 3 and 4, real collaborators and an observed outcome: script in the page. Main,
+Components/Native/WhenButtonFires.cs line 69. The test writes the element's text itself, which no user can, to make
+its second assertion mean something. Here the opposite case is a gesture the page offers.
+
+```csharp illustration
+await admitStatus.EvaluateAsync("el => el.textContent = 'reset'");
+await Page.Locator("#btn-admit").ClickAsync();
+await Expect(admitStatus).ToHaveTextAsync("Admit Resident clicked", new() { Timeout = 3000 });
+```
+
+Rule 8, deterministic: a wait on time. Main,
+Components/Fusion/InPlaceEditor/WhenInPlaceEditorQuickEditBlocksOnValidationRule.cs line 33. It sleeps 2.8 seconds
+and then reads a flag, so it is slow when the code is right and green when a slow machine sends the request late.
+Here the test expects the state the refusal shows, and the request that was held back is read from what the harness
+collected.
+
+```csharp illustration
+await inner.PressAsync("Enter");
+await Page.WaitForTimeoutAsync(2800);
+Assert.That(postFired, Is.False, "FluentValidator must abort the POST when Value violates GreaterThan(0).");
+```
+
+Rule 9, readable as the specification: a branch on a one-shot read. Main,
+Components/Fusion/Kanban/WhenUsingFusionKanban.cs line 138. The test does not know which page it is on, so it
+proves neither. Here a test has no branch, and the page's state is the promise's own.
+
+```csharp illustration
+if (await Page.Locator("#care-kanban_dialog_wrapper.e-popup-open").IsVisibleAsync())
+    await Page.Keyboard.PressAsync("Escape");
+```
+
+Rule 7 again: an expected value the test computes from the page. Redesign,
+Components/Fusion/Schedule/WhenUsingFusionSchedule.cs line 424. The count comes from a one-shot read of the summary
+it then asserts, through a pattern that matches any prefix. Here the world is seeded, so the count is a literal.
+
+```csharp illustration
+var before = await ShiftsNeedingCoverage();
+await Expect(Summary).ToHaveTextAsync(new Regex($@": {before - 1} of 21 shifts"), new() { Timeout = 15000 });
+```
+
+Rule 3 again: a stubbed network. Redesign,
+Components/AppLevel/PharmacyDelivery/WhenTheNightNurseReceivesADelivery.cs line 157; 19 files of the redesign and 8
+of main route a request. The test's own semaphore decides when the answer leaves, so the server's part of the
+promise never runs. Here the app's endpoint holds its own answer at a gate, and the test releases it.
+
+```csharp illustration
+await Page.RouteAsync(ManifestUrl, async route =>
+{
+    await manifestReleased.WaitAsync();
+    await route.ContinueAsync();
+});
+```
+
+Rule 7 a third time: a partial match. Redesign, Conditions/WhenAConditionAsksTheUser.cs line 24, in
+tests/Alis.Reactive.Framework.PlaywrightTests; 61 files of the redesign and 73 of main do it. Text before or after
+the expected words passes. Here the whole text is expected.
+
+```csharp illustration
+await Expect(Dialog).ToContainTextAsync("Discharge the resident?");
+```
+
+## Commands
+
+```bash
+scripts/playwright.sh --unit U2
+scripts/playwright.sh --unit U3
+scripts/playwright.sh WhenTwoWorldsRun
+scripts/playwright.sh --measure-parallelism --all
+scripts/playwright.sh --measure --all
+scripts/playwright.sh --pool core --shard "1/1"
+scripts/playwright.sh --test M19_F1.M19_X5_0 --host consumerNet10
+scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
+scripts/plant-defect.sh --test M19_F1.M19_X5_0 --host consumerNet10 --in Alis.Reactive/Alis.Reactive.csproj --replace 'Sdk="Microsoft.NET.Sdk.Razor"' --with 'Sdk="Microsoft.NET.Sdk"'
+scripts/plant-defect.sh --test M14_F1.X19_3_0 --in Alis.Reactive.Assets/runtime/Schema/read-plan.ts --replace "plan.version === pageVersion" --with "plan.version > 0"
+scripts/plant-defect.sh --test Harness.WhenAGateIsHeldAtTwoEndpoints_each_endpoints_answer_waits_for_its_own_release --in tests/Alis.Reactive.Conformance.App/World/WorldData.cs --replace 'GetOrAdd((order.Gate, order.At)' --with 'GetOrAdd((order.Gate, Anywhere)'
+scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace '<title>{Text(title)}</title>' --with '<title>{Text(title)}</title><script src=\"/js/ej2.min.js\"></script>'
+```

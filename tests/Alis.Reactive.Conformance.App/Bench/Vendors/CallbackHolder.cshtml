@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CallbackHolderBoard
+@{
+    Layout = "/Bench/Vendors/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<CallbackHolderBoard>();
+}
+<h1>The bench</h1>
+<h2>@Model.Caption</h2>
+@(plan.ConformanceCallbacks("callbacks", new CallbacksStart())
+    .Reactive(callbacks => callbacks.OnRaised, (raised, pipeline) => pipeline.Component<ConformanceCallbacks>("callbacks").Append("page-1"))
+    .Reactive(callbacks => callbacks.OnRaised, (raised, pipeline) => pipeline.Component<ConformanceCallbacks>("callbacks").Append("page-2")))
+<button type="button" @Html.Raises(plan, CallbackHolderButtons.OpenTheSlot)>Open the slot</button>
+<button type="button" @Html.Raises(plan, CallbackHolderButtons.CloseTheSlot)>Close the slot</button>
+<dl>
+    <dt>Inner slot opened</dt>
+    <dd id="inner-opened"></dd>
+</dl>
+<section id="holder" aria-label="Holder"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(CallbackHolderButtons.OpenTheSlot, pipeline => pipeline.Get(VendorSlotCards.Holder).Into("holder"))
+        .CustomEvent(CallbackHolderButtons.CloseTheSlot, pipeline => pipeline.Unload("holder")));
+}
+@Html.RenderPlan(plan)

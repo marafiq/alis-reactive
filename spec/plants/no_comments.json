@@ -1,0 +1,79 @@
+[
+ {
+  "name": "a line comment in the inventory script",
+  "edits": [
+   {
+    "file": "spec/tools/inventory.py",
+    "old": "#!/usr/bin/env python3\nimport json\n",
+    "new": "#!/usr/bin/env python3\n# the inventory script\nimport json\n"
+   }
+  ],
+  "expect": "spec/tools/inventory.py:2"
+ },
+ {
+  "name": "a docstring on a function",
+  "edits": [
+   {
+    "file": "spec/tools/main_surface.py",
+    "old": "#!/usr/bin/env python3\nimport os\n",
+    "new": "#!/usr/bin/env python3\ndef planted():\n    \"\"\"A planted docstring.\"\"\"\n\n\nimport os\n"
+   }
+  ],
+  "expect": "spec/tools/main_surface.py:3 docstring"
+ },
+ {
+  "name": "a line comment in a TLA+ spec",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.tla",
+    "old": "---- MODULE Tracing ----\nEXTENDS Naturals, FiniteSets\n",
+    "new": "---- MODULE Tracing ----\nEXTENDS Naturals, FiniteSets\n\\* the spans a run opens\n"
+   }
+  ],
+  "expect": "spec/Tracing/Tracing.tla:3"
+ },
+ {
+  "name": "a block comment in a TLA+ spec",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.tla",
+    "old": "---- MODULE Tracing ----\nEXTENDS Naturals, FiniteSets\n",
+    "new": "---- MODULE Tracing ----\n(* the tracing model *)\nEXTENDS Naturals, FiniteSets\n"
+   }
+  ],
+  "expect": "spec/Tracing/Tracing.tla:2"
+ },
+ {
+  "name": "a comment in a TLC config",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.cfg",
+    "old": "SPECIFICATION Spec\n",
+    "new": "SPECIFICATION Spec \\* the spec\n"
+   }
+  ],
+  "expect": "spec/Tracing/Tracing.cfg:1"
+ },
+ {
+  "name": "a hash inside a string literal",
+  "edits": [
+   {
+    "file": "spec/tools/inventory.py",
+    "old": "REPO = SPEC.parent\nOUT = SPEC / \"inventory\"\n",
+    "new": "REPO = SPEC.parent\nMARK = \"# \"\nOUT = SPEC / \"inventory\"\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a triple-quoted string assigned to a name",
+  "edits": [
+   {
+    "file": "spec/tools/main_surface.py",
+    "old": "def doors(path):\n",
+    "new": "HEADER = \"\"\"#nullable enable\"\"\"\n\n\ndef doors(path):\n"
+   }
+  ],
+  "expect": null
+ }
+]

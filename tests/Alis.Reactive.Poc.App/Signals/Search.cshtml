@@ -1,0 +1,21 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Medicine search";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Medicine search</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+<p>Query: <span id="query">unread</span></p>
+
+@(plan.MedicineSearch("search")
+    .Reactive(search => search.Load, (load, pipeline) =>
+    {
+        pipeline.Element("query").Text.Set(load.Query);
+        load.Answer(pipeline.Component<MedicationCart>("cart").Doses.Where(dose => dose.Route == 'I').Select(dose => dose.Medicine));
+    }))
+
+@Html.RenderPlan(plan)

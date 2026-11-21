@@ -1,0 +1,82 @@
+[
+ {
+  "name": "a step-5 mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.violates.ChildEndsBeforeParent.cfg",
+    "old": "CONSTANT Mutant = \"DisposeEndsRunFirst\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Tracing.violates.ChildEndsBeforeParent.cfg: expected ChildEndsBeforeParent violated, saw Model checking completed"
+ },
+ {
+  "name": "a config that must hold now carries a mutant",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.holds.OwnPlanStops.cfg",
+    "old": "CONSTANT Mutant = \"none\"",
+    "new": "CONSTANT Mutant = \"NameWithoutPrefix\""
+   }
+  ],
+  "expect": "Partials.holds.OwnPlanStops.cfg: expected green, saw violated: AttachedInputBindsItsMember"
+ },
+ {
+  "name": "a counterexample of the redesign's validation shows another gap",
+  "edits": [
+   {
+    "file": "spec/Validation/ValidationToday.violates.AConditionReadsTheObjectsStart.cfg",
+    "old": "INVARIANT AConditionReadsTheObjectsStart",
+    "new": "INVARIANT AListNotSentReadsItsStart"
+   }
+  ],
+  "expect": "expected AConditionReadsTheObjectsStart violated, saw violated: AListNotSentReadsItsStart"
+ },
+ {
+  "name": "Tracing's main config in another order",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.cfg",
+    "old": "INVARIANT TraceHeadersStayHome\nINVARIANT SinkFailureChangesNothing\n",
+    "new": "INVARIANT SinkFailureChangesNothing\nINVARIANT TraceHeadersStayHome\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "recorded results for another jar pin",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/tools/tla2tools.lock",
+    "old": "  \"sha256\": \"",
+    "new": "  \"sha256\": \"0000000000000000000000000000000000000000000000000000000000000000\",\n  \"original_sha256\": \""
+   }
+  ],
+  "expect": "spec/STATE.json has no recorded TLC outcomes for jar SHA-256"
+ },
+ {
+  "name": "a recorded counterexample marked green",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/STATE.json",
+    "old": "          \"Tracing.violates.ChildEndsBeforeParent.cfg\": {\n            \"green\": false,",
+    "new": "          \"Tracing.violates.ChildEndsBeforeParent.cfg\": {\n            \"green\": true,"
+   }
+  ],
+  "expect": "Tracing.violates.ChildEndsBeforeParent.cfg: expected ChildEndsBeforeParent violated"
+ },
+ {
+  "name": "recorded results for the current jar with a different lock format",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/tools/tla2tools.lock",
+    "old": "{\n",
+    "new": "{  \n"
+   }
+  ],
+  "expect": null
+ }
+]

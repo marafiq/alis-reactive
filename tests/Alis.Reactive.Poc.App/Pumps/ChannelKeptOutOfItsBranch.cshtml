@@ -1,0 +1,22 @@
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Pump channels";
+    var plan = Html.ReactivePlan<InfusionPage>();
+}
+<h1>Pump channels</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+
+@plan.StationCensus("census")
+
+@(plan.Button("pause", "Pause the first channel")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        PumpChannel? first = null;
+        pipeline.When(pipeline.Component<StationCensus>("census").Count.Gt(0))
+            .Then(counted => first = counted.Component<InfusionPump>("pump").Channels().At(0));
+        first!.Pause();
+    }))
+
+@Html.RenderPlan(plan)

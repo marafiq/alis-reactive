@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model AdmissionConsent
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Photo consent";
+    var plan = Html.ReactivePlan<AdmissionConsent>();
+}
+<h1>Photo consent</h1>
+<fieldset>
+    <legend>Photo consent</legend>
+    @(Html.InputField(plan, m => m.PhotoConsent, options => options.Label("Photo consent")).FusionCheckBox())
+</fieldset>
+@Html.RenderPlan(plan)

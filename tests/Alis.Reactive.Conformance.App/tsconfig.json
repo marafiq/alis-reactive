@@ -1,0 +1,8 @@
+{
+  "extends": "../../Alis.Reactive.Assets/tsconfig.json",
+  "compilerOptions": {
+    "moduleDetection": "force"
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["bin", "obj", "wwwroot"]
+}

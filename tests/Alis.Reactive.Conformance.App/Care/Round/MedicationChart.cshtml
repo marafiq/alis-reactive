@@ -1,0 +1,21 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MedicationChart
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Medication chart";
+    var plan = Html.ReactivePlan<MedicationChart>();
+}
+<h1>Medication chart of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, MedicationCharts.Check)>Check</button>
+<p>Aspirin on this round: <span id="round-status">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MedicationCharts.Check, pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<ChartedMedication>>((chart, pipeline) => pipeline.When(chart.Body.Find(d => d.Medicine == "Aspirin", d => d.Status).Eq(DoseStatus.Given))
+            .Then(pipeline => pipeline.Element("round-status").Text.Set("Given"))
+            .Else(pipeline => pipeline.Element("round-status").Text.Set("Due")))));
+}
+@Html.RenderPlan(plan)

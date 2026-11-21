@@ -1,0 +1,114 @@
+#nullable enable
+Alis.Reactive.FluentValidator.FieldConditionBuilder<T>
+Alis.Reactive.FluentValidator.FieldConditionBuilder<T>.Field<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field) -> Alis.Reactive.FluentValidator.FieldStart<T!, TProp>!
+Alis.Reactive.FluentValidator.FieldGuard<T>
+Alis.Reactive.FluentValidator.FieldGuard<T>.And(Alis.Reactive.FluentValidator.FieldGuard<T!>! other) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldGuard<T>.Not() -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldGuard<T>.Or(Alis.Reactive.FluentValidator.FieldGuard<T!>! other) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.ArrayContains(TProp value) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Between(TProp low, TProp high) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Contains(string! substring) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.EndsWith(string! suffix) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Eq(TProp value) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Falsy() -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Gt(TProp value) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Gte(TProp value) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.In(params TProp[]! values) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.IsEmpty() -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.IsNull() -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Lt(TProp value) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Lte(TProp value) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Matches(string! pattern) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.MinLength(int minLength) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Neq(TProp value) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.NotEmpty() -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.NotIn(params TProp[]! values) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.NotNull() -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.StartsWith(string! prefix) -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.FieldStart<T, TProp>.Truthy() -> Alis.Reactive.FluentValidator.FieldGuard<T!>!
+Alis.Reactive.FluentValidator.ReactiveClientCollectionRuleBuilder<TModel, TItem>
+Alis.Reactive.FluentValidator.ReactiveClientCollectionRuleBuilder<TModel, TItem>.AtLeastOne(string! message) -> Alis.Reactive.FluentValidator.ReactiveClientCollectionRuleBuilder<TModel!, TItem!>!
+Alis.Reactive.FluentValidator.ReactiveClientCollectionRuleBuilder<TModel, TItem>.SetValidator(Alis.Reactive.FluentValidator.ReactiveValidator<TItem!>! validator) -> Alis.Reactive.FluentValidator.ReactiveClientCollectionRuleBuilder<TModel!, TItem!>!
+Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel, TValue>
+Alis.Reactive.FluentValidator.ReactiveClientRules
+Alis.Reactive.FluentValidator.ReactiveFluentValidationBuilder
+Alis.Reactive.FluentValidator.ReactiveFluentValidationBuilder.Add<TValidator>() -> Alis.Reactive.FluentValidator.ReactiveFluentValidationBuilder!
+Alis.Reactive.FluentValidator.ReactiveFluentValidationBuilder.AddFromAssembly(System.Reflection.Assembly! assembly) -> Alis.Reactive.FluentValidator.ReactiveFluentValidationBuilder!
+Alis.Reactive.FluentValidator.ReactiveFluentValidationBuilder.AddFromAssemblyContaining<TMarker>() -> Alis.Reactive.FluentValidator.ReactiveFluentValidationBuilder!
+Alis.Reactive.FluentValidator.ReactiveFluentValidationServiceCollectionExtensions
+Alis.Reactive.FluentValidator.ReactiveValidator<T>
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.ClientRule<TChild>(System.Linq.Expressions.Expression<System.Func<T!, TChild!>!>! field, Alis.Reactive.FluentValidator.ReactiveValidator<TChild!>! validator) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.ClientRule<TValue>(System.Linq.Expressions.Expression<System.Func<T!, TValue>!>! field) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<T!, TValue>!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.ClientRuleEach<TItem>(System.Linq.Expressions.Expression<System.Func<T!, System.Collections.Generic.IEnumerable<TItem!>!>!>! field) -> Alis.Reactive.FluentValidator.ReactiveClientCollectionRuleBuilder<T!, TItem!>!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.ClientRulesFrom(Alis.Reactive.FluentValidator.ReactiveValidator<T!>! validator) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.ClientRulesFrom<TSource>(Alis.Reactive.FluentValidator.ReactiveValidator<TSource!>! validator) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.ReactiveValidator() -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.Unless(System.Func<T!, bool>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.Unless(System.Func<T!, FluentValidation.ValidationContext<T!>!, bool>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.UnlessAsync(System.Func<T!, FluentValidation.ValidationContext<T!>!, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.UnlessAsync(System.Func<T!, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.When(System.Func<T!, bool>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.When(System.Func<T!, FluentValidation.ValidationContext<T!>!, bool>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenAsync(System.Func<T!, FluentValidation.ValidationContext<T!>!, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenAsync(System.Func<T!, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenField(System.Linq.Expressions.Expression<System.Func<T!, bool>!>! field, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenField<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldArrayContains<TProp>(System.Linq.Expressions.Expression<System.Func<T!, System.Collections.Generic.IEnumerable<TProp>?>!>! field, TProp value, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldBetween<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp low, TProp high, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldContains(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, string! substring, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldEmpty(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldEndsWith(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, string! suffix, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldGt<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldGte<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldIn<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp[]! values, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldLt<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldLte<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldMatches(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, string! pattern, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldMinLength(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, int minLength, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldNot(System.Linq.Expressions.Expression<System.Func<T!, bool>!>! field, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldNot<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldNotEmpty(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldNotIn<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp[]! values, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldNotNull<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldNull<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFields(System.Func<Alis.Reactive.FluentValidator.FieldConditionBuilder<T!>!, Alis.Reactive.FluentValidator.FieldGuard<T!>!>! buildCondition, System.Action! defineRules) -> void
+Alis.Reactive.FluentValidator.ReactiveValidator<T>.WhenFieldStartsWith(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, string! prefix, System.Action! defineRules) -> void
+static Alis.Reactive.FluentValidator.ReactiveClientRules.AtLeastOne<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.CreditCard<TModel>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>! rule, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Email<TModel>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>! rule, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Empty<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.EqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.EqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue expected, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.ExclusiveRange<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue lowerBound, TValue upperBound, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.ExclusiveRange<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue lowerBound, TValue upperBound, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.GreaterThan<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.GreaterThan<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue value, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.GreaterThan<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue?>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.GreaterThan<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue value, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.GreaterThanOrEqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.GreaterThanOrEqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue minimum, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.GreaterThanOrEqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue?>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.GreaterThanOrEqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue minimum, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.LessThan<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.LessThan<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue value, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.LessThan<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue?>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.LessThan<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue value, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.LessThanOrEqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.LessThanOrEqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue maximum, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.LessThanOrEqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue?>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.LessThanOrEqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue maximum, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Max<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue maximum, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Max<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue maximum, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.MaxLength<TModel>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>! rule, int length, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Min<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue minimum, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Min<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue minimum, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.MinLength<TModel>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>! rule, int length, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.NotEqual<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue forbidden, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.NotEqualTo<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Range<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue lowerBound, TValue upperBound, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Range<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue lowerBound, TValue upperBound, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Regex<TModel>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>! rule, string! pattern, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Required<TModel, TValue>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>! rule, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, TValue>!
+static Alis.Reactive.FluentValidator.ReactiveClientRules.Url<TModel>(this Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>! rule, string! message) -> Alis.Reactive.FluentValidator.ReactiveClientRuleBuilder<TModel!, string?>!
+static Alis.Reactive.FluentValidator.ReactiveFluentValidationServiceCollectionExtensions.AddReactiveFluentValidation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.FluentValidator.ReactiveFluentValidationBuilder!>! configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

@@ -1,0 +1,172 @@
+[
+ {
+  "name": "the harness tests gone from app.json",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"harnessTests\": [",
+    "new": "\"harnessTestsDraft\": ["
+   }
+  ],
+  "expect": "U2 proves nothing: no browser test lands in it, no core feature of it writes a node a module test reads, none of its features has an analyzer defect, and app.json gives it no harness test"
+ },
+ {
+  "name": "a unit whose features are emptied",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "### U14. Plugins\nFeatures: M13.F1, M13.F2\n",
+    "new": "### U14. Plugins\nFeatures: none\n"
+   }
+  ],
+  "expect": "U14 proves nothing"
+ },
+ {
+  "name": "a harness test on a care screen",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"fixture\": \"WhenTwoWorldsRun\",",
+    "new": "\"fixture\": \"WhenTwoWorldsRun\",\n      \"screen\": \"residents\","
+   }
+  ],
+  "expect": "harness test WhenTwoWorldsRun.each_world_lists_only_the_residents_it_seeded runs on its screen 'residents'; a harness test runs on no framework part"
+ },
+ {
+  "name": "a harness test naming no unit",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",\n      \"unit\": \"U2\",",
+    "new": "\"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",\n      \"unit\": \"U99\","
+   }
+  ],
+  "expect": "harness test WhenAGateHoldsAnAnswer.the_held_answer_reads_the_word_seeded_while_it_was_held names 'U99', no unit of REWRITE.md"
+ },
+ {
+  "name": "a harness test with no opposite",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "      \"opposite\": \"With no gate armed, seeding North and clicking the link shows North in the frame.\",\n",
+    "new": ""
+   }
+  ],
+  "expect": "harness test WhenAGateHoldsAnAnswer.the_held_answer_reads_the_word_seeded_while_it_was_held states no opposite"
+ },
+ {
+  "name": "a harness gate at an action no Next holds",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"action\": \"Composition.tla:Answer\",\n          \"on\": \"the word endpoint's answer\"",
+    "new": "\"action\": \"Composition.tla:Reply\",\n          \"on\": \"the word endpoint's answer\""
+   }
+  ],
+  "expect": "harness test WhenAGateHoldsAnAnswer.the_held_answer_reads_the_word_seeded_while_it_was_held holds Composition.tla:Reply, no action of Composition.tla's Next"
+ },
+ {
+  "name": "a harness test under a host app.json lacks",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"defect\": \"The world middleware scopes no seeded data to the world's key, so each records page lists both residents.\",\n      \"hosts\": [\n        \"net10\"",
+    "new": "\"defect\": \"The world middleware scopes no seeded data to the world's key, so each records page lists both residents.\",\n      \"hosts\": [\n        \"net11\""
+   }
+  ],
+  "expect": "harness test WhenTwoWorldsRun.each_world_lists_only_the_residents_it_seeded runs under 'net11', no host of app.json"
+ },
+ {
+  "name": "a harness test's gesture reworded",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "click the link, wait until the harness reports the gate held, seed the word South",
+    "new": "click the page's link, wait until the harness reports the gate held, seed the word South"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a feature moved to the next unit",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M2.F1, M2.F2\n",
+    "new": "Features: M2.F1\n"
+   },
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M3.F1, M3.F2\n",
+    "new": "Features: M2.F2, M3.F1, M3.F2\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a harness test moved to a later unit",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",\n      \"unit\": \"U2\",",
+    "new": "\"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",\n      \"unit\": \"U3\","
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a harness test under a fresh app's host",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"defect\": \"The world middleware scopes no seeded data to the world's key, so each records page lists both residents.\",\n      \"hosts\": [\n        \"net10\"",
+    "new": "\"defect\": \"The world middleware scopes no seeded data to the world's key, so each records page lists both residents.\",\n      \"hosts\": [\n        \"consumerNet10\""
+   }
+  ],
+  "expect": "harness test WhenTwoWorldsRun.each_world_lists_only_the_residents_it_seeded runs under 'consumerNet10', a fresh app's server, which holds no world"
+ },
+ {
+  "name": "a harness test listed twice",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"fixture\": \"WhenAGateHoldsAnAnswer\",\n      \"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",",
+    "new": "\"fixture\": \"WhenTwoWorldsRun\",\n      \"test\": \"each_world_lists_only_the_residents_it_seeded\","
+   }
+  ],
+  "expect": "harness test WhenTwoWorldsRun.each_world_lists_only_the_residents_it_seeded is listed 2 times"
+ },
+ {
+  "name": "a harness fixture not named for its situation",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"fixture\": \"WhenTwoWorldsRun\",",
+    "new": "\"fixture\": \"TwoWorldsRun\","
+   }
+  ],
+  "expect": "harness test TwoWorldsRun.each_world_lists_only_the_residents_it_seeded's fixture is not named When and its situation"
+ },
+ {
+  "name": "a unit whose one core feature writes no node",
+  "edits": [
+   {
+    "file": "spec/OwnershipAndState/features.json",
+    "old": "      \"nodes\": [\n        \"plugin\",\n        \"none\",\n        \"form\",\n        \"model\",\n        \"hub\",\n        \"stream\",\n        \"listen\",\n        \"request\",\n        \"zone\"\n      ],",
+    "new": "      \"nodes\": [],"
+   }
+  ],
+  "expect": "U6 proves nothing: no browser test lands in it, no core feature of it writes a node a module test reads"
+ },
+ {
+  "name": "a unit its module tests alone prove, one node fewer",
+  "edits": [
+   {
+    "file": "spec/OwnershipAndState/features.json",
+    "old": "        \"request\",\n        \"zone\"\n      ],",
+    "new": "        \"request\"\n      ],"
+   }
+  ],
+  "expect": null
+ }
+]

@@ -1,0 +1,16 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Ordered flags";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Ordered flags</h1>
+
+@plan.FluidBalance("balance")
+
+@(plan.Button("assess", "Assess the recheck")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.When(pipeline.Component<FluidBalance>("balance").Rechecking.Gt(false))
+            .Then(rechecking => rechecking.Element("assess").Text.Set("rechecking"))))
+
+@Html.RenderPlan(plan)

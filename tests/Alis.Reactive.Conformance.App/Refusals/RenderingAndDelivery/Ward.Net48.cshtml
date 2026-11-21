@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardPage
+@{
+    ViewData["Title"] = "The ward";
+    var plan = Html.ReactivePlan<WardPage>();
+    var name = Model.Name;
+}
+<h1>The ward</h1>
+<p>Ward: <span id="ward-name"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("ward-name").Text.Set(name)));
+}
+@Html.RenderPlan(plan)

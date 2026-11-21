@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Values
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Aspirin's code labels the chart";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Aspirin's code labels the chart</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@plan.DoseChart("chart")
+
+<p>Verdict: <span id="verdict">unchecked</span></p>
+
+@(plan.Button("label", "Label")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var cart = pipeline.Component<MedicationCart>("cart");
+        pipeline.Component<DoseChart>("chart").TickLabel.Set(tick => cart.Doses.Find(d => d.Medicine == "Aspirin", d => d.Code));
+    }))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,6 @@
+first
+nested
+nested/left nested/right
+wings/*
+.
+second third

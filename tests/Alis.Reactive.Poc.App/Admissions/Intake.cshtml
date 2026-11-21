@@ -1,0 +1,34 @@
+@using Alis.Reactive.Poc.App.Admissions
+@model IntakeForm
+@{
+    ViewData["Title"] = "Resident intake";
+    var plan = Html.ReactivePlan<IntakeForm>();
+    string[] wards = ["North", "South", "East"];
+}
+<h1>Resident intake</h1>
+
+@using (Html.BeginForm("Intake", "Admissions", FormMethod.Post))
+{
+    @Html.InputField(plan, m => m.ResidentName).TextBox("Resident name")
+    @Html.InputField(plan, m => m.NextOfKin.Name).TextBox("Next of kin")
+    @(Html.InputField(plan, m => m.Ward).WardPicker("Ward", wards)
+        .Reactive(picker => picker.Change, pipeline =>
+            pipeline.Element("chosen-ward").Text.Set(pipeline.Input(m => m.Ward).Component<WardPicker>().Selected)))
+    <p>Chosen ward: <strong id="chosen-ward">not chosen yet</strong></p>
+    <button type="submit">Save intake</button>
+}
+
+@(plan.Button("preview-card", "Preview the door card")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("card-resident").Text.Set(pipeline.Input(m => m.ResidentName).Component<NativeTextBox>().Value);
+        pipeline.Element("card-kin").Text.Set(pipeline.Input(m => m.NextOfKin.Name).Component<NativeTextBox>().Value);
+    }))
+
+<section>
+    <h2>Door card</h2>
+    <p>Resident: <strong id="card-resident">no preview</strong></p>
+    <p>Next of kin: <strong id="card-kin">no preview</strong></p>
+</section>
+
+@Html.RenderPlan(plan)

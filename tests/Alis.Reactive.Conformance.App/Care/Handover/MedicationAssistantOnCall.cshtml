@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@model MedicationAssistant
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Medication assistant";
+    var plan = Html.ReactivePlan<MedicationAssistant>();
+}
+<h1>Medication assistant: @Model.Round</h1>
+@(Html.FusionAIAssistView(plan, "medication-assistant", build => build.PromptPlaceholder("Ask about a dose"))
+    .Reactive(assistant => assistant.PromptRequest, (asked, pipeline) => pipeline
+        .Get(MedicationAssistantEndpoints.OnCallAnswer)
+        .OnSuccess(Content.Text, (answer, pipeline) => pipeline
+            .Component<FusionAIAssistView>("medication-assistant").AddPromptResponse(answer.Body))))
+@Html.RenderPlan(plan)

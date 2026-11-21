@@ -1,0 +1,16 @@
+@using Alis.Reactive.Poc.App.Monitors
+@model MonitorsPage
+@{
+    ViewData["Title"] = "Cancelled after an await";
+    var plan = Html.ReactivePlan<MonitorsPage>();
+}
+<h1>Cancelled after an await</h1>
+
+@(plan.VitalsMonitor("monitor")
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+    {
+        pipeline.Component<VitalsMonitor>("monitor").Acknowledge();
+        alarm.Cancel.Set(true);
+    }))
+
+@Html.RenderPlan(plan)

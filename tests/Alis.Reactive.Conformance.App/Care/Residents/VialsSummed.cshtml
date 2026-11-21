@@ -1,0 +1,17 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ChartedRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Vials in supply";
+    var plan = Html.ReactivePlan<ChartedRound>();
+}
+<h1>@Model.Round round: vials in supply</h1>
+<p>Vials across the round: <span id="vial-total">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<RoundDose>>((doses, pipeline) => pipeline.Element("vial-total").Text.Set(doses.Body.Select(d => d.Supply.Vials).Sum(v => v)))));
+}
+@Html.RenderPlan(plan)

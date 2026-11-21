@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+<h2>Medication orders</h2>
+<div id="medication-rows">
+    @await Html.PartialAsync("/Care/MoveIn/MedicationRows.cshtml", new MedicationEdit { Medications = Model.Medications })
+</div>
+@(Html.NativeButton("save-medications", "Save medications").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MoveInDraftEvents.Command, pipeline.Object<DraftCommand>(c => c.Set(m => m.Kind, DraftCommandKind.SaveMedications)))))
+@(Html.NativeButton("close-medications", "Close medication editor").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+{
+    pipeline.Unload("medication-rows");
+    pipeline.Element("medication-status").Text.Set("Medication editor closed.");
+}))
+@(Html.NativeButton("open-medications", "Open medication editor").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Get<SectionQuery>(MoveInEndpoints.MedicationRows, request => request.Query(q => q.DraftId, Model.DraftId)).Into("medication-rows")))
+<p id="medication-status"></p>
+@await Html.PartialAsync("/Care/MoveIn/PharmacyReview.cshtml", Model)
+@Html.RenderPlan(plan)

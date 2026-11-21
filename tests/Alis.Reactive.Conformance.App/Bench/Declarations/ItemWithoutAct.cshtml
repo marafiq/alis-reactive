@@ -1,0 +1,42 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ItemActsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Current items";
+    var plan = Html.ReactivePlan<ItemActsBoard>();
+}
+<h1>Current items</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, CurrentItem = Model.CurrentItem }))
+@(plan.ConformanceComponent("conformance-lacking", new ConformanceStart { Text = Model.Text, CurrentItem = Model.CurrentItem, CurrentItemLacksAct = true }))
+<button type="button" @Html.Raises(plan, ItemActButtons.ActOnCurrent)>Act on current</button>
+<button type="button" @Html.Raises(plan, ItemActButtons.ActOnLacking)>Act on lacking</button>
+<button type="button" @Html.Raises(plan, ItemActButtons.ShowLackingsText)>Show lacking's text</button>
+<dl>
+    <dt>Act done</dt>
+    <dd id="act-done"></dd>
+    <dt>Lacking's act tried</dt>
+    <dd id="act-tried"></dd>
+    <dt>Lacking's act done</dt>
+    <dd id="lacking-done"></dd>
+    <dt>Lacking's text</dt>
+    <dd id="text-read"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ItemActButtons.ActOnCurrent, pipeline =>
+        {
+            pipeline.Component<ConformanceComponent>("conformance").Current().Act();
+            pipeline.Element("act-done").Text.Set("acted");
+        })
+        .CustomEvent(ItemActButtons.ActOnLacking, pipeline =>
+        {
+            pipeline.Element("act-tried").Text.Set("acting");
+            pipeline.Component<ConformanceComponent>("conformance-lacking").Current().Act();
+            pipeline.Element("lacking-done").Text.Set("acted");
+        })
+        .CustomEvent(ItemActButtons.ShowLackingsText, pipeline => pipeline.Element("text-read").Text.Set(pipeline.Component<ConformanceComponent>("conformance-lacking").Text)));
+}
+@Html.RenderPlan(plan)

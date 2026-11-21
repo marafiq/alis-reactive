@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.PivotView
+@model LedUnits
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Led units";
+    var plan = Html.ReactivePlan<LedUnits>();
+    var unit = FusionPivotViewFields.Of<LedUnit>();
+}
+<h1>Led units</h1>
+@(Html.FusionPivotView(plan, "led-units", build => build
+    .DisplayOption(new PivotViewDisplayOption { View = View.Table })
+    .DataSourceSettings(new PivotViewDataSourceSettings
+    {
+        DataSource = Model.Units,
+        Rows = new List<PivotViewRow> { new() { Name = Model.ByLead ? unit.Field(u => u.Lead.Name) : unit.Field(u => u.Ward), Caption = "Unit" } },
+        Values = new List<PivotViewRow> { new() { Name = unit.Field(u => u.Beds), Caption = "Beds" } },
+    })))
+@Html.RenderPlan(plan)

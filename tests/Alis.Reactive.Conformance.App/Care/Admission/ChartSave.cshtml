@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ChartSave
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission chart";
+    var plan = Html.ReactivePlan<ChartSave>();
+}
+<h1>Admission chart</h1>
+@using (var chart = Html.BeginRequestForm(plan, "chart"))
+{
+    <fieldset>
+        <legend>Diet</legend>
+        @(Html.InputField(plan, m => m.Diet, options => options.Label("Diet")).NativeTextBox())
+    </fieldset>
+    <button type="button" @Html.Raises(plan, ChartSaveButtons.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(ChartSaveButtons.Save, HandlerPolicy.Skip, pipeline => pipeline
+        .Post<ChartSave>(CareEndpoints.ChartSaves, request => request.Form(chart.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("chart-status").Text.Set(saved.Body))));
+}
+<p>Status: <span id="chart-status">Not saved</span></p>
+@Html.RenderPlan(plan)

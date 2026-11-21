@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@model WardBeds
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Beds";
+}
+<h1>Beds of the @Model.Ward</h1>
+<nav aria-label="Beds">
+    <ul>
+        @foreach (var id in Model.Ids)
+        {
+            <li><a href="@FreeBedEndpoints.BedAt(id)">@id</a></li>
+        }
+    </ul>
+</nav>

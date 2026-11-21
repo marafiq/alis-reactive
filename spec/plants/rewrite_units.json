@@ -1,0 +1,205 @@
+[
+ {
+  "name": "a feature dropped from its unit",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M1.F1, M1.F2\n",
+    "new": "Features: M1.F1\n"
+   }
+  ],
+  "expect": "M1.F2 is in no unit"
+ },
+ {
+  "name": "a feature listed in two units",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M2.F1, M2.F2\n",
+    "new": "Features: M2.F1, M2.F2, M1.F1\n"
+   }
+  ],
+  "expect": "M1.F1 is in U9 and U20"
+ },
+ {
+  "name": "a unit lists a feature no features.json holds",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M5.F1\n",
+    "new": "Features: M5.F1, M5.F2\n"
+   }
+  ],
+  "expect": "U15 lists M5.F2, no feature of spec/*/features.json"
+ },
+ {
+  "name": "a unit heading renumbered",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "### U15. Elements\n",
+    "new": "### U16. Elements\n"
+   }
+  ],
+  "expect": "U16 stands at place 15"
+ },
+ {
+  "name": "a unit's Features line dropped",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "### U1. Tools, pins and tables\nFeatures: M20.F1\n",
+    "new": "### U1. Tools, pins and tables\n"
+   }
+  ],
+  "expect": "U1 lists no Features line"
+ },
+ {
+  "name": "an app part needs a module no unit holds",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"role\": \"the search box, a NativeTextBox whose typing finds residents\",\n          \"module\": \"NativeComponents\"",
+    "new": "\"role\": \"the search box, a NativeTextBox whose typing finds residents\",\n          \"module\": \"NativeComponent\""
+   }
+  ],
+  "expect": "residents's search needs 'NativeComponent', the module of no unit"
+ },
+ {
+  "name": "a wrapped Features line's next line lists a feature no features.json holds",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14,\nM21.F15, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27,\n",
+    "new": "Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14,\nM21.F15, M21.F99, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27,\n"
+   }
+  ],
+  "expect": "U26 lists M21.F99, no feature of spec/*/features.json"
+ },
+ {
+  "name": "a Doors line naming a door no module has",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Doors: N14.2, M1.N1, M5.N5, M5.N1\n",
+    "new": "Doors: N14.2, M1.N1, M5.N5, M5.N99\n"
+   }
+  ],
+  "expect": "U3's Doors line names M5.N99, no core or module door"
+ },
+ {
+  "name": "a door on two Doors lines",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "### U20. Triggers and pipelines\nFeatures: M1.F1, M1.F2\n",
+    "new": "### U20. Triggers and pipelines\nFeatures: M1.F1, M1.F2\nDoors: M1.N1\n"
+   }
+  ],
+  "expect": "M1.N1 is on the Doors lines of U3 and U20"
+ },
+ {
+  "name": "a part listing a door no module has",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"doors\": [\n            \"M1.N1\"\n          ]",
+    "new": "\"doors\": [\n            \"M1.N99\"\n          ]"
+   }
+  ],
+  "expect": "fresh's consumerLoad lists M1.N99, no core or module door"
+ },
+ {
+  "name": "a unit's features in another order",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M2.F1, M2.F2\n",
+    "new": "Features: M2.F2, M2.F1\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a feature moved to the next unit",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M2.F1, M2.F2\n",
+    "new": "Features: M2.F1\n"
+   },
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M3.F1, M3.F2\n",
+    "new": "Features: M2.F2, M3.F1, M3.F2\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a Features line wrapped at another width",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14,\nM21.F15, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27,\nM21.F28, M21.F29, M21.F30, M21.F31, M21.F32, M21.F33, M21.F34, M21.F35, M21.F36, M21.F37, M21.F38, M21.F39, M21.F40,\nM21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46, M21.F47, M21.F48, M21.F49, M21.F50, M21.F51, M21.F52\n",
+    "new": "Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10,\nM21.F11, M21.F12, M21.F13, M21.F14, M21.F15, M21.F16, M21.F17, M21.F18, M21.F19,\nM21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27, M21.F28,\nM21.F29, M21.F30, M21.F31, M21.F32, M21.F33, M21.F34, M21.F35, M21.F36, M21.F37,\nM21.F38, M21.F39, M21.F40, M21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46,\nM21.F47, M21.F48, M21.F49, M21.F50, M21.F51, M21.F52\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a Doors line in another order",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Doors: N14.2, M1.N1, M5.N5, M5.N1\n",
+    "new": "Doors: M5.N1, M5.N5, M1.N1, N14.2\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a part's door on no Doors line",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Doors: N14.2, M1.N1, M5.N5, M5.N1",
+    "new": "Doors: N14.2, M1.N1, M5.N5"
+   }
+  ],
+  "expect": "fresh's consumerStatus lists M5.N1, which no unit's Doors line brings"
+ },
+ {
+  "name": "a page calls a door of a module no unit holds",
+  "edits": [
+   {
+    "file": "spec/Reference/page-doors.json",
+    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [],\n",
+    "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Ledgers\"\n    ],\n"
+   }
+  ],
+  "expect": "M16.F1 X18.8 0's pages call a door of 'Ledgers', the module of no unit"
+ },
+ {
+  "name": "the doors table lands a promise app.json does not hold",
+  "edits": [
+   {
+    "file": "spec/Reference/page-doors.json",
+    "old": "  \"M16.F1 X18.8 0\": {\n",
+    "new": "  \"M16.F1 X18.8 9\": {\n"
+   }
+  ],
+  "expect": "spec/Reference/page-doors.json lands M16.F1 X18.8 9, which no placement or cell of app.json promises"
+ },
+ {
+  "name": "a page calls a door of another module a unit holds",
+  "edits": [
+   {
+    "file": "spec/Reference/page-doors.json",
+    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [],\n",
+    "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Conditions\"\n    ],\n"
+   }
+  ],
+  "expect": null
+ }
+]

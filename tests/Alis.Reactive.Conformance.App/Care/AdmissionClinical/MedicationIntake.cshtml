@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MedicationIntake
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Medication intake";
+    var plan = Html.ReactivePlan<MedicationIntake>();
+}
+<h1>Medication intake</h1>
+@using (var intake = Html.BeginRequestForm(plan, "medication-intake"))
+{
+    <fieldset>
+        <legend>Current medication</legend>
+        @(Html.InputField(plan, m => m.CurrentMedication, options => options.Label("Current medication"))
+            .FusionAutoComplete(Model.Medications, build => build.Fields((Medication m) => m.DisplayLabel, m => m.DisplayLabel)))
+    </fieldset>
+    <button type="button" @Html.Raises(plan, MedicationIntakes.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(MedicationIntakes.Save, pipeline => pipeline
+        .Post<MedicationIntake>(MedicationIntakeEndpoints.Intakes, request => request.Form(intake.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+<p id="saved">Not saved</p>
+@Html.RenderPlan(plan)

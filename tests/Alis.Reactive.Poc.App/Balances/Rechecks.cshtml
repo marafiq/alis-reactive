@@ -1,0 +1,21 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Rechecks";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Rechecks</h1>
+
+@plan.FluidBalance("balance")
+
+<p>After: <span id="after">waiting</span></p>
+
+@(plan.Button("recheck", "Recheck a balance with intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Intake.Gt(0)).Then(taken => taken.Component<FluidBalance>("balance").Recheck());
+        pipeline.Element("after").Text.Set("done");
+    }))
+
+@Html.RenderPlan(plan)

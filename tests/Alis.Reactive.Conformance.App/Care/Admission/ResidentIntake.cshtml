@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentIntake
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident intake";
+    var plan = Html.ReactivePlan<ResidentIntake>();
+}
+<style>
+    .is-invalid { outline: 2px solid red; }
+</style>
+<h1>Resident intake</h1>
+@using (var intake = Html.BeginRequestForm(plan, "resident-intake"))
+{
+    <fieldset>
+        <legend>Name</legend>
+        @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    </fieldset>
+    <button type="button" @Html.Raises(plan, ResidentIntakeButtons.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentIntakeButtons.Save, pipeline => pipeline
+        .Post<ResidentIntake>(ResidentIntakeEndpoints.Intakes, request => request.Form(intake.Form))
+        .Validate<ResidentIntakeRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("intake-status").Text.Set(saved.Body))));
+}
+<p>Intake: <span id="intake-status">Not saved</span></p>
+@Html.RenderPlan(plan)

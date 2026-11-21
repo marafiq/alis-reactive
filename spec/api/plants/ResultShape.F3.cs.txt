@@ -1,0 +1,9 @@
+using System;
+using Alis.Reactive.Pipelines;
+
+namespace Alis.Reactive.Plants;
+
+public static class ResultShapePlant
+{
+    public static string Into<TRequest>(this BodyParts<TRequest> parts, int position) => throw new NotSupportedException();
+}

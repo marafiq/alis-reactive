@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundResidents
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Round";
+    var plan = Html.ReactivePlan<RoundResidents>();
+}
+<h1>Round</h1>
+@(Html.FusionListView(plan, "round-residents", build => build.DataSource(Model.Residents)))
+<button type="button" @Html.Raises(plan, RoundSelections.UnselectLena)>Unselect Lena</button>
+<p>Round: <output id="round-status">Lena Ortiz on the round</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline
+            .Component<FusionListView>("round-residents").SelectItem<RoundEntry>(new RoundEntry("lena", "Lena Ortiz")))
+        .CustomEvent(RoundSelections.UnselectLena, pipeline =>
+        {
+            pipeline.Component<FusionListView>("round-residents").UnselectItem<RoundEntry>(new RoundEntry("lena", "Lena Ortiz"));
+            pipeline.Element("round-status").Text.Set("Lena Ortiz off the round");
+        }));
+}
+@Html.RenderPlan(plan)

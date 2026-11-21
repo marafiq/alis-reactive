@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardRefreshCard
+@{
+    var plan = Html.ReactivePlan<WardRefreshCard>();
+}
+<h2>@Model.Title</h2>
+<button type="button" @Html.Raises(plan, WardRefreshes.Refresh)>Refresh</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardRefreshes.Refresh, pipeline => pipeline
+        .Get(WardRefreshEndpoints.Resident)
+        .Busy("ward-busy")
+        .OnSuccess(pipeline => pipeline.Element("ward-status").Text.Set("Refreshed"))));
+}
+@Html.RenderPlan(plan)

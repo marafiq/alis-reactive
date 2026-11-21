@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardPanels
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Ward panels";
+    var plan = Html.ReactivePlan<WardPanels>();
+}
+@section Styles {
+    <style>
+        .alis-loader--target { display: inline-block; width: 20px; height: 20px; }
+    </style>
+}
+<h1>Ward panels</h1>
+<button type="button" @Html.Raises(plan, WardPanelButtons.RefreshNorth)>Refresh north</button>
+<button type="button" @Html.Raises(plan, WardPanelButtons.RefreshSouth)>Refresh south</button>
+<section id="north" aria-label="North">@Model.North</section>
+<section id="south" aria-label="South">@Model.South</section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(WardPanelButtons.RefreshNorth, pipeline => pipeline.Get(CareEndpoints.NorthWardPanel)
+            .OnSuccess(Content.Json<WardPanelText>(), (panel, pipeline) => pipeline.Element("north").Text.Set(panel.Body.Read(shown => shown.Text))))
+        .CustomEvent(WardPanelButtons.RefreshSouth, pipeline => pipeline.Get(CareEndpoints.SouthWardPanel)
+            .OnSuccess(Content.Json<WardPanelText>(), (panel, pipeline) => pipeline.Element("south").Text.Set(panel.Body.Read(shown => shown.Text)))));
+}
+@Html.RenderPlan(plan)

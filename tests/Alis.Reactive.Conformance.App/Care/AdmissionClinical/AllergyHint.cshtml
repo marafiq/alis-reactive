@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AllergyHint
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Helen Martinez's intake";
+    var plan = Html.ReactivePlan<AllergyHint>();
+}
+<h1>Helen Martinez's intake</h1>
+<fieldset>
+    <legend>Allergies</legend>
+    @(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies"))
+        .FusionMultiSelect(HelensAllergies.Offered(), build => build.Fields((HelenAllergy a) => a.Name, a => a.Code).Placeholder(Model.Hint)))
+</fieldset>
+<button type="button" @Html.Raises(plan, AllergyHints.Show)>Show hint</button>
+<p>Hint: <output id="hint">No hint</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(AllergyHints.Show, pipeline => pipeline
+        .Element("hint").Text.Set(pipeline.Input(m => m.AllergyCodes).Component<FusionMultiSelect<int[]?>>().Placeholder)));
+}
+@Html.RenderPlan(plan)

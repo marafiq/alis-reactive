@@ -1,0 +1,31 @@
+@using Alis.Reactive.Poc.App.Cards
+@model CardsWard
+@{
+    ViewData["Title"] = "Radios";
+    var plan = Html.ReactivePlan<CardsWard>();
+    plan.Plugin<WardRadio>().Reactive(radio => radio.Broadcast, (broadcast, pipeline) =>
+        pipeline.Component<CallLog>("calls").Note("The ward radio was heard"));
+    plan.Plugin<NightRadio>().Reactive(radio => radio.Broadcast, (broadcast, pipeline) =>
+        pipeline.Component<CallLog>("calls").Note("The night radio was heard"));
+}
+<h1>Radios</h1>
+
+<p>Announced: <span id="announced">nothing</span></p>
+
+@plan.CallLog("calls")
+
+@(plan.Button("announce-ward", "Announce on the ward radio")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<WardRadio>().Announce("A fire drill at noon");
+        pipeline.Element("announced").Text.Set("Announced on the ward radio");
+    }))
+
+@(plan.Button("announce-night", "Announce on the night radio")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<NightRadio>().Announce("Lights out at ten");
+        pipeline.Element("announced").Text.Set("Announced on the night radio");
+    }))
+
+@Html.RenderPlan(plan)

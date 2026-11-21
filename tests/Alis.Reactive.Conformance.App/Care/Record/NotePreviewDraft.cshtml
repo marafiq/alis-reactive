@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model NoteDraft
+@{
+    var plan = Html.ReactivePlan<NoteDraft>();
+}
+@using (Html.BeginRequestForm(plan, "note-draft"))
+{
+    @(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+}
+@Html.RenderPlan(plan)

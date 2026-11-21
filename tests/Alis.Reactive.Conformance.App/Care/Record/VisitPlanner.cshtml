@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitPlanner
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visit planner";
+    var plan = Html.ReactivePlan<VisitPlanner>();
+}
+<h1>Visits of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Visitor })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => pipeline.Component<ConformanceComponent>("care-panel").TakeDay(raised.Day)))
+<button type="button" @Html.Raises(plan, VisitPlanners.TakeTheWeek)>Take the week</button>
+<button type="button" @Html.Raises(plan, VisitPlanners.LogText)>Log text</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(VisitPlanners.TakeTheWeek, pipeline =>
+        {
+            var panel = pipeline.Component<ConformanceComponent>("care-panel");
+            panel.TakeDay(Model.Starts);
+            panel.Take(new Record { Name = Model.Visitor, Day = Model.Starts });
+            panel.TakeDays(Model.Days);
+            panel.NullableDay.Set(Model.Ends);
+            panel.Day.Set(Model.Starts);
+            panel.TakeMoment(Model.Arrives);
+            panel.Take(panel.Snapshot());
+        })
+        .CustomEvent(VisitPlanners.LogText, pipeline => pipeline.Component<ConformanceComponent>("care-panel").Log("2026-11-09T09:00:00")));
+}
+@Html.RenderPlan(plan)

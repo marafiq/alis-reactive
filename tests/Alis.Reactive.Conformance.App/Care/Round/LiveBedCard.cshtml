@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedCard
+@{
+    var plan = Html.ReactivePlan<BedCard>();
+}
+<section aria-label="Bed card">
+    <h2>@Model.Bed</h2>
+    <p>Bed board: <span id="bed-line"></span></p>
+</section>
+@{
+    Html.On(plan, trigger => trigger.ServerPush(BedBoard.Live, beds => beds.Welcome, (welcome, pipeline) => pipeline.Element("bed-line").Text.Set("live")));
+}
+@Html.RenderPlan(plan)

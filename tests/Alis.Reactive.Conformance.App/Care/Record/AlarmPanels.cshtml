@@ -1,0 +1,38 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AlarmPanels
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Alarm panels";
+    var plan = Html.ReactivePlan<AlarmPanels>();
+}
+<h1>Alarm panels of @Model.Resident</h1>
+<h2>Bed alarm</h2>
+@(plan.ConformanceComponent("first-panel", new ConformanceStart { Text = "Bed alarm", Outer = new OuterStart { Text = Model.Outer } })
+    .Reactive(panel => panel.Raised, (raised, pipeline) =>
+    {
+        raised.WriteOnlyText.Set("Kappa");
+        pipeline.Element("ack-status").Text.Set("Writing");
+        pipeline.Component<ConformanceComponent>("first-panel").Settle();
+        raised.Outer.Text.Set("acknowledged");
+        raised.Act();
+        pipeline.Element("ack-total").Text.Set(raised.Total());
+        pipeline.Element("ack-status").Text.Set("Settled");
+    }))
+<p>Acknowledgement: <span id="ack-status"></span></p>
+<p>Alarms left: <span id="ack-total"></span></p>
+<h2>Door alarm</h2>
+@(plan.ConformanceComponent("second-panel", new ConformanceStart { Text = "Door alarm" })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => pipeline.Component<ConformanceComponent>("second-panel").Settle())
+    .Reactive(panel => panel.Raised, (raised, pipeline) =>
+    {
+        raised.WriteOnlyText.Set("Kappa");
+        pipeline.Component<ConformanceComponent>("second-panel").Settle();
+    }))
+<h2>Call bell</h2>
+@(plan.ConformanceComponent("third-panel", new ConformanceStart { Text = "Call bell" })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => pipeline.Element("bell-status").Text.Set("Rung")))
+<p>Call bell: <span id="bell-status"></span></p>
+@Html.RenderPlan(plan)

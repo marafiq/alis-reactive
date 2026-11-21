@@ -1,0 +1,20 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Recount in an IfNull";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Recount in an IfNull</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("target", "Set the fluid target")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        balance.Intake.Set(balance.Weight.IfNull(balance.Recount()));
+    }))
+
+@Html.RenderPlan(plan)

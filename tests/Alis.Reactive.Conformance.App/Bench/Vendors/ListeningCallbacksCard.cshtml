@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ListeningCallbacksCard
+@{
+    var plan = Html.ReactivePlan<ListeningCallbacksCard>();
+}
+<p>@Model.Note</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Listen(
+        pipeline.Component<ConformanceCallbacks>(Model.Callbacks),
+        callbacks => callbacks.OnRaised,
+        (raised, pipeline) => pipeline.Component<ConformanceCallbacks>(Model.Callbacks).Append(Model.Word))));
+}
+@Html.RenderPlan(plan)

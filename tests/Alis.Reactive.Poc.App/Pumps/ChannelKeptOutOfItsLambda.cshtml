@@ -1,0 +1,26 @@
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Pump channels";
+    var plan = Html.ReactivePlan<InfusionPage>();
+}
+<h1>Pump channels</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+
+<p>Running: <span id="running"></span></p>
+
+@(plan.Button("running", "Show a running channel")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        PumpChannel? running = null;
+        pipeline.When(pipeline.Component<InfusionPump>("pump").Channels().Any(channel =>
+            {
+                running = channel;
+                return channel.IsRunning();
+            }))
+            .Then(found => found.Element("running").Text.Set("A channel runs"));
+        pipeline.Element("running").Text.Set(running!.Label);
+    }))
+
+@Html.RenderPlan(plan)

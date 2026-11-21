@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ArrivalDesk
+@{
+    var plan = Html.ReactivePlan<ArrivalDesk>();
+}
+@(Html.InputField(plan, m => m.FundingNumber, options => options.Label("Funding number")).NativeTextBox())
+@Html.RenderPlan(plan)

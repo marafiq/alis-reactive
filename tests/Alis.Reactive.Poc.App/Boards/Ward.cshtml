@@ -1,0 +1,44 @@
+@using Alis.Reactive.Poc.App.Boards
+@model WardBoardsPage
+@{
+    ViewData["Title"] = "Ward boards";
+    var plan = Html.ReactivePlan<WardBoardsPage>();
+}
+<h1>Ward boards</h1>
+
+@plan.CareBoard("ward-a", "Ward A", unlockCode: "4321")
+@plan.CareBoardVersion2("ward-b", "Ward B")
+
+@plan.TextBox("board-title", "Board title", "")
+
+@(plan.Button("rename-ward-a", "Rename Ward A")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var board = pipeline.Component<CareBoard>("ward-a");
+        board.Title.Set(pipeline.Component<NativeTextBox>("board-title").Value);
+        pipeline.Element("rename-status").Text.Set("Renamed");
+    }))
+
+@(plan.Button("rename-ward-b", "Rename Ward B")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var board = pipeline.Component<CareBoard>("ward-b");
+        board.Title.Set(pipeline.Component<NativeTextBox>("board-title").Value);
+        pipeline.Element("rename-status").Text.Set("Renamed");
+    }))
+
+<p>Rename: <span id="rename-status"></span></p>
+
+@plan.TextBox("unlock-code", "Unlock code", "")
+
+@(plan.Button("unlock-ward-a", "Unlock Ward A")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var board = pipeline.Component<CareBoard>("ward-a");
+        board.Pin.Set(pipeline.Component<NativeTextBox>("unlock-code").Value);
+        pipeline.Element("lock-state").Text.Set(board.Status);
+    }))
+
+<p>Ward A is <span id="lock-state"></span></p>
+
+@Html.RenderPlan(plan)

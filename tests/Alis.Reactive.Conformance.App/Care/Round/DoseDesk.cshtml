@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseDesk
+@{
+    var plan = Html.ReactivePlan<DoseDesk>();
+}
+<h2>Dose desk</h2>
+@using (var desk = Html.BeginRequestForm(plan, "dose-desk"))
+{
+    @(Html.InputField(plan, m => m.Strength, options => options.Label("Strength")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, DoseStrengthButtons.SaveDesk)>Save desk</button>
+    Html.On(plan, trigger => trigger.CustomEvent(DoseStrengthButtons.SaveDesk, pipeline => pipeline
+        .Post<DoseDesk>(Model.Save, request => request.Form(desk.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("desk-strength").Text.Set(saved.Body))));
+}
+<p>Saved strength: <span id="desk-strength">Not saved</span></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,125 @@
+using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
+using NUnit.Framework;
+
+namespace Alis.Reactive.Poc.AnalyzerTests;
+
+internal static class Fixture
+{
+    public const string Path = "Components/Ward.cs";
+
+    public const string ContractPath = "obj/Debug/net10.0/vendor-contract.tsv";
+
+    private static readonly ImmutableArray<MetadataReference> References = [.. TrustedPlatformAssemblies()];
+
+    public static Task Reports<TAnalyzer>(string id, string message, string markedSource, string? contract)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+        => ReportsWith<TAnalyzer>(id, message, markedSource, contract is null ? [] : [contract]);
+
+    public static Task ReportsNothing<TAnalyzer>(string source, string? contract)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+        => ReportsNothingWith<TAnalyzer>(source, contract is null ? [] : [contract]);
+
+    public static async Task ReportsWith<TAnalyzer>(string id, string message, string markedSource, string[] contracts)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var (source, span) = Unmark(markedSource);
+        var reported = await Analyze<TAnalyzer>(source, contracts);
+
+        Assert.That(
+            reported.Select(diagnostic => Describe(diagnostic.Id, diagnostic.Location.SourceSpan, diagnostic.GetMessage(), source)),
+            Is.EqualTo(new[] { Describe(id, span, message, source) }));
+    }
+
+    public static async Task ReportsNothingWith<TAnalyzer>(string source, string[] contracts)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var reported = await Analyze<TAnalyzer>(source, contracts);
+
+        Assert.That(
+            reported.Select(diagnostic => Describe(diagnostic.Id, diagnostic.Location.SourceSpan, diagnostic.GetMessage(), source)),
+            Is.Empty);
+    }
+
+    public static Task Suppresses<TSuppressor>(string warning, string suppression, string markedSource)
+        where TSuppressor : DiagnosticSuppressor, new()
+        => Warns<TSuppressor>(warning, "suppressed by " + suppression, markedSource);
+
+    public static Task Keeps<TSuppressor>(string warning, string markedSource)
+        where TSuppressor : DiagnosticSuppressor, new()
+        => Warns<TSuppressor>(warning, "kept", markedSource);
+
+    private static async Task Warns<TSuppressor>(string warning, string outcome, string markedSource)
+        where TSuppressor : DiagnosticSuppressor, new()
+    {
+        var (source, span) = Unmark(markedSource);
+        var compilation = Compiled(source);
+        var options = new CompilationWithAnalyzersOptions(new AnalyzerOptions([]), onAnalyzerException: null, concurrentAnalysis: false, logAnalyzerExecutionTime: false, reportSuppressedDiagnostics: true);
+        var reported = await compilation.WithAnalyzers([new TSuppressor()], options).GetAllDiagnosticsAsync();
+        var nullWarnings = reported.Where(diagnostic => diagnostic.Id.StartsWith("CS86", StringComparison.Ordinal));
+
+        Assert.That(
+            nullWarnings.Select(diagnostic => Describe(diagnostic.Id, diagnostic.Location.SourceSpan, OutcomeOf(diagnostic, compilation), source)),
+            Is.EqualTo(new[] { Describe(warning, span, outcome, source) }));
+    }
+
+    private static string OutcomeOf(Diagnostic diagnostic, Compilation compilation)
+    {
+        if (!diagnostic.IsSuppressed) return "kept";
+        var suppressions = diagnostic.GetSuppressionInfo(compilation)?.ProgrammaticSuppressions ?? [];
+        return "suppressed by " + string.Join(", ", suppressions.Select(suppression => suppression.Descriptor.Id));
+    }
+
+    private static CSharpCompilation Compiled(string source)
+    {
+        var compilation = CSharpCompilation.Create(
+            "Ward.Web",
+            [CSharpSyntaxTree.ParseText(source, path: Path)],
+            References,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
+
+        var errors = compilation.GetDiagnostics().Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error).ToList();
+        Assert.That(errors, Is.Empty, "The fixture must compile.\n" + string.Join("\n", errors));
+        return compilation;
+    }
+
+    private static async Task<ImmutableArray<Diagnostic>> Analyze<TAnalyzer>(string source, string[] contracts)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var compilation = Compiled(source);
+        var options = new AnalyzerOptions([.. contracts.Select((contract, position) => (AdditionalText)new ContractText($"obj/{position}/{ContractPath}", contract))]);
+        return await compilation
+            .WithAnalyzers([new TAnalyzer()], options)
+            .GetAnalyzerDiagnosticsAsync();
+    }
+
+    private sealed class ContractText(string path, string text) : AdditionalText
+    {
+        public override string Path => path;
+
+        public override SourceText? GetText(CancellationToken cancellationToken = default) => SourceText.From(text);
+    }
+
+    private static string Describe(string id, TextSpan span, string message, string source)
+        => $"{id} [|{source.Substring(span.Start, span.Length)}|] ({span.Start}..{span.End}) {message}";
+
+    private static (string Source, TextSpan Span) Unmark(string markedSource)
+    {
+        var start = markedSource.IndexOf("[|", StringComparison.Ordinal);
+        var end = markedSource.IndexOf("|]", StringComparison.Ordinal);
+        if (start < 0 || end < start)
+            throw new ArgumentException("Mark the span the diagnostic must cover as [|...|].", nameof(markedSource));
+
+        var source = markedSource.Remove(end, 2).Remove(start, 2);
+        return (source, TextSpan.FromBounds(start, end - 2));
+    }
+
+    private static IEnumerable<MetadataReference> TrustedPlatformAssemblies()
+    {
+        var paths = (string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!;
+        return paths.Split(System.IO.Path.PathSeparator).Select(path => (MetadataReference)MetadataReference.CreateFromFile(path));
+    }
+}

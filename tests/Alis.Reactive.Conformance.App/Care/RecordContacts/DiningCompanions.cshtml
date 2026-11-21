@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DiningCompanions
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Dining";
+    var plan = Html.ReactivePlan<DiningCompanions>();
+}
+<h1>Dining companions</h1>
+@(Html.FusionListBox<DiningCompanions, string[]>(plan, "dining-companions", build => build.DataSource(new[] { "Carey", "Dev", "Ann" }).Value(new[] { "Dev" })))
+<button type="button" @Html.Raises(plan, DiningSeats.WithCarey)>Seat with Carey</button>
+<button type="button" @Html.Raises(plan, DiningSeats.Everyone)>Seat everyone</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(DiningSeats.WithCarey, pipeline => pipeline.Component<FusionListBox<string[]>>("dining-companions").SelectItems(new[] { "Carey" }, true, false))
+        .CustomEvent(DiningSeats.Everyone, pipeline => pipeline.Component<FusionListBox<string[]>>("dining-companions").SelectAll(true)));
+}
+@Html.RenderPlan(plan)

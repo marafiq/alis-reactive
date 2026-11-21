@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AllergyList
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Helen Martinez's intake";
+    var plan = Html.ReactivePlan<AllergyList>();
+}
+<h1>Helen Martinez's intake</h1>
+<fieldset>
+    <legend>Allergies</legend>
+    @(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies"))
+        .FusionMultiSelect(HelensAllergies.Offered(), build => build.Fields((HelenAllergy a) => a.Name, a => a.Code)))
+</fieldset>
+<button type="button" @Html.Raises(plan, AllergyLists.Show)>Show allergies</button>
+<p>The ward's list: <output id="ward-list">Not asked</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(AllergyLists.Show, pipeline => pipeline
+        .When(pipeline.PageUrl<AllergyListWard>().Read(ward => ward.Ward).Eq("South"))
+        .Then(pipeline =>
+        {
+            pipeline.Input(m => m.AllergyCodes).Component<FusionMultiSelect<int[]?>>().ShowPopup();
+            pipeline.Element("ward-list").Text.Set("Shown");
+        })
+        .Else(pipeline => pipeline.Element("ward-list").Text.Set("Kept closed"))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DischargeDrawerPage
+@{
+    Layout = "/Refusals/Execution/_DrawerLayout.cshtml";
+    ViewData["Title"] = "Discharge";
+    var plan = Html.ReactivePlan<DischargeDrawerPage>();
+}
+<h1>Discharge @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, DischargeDrawerButtons.OpenDischarge)>Open discharge</button>
+<p>Discharge: <output id="discharge-sent"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DischargeDrawerButtons.OpenDischarge, pipeline =>
+    {
+        pipeline.Element(NativeDrawer.TitleId).Text.Set("Discharge " + Model.Resident);
+        pipeline.Component<NativeDrawer>().Open();
+    }));
+    plan.Component<NativeDrawer>().Reactive(drawer => drawer.BeforeClose, (closing, pipeline) =>
+        pipeline.Post(DischargeDrawerEndpoints.Discharges)
+            .WhileLoading(pipeline => closing.Cancel.Set(true))
+            .OnSuccess(Content.Text, (sent, pipeline) => pipeline.Element("discharge-sent").Text.Set(sent.Body)));
+}
+@Html.RenderPlan(plan)

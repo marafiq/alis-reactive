@@ -1,0 +1,25 @@
+@using Alis.Reactive.Components
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Channels read by another pipeline";
+    var plan = Html.ReactivePlan<InfusionPage>();
+    LiveObjects<PumpChannel>? captured = null;
+}
+<h1>Channels read by another pipeline</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+
+@plan.StationCensus("census")
+
+<p>Shown: <span id="shown"></span></p>
+
+@(plan.Button("read", "Read the channels")
+    .Reactive(button => button.Click, pipeline =>
+        captured = pipeline.Component<InfusionPump>("pump").Channels()))
+
+@(plan.Button("show", "Show what the other pipeline read")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(captured!.Count())))
+
+@Html.RenderPlan(plan)

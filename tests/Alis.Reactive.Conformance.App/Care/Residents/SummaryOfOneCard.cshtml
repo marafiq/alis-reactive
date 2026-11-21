@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentsSummary
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents summary";
+    var plan = Html.ReactivePlan<ResidentsSummary>();
+}
+<h1>Summary of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, ResidentsBusyEvents.Load)>Load</button>
+<p>Summary: <span id="summary-card">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentsBusyEvents.Load, pipeline => pipeline.Parallel(
+        pipeline => pipeline.Get(CareEndpoints.SummaryOfTheFirstWing).OnSuccess(pipeline => pipeline.Element("summary-card").Text.Set("first wing")),
+        pipeline => pipeline.Get(CareEndpoints.SummaryOfTheSecondWing).OnSuccess(pipeline => pipeline.Element("summary-card").Text.Set("second wing")))));
+}
+@Html.RenderPlan(plan)

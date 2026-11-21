@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model TransferSummaryPage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Transfer summary";
+    var plan = Html.ReactivePlan<TransferSummaryPage>();
+}
+<h1>Transfer of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, TransferSummaries.Load)>Load</button>
+<p>Summary: <span id="summary-status">Waiting</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(TransferSummaries.Load, pipeline => pipeline.Get(Model.Summary)
+        .OnSuccess<TransferSummary>((summary, pipeline) => pipeline.Element("summary-status").Text.Set("Loaded"))
+        .OnError(302, Content.None, (moved, pipeline) => pipeline.Element("summary-status").Text.Set("Moved"))
+        .OnError((failed, pipeline) => pipeline.Element("summary-status").Text.Set(failed.Outcome))));
+}
+@Html.RenderPlan(plan)

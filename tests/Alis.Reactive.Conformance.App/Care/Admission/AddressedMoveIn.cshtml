@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AddressedMoveIn
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Move in";
+    var plan = Html.ReactivePlan<AddressedMoveIn>();
+}
+<h1>Move in</h1>
+@using (var moveIn = Html.BeginRequestForm(plan, "move-in"))
+{
+    @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    <section aria-label="Home address">
+        <h2>Home address</h2>
+        @Html.EditorFor(m => m.Home, "/Care/Admission/MoveInAddress.cshtml")
+    </section>
+    <section aria-label="Postal address">
+        <h2>Postal address</h2>
+        @Html.EditorFor(m => m.Postal, "/Care/Admission/MoveInAddress.cshtml")
+    </section>
+    <button type="button" @Html.Raises(plan, AddressedMoveIns.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(AddressedMoveIns.Save, pipeline => pipeline
+        .Post<AddressedMoveIn>(AddressedMoveInEndpoints.MoveIns, request => request.Form(moveIn.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("move-in-status").Text.Set(saved.Body))
+        .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))));
+}
+<p id="move-in-status">Not saved</p>
+@Html.RenderPlan(plan)

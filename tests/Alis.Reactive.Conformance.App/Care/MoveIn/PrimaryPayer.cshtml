@@ -1,0 +1,58 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+@if (Model.Payer.Kind == PayerKind.Private)
+{
+    <p>Private funding</p>
+}
+else
+{
+    <fieldset>
+        <legend>Primary coverage</legend>
+        @await Html.PartialFor(m => m.Payer.Primary, "/Care/MoveIn/PrimaryCoverage.cshtml")
+        @(Html.NativeHiddenField(plan, m => m.Payer.ContactId))
+        @(Html.InputField(plan, m => m.Payer.PortalUrl, o => o.Label("Payer portal")).NativeTextBox())
+        @(Html.InputField(plan, m => m.Payer.HasSecondary, o => o.Label("Add secondary coverage")).NativeCheckBox().Reactive(box => box.Change, (changed, pipeline) =>
+        {
+            var form = pipeline.Container<MoveInPage>("move-in");
+            var day = form.Read(m => m.Resident.MoveInDate);
+            pipeline.Element("secondary-status").Text.Set("");
+            pipeline.When(form.Read(m => m.Payer.HasSecondary)
+                .And(form.Read(m => m.Payer.Primary.StartsOn).Lte(day))
+                .And(form.Read(m => m.Payer.Primary.EndsOn).Gte(day))
+                .And(pipeline.Component<ConformanceComponent>("allocation-panel").Check()))
+                .Then(pipeline => pipeline.Get<SectionQuery>(CareEndpoints.MoveInSecondaryCoverage, request => request
+                    .Query(q => q.DraftId, Model.DraftId)
+                    .Query(q => q.PayerKind, form.Read(m => m.Payer.Kind))
+                    .Query(q => q.Section, SectionKind.SecondaryPayer)
+                    .Query(q => q.Culture, System.Globalization.CultureInfo.CurrentCulture.Name))
+                    .Into("secondary-payer").OnError((failed, pipeline) =>
+                    {
+                        pipeline.Element("secondary-status").Text.Set("Secondary coverage could not be loaded.");
+                        pipeline.Notice().Error("Secondary coverage could not be loaded.");
+                    }))
+                .Else(pipeline =>
+                {
+                    pipeline.Unload("secondary-payer");
+                    pipeline.When(form.Read(m => m.Payer.HasSecondary)).Then(pipeline => pipeline.Element("secondary-status").Text.Set("Coverage dates and allocation must permit secondary coverage."));
+                });
+        }))
+        <p id="secondary-status"></p>
+        <div id="secondary-payer">
+            @if (Model.Payer.HasSecondary && Model.Payer.Secondary is not null)
+            {
+                @await Html.PartialAsync("/Care/MoveIn/SecondaryPayer.cshtml", Model)
+            }
+        </div>
+    </fieldset>
+}
+@Html.RenderPlan(plan)

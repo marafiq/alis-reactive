@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveRound
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveRound>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+<button type="button" @Html.Raises(plan, LiveRoundButtons.Load)>Load</button>
+<p>Feed dropped: <span id="feed-dropped"></span></p>
+<p>Feed back: <span id="feed-back"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .ServerPush(Feed.Live, feed => feed.Reconnecting, pipeline => pipeline.Element("feed-dropped").Text.Set("dropped"))
+        .ServerPush(Feed.Live, feed => feed.Reconnected, pipeline => pipeline.Element("feed-back").Text.Set("back"))
+        .CustomEvent(LiveRoundButtons.Load, pipeline => pipeline.Get(CareEndpoints.LiveItems)));
+}
+@Html.RenderPlan(plan)

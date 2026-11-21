@@ -1,0 +1,10 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RadioWardAdaNotes
+@{
+    var plan = Html.ReactivePlan<RadioWardAdaNotes>();
+    plan.Plugin<CardRadio>().Reactive(radio => radio.Call, pipeline => pipeline.Element("inner-heard").Text.Set("Ada's notes heard the call"));
+}
+<p>@Model.Text</p>
+@Html.RenderPlan(plan)

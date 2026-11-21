@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model RespiteStay
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Respite stay";
+    var plan = Html.ReactivePlan<RespiteStay>();
+}
+<h1>Respite stay</h1>
+<fieldset>
+    <legend>Respite stay</legend>
+    @(Html.InputField(plan, m => m.Stay, options => options.Label("Stay")).FusionDateRangePicker(build => build.Format("yyyy-MM-dd")))
+</fieldset>
+@Html.RenderPlan(plan)

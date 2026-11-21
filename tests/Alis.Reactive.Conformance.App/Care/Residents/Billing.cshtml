@@ -1,0 +1,35 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Billing
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Billing";
+    var plan = Html.ReactivePlan<Billing>();
+}
+<h1>Billing for @Model.Month</h1>
+<dl>
+    <dt>Charges</dt>
+    <dd id="charge-total">-</dd>
+    <dt>Hourly rates</dt>
+    <dd id="rate-total">-</dd>
+    <dt>Refunds</dt>
+    <dd id="refund-total">-</dd>
+    <dt>Units billed</dt>
+    <dd id="unit-total">-</dd>
+</dl>
+<p id="billing-status">Waiting</p>
+<button type="button" @Html.Raises(plan, Billings.Sum)>Sum</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(Billings.Sum, pipeline => pipeline.Get(Model.Figures)
+        .OnSuccess<BillingFigures>((figures, pipeline) =>
+        {
+            pipeline.Element("charge-total").Text.Set(figures.Body.Read(f => f.Charges).Sum(c => c.Amount));
+            pipeline.Element("rate-total").Text.Set(figures.Body.Read(f => f.Rates).Sum(r => r.Hourly));
+            pipeline.Element("refund-total").Text.Set(figures.Body.Read(f => f.Refunds).Sum(c => c.Amount));
+            pipeline.Element("unit-total").Text.Set(figures.Body.Read(f => f.Units).Sum(u => u.Billed));
+            pipeline.Element("billing-status").Text.Set("Summed");
+        })));
+}
+@Html.RenderPlan(plan)

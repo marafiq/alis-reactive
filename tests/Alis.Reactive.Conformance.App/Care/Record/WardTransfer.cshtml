@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardTransfer
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ward transfer";
+    var plan = Html.ReactivePlan<WardTransfer>();
+}
+<h1>Transfer a resident</h1>
+@(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+@(Html.InputField(plan, m => m.Destination.Ward, options => options.Label("Destination ward")).NativeTextBox())
+<button type="button" @Html.Raises(plan, WardTransfers.Send)>Transfer</button>
+<h2>Last transfer</h2>
+<p>Name: <span id="transfer-name">-</span></p>
+<p>Ward: <span id="transfer-ward">-</span></p>
+<p>Reason: <span id="transfer-reason">-</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(WardTransfers.Send, pipeline => pipeline.Dispatch(WardTransfers.Transfer, pipeline.Object<TransferOrder>(order => order
+            .Set(transfer => transfer.Name, pipeline.Input(m => m.Name).Component<NativeTextBox>().Value)
+            .Set(transfer => transfer.Destination.Ward, pipeline.Input(m => m.Destination.Ward).Component<NativeTextBox>().Value)
+            .Set(transfer => transfer.Reason, "fall"))))
+        .CustomEvent(WardTransfers.Transfer, (transfer, pipeline) =>
+        {
+            pipeline.Element("transfer-name").Text.Set(transfer.Read(order => order.Name));
+            pipeline.Element("transfer-ward").Text.Set(transfer.Read(order => order.Destination.Ward));
+            pipeline.Element("transfer-reason").Text.Set(transfer.Read(order => order.Reason));
+        }));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model KinPhone
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Next of kin";
+    var plan = Html.ReactivePlan<KinPhone>();
+}
+<h1>Next of kin</h1>
+<fieldset>
+    <legend>Phone</legend>
+    @(Html.InputField(plan, m => m.Phone, options => options.Label("Phone")).FusionMaskedTextBox(build => build.Mask("000-000-0000")))
+</fieldset>
+@Html.RenderPlan(plan)

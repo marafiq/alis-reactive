@@ -1,0 +1,72 @@
+# Alis.Reactive.ArchitectureTests
+
+Rules over what the repository holds. Each fixture is one rule's situation, `When` and what is written, and holds
+three kinds of test: a `[Test]` that runs the rule over the tracked repository (`Repository.cs` lists what git
+tracks) or over the conformance app as built, a `RefusedCaseAttribute` case that runs it over what the case writes,
+text or a small app, and expects each refusal by name, and an `AcceptedCaseAttribute` case one fact away that
+expects none.
+
+## The standard
+
+- A scan of a clean repository passes whether its rule works or not, so a fixture that holds a rule holds a case of
+  each mark; `WhenAnArchitectureTestIsWritten` refuses one that does not.
+- A rule reads C# through Roslyn and a script through `read-scripts.mjs`, never by a pattern over their text; a
+  project file as XML and JSON through a reader; markup, a stylesheet and a shell script by a scanner that knows
+  their quoting.
+- A rule fires on a real defect alone: it pins no wording a legitimate edit moves, and its refusal names where the
+  defect is and the cure: the file and the line of what is tracked, the member or the address of what the app holds.
+- A rule reads tracked files, so a unit is staged before the rules run on it.
+- A defect planted in a rule's reader fails a case named for it; one that no case fails on names a missing case.
+  The build refuses an unread member or parameter and unreachable code, so a planted defect that leaves one does not
+  compile and proves nothing: it is redone as a mutation that compiles (the lead's mistake again, 2026-11-14, in the
+  reader `WhenAPagesDoorsAreRead` runs). A copy the sweep restores is touched, since the build reads a
+  file's time, and a stale build passes for the restored code (the lead's mistakes, 2026-11-11). The copy is built
+  and read green before the first plant, with what the fixture runs beside the code, `node_modules` among it: a plant
+  on a copy that already fails proves nothing (the lead's mistake, 2026-11-11).
+- `LintCases` holds the lint's refused and accepted files, which `WhenTheLintIsConfigured` lints; `LintCases/rows` is
+  a slice table of its own, for the import rows, and `LintCases/package` one that writes no dot, for the file
+  beside it.
+- `WhenAnAppRendersItsPages` and `WhenTheAppHoldsNoStaticState` read the conformance app as built, which this project
+  references for the two of them. The first runs the app in this process, under the net10 host, and opens every
+  address it answers to a GET, and every link its pages hold, as a browser opens a document; its cases sweep an app
+  the case maps. A route with a parameter is opened by the address a link gives it, and one no page links to is
+  refused. Every plan a page renders is read against `Alis.Reactive.Assets/runtime/Schema/plan.schema.json`. The
+  sweep's own host hears what a page threw from the developer exception page: a page of the refusals area that refuses
+  is accepted as refused by design, and a page whose door is not built is listed apart from a problem until the last
+  unit builds the last door (`spec/REWRITE.md`, U27), a door's exception read through a type that failed to start on
+  it. The second reads every static of the types the app's authors wrote; its cases read an assembly built from their
+  text. What the app holds as it runs is read from its assembly, the one place a view's and a generator's statics are.
+- `WhenTheCoreIsCompiled` compiles the core's tracked C# as its net10 host does, against the references this
+  project's build writes beside the tests, and holds every read of type information to the owner's list, by file
+  and member; its cases compile small sources the same way. Its last two cases run the build's own analyzer over
+  `Alis.Reactive/BannedSymbols.txt`, so an entry that names no symbol fails the case of its use.
+- `WhenThePlanContractIsGenerated` runs the contract generator's reader, which this project references for it, over
+  small grammars its cases declare, and expects each refusal's own words and the TypeScript and the schema of an
+  accepted one as literals. The core's own contract is held by the first step of `scripts/check.sh`.
+- `WhenAPagesDoorsAreRead` runs `scripts/page-doors.cs` over the assemblies each case compiles, an app, its tests and a
+  framework with doors built and not built, and expects the exit, each refusal's own line and the table as one literal.
+  A fixture under a fresh app's host is read by none of the app's pages, and the table leaves it out; so does a
+  fixture under net48 alone whose route no action of the app answers, a page the twin alone holds, while one the app
+  answers keeps its entry. The conformance
+  app's own table is held by `scripts/check.sh`'s step after its build.
+- `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` run the browser runner's two readers, the selection and the
+  result, over the tables and TRX files their cases write, and expect each refusal's own line; a selection names the
+  fresh apps its cases run on and each net10 or admissions host whose move-in cases the selected shard takes. A result counts a fresh app's server left alive on a line of its own. A case's tables
+  hold what the real tools write: a fixture in the namespace of its first folder, as ALIS011 holds every test,
+  beside the folder `scripts/list-tests.cs` reads from the assembly's portable PDB (the lead's mistake, 2026-11-13).
+- `WhenAConsumerAppIsBuilt` builds small apps its cases write on the packs in nupkgs/, each restored by its own
+  nuget.config into its own obj/, and builds the two fresh apps: `tests/Alis.Reactive.Consumer.Net10`, whose build
+  writes no file git lists and whose static web assets serve each package's browser file under _content/<PackageId>/js/,
+  and `tests/Alis.Reactive.Consumer.Net48`, a classic MVC 5 project only Visual Studio's MSBuild compiles, whose build
+  writes no file git lists. `scripts/check.sh` leaves it out, `scripts/delivery.sh` runs it but the fresh MVC 5 app's
+  test, and CI's Windows job runs it whole.
+- `WhenThePackagesAreAudited` runs `scripts/npm-audit.mjs` over the audit reports, locks and latest versions its
+  cases write, and expects the exit and each refusal's own line; the tracked tree's audit is `scripts/check.sh`'s step.
+- `WhenADocShowsAnExample` reads each example of README.md, every fence but bash and text, and each view example of a
+  skill, its cshtml fences, and refuses one found whole in no view a browser test opens, as
+  `spec/Reference/page-doors.json` lists them, and in no fresh app's tracked file. `WhenARuleNamesTheCode.cs` leaves
+  a skill's cshtml fence to it and refuses that fence in any other rule file.
+
+```bash
+dotnet test tests/Alis.Reactive.ArchitectureTests
+```

@@ -1,0 +1,18 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SpotRoster
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The wing's bindings";
+    var plan = Html.ReactivePlan<SpotRoster>();
+}
+<h1>@Model.Wing</h1>
+<p>Beta was converted by: <span id="found-converted"></span></p>
+<button type="button" @Html.Raises(plan, ConvertedNames.Show)>Show the converted</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ConvertedNames.Show, pipeline => pipeline.Get(ExecutionEndpoints.WrittenBindings)
+        .OnSuccess<List<WrittenBinding>>((bindings, pipeline) => pipeline.Element("found-converted").Text.Set(bindings.Body.Find(b => b.Name == "Beta", b => b.Converted.Name)))));
+}
+@Html.RenderPlan(plan)

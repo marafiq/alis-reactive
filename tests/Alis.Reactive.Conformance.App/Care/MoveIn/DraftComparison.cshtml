@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model DraftComparison
+@{
+    var plan = Html.ReactivePlan<DraftComparison>();
+}
+<p id="comparison-version">Version @Model.Revision saved by @Model.Coordinator</p>
+<p>Saved notes: @Model.Notes</p>
+@Html.RenderPlan(plan)

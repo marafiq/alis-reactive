@@ -1,0 +1,73 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AllocationDeskPage
+@{
+    var plan = Html.ReactivePlan<AllocationDeskPage>();
+}
+<button type="button" @Html.Raises(plan, MoveInAllocationEvents.ReviewAsked)>Review allocation</button>
+<p id="allocation-status">Not reviewed</p>
+<p id="allocation-waitlist"></p>
+<div id="allocation-instructions"></div>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MoveInAllocationEvents.ReviewAsked, HandlerPolicy.Replace, pipeline =>
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        var panel = pipeline.Component<ConformanceComponent>("allocation-panel");
+        pipeline.When(moveIn.Read(m => m.Location.BedId).NotEmpty().And(panel.Check()))
+            .Then(pipeline => pipeline.When(pipeline.Component<ConformanceComponent>("allocation-panel").SettleCheck())
+                .Then(pipeline => pipeline
+                .Post<AllocationRequest>(MoveInEndpoints.AllocationReview, request => request
+                    .Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+                    .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+                    .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+                    .Json(body => body
+                        .Set(sent => sent.Version, moveIn.Read(m => m.Version))
+                        .Set(sent => sent.Location.CommunityId, moveIn.Read(m => m.Location.CommunityId))
+                        .Set(sent => sent.Location.BuildingId, moveIn.Read(m => m.Location.BuildingId))
+                        .Set(sent => sent.Location.ApartmentId, moveIn.Read(m => m.Location.ApartmentId))
+                        .Set(sent => sent.Location.BedId, moveIn.Read(m => m.Location.BedId))
+                        .Set(sent => sent.Location.BedRevision, moveIn.Read(m => m.Location.BedRevision))
+                        .Set(sent => sent.Level, moveIn.Read(m => m.Care.Level))
+                        .Set(sent => sent.ResidentId, moveIn.Read(m => m.ResidentId))
+                        .Set(sent => sent.Ready, true)
+                        .Set(sent => sent.Reference, panel.Outer.Middle.Inner.Text)))
+                .OnSuccess<AllocationReply>((cleared, pipeline) =>
+                {
+                    var reviewed = pipeline.Component<ConformanceComponent>("allocation-panel");
+                    reviewed.Text.Set(cleared.Body.Read(reply => reply.Allocation.Status));
+                    reviewed.WriteOnlyText.Set(cleared.Body.Read(reply => reply.Allocation.Bed.Apartment.Building.Community.Name));
+                    pipeline.Element("allocation-status").Text.Set(pipeline.Concat(cleared.Body.Read(reply => reply.Allocation.Status), ": ", cleared.Body.Read(reply => reply.Allocation.Bed.Id), " revision ", cleared.Body.Read(reply => reply.Allocation.Bed.Revision)));
+                    pipeline.Element("allocation-waitlist").Text.Set("");
+                    pipeline.When(cleared.Body.Read(reply => reply.Allocation.Instructions.Required))
+                        .Then(pipeline => pipeline
+                            .Get<ReceiptQuery>(CareEndpoints.MoveInReceipts, request => request
+                                .Query(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                                .Query(query => query.Reference, cleared.Body.Read(reply => reply.Allocation.Instructions.Id)))
+                            .Into("allocation-instructions"))
+                        .Else(pipeline => pipeline.Unload("allocation-instructions"));
+                })
+                .OnError<BedConflict>(409, (taken, pipeline) =>
+                {
+                    pipeline.Element("allocation-status").Text.Set(pipeline.Concat("Bed held by ", taken.Body.Read(conflict => conflict.Conflict.Bed.Holder.Name), "; review reference ", moveIn.Read(m => m.Review.Reference).IfNull("Unassigned")));
+                    pipeline.When(taken.Body.Read(conflict => conflict.Conflict.Waitlist.Allowed))
+                        .Then(pipeline =>
+                        {
+                            pipeline.Element("allocation-waitlist").Text.Set("A waitlist place can be offered");
+                            pipeline.Get<WaitlistTermsQuery>(MoveInEndpoints.WaitlistTerms, request => request
+                                .Path(query => query.DraftId, moveIn.Read(m => m.DraftId))
+                                .Path(query => query.TermsId, taken.Body.Read(conflict => conflict.Conflict.Waitlist.TermsId))
+                                .Query(query => query.BedId, taken.Body.Read(conflict => conflict.Conflict.Bed.Id)))
+                                .Into("waitlist-terms");
+                        })
+                        .Else(pipeline => pipeline.Element("allocation-waitlist").Text.Set("No waitlist place can be offered"));
+                }))
+                .Else(pipeline => pipeline.Element("allocation-status").Text.Set("Allocation is not ready")))
+            .Else(pipeline => pipeline.Element("allocation-status").Text.Set("Allocation is not ready"));
+    }));
+}
+@Html.RenderPlan(plan)

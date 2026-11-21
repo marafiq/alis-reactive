@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomBooking
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Room booking";
+    var plan = Html.ReactivePlan<RoomBooking>();
+}
+<h1>A room for @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Open" }))
+@(Html.InputField(plan, m => m.RoomFree, options => options.Label("Room free")).NativeCheckBox())
+<button type="button" @Html.Raises(plan, RoomBookings.Book)>Book</button>
+<p>Booking: <span id="booking-summary"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RoomBookings.Book, pipeline =>
+    {
+        pipeline.When(pipeline.Input(m => m.RoomFree).Component<NativeCheckBox>().Checked).Then(pipeline =>
+        {
+            pipeline.Component<ConformanceComponent>("care-panel").Settle();
+            pipeline.Component<ConformanceComponent>("care-panel").Text.Set("Reserved");
+        });
+        pipeline.Element("booking-summary").Text.Set(pipeline.Component<ConformanceComponent>("care-panel").Text);
+    }));
+}
+@Html.RenderPlan(plan)

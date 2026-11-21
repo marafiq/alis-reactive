@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LaneBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<LaneBoard>();
+}
+<h1>The bench</h1>
+<p id="log"></p>
+<section id="card" aria-label="Card"></section>
+<button type="button" @Html.Raises(plan, LaneCells.CloseCard)>Close card</button>
+<button type="button" @Html.Raises(plan, LaneCells.OpenCard)>Open card</button>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Get(LaneCards.ComponentCard).Into("card"))
+        .CustomEvent(LaneCells.CloseCard, pipeline => pipeline.Unload("card"))
+        .CustomEvent(LaneCells.OpenCard, pipeline => pipeline.Get(LaneCards.ComponentCard).Into("card")));
+}
+@Html.RenderPlan(plan)

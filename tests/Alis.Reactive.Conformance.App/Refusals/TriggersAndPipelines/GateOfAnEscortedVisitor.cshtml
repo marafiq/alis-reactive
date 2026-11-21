@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Gate
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Gate";
+    var plan = Html.ReactivePlan<Gate>();
+}
+<h1>@Model.Name</h1>
+<ul>
+    <li><button type="button" @Html.Raises(plan, EscortedGates.Announced, new EscortedVisitor { PartySize = 3, Escort = new Escort("Ben Okoro") })>@Model.Visitor</button></li>
+</ul>
+<p id="announced-party"></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(EscortedGates.Announced, (visitor, pipeline) => pipeline.Element("announced-party").Text.Set(visitor.Read(announced => announced.PartySize))));
+}
+@Html.RenderPlan(plan)

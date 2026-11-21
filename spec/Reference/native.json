@@ -1,0 +1,3420 @@
+{
+  "component": "ConformanceComponent",
+  "what": "the native reference: a TypeScript component the framework's own test app writes and declares in C# as an app brings a component, on the core's public surface only (its own vendor data, alis:mount); each member is named for the framework capability it exercises, and the browser tests of every core module run on it",
+  "input": {
+    "value": "ConformanceComponent.value",
+    "commit": "ConformanceComponent.change"
+  },
+  "versions": [
+    {
+      "id": "current",
+      "differs": [],
+      "why": "the declaration's own version"
+    },
+    {
+      "id": "older",
+      "differs": [
+        "ConformanceComponent.readOnlyText",
+        "ConformanceComponent.log()",
+        "ConformanceComponent.echo()",
+        "ConformanceComponent.settleRecord()"
+      ],
+      "why": "an older build that lacks two declared members, readOnlyText and log(), holds echo as the text Echoed in place of a function, and returns a plain record from settleRecord(), which the declaration declares with MethodAsync (D4.1, D4.3, X4.2, X5.12, X4.11)"
+    },
+    {
+      "id": "promised",
+      "differs": [
+        "ConformanceComponent.total()",
+        "ConformanceComponent.raised.count",
+        "ConformanceComponent.ping()"
+      ],
+      "why": "a build that returns a promise from a method declared with Method or Method<T>, ping() resolving once the component shows Pinged and rejecting while Enabled is false, and hands a promise in a payload member declared as a value (D4.3, D4.4, X4.5, X11.3), its drift from the declaration suppressed naming the test that arranges it (spec/CLAUDE.md, the vendor contract of 2026-11-07)"
+    }
+  ],
+  "types": [
+    {
+      "name": "ConformanceComponent",
+      "kind": "component",
+      "vendor": {
+        "name": "conformance-component",
+        "locate": {
+          "kind": "path",
+          "path": "conformanceComponent"
+        },
+        "listening": {
+          "kind": "pair",
+          "subscribe": "addEventListener",
+          "unsubscribe": "removeEventListener"
+        }
+      },
+      "members": [
+        {
+          "js": "value",
+          "kind": "property",
+          "ts": "value: string | null",
+          "door": "Property<string?>",
+          "csharp": "Value"
+        },
+        {
+          "js": "text",
+          "kind": "property",
+          "ts": "text: string",
+          "door": "Property<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "count",
+          "kind": "property",
+          "ts": "count: number",
+          "door": "Property<int>",
+          "csharp": "Count"
+        },
+        {
+          "js": "amount",
+          "kind": "property",
+          "ts": "amount: number",
+          "door": "Property<decimal>",
+          "csharp": "Amount"
+        },
+        {
+          "js": "ratio",
+          "kind": "property",
+          "ts": "ratio: number",
+          "door": "Property<double>",
+          "csharp": "Ratio"
+        },
+        {
+          "js": "enabled",
+          "kind": "property",
+          "ts": "enabled: boolean",
+          "door": "Property<bool>",
+          "csharp": "Enabled"
+        },
+        {
+          "js": "day",
+          "kind": "property",
+          "ts": "day: Date",
+          "door": "Property<DateTime>",
+          "csharp": "Day"
+        },
+        {
+          "js": "nullableDay",
+          "kind": "property",
+          "ts": "nullableDay: Date | null",
+          "door": "Property<DateTime?>",
+          "csharp": "NullableDay"
+        },
+        {
+          "js": "moment",
+          "kind": "property",
+          "ts": "moment: Date",
+          "door": "Property<DateTimeOffset>",
+          "csharp": "Moment"
+        },
+        {
+          "js": "choice",
+          "kind": "property",
+          "ts": "choice: \"low\" | \"high\"",
+          "door": "Property<Choice>",
+          "csharp": "Choice"
+        },
+        {
+          "js": "days",
+          "kind": "property",
+          "ts": "days: number",
+          "door": "Property<CareDays>",
+          "csharp": "Days"
+        },
+        {
+          "js": "nullableCount",
+          "kind": "property",
+          "ts": "nullableCount: number | null",
+          "door": "Property<int?>",
+          "csharp": "NullableCount"
+        },
+        {
+          "js": "optionalText",
+          "kind": "property",
+          "ts": "optionalText?: string",
+          "door": "Property<string?>",
+          "csharp": "OptionalText",
+          "optional": true
+        },
+        {
+          "js": "record",
+          "kind": "property",
+          "ts": "record: Record",
+          "door": "Property<Record>",
+          "csharp": "Record",
+          "type": "Record"
+        },
+        {
+          "js": "records",
+          "kind": "property",
+          "ts": "records: Record[]",
+          "door": "Property<IReadOnlyList<Record>>",
+          "csharp": "Records",
+          "type": "Record"
+        },
+        {
+          "js": "nullableRecords",
+          "kind": "property",
+          "ts": "nullableRecords: Record[] | null",
+          "door": "Property<IReadOnlyList<Record>?>",
+          "csharp": "NullableRecords",
+          "type": "Record"
+        },
+        {
+          "js": "bindings",
+          "kind": "property",
+          "ts": "bindings: Binding[]",
+          "door": "Property<IReadOnlyList<Binding>>",
+          "csharp": "Bindings",
+          "type": "Binding"
+        },
+        {
+          "js": "binding",
+          "kind": "property",
+          "ts": "binding: Binding",
+          "door": "Property<Binding>",
+          "csharp": "Binding",
+          "type": "Binding"
+        },
+        {
+          "js": "starts",
+          "kind": "property",
+          "ts": "starts: Starts",
+          "door": "Property<Starts>",
+          "csharp": "Starts",
+          "type": "Starts"
+        },
+        {
+          "js": "readOnlyText",
+          "kind": "readOnly",
+          "ts": "readonly readOnlyText: string",
+          "door": "ReadOnly<string>",
+          "csharp": "ReadOnlyText"
+        },
+        {
+          "js": "readOnlyCount",
+          "kind": "readOnly",
+          "ts": "readonly readOnlyCount: number",
+          "door": "ReadOnly<int>",
+          "csharp": "ReadOnlyCount"
+        },
+        {
+          "js": "calls",
+          "kind": "readOnly",
+          "ts": "readonly calls: number",
+          "door": "ReadOnly<int>",
+          "csharp": "Calls"
+        },
+        {
+          "js": "isDestroyed",
+          "kind": "readOnly",
+          "ts": "readonly isDestroyed: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "IsDestroyed"
+        },
+        {
+          "js": "firstPeerState",
+          "kind": "readOnly",
+          "ts": "readonly firstPeerState: string, alive while the first peer it built lives and collected once that peer was collected",
+          "door": "ReadOnly<string>",
+          "csharp": "FirstPeerState"
+        },
+        {
+          "js": "writeOnlyText",
+          "kind": "writeOnly",
+          "ts": "set writeOnlyText(text: string)",
+          "door": "WriteOnly<string>",
+          "csharp": "WriteOnlyText"
+        },
+        {
+          "js": "outer",
+          "kind": "liveObject",
+          "ts": "outer: Outer",
+          "door": "LiveObject<Outer>",
+          "csharp": "Outer",
+          "type": "Outer"
+        },
+        {
+          "js": "nullableOuter",
+          "kind": "liveObject",
+          "ts": "nullableOuter: Outer | null",
+          "door": "LiveObject<Outer>",
+          "csharp": "NullableOuter",
+          "type": "Outer",
+          "nullable": true
+        },
+        {
+          "js": "items",
+          "kind": "liveObjects",
+          "ts": "items: Item[]",
+          "door": "LiveObjects<Item>",
+          "csharp": "Items",
+          "type": "Item"
+        },
+        {
+          "js": "nullableItems",
+          "kind": "liveObjects",
+          "ts": "nullableItems: Item[] | null",
+          "door": "LiveObjects<Item>",
+          "csharp": "NullableItems",
+          "type": "Item",
+          "nullable": true
+        },
+        {
+          "js": "answer",
+          "kind": "callback",
+          "ts": "answer: ((item: Item) => string) | null",
+          "door": "Callback<Item, string>",
+          "csharp": "Answer"
+        },
+        {
+          "js": "pair",
+          "kind": "callback",
+          "ts": "pair: ((key: string, record: Record) => string) | null",
+          "door": "Callback<PairArgs, string>",
+          "csharp": "Pair",
+          "type": "PairArgs"
+        },
+        {
+          "js": "ping",
+          "kind": "method",
+          "ts": "ping(): void",
+          "door": "Method",
+          "csharp": "Ping()"
+        },
+        {
+          "js": "total",
+          "kind": "methodValue",
+          "ts": "total(): number",
+          "door": "Method<int>",
+          "csharp": "Total()"
+        },
+        {
+          "js": "check",
+          "kind": "methodValue",
+          "ts": "check(): boolean",
+          "door": "Method<bool>",
+          "csharp": "Check()"
+        },
+        {
+          "js": "echo",
+          "kind": "methodValue",
+          "ts": "echo(text: string): string",
+          "door": "Method<string>",
+          "csharp": "Echo(Arg<string> text)"
+        },
+        {
+          "js": "snapshot",
+          "kind": "methodValue",
+          "ts": "snapshot(): Record",
+          "door": "Method<Record>",
+          "csharp": "Snapshot()",
+          "type": "Record"
+        },
+        {
+          "js": "current",
+          "kind": "returnedObject",
+          "ts": "current(): Item",
+          "door": "ReturnedObject<Item>",
+          "csharp": "Current()",
+          "type": "Item"
+        },
+        {
+          "js": "maybeItem",
+          "kind": "returnedObject",
+          "ts": "maybeItem(): Item | null",
+          "door": "ReturnedObject<Item>",
+          "csharp": "MaybeItem()",
+          "type": "Item",
+          "nullable": true
+        },
+        {
+          "js": "matching",
+          "kind": "returnedObjects",
+          "ts": "matching(): Item[]",
+          "door": "ReturnedObjects<Item>",
+          "csharp": "Matching()",
+          "type": "Item"
+        },
+        {
+          "js": "self",
+          "kind": "returnedObject",
+          "ts": "self(): ConformanceComponent",
+          "door": "ReturnedObject<ConformanceComponent>",
+          "csharp": "Self()",
+          "type": "ConformanceComponent"
+        },
+        {
+          "js": "settle",
+          "kind": "methodAsync",
+          "ts": "settle(): Promise<void>",
+          "door": "MethodAsync",
+          "csharp": "Settle()"
+        },
+        {
+          "js": "settleCount",
+          "kind": "methodAsyncValue",
+          "ts": "settleCount(): Promise<number>",
+          "door": "MethodAsync<int>",
+          "csharp": "SettleCount()"
+        },
+        {
+          "js": "settleCheck",
+          "kind": "methodAsyncValue",
+          "ts": "settleCheck(): Promise<boolean>",
+          "door": "MethodAsync<bool>",
+          "csharp": "SettleCheck()"
+        },
+        {
+          "js": "settleRecord",
+          "kind": "methodAsyncValue",
+          "ts": "settleRecord(): Promise<Record>",
+          "door": "MethodAsync<Record>",
+          "csharp": "SettleRecord()",
+          "type": "Record"
+        },
+        {
+          "js": "settleMaybe",
+          "kind": "methodAsyncValue",
+          "ts": "settleMaybe(): Promise<Record | null>",
+          "door": "MethodAsync<Record?>",
+          "csharp": "SettleMaybe()",
+          "type": "Record"
+        },
+        {
+          "js": "log",
+          "kind": "method",
+          "ts": "log(text: string): void",
+          "door": "Method",
+          "csharp": "Log(Arg<string> text)"
+        },
+        {
+          "js": "add",
+          "kind": "method",
+          "ts": "add(amount: number): void",
+          "door": "Method",
+          "csharp": "Add(Arg<decimal> amount)"
+        },
+        {
+          "js": "takeNullable",
+          "kind": "method",
+          "ts": "takeNullable(count: number | null): void",
+          "door": "Method",
+          "csharp": "TakeNullable(Arg<int?> count)"
+        },
+        {
+          "js": "takeText",
+          "kind": "method",
+          "ts": "takeText(text: string | null): void",
+          "door": "Method",
+          "csharp": "TakeText(Arg<string?> text)"
+        },
+        {
+          "js": "takeDay",
+          "kind": "method",
+          "ts": "takeDay(day: Date): void",
+          "door": "Method",
+          "csharp": "TakeDay(Arg<DateTime> day)"
+        },
+        {
+          "js": "takeMoment",
+          "kind": "method",
+          "ts": "takeMoment(moment: Date): void",
+          "door": "Method",
+          "csharp": "TakeMoment(Arg<DateTimeOffset> moment)"
+        },
+        {
+          "js": "take",
+          "kind": "method",
+          "ts": "take(record: Record): void",
+          "door": "Method",
+          "csharp": "Take(Arg<Record> record)"
+        },
+        {
+          "js": "takeAll",
+          "kind": "method",
+          "ts": "takeAll(records: Record[]): void",
+          "door": "Method",
+          "csharp": "TakeAll(Arg<IReadOnlyList<Record>> records)"
+        },
+        {
+          "js": "takeDays",
+          "kind": "method",
+          "ts": "takeDays(days: Date[]): void",
+          "door": "Method",
+          "csharp": "TakeDays(Arg<IReadOnlyList<DateTime>> days)"
+        },
+        {
+          "js": "takeLinked",
+          "kind": "method",
+          "ts": "takeLinked(linked: Linked): void",
+          "door": "Method",
+          "csharp": "TakeLinked(Arg<Linked> linked)"
+        },
+        {
+          "js": "sortBy",
+          "kind": "method",
+          "ts": "sortBy(field: string): void",
+          "door": "Method",
+          "csharp": "SortBy(Arg<Field> field)"
+        },
+        {
+          "js": "sortItems",
+          "kind": "method",
+          "ts": "sortItems(key: (item: Item) => number): void",
+          "door": "Method",
+          "csharp": "SortItems(Answer<Item, int> key)"
+        },
+        {
+          "js": "destroy",
+          "kind": "method",
+          "ts": "destroy(): void",
+          "door": "Method",
+          "csharp": "Destroy()"
+        },
+        {
+          "js": "change",
+          "kind": "event",
+          "ts": "change: the listener's first argument, Change",
+          "door": "Event<Change>",
+          "csharp": "Change",
+          "type": "Change"
+        },
+        {
+          "js": "commit",
+          "kind": "event",
+          "ts": "commit: the listener's first argument, Change",
+          "door": "Event<Change>",
+          "csharp": "Commit",
+          "type": "Change"
+        },
+        {
+          "js": "raised",
+          "kind": "event",
+          "ts": "raised: the listener's first argument, Raised",
+          "door": "Event<Raised>",
+          "csharp": "Raised",
+          "type": "Raised"
+        },
+        {
+          "js": "handed",
+          "kind": "event",
+          "ts": "handed: the listener's first argument, the ConformancePeer it hands",
+          "door": "Event<ConformancePeer>",
+          "csharp": "Handed",
+          "type": "ConformancePeer"
+        }
+      ],
+      "what": "the first custom component: a TypeScript object its element holds at conformanceComponent, an EventTarget heard by addEventListener and removeEventListener; its Choice is the app's enum Choice, whose Minimum and Maximum are held as low and high under JsonStringEnumMemberName (D7.7, D9.13)",
+      "behaviors": [
+        {
+          "behavior": "Calls counts the component's method calls, which it shows; Total() answers its Count, and Check() answers its Enabled.",
+          "tests": [
+            "X8.13",
+            "X8.14",
+            "X8.15",
+            "X5.11",
+            "X7.6 #3"
+          ]
+        },
+        {
+          "behavior": "Settle() awaits the test app's settle endpoint, resolves on its success and rejects when it answers a 500 the harness seeds; SettleCount() awaits its count endpoint, SettleRecord() its record endpoint, SettleCheck() its check endpoint, which answers the answer a seed gives it and yes where none does, an item's Settle() its item endpoint, a payload's Settle() the text endpoint, which answers Settled text, and a held object's SettleCount() the held count endpoint, which answers 42, the same way, each address given by the render helper, and once an endpoint answers the component shows Answered, or Refused for a 500, in a status named Settle.",
+          "tests": [
+            "X4.11",
+            "X11.4",
+            "X4.5",
+            "X11.3"
+          ]
+        },
+        {
+          "behavior": "After each raise the component shows Raised and its count of raises, Raised 1 and on, in a status named Raises.",
+          "tests": [
+            "X5.7",
+            "X17.15"
+          ]
+        },
+        {
+          "behavior": "The component shows NullableCount in its nullable count line, none for null, and a value that is no number as its JavaScript type and the value as JSON writes it, in parentheses, (string \"500\") for the text 500.",
+          "tests": [
+            "X7.9 #0",
+            "X7.9 #1",
+            "X7.7 #0"
+          ]
+        },
+        {
+          "behavior": "The component writes a line into its log, a list named Log with an item for each line, for each value it receives: Date and the value's local yyyy-MM-dd HH:mm, TakeMoment's toISOString, null, same record when Take receives the object Snapshot() returned, or text and the text, Log's own text among them.",
+          "tests": [
+            "X3.10",
+            "X3.12",
+            "X7.6 #1"
+          ]
+        },
+        {
+          "behavior": "TakeNullable shows Took and the count it receives, Took none before a call, in a status named Took; TakeText shows the text it receives as its taken text, (null) for null and (undefined) for undefined.",
+          "tests": [
+            "M11.X1",
+            "X5.12",
+            "X4.11",
+            "X7.7 #2"
+          ]
+        },
+        {
+          "behavior": "Its own Ask button asks Answer for each item and shows the answers in its answer line, each item's position when Answer holds no function; a write that changes Text asks Answer again before the line draws; a throw from Answer leaves the line it drew and shows the message in its error line.",
+          "tests": [
+            "X17.14",
+            "X17.20",
+            "X17.21",
+            "X17.22",
+            "X17.24"
+          ]
+        },
+        {
+          "behavior": "Its own Ask button calls Pair with the key count and each record, and draws each answer in its answer line.",
+          "tests": [
+            "X17.23"
+          ]
+        },
+        {
+          "behavior": "SortItems orders and redraws its items by the key its answer gives for each; SortBy orders its records by the member the field names; the component lists its records' names, a list named Records with an item for each record.",
+          "tests": [
+            "X17.20",
+            "M11.X2",
+            "M4.X3"
+          ]
+        },
+        {
+          "behavior": "Its own box: Raise raises Raised with the box's text as Text and, when the text reads a number, as Count, and on net10 as Time.",
+          "tests": [
+            "X6.58 #1",
+            "X12.14"
+          ]
+        },
+        {
+          "behavior": "The Raise buttons the test's render options name raise Raised with the payload each names: no text, no optional text, a null nullable text, a record or none, Flag true or false, or no argument; the component shows its payload line, a status named Payload, once its listeners return, what a handler wrote into the payload's held object in a status named Held, Held: none as it starts and acted for with what the held object's Answer gives once a handler calls its Act(), and what its payload's Answer gives for its current item in a status named Answer, the item's name with unanswered where a handler set no answer.",
+          "tests": [
+            "M3.X1",
+            "M5.X3",
+            "X4.3",
+            "X5.7",
+            "X5.8",
+            "X7.5",
+            "X7.6 #0",
+            "X11.11",
+            "X11.12",
+            "X11.13",
+            "X17.15"
+          ]
+        },
+        {
+          "behavior": "Its Raise button hands its peer, the same peer at each click, Raise with a new peer puts a new peer on a new element and hands it, Hand a peer raises Handed with its peer, and Drop the peer removes that peer's element and lets go of it.",
+          "tests": [
+            "X12.9",
+            "X12.10",
+            "X12.18"
+          ]
+        },
+        {
+          "behavior": "The render helper takes the version the component is built as, the options its list holds, the items and records the component holds, the items, the total and the count of matching items its payload's held object holds, its Days in the live form (D7.7), an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
+          "tests": [
+            "M4.X4",
+            "M4.X6",
+            "M4.X7",
+            "M4.X8",
+            "M4.X9",
+            "X5.3",
+            "M11.X3",
+            "X5.12",
+            "X9.24 #2"
+          ]
+        },
+        {
+          "behavior": "Its own controls: a day field setting Day or NullableDay; a list of the options its render helper gives, none, residential and nursing on a care screen and a-1 and a-2 on the bench, a listbox named Value, picked with the arrow keys and Enter, setting Value and raising change, beside its value line, a status named Value; Low, High and Hold medium setting Choice, medium a text no value of Choice is held as; Hold 129 setting Days to 129, a number no value of CareDays names; Sort and Edit first over Records; Deactivate last over Items; Paged and Clear over NullableRecords; Free and Busy setting Count to 1 and 0; Destroy; Remove the read-only text.",
+          "tests": [
+            "X8.27 #0",
+            "X8.27 #1",
+            "X8.27 #3",
+            "M7.X3",
+            "X9.18",
+            "X9.19",
+            "X10.13",
+            "X5.11",
+            "X6.7",
+            "X8.14",
+            "X12.7",
+            "X17.21",
+            "X17.22",
+            "X9.25"
+          ]
+        },
+        {
+          "behavior": "Add adds the amount it is passed to Amount, which the component shows in a status named Amount, as it shows its Ratio in a status named Ratio.",
+          "tests": [
+            "M12.X2",
+            "X7.13",
+            "X7.14",
+            "X17.4"
+          ]
+        },
+        {
+          "behavior": "On the page that names it, the component's own code sets its Binding's Count to a promise.",
+          "tests": [
+            "X4.9"
+          ]
+        },
+        {
+          "behavior": "A script of the test app builds the component only when the page's Build the component button is clicked.",
+          "tests": [
+            "M12.X4"
+          ]
+        },
+        {
+          "behavior": "The component's Text is its heading; its Ping status starts at Pinged 0 times and reads Pinged 1 time after one Ping(), then times for more. Its Write-only status starts at Unwritten and reads Written and the text last written. Its Calls status reads the number of calls, starting at 0. Its Records status starts at None and Take and TakeAll show each name in its code, Alpha in C7; Beta in C8 for those two records, beside its Records list.",
+          "tests": [
+            "method.void",
+            "method.arg.object",
+            "method.arg.list",
+            "prop.writeOnly",
+            "X5.11"
+          ]
+        },
+        {
+          "behavior": "Its Items list reads each item's name and value separated by a space. An item's status is named Item and its name, One, not acted before Act() and One, acted after; its Checks status starts at 0 and shows each check. The Answer status holds the list its Ask button draws, and Error holds the thrown message. Its Raise status starts at Waiting and reads Acted after the payload's Act(), beside the Payload action status that reads Payload acted. Payload starts at Payload text: none and, once a raise's listeners return, reads Payload text: and the text its payload's WriteOnlyText was written, or none where no listener wrote it.",
+          "tests": [
+            "X5.3",
+            "X5.11",
+            "X17.22",
+            "event.poc15.callback.payload.before",
+            "event.poc15.writeOnly.payload.before",
+            "X11.11"
+          ]
+        },
+        {
+          "behavior": "Raise's payload has Count 14 where the box holds no number, a day of 2026-11-12T10:00:00 and its box text as Time. Raise is flagged, Raise plain is not. Their outer's middle is named M-12 and M-14. Before listeners return, the flagged payload's Total() is 3, its Current() is One, two of its three Items are named Missed and Matching() holds two items; the plain payload's Total() is 1, its Current() is Two and no item matches or is named Missed. After listeners return, Total() is 2, Current() is Two and the first item is named Done, leaving one Missed in the flagged payload. Held.ItemAt uses positions starting at 1 and Held.Item is One.",
+          "tests": [
+            "event.poc15.methodValue.payload.before",
+            "event.poc15.methodValue.payload.after",
+            "event.poc15.returnedObject.payload.before",
+            "event.poc15.returnedObject.payload.after",
+            "event.poc15.liveObjects.payload.after",
+            "event.poc15.returnedObject.held.before"
+          ]
+        },
+        {
+          "behavior": "Sort orders Records by name and Edit first increases the first record's Count by one. Paged puts a result object with result and count into NullableRecords, the deliberate non-list that X6.7 reads; Clear puts null there. The Day field sets both Day and NullableDay to the selected local day; clearing it puts null in NullableDay and an invalid date in Day.",
+          "tests": [
+            "X10.13",
+            "X6.7",
+            "X8.27 #0",
+            "X8.27 #3"
+          ]
+        },
+        {
+          "behavior": "Error starts empty and is cleared when Ask answers. A payload's WriteOnlyText also shows that text in Note; its Fill() replaces the list named Names with the names it receives.",
+          "tests": [
+            "X17.22",
+            "X11.8"
+          ]
+        },
+        {
+          "behavior": "The record, the records, the bindings and the starts the render helper gives it are held as that data holds them, each member the data lacks absent, so a member a page leaves out reads its start; its Binding holds no member, and a text the start holds as null is its Text. Once destroyed, it refuses the removal of a listener with the error The component was destroyed before its listener was removed.",
+          "tests": [
+            "X4.7",
+            "X4.8",
+            "M3.X1",
+            "X12.7",
+            "X7.7 #2"
+          ]
+        },
+        {
+          "behavior": "Each call of removeEventListener on one of its objects adds one to the page's count of them, a destroyed object's call before it throws among them, and an object whose render helper names an element writes the count there as it is built and at each call; a destroy, by its Destroy button, the harness's restart or alis:unmount, calls no removeEventListener.",
+          "tests": [
+            "X12.13"
+          ]
+        },
+        {
+          "behavior": "The harness's restart destroys the object, which takes its peer with it, empties its element and builds a new object there from the element's start, as alis:mount built the first.",
+          "tests": [
+            "X12.13",
+            "lane.slot.hostDestroyed"
+          ]
+        },
+        {
+          "behavior": "It holds the first peer it built by a WeakRef beside its own hold of its peer, which Drop the peer lets go of, and FirstPeerState reads alive while that peer lives and collected once it was collected.",
+          "tests": [
+            "X12.18"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ConformancePeer",
+      "kind": "component",
+      "vendor": {
+        "name": "conformance-peer",
+        "locate": {
+          "kind": "path",
+          "path": "conformancePeer"
+        },
+        "listening": {
+          "kind": "pair",
+          "subscribe": "addEventListener",
+          "unsubscribe": "removeEventListener"
+        },
+        "elementPath": "element"
+      },
+      "members": [
+        {
+          "js": "ratio",
+          "kind": "property",
+          "ts": "ratio: number",
+          "door": "Property<double>",
+          "csharp": "Ratio"
+        },
+        {
+          "js": "text",
+          "kind": "property",
+          "ts": "text: string",
+          "door": "Property<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "change",
+          "kind": "event",
+          "ts": "change: the listener's first argument, Change",
+          "door": "Event<Change>",
+          "csharp": "Change",
+          "type": "Change"
+        }
+      ],
+      "what": "the component ConformanceComponent's payloads hand over, on an element of its own, holding that element at element so a listen on it tells when its host destroyed it",
+      "behaviors": [
+        {
+          "behavior": "Its own Change button raises its Change.",
+          "tests": [
+            "X12.9",
+            "X12.10"
+          ]
+        },
+        {
+          "behavior": "It shows its Ratio after the word Ratio in a status named Ratio, inside a region named Peer.",
+          "tests": [
+            "event.poc15.component.payload.before",
+            "event.poc15.component.payload.after",
+            "event.poc15.component.held.before",
+            "event.poc15.component.held.after"
+          ]
+        },
+        {
+          "behavior": "The parent's mount builds its peer beside it, with Ratio 25 and empty Text, before any Raise or Hand a peer. Its Text is shown in its Text status. A new peer starts at those same values.",
+          "tests": [
+            "event.poc15.component.payload.before",
+            "event.poc15.component.held.before"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ConformanceElement",
+      "kind": "component",
+      "what": "the second custom component: the custom element conformance-element, its controls in an open shadow root, whose element is its object, declared with the platform's own vendor, ComponentVendor.Native",
+      "vendor": {
+        "name": "native",
+        "locate": {
+          "kind": "element"
+        },
+        "listening": {
+          "kind": "pair",
+          "subscribe": "addEventListener",
+          "unsubscribe": "removeEventListener"
+        },
+        "elementPath": ""
+      },
+      "members": [
+        {
+          "js": "opened",
+          "kind": "event",
+          "ts": "opened: a CustomEvent its Open with room button dispatches with the detail { room }, and its Open with no room button with none",
+          "door": "Event<ElementSignal>",
+          "csharp": "Opened",
+          "type": "ElementSignal"
+        },
+        {
+          "js": "keydown",
+          "kind": "event",
+          "ts": "keydown: the KeyboardEvent its shadow root's focused key field raises, composed to the element",
+          "door": "Event<ElementKey>",
+          "csharp": "Keydown",
+          "type": "ElementKey"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Its Open with room button dispatches the CustomEvent opened with the detail {\"room\": \"12\"}, and its Open with no room button dispatches opened with no detail.",
+          "tests": [
+            "X17.3",
+            "X19.4"
+          ]
+        },
+        {
+          "behavior": "It draws its controls in its open shadow root on alis:mount: the key field, its one text box, a keydown in it reaching the element composed, then Open with room and Open with no room, the room its start's.",
+          "tests": [
+            "X17.3",
+            "X19.4"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ElementSignal",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "type",
+          "kind": "readOnly",
+          "ts": "readonly type: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Type"
+        },
+        {
+          "js": "detail",
+          "kind": "readOnly",
+          "ts": "readonly detail: OpenedDetail | null",
+          "door": "ReadOnly<OpenedDetail?>",
+          "csharp": "Detail",
+          "type": "OpenedDetail"
+        }
+      ]
+    },
+    {
+      "name": "OpenedDetail",
+      "kind": "data",
+      "members": [
+        {
+          "js": "room",
+          "kind": "property",
+          "ts": "room: string",
+          "door": "string",
+          "csharp": "Room"
+        }
+      ]
+    },
+    {
+      "name": "ElementKey",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "key",
+          "kind": "readOnly",
+          "ts": "readonly key: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Key"
+        }
+      ]
+    },
+    {
+      "name": "ConformanceRegistered",
+      "kind": "component",
+      "what": "an object the conformance library keeps in a WeakMap of its own, off its element, found by the lookup the library registers as the plugin conformance-registry and heard by on and off",
+      "vendor": {
+        "name": "conformance-registered",
+        "locate": {
+          "kind": "plugin",
+          "plugin": "conformance-registry"
+        },
+        "listening": {
+          "kind": "pair",
+          "subscribe": "on",
+          "unsubscribe": "off"
+        }
+      },
+      "members": [
+        {
+          "js": "reading",
+          "kind": "readOnly",
+          "ts": "readonly reading: number",
+          "door": "ReadOnly<int>",
+          "csharp": "Reading"
+        },
+        {
+          "js": "threshold",
+          "kind": "property",
+          "ts": "threshold: number, shown beside the element",
+          "door": "Property<int>",
+          "csharp": "Threshold"
+        },
+        {
+          "js": "raise",
+          "kind": "method",
+          "ts": "raise(): void, showing Alarm raised",
+          "door": "Method",
+          "csharp": "Raise()"
+        },
+        {
+          "js": "lower",
+          "kind": "method",
+          "ts": "lower(): void, showing Alarm lowered",
+          "door": "Method",
+          "csharp": "Lower()"
+        },
+        {
+          "js": "alarmed",
+          "kind": "event",
+          "ts": "alarmed: on('alarmed', listener) calls listener with no argument when its Sound the alarm button is clicked",
+          "door": "Event",
+          "csharp": "Alarmed"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Its Sound the alarm button raises Alarmed with no argument.",
+          "tests": [
+            "X17.15"
+          ]
+        },
+        {
+          "behavior": "It shows its threshold in its Threshold status, 0 at its start, and Raise() and Lower() write Alarm raised and Alarm lowered into its Alarm status. A start that names a button makes the gauge when that button is clicked, and until then the lookup finds none for its element.",
+          "tests": [
+            "X17.10",
+            "X17.15"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ConformanceStore",
+      "kind": "component",
+      "what": "an object its element holds at conformanceStore, whose subscribe returns the function that removes the listener it added, and which shows the count of listeners it holds as subscribers: n",
+      "vendor": {
+        "name": "conformance-store",
+        "locate": {
+          "kind": "path",
+          "path": "conformanceStore"
+        },
+        "listening": {
+          "kind": "returnedUnsubscriber",
+          "subscribe": "subscribe"
+        }
+      },
+      "members": [
+        {
+          "js": "posted",
+          "kind": "event",
+          "ts": "posted: subscribe('posted', listener) calls listener(posted: Posted) when its Post an update button is clicked, and returns () => void",
+          "door": "Event<Posted>",
+          "csharp": "Posted",
+          "type": "Posted"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Its Post an update button posts the message Bed 4 needs water, and it shows the count of listeners it holds as subscribers: n.",
+          "tests": [
+            "X17.11",
+            "X17.17"
+          ]
+        },
+        {
+          "behavior": "Its count of listeners is its Subscribers status, subscribers: 0 at its start, and the function its subscribe returns removes that one listener once.",
+          "tests": [
+            "X17.11",
+            "X17.17"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Posted",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "message",
+          "kind": "readOnly",
+          "ts": "readonly message: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Message"
+        }
+      ]
+    },
+    {
+      "name": "ConformanceCallbacks",
+      "kind": "component",
+      "what": "an object its element holds at conformanceCallbacks, heard through its callback properties; its own code assigns onRaised a function that appends own to its log before any listener",
+      "vendor": {
+        "name": "conformance-callbacks",
+        "locate": {
+          "kind": "path",
+          "path": "conformanceCallbacks"
+        },
+        "listening": {
+          "kind": "callbackProperty"
+        }
+      },
+      "members": [
+        {
+          "js": "onRaised",
+          "kind": "event",
+          "ts": "onRaised: ((raised: RaisedRoom) => void) | null, called when its Raise room 7 button is clicked",
+          "door": "Event<RaisedRoom>",
+          "csharp": "OnRaised",
+          "type": "RaisedRoom"
+        },
+        {
+          "js": "onSearch",
+          "kind": "event",
+          "ts": "onSearch: ((query: string, show: (names: string[]) => void) => void) | null, called as its search box is typed into; show lists the names it is given under the box",
+          "door": "Event<SearchArgs>",
+          "csharp": "OnSearch",
+          "type": "SearchArgs"
+        },
+        {
+          "js": "append",
+          "kind": "method",
+          "ts": "append(text: string): void, adding the text after a space to the line its last raise wrote",
+          "door": "Method",
+          "csharp": "Append(Arg<string> text)"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Its own code assigns onRaised a function that appends its own word to its log, own unless its render helper gives another, with a space and the object's generation after it where the helper asks, 1 for the object alis:mount builds and one more at each restart; its raise button, Raise room 7 unless the helper names it, calls onRaised with the room 7, each call writing a new line; Make it throw makes its own function throw after it appends.",
+          "tests": [
+            "X17.17",
+            "X17.49",
+            "X17.50",
+            "X17.51",
+            "X17.52"
+          ]
+        },
+        {
+          "behavior": "Its log is a log named Log, each line a list item that holds the texts one Raise room 7 appends, parted by a space. Its search box is the search box Search, and show draws the names it is handed as the list Names, empty at its start. Check writes into its Holds status own while onRaised holds its own function, script while it holds the function Replace the callback assigned, and other for any other value, and a throw its Raise room 7 meets shows its message in its Error status.",
+          "tests": [
+            "X17.12",
+            "X17.17",
+            "X17.49",
+            "X17.50"
+          ]
+        },
+        {
+          "behavior": "Append adds its text, after a space, to the line the last raise wrote; a handler's pipeline calls it on the object its element holds when the step runs.",
+          "tests": [
+            "X17.49",
+            "X17.50",
+            "X17.51",
+            "X17.52"
+          ]
+        },
+        {
+          "behavior": "Replace the callback assigns onRaised a function of the object's own that appends script, as a page's script assigns one.",
+          "tests": [
+            "X17.50"
+          ]
+        },
+        {
+          "behavior": "Its freeze button, Freeze unless its render helper names it, freezes the object, which then refuses an assignment of onRaised; its destroy freezes it too, so a destroyed object refuses a put-back.",
+          "tests": [
+            "X17.51",
+            "X17.52"
+          ]
+        },
+        {
+          "behavior": "The harness's restart destroys the object, empties its element and builds a new object there from the element's start, one generation on, its log empty.",
+          "tests": [
+            "X17.52"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RaisedRoom",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "room",
+          "kind": "readOnly",
+          "ts": "readonly room: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Room"
+        }
+      ]
+    },
+    {
+      "name": "SearchArgs",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "query",
+          "kind": "argument",
+          "ts": "the first argument, query: string",
+          "door": "Argument<string>",
+          "csharp": "Query",
+          "position": 0
+        },
+        {
+          "js": "show",
+          "kind": "methodAt",
+          "ts": "the second argument, show(names: string[]): void",
+          "door": "MethodAt",
+          "csharp": "Show(Arg<IReadOnlyList<string>> names)",
+          "position": 1
+        }
+      ]
+    },
+    {
+      "name": "PairArgs",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "key",
+          "kind": "argument",
+          "ts": "the first argument, key: string",
+          "door": "Argument<string>",
+          "csharp": "Key",
+          "position": 0
+        },
+        {
+          "js": "record",
+          "kind": "argument",
+          "ts": "the second argument, record: Record",
+          "door": "Argument<Record>",
+          "csharp": "Record",
+          "position": 1,
+          "type": "Record"
+        }
+      ]
+    },
+    {
+      "name": "Outer",
+      "kind": "live",
+      "members": [
+        {
+          "js": "name",
+          "kind": "readOnly",
+          "ts": "readonly name: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Name"
+        },
+        {
+          "js": "text",
+          "kind": "property",
+          "ts": "text: string",
+          "door": "Property<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "count",
+          "kind": "property",
+          "ts": "count: number",
+          "door": "Property<int>",
+          "csharp": "Count"
+        },
+        {
+          "js": "middle",
+          "kind": "liveObject",
+          "ts": "readonly middle: Middle",
+          "door": "LiveObject<Middle>",
+          "csharp": "Middle",
+          "type": "Middle"
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "The component shows its outer's text as Outer: and the text in a status named Outer, its outer's count as Outer count: and the count in a status named Outer count, and Outer acted in a status named Outer action once the outer's Act() is called.",
+          "tests": [
+            "X5.10"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Middle",
+      "kind": "live",
+      "members": [
+        {
+          "js": "name",
+          "kind": "readOnly",
+          "ts": "readonly name: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Name"
+        },
+        {
+          "js": "text",
+          "kind": "property",
+          "ts": "text: string",
+          "door": "Property<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "inner",
+          "kind": "liveObject",
+          "ts": "readonly inner: Inner",
+          "door": "LiveObject<Inner>",
+          "csharp": "Inner",
+          "type": "Inner"
+        }
+      ]
+    },
+    {
+      "name": "Inner",
+      "kind": "live",
+      "members": [
+        {
+          "js": "name",
+          "kind": "readOnly",
+          "ts": "readonly name: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Name"
+        },
+        {
+          "js": "text",
+          "kind": "property",
+          "ts": "text: string",
+          "door": "Property<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
+        },
+        {
+          "js": "settle",
+          "kind": "methodAsyncValue",
+          "ts": "settle(): Promise<string>",
+          "door": "MethodAsync<string>",
+          "csharp": "Settle()"
+        }
+      ]
+    },
+    {
+      "name": "Item",
+      "kind": "live",
+      "members": [
+        {
+          "js": "name",
+          "kind": "readOnly",
+          "ts": "readonly name: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Name"
+        },
+        {
+          "js": "active",
+          "kind": "readOnly",
+          "ts": "readonly active: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "Active"
+        },
+        {
+          "js": "value",
+          "kind": "property",
+          "ts": "value: number",
+          "door": "Property<int>",
+          "csharp": "Value"
+        },
+        {
+          "js": "optionalCount",
+          "kind": "property",
+          "ts": "optionalCount?: number",
+          "door": "Property<int?>",
+          "csharp": "OptionalCount",
+          "optional": true
+        },
+        {
+          "js": "optionalScore",
+          "kind": "property",
+          "ts": "optionalScore?: number",
+          "door": "Property<int>",
+          "csharp": "OptionalScore",
+          "optional": true
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
+        },
+        {
+          "js": "check",
+          "kind": "methodValue",
+          "ts": "check(): boolean",
+          "door": "Method<bool>",
+          "csharp": "Check()"
+        },
+        {
+          "js": "settle",
+          "kind": "methodAsyncValue",
+          "ts": "settle(): Promise<string>",
+          "door": "MethodAsync<string>",
+          "csharp": "Settle()"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Act() shows the item's name and acted; Check() answers Active and adds one to the checks the item shows.",
+          "tests": [
+            "X5.3",
+            "X5.11"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Held",
+      "kind": "live",
+      "members": [
+        {
+          "js": "writeOnlyText",
+          "kind": "writeOnly",
+          "ts": "set writeOnlyText(text: string)",
+          "door": "WriteOnly<string>",
+          "csharp": "WriteOnlyText"
+        },
+        {
+          "js": "items",
+          "kind": "liveObjects",
+          "ts": "readonly items: Item[]",
+          "door": "LiveObjects<Item>",
+          "csharp": "Items",
+          "type": "Item"
+        },
+        {
+          "js": "total",
+          "kind": "methodValue",
+          "ts": "total(): number",
+          "door": "Method<int>",
+          "csharp": "Total()"
+        },
+        {
+          "js": "settleCount",
+          "kind": "methodAsyncValue",
+          "ts": "settleCount(): Promise<number>",
+          "door": "MethodAsync<int>",
+          "csharp": "SettleCount()"
+        },
+        {
+          "js": "itemAt",
+          "kind": "returnedObject",
+          "ts": "itemAt(position: number): Item",
+          "door": "ReturnedObject<Item>",
+          "csharp": "ItemAt(Arg<int> position)",
+          "type": "Item"
+        },
+        {
+          "js": "matching",
+          "kind": "returnedObjects",
+          "ts": "matching(): Item[]",
+          "door": "ReturnedObjects<Item>",
+          "csharp": "Matching()",
+          "type": "Item"
+        },
+        {
+          "js": "answer",
+          "kind": "callback",
+          "ts": "answer: ((item: Item) => string) | null",
+          "door": "Callback<Item, string>",
+          "csharp": "Answer"
+        },
+        {
+          "js": "item",
+          "kind": "liveObject",
+          "ts": "readonly item: Item",
+          "door": "LiveObject<Item>",
+          "csharp": "Item",
+          "type": "Item"
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "ItemAt(position) answers the held item at that position, counted from 1; at a position that holds no item it throws an Error, There is no held item at 4. for 4.",
+          "tests": [
+            "X11.25 #0",
+            "X11.25 #1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Record",
+      "kind": "data",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        },
+        {
+          "js": "code",
+          "kind": "property",
+          "ts": "code: string | null",
+          "door": "string?",
+          "csharp": "Code"
+        },
+        {
+          "js": "count",
+          "kind": "property",
+          "ts": "count: number",
+          "door": "int",
+          "csharp": "Count"
+        },
+        {
+          "js": "day",
+          "kind": "property",
+          "ts": "day: string",
+          "door": "DateTime",
+          "csharp": "Day"
+        },
+        {
+          "js": "detail",
+          "kind": "property",
+          "ts": "detail: Detail",
+          "door": "Detail",
+          "csharp": "Detail",
+          "type": "Detail"
+        },
+        {
+          "js": "multiWord",
+          "kind": "property",
+          "ts": "multiWord: number",
+          "door": "int",
+          "csharp": "MultiWord"
+        },
+        {
+          "js": "ratio",
+          "kind": "property",
+          "ts": "ratio: number",
+          "door": "double",
+          "csharp": "Ratio"
+        },
+        {
+          "js": "stage",
+          "kind": "property",
+          "ts": "stage: number",
+          "door": "RecordStage",
+          "csharp": "Stage"
+        },
+        {
+          "js": "wing",
+          "kind": "property",
+          "ts": "wing: string",
+          "door": "RecordWing",
+          "csharp": "Wing"
+        }
+      ],
+      "what": "the app's C# class Record, whose Name starts at null and whose Code at C0, the values a record whose data lacks name or code reads (D4.2); its Stage is the enum RecordStage, Waiting, Ready and Closed, which the live form holds as its number and starts at Waiting, and its Wing the enum RecordWing, North and South, which the member's own JsonStringEnumConverter writes by its C# name in both forms (D7.7, X7.20)"
+    },
+    {
+      "name": "Detail",
+      "kind": "data",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "Linked",
+      "kind": "data",
+      "what": "a record that holds itself and a date, which a step's value refuses where the view renders (D3.13, X3.12)",
+      "members": [
+        {
+          "js": "day",
+          "kind": "property",
+          "ts": "day: string",
+          "door": "DateTime",
+          "csharp": "Day"
+        },
+        {
+          "js": "previous",
+          "kind": "property",
+          "ts": "previous: Linked | null",
+          "door": "Linked?",
+          "csharp": "Previous",
+          "type": "Linked"
+        }
+      ]
+    },
+    {
+      "name": "Binding",
+      "kind": "data",
+      "what": "the app's C# record Binding(string Name, string Code), deriving from the abstract BindingBase: Started starts at start; Constructor is a string? whose JSON name is constructor; BindingBase declares the abstract Renamed with [JsonPropertyName(\"renamed_member\")], which Binding overrides with the same name, starting empty, and the abstract Ignored, which Binding overrides with [JsonIgnore], ALIS025 suppressed on that member (D4.2, D2.9, D18.3)",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        },
+        {
+          "js": "code",
+          "kind": "property",
+          "ts": "code: string",
+          "door": "string",
+          "csharp": "Code"
+        },
+        {
+          "js": "count",
+          "kind": "property",
+          "ts": "count: number",
+          "door": "int",
+          "csharp": "Count"
+        },
+        {
+          "js": "started",
+          "kind": "property",
+          "ts": "started: string",
+          "door": "string",
+          "csharp": "Started"
+        },
+        {
+          "js": "strict",
+          "kind": "property",
+          "ts": "strict: StrictSpot",
+          "door": "StrictSpot",
+          "csharp": "Strict",
+          "type": "StrictSpot"
+        },
+        {
+          "js": "sealed",
+          "kind": "property",
+          "ts": "sealed: SealedSpot",
+          "door": "SealedSpot",
+          "csharp": "Sealed",
+          "type": "SealedSpot"
+        },
+        {
+          "js": "polymorphic",
+          "kind": "property",
+          "ts": "polymorphic: PolySpot",
+          "door": "PolySpot",
+          "csharp": "Polymorphic",
+          "type": "PolySpot"
+        },
+        {
+          "js": "shaped",
+          "kind": "property",
+          "ts": "shaped: Shape",
+          "door": "Shape",
+          "csharp": "Shaped",
+          "type": "Shape"
+        },
+        {
+          "js": "constructor",
+          "kind": "property",
+          "ts": "constructor: string | null",
+          "door": "string?",
+          "csharp": "Constructor"
+        },
+        {
+          "js": "converted",
+          "kind": "property",
+          "ts": "converted: string",
+          "door": "ConvertedSpot",
+          "csharp": "Converted",
+          "type": "ConvertedSpot"
+        },
+        {
+          "js": "renamed_member",
+          "kind": "property",
+          "ts": "renamed_member: string",
+          "door": "string",
+          "csharp": "Renamed"
+        },
+        {
+          "js": "ignored",
+          "kind": "property",
+          "ts": "ignored: string",
+          "door": "string",
+          "csharp": "Ignored"
+        }
+      ]
+    },
+    {
+      "name": "Starts",
+      "kind": "data",
+      "what": "the app's C# class Starts, whose constructor takes no parameters, since System.Text.Json refuses Populate on a type whose constructor takes them (core-stj-populate-parameterized): Populated, which carries [JsonObjectCreationHandling(Populate)], GetterOnly, which has no setter, and Replaced each start at a Spot whose Place is binding start (D4.2)",
+      "members": [
+        {
+          "js": "populated",
+          "kind": "property",
+          "ts": "populated: Spot",
+          "door": "Spot",
+          "csharp": "Populated",
+          "type": "Spot"
+        },
+        {
+          "js": "getterOnly",
+          "kind": "property",
+          "ts": "getterOnly: Spot",
+          "door": "Spot",
+          "csharp": "GetterOnly",
+          "type": "Spot"
+        },
+        {
+          "js": "replaced",
+          "kind": "property",
+          "ts": "replaced: Spot",
+          "door": "Spot",
+          "csharp": "Replaced",
+          "type": "Spot"
+        }
+      ]
+    },
+    {
+      "name": "Spot",
+      "kind": "data",
+      "what": "the app's C# class Spot, whose own initializer sets Place to own start (D4.2)",
+      "members": [
+        {
+          "js": "place",
+          "kind": "property",
+          "ts": "place: string",
+          "door": "string",
+          "csharp": "Place"
+        }
+      ]
+    },
+    {
+      "name": "StrictSpot",
+      "kind": "data",
+      "what": "the app's C# class StrictSpot, whose Place carries [JsonRequired], so a holder that lacks it stops every read through it (D4.2)",
+      "members": [
+        {
+          "js": "place",
+          "kind": "property",
+          "ts": "place: string",
+          "door": "string",
+          "csharp": "Place"
+        },
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "SealedSpot",
+      "kind": "data",
+      "what": "the app's C# class SealedSpot, with only a private constructor, so the binding cannot create it (D4.2)",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "PolySpot",
+      "kind": "data",
+      "what": "the app's C# class PolySpot, marked [JsonPolymorphic], whose start hangs on the discriminator the data holds (D4.2)",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "Shape",
+      "kind": "data",
+      "members": [
+        {
+          "js": "number",
+          "kind": "property",
+          "ts": "number: number",
+          "door": "int",
+          "csharp": "Number"
+        }
+      ]
+    },
+    {
+      "name": "ConvertedSpot",
+      "kind": "data",
+      "what": "the app's C# class ConvertedSpot, which Binding's Converted writes through that member's own [JsonConverter], as its Name, a text in the data (D4.2, D7.7, X4.13)",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "Change",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "value",
+          "kind": "readOnly",
+          "ts": "readonly value: string | null",
+          "door": "ReadOnly<string?>",
+          "csharp": "Value"
+        },
+        {
+          "js": "previousValue",
+          "kind": "readOnly",
+          "ts": "readonly previousValue: string | null",
+          "door": "ReadOnly<string?>",
+          "csharp": "PreviousValue"
+        },
+        {
+          "js": "isInteracted",
+          "kind": "readOnly",
+          "ts": "readonly isInteracted: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "IsInteracted"
+        }
+      ]
+    },
+    {
+      "name": "Raised",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "flag",
+          "kind": "readOnly",
+          "ts": "readonly flag: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "Flag"
+        },
+        {
+          "js": "count",
+          "kind": "readOnly",
+          "ts": "readonly count: number",
+          "door": "ReadOnly<int>",
+          "csharp": "Count"
+        },
+        {
+          "js": "text",
+          "kind": "readOnly",
+          "ts": "readonly text: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "nullableText",
+          "kind": "readOnly",
+          "ts": "readonly nullableText: string | null",
+          "door": "ReadOnly<string?>",
+          "csharp": "NullableText"
+        },
+        {
+          "js": "optionalText",
+          "kind": "readOnly",
+          "ts": "readonly optionalText?: string",
+          "door": "ReadOnly<string?>",
+          "csharp": "OptionalText",
+          "optional": true
+        },
+        {
+          "js": "day",
+          "kind": "readOnly",
+          "ts": "readonly day: string",
+          "door": "ReadOnly<DateTime>",
+          "csharp": "Day"
+        },
+        {
+          "js": "time",
+          "kind": "readOnly",
+          "ts": "readonly time: string",
+          "door": "ReadOnly<TimeOnly>",
+          "csharp": "Time"
+        },
+        {
+          "js": "record",
+          "kind": "readOnly",
+          "ts": "readonly record: Record",
+          "door": "ReadOnly<Record>",
+          "csharp": "Record",
+          "type": "Record"
+        },
+        {
+          "js": "writeOnlyText",
+          "kind": "writeOnly",
+          "ts": "set writeOnlyText(text: string)",
+          "door": "WriteOnly<string>",
+          "csharp": "WriteOnlyText"
+        },
+        {
+          "js": "outer",
+          "kind": "liveObject",
+          "ts": "readonly outer: Outer",
+          "door": "LiveObject<Outer>",
+          "csharp": "Outer",
+          "type": "Outer"
+        },
+        {
+          "js": "items",
+          "kind": "liveObjects",
+          "ts": "readonly items: Item[]",
+          "door": "LiveObjects<Item>",
+          "csharp": "Items",
+          "type": "Item"
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
+        },
+        {
+          "js": "total",
+          "kind": "methodValue",
+          "ts": "total(): number",
+          "door": "Method<int>",
+          "csharp": "Total()"
+        },
+        {
+          "js": "settle",
+          "kind": "methodAsyncValue",
+          "ts": "settle(): Promise<string>",
+          "door": "MethodAsync<string>",
+          "csharp": "Settle()"
+        },
+        {
+          "js": "current",
+          "kind": "returnedObject",
+          "ts": "current(): Item",
+          "door": "ReturnedObject<Item>",
+          "csharp": "Current()",
+          "type": "Item"
+        },
+        {
+          "js": "matching",
+          "kind": "returnedObjects",
+          "ts": "matching(): Item[]",
+          "door": "ReturnedObjects<Item>",
+          "csharp": "Matching()",
+          "type": "Item"
+        },
+        {
+          "js": "answer",
+          "kind": "callback",
+          "ts": "answer: ((item: Item) => string) | null",
+          "door": "Callback<Item, string>",
+          "csharp": "Answer"
+        },
+        {
+          "js": "held",
+          "kind": "liveObject",
+          "ts": "readonly held: Held",
+          "door": "LiveObject<Held>",
+          "csharp": "Held",
+          "type": "Held"
+        },
+        {
+          "js": "peer",
+          "kind": "component",
+          "ts": "readonly peer: ConformancePeer",
+          "door": "LiveObject<ConformancePeer>",
+          "csharp": "Peer",
+          "type": "ConformancePeer"
+        },
+        {
+          "js": "fill",
+          "kind": "method",
+          "ts": "fill(names: string[]): void",
+          "door": "Method",
+          "csharp": "Fill(Arg<IReadOnlyList<string>> names)"
+        }
+      ],
+      "what": "the payload ConformanceComponent's Raised hands its listeners; Time is declared on net10 alone, where TimeOnly exists (X6.58)",
+      "behaviors": [
+        {
+          "behavior": "Act() makes the component show Payload acted.",
+          "tests": [
+            "X11.11"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ConformanceBusy",
+      "kind": "live",
+      "what": "the conformance library's busy indicator, the object its script provides as the plugin busy when its element mounts (D17.14): show(target?: string): void and hide(target?: string): void set a state on one target, the page where none is passed, and it never hides by itself (D10.21); the core alone calls both, so the app's C# declares no member of it and holds its render helper alone",
+      "members": [],
+      "behaviors": [
+        {
+          "behavior": "Html.ConformanceBusy() renders its element once, in a layout, and its script provides the plugin busy when that element mounts; a page whose layout renders none provides no busy.",
+          "tests": [
+            "X10.20"
+          ]
+        },
+        {
+          "behavior": "It shows what it holds shown in a status named Busy, whose whole text is Busy: and each shown target's id, ordered as text and parted by a comma and a space, the page as the page, and Busy: none while nothing is shown; a show of a shown target and a hide of a hidden one change nothing.",
+          "tests": [
+            "X10.3",
+            "X10.8",
+            "X10.16",
+            "X10.17",
+            "X10.19",
+            "X4.4",
+            "X11.4",
+            "X11.5",
+            "X11.6",
+            "X11.23",
+            "X21.8"
+          ]
+        },
+        {
+          "behavior": "It lists every call the core made in a status named Busy calls, whose whole text is Busy calls: and each call in the order made, parted by a semicolon and a space, a call its method's name, show or hide, a space and its target's id, the page as the page, and Busy calls: none until the first.",
+          "tests": [
+            "X10.8",
+            "X10.16"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ConformanceNotice",
+      "kind": "live",
+      "what": "the conformance library's notice, the object its script provides as the plugin notice when its element mounts (D17.14): show(text: string | null | undefined, kind: string): void; it keeps every notice and has no time and no dismiss (D11.9), and the core alone calls it (D10.21), so the app's C# declares no member of it and holds its render helper alone",
+      "members": [],
+      "behaviors": [
+        {
+          "behavior": "Html.ConformanceNotice() renders its element once, in a layout, and its script provides the plugin notice when that element mounts.",
+          "tests": [
+            "X16.15",
+            "X16.16"
+          ]
+        },
+        {
+          "behavior": "It shows every notice it was passed in a status named Notices, whose whole text is Notices: and each notice in the order shown, parted by a semicolon and a space, a notice its kind, a colon, a space and its text, (null) for null and (undefined) for undefined, and Notices: none until one shows.",
+          "tests": [
+            "X16.15",
+            "X16.16",
+            "X10.12"
+          ]
+        }
+      ]
+    }
+  ],
+  "cells": {
+    "prop.scalar.read": {
+      "members": [
+        "ConformanceComponent.text"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Show button whose click sets shown's text to conformance.Text.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads Alpha.",
+        "opposite": "On a component whose text is Beta the same click shows Beta.",
+        "defect": "The read names the member Text, its C# name, so the component's text reads nothing and shown stays empty."
+      }
+    },
+    "prop.scalar.write": {
+      "members": [
+        "ConformanceComponent.text"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Rename button whose click sets conformance.Text to \"Alpha, renamed\".",
+        "gesture": "Click Rename.",
+        "outcome": "The component's heading reads Alpha, renamed.",
+        "opposite": "Before the click the heading reads Alpha.",
+        "defect": "The set writes text on the host element instead of the component the vendor's objectPath finds, so the heading keeps Alpha."
+      }
+    },
+    "prop.dotted.read": {
+      "members": [
+        "ConformanceComponent.outer.count"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose outer object's count is 8 (outer.count 8), and a Show button whose click sets shown's text to conformance.Outer.Count.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads 8.",
+        "opposite": "On a component whose outer count is 12 the same click shows 12.",
+        "defect": "The read takes outer.count as one member name, so it reads nothing and shown stays empty."
+      }
+    },
+    "prop.dotted.write": {
+      "members": [
+        "ConformanceComponent.outer.count"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose outer object's count is 8, which the component shows as Outer count: 8, and a Set to 4 button whose click sets conformance.Outer.Count to 4.",
+        "gesture": "Click Set to 4.",
+        "outcome": "The component's outer line reads Outer count: 4.",
+        "opposite": "Before the click it reads Outer count: 8.",
+        "defect": "The write sets a member named outer.count on the component, so its outer object keeps 8 and the line reads Outer count: 8."
+      }
+    },
+    "prop.object.memberRead": {
+      "members": [
+        "ConformanceComponent.outer.text"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose outer object's text is Gamma, and a Show button whose click sets shown's text to conformance.Outer.Text.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads Gamma.",
+        "opposite": "On a component whose outer text is Delta the same click shows Delta.",
+        "defect": "The read stops at outer and sets the object as text, so shown reads [object Object]."
+      }
+    },
+    "prop.object.memberWrite": {
+      "members": [
+        "ConformanceComponent.outer.text"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose outer object's text is Gamma, which the component shows as Outer: Gamma, and a Rename outer button whose click sets conformance.Outer.Text to \"Gamma, renamed\".",
+        "gesture": "Click Rename outer.",
+        "outcome": "The component's outer line reads Outer: Gamma, renamed.",
+        "opposite": "Before the click it reads Outer: Gamma.",
+        "defect": "The write lands on the component's own text instead of outer.text, so the outer line keeps Outer: Gamma."
+      }
+    },
+    "prop.list.lambda": {
+      "members": [
+        "ConformanceComponent.items.active"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, of 4 items, 3 active, and a Count button whose click sets shown's text to conformance.Items.Count(i => i.Active).",
+        "gesture": "Click Count.",
+        "outcome": "shown reads 3.",
+        "opposite": "On a component of 4 items with 1 active the same click shows 1.",
+        "defect": "The lambda reads each item's member by its C# name Active, so no item counts and shown reads 0."
+      }
+    },
+    "prop.readOnly": {
+      "members": [
+        "ConformanceComponent.readOnlyText"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose read-only text is RO-2026-11-10, and a Show button whose click sets shown's text to conformance.ReadOnlyText.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads RO-2026-11-10.",
+        "opposite": "On a component whose read-only text is RO-2026-11-11 the same click shows RO-2026-11-11.",
+        "defect": "The read of a ReadOnly member is written as a call of readOnlyText, which is no function, so the pipeline stops and shown stays empty."
+      }
+    },
+    "prop.writeOnly": {
+      "members": [
+        "ConformanceComponent.writeOnlyText"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Write button whose click sets conformance.WriteOnlyText to \"Kappa\".",
+        "gesture": "Click Write.",
+        "outcome": "The component's write-only line reads Written Kappa.",
+        "opposite": "Before the click it reads Unwritten.",
+        "defect": "The set reads the member before writing it, and a write-only member has no getter, so the step stops and the line reads Unwritten."
+      }
+    },
+    "method.void": {
+      "members": [
+        "ConformanceComponent.ping()"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Ping button whose click calls conformance.Ping().",
+        "gesture": "Click Ping.",
+        "outcome": "The component's ping line reads Pinged 1 time.",
+        "opposite": "Before the click it reads Pinged 0 times.",
+        "defect": "The call is written as a read of ping, so the method never runs and the line keeps Pinged 0 times."
+      }
+    },
+    "method.value": {
+      "members": [
+        "ConformanceComponent.total()"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose total is 3, and a Show button whose click sets shown's text to conformance.Total().",
+        "gesture": "Click Show.",
+        "outcome": "shown reads 3.",
+        "opposite": "On a component whose total is 1 the same click shows 1.",
+        "defect": "The result is read from the method's function object instead of its call, so shown stays empty."
+      }
+    },
+    "method.object.memberRead": {
+      "members": [
+        "ConformanceComponent.current().name"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose current item is named One, and a Show button whose click sets shown's text to conformance.Current().Name.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads One.",
+        "opposite": "On a component whose current item is named Two the same click shows Two.",
+        "defect": "The member is read from the method instead of the object it returned, so shown stays empty."
+      }
+    },
+    "method.object.methodCall": {
+      "members": [
+        "ConformanceComponent.current().act()"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose current item is One, and an Act button whose click calls conformance.Current().Act().",
+        "gesture": "Click Act.",
+        "outcome": "Item One's line reads One, acted, and item Two's still reads Two, not acted.",
+        "opposite": "Before the click item One's line reads One, not acted.",
+        "defect": "The call goes to conformance.act, which the ConformanceComponent lacks, so the pipeline stops and item One stays not acted."
+      }
+    },
+    "method.async.void": {
+      "members": [
+        "ConformanceComponent.settle()"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Settle button whose click sets shown's text to Settling, awaits conformance.Settle(), which the test app's settle endpoint answers when the test releases it, then sets shown's text to Settled.",
+        "gesture": "Click Settle.",
+        "outcome": "While the settle endpoint is held shown reads Settling, and once it answers shown reads Settled.",
+        "opposite": "A settle the endpoint refuses rejects the promise and stops the pipeline, so shown keeps Settling.",
+        "defect": "The step after the call runs before the promise settles, so shown reads Settled while the endpoint is held.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "method.async.value": {
+      "members": [
+        "ConformanceComponent.settleCount()"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Show button whose click sets shown's text to conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it.",
+        "gesture": "Click Show.",
+        "outcome": "While the endpoint is held shown stays empty, and once it answers shown reads 3.",
+        "opposite": "A count the endpoint refuses stops the pipeline, so shown stays empty.",
+        "defect": "The value set is the promise itself, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "method.arg.scalar": {
+      "members": [
+        "ConformanceComponent.log()"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Log button whose click calls conformance.Log(\"Checked at 14:00\").",
+        "gesture": "Click Log.",
+        "outcome": "The component's log line reads text Checked at 14:00.",
+        "opposite": "Before the click the log line is empty.",
+        "defect": "The argument does not reach the method, so the log line reads text undefined."
+      }
+    },
+    "method.arg.object": {
+      "members": [
+        "ConformanceComponent.take()"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Take button whose click calls conformance.Take with a record named Alpha with the code C7.",
+        "gesture": "Click Take.",
+        "outcome": "The component's records line reads Alpha in C7.",
+        "opposite": "Before the click the records line reads None.",
+        "defect": "The record's members are written by their C# names Name and Code, so the component shows undefined in undefined."
+      }
+    },
+    "method.arg.list": {
+      "members": [
+        "ConformanceComponent.takeAll()"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Take both button whose click calls conformance.TakeAll with Alpha in C7 and Beta in C8.",
+        "gesture": "Click Take both.",
+        "outcome": "The component's records line reads Alpha in C7; Beta in C8.",
+        "opposite": "Before the click the records line reads None.",
+        "defect": "The list is spread into two arguments, so only Alpha is taken."
+      }
+    },
+    "event.scalar": {
+      "members": [
+        "ConformanceComponent.raised.flag"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to Flagged when args.Flag holds, else Plain; the component's Raise button raises Raised with its flag set, and its Raise plain button with its flag unset.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads Flagged.",
+        "opposite": "Raise plain, with the same handler, shows Plain.",
+        "defect": "The payload is read from the listener's second argument, so flag reads nothing and Raise shows Plain."
+      }
+    },
+    "event.object": {
+      "members": [
+        "ConformanceComponent.raised.outer.middle.name"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Outer.Middle.Name; Raise hands an outer object whose middle is named M-12.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads M-12.",
+        "opposite": "Raise plain, whose payload's middle is named M-14, shows M-14.",
+        "defect": "The read takes outer.middle.name as one member name, so shown stays empty."
+      }
+    },
+    "event.list": {
+      "members": [
+        "ConformanceComponent.raised.items.name"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Items.Count(i => i.Name != \"Done\"); Raise hands the items Missed, Missed and Done.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads 2.",
+        "opposite": "Raise plain, whose items are all named Done, shows 0.",
+        "defect": "The lambda reads name by the C# name Name, so every item reads nothing, counts as not Done, and shown reads 3."
+      }
+    },
+    "event.method": {
+      "members": [
+        "ConformanceComponent.raised.act()"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that calls args.Act().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The component's raise line reads Acted.",
+        "opposite": "Before the click the raise line reads Waiting, and Raise plain with the same handler also reads Acted.",
+        "defect": "The call is taken from the component instead of the payload, which the ConformanceComponent lacks, so the pipeline stops and the line reads Waiting."
+      }
+    },
+    "event.promise": {
+      "members": [
+        "ConformanceComponent.raised.count"
+      ],
+      "version": "promised",
+      "promise": {
+        "page": "The promised version of the page: its ConformanceComponent hands a promise in raised's count, declared ReadOnly<int>, and the Raised handler sets shown's text to args.Count, then sets done's text to after.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown and done stay empty: the read of a promise stops the pipeline.",
+        "opposite": "On the current version, whose count is 14, the same click shows 14 and done reads after.",
+        "defect": "The read hands the promise to the set and runs on, so shown reads [object Promise] and done reads after."
+      }
+    },
+    "event.deepAsync": {
+      "members": [
+        "ConformanceComponent.raised.held.item.settle()",
+        "ConformanceComponent.raised.flag"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that awaits args.Held.Item.Settle(), which the test app's item endpoint answers with Item settled when the test releases it, sets shown's text to the result, then sets flagged's text to Flagged when args.Flag holds.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the item endpoint is held shown and flagged stay empty; once it answers shown reads Item settled and flagged reads Flagged.",
+        "opposite": "An item the endpoint refuses rejects the promise and stops the handler, so shown and flagged stay empty.",
+        "defect": "The step after the call runs before the promise settles, so shown reads [object Promise] while the endpoint is held.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.writeOnly.payload.before": {
+      "members": [
+        "ConformanceComponent.raised.writeOnlyText"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.writeOnlyText",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.WriteOnlyText to \"Kappa\".",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The component's payload line reads Payload text: Kappa, which the component reads when the handler returns.",
+        "opposite": "A handler that writes no text leaves Payload text: none.",
+        "defect": "The write goes to a copy of the payload, so the component reads no text and shows Payload text: none."
+      }
+    },
+    "event.poc15.writeOnly.payload.after": {
+      "members": [
+        "ConformanceComponent.raised.writeOnlyText"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.writeOnlyText"
+    },
+    "event.poc15.writeOnly.held.before": {
+      "members": [
+        "ConformanceComponent.raised.held.writeOnlyText"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.writeOnlyText",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Held.WriteOnlyText to \"Kappa\".",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The component's held line reads Held: Kappa.",
+        "opposite": "Before the click it reads Held: none.",
+        "defect": "The write lands on args.writeOnlyText instead of the held object, so the line keeps Held: none."
+      }
+    },
+    "event.poc15.writeOnly.held.after": {
+      "members": [
+        "ConformanceComponent.raised.held.writeOnlyText"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.writeOnlyText",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Held.WriteOnlyText to \"Kappa\".",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the count endpoint is held the held line reads Held: none; once it answers it reads Held: Kappa.",
+        "opposite": "Before the click it reads Held: none.",
+        "defect": "The run drops a write to an object the payload holds after the await as it drops a payload write, so the line keeps Held: none.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.liveObjects.payload.before": {
+      "members": [
+        "ConformanceComponent.raised.items"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.items",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Items.Count(i => i.Name == \"Missed\").",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads 2.",
+        "opposite": "Raise plain, with no item named Missed, reads 0.",
+        "defect": "The lambda reads name by its C# name Name, so no item counts and shown reads 0."
+      }
+    },
+    "event.poc15.liveObjects.payload.after": {
+      "members": [
+        "ConformanceComponent.raised.items"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.items",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Items.Count(i => i.Name == \"Missed\").",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 1: the component renamed one Missed item when the handler returned.",
+        "opposite": "Without the await the same count reads 2.",
+        "defect": "The read uses the list as the handler started, so shown reads 2.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.liveObjects.held.before": {
+      "members": [
+        "ConformanceComponent.raised.held.items"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.items",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.Items.Count(i => i.Name != \"\").",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads 4.",
+        "opposite": "On a held object of 3 named items it reads 3.",
+        "defect": "The lambda reads name by its C# name Name, so no item counts and shown reads 0."
+      }
+    },
+    "event.poc15.liveObjects.held.after": {
+      "members": [
+        "ConformanceComponent.raised.held.items"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.items",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.Items.Count(i => i.Name != \"\").",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 4.",
+        "opposite": "While the count endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.methodValue.payload.before": {
+      "members": [
+        "ConformanceComponent.raised.total()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.total()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Total().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads 3.",
+        "opposite": "Raise plain, whose total is 1, reads 1.",
+        "defect": "The result is read from the method's function object, so shown stays empty."
+      }
+    },
+    "event.poc15.methodValue.payload.after": {
+      "members": [
+        "ConformanceComponent.raised.total()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.total()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Total().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 2: the component counted one down when the handler returned.",
+        "opposite": "Without the await it reads 3.",
+        "defect": "The call runs at the handler's start instead of after the await, so shown reads 3.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.methodValue.held.before": {
+      "members": [
+        "ConformanceComponent.raised.held.total()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.total()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.Total(); the payload's own total is 3.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads 14.",
+        "opposite": "On a held object whose total is 9 it reads 9.",
+        "defect": "The call goes to the payload's own total instead of the held object's, so shown reads 3."
+      }
+    },
+    "event.poc15.methodValue.held.after": {
+      "members": [
+        "ConformanceComponent.raised.held.total()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.total()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.Total().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 14.",
+        "opposite": "While the count endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.methodAsyncValue.payload.before": {
+      "members": [
+        "ConformanceComponent.raised.settle()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.settle()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Settle(), which the test app's text endpoint answers with Settled text when the test releases it.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the text endpoint is held shown stays empty; once it answers shown reads Settled text.",
+        "opposite": "A text the endpoint refuses stops the handler, so shown stays empty.",
+        "defect": "The value set is the promise itself, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.methodAsyncValue.payload.after": {
+      "members": [
+        "ConformanceComponent.raised.settle()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.settle()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Settle(), which the test app's text endpoint answers with Settled text when the test releases it.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once both endpoints answer shown reads Settled text.",
+        "opposite": "While the text endpoint is held shown stays empty.",
+        "defect": "The second await is not waited for, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.methodAsyncValue.held.before": {
+      "members": [
+        "ConformanceComponent.raised.held.settleCount()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.settleCount()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.SettleCount(), which the test app's held endpoint answers with 42 when the test releases it.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the held endpoint is held shown stays empty; once it answers shown reads 42.",
+        "opposite": "A count the held endpoint refuses stops the handler, so shown stays empty.",
+        "defect": "The value set is the promise itself, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.methodAsyncValue.held.after": {
+      "members": [
+        "ConformanceComponent.raised.held.settleCount()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.settleCount()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.SettleCount(), which the test app's held endpoint answers with 42 when the test releases it.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once both endpoints answer shown reads 42.",
+        "opposite": "While the held endpoint is held shown stays empty.",
+        "defect": "The second await is not waited for, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.returnedObject.payload.before": {
+      "members": [
+        "ConformanceComponent.raised.current()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.current()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Current().Name.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads One.",
+        "opposite": "Raise plain, whose current item is Two, reads Two.",
+        "defect": "The member is read from the method instead of the item it returned, so shown stays empty."
+      }
+    },
+    "event.poc15.returnedObject.payload.after": {
+      "members": [
+        "ConformanceComponent.raised.current()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.current()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Current().Name.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads Two: the component moved past One when the handler returned.",
+        "opposite": "Without the await it reads One.",
+        "defect": "The returned item is the one bound before the await, so shown reads One.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.returnedObject.held.before": {
+      "members": [
+        "ConformanceComponent.raised.held.itemAt()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.itemAt()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.ItemAt(1).Name; the held object's items are named First and Second.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads First.",
+        "opposite": "ItemAt(2) on the same page reads Second.",
+        "defect": "The argument is dropped, so the call returns no item and the pipeline stops with shown empty."
+      }
+    },
+    "event.poc15.returnedObject.held.after": {
+      "members": [
+        "ConformanceComponent.raised.held.itemAt()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.itemAt()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.ItemAt(1).Name.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads First.",
+        "opposite": "While the count endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.returnedObjects.payload.before": {
+      "members": [
+        "ConformanceComponent.raised.matching()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.matching()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Matching().Count().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads 2.",
+        "opposite": "Raise plain, with no matching item, reads 0.",
+        "defect": "The returned list is read as one object, so shown reads 1."
+      }
+    },
+    "event.poc15.returnedObjects.payload.after": {
+      "members": [
+        "ConformanceComponent.raised.matching()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.matching()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Matching().Count().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 2.",
+        "opposite": "While the count endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.returnedObjects.held.before": {
+      "members": [
+        "ConformanceComponent.raised.held.matching()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.matching()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.Matching().Count().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads 1.",
+        "opposite": "On a held object with no matching item it reads 0.",
+        "defect": "The returned list is read as one object, so shown reads 1 with no matching item too."
+      }
+    },
+    "event.poc15.returnedObjects.held.after": {
+      "members": [
+        "ConformanceComponent.raised.held.matching()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.matching()",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.Matching().Count().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 1.",
+        "opposite": "While the count endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.callback.payload.before": {
+      "members": [
+        "ConformanceComponent.raised.answer"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.answer",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Answer to the answer item => item.Name.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The component's answer line reads One, the name the answer gives for its current item, which the component asks for when the handler returns.",
+        "opposite": "A handler that sets no answer leaves One unanswered.",
+        "defect": "The callback is set on a copy of the payload, so the component asks nothing and the line reads One unanswered."
+      }
+    },
+    "event.poc15.callback.payload.after": {
+      "members": [
+        "ConformanceComponent.raised.answer"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.answer"
+    },
+    "event.poc15.callback.held.before": {
+      "members": [
+        "ConformanceComponent.raised.held.answer",
+        "ConformanceComponent.raised.held.act()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.answer",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Held.Answer to the answer item => item.Name, then calls args.Held.Act().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The held line reads Held: acted for One.",
+        "opposite": "Before the click it reads Held: none.",
+        "defect": "The callback is set on the payload instead of the held object, so the held object acts with no answer and the line keeps Held: none."
+      }
+    },
+    "event.poc15.callback.held.after": {
+      "members": [
+        "ConformanceComponent.raised.held.answer",
+        "ConformanceComponent.raised.held.act()"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.held.answer",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Held.Answer to the answer item => item.Name, then calls args.Held.Act().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers the held line reads Held: acted for One.",
+        "opposite": "While the endpoint is held it reads Held: none.",
+        "defect": "The run drops a callback set on an object the payload holds after the await as it drops a payload write, so the line keeps Held: none.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.component.payload.before": {
+      "members": [
+        "ConformanceComponent.handed.ratio"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.handed",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, a ConformancePeer at ratio 25, and a Handed handler that sets shown's text to args.Ratio, then sets args.Ratio to 50.",
+        "gesture": "Click the component's Hand a peer button.",
+        "outcome": "shown reads 25 and the peer reads Ratio 50.",
+        "opposite": "Before the click the peer reads Ratio 25.",
+        "defect": "The payload is taken as plain data, so the write changes a copy and the peer keeps Ratio 25."
+      }
+    },
+    "event.poc15.component.payload.after": {
+      "members": [
+        "ConformanceComponent.handed.ratio"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.handed",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, a ConformancePeer at ratio 25, and a Handed handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Ratio to 50.",
+        "gesture": "Click the component's Hand a peer button.",
+        "outcome": "While the count endpoint is held the peer reads Ratio 25; once it answers it reads Ratio 50.",
+        "opposite": "Before the click the peer reads Ratio 25.",
+        "defect": "The run drops a write to a payload that is a component after the await as it drops a plain payload write, so the peer keeps Ratio 25.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "event.poc15.component.held.before": {
+      "members": [
+        "ConformanceComponent.raised.peer.ratio"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.peer",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Peer.Ratio, then sets args.Peer.Ratio to 50; the payload's peer, a ConformancePeer, runs at ratio 25.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads 25 and the peer reads Ratio 50.",
+        "opposite": "Before the click the peer reads Ratio 25.",
+        "defect": "The peer is read through the component's own element instead of the payload's peer, so shown reads nothing and the peer keeps Ratio 25."
+      }
+    },
+    "event.poc15.component.held.after": {
+      "members": [
+        "ConformanceComponent.raised.peer.ratio"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.raised.peer",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Peer.Ratio to 50; the payload's peer, a ConformancePeer, runs at ratio 25.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the count endpoint is held the peer reads Ratio 25; once it answers it reads Ratio 50.",
+        "opposite": "Before the click the peer reads Ratio 25.",
+        "defect": "The run drops a write to a component the payload holds after the await as it drops a payload write, so the peer keeps Ratio 25.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "absence.member": {
+      "members": [
+        "ConformanceComponent.readOnlyText"
+      ],
+      "version": "older",
+      "promise": {
+        "page": "The older version of the page: its ConformanceComponent lacks readOnlyText, and a Show button whose click sets shown's text to conformance.ReadOnlyText, then sets done's text to after.",
+        "gesture": "Click Show.",
+        "outcome": "shown and done stay empty: the read of a member the component lacks stops the pipeline.",
+        "opposite": "On the current version the same click shows RO-2026-11-10 and done reads after.",
+        "defect": "A member the object lacks reads undefined and the pipeline runs on, so done reads after."
+      }
+    },
+    "absence.past": {
+      "members": [
+        "ConformanceComponent.record.detail.name"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose record holds no detail, Detail's Name starting as none, and a Show button whose click sets shown's text to conformance.Record.Read(r => r.Detail.Name).",
+        "gesture": "Click Show.",
+        "outcome": "shown reads none, the start of a Detail.",
+        "opposite": "On a record whose detail is named Full the same click shows Full.",
+        "defect": "The read past the missing detail stops the pipeline, so shown stays empty."
+      }
+    },
+    "absence.promise": {
+      "members": [
+        "ConformanceComponent.total()"
+      ],
+      "version": "promised",
+      "promise": {
+        "page": "The promised version of the page: its ConformanceComponent's total returns a promise of 3, declared Method<int>, and a Show button whose click sets shown's text to conformance.Total(), then sets done's text to after.",
+        "gesture": "Click Show.",
+        "outcome": "shown and done stay empty: a promise where a value was declared stops the pipeline at the call.",
+        "opposite": "On the current version the same click shows 3 and done reads after.",
+        "defect": "The promise is set as text and the pipeline runs on, so shown reads [object Promise] and done reads after."
+      }
+    },
+    "source.PropertySet": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Copy button whose click sets conformance.Text to conformance.Value.IfNull(\"none\"), since a text without null takes a nullable source through IfNull (D7.3).",
+        "gesture": "Click the page's button.",
+        "outcome": "The component's heading reads a-1.",
+        "opposite": "Before the click it reads Alpha.",
+        "defect": "The component's member read at Positions.PropertySet reads its name instead of its value, so the heading empties."
+      }
+    },
+    "source.WriteOnlySet": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Write button whose click sets conformance.WriteOnlyText to conformance.Value.IfNull(\"none\"), since a text without null takes a nullable source through IfNull (D7.3).",
+        "gesture": "Click the page's button.",
+        "outcome": "The write-only line reads Written a-1.",
+        "opposite": "Before the click it reads Unwritten.",
+        "defect": "The component's member read at Positions.WriteOnlySet reads its name instead of its value, so the line reads Written."
+      }
+    },
+    "source.ElementText": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Show button whose click sets shown's text to conformance.Value.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads a-1.",
+        "opposite": "With a-2 picked in the component the same click shows a-2.",
+        "defect": "The component's member read at Positions.ElementText reads its name instead of its value, so shown stays empty."
+      }
+    },
+    "source.ElementHtml": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Show button whose click sets shown's HTML to conformance.Value.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads a-1.",
+        "opposite": "With a-2 picked in the component the same click shows a-2.",
+        "defect": "The component's member read at Positions.ElementHtml reads its name instead of its value, so shown stays empty."
+      }
+    },
+    "source.ElementClass": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Mark button whose click adds the class named by conformance.Value to the element marked.",
+        "gesture": "Click the page's button.",
+        "outcome": "marked carries the class a-1.",
+        "opposite": "With a-2 picked in the component the same click adds a-2.",
+        "defect": "The component's member read at Positions.ElementClass reads its name instead of its value, so no class is added."
+      }
+    },
+    "source.ConditionLeft": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Check button whose click sets shown's text to Picked first when conformance.Value equals \"a-1\", else Elsewhere.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Picked first.",
+        "opposite": "With a-2 picked in the component the same click shows Elsewhere.",
+        "defect": "The component's member read at Positions.ConditionLeft reads its name instead of its value, so every click shows Elsewhere."
+      }
+    },
+    "source.ConditionRight": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, a NativeTextBox typed holding a-1, and a Check button whose click sets shown's text to Same value when the box's value equals conformance.Value, else Other value.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Same value.",
+        "opposite": "With a-2 typed in the box the same click shows Other value.",
+        "defect": "The component's member read at Positions.ConditionRight reads its name instead of its value, so every click shows Other value."
+      }
+    },
+    "source.TextTestOperand": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, a NativeTextBox note holding \"a-1: checked\", and a Check button whose click sets shown's text to Note matches when the note's value starts with conformance.Value, else No match, through M3.N1's text test.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Note matches.",
+        "opposite": "With \"a-2: checked\" in the box the same click shows No match.",
+        "defect": "The component's member read at Positions.TextTestOperand reads its name instead of its value, so every click shows No match."
+      }
+    },
+    "source.MatchesPattern": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "door": "ConformanceComponent.value"
+    },
+    "source.RequestMember": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Send button whose click posts conformance.Value as the request's Code to the test app's echo endpoint, which answers Received and the code, set as shown's text.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Received a-1.",
+        "opposite": "With a-2 picked in the component the same click shows Received a-2.",
+        "defect": "The component's member read at Positions.RequestMember reads its name instead of its value, so the endpoint receives no Code and shown reads Received.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "source.Header": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Send button whose click posts to the test app's echo endpoint with the header X-Code set to conformance.Value, which the endpoint answers back as shown's text.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads X-Code a-1.",
+        "opposite": "With a-2 picked in the component the same click shows X-Code a-2.",
+        "defect": "The component's member read at Positions.Header reads its name instead of its value, so the header is not sent and shown reads X-Code.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "source.DispatchPayloadMember": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Tell button whose click dispatches the app event Picked with Code set to conformance.Value through M1.N4's dispatch, and a Picked handler that sets shown's text to the payload's Code.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads a-1.",
+        "opposite": "With a-2 picked in the component the same click shows a-2.",
+        "defect": "The component's member read at Positions.DispatchPayloadMember reads its name instead of its value, so shown stays empty."
+      }
+    },
+    "source.MethodArgument": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Log button whose click calls conformance.Log(conformance.Value.IfNull(\"none\")), since a text without null takes a nullable source through IfNull (D7.3).",
+        "gesture": "Click the page's button.",
+        "outcome": "The component's log line reads text a-1.",
+        "opposite": "Before the click the log line is empty.",
+        "defect": "The component's member read at Positions.MethodArgument reads its name instead of its value, so the log line reads nothing."
+      }
+    },
+    "source.PluginArgument": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, the page plugin pageLog, a plugin of the bench that writes each text it is passed as a line of the list the page names Page log, and a Log button whose click calls pageLog.Log(conformance.Value).",
+        "gesture": "Click the page's button.",
+        "outcome": "The page log's last line reads a-1.",
+        "opposite": "Before the click the page log is empty.",
+        "defect": "The component's member read at Positions.PluginArgument reads its name instead of its value, so the log line is empty."
+      }
+    },
+    "source.HubArgument": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and on net10 a Tell button whose click invokes the test hub's Announce with conformance.Value through N21.1's hub door, and the hub's Announced message set as shown's text.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Announced a-1.",
+        "opposite": "With a-2 picked in the component the same click shows Announced a-2.",
+        "defect": "The component's member read at Positions.HubArgument reads its name instead of its value, so the hub receives no code and shown reads Announced.",
+        "observes": "Realtime.tla:Message"
+      }
+    },
+    "http.get": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a GET to the test app's items endpoint with conformance.Value as its query's code, its success setting shown's text to the body's summary.",
+        "gesture": "Click Load.",
+        "outcome": "The request is GET /items?Code=a-1, its key the member's C# name (D2.5), and shown reads 3 items for a-1.",
+        "opposite": "With a-2 picked in the component the same click sends a-2 and shows its summary for a-2.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty code.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.post": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the test app's items endpoint with conformance.Value as the JSON body's code, its success setting shown's text to the body's summary.",
+        "gesture": "Click Load.",
+        "outcome": "The body sent is {\"code\":\"a-1\"} and shown reads Recorded a-1.",
+        "opposite": "With a-2 picked in the component the same click sends a-2 and shows its summary for a-2.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty code.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.put": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a PUT to the test app's item endpoint with conformance.Value as the form data's Code, its success setting shown's text to the body's summary.",
+        "gesture": "Click Load.",
+        "outcome": "The form data sent holds Code=a-1 and shown reads Moved a-1.",
+        "opposite": "With a-2 picked in the component the same click sends a-2 and shows its summary for a-2.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty code.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.delete": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a DELETE to the test app's item endpoint with conformance.Value as the JSON body's code, its success setting shown's text to the body's summary.",
+        "gesture": "Click Load.",
+        "outcome": "The body sent is {\"code\":\"a-1\"} and shown reads Closed a-1.",
+        "opposite": "With a-2 picked in the component the same click sends a-2 and shows its summary for a-2.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty code.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.beside.route": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to /groups/{group}/notes with Group set to Alpha and conformance.Value as Code, the endpoint answering the group and code as shown's text.",
+        "gesture": "Click Load.",
+        "outcome": "The request is POST /groups/Alpha/notes, its body holds Group Alpha and Code a-1, since a member that fills a placeholder is sent in the body too (D9.9), and shown reads Alpha: a-1.",
+        "opposite": "With Group set to Beta the same click posts to /groups/Beta/notes.",
+        "defect": "The placeholder is filled from the component's value instead of Group, so the request goes to /groups/a-1/notes.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.beside.query": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a GET to the items endpoint with conformance.Value as code and the literal 2026-11-10 as day.",
+        "gesture": "Click Load.",
+        "outcome": "The request is GET /items?Code=a-1&Day=2026-11-10.",
+        "opposite": "Without the day the request is GET /items?Code=a-1.",
+        "defect": "The query keeps only the last member, so the request is GET /items?day=2026-11-10.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.beside.header": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the notes endpoint with conformance.Value as Code and the header X-Mode set to Late, the endpoint answering the header as shown's text.",
+        "gesture": "Click Load.",
+        "outcome": "The body holds Code a-1 and shown reads X-Mode Late.",
+        "opposite": "Without the header shown reads X-Mode none.",
+        "defect": "The header is sent as a body member, so shown reads X-Mode none.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.beside.static": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the notes endpoint with conformance.Value as Code and the literal member Source set to conformance.",
+        "gesture": "Click Load.",
+        "outcome": "The body sent is {\"code\":\"a-1\",\"source\":\"conformance\"}.",
+        "opposite": "Without the literal the body is {\"code\":\"a-1\"}.",
+        "defect": "The literal is written by its C# name Source, so the endpoint binds no source.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.beside.hidden": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends the form's inputs, a hidden Batch of B-2026-11-10 and the ConformanceComponent bound to Code, to the batch notes endpoint as form data, and sets shown's text to the endpoint's answer, the batch and the code it bound.",
+        "gesture": "Click Load.",
+        "outcome": "shown reads B-2026-11-10: a-1: the form data sent held Batch=B-2026-11-10 and Code=a-1.",
+        "opposite": "With a-2 picked in the component the same click shows B-2026-11-10: a-2.",
+        "defect": "The hidden input is skipped as a non-component input, so the form data holds Code=a-1 alone and shown reads : a-1.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.into": {
+      "members": [
+        "ConformanceComponent.change"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page with an empty card element and an Open card button whose click GETs the test app's card endpoint into card; the card's partial renders a ConformanceComponent whose text is Card component and a Change handler that sets the card's picked text to the component's Value.",
+        "gesture": "Click Open card, then Pick a-2 in the loaded component.",
+        "outcome": "The card shows the heading Card component and picked reads a-2.",
+        "opposite": "Before the click the card is empty.",
+        "defect": "The loaded partial's plan is not started, so Pick a-2 runs no handler and picked stays empty.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.whileLoading": {
+      "members": [
+        "ConformanceComponent.text"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a GET to the items endpoint whose WhileLoading sets conformance.Text to Loading items and whose success sets it to Alpha, 3 items.",
+        "gesture": "Click Load.",
+        "outcome": "While the items endpoint is held the heading reads Loading items; once it answers it reads Alpha, 3 items.",
+        "opposite": "A request whose argument stops when it is read, its code read from a member the older version lacks, sends nothing and the heading keeps Alpha: the read comes before WhileLoading (D10.23).",
+        "defect": "WhileLoading runs after the response, so the heading never reads Loading items.",
+        "observes": "Request.tla:Loading"
+      }
+    },
+    "http.response.success": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the move endpoint, which answers {\"code\":\"a-2\"}, its success setting conformance.Value to the body's Code.",
+        "gesture": "Click Load.",
+        "outcome": "The component's value line reads a-2.",
+        "opposite": "When the endpoint answers 409 the success route does not run and the line keeps a-1.",
+        "defect": "The body is read before it is decoded, so conformance.Value is set to nothing and the line empties.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.response.error": {
+      "members": [
+        "ConformanceComponent.text"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the move endpoint, which answers 422 with {\"message\":\"a-2 is closed\"}, its error route setting conformance.Text to the error body's Message.",
+        "gesture": "Click Load.",
+        "outcome": "The component's heading reads a-2 is closed.",
+        "opposite": "When the endpoint answers 200 the error route does not run and the heading keeps Alpha.",
+        "defect": "The error route reads the success body's shape, so the heading empties.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.chained": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the move endpoint whose success sets conformance.Value to a-2, then Chained a GET to the items endpoint with conformance.Value as code.",
+        "gesture": "Click Load.",
+        "outcome": "The chained request is GET /items?Code=a-2.",
+        "opposite": "When the move answers 409 no chained request is sent.",
+        "defect": "The chained request reads conformance.Value before the first success route ran, so it sends Code=a-1.",
+        "observes": "Request.tla:Chained"
+      }
+    },
+    "http.parallel": {
+      "members": [
+        "ConformanceComponent.text",
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends Parallel GETs to the items endpoint, setting conformance.Text to its summary, and to the code endpoint, setting conformance.Value to its code. The harness gates both GETs (Lanes.tla's Respond).",
+        "gesture": "Click Load; once the harness reports both GETs held, release the code endpoint's GET and wait until the value line reads a-2; then release the items endpoint's GET.",
+        "outcome": "While the items GET is held the value line reads a-2 and the heading keeps Alpha; after its release the heading reads 3 items.",
+        "opposite": "With the code endpoint seeded to answer 500, the value line keeps a-1 while the items branch still sets 3 items.",
+        "defect": "The branches' routes run only after both answer, so a-2 shows only with 3 items.",
+        "observes": "Lanes.tla:AllSettled"
+      }
+    },
+    "http.finally": {
+      "members": [
+        "ConformanceComponent.text"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the move endpoint whose Finally sets conformance.Text to Finished.",
+        "gesture": "Click Load.",
+        "outcome": "Once the endpoint answers 200 the heading reads Finished.",
+        "opposite": "When the endpoint answers 500 the heading also reads Finished.",
+        "defect": "Finally runs only on success, so a 500 leaves Alpha.",
+        "observes": "Request.tla:Finally"
+      }
+    },
+    "lane.confirm": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Move button whose click asks NativeConfirm Move to a-2? and sets conformance.Value to a-2 when the answer is yes.",
+        "gesture": "Click Move and answer OK.",
+        "outcome": "The component's value line reads a-2.",
+        "opposite": "Answering Cancel leaves a-1.",
+        "defect": "The write runs before the answer settles, so Cancel still moves the value to a-2.",
+        "observes": "Run.tla:Settle"
+      }
+    },
+    "lane.push": {
+      "members": [
+        "ConformanceComponent.text"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "On net10, a page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, subscribed to the test stream whose Renamed message sets conformance.Text to the message's Text. The harness pushes Renamed with the text the test names.",
+        "gesture": "Wait until the harness reports the test stream open, then push Renamed with Beta through the harness.",
+        "outcome": "The component's heading reads Beta.",
+        "opposite": "Before the push it reads Alpha.",
+        "defect": "The message's member is read by its C# name Text, so conformance.Text is set to nothing and the heading empties.",
+        "observes": "Realtime.tla:Message"
+      }
+    },
+    "lane.slot.load": {
+      "members": [
+        "ConformanceComponent.change"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page whose card slot is loaded on start by a GET to the test app's card endpoint; the card's partial renders a ConformanceComponent and a Change handler that sets the card's picked text to the component's Value.",
+        "gesture": "Pick a-2 in the card's component.",
+        "outcome": "picked reads a-2.",
+        "opposite": "Before the click picked is empty.",
+        "defect": "The slot's plan subscribes before the component mounts, so Pick a-2 runs no handler.",
+        "observes": "Ownership.tla:LoadA"
+      }
+    },
+    "lane.slot.unloadListener": {
+      "members": [
+        "ConformanceComponent.change"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A page with the page's ConformanceComponent and a card slot whose plan listens to the page's component by its element id, setting the page's log text to the component's Value on Change, and a Close card button that unloads the slot.",
+        "gesture": "Click Close card, then Pick a-2 on the page's component.",
+        "outcome": "log keeps empty: the unloaded slot's listener is gone.",
+        "opposite": "With the card still loaded the same click sets log to a-2.",
+        "defect": "The unload removes the card's content and leaves its listener on the page's component, so log reads a-2.",
+        "observes": "Ownership.tla:UnloadA"
+      }
+    },
+    "lane.slot.hostDestroyed": {
+      "members": [
+        "ConformanceComponent.destroy()",
+        "ConformanceComponent.isDestroyed",
+        "ConformanceComponent.change"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "The bench page whose card slot holds a ConformanceComponent, with Close card and Open card buttons; the harness's restart, standing for the component's host, destroys it and mounts a new one (Ownership.tla's HostDestroys).",
+        "gesture": "Restart the component through the harness; click Close card, then Open card.",
+        "outcome": "The console shows no error, and the reopened card shows its component with the value a-1.",
+        "opposite": "Closing without a restart also leaves the console without an error.",
+        "defect": "The unload removes the listener from the destroyed component, whose element no longer holds it, so removeEventListener throws and the console shows the error.",
+        "observes": "Ownership.tla:HostDestroys"
+      }
+    },
+    "template.render": {
+      "carriedBy": "FusionMultiSelect",
+      "reason": "D15.1 and D15.2 put templates in the Fusion module, where Syncfusion's engine compiles them, and give the core no template node, so a native template proves the native component's own code and no path through the framework; FusionMultiSelect's itemTemplate carries the cell"
+    },
+    "template.conditional": {
+      "carriedBy": "FusionMultiSelect",
+      "reason": "D8.4 and D15.2 make a template conditional the Syncfusion engine's, never the core's condition, so the native reference has no engine to hold one; FusionMultiSelect's itemTemplate carries the cell"
+    },
+    "validation.rule": {
+      "members": [
+        "ConformanceComponent.value",
+        "ConformanceComponent.change"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A form, its ConformanceComponent bound to ConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's form endpoint.",
+        "gesture": "Click Save.",
+        "outcome": "The message Pick a code. shows beside the component and nothing is sent.",
+        "opposite": "After Pick a-1, Save sends Code=a-1 and shows the server's Saved a-1.",
+        "defect": "The rule is bound to the component's element by a name its input does not carry, so Save sends the empty form.",
+        "observes": "Request.tla:Check"
+      }
+    },
+    "validation.condition": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A form, its ConformanceComponent bound to StrictConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's endpoint for that form, the rule written When(m => m.IsStrict), and a strict box.",
+        "gesture": "Tick strict, then click Save.",
+        "outcome": "The message Pick a code. shows beside the component.",
+        "opposite": "With strict unticked Save sends the form and shows Saved.",
+        "defect": "The condition reads IsStrict by its C# name, so it never holds and Save sends the empty form.",
+        "observes": "Request.tla:Check"
+      }
+    },
+    "validation.live": {
+      "members": [
+        "ConformanceComponent.change"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A form, its ConformanceComponent bound to ConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's form endpoint, after a Save that showed its message.",
+        "gesture": "Click Pick a-1 in the component.",
+        "outcome": "The message clears without another Save.",
+        "opposite": "Picking no value leaves the message.",
+        "defect": "Live validation listens for the input event, which the component never raises, so the message stays."
+      }
+    },
+    "validation.summary": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A form, its ConformanceComponent bound to ConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's form endpoint, and a validation summary.",
+        "gesture": "Click Save.",
+        "outcome": "The summary lists Pick a code.",
+        "opposite": "After Pick a-1 the summary is empty.",
+        "defect": "The message's place is read from the page instead of the plan, so the summary stays empty."
+      }
+    },
+    "validation.listItem": {
+      "members": [
+        "ConformanceComponent.value",
+        "ConformanceComponent.change"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A form of two entries, each a ConformanceComponent bound to Entries[i].Code, whose ReactiveValidator writes NotEmpty on each entry's Code, and a Save button.",
+        "gesture": "Click Pick a-1 in the first component, then click Save.",
+        "outcome": "The message shows beside the second component only, and nothing is sent.",
+        "opposite": "With a-1 picked in the first and a-2 in the second, Save sends Entries[0].Code=a-1 and Entries[1].Code=a-2.",
+        "defect": "The rule is bound to Entries.Code without the index, so the message shows beside the first component.",
+        "observes": "Request.tla:Check"
+      }
+    },
+    "validation.prefix": {
+      "members": [
+        "ConformanceComponent.value"
+      ],
+      "version": "current",
+      "promise": {
+        "page": "A form whose first entry is rendered by Html.PartialFor(m => m.First), its ConformanceComponent bound to Code under the prefix First, with NotEmpty on First.Code.",
+        "gesture": "Click Pick a-1 in the first entry's component, then click Save.",
+        "outcome": "The form sends First.Code=a-1 and the server binds it, showing Saved a-1.",
+        "opposite": "Saving with no value picked shows the message beside the first entry's component.",
+        "defect": "The component's name drops the prefix, so the form sends Code=a-1 and the server binds no first code.",
+        "observes": "Request.tla:Check"
+      }
+    }
+  }
+}

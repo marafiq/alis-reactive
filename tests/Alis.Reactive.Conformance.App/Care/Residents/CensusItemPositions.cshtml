@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusItemPositions
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Census rooms";
+    var plan = Html.ReactivePlan<CensusItemPositions>();
+}
+<h1>Census rooms</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Items = Model.Rooms }))
+<p>Item read: <span id="item-name">-</span></p>
+<p id="item-status">Waiting</p>
+<button type="button" @Html.Raises(plan, CensusItemPositionEvents.RaiseSecond)>Raise second item</button>
+<button type="button" @Html.Raises(plan, CensusItemPositionEvents.ReadThird)>Read third item</button>
+<button type="button" @Html.Raises(plan, CensusItemPositionEvents.ReadSecond)>Read second item</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CensusItemPositionEvents.RaiseSecond, pipeline => pipeline.Component<ConformanceComponent>("census").Items.At(1).Value.Set(24)));
+    Html.On(plan, trigger => trigger.CustomEvent(CensusItemPositionEvents.ReadThird, pipeline =>
+    {
+        pipeline.Element("item-name").Text.Set(pipeline.Component<ConformanceComponent>("census").Items.At(2).Name);
+        pipeline.Element("item-status").Text.Set("Read");
+    }));
+    Html.On(plan, trigger => trigger.CustomEvent(CensusItemPositionEvents.ReadSecond, pipeline =>
+    {
+        pipeline.Element("item-name").Text.Set(pipeline.Component<ConformanceComponent>("census").Items.At(1).Name);
+        pipeline.Element("item-status").Text.Set("Read");
+    }));
+}
+@Html.RenderPlan(plan)

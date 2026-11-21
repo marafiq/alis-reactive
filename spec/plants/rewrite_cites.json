@@ -1,0 +1,35 @@
+[
+ {
+  "name": "the DESIGN cite loses its SHA",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "(`spec/Core/DESIGN.md:2322-2331` at 924147dbb)",
+    "new": "(`spec/Core/DESIGN.md:2322-2331`)"
+   }
+  ],
+  "expect": "names no SHA"
+ },
+ {
+  "name": "a main cite past its file's end",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Net48MvcSmoke.csproj:29-31` at 7b9e987cc",
+    "new": "Net48MvcSmoke.csproj:29-3100` at 7b9e987cc"
+   }
+  ],
+  "expect": "resolves nowhere at 7b9e987cc"
+ },
+ {
+  "name": "a pinned cite narrowed to one line it holds",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "(`spec/Core/DESIGN.md:2322-2331` at 924147dbb)",
+    "new": "(`spec/Core/DESIGN.md:2322` at 924147dbb)"
+   }
+  ],
+  "expect": null
+ }
+]

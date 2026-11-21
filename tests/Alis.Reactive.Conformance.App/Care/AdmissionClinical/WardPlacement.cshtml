@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardPlacement
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward placement";
+    var plan = Html.ReactivePlan<WardPlacement>();
+}
+<h1>Ward placement</h1>
+@using (var placement = Html.BeginRequestForm(plan, "ward-placement"))
+{
+    <fieldset>
+        <legend>Ward</legend>
+        @(Html.InputField(plan, m => m.WardCode, options => options.Label("Ward"))
+            .FusionDropDownList(Model.Wards, build => build.Fields((HomeWard w) => w.DisplayLabel, w => w.WardCode)))
+    </fieldset>
+    <button type="button" @Html.Raises(plan, WardPlacements.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(WardPlacements.Save, pipeline => pipeline
+        .Post<WardPlacement>(WardPlacementEndpoints.Placements, request => request.Form(placement.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+<p id="saved">Not saved</p>
+@Html.RenderPlan(plan)

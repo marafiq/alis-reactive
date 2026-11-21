@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Microsoft.Extensions.Caching.Distributed
+@inject IDistributedCache Cache
+@model WardOverview
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ward overview";
+    var plan = Html.ReactivePlan<WardOverview>();
+}
+<h1>Ward overview</h1>
+<button type="button" @Html.Raises(plan, WardOverviewEvents.ShowTheWard)>Show the ward</button>
+<p>Ward: <span id="ward-name"></span></p>
+<aside aria-label="Today's rounds">
+    @Html.Raw(await Cache.GetStringAsync(CachedRounds.Key))
+</aside>
+<aside aria-label="Today's vitals">
+    @Html.Raw(await Cache.GetStringAsync(CachedVitals.Key))
+</aside>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardOverviewEvents.ShowTheWard, pipeline => pipeline.Element("ward-name").Text.Set(Model.Ward)));
+}
+@Html.RenderPlan(plan)

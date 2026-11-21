@@ -1,0 +1,82 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StrictBindingsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Strict bindings";
+    var plan = Html.ReactivePlan<StrictBindingsBoard>();
+}
+<h1>Strict bindings</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { BindingCountPending = Model.CountPending }))
+<button type="button" @Html.Raises(plan, StrictBindingsButtons.ListTheStrictNames)>List the strict names</button>
+<button type="button" @Html.Raises(plan, StrictBindingsButtons.ListTheSealedNames)>List the sealed names</button>
+<button type="button" @Html.Raises(plan, StrictBindingsButtons.ListThePolymorphicNames)>List the polymorphic names</button>
+<button type="button" @Html.Raises(plan, StrictBindingsButtons.ShowTheShapedNumber)>Show the shaped number</button>
+<button type="button" @Html.Raises(plan, StrictBindingsButtons.ShowTheBindingsCount)>Show the binding's count</button>
+<button type="button" @Html.Raises(plan, StrictBindingsButtons.ShowAlphasStrictName)>Show Alpha's strict name</button>
+<dl>
+    <dt>Bindings</dt>
+    <dd id="binding-status"></dd>
+    <dt>Names</dt>
+    <dd id="binding-list">unknown</dd>
+    <dt>Shaped number</dt>
+    <dd id="shaped-number">unknown</dd>
+    <dt>The binding's count</dt>
+    <dd id="binding-count">unknown</dd>
+    <dt>Alpha's strict name</dt>
+    <dd id="alpha-strict"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(StrictBindingsButtons.ListTheStrictNames, pipeline => pipeline.Get(Model.Bindings)
+            .OnSuccess<IReadOnlyList<Binding>>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Bindings.Set(loaded.Body);
+                pipeline.Element("binding-status").Text.Set("Listing strict");
+                pipeline.Element("binding-list").Text.Set(conformance.Bindings.Select(binding => binding.Strict.Name));
+            }))
+        .CustomEvent(StrictBindingsButtons.ListTheSealedNames, pipeline => pipeline.Get(Model.Bindings)
+            .OnSuccess<IReadOnlyList<Binding>>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Bindings.Set(loaded.Body);
+                pipeline.Element("binding-status").Text.Set("Listing sealed");
+                pipeline.Element("binding-list").Text.Set(conformance.Bindings.Select(binding => binding.Sealed.Name));
+            }))
+        .CustomEvent(StrictBindingsButtons.ListThePolymorphicNames, pipeline => pipeline.Get(Model.Bindings)
+            .OnSuccess<IReadOnlyList<Binding>>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Bindings.Set(loaded.Body);
+                pipeline.Element("binding-status").Text.Set("Listing polymorphic");
+                pipeline.Element("binding-list").Text.Set(conformance.Bindings.Select(binding => binding.Polymorphic.Name));
+            }))
+        .CustomEvent(StrictBindingsButtons.ShowTheShapedNumber, pipeline => pipeline.Get(Model.Binding)
+            .OnSuccess<Binding>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Binding.Set(loaded.Body);
+                pipeline.Element("binding-status").Text.Set("Shaping");
+                pipeline.Element("shaped-number").Text.Set(conformance.Binding.Read(binding => binding.Shaped.Number));
+            }))
+        .CustomEvent(StrictBindingsButtons.ShowTheBindingsCount, pipeline => pipeline.Get(Model.Binding)
+            .OnSuccess<Binding>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Binding.Set(loaded.Body);
+                pipeline.Element("binding-status").Text.Set("Counting");
+                pipeline.Element("binding-count").Text.Set(conformance.Binding.Read(binding => binding.Count));
+            }))
+        .CustomEvent(StrictBindingsButtons.ShowAlphasStrictName, pipeline => pipeline.Get(Model.Bindings)
+            .OnSuccess<IReadOnlyList<Binding>>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Bindings.Set(loaded.Body);
+                pipeline.Element("alpha-strict").Text.Set(conformance.Bindings.Find(binding => binding.Name == "Alpha", binding => binding.Strict.Name));
+            })));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,12 @@
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class OtherNamePlant
+{
+    public static void ARoutePipelineNamedForItsRole(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+            .OnSuccess<IntakeCreated>((created, done) => done.Element("admitted").Text.Set(created.Request.Read(r => r.Name)));
+}

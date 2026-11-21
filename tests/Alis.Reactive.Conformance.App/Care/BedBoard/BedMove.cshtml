@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.DropDowns
+@model BedMove
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed move";
+    var plan = Html.ReactivePlan<BedMove>();
+    var node = FusionDropDownTreeFields.Of<WingNode>();
+}
+<h1>Bed move</h1>
+<fieldset>
+    <legend>Ward</legend>
+    @(Html.InputField(plan, m => m.Ward, options => options.Label("Ward"))
+        .FusionDropDownTree(build => build.Fields(new DropDownTreeFields
+        {
+            DataSource = Model.Wings,
+            Value = node.Field(n => n.Id),
+            Text = node.Field(n => n.Name),
+            Child = node.Field(n => n.Wards),
+        })))
+</fieldset>
+@Html.RenderPlan(plan)

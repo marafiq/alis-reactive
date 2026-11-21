@@ -1,0 +1,43 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PromisedPingBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Pings and settles";
+    var plan = Html.ReactivePlan<PromisedPingBoard>();
+}
+<h1>Pings and settles</h1>
+@(plan.ConformanceComponent("conformance-promised", new ConformanceStart { Version = ComponentVersion.Promised, Text = Model.Text, Enabled = Model.PromisedIsEnabled }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text }))
+<button type="button" @Html.Raises(plan, PromisedPingButtons.PingPromised)>Ping promised</button>
+<button type="button" @Html.Raises(plan, PromisedPingButtons.Settle)>Settle</button>
+<button type="button" @Html.Raises(plan, PromisedPingButtons.ShowPromisedsText)>Show promised's text</button>
+<dl>
+    <dt>Ping tried</dt>
+    <dd id="ping-tried"></dd>
+    <dt>Ping done</dt>
+    <dd id="ping-done"></dd>
+    <dt>Settle done</dt>
+    <dd id="settle-done"></dd>
+    <dt>Promised's text</dt>
+    <dd id="text-read"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(PromisedPingButtons.PingPromised, pipeline =>
+        {
+            pipeline.Element("ping-tried").Text.Set("pinging");
+            pipeline.Component<ConformanceComponent>("conformance-promised").Ping();
+            pipeline.Element("ping-done").Text.Set("pinged");
+        })
+        .CustomEvent(PromisedPingButtons.Settle, pipeline =>
+        {
+            pipeline.Component<ConformanceComponent>("conformance").Settle();
+            pipeline.Element("settle-done").Text.Set("settled");
+        })
+        .CustomEvent(PromisedPingButtons.ShowPromisedsText, pipeline => pipeline.Element("text-read").Text.Set(pipeline.Component<ConformanceComponent>("conformance-promised").Text)));
+}
+@Html.RenderPlan(plan)

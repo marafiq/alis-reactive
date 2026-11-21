@@ -1,0 +1,15 @@
+@using Alis.Reactive.Poc.App.Families
+@model Contact
+@{
+    var plan = Html.ReactivePlan<Contact>();
+    var phone = Html.InputField(plan, m => m.Phone);
+}
+<fieldset>
+    <legend>@Model.Kind</legend>
+    @phone.TextBox($"{Model.Kind} phone")
+    @(plan.Button($"{phone.Id}-dial", $"Dial {Model.Kind}")
+        .Reactive(button => button.Click, pipeline =>
+            pipeline.Element($"{phone.Id}-dialled").Text.Set(pipeline.Input(m => m.Phone).Component<NativeTextBox>().Value)))
+    <p>Dialled: <strong id="@($"{phone.Id}-dialled")">not dialled</strong></p>
+</fieldset>
+@Html.RenderPlan(plan)

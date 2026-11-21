@@ -1,0 +1,39 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RecordNameGate
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "A record's name";
+    var plan = Html.ReactivePlan<RecordNameGate>();
+    var raises = new[]
+    {
+        new RaiseStart { Button = "Unnamed record", Record = new RecordStart { Name = null } },
+        new RaiseStart { Button = "No record" },
+        new RaiseStart { Button = "Nameless record", EmptyRecord = true },
+        new RaiseStart { Button = "Ada", Record = new RecordStart { Name = "Ada" } },
+    };
+}
+<h1>The record of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Care panel", Raises = raises })
+    .Reactive(panel => panel.Raised, (raised, pipeline) =>
+    {
+        var name = raised.Record.Read(record => record.Name);
+        pipeline.When(name.IsNull())
+            .Then(pipeline => pipeline.Element("gate").Text.Set("No name"))
+            .ElseIf(name.NotNull())
+            .Then(pipeline => pipeline.Element("gate").Text.Set("Named"))
+            .Else(pipeline => pipeline.Element("gate").Text.Set("Unknown"));
+        pipeline.When(name.IsEmpty())
+            .Then(pipeline => pipeline.Element("badge").Text.Set("Blank"))
+            .Else(pipeline => pipeline.Element("badge").Text.Set("Filled"));
+    }))
+<dl>
+    <dt>The gate</dt>
+    <dd id="gate"></dd>
+    <dt>The badge</dt>
+    <dd id="badge"></dd>
+</dl>
+@Html.RenderPlan(plan)

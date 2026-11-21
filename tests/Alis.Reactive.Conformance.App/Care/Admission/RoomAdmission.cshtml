@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomAdmission
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admit a resident";
+    var plan = Html.ReactivePlan<RoomAdmission>();
+}
+<h1>Admit a resident</h1>
+@using (var admission = Html.BeginRequestContainer(plan, "admission"))
+{
+    @(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
+    <div id="room-line"></div>
+    <button type="button" @Html.Raises(plan, RoomAdmissionButtons.ChooseARoom)>Choose a room</button>
+    <button type="button" @Html.Raises(plan, RoomAdmissionButtons.ClearTheRoom)>Clear the room</button>
+    <button type="button" @Html.Raises(plan, RoomAdmissionButtons.Admit)>Admit</button>
+    Html.On(plan, trigger => trigger
+        .CustomEvent(RoomAdmissionButtons.ChooseARoom, pipeline => pipeline.Get(RoomAdmissionEndpoints.RoomLine).Into("room-line"))
+        .CustomEvent(RoomAdmissionButtons.ClearTheRoom, pipeline => pipeline.Unload("room-line"))
+        .CustomEvent(RoomAdmissionButtons.Admit, pipeline => pipeline
+            .Post<RoomAdmission>(RoomAdmissionEndpoints.Admissions, request => request.Inputs(admission.Container))
+            .Validate<RoomAdmissionRules>()
+            .OnSuccess(Content.Text, (admitted, pipeline) => pipeline.Element("admitted").Text.Set(admitted.Body))));
+}
+<p>Admitted: <span id="admitted"></span></p>
+@Html.RenderPlan(plan)

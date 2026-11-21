@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Wristband
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Wristband";
+    var plan = Html.ReactivePlan<Wristband>();
+}
+<h1>Wristband</h1>
+<fieldset>
+    <legend>Wristband color</legend>
+    @(Html.InputField(plan, m => m.BandColor, options => options.Label("Wristband color")).FusionColorPicker())
+</fieldset>
+<button type="button" @Html.Raises(plan, Wristbands.ShowBand)>Show band</button>
+<p>Band: <output id="band-shown">-</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(Wristbands.ShowBand, pipeline =>
+        pipeline.Element("band-shown").Text.Set(pipeline.Input(m => m.BandColor).Component<FusionColorPicker>().Value)));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,112 @@
+[
+ {
+  "name": "a main-only door's verdict dropped",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "        {\n          \"door\": \"ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"kept\",\n          \"as\": [\n            \"M5.N1\"\n          ]\n        },\n",
+    "new": ""
+   }
+  ],
+  "expect": "M5.F1: no verdict for main-only ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!"
+ },
+ {
+  "name": "a door given two verdicts",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "        {\n          \"door\": \"ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"kept\",\n          \"as\": [\n            \"M5.N1\"\n          ]\n        },\n",
+    "new": "        {\n          \"door\": \"ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"kept\",\n          \"as\": [\n            \"M5.N1\"\n          ]\n        },\n        {\n          \"door\": \"ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"kept\",\n          \"as\": [\n            \"M5.N1\"\n          ]\n        },\n"
+   }
+  ],
+  "expect": "M5.F1: two verdicts for ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!"
+ },
+ {
+  "name": "a verdict of no kind",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"door\": \"ElementBuilder<TModel>.Hide() -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"kept\",",
+    "new": "\"door\": \"ElementBuilder<TModel>.Hide() -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"moved\","
+   }
+  ],
+  "expect": "M5.F1: ElementBuilder<TModel>.Hide() -> PipelineBuilder<TModel!>! verdict 'moved' is not kept, renamed or refused"
+ },
+ {
+  "name": "a rename naming no door",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"door\": \"ElementBuilder<TModel>.AddClass(string! className) -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"renamed\",\n          \"to\": [\n            \"M5.N2\"\n          ]",
+    "new": "\"door\": \"ElementBuilder<TModel>.AddClass(string! className) -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"renamed\""
+   }
+  ],
+  "expect": "M5.F1: ElementBuilder<TModel>.AddClass(string! className) -> PipelineBuilder<TModel!>! renamed names no to"
+ },
+ {
+  "name": "a kept door held by no door",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"door\": \"ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"kept\",\n          \"as\": [\n            \"M5.N1\"",
+    "new": "\"door\": \"ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!\",\n          \"verdict\": \"kept\",\n          \"as\": [\n            \"M5.N99\""
+   }
+  ],
+  "expect": "M5.F1: ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>! to M5.N99 is no core or module door"
+ },
+ {
+  "name": "a refusal with no reason",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"reason\": \"A string names the member it reads, which ALIS009 refuses; the element's classes are a declared iterator of text, and any other list a declaration declares with its iterator.\",",
+    "new": "\"reason\": \"\","
+   }
+  ],
+  "expect": "M5.F1: PipelineBuilder<TModel>.FromDom(string! elementId, string! member) -> ReactiveArray<string!>! refused with no reason"
+ },
+ {
+  "name": "a refusal carried by no door",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"reason\": \"A string names the member it reads, which ALIS009 refuses; the element's children are a declared iterator whose items are typed.\",\n          \"carriers\": [\n            \"M5.N3\",",
+    "new": "\"reason\": \"A string names the member it reads, which ALIS009 refuses; the element's children are a declared iterator whose items are typed.\",\n          \"carriers\": [\n            \"M5.N33\","
+   }
+  ],
+  "expect": "M5.F1: PipelineBuilder<TModel>.FromDom<TElement>(string! elementId, string! member) -> ReactiveArray<TElement>! carriers M5.N33 is no core or module door"
+ },
+ {
+  "name": "a main-tip verdict without its SHA",
+  "edits": [
+   {
+    "file": "spec/FusionAppLevelObjects/features.json",
+    "old": "\"door\": \"FusionToastExtensions.SetTitle<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> title)\",\n          \"sha\": \"7b9e987cc3b9991c1107aa782bc3f6e8486968f9\",",
+    "new": "\"door\": \"FusionToastExtensions.SetTitle<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> title)\","
+   }
+  ],
+  "expect": "M23.F1: verdict for FusionToastExtensions.SetTitle<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> title), no main-only door of this feature"
+ },
+ {
+  "name": "a refusal carried by one door more",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"reason\": \"A string names the member it reads, which ALIS009 refuses; the element's children are a declared iterator whose items are typed.\",\n          \"carriers\": [\n            \"M5.N3\",",
+    "new": "\"reason\": \"A string names the member it reads, which ALIS009 refuses; the element's children are a declared iterator whose items are typed.\",\n          \"carriers\": [\n            \"M5.N3\",\n            \"M5.N4\","
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a refusal's reason reworded",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"reason\": \"A string names the member it reads, which ALIS009 refuses; the element's classes are a declared iterator of text, and any other list a declaration declares with its iterator.\",",
+    "new": "\"reason\": \"Its string names the member it reads, which ALIS009 refuses; the element's classes are a declared iterator of text, and any other list a declaration declares with its iterator.\","
+   }
+  ],
+  "expect": null
+ }
+]

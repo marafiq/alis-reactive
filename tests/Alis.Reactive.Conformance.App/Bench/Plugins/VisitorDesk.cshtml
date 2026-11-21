@@ -1,0 +1,46 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitorDeskBoard
+@{
+    Layout = "/Bench/Plugins/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Visitor desk";
+    var plan = Html.ReactivePlan<VisitorDeskBoard>();
+    plan.Plugin<VisitorBook>().Reactive(book => book.Signed, pipeline => pipeline.Element("book-signed").Text.Set("signed"));
+}
+<h1>Visitor desk</h1>
+<section aria-label="Visitor book">
+    <button type="button" id="open-the-book">Open the visitor book</button>
+    <button type="button" id="sign-the-book">Sign the book</button>
+    <dl>
+        <dt>Book</dt>
+        <dd id="book-state"></dd>
+        <dt>Signed at the desk</dt>
+        <dd id="book-own"></dd>
+    </dl>
+</section>
+<button type="button" @Html.Raises(plan, VisitorDeskButtons.CountTheVisits)>Count the visits</button>
+<button type="button" @Html.Raises(plan, VisitorDeskButtons.GreetTheVisitor)>Greet the visitor</button>
+<dl>
+    <dt>Count tried</dt>
+    <dd id="count-tried"></dd>
+    <dt>Visits</dt>
+    <dd id="visits"></dd>
+    <dt>Count done</dt>
+    <dd id="count-done"></dd>
+    <dt>Greeting</dt>
+    <dd id="greeting"></dd>
+    <dt>Signature heard</dt>
+    <dd id="book-signed"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(VisitorDeskButtons.CountTheVisits, pipeline =>
+        {
+            pipeline.Element("count-tried").Text.Set("tried");
+            pipeline.Element("visits").Text.Set(pipeline.Plugin<VisitorBook>().Visits);
+            pipeline.Element("count-done").Text.Set("counted");
+        })
+        .CustomEvent(VisitorDeskButtons.GreetTheVisitor, pipeline => pipeline.Element("greeting").Text.Set("welcome")));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PharmacyCheck
+@{
+    Layout = "/Care/Round/_TracedLayout.cshtml";
+    ViewData["Title"] = "Stock check";
+    var plan = Html.ReactivePlan<PharmacyCheck>();
+}
+<h1>Stock check of the @Model.Ward ward</h1>
+<button type="button" @Html.Raises(plan, PharmacyCheckEvents.CheckPharmacy)>Check pharmacy</button>
+<p>Pharmacy answer: <span id="pharmacy-echo">-</span></p>
+<button type="button" @Html.Raises(plan, PharmacyCheckEvents.CheckWard)>Check ward</button>
+<p>Ward answer: <span id="ward-echo">-</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(PharmacyCheckEvents.CheckPharmacy, pipeline => pipeline.Get(Model.PharmacyStock)
+            .OnSuccess(Content.Text, (answered, pipeline) => pipeline.Element("pharmacy-echo").Text.Set(answered.Body)))
+        .CustomEvent(PharmacyCheckEvents.CheckWard, pipeline => pipeline.Get(CareEndpoints.WardStock)
+            .OnSuccess(Content.Text, (answered, pipeline) => pipeline.Element("ward-echo").Text.Set(answered.Body))));
+}
+@Html.RenderPlan(plan)

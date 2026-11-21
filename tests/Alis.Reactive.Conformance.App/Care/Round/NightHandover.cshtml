@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NightHandoverDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Handover";
+    var plan = Html.ReactivePlan<NightHandoverDesk>();
+}
+<h1>Handover of @Model.Resident</h1>
+<p>Answer: <span id="handed-over">-</span></p>
+<button type="button" @Html.Raises(plan, NightHandovers.HandOver)>Hand over</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(NightHandovers.HandOver, pipeline => pipeline.Get(Model.Handover)
+        .OnSuccess<NightHandoverReply>((found, pipeline) => pipeline
+            .Post<NoModel>(NightHandovers.Received, request => request.Text(found.Body.Read(reply => reply.Note)))
+            .OnSuccess(Content.Text, (handed, pipeline) => pipeline.Element("handed-over").Text.Set(handed.Body)))));
+}
+@Html.RenderPlan(plan)

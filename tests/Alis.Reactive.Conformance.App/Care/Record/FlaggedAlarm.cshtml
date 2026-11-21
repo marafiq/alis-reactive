@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FlaggedAlarm
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Flagged alarm";
+    var plan = Html.ReactivePlan<FlaggedAlarm>();
+    var raises = new[]
+    {
+        new RaiseStart { Button = "Raise flagged", Flag = true },
+        new RaiseStart { Button = "Raise unflagged" },
+    };
+}
+<h1>Alarm of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Alarm, Raises = raises })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => pipeline.When(raised.Flag)
+        .Then(pipeline => pipeline.Component<ConformanceComponent>("care-panel").Settle())
+        .Else(pipeline => raised.WriteOnlyText.Set("Kappa"))))
+<p><a href="@CarePages.FlaggedAlarmWrittenLate">Late write</a></p>
+@Html.RenderPlan(plan)

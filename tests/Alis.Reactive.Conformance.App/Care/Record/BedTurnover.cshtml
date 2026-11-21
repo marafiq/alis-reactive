@@ -1,0 +1,29 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedTurnover
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Bed turnover";
+    var plan = Html.ReactivePlan<BedTurnover>();
+}
+<h1>Bed turnover of the @Model.Ward</h1>
+@(plan.ConformanceComponent("turnover-panel", new ConformanceStart { Text = "Turnover panel" }))
+<button type="button" @Html.Raises(plan, BedTurnovers.Load)>Load the beds</button>
+<p>Ready beds: <span id="ready-beds"></span></p>
+<p>Waiting beds: <span id="waiting-beds"></span></p>
+<p>South wing beds: <span id="south-beds"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BedTurnovers.Load, pipeline => pipeline.Get(Model.Beds)
+        .OnSuccess<TurnoverBeds>((loaded, pipeline) =>
+        {
+            var panel = pipeline.Component<ConformanceComponent>("turnover-panel");
+            panel.Records.Set(loaded.Body.Read(turnover => turnover.Beds));
+            pipeline.Element("ready-beds").Text.Set(panel.Records.Count(bed => bed.Stage == RecordStage.Ready));
+            pipeline.Element("waiting-beds").Text.Set(panel.Records.Count(bed => bed.Stage == RecordStage.Waiting));
+            pipeline.Element("south-beds").Text.Set(panel.Records.Count(bed => bed.Wing == RecordWing.South));
+        })));
+}
+@Html.RenderPlan(plan)

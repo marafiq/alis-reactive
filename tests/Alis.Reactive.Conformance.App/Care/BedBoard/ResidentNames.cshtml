@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Grids
+@model ResidentNames
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident board";
+    var plan = Html.ReactivePlan<ResidentNames>();
+}
+<h1>Resident board</h1>
+@(Html.FusionGrid<ResidentNames, NamedResident>(plan, "resident-names", build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { HeaderText = "Name", Template = FusionTemplate.Create<NamedResident>().Span(m => m.Name).Render(plan) },
+    })))
+<p>Residents: <output id="board-status">Loading</output></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline
+        .Get(Model.ResidentsEndpoint)
+        .OnSuccess(Content.Json<IReadOnlyList<NamedResident>>(), (residents, pipeline) =>
+        {
+            pipeline.Component<FusionGrid>("resident-names").DataSource<NamedResident>().Set(residents.Body);
+            pipeline.Element("board-status").Text.Set("Loaded");
+        })));
+}
+@Html.RenderPlan(plan)

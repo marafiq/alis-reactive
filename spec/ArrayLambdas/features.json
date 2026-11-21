@@ -1,0 +1,1077 @@
+{
+  "module": "ArrayLambdas",
+  "features": [
+    {
+      "id": "M4.F1",
+      "summary": "A list of data, the server's or what a live object holds, and its operations: Where, Select, OrderBy, OrderByDescending, Count, Any, All, Sum and Find, each over a lambda on the item's dotted members, each a source at every value position.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:ReactiveArray<TElement>",
+        "Alis.Reactive:ReactiveValue<TValue>",
+        "Alis.Reactive:ListPropertyExtensions"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.From<TElement>(TypedSource<System.Collections.Generic.IEnumerable<TElement>!>! source) -> ReactiveArray<TElement>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.From<TElement>(TypedSource<System.Collections.Generic.IReadOnlyList<TElement>!>! source) -> ReactiveArray<TElement>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.From<TElement>(TypedSource<System.Collections.Generic.List<TElement>!>! source) -> ReactiveArray<TElement>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.From<TElement>(TypedSource<TElement[]!>! source) -> ReactiveArray<TElement>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.From<TPayload, TElement>(TPayload args, System.Linq.Expressions.Expression<System.Func<TPayload, TElement[]!>!>! selector) -> ReactiveArray<TElement>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "var residents = p.From(json.Read(x => x.Residents));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:15"
+        },
+        {
+          "line": "main",
+          "text": "s.Element(\"res-active\").SetText(residents.Count(x => x.Status == \"active\"));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:18"
+        },
+        {
+          "line": "main",
+          "text": "s.Element(\"res-active-age-sum\").SetText(residents.Where(x => x.Status == \"active\").Sum(x => x.Age));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:20"
+        },
+        {
+          "line": "main",
+          "text": "s.Element(\"res-oldest-active\").SetText(residents.Where(x => x.Status == \"active\").OrderByDescending(x => x.Age).Find(x => true, x => x.Name));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:21-22"
+        },
+        {
+          "line": "main",
+          "text": "s.When(residents.Any(x => x.Status == \"critical\")).Truthy()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:24"
+        },
+        {
+          "line": "main",
+          "text": "var count = p.From(args, e => e.Value).Count();",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:67"
+        },
+        {
+          "line": "main",
+          "text": "s.Component<FusionGrid>(\"roster-grid\").SetDataSource(roster.OrderBy(x => x.Name).AsSource());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ArrayGrid/Index.cshtml:17-18"
+        },
+        {
+          "line": "redesign",
+          "text": "var residents = s.From(census.Get(x => x.Residents));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:17"
+        },
+        {
+          "line": "redesign",
+          "text": "var inResidence = residents.Where(r => r.Status == CensusStatus.InResidence);",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:18"
+        },
+        {
+          "line": "redesign",
+          "text": "s.Element(\"census-charges\").Text.Set(inResidence.Sum(r => r.MonthlyCharges));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:29"
+        },
+        {
+          "line": "redesign",
+          "text": "s.Element(\"census-next-review\").Text.Set(residents.OrderBy(r => r.DaysToReview).Find(r => r.Status == CensusStatus.InResidence, r => r.Name));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:33-34"
+        },
+        {
+          "line": "redesign",
+          "text": "s.When(residents.Any(r => r.Status == CensusStatus.InHospital)).Truthy()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:36"
+        },
+        {
+          "line": "redesign",
+          "text": "s.Element(\"board-quiet\").Text.Set(s.From(planner.Slots).Count(slot => slot.Quiet));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/VisitBoard.cshtml:35"
+        },
+        {
+          "line": "redesign",
+          "text": "var onScreen = p.From(rosterGrid.Rows<RosterResident>());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ArrayGrid/Index.cshtml:45"
+        },
+        {
+          "line": "redesign",
+          "text": "rosterGrid.Rows<RosterResident>().Set(onScreen.Where(x => x.Status == \"active\").OrderBy(x => x.Name));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ArrayGrid/Index.cshtml:46"
+        },
+        {
+          "line": "redesign",
+          "text": "public ReadOnly<IReadOnlyList<string>> OfferedDays => Slots.Each(slot => slot.Day);",
+          "cite": "Alis.Reactive.SandboxApp/BroughtComponents/VisitPlanner/VisitPlanner.cs:29"
+        },
+        {
+          "line": "proposed",
+          "text": "var residents = reply.Body.Read(census => census.Residents);",
+          "doors": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "rosterGrid.Rows<RosterResident>().Set(residents.Where(resident => resident.Status == CensusStatus.InResidence).OrderBy(resident => resident.Name));",
+          "doors": [
+            "N6.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(residents.Any(resident => resident.Status == CensusStatus.InHospital))",
+          "doors": [
+            "N6.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "var nextReview = residents.OrderBy(resident => resident.DaysToReview).Find(resident => resident.Status == CensusStatus.InResidence, resident => resident.Name);",
+          "doors": [
+            "N6.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<StandUp>(url, request => request.Set(r => r.Charges, residents.Where(resident => resident.Status == CensusStatus.InResidence).Sum(resident => resident.MonthlyCharges)));",
+          "doors": [
+            "N10.7",
+            "N6.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "var quiet = planner.Slots.Count(slot => slot.Quiet);",
+          "doors": [
+            "N6.1",
+            "N6.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "var offeredDays = planner.Slots.Select(slot => slot.Day);",
+          "doors": [
+            "N6.1",
+            "N6.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "var picked = payload.Read(change => change.Value).Count();",
+          "doors": [
+            "N5.6",
+            "N6.1"
+          ]
+        }
+      ],
+      "nodes": [
+        "call",
+        "fn",
+        "get",
+        "op",
+        "ref",
+        "lit",
+        "data",
+        "start",
+        "nothing",
+        "unbound",
+        "as",
+        "array",
+        "nullable"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:35-154"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:62-271"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Arrays.cs:17-39"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/JsMembers.cs:161-173"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:18-80"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:28-121"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Arrays.cs:18-39"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanModel/Values/ValueExpression.cs:136-163"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/evaluate.ts:60-80"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/operators.ts:86-117"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/paths.ts:30-35"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/values/evaluate.ts:61-67"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/values/array-op-engine.ts:10-135"
+        }
+      ],
+      "core": [
+        "Q1",
+        "Q2",
+        "Q4",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q18"
+      ],
+      "meanings": [],
+      "oracle": ".NET's LINQ to Objects over the same items on .NET 10 and net48 (Count, Where, Select, Sum, OrderBy, OrderByDescending, Any, All, FirstOrDefault) with the C# operators they call, over the values System.Text.Json writes and binds under the app's options (D4.2, D6.12); ECMAScript's array members map, filter, some, every, find, toSorted and length, which the plan calls (D6.6); and the probes core-select-past-null, core-json-decimal-text-written, core-json-decimal-text-rounded, core-json-double-text, js-array-from-text, and the date probes core-date-compares-ticks, core-stj-date-time-forms, core-query-date-forms, core-stj-own-date-converters, js-date-wall-gap, js-date-wall-overlap, js-date-milliseconds, js-key-text-order, js-span-key-order and the net48 operators of DateTime, DateTimeOffset and TimeSpan (D6.12, D6.13).",
+      "checker": [
+        "core:Q6",
+        "core:Q4",
+        "Absence.tla:MissingListReadsNothing",
+        "Absence.tla:DataAbsentReadsItsStart",
+        "Absence.tla:NullHolderReadsNothing",
+        "Schema.tla:DecimalTextComparedByValue",
+        "Schema.tla:SelectFieldHoldsItsType",
+        "Schema.tla:ReadsTakeNoEach",
+        "Schema.tla:DatesComparedByKey",
+        "Schema.tla:KeysOnlyCompared",
+        "Schema.tla:KeyFallbackIsALiteral"
+      ],
+      "defects": [
+        {
+          "id": "X6.2",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.6",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.10",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.11",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.12",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.13",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.14",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.15",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.16",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.17",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.18",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.19",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.20",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.21",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.22",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.23",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.24",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.25",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.26",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.27",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.28",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.29",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.30",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.31",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.32",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.33",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.34",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.35",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.36",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.37",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.38",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.39",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.40",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.41",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.42",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.43",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.44",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.45",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.46",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.47",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.48",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.49",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.50",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.51",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.52",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X6.53",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.54",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.55",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.57",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.58",
+          "rung": "behavior"
+        },
+        {
+          "id": "M4.X1",
+          "rung": "analyzer",
+          "defect": "A care note's text counted, filtered, summed or ordered as a list of its characters, since the covariant source of N6.4 takes a string as a list of char (D6.10): \"'{source}' is a source of text, and a text is no list in the browser; run {operation} over a list, such as a List<T> or an array, or test the text with Contains, StartsWith, EndsWith, MinLength or Matches.\" At build by ALIS042, {source} the view's own text of the receiver, and where the view renders on code it does not follow, which holds no view text, so the operation names itself (D18.6): \"The source passed to {operation} is text, and a text is no list in the browser; run {operation} over a list, such as a List<T> or an array, or test the text with Contains, StartsWith, EndsWith, MinLength or Matches.\" new:N18.16."
+        },
+        {
+          "id": "M4.X2",
+          "rung": "behavior",
+          "defect": "A Select's field that an item of data lacks reads its start, as the endpoint binds it (D4.2), where the redesign's Each reads it as nothing: Select(slot => slot.Day) over a slot the vendor sent with no day, whose class starts Day at Monday, holds Monday."
+        },
+        {
+          "id": "M4.X3",
+          "rung": "behavior",
+          "defect": "An operation changes the list it reads: a sort that orders the vendor's own array in place, where the core sorts by toSorted (D6.6) and leaves the list as the vendor holds it, so a later read of the same list reads the sorted order."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X6.3",
+          "page": "A roster of three residents: one sent with an empty name, one sent with no name member, whose class starts Name at null, and Ada; a button counts the residents whose trimmed name is empty, then sets the status to Counted.",
+          "gesture": "Click the count button.",
+          "outcome": "The count shows 1 and the status shows Counted.",
+          "opposite": "A fourth resident sent with a name of three spaces is counted too, and the count shows 2.",
+          "defect": "The missing name read as an empty text, so the count shows 2; or Trim called on nothing stopping the pipeline, so the count keeps its dash and the status keeps Waiting."
+        },
+        {
+          "for": "X6.4",
+          "page": "A ward board whose status starts as Unknown and whose handler of the app event AlarmRaised, its payload holding an Alarms list, sets the status to Alarms where Alarms.Any() holds and to Quiet where Alarms.Any().Not() holds, then sets the second status to Read. No list dispatches AlarmRaised with Alarms holding null, No alarms with an empty list, and One alarm with one alarm.",
+          "gesture": "Click No list.",
+          "outcome": "The status keeps Unknown and the second status shows Read.",
+          "opposite": "Clicking No alarms, the status shows Quiet, and clicking One alarm, Alarms.",
+          "defect": "The null list read as a list of no item, so Any() reads false, its Not holds, and the status shows Quiet."
+        },
+        {
+          "for": "X6.5",
+          "page": "A census view whose model names the ward East, over two East residents and three West ones, with one count of r => r.Ward == Model.Ward and one of r => r.Ward == ward, where ward is a local copied from Model.Ward.",
+          "gesture": "Open the page with the model naming East, then with the model naming West.",
+          "outcome": "Both counts show 2 under East and 3 under West.",
+          "opposite": "A count of r => r.Ward == \"East\", a literal, shows 2 under either model.",
+          "defect": "The captured value written as its expression's text or as nothing, so both counts show 0; or read once and kept across renders, so the West render shows 2."
+        },
+        {
+          "for": "X6.7",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose step counts the records its NullableRecords property holds, then sets the status to Counted; the panel's own Paged button makes NullableRecords hold a paged result, an object with result and count, and its Clear button makes it hold null.",
+          "gesture": "Click the census panel's Paged, then Count.",
+          "outcome": "The count keeps its dash and the status keeps Waiting.",
+          "opposite": "With NullableRecords holding null, Count empties the count and the status shows Counted.",
+          "defect": "The paged result read as a list of one item, so the count shows 1 and the status Counted; or the null list counted as no item, so the opposite shows 0."
+        },
+        {
+          "for": "X6.9",
+          "page": "A billing page whose step sums, in this order and each into its own text, decimal charges 0.1 and 0.2, double rates 0.1 and 0.2, an empty list of charges, and int counts 2,147,483,000, 1,000 and -1,000, then sets the status to Summed.",
+          "gesture": "Click Sum.",
+          "outcome": "The decimal sum shows 0.3, the double sum 0.30000000000000004 and the empty sum 0; the int sum keeps its dash and the status keeps Waiting.",
+          "opposite": "With the int counts 2,147,483,000 and 600, the int sum shows 2147483600 and the status shows Summed.",
+          "defect": "Decimal terms added as binary floating point, so the decimal sum shows 0.30000000000000004; or the int total checked only once at the end, so the int sum shows 2147483000 and the status Summed."
+        },
+        {
+          "for": "X6.12",
+          "page": "An app whose JSON options write enums by name, and a dose page of four doses, due, given, held and due, that counts d => d.Status > DoseStatus.Due, where DoseStatus declares Due, Given and Held in that order.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.12's message, which names d.Status > DoseStatus.Due and cures it with == or != or ordering on the server.",
+          "opposite": "Under options that write enums as numbers, the page renders and the count shows 2.",
+          "defect": "The names ordered as text in the browser, so the page renders and a given dose counts as before due, where .NET orders Given after Due."
+        },
+        {
+          "for": "X6.15",
+          "page": "A census whose lambda counts r => r.Lead == Model.Cover.Name, rendered with Model.Cover null.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.15's message, naming Model.Cover.Name.",
+          "opposite": "Rendered with a cover named Ada, the page renders and counts Ada's two residents.",
+          "defect": "The null cover read as nothing, so the page renders and the count shows 0; or a NullReferenceException that names no value."
+        },
+        {
+          "for": "X6.16",
+          "page": "Four doses under options that write enums by name: A due as planned, route I, 5 mg, priority 2; B given where due was planned, route O, 4 mg, priority 3; C due where given was planned, route A, 4 mg, no priority; D held as planned, route T, 2 mg, priority 1. Five counts: d.Status == DoseStatus.Due, d.Route == 'I', d.Status == d.Planned, d.Milligrams > d.Priority and d.Route < 'L'.",
+          "gesture": "Open the page.",
+          "outcome": "The counts show 2, 1, 2, 3 and 2.",
+          "opposite": "Under options that write enums as numbers, the due count still shows 2 and the as planned count 2.",
+          "defect": "DoseStatus.Due written as its number where the doses hold names, so the due count shows 0; 'I' written as its code 73, so the route count shows 0; or a null priority compared as 0, as JavaScript's > compares it, so the fourth count shows 4."
+        },
+        {
+          "for": "X6.19",
+          "page": "Six notes, five whose Detail holds the text a followed by U+0085, U+FEFF followed by a, straße, ΟΔΟΣ, and U+0085 alone, and one whose Detail holds null. Five counts over n.Detail.Text: Trim().Length == 1, ToUpperInvariant() == \"STRAßE\", ToLowerInvariant() == \"οδοσ\", string.IsNullOrEmpty and string.IsNullOrWhiteSpace; then a step counts the notes whose text contains a value the view holds as null and sets the status to Looked.",
+          "gesture": "Open the page.",
+          "outcome": "The counts show 1, 1, 1, 1 and 2, and the status keeps Waiting.",
+          "opposite": "With the value the view holds set to a, the status shows Looked.",
+          "defect": "JavaScript's own trim, toUpperCase, toLowerCase and white space test, so the first three counts show 2, 0 and 0 and the last 1; IsNullOrEmpty reading nothing as false, so the fourth shows 0; or Contains passing null on, so the status shows Looked."
+        },
+        {
+          "for": "X6.20",
+          "page": "Three doses: A whose carer Ada is among its checks, all signed; B whose carer Ben is not among its checks, one unsigned; C with no carer and no checks. Counts of d => d.Carer != null && d.Checks.Any(c => c.Name == d.Carer.Name), of d => d.Checks.All(c => c.Signed), and of d => d.Checks.Any().",
+          "gesture": "Open the page.",
+          "outcome": "The counts show 1, 2 and 2.",
+          "opposite": "With Ben added to B's checks, the first count shows 2.",
+          "defect": "The inner lambda reading the outer item where it names its own, so the first count shows 0; or All over a list with no item reading false, so the second count shows 1."
+        },
+        {
+          "for": "X6.24",
+          "page": "A dose list counted by d => wards.Contains(d.Ward), where wards is a local that holds null when the view renders.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.24's message, naming wards.Contains(d.Ward).",
+          "opposite": "With wards holding East and West, the page renders and counts the three doses of those wards.",
+          "defect": "The null list written as a list of no item, so the page renders and the count shows 0, where .NET throws."
+        },
+        {
+          "for": "X6.26",
+          "page": "Four doses of aspirin, morphine, heparin and insulin, in the wards East, West, North and East, the string Ward and the enum Wing naming the same ward, two of whose Hours lists hold two hours and one of whose Codes arrays holds two codes. Counts of d => wards.Contains(d.Ward) over a string array of East and North, a List<string> of them and an IEnumerable<string> that holds an array of them; of d => wings.Contains(d.Wing) over an enum array of East and North the app writes by name; of d => d.Medicine.Contains('o'); of d => d.Hours.Count == 2; and of d => d.Codes.Length == 2.",
+          "gesture": "Open the page.",
+          "outcome": "The four lookup counts each show 3, the letter count 1, the hours count 2 and the codes count 1.",
+          "opposite": "With North dropped from each looked-up list, each lookup count shows 2.",
+          "defect": "The enum array written as numbers where the doses hold names, so its count shows 0; Count read as a member of a JavaScript array, which has none, so the hours count shows 0; or a char written as its code, so the letter count shows 0."
+        },
+        {
+          "for": "X6.27",
+          "page": "Two carers, Dr Işık and DR İNCE, ordered by name with no comparer, the first name after the sort shown, then the status set to Sorted; the view renders under the culture its query names.",
+          "gesture": "Open the page under tr-TR.",
+          "outcome": "The first name shows Dr Işık and the status shows Sorted.",
+          "opposite": "Under en-US the first name shows DR İNCE, and under haw-US, which the browser has no collation for, the first name keeps its dash and the status keeps Waiting.",
+          "defect": "Text ordered by code unit or by the browser's own locale, so under tr-TR the first name shows DR İNCE, or under haw-US the sort runs and the status shows Sorted."
+        },
+        {
+          "for": "X6.28",
+          "page": "An app whose JSON options write enums by name, and a list of doses of 5, 1 and 3 mg ordered by d => d.Status.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.28's message, naming d.Status.",
+          "opposite": "Ordered by d => d.Milligrams, the page renders and shows the 1 mg dose first.",
+          "defect": "The names ordered as text, so the page renders and lists a given dose before a due one, where .NET orders by the enum's value."
+        },
+        {
+          "for": "X6.32",
+          "page": "Four doses: A 5 mg, priority 2, not urgent, code b; B 1 mg, priority 4, urgent, code B; C 5 mg, priority 1, urgent, code a; D 3 mg, no priority, not urgent, code A. Six orders each show their first dose: OrderBy milligrams, OrderBy priority, OrderBy urgent, OrderBy code with StringComparer.Ordinal, OrderByDescending priority and OrderByDescending milligrams.",
+          "gesture": "Open the page.",
+          "outcome": "The first doses show B, D, A, D, B and A.",
+          "opposite": "With D's priority set to 3, the priority order's first dose shows C.",
+          "defect": "A null key ordered after the numbers, as both lines order it as text, so the priority order shows C; the code ordered by the culture, so it shows C; or an unstable sort, so the descending milligrams order shows C."
+        },
+        {
+          "for": "X6.34",
+          "page": "Three doses: A of priority 2 with the carer Ada and the ward East; B of priority null with a carer that is null and the ward West; C of priority 3 with the carer Ben, sent with no ward, whose start is null. Counts of d.Priority.HasValue, d.Priority.Value != 2, d.Priority != 2, (d.Carer.Name ?? \"unassigned\") == \"unassigned\", (d.Ward ?? \"none\") == \"none\" and (d.Priority > 2 ? d.Carer.Name : \"low\") == \"low\".",
+          "gesture": "Open the page.",
+          "outcome": "The counts show 2, 1, 2, 1, 1 and 2.",
+          "opposite": "With B's priority set to 4, the Value count shows 2 and the last count shows 1.",
+          "defect": "Value of null read as null, so the Value count keeps B and shows 2; the carer's name read past a null carer as an error, so the pipeline stops and the counts keep their dashes; or ?: reading its first branch where its test fails, so the last count shows 0."
+        },
+        {
+          "for": "X6.35",
+          "page": "Three doses whose Room holds the ward East, a ward that holds null, and a room that is null; a count of d => wards.Contains(d.Room.Ward), where wards is a local array that holds East and null.",
+          "gesture": "Open the page.",
+          "outcome": "The count shows 2.",
+          "opposite": "With wards holding East alone, the count shows 1.",
+          "defect": "A ward read past a null room looked up as null, so the count shows 3; or null never found, so the count shows 1."
+        },
+        {
+          "for": "X6.36",
+          "page": "The carers Müller and Muhr ordered by c => c.Name with no comparer, the view rendered under de-DE_phoneb.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.36's message, naming c => c.Name and the alternate sort phoneb.",
+          "opposite": "Rendered under de-DE, the page renders and lists Muhr before Müller.",
+          "defect": "The alternate sort dropped from the collation, so the page renders and orders by de-DE."
+        },
+        {
+          "for": "X6.37",
+          "page": "Five notes: with food and a line break, with food and two line breaks, costs $5, after food, and a note that holds null. Counts of notes matching food$, of \\$, of a local that holds food$, and of (?<=after )food with RegexOptions.CultureInvariant.",
+          "gesture": "Open the page.",
+          "outcome": "The counts show 2, 1, 2 and 1.",
+          "opposite": "With the note ending in one line break removed, the food$ count and the local's count show 1.",
+          "defect": "The pattern passed to the browser as .NET wrote it, where JavaScript's $ does not match before a final line break, so the first and third counts show 1; or the null note matched as the text null."
+        },
+        {
+          "for": "X6.39",
+          "page": "Five doses charted Given, Held, Held, Due and Due, whose Charted member carries its own JsonStringEnumConverter, unlike the app's camel-case enums, counted by d => charted.Contains(d.Charted), where charted is a local array of Given and Held.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.39's message, naming d.Charted and its own JSON converter.",
+          "opposite": "Counted by d => d.Charted == DoseStatus.Given || d.Charted == DoseStatus.Held, the page renders and the count shows 3.",
+          "defect": "The local array written in the app's camel case, so the page renders and the count shows 0, where .NET counts 3."
+        },
+        {
+          "for": "X6.40",
+          "page": "A dose list whose Supply class writes its numbers as text by its own number handling, counted by d => d.Supply.Vials > 2.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.40's message, naming d.Supply.Vials and its class's JSON number handling.",
+          "opposite": "Counted by d => d.Supply.Vials == 2, the page renders and counts the one dose whose supply holds 2.",
+          "defect": "The texts ordered in the browser, so the page renders and a supply of 10 vials is not counted, since \"10\" orders before \"2\"."
+        },
+        {
+          "for": "X6.41",
+          "page": "A dose list whose Seal member, a class, carries its own converter that writes it as text, counted by d => d.Seal == seal, where seal is a local Seal.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.41's message, naming d.Seal and its own JSON converter.",
+          "opposite": "With Seal's converter removed and the count written as d => d.Seal.Tag == \"S4\", the page renders and counts the one dose sealed S4.",
+          "defect": "The converter's text compared with the local written by the same converter, so the page renders and counts by text where .NET compares the object."
+        },
+        {
+          "for": "X6.42",
+          "page": "Four doses whose Status and Charted hold the same status, two of them as planned, counted by d => d.Charted == d.Planned, where Charted carries its own JsonStringEnumConverter and Planned is written by the app's camel-case options.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.42's message, naming d.Charted.",
+          "opposite": "Counted by d => d.Status == d.Planned, both written by the app's options, the page renders and the count shows 2.",
+          "defect": "The two forms compared as written, Given against given, so the page renders and the count shows 0, where .NET counts 2."
+        },
+        {
+          "for": "X6.43",
+          "page": "An app whose JSON options write numbers as text, and a reading list counted by r => r.Temperature == 0.0, a double.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.43's message, naming r.Temperature == 0.0.",
+          "opposite": "Under options that write numbers as JSON numbers, the page renders and counts the readings of 0 and -0, 2.",
+          "defect": "The texts compared, so the page renders and the reading written -0 is not counted, where .NET counts it."
+        },
+        {
+          "for": "X6.44",
+          "page": "Five doses whose Charted carries its own JsonStringEnumConverter under options that write enums in camel case: three charted Given and two that omit Charted, whose default is Due; one dose's supply, whose class writes its numbers as text, holds 2 vials. Counts of d.Charted == DoseStatus.Given, d.Charted != DoseStatus.Given, d.Charted == DoseStatus.Due and d.Supply.Vials == 2.",
+          "gesture": "Open the page.",
+          "outcome": "The counts show 3, 2, 2 and 1.",
+          "opposite": "With the two omitted doses charted Held, the third count shows 0 and the second still 2.",
+          "defect": "DoseStatus.Given written by the app's options as given, so the first count shows 0 and the second 5; or an omitted Charted read as nothing, so the third shows 0."
+        },
+        {
+          "for": "X6.45",
+          "page": "Five doses, three charted Given by Charted's own JsonStringEnumConverter under options that write enums in camel case, counted through Select(d => d.Charted).Count(s => s == DoseStatus.Given).",
+          "gesture": "Open the page.",
+          "outcome": "The count shows 3.",
+          "opposite": "A view that sums Select(d => d.Supply.Vials).Sum(v => v), whose supply class writes its numbers as text, is refused where it renders with X6.39's message.",
+          "defect": "The selected items read in the app's form, so the literal is written given and the count shows 0."
+        },
+        {
+          "for": "X6.47",
+          "page": "Five doses of priority 1, 2, 2, 3 and null, and a view's int? routine that holds 2. Counts of (int)d.Priority != 2 and of d.Priority == (int)routine; then a step that sums d => (int)d.Priority! into the total and sets the status to Summed.",
+          "gesture": "Open the page.",
+          "outcome": "The counts show 2 and 2; the total keeps its dash and the status keeps Waiting.",
+          "opposite": "Without the dose whose priority is null, the total shows 8 and the status shows Summed.",
+          "defect": "The cast read as the nullable itself, so the first count keeps the null dose and shows 3; or the null term added as 0, so the total shows 8 and the status Summed."
+        },
+        {
+          "for": "X6.48",
+          "page": "A dose list counted by d => d.Priority == (int)none, where none is a view's int? that holds null when the view renders.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.48's message, naming none.",
+          "opposite": "With none holding 2, the page renders and counts the two doses of priority 2.",
+          "defect": "The null cast written as null, so the page renders and counts the dose whose priority is null, where .NET throws."
+        },
+        {
+          "for": "X6.51",
+          "page": "Three doses charged 0, 2.50 and 4, and a view's int freeCharge that holds 0; a count of d => d.Charge > freeCharge.",
+          "gesture": "Open the page.",
+          "outcome": "The count shows 2.",
+          "opposite": "With freeCharge holding 3, the count shows 1.",
+          "defect": "The conversion from int refused as a cast that narrows, so the page is refused where it renders; or freeCharge written as text, so the count shows 0."
+        },
+        {
+          "for": "X6.53",
+          "page": "Four doses whose Billing's Copay is written as text by its own number handling: 0.10, 0.1, 0.1000000000000000000000000001, and one whose Billing holds null. Counts of d => d.Billing.Copay == 0.10m and d => d.Billing.Copay != 0.10m, then the status set to Counted.",
+          "gesture": "Open the page.",
+          "outcome": "The equal count shows 2, the unequal count 1, and the status shows Counted.",
+          "opposite": "With a fifth dose whose copay holds abc, the counts keep their dashes and the status keeps Waiting.",
+          "defect": "The texts compared as written, so the equal count shows 1 and the unequal 2; the texts read as doubles, so the third copay counts as equal and the counts show 3 and 0; or the null billing counted as unequal, so the unequal count shows 2."
+        },
+        {
+          "for": "X6.54",
+          "page": "A dose list whose Copay is written as text by its own number handling, counted by d => copays.Contains(d.Copay), where copays is a local array of 0.10m and 0.25m.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.54's message, naming copays.Contains(d.Copay).",
+          "opposite": "Counted by d => d.Copay == 0.10m || d.Copay == 0.25m, the page renders and counts a copay written 0.1.",
+          "defect": "The lookup compares the texts, so the page renders and a copay written 0.1 is not found."
+        },
+        {
+          "for": "X6.55",
+          "page": "Three doses, one whose supply holds null; a step that shows Select(d => (int?)d.Supply.Vials).Count(v => v == null), then one that shows Select(d => d.Supply.Vials).Count(), then the status set to Counted.",
+          "gesture": "Open the page.",
+          "outcome": "The nullable count shows 1, the second count keeps its dash, and the status keeps Waiting.",
+          "opposite": "With every supply held, the second count shows 3 and the status shows Counted.",
+          "defect": "The field that reads nothing put in the list as null, so the second count shows 3 and the status Counted."
+        },
+        {
+          "for": "M4.X2",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Records hold three records: one with the code C0, one with the code C1, and one its JavaScript sends with no code, whose class Record starts Code at C0; on load a step shows the panel's Records.Select(r => r.Code).Count(code => code == \"C0\").",
+          "gesture": "Open the residents screen.",
+          "outcome": "The C0 count shows 2.",
+          "opposite": "With the third record sent with Code null, the count shows 1, since a member that holds null reads null.",
+          "defect": "The absent code read as nothing, as the redesign's Each reads it, so the count shows 1."
+        },
+        {
+          "for": "M4.X3",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Records property holds a plain array of Martin, Adams and Lee in the order of admission, and a second ConformanceComponent beside it, census-sorted; a Copy sorted button sets census-sorted's Records from the census panel's Records ordered by Name, then shows the census panel's first name, Records.Find(r => true, r => r.Name).",
+          "gesture": "Click Copy sorted.",
+          "outcome": "census-sorted lists Adams, Lee and Martin, and the first name shows Martin.",
+          "opposite": "Ordered by name descending, census-sorted lists Martin, Lee and Adams, and the first name shows Martin.",
+          "defect": "The sort runs in place on the census panel's own array, so the first name shows Adams."
+        },
+        {
+          "for": "X6.11",
+          "page": "A visit list whose server, in New York, writes six visits with the app's options: 02:30 and 03:15 on 2026-03-08, a Utc visit at 2026-11-09T08:30:00Z, a Local one at 2026-11-09T08:30:00-05:00 seen at 2026-11-09T13:00:00-05:00, an Unspecified one at 2026-11-09T08:30:00 and one at 2026-11-09T08:30:00.0000001. Four counts over the view's locals threeOnTheNight, new DateTime(2026, 3, 8, 3, 0, 0), and halfPastEight, new DateTime(2026, 11, 9, 8, 30, 0): v.At < threeOnTheNight, v.At == halfPastEight, v.At > halfPastEight, and seen.Contains(v.Seen) over a view's DateTimeOffset array that holds 2026-11-09T18:00:00Z.",
+          "gesture": "Open the visits in a browser whose zone is New York, then in one whose zone is Kolkata.",
+          "outcome": "Both times the counts show 1, 3, 1 and 1.",
+          "opposite": "With the 02:30 visit written at 03:30, the first count shows 0; with the Utc visit written at 08:31, the second shows 2.",
+          "defect": "Each side read as a JavaScript Date, as the redesign compares: in New York the 02:30 visit holds 03:30, so the first count shows 0; the Z text reads as a moment, so the second count misses the Utc visit, and in Kolkata the Local one too; the tick is dropped, so the third count shows 0. Or the instants compared as their texts, so the lookup shows 0."
+        },
+        {
+          "for": "X6.29",
+          "page": "Three lists the server, in New York, writes with the app's options, each shown first to last after its sort: visits at 03:15, 01:30 and 02:30 on 2026-03-08 by OrderBy(v => v.At); seen instants 2026-11-09T18:00:00.0000001+00:00, 2026-11-09T10:00:00-08:00, 2026-11-09T13:00:00-05:00 and 2026-11-09T12:00:00-08:00 by OrderBy(v => v.Seen); stays of 23:00:00, -00:00:00.5000000 and 1.02:00:00 by OrderByDescending(v => v.Length).",
+          "gesture": "Open the page in a browser whose zone is New York.",
+          "outcome": "The visits list 01:30, 02:30, 03:15; the instants list 10:00:00-08:00, 13:00:00-05:00, 18:00:00.0000001+00:00, 12:00:00-08:00; the stays list 1.02:00:00, 23:00:00, -00:00:00.5000000.",
+          "opposite": "OrderByDescending(v => v.At) lists 03:15 first and 01:30 last.",
+          "defect": "A Date's time orders the visits, so 02:30, held as 03:30, lists last; milliseconds tie the three instants at 18:00 UTC, so 18:00:00.0000001 lists first; or the texts order, so the instants end at 18:00:00.0000001+00:00 and the stays list 23:00:00 first."
+        },
+        {
+          "for": "X6.43",
+          "page": "A visit list whose At member, a DateTime, carries its own JsonConverter that writes the day and the time as dd.MM.yyyy HH:mm, counted by v => v.At == start, a DateTime the view holds.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.43's message, naming v.At == start.",
+          "opposite": "Without the member's converter, the page renders and counts the visits that start at that time.",
+          "defect": "The view's DateTime written through the member's converter and compared as text, as a member's own form compares an enum, so the page renders and a visit one tick past the start counts as equal, its text the same."
+        },
+        {
+          "for": "X6.57",
+          "page": "A visits index with the link Open the visit count, to a visit count page in an app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy, whose Count button counts the visit list by v => v.At < cutoff, a DateTime the view holds, into visit-count.",
+          "gesture": "On the visits index, click Open the visit count.",
+          "outcome": "The visit count page is refused where the view renders with X6.57's message, naming v.At < cutoff.",
+          "opposite": "Without the app's converter, the visit count page renders, and Count writes the number of visits before the cutoff into visit-count.",
+          "defect": "The page renders and reads the converter's text: as text it orders 01.11.2026 before 31.10.2026 and counts a November visit before an October cutoff, or as a key it stops the pipeline and no count shows."
+        },
+        {
+          "for": "X6.58",
+          "page": "The residents screen's census panel, a ConformanceComponent whose Records property holds data its own JavaScript writes, one record's Day, a DateTime, held as the text 10/27/2026; a Count button counts the records with r => r.Day < cutoff, a DateTime the view holds, shows the count, then writes checked into a log.",
+          "gesture": "Click Count.",
+          "outcome": "No count shows, the log stays empty, and the console holds one error naming the text 10/27/2026.",
+          "opposite": "With that record's Day held as 2026-10-27, the count shows and the log reads checked; held as 2026-02-30, a day no month holds, the count shows without that record, the log reads checked and the console holds no error.",
+          "defect": "The text read as nothing, so the count shows without that record and the log reads checked; or parsed by the browser's Date, so it counts as October 27, a reading no endpoint's binding shares on both hosts. Or 2026-02-30 stops the pipeline too, so with it no count shows."
+        },
+        {
+          "for": "X6.57",
+          "page": "A handovers index with the link Open the handover, to a handover page in an app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy; its Check handover button gets the handover, whose success route's When orders the body's At, a DateTime, before a cutoff the view holds and writes early into handover-status.",
+          "gesture": "On the handovers index, click Open the handover.",
+          "outcome": "The handover page is refused where the view renders with X6.57's message, naming the At read.",
+          "opposite": "Without the app's converter, the handover page renders, and Check handover, answered with an At before the cutoff, writes early into handover-status.",
+          "defect": "The page renders and reads the converter's text: as text it orders 01.11.2026 before 31.10.2026, so a November handover writes early, or as a key it stops the pipeline and handover-status stays empty."
+        },
+        {
+          "for": "X6.57",
+          "page": "A visits index with the link Book a visit, to a visit form in an app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy; the form's At date picker is bound to a DateTime under VisitValidator's RuleFor(v => v.At).GreaterThan(new DateTime(2026, 11, 1)).WithMessage(\"Book a visit after November 1.\"), and Save posts the form.",
+          "gesture": "On the visits index, click Book a visit.",
+          "outcome": "The visit form is refused where the view renders with X6.57's message, naming At's GreaterThan rule.",
+          "opposite": "Without the app's converter, the visit form renders, and picking 2026-10-27 in At and clicking Save shows \"Book a visit after November 1.\" beside At, with no request sent.",
+          "defect": "The form renders and its browser rule reads At in a form the app's converter decides and the browser cannot read as the value .NET holds, so the browser and the endpoint disagree on a visit; or the rule is left to the server in silence, so Save sends a visit dated 2026-10-27 that only the endpoint's answer refuses."
+        },
+        {
+          "for": "X6.58",
+          "page": "The residents screen's census panel on net10, a ConformanceComponent with its own text box and Raise button, whose click raises Raised with a payload whose Time, a TimeOnly, its JavaScript fills with the box's text; the handler's When orders Time before new TimeOnly(12, 0) and writes morning, Else afternoon, then writes checked into a log.",
+          "gesture": "Type 7:00 PM into the census panel's box and click Raise, then type 19:00 and click Raise.",
+          "outcome": "After 7:00 PM neither morning nor afternoon shows, the log stays empty and the console holds one error naming the text 7:00 PM; after 19:00 the line reads afternoon and the log reads checked.",
+          "opposite": "Typed 07:00 and raised, the line reads morning; typed 24:00 and raised, a time no day holds, the line reads afternoon, the log reads checked and the console holds no error.",
+          "defect": "The text read as nothing, so the Else runs, afternoon shows and the log reads checked though nothing named the text; or compared as text, so the branch runs by the letters of 7:00 PM. Or 24:00 stops the pipeline too, so with it the log stays empty."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "ReactiveArray<TElement>.AsSource() -> TypedSource<TElement[]!>!",
+          "verdict": "refused",
+          "reason": "An operation's result is a source itself (D6.10, D7.2), as the redesign's ReactiveArray already is, so a door that turns it into one is a second door for one concept; main needs it only because its ReactiveArray is no source.",
+          "carriers": [
+            "N6.1",
+            "N6.4"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.From<TPayload, TElement>(TPayload args, System.Linq.Expressions.Expression<System.Func<TPayload, TElement[]!>!>! selector) -> ReactiveArray<TElement>!",
+          "verdict": "refused",
+          "reason": "It takes the payload as a placeholder value and names its list by a lambda over it, a second read of a payload's member beside Read; a payload's list is read with Read, and the list operations extend the source Read returns, so no door starts them (D6.10).",
+          "carriers": [
+            "N5.6",
+            "N6.1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M4.F2",
+      "summary": "A list of live objects a declaration declares, held by a property or returned by a method: the item at a position, Count, Where, Select, Any, All and Find over a delegate on the item's declaration, its members required; a sum or a sort goes through Select, whose list is data in the live form.",
+      "status": "redesign-only",
+      "types": [
+        "Alis.Reactive:Objects<TItem>"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "redesign",
+          "text": "s.Element(\"zone-count\").Text.Set(thermostat.Zones.Count);",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/Thermostat/Index.cshtml:58"
+        },
+        {
+          "line": "redesign",
+          "text": "s.When(thermostat.Zones.Each(zone => zone.Name)).ArrayContains(\"Bath\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/Thermostat/Index.cshtml:59"
+        },
+        {
+          "line": "redesign",
+          "text": "var bath = p.Component<Thermostat>(m => m.Target).Zones.At(1);",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/Thermostat/Index.cshtml:161"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element(\"list-units-each\").Text.Set(p.From(list.Lines.Each(l => l.Units)).Sum(u => u));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/MedicationList/Index.cshtml:52"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(thermostat.Zones.Count().Gt(1))",
+          "doors": [
+            "N6.1",
+            "N8.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(thermostat.Zones.Any(zone => zone.Name.Eq(\"Bath\")))",
+          "doors": [
+            "N6.1",
+            "N8.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "thermostat.Zones.At(1).Boost();",
+          "doors": [
+            "N5.5",
+            "N6.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "thermostat.Zones.Find(zone => zone.Name.Eq(\"Bath\")).Target.Set(24);",
+          "doors": [
+            "N6.1",
+            "N8.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "var total = list.Lines.Select(line => line.Units).Sum(units => units);",
+          "doors": [
+            "N6.1"
+          ]
+        }
+      ],
+      "nodes": [
+        "call",
+        "fn",
+        "get",
+        "set",
+        "op",
+        "ref",
+        "lit",
+        "do",
+        "let"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/JsMembers.cs:114-148"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/JsObject.cs:139-143"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/paths.ts:13-35"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/evaluate.ts:49-54"
+        }
+      ],
+      "core": [
+        "Q1",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8"
+      ],
+      "meanings": [],
+      "oracle": "The vendor's own JavaScript array the declaration mirrors member for member (D5.3), read by ECMAScript's array members (D6.6); and .NET's list indexer and Enumerable.FirstOrDefault, whose indexer throws past the end and whose null item throws on a member read, which the stops follow.",
+      "checker": [
+        "core:Q5",
+        "core:Q6",
+        "Absence.tla:RequiredAbsentStops",
+        "Absence.tla:MissingListReadsNothing",
+        "Schema.tla:ReadsTakeNoEach"
+      ],
+      "defects": [
+        {
+          "id": "X6.1",
+          "rung": "type"
+        },
+        {
+          "id": "X6.8",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X5.13",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X4.12",
+          "rung": "analyzer"
+        },
+        {
+          "id": "M4.X4",
+          "rung": "behavior",
+          "defect": "At(n) reaches another item than the one at its position, or an item past the list's end reads nothing: a list of two zones whose At(2).Name is read, an item the list does not hold, a live object declared neither optional nor nullable, stops the pipeline, as any member of it does when it holds nothing (D5.3, D4.1), and .NET's indexer throws past the end."
+        },
+        {
+          "id": "M4.X5",
+          "rung": "refusal",
+          "defect": "A negative position reaches the plan: At(position) whose position is below zero where the view renders is refused there with \"An item's position is zero or more.\", since a path's index is a non-negative integer (D1.1); a constant one is M4.X10's, at build."
+        },
+        {
+          "id": "M4.X10",
+          "rung": "analyzer",
+          "defect": "A constant position below zero given to At compiles, where only the render refuses it (M4.X5): at build by ALIS033, new:N18.10; a position the view computes where it renders stays M4.X5's refusal."
+        },
+        {
+          "id": "M4.X6",
+          "rung": "behavior",
+          "defect": "A write through a live Find that kept no item writes nothing and the pipeline goes on, or every kept item takes it: Find(predicate) over live objects is the first item it keeps, and a member of it read, written or called when no item matched stops the pipeline (D6.9)."
+        },
+        {
+          "id": "M4.X7",
+          "rung": "behavior",
+          "defect": "Find(predicate, field) over live objects stops where no item matched, or reads the field optional: it reads nothing when no item matched, and a kept item that lacks the field's declared member stops the pipeline (D6.9, D4.1, D4.9)."
+        },
+        {
+          "id": "M4.X9",
+          "rung": "behavior",
+          "defect": "A live Select's field that reads nothing, an optional member its item lacks (D5.3), is put in its list as nothing whatever its type: a list never holds a value its item type cannot hold, so the field is null in its list when its C# type holds null and stops the pipeline when it holds none (D6.16)."
+        },
+        {
+          "id": "M4.X8",
+          "rung": "behavior",
+          "defect": "A live list's predicate that reads a member an item lacks reads it as nothing, or a live list declared nullable that holds null counts as no item: the member is required (D6.8, D4.1), so the operation stops, and the list reads nothing, so its Count() reads nothing (D6.3)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M4.X4",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Items hold two items, Hall with the value 20 and Bath with 21, each shown with its value; a button sets Items.At(1)'s Value to 24, another shows Items.At(2)'s Name in the item text, then sets the status to Read.",
+          "gesture": "Click Raise second item, then Read third item.",
+          "outcome": "Bath shows 24 and Hall keeps 20; the item text keeps its dash and the status keeps Waiting.",
+          "opposite": "A button that shows Items.At(1)'s Name sets the item text to Bath and the status to Read.",
+          "defect": "The position read as a member that reads optional, so Items.At(2)'s Name reads nothing, the item text empties and the status shows Read; or At(1) reaching the first item, so Hall shows 24."
+        },
+        {
+          "for": "M4.X5",
+          "page": "A view of the ConformanceComponent whose step shows Items.At(position).Name, where position is a local that holds -1 when the view renders.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"An item's position is zero or more.\", naming the position -1.",
+          "opposite": "With position holding 0, the page renders and the item text shows Hall.",
+          "defect": "The negative position written to the plan, so the page renders and the item text shows nothing, as JavaScript reads items[-1]."
+        },
+        {
+          "for": "M4.X6",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Items hold two inactive items, and a second ConformanceComponent beside it, census-north, whose Items hold three, the second and third active; each item shows its Value, 0 to start. Each component's Check button sets that component's status line to Checking, writes 1 into the Value of Items.Find(item => item.Active), then sets the status line to Checked.",
+          "gesture": "Click the census panel's Check.",
+          "outcome": "Both of the census panel's items keep 0, and its status line keeps Checking.",
+          "opposite": "census-north's Check shows its items' values 0, 1 and 0, and its status line shows Checked.",
+          "defect": "A write through a find that kept no item writes nothing and the pipeline goes on, so the status line shows Checked; or every kept item takes the write, so census-north's items show 0, 1 and 1."
+        },
+        {
+          "for": "M4.X7",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Items hold two inactive items, and a second ConformanceComponent beside it, census-south, whose one active item lacks the name member Item declares; each component's Ask button sets the status to Asking, shows Items.Find(item => item.Active, item => item.Name) of that component in the name text, which starts unknown, then sets the status to Asked.",
+          "gesture": "Click the census panel's Ask.",
+          "outcome": "The name text is empty and the status shows Asked.",
+          "opposite": "census-south's Ask leaves the name text unknown and the status at Asking.",
+          "defect": "A find that keeps no item stopping the pipeline, so the status keeps Asking; or the field read optional, so census-south's Ask empties the name text and sets the status to Asked."
+        },
+        {
+          "for": "M4.X9",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Items hold three items, one lacking OptionalScore, which Item declares optional: true and types int; a button sets the status to Counting, shows Items.Select(item => item.OptionalScore).Count() in the count, which starts at a dash, then sets the status to Counted.",
+          "gesture": "Click Count.",
+          "outcome": "The count keeps its dash and the status keeps Counting.",
+          "opposite": "Over the same items, the third also lacking OptionalCount, which Item types int?, Items.Select(item => item.OptionalCount).Count() shows 3, and Items.Select(item => item.OptionalCount).Count(count => count == null) shows 1.",
+          "defect": "The missing score put in the list as nothing, so the count shows 3 and the status Counted."
+        },
+        {
+          "for": "M4.X8",
+          "page": "A ConformanceComponent beside the census panel, census-north, whose second item lacks the active member Item declares, and the census panel, the residents screen's ConformanceComponent, whose NullableItems, a LiveObjects<Item> declared nullable, holds null; each component's Count button sets the status to Counting, shows census-north's Items.Count(item => item.Active) or the census panel's NullableItems.Count() in the count, which starts at a dash, then sets the status to Counted.",
+          "gesture": "Click census-north's Count.",
+          "outcome": "The count keeps its dash and the status keeps Counting.",
+          "opposite": "The census panel's Count, its NullableItems holding null, empties the count and sets the status to Counted.",
+          "defect": "The member the item lacks read as nothing, so the count shows 1 and the status Counted; or the null list counted as no item, so the census panel's count shows 0."
+        }
+      ],
+      "verdicts": []
+    }
+  ]
+}

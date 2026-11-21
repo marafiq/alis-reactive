@@ -1,0 +1,13 @@
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.ModuleTests.Tracing
+@using Microsoft.AspNetCore.Html
+@model Round
+@{
+    var plan = Html.ReactivePlan<Round>();
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("round-status").Text.Set("begun")));
+    plan.Plugin<WardBell>().Reactive(bell => bell.Rung, pipeline => pipeline.Element("round-status").Text.Set("rung"));
+}
+<p id="round-status"></p>
+@(plan.Render<RoundButton>("round-done", new HtmlString("<button id=\"round-done\" type=\"button\">Done</button>")).Reactive(button => button.Pressed, pipeline => pipeline.Element("round-status").Text.Set("done")))
+@Html.RenderPlan(plan)

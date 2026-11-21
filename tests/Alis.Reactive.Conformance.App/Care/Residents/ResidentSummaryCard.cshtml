@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentSummaryCard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident summary";
+    var plan = Html.ReactivePlan<ResidentSummaryCard>();
+}
+<h1>Resident summary of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, ResidentSummaryCards.Load)>Load summary</button>
+<p>Resident: <span id="resident-card">-</span></p>
+<p>Error: <span id="summary-error"></span></p>
+<p>Status: <span id="summary-status">Waiting</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentSummaryCards.Load, pipeline => pipeline
+        .Get(ResidentSummaryCardEndpoints.Summary)
+        .NoRetry()
+        .OnSuccess<ResidentCardSummary>((summary, pipeline) => pipeline.Element("resident-card").Text.Set(summary.Body.Read(card => card.Resident)))
+        .OnError((failed, pipeline) => pipeline.Element("summary-error").Text.Set("Offline"))
+        .Finally(pipeline => pipeline.Element("summary-status").Text.Set("Done"))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,32 @@
+@using Alis.Reactive.Poc.App.Admissions
+@model IntakeForm
+@{
+    ViewData["Title"] = "Resident finder";
+    var plan = Html.ReactivePlan<IntakeForm>();
+}
+<h1>Resident finder</h1>
+<p>Type a name and press Tab, then answer or fail the lookup. Helen Park has a wing on record, Sam Park has none, and anyone else is not on the register.</p>
+
+@(Html.InputField(plan, m => m.ResidentName).ResidentFinder("Find a resident")
+    .Reactive(finder => finder.Looked, (looked, pipeline) =>
+    {
+        pipeline.Element("finder-term").Text.Set(looked.Term);
+        pipeline.Element("finder-outcome").Text.Set("Looking up");
+        var count = looked.Count();
+        pipeline.Element("match-count").Text.Set(count.Eq(1).Choose("one", "none"));
+        var match = looked.Match();
+        pipeline.Element("match-name").Text.Set(match.Read(found => found!.Name));
+        pipeline.Element("match-room").Text.Set(match.Read(found => found!.Room));
+        pipeline.Element("match-wing").Text.Set(match.Read(found => found!.Wing!.Name).OrNull().IfNull("no wing on record"));
+        pipeline.When(count.Eq(0))
+            .Then(none => none.Element("finder-outcome").Text.Set("Not on the register"))
+            .Else(found => found.Element("finder-outcome").Text.Set("Found"));
+    }))
+
+<p>Looked up: <strong id="finder-term">nothing yet</strong></p>
+<p>Outcome: <strong id="finder-outcome">idle</strong></p>
+<p>Matches: <strong id="match-count">-</strong></p>
+<p>Name: <strong id="match-name">-</strong>, room <strong id="match-room">-</strong></p>
+<p>Wing: <strong id="match-wing">-</strong></p>
+
+@Html.RenderPlan(plan)

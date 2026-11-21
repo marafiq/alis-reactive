@@ -1,0 +1,17 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PlannedRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The round against its plan";
+    var plan = Html.ReactivePlan<PlannedRound>();
+}
+<h1>@Model.Name round against its plan</h1>
+<p>Doses that went as planned: <span id="count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(ArrayLambdaEndpoints.PlannedDoses)
+        .OnSuccess<List<PlannedDose>>((doses, pipeline) => pipeline.Element("count").Text.Set(doses.Body.Count(d => d.Status == d.Planned)))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedSpotMoveDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Bed move";
+    var plan = Html.ReactivePlan<BedSpotMoveDesk>();
+}
+<h1>Bed move of @Model.Resident</h1>
+<p>Answer: <span id="moved">-</span></p>
+<button type="button" @Html.Raises(plan, BedSpotMoves.Move)>Move the bed</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BedSpotMoves.Move, pipeline => pipeline.Get(Model.Bed)
+        .OnSuccess<BedSpotMoveReply>((found, pipeline) => pipeline
+            .Post<BedSpotMoveSent>(BedSpotMoves.Moved, request => request.Json(body => body.Set(r => r.Spot, found.Body.Read(reply => reply.Bed!.Spot))))
+            .OnSuccess(Content.Text, (moved, pipeline) => pipeline.Element("moved").Text.Set(moved.Body)))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DeputyNamelessAppointment
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Deputy";
+    var plan = Html.ReactivePlan<DeputyNamelessAppointment>();
+}
+<h1>Deputy</h1>
+@using (var appointment = Html.BeginRequestForm(plan, "deputy-appointment"))
+{
+    <fieldset>
+        <legend>Phone</legend>
+        @(Html.InputField(plan, m => m.Deputy!.Phone, options => options.Label("Phone")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-deputy", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<DeputyNamelessAppointment>(DeputyAppointmentEndpoints.NamelessAppointments, request => request.Form(appointment.Form))
+        .Validate<DeputyNamelessAppointmentRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

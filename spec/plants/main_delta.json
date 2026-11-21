@@ -1,0 +1,68 @@
+[
+ {
+  "name": "a main-tip sentence without its SHA",
+  "edits": [
+   {
+    "file": "spec/NativeAppLevelObjects/features.json",
+    "old": "\"sha\": \"7b9e987cc3b9991c1107aa782bc3f6e8486968f9\",\n          \"text\": \"unloadPartialSlot(CONTENT_ID);\",\n          \"cite\": \"Alis.Reactive.Assets/runtime/components/native/drawer.ts:26\"",
+    "new": "\"text\": \"unloadPartialSlot(CONTENT_ID);\",\n          \"cite\": \"Alis.Reactive.Assets/runtime/components/native/drawer.ts:26\""
+   }
+  ],
+  "expect": "Alis.Reactive.Assets/runtime/components/native/drawer.ts changed on main from 623dd4a27 to 7b9e987cc and no sentence cites it there"
+ },
+ {
+  "name": "a main-tip sentence citing another file",
+  "edits": [
+   {
+    "file": "spec/NativeAppLevelObjects/features.json",
+    "old": "\"sha\": \"7b9e987cc3b9991c1107aa782bc3f6e8486968f9\",\n          \"text\": \"unloadPartialSlot(CONTENT_ID);\",\n          \"cite\": \"Alis.Reactive.Assets/runtime/components/native/drawer.ts:26\"",
+    "new": "\"sha\": \"7b9e987cc3b9991c1107aa782bc3f6e8486968f9\",\n          \"text\": \"unloadPartialSlot(CONTENT_ID);\",\n          \"cite\": \"Alis.Reactive.Assets/runtime/components/native/toast.ts:26\""
+   }
+  ],
+  "expect": "Alis.Reactive.Assets/runtime/components/native/drawer.ts changed on main from 623dd4a27 to 7b9e987cc and no sentence cites it there"
+ },
+ {
+  "name": "a main-tip verdict without its SHA",
+  "edits": [
+   {
+    "file": "spec/FusionAppLevelObjects/features.json",
+    "old": "\"door\": \"FusionToastExtensions.SetTitle<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> title)\",\n          \"sha\": \"7b9e987cc3b9991c1107aa782bc3f6e8486968f9\",",
+    "new": "\"door\": \"FusionToastExtensions.SetTitle<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> title)\","
+   }
+  ],
+  "expect": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs: SetTitle, added on main by 7b9e987cc, has no verdict at that SHA"
+ },
+ {
+  "name": "a main-tip verdict naming another member",
+  "edits": [
+   {
+    "file": "spec/FusionComponents/features.json",
+    "old": "\"door\": \"FusionScheduleExtensions.CloseTooltip<TModel>()\",",
+    "new": "\"door\": \"FusionScheduleExtensions.CloseTooltips<TModel>()\","
+   }
+  ],
+  "expect": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs: CloseTooltip, added on main by 7b9e987cc, has no verdict at that SHA"
+ },
+ {
+  "name": "two main-tip verdicts in another order",
+  "edits": [
+   {
+    "file": "spec/FusionAppLevelObjects/features.json",
+    "old": "        {\n          \"door\": \"FusionToastExtensions.SetTitle<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> title)\",\n          \"sha\": \"7b9e987cc3b9991c1107aa782bc3f6e8486968f9\",\n          \"verdict\": \"renamed\",\n          \"to\": [\n            \"M23.N1\",\n            \"M12.N2\"\n          ]\n        },\n        {\n          \"door\": \"FusionToastExtensions.SetContent<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> content)\",\n          \"sha\": \"7b9e987cc3b9991c1107aa782bc3f6e8486968f9\",\n          \"verdict\": \"renamed\",\n          \"to\": [\n            \"M23.N1\",\n            \"M12.N2\"\n          ]\n        }\n",
+    "new": "        {\n          \"door\": \"FusionToastExtensions.SetContent<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> content)\",\n          \"sha\": \"7b9e987cc3b9991c1107aa782bc3f6e8486968f9\",\n          \"verdict\": \"renamed\",\n          \"to\": [\n            \"M23.N1\",\n            \"M12.N2\"\n          ]\n        },\n        {\n          \"door\": \"FusionToastExtensions.SetTitle<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> title)\",\n          \"sha\": \"7b9e987cc3b9991c1107aa782bc3f6e8486968f9\",\n          \"verdict\": \"renamed\",\n          \"to\": [\n            \"M23.N1\",\n            \"M12.N2\"\n          ]\n        }\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a main-tip verdict's door spelled with its receiver",
+  "edits": [
+   {
+    "file": "spec/FusionComponents/features.json",
+    "old": "\"door\": \"FusionScheduleExtensions.CloseTooltip<TModel>()\",",
+    "new": "\"door\": \"FusionScheduleExtensions.CloseTooltip<TModel>(this ComponentRef<FusionSchedule, TModel> schedule)\","
+   }
+  ],
+  "expect": null
+ }
+]

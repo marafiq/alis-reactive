@@ -1,0 +1,27 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentTimeline
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Timeline";
+    var plan = Html.ReactivePlan<ResidentTimeline>();
+}
+<h1>Timeline of @Model.Resident</h1>
+<p>Visits: <span id="timeline-visits">-</span></p>
+<p>Seen: <span id="timeline-seen">-</span></p>
+<p>Stays: <span id="timeline-stays">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(ResidentTimelineEndpoints.Entries)
+        .OnSuccess<TimelineEntries>((timeline, pipeline) =>
+        {
+            var visits = timeline.Body.Read(entries => entries.Visits);
+            pipeline.Element("timeline-visits").Text.Set(Model.LatestVisitFirst
+                ? visits.OrderByDescending(v => v.At).Select(v => v.Label)
+                : visits.OrderBy(v => v.At).Select(v => v.Label));
+            pipeline.Element("timeline-seen").Text.Set(timeline.Body.Read(entries => entries.Sightings).OrderBy(s => s.Seen).Select(s => s.Label));
+            pipeline.Element("timeline-stays").Text.Set(timeline.Body.Read(entries => entries.Stays).OrderByDescending(s => s.Length).Select(s => s.Label));
+        })));
+}
+@Html.RenderPlan(plan)

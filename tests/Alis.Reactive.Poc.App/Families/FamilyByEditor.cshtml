@@ -1,0 +1,17 @@
+@using Alis.Reactive.Poc.App.Families
+@model FamilyForm
+@{
+    ViewData["Title"] = "Family";
+    var plan = Html.ReactivePlan<FamilyForm>();
+}
+<h1>Family</h1>
+
+@Html.EditorFor(m => m.NextOfKin)
+
+@(plan.Button("preview-family", "Preview the family card")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("card-kin").Text.Set(pipeline.Input(m => m.NextOfKin.Name).Component<NativeTextBox>().Value)))
+
+<p>Next of kin: <strong id="card-kin">no preview</strong></p>
+
+@Html.RenderPlan(plan)

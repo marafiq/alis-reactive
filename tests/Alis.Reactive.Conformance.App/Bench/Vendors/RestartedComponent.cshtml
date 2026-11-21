@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RestartedComponentBoard
+@{
+    Layout = "/Bench/Vendors/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<RestartedComponentBoard>();
+}
+<h1>The bench</h1>
+<dl>
+    <dt>@Model.Caption</dt>
+    <dd id="heard"></dd>
+    <dt>Listeners removed</dt>
+    <dd id="off-calls"></dd>
+</dl>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { OffCalls = "off-calls" }))
+<button type="button" @Html.Raises(plan, RestartedComponentButtons.OpenTheSlot)>Open the slot</button>
+<button type="button" @Html.Raises(plan, RestartedComponentButtons.CloseTheSlot)>Close the slot</button>
+<section id="holder" aria-label="Holder"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(RestartedComponentButtons.OpenTheSlot, pipeline => pipeline.Get(VendorSlotCards.RaisesHolder).Into("holder"))
+        .CustomEvent(RestartedComponentButtons.CloseTheSlot, pipeline => pipeline.Unload("holder")));
+}
+@Html.RenderPlan(plan)

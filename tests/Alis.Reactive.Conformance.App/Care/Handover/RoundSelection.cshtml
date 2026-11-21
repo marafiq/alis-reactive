@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundResidents
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Round";
+    var plan = Html.ReactivePlan<RoundResidents>();
+}
+<h1>Round</h1>
+@(Html.FusionListView(plan, "round-residents", build => build.DataSource(Model.Residents)))
+<button type="button" @Html.Raises(plan, RoundSelections.SelectLena)>Select Lena</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RoundSelections.SelectLena, pipeline => pipeline
+        .Component<FusionListView>("round-residents").SelectItem<RoundEntry>(new RoundEntry("lena", "Lena Ortiz"))));
+}
+@Html.RenderPlan(plan)

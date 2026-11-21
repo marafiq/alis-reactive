@@ -1,0 +1,19 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusCodes
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents";
+    var plan = Html.ReactivePlan<CensusCodes>();
+}
+<h1>Residents</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Records = Model.Records }))
+<p>Records in C0: <span id="c0-count">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("c0-count").Text.Set(
+        pipeline.Component<ConformanceComponent>("census").Records.Select(r => r.Code).Count(code => code == "C0"))));
+}
+@Html.RenderPlan(plan)

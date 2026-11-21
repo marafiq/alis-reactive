@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Schedule
+@model RotaWeekShifts
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Shift rota";
+    var plan = Html.ReactivePlan<RotaWeekShifts>();
+}
+<h1>Shift rota</h1>
+@(Html.FusionSchedule(plan, "shift-rota", build => build.CurrentView(View.Week).SelectedDate(Model.SelectedDate))
+    .Reactive(rota => rota.Navigating, (moving, pipeline) => pipeline
+        .Post<RotaWeekQuery>(RotaWeekShiftsEndpoints.Shifts, request => request.Json(body => body.Set(week => week.CurrentDate, moving.CurrentDate)))
+        .OnSuccess(Content.Text, (shifts, pipeline) => pipeline.Element("week-shifts").Text.Set(shifts.Body))))
+<p>Shifts: <output id="week-shifts">This week</output></p>
+@Html.RenderPlan(plan)

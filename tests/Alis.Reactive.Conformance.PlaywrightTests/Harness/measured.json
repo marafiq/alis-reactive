@@ -1,0 +1,41 @@
+{
+  "budgetSeconds": 7.44,
+  "slowestSeconds": 1.86,
+  "slowest": "Alis.Reactive.Conformance.PlaywrightTests.RequestsAndResponses.WhenACondensedRequestIsRefusedWithErrors(\"net10\").the_defaults_show_each_error_at_the_requests_own_form",
+  "actionWaitMilliseconds": 740,
+  "slowestActionMilliseconds": 185,
+  "slowestAction": "Frame.expect in Alis.Reactive.Conformance.PlaywrightTests.NativeAppLevelObjects.WhenTheRoundsStreamGivesUp(\"net10\").the_offer_shows_the_apps_words_beside_its_reconnect_button",
+  "navigationWaitMilliseconds": 704,
+  "slowestNavigationMilliseconds": 176,
+  "slowestNavigation": "Frame.goto in Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenACoordinatorAsksForAnAllocationReview(\"net10\").a_bed_taken_since_it_was_listed_shows_who_holds_it_and_no_review_is_kept",
+  "runs": 20,
+  "tests": 499,
+  "selection": "core",
+  "measuredOn": "2026-11-18",
+  "machine": "Apple M2 Max, Darwin 27.2.0",
+  "budgetAtOnce": 1,
+  "testsAtOnce": 1,
+  "wallSeconds": {
+    "1": 26.96,
+    "2": 22,
+    "4": 22.93,
+    "8": 22.54
+  },
+  "fusion": {
+    "budgetSeconds": 11.04,
+    "slowestSeconds": 2.76,
+    "slowest": "Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenAMultiSelectsTextFieldIsRead(\"net10\").the_text_field_is_the_name_the_apps_json_gives_the_member",
+    "actionWaitMilliseconds": 3200,
+    "slowestActionMilliseconds": 800,
+    "slowestAction": "Frame.expect in Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenAMultiSelectsFilteringAnswersAfterARequest(\"net10\").the_list_shows_the_items_the_endpoint_answered",
+    "navigationWaitMilliseconds": 2024,
+    "slowestNavigationMilliseconds": 506,
+    "slowestNavigation": "Frame.goto in Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenAMultiSelectsValuesAreSent(\"net10\").the_endpoint_binds_the_codes_the_box_holds",
+    "runs": 20,
+    "tests": 32,
+    "selection": "U25",
+    "measuredOn": "2026-11-17",
+    "machine": "Apple M2 Max, Darwin 27.2.0",
+    "budgetAtOnce": 1
+  }
+}

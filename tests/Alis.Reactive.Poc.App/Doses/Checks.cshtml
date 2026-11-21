@@ -1,0 +1,44 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Dose checks";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Dose checks</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-checked-by-their-carer", "Count doses their carer also checked")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Carer != null && d.Checks.Any(c => c.Name == d.Carer.Name)))))
+
+@(plan.Button("count-checked-by-kofi", "Count doses Kofi checked")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Checks.Any(c => c.Name == "Kofi")))))
+
+@(plan.Button("count-not-checked-by-kofi", "Count doses Kofi did not check")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Checks.All(c => c.Name != "Kofi")))))
+
+@(plan.Button("count-checked-twice", "Count doses checked more than once")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Checks.Count() > 1))))
+
+@(plan.Button("count-checked", "Count doses anyone checked")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Checks.Any()))))
+
+@(plan.Button("count-checked-once-without-kofi", "Count doses checked once by someone other than Kofi")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Checks.Count(c => c.Name != "Kofi") == 1))))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,61 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model DepositPage
+@{
+    var plan = Html.ReactivePlan<DepositPage>();
+    void Receipt(Response<DepositPage, PaymentReply> paid, Pipeline<DepositPage> pipeline)
+    {
+        pipeline.Element("deposit-receipt").Text.Set(paid.Body.Read(r => r.Deposit.Receipt.ReceiptId));
+        pipeline.Element("deposit-status").Text.Set(pipeline.Concat("Deposit authorised: ", paid.Headers.Get(MoveInEndpoints.PaidAmount), " ", paid.Body.Read(r => r.Deposit.Receipt.Currency), ", card ending ", paid.Body.Read(r => r.Deposit.Receipt.LastFour)));
+        pipeline.Element("deposit-balance").Text.Set(pipeline.Concat(paid.Headers.Get(MoveInEndpoints.BalanceDue), " USD due"));
+        pipeline.Element("deposit-readiness").Text.Set(paid.Body.Read(r => r.Deposit.Balance.Satisfied).Choose("Deposit satisfied", "Deposit outstanding"));
+    }
+}
+<p id="deposit-required">@FormattableString.Invariant($"{Model.RequiredAmount:0.00} USD required")</p>
+<p id="deposit-on-file">@Reads.DepositOnFile(Model.DraftId)</p>
+@using (var deposit = Html.BeginRequestContainer(plan, "deposit"))
+{
+    @(Html.NativeHiddenField(plan, m => m.DraftId))
+    @(Html.NativeHiddenField(plan, m => m.OperationId))
+    @(Html.NativeHiddenField(plan, m => m.RequiredAmount))
+    @(Html.NativeHiddenField(plan, m => m.Currency))
+    @(Html.InputField(plan, m => m.Cardholder, o => o.Label("Cardholder")).NativeTextBox())
+    @(Html.InputField(plan, m => m.CardNumber, o => o.Label("Card number")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Amount, o => o.Label("Deposit amount")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Consent, o => o.Label("I authorise this deposit")).NativeCheckBox())
+    @(Html.NativeButton("pay-deposit", "Authorise deposit").Reactive(plan, b => b.Click, (clicked, pipeline) => pipeline
+        .Post<DepositPage>(MoveInEndpoints.Deposits, request => request
+            .Path(m => m.DraftId, deposit.Container.Read(m => m.DraftId))
+            .Header(MoveInEndpoints.CoordinatorHeader, pipeline.Container<MoveInPage>("move-in").Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, deposit.Container.Read(m => m.OperationId))
+            .Json(deposit.Container, body => { }))
+        .Busy("pay-deposit").Validate<DepositRules>()
+        .WhileLoading(pipeline =>
+        {
+            pipeline.Element("deposit-progress").Text.Set("Submitting deposit");
+            pipeline.Element("deposit-status").Text.Set("Authorising deposit");
+        })
+        .OnSuccess<PaymentReply>(Receipt)
+        .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+        .OnError<ErrorEnvelope>(402, (refused, pipeline) => pipeline.Element("deposit-status").Text.Set(refused.Body.Read(r => r.Error.Message)))
+        .OnError<ErrorEnvelope>(409, (refused, pipeline) => pipeline.Element("deposit-status").Text.Set(refused.Body.Read(r => r.Error.Message)))
+        .OnError((failed, pipeline) => pipeline.Element("deposit-status").Text.Set("Deposit outcome unknown"))
+        .Finally(pipeline => pipeline.Element("deposit-progress").Text.Set("Ready"))))
+    @(Html.NativeButton("read-deposit", "Look up deposit").Reactive(plan, b => b.Click, (clicked, pipeline) => pipeline
+        .Get<DepositPage>(MoveInEndpoints.DepositReceipt, request => request
+            .Query(m => m.DraftId, deposit.Container.Read(m => m.DraftId))
+            .Query(m => m.OperationId, deposit.Container.Read(m => m.OperationId)))
+        .NoBusy().NoValidation().OnSuccess<PaymentReply>(Receipt)
+        .OnError<ErrorEnvelope>(404, (missing, pipeline) => pipeline.Element("deposit-status").Text.Set(missing.Body.Read(r => r.Error.Message)))))
+}
+<p id="deposit-progress">Ready</p>
+<p id="deposit-status"></p>
+<p id="deposit-receipt"></p>
+<p id="deposit-balance"></p>
+<p id="deposit-readiness"></p>
+@Html.RenderPlan(plan)

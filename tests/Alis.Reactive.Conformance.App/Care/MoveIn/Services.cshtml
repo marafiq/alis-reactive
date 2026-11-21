@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.RenderingAndDelivery
+@inject MoveInReads Reads
+@model ServiceInput
+@{
+    var plan = Html.ReactivePlan<ServiceInput>();
+    var catalogue = Reads.ServiceChoices();
+}
+@(Html.InputField(plan, m => m.Codes, o => o.Label("Services to price"))
+    .NativeCheckList(list => list.Items(catalogue.Select(s => new CheckListItem(s.Code, s.Name))))
+    .Reactive(list => list.Change, (changed, pipeline) => pipeline.Dispatch(QuoteEvents.ServicesEdited)))
+@for (var index = 0; index < Model.Visits.Count; index++)
+{
+    var at = index;
+    var visit = Model.Visits[at];
+    <fieldset>
+        <legend>@visit.Code visits</legend>
+        @(Html.NativeHiddenField(plan, m => m.Visits[at].Code))
+        @(Html.InputField(plan, m => m.Visits[at].Count, o => o.Label("Visits")).NativeTextBox().Reactive(field => field.Change, (changed, pipeline) => pipeline.Dispatch(QuoteEvents.ServicesEdited)))
+        @(Html.InputField(plan, m => m.Visits[at].Active, o => o.Label("Active visits")).NativeCheckBox().Reactive(field => field.Change, (changed, pipeline) => pipeline.Dispatch(QuoteEvents.ServicesEdited)))
+    </fieldset>
+}
+@foreach (var service in catalogue)
+{
+    <p>@service.Name capacity: <span id="@(service.Code == "TRA" ? "transport-capacity" : "capacity-" + service.Code)">@service.Capacity</span></p>
+}
+@Html.RenderPlan(plan)

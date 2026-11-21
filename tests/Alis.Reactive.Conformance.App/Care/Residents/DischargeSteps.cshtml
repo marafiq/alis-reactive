@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DischargeSteps
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Discharge steps";
+    var plan = Html.ReactivePlan<DischargeSteps>();
+    var residents = plan.Rows<ResidentRow>("residents");
+    var ready = residents.NativeActionButton((activated, pipeline) => pipeline
+        .Post<DischargeRequest>(CareEndpoints.ResidentDischarge, request => request.Path(discharged => discharged.ResidentId, activated.Row.Read(row => row.Id)))
+        .OnSuccess(Content.Json<DischargeAnswer>(), (answer, pipeline) => activated.Element.Classes.Add("ready")));
+    var notify = residents.NativeActionButton((activated, pipeline) => pipeline
+        .Post<DischargeRequest>(CareEndpoints.ResidentDischarge, request => request.Path(discharged => discharged.ResidentId, activated.Row.Read(row => row.Id)))
+        .OnSuccess(Content.Json<DischargeAnswer>(), (answer, pipeline) => activated.Element.Text.Append(" sent")));
+    var discharge = residents.NativeActionButton((activated, pipeline) => pipeline
+        .Post<DischargeRequest>(CareEndpoints.ResidentDischarge, request => request.Path(discharged => discharged.ResidentId, activated.Row.Read(row => row.Id)))
+        .OnSuccess(Content.Json<DischargeAnswer>(), (answer, pipeline) => activated.Element.Hide()));
+}
+<h1>Discharge steps</h1>
+<ul aria-label="Residents">
+    @foreach (var resident in Model.Residents)
+    {
+        <li aria-label="@resident.Name">@resident.Name @ready.Render(resident, "Ready") @notify.Render(resident, "Notify") @discharge.Render(resident, "Discharge")</li>
+    }
+</ul>
+@Html.RenderPlan(plan)

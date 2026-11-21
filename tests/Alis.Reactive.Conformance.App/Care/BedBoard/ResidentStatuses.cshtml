@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model ResidentStatuses
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident board";
+    var plan = Html.ReactivePlan<ResidentStatuses>();
+    var columns = FusionGridColumns.Of<StatusedResident>();
+    var status = FusionTemplate.Create<StatusedResident>()
+        .When(m => m.Status == "Active", then: t => t.Badge(m => m.Status, "e-badge"), @else: e => e.Span("Away"))
+        .Render(plan);
+}
+<h1>Resident board</h1>
+@(Html.FusionGrid(plan, "resident-statuses", Model.Residents, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.Name), HeaderText = "Name" },
+        new() { HeaderText = "Status", Template = status },
+    })))
+@Html.RenderPlan(plan)

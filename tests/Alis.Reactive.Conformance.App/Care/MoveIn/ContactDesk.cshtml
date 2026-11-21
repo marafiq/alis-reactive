@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+<div id="contact-rows">
+    @await Html.PartialAsync("/Care/MoveIn/ContactRows.cshtml", Model)
+</div>
+@(Html.NativeButton("save-contacts", "Save contacts").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(MoveInDraftEvents.Command, pipeline.Object<DraftCommand>(command => command
+    .Set(sent => sent.Kind, DraftCommandKind.SaveContacts)
+    .Set(sent => sent.Version, pipeline.Container<MoveInPage>("move-in").Read(m => m.Version))))))
+<p id="contacts-status"></p>
+<p id="contacts-refusal"></p>
+<div id="payer-explanation"></div>
+<div id="authority-on-file"></div>
+@await Html.PartialAsync("/Care/MoveIn/NewContact.cshtml", Reads.NewContact())
+@Html.RenderPlan(plan)

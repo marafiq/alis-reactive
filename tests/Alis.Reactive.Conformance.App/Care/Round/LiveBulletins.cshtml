@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveRound
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveRound>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+<p>Bulletins: <span id="bulletins">0</span></p>
+<p>All clear: <span id="all-clear"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .ServerPush(WardBoardStream.Live, board => board.Bulletin, (bulletin, pipeline) => pipeline.Element("bulletins").Text.Set("1"))
+        .ServerPush(WardBoardStream.Live, board => board.AllClear, (allClear, pipeline) => pipeline.Element("all-clear").Text.Set("clear")));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,23 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BindingConstructorsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Bindings";
+    var plan = Html.ReactivePlan<BindingConstructorsBoard>();
+}
+<h1>Bindings</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Bindings = Model.Bindings }))
+<button type="button" @Html.Raises(plan, BindingConstructorButtons.CountTheBindingsWithNoConstructor)>Count the bindings with no constructor</button>
+<dl>
+    <dt>Bindings with no constructor</dt>
+    <dd id="constructor-count"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BindingConstructorButtons.CountTheBindingsWithNoConstructor, pipeline
+        => pipeline.Element("constructor-count").Text.Set(pipeline.Component<ConformanceComponent>("conformance").Bindings.Count(binding => binding.Constructor == null))));
+}
+@Html.RenderPlan(plan)

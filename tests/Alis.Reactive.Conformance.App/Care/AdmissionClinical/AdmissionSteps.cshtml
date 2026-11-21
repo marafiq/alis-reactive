@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Navigations
+@model AdmissionProgress
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission steps";
+    var plan = Html.ReactivePlan<AdmissionProgress>();
+}
+<h1>Admission steps</h1>
+@(Html.FusionStepper(plan, "admission-steps", build => build
+    .Steps([new Step { Label = "Details" }, new Step { Label = "Medications" }, new Step { Label = "Room" }])
+    .ActiveStep(Model.ActiveStep)))
+<button type="button" @Html.Raises(plan, AdmissionStepChecks.WhichStep)>Which step</button>
+<p>Step: <output id="step-shown">No step</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(AdmissionStepChecks.WhichStep, pipeline => pipeline
+        .Element("step-shown").Text.Set(pipeline.Component<FusionStepper>("admission-steps").ActiveStep)));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model CareNoteRecord
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident record";
+    var plan = Html.ReactivePlan<CareNoteRecord>();
+}
+<h1>Resident record</h1>
+@(Html.InputField(plan, m => m.CareNotes, options => options.Label("Care notes")).NativeTextArea())
+@Html.RenderPlan(plan)

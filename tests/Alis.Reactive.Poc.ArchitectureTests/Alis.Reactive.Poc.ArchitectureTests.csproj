@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NUnit" Version="4.6.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
+  </ItemGroup>
+
+  <Target Name="WriteTheCoresReferences" AfterTargets="FindReferenceAssembliesForReferences">
+    <ItemGroup>
+      <CoreReference Include="@(ReferencePathWithRefAssemblies->WithMetadataValue('FrameworkReferenceName', 'Microsoft.NETCore.App'))" />
+      <CoreReference Include="@(ReferencePathWithRefAssemblies->WithMetadataValue('FrameworkReferenceName', 'Microsoft.AspNetCore.App'))" />
+    </ItemGroup>
+    <MakeDir Directories="$(OutDir)" />
+    <WriteLinesToFile File="$(OutDir)core-references.txt" Lines="@(CoreReference)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
+</Project>

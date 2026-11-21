@@ -1,0 +1,5 @@
+[*.cs]
+dotnet_diagnostic.CA1716.severity = none
+
+[**/obj/**.cs]
+dotnet_diagnostic.RS0030.severity = none
