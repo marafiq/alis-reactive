@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Fri Nov 20 17:53:50 EST 2026
+Written at `date`: Sat Nov 21 02:43:23 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -28,6 +28,9 @@ note: open 2026-11-19 | direction | the queue of this file | queue | "i would be
 note: open 2026-11-19 | direction | the queue of this file | queue | "showspinner of compobox and hide when it succed" 
 note: open 2026-11-19 | direction | the queue of this file | queue | "use this as refereces to the skill so it works" a
 note: open 2026-11-19 | direction | the queue of this file | queue | "lets onboard datamanager only for combobox and le
+note: open 2026-11-20 | direction | the queue of this file | queue | "please priortise framework over mvc5 or other. Fr
+note: open 2026-11-20 | direction | the queue of this file | queue | "If you image if i decide to onboard *IF* TanStack
+note: open 2026-11-20 | direction | the queue of this file | queue | "new session will re-discover, bring concrete and 
 unit: ready ../ci-tlc-cold SpecCiCold
   next: scripts/land-unit.sh ../ci-tlc-cold 2ab0d5f00 "Publish independent TLC baselines for spec CI" ".landing/SpecCiCold"
   leaves by: `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed
@@ -63,6 +66,8 @@ unit: returned ../fusion-combobox-onboarding-replay FusionComboBoxOnboardingRepl
 unit: ready ../fusion-combobox-payload FusionComboBoxPayload
   next: scripts/land-unit.sh ../fusion-combobox-payload 9c77fd7d8 "Prove typed ComboBox changes on Helen Martinez's communication plan" ".landing/FusionComboBoxPayload"
 unit: returned ../fusion-combobox-server-search FusionComboBoxServerSearch: reply.md waits for read.md
+unit: unbriefed ../fusion-form-builder FusionFormBuilder: its Rules name AGENTS.md/CLAUDE.md, which the worktree lacks
+unit: unbriefed ../fusion-query-builder FusionQueryBuilder: its Rules name AGENTS.md/CLAUDE.md, which the worktree lacks
 unit: ready ../movein-availability MoveInAvailability
   next: scripts/land-unit.sh ../movein-availability 6a418dc64 "MI.18.5, MI.20 and MI.21. Publish the world's bed changes to independently owned page and card streams. A held response checks current community access and preserves a newer displayed revision and holder. Reconnect re-reads the bed; the retry offer remains until every failed owner recovers or leaves." ".landing/MoveInAvailability"
 unit: ready ../movein-contacts MoveInContacts
@@ -99,12 +104,13 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: pushed at 16bafe33d on feature/rewrite: equal to the remote
-  leaves by: the landing of a unit that is ready
-  read first: the queue of `HANDOFF.md`
-  exit line: "landed"
-  goes to: lane: landed
-ci: unread at 16bafe33d
+unit: unbriefed ../tanstack-charts TanStackCharts: its Rules name /SKILL.md, Components/ConformanceComponent/ConformanceComponentHtml.cs, Care/Admission/RoomChoice.cshtml, which the worktree lacks
+unit: unbriefed ../tanstack-table TanStackTable: its Rules name Care/Residents/ResidentDischarges.cshtml, Care/Round/LeastDoseRoundController.cs, Care/MoveIn/PayerDesk.cshtml, which the worktree lacks
+lane: checking at c85faeceb on feature/rewrite
+  leaves by: the last line `scripts/full-check.sh` prints
+  exit line: "spec check at" its commit
+  goes to: lane: checked
+ci: unread at c85faeceb
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -112,11 +118,11 @@ file: over CLAUDE.md: holds 338 lines, its limit 200
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over spec/CLAUDE.md: holds 2080 lines, its limit 150
-file: over HANDOFF.md: holds 865 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2081 lines, its limit 150
+file: over HANDOFF.md: holds 890 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 33 units have landed since .claude/rules/process.md last changed
+machine: review due : 34 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -124,13 +130,13 @@ machine: review due : 33 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 16bafe33d Preserve saved DateTime values in Native textboxes
-- Full check: .work/logs/spec-check-16bafe33d.log: spec check at 16bafe33d: 40 of 40 checks pass
-- .work/last-run.txt: 20261120-174004-48382 16bafe33d
+- HEAD: c85faeceb Record the parked browser validation follow-up
+- Full check: .work/logs/spec-check-c85faeceb.log: spec check at c85faeceb: 40 of 40 checks pass
+- .work/last-run.txt: 20261121-023017-9498 c85faeceb
 
 ## Landed since the commit before the last spec: STATE commit
-16bafe33d Preserve saved DateTime values in Native textboxes
-1733be893 spec: STATE and handoff at 76452da4c
+c85faeceb Record the parked browser validation follow-up
+901319ae9 spec: STATE and handoff at 16bafe33d
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -179,10 +185,12 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 435 to 436
+- A shell command or a script wrong in its own terms: 610 to 611
+- A fault found in an agent's work whose instruction the brief did not give: 12 to 13
 
 ## The owner's latest decisions
-spec/CLAUDE.md:9: - The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
+spec/CLAUDE.md:9: - The owner, 2026-11-20, correcting the browser validation proposal: preserve existing use cases and establish the one shared operation befo
+spec/CLAUDE.md:10: - The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -208,22 +216,54 @@ spec/CLAUDE.md:9: - The owner, 2026-11-20: run TLC on the Mac to conserve hosted
 - 2026-11-19 | direction | the queue of this file | queue | "use this as refereces to the skill so it works" and "and then test the skill actually" and "yeah lets make skill perform with very high confidence so you can onboard other components". The replay checks the pinned ComboBox and held-out NumericTextBox.
 - 2026-11-19 | direction | the queue of this file | queue | "lets onboard datamanager only for combobox and leave it for the rest, but have it in skill so if i ask onboard for that component". The direct, component-local DataManager example builds in ../fusion-combobox-data-manager.
 2026-11-19 | direction | spec/CLAUDE.md | Net48BrowserHost | "well fix net48 as well so we gain high confidence"
+- 2026-11-20 | direction | the queue of this file | queue | "please priortise framework over mvc5 or other. Framework, then fusion or mvc should go in parallel. The validation is built to work regardlessof consumers. But if consumer need something specific, we should design it like row level action which has same framework permitives"
+- 2026-11-20 | direction | the queue of this file | queue | "If you image if i decide to onboard *IF* TanStack components pure JS Table... then validation still work." "adapter is not default choice, i would prefer if none is needed for any consumer"
+- 2026-11-20 | direction | the queue of this file | queue | "new session will re-discover, bring concrete and fully thought through one proposal to do which aligns with framework vision, and not add lower quality or hacks." "We stay on same branch, and follow the process. Quality bar will be never be lowered. But I am okay to adapt modern LLM patterns to arrive at correct, and well designed solution"
 <!-- /notes -->
 
 ## Next
 <!-- next -->
 
-### Framework quality priorities
+### Next session — TanStack experiments and parked validation follow-up
 
-The owner, 2026-11-20: "lets priortize framework open items, list for me, and close any gaps on
-quality of framework, that is focus, but not imagnitive improvements or for the sake of it".
-Use a reproduced defect, a reachable incomplete contract, or an existing unproved promise to open a
-slice. Review the source and the appropriate failed proof before a fix.
+Run the rewrite orientation from root `CLAUDE.md` / `AGENTS.md`. Read the owner's decisions,
+`spec/MISTAKES.md`, `spec/REWRITE.md` sections 1 and 4, and `.claude/rules/process.md`.
+Keep builds serial. On this Mac, source `scripts/toolchain-env.sh` and set
+`JAVA_HOME` to `/opt/homebrew/opt/openjdk@27/libexec/openjdk.jdk/Contents/Home` for the pinned doctor.
 
-Classify the gap before editing. A design gap leaves the contract undecided. An implementation
-defect fails an existing contract. A proof gap leaves promised behavior unverified. The owner's
-direction is to fit the agent workflow to the problem and keep the required proof. Use a focused
-consult when the contract is unclear and a scoped builder when the source and failure decide it.
+**Validation is parked.** Read the [current follow-up](spec/Validation/browser-validation-proposal.md)
+and its [archive with the diagnostic test](spec/Validation/browser-validation-proposal.archived.md).
+The existing typed request container handled both a JavaScript-owned edit and an indexed bulk array.
+Use distinct typed models and validators for routes or views with different rules. The shared-key
+North/South probe demonstrated the first-registration lookup but mixed different policies under one
+key. The architect approved documentation and declined the runtime change under the no-TLA+-change
+condition. Bring a supported reproduction and its proof obligation to the owner before any code work.
+The intentionally red TypeScript probe is preserved in the archive.
+
+**Resume the TanStack experiment separately.** The local worktree is `../tanstack-table`, branch
+`feature/tanstack-table`. The uncommitted package and conformance demo live there. Read its
+`spec/Reference/tanstack-table.md` and `.landing/TanStackTable/inline-reply.md`. The inline demo was
+served at http://localhost:5295/care/billing/charge-review/inline. It proved two row edits survive
+sorting, a row-local failure blocks the batch, and one save posts both corrected rows.
+Continue feature experiments in that worktree. For pagination, prove that edits made on two pages
+remain bound to their charge IDs and save in one batch. Use the onboarding skill and measure actual
+browser behavior. Keep the package and demo isolated until the owner reviews them.
+
+**TanStack Charts is a separate experiment.** Worktree `../tanstack-charts`, branch
+`feature/tanstack-charts`, holds the onboarding brief in `.landing/TanStackCharts/brief.md`.
+The owner wants a standalone Charts package and
+clarified that JavaScript runs in the browser. MVC renders the chart host and typed Reactive
+plan, as it does for Table. The vanilla TanStack host creates the SVG in the browser. Use no
+server-side JavaScript or Node deployment. One proof is an occupancy chart whose keyboard
+selection opens the corresponding wing through a typed Reactive action.
+[TanStack DOM host](https://tanstack.com/charts/latest/docs/reference/dom-host)
+
+**Other framework leads are parked.** The raw text and single-file browser check refusal, named enum
+in a pushed message, typed list construction from separate sources, unused operators and plan shape
+alignment, standalone named rule sets, activated-row replacement, handler cleanup, and the
+attached-partial validation summary observation remain separate follow-ups.
+
+### Framework work already landed
 
 1. **Multipart file-list capture.** The net10 Chromium test X9.27 index 1 first failed on the actual
    scalar conversion of a registered list input. The runtime dispatch now uses the existing file
@@ -237,18 +277,35 @@ consult when the contract is unclear and a scoped builder when the source and fa
    text. M24.X15 proves the actual MVC receipt holds the saved day, 14:35:08.123 orientation and
    null discharge under de-DE. The old culture format failed before the change and on its plant.
    The existing attempted-text regression passed on net10. The Native package built both targets.
-   Read the net48 execution from the Windows job at the pushed commit.
-3. **MVC 5 date response proof.** X3.7 separately promises that the framework JSON response carries
-   a date of birth to a browser in a different time zone. The placement is net48. Prove it under
-   Windows IIS before counting that promise closed.
-4. **Promised Fusion behavior.** Finish the template member-equality and Grid validation cases
-   before the exports. Follow the landed order through the remaining Breadcrumb, Menu, Sidebar,
-   Toolbar, and SmartPaste placements and then U27 Confirm and Toast.
-5. **Plan contract alignment.** Verify the raw text and file body validation boundary and the
-   reported pushed enum case before authoring code. Retire the seven unused operators as already
-   approved and narrow the generated plan to the shapes C# writes. Confirm a case is reachable
-   before assigning a browser test to it.
+   The Windows IIS run passed the saved-date case on the MVC 5 conformance app.
 
+At `901319ae9`, recorded GitHub CI run 44832814465 passed all 10 jobs. Its proof line was
+`[playwright:proof] 6 runs: 832 of the full list, 832 ran, each once`. The local integration run
+passed 818 of 818, and the content commit’s full spec check passed 40 of 40. These are saved
+proof results from those runs. This handoff update adds no product change.
+
+### Parked non-framework follow-ups
+
+- **Fusion templates and Grid.** Member equality across differing wire forms and object members,
+  the five Grid validation cases, Excel/CSV/PDF download and ordering proof, and the typed filter
+  predicate value. Resolve the shared validation design before choosing how an editor consumes it.
+- **Fusion component lifecycle.** SmartPaste mounting, protected requests on both hosts and partial
+  mounting. The four layout render helpers for Breadcrumb, Menu, Sidebar and Toolbar, the
+  `fusionShell` proof host, and Confirm and Toast’s render helpers and behavior. Choose shared
+  overlay lifetime from the actual use case.
+- **Fusion verification.** The vendor contract extractor and omitted-member checks remain in
+  `spec/FusionComponents/audit/README.md`. The ComboBox evidence stays in its landed slices.
+- **MVC 5 host proof.** X3.7 checks that the JSON response preserves the calendar day across
+  browser and server time zones. MVC 5 and Fusion work can proceed in parallel worktrees after
+  shared framework work, with local builds kept serial.
+- **Native package follow-ups.** Built-in calendar-day editor and file picker, typed button and
+  textbox types, typed row-link attributes, three NativeButton click methods and Drawer’s
+  build-time mirror coverage. Treat any shared primitive these expose as a framework proposal
+  only after establishing a concrete need.
+- **Conformance app and harness.** MI.24 still needs an authorized assertion of the browser-saved
+  bytes. The filename, preview and server response already have recorded evidence. The waitlist
+  formats its community-zone time on the server; move-in documents that and the equivalent
+  typed projection for its response-list read. Preserve the conformance coverage and old notes.
 
 ### TLC and CI
 
@@ -282,32 +339,6 @@ five evidence plants behaved as expected. The owner decision is in the standing 
   CI, runs every probe and checks the latest tool pins. The Syncfusion pin workflow runs on relevant
   package and lock changes or manual dispatch, checking the pin, probes and Fusion browser pool.
   Publishing starts on a version tag and uses the verified artifacts from its CI call.
-
-### Next framework session
-
-Use this worktree and start with the repo orientation, owner decisions, applicable file and project
-rules, and the mistake log. `python3 scripts/open.py` reports 19 unwritten browser promises, seven
-runtime cases to resolve and 14 unimplemented doors. They overlap. Follow the plan in
-`spec/REWRITE.md` section 4 and the retained framework queue below.
-
-1. Start with the Native date input and date-bound input use case from the queue below. Read
-   `spec/PathsAndWire/module.md`, `spec/NativeComponents/module.md` and the move-in use case.
-   Settle the exact spec lines, host coverage and proof before opening a scoped builder.
-2. Continue the core items in queue order. They cover request form file lists, validation of text
-   and file bodies, the approved Conditions operator removal, narrowing the plan contract, and an
-   enum member in a pushed message. Read the owner decisions before each item, including the
-   changes reserved for after 1.0.
-3. Continue the second U3 piece and the Fusion template and slice gaps. The remaining Fusion work
-   includes template member equality, the Grid validation and export cases, and SmartPaste. Finish
-   U27 by closing the Confirm and Toast doors and their browser promises.
-
-Each scoped builder uses the latest Astra at xhigh, reads the rules and reports the exact proof
-lines. The lead checks the source, required red and green runs, and planted failures before
-landing. Preserve the committed conformance coverage. MI.24's saved file bytes are a separate
-test-harness decision. The app's existing browser filename, preview and server bytes stay proved.
-
-For the next slice, use the repository's build-a-screen skill for a conformance proof and its
-onboard-component skill when a Fusion slice needs a new typed vendor member.
 
 ### Earlier handoff notes
 
