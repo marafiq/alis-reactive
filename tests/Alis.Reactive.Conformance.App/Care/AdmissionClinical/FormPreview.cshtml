@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model AdmissionSchema
+@{
+    Layout = "/Care/AdmissionClinical/_FormDesignLayout.cshtml";
+    ViewData["Title"] = "Staff admission preview";
+    var plan = Html.ReactivePlan<AdmissionSchema>();
+}
+@section FormScript {
+    <script src="~/_content/Syncfusion.AspNetCore.FormRenderer/scripts/sf-form-renderer.min.js"></script>
+}
+<h1>Staff admission preview</h1>
+<p>Try a hospital or planned admission with the saved receiving nurse requirement.</p>
+<a href="@CarePages.FormDesign">Edit admission form</a>
+@(plan.AdmissionFormRenderer("staff-admission", Model)
+    .Reactive(form => form.Submit, (submitted, pipeline) => pipeline.Element("admission-result").Text
+        .Set(pipeline.Concat(submitted.Data.Read(value => value.ArrivalRoute), " admission passed."))))
+<output aria-label="Admission preview result" id="admission-result">Awaiting a sample admission.</output>
+@Html.RenderPlan(plan)

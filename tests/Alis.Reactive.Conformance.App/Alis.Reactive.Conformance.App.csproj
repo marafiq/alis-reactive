@@ -25,6 +25,7 @@
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
     </ItemGroup>
 
+    <Import Project="Care/AdmissionClinical/FormDesignAssets.props" />
     <Import Project="../../Alis.Reactive.Analyzers/Vendors/VendorContract.targets" />
 
 </Project>

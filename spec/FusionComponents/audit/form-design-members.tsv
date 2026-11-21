@@ -1,0 +1,96 @@
+site	member	signature	package source	admission consumer
+FormBuilder	locale	locale: string;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:97	not exposed by this admission workflow
+FormBuilder	allowExport	allowExport: boolean;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:104	not exposed by this admission workflow
+FormBuilder	enablePreview	enablePreview: boolean;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:111	not exposed by this admission workflow
+FormBuilder	enablePersistence	enablePersistence: boolean;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:118	typed start option; the device draft survives navigation
+FormBuilder	enableRtl	enableRtl: boolean;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:125	not exposed by this admission workflow
+FormBuilder	mode	mode: 'Simple' | 'Developer';	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:133	not exposed by this admission workflow
+FormBuilder	formTemplates	formTemplates: CustomFormTemplate[] | null;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:140	not exposed by this admission workflow
+FormBuilder	toolboxCategories	toolboxCategories: ToolboxCategory[] | null;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:147	not exposed by this admission workflow
+FormBuilder	toolboxItems	toolboxItems: ToolboxItemSettingModel[];	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:155	not exposed by this admission workflow
+FormBuilder	schema	schema: Schema | string | Record<string, unknown> | null;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:162	typed initial admission schema; omitted when restoring the device draft
+FormBuilder	onFieldDragStarted	onFieldDragStarted: EmitType<FieldDragStartEventArgs>;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:169	not exposed by this admission workflow
+FormBuilder	onFieldDragOver	onFieldDragOver: EmitType<FieldDragOverEventArgs>;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:176	not exposed by this admission workflow
+FormBuilder	onFieldDropped	onFieldDropped: EmitType<FieldDroppedEventArgs>;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:183	not exposed by this admission workflow
+FormBuilder	enableHtmlSanitizer	enableHtmlSanitizer: boolean;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:189	not exposed by this admission workflow
+FormBuilder	onFieldPropertyChanged	onFieldPropertyChanged: EmitType<PropertyChangedEventArgs>;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:196	AdmissionFormBuilder.OnFieldPropertyChanged; callback-property listener
+FormBuilder	getProperty	getProperty(componentType: FormWidgetType, propertyName: string): PropertyDefinition | undefined;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:270	not exposed by this admission workflow
+FormBuilder	setProperty	setProperty(componentType: FormWidgetType, property: PropertyDefinition): void;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:282	not exposed by this admission workflow
+FormBuilder	setFieldValue	setFieldValue(fieldName: string, value: any): void;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:297	not exposed by this admission workflow
+FormBuilder	element	element: ElementType;	@syncfusion/ej2-base/src/component.d.ts:17	inherited vendor infrastructure; no admission view door
+FormBuilder	root	root: any;	@syncfusion/ej2-base/src/component.d.ts:18	inherited vendor infrastructure; no admission view door
+FormBuilder	ej2StatePersistenceVersion	ej2StatePersistenceVersion: string;	@syncfusion/ej2-base/src/component.d.ts:20	inherited vendor infrastructure; no admission view door
+FormBuilder	currentContext	currentContext: { calls?: Function; args?: any; };	@syncfusion/ej2-base/src/component.d.ts:45	inherited vendor infrastructure; no admission view door
+FormBuilder	isAngular	isAngular: boolean;	@syncfusion/ej2-base/src/component.d.ts:51	inherited vendor infrastructure; no admission view door
+FormBuilder	isReact	isReact: boolean;	@syncfusion/ej2-base/src/component.d.ts:52	inherited vendor infrastructure; no admission view door
+FormBuilder	isVue	isVue: boolean;	@syncfusion/ej2-base/src/component.d.ts:53	inherited vendor infrastructure; no admission view door
+FormBuilder	portals	portals: any;	@syncfusion/ej2-base/src/component.d.ts:54	inherited vendor infrastructure; no admission view door
+FormBuilder	refresh	refresh(): void;	@syncfusion/ej2-base/src/component.d.ts:74	inherited vendor infrastructure; no admission view door
+FormBuilder	getRootElement	getRootElement(): HTMLElement;	@syncfusion/ej2-base/src/component.d.ts:81	inherited vendor infrastructure; no admission view door
+FormBuilder	appendTo	appendTo(selector?: string | HTMLElement): void;	@syncfusion/ej2-base/src/component.d.ts:116	mount helper creates the actual control on its element
+FormBuilder	dataBind	dataBind(): void;	@syncfusion/ej2-base/src/component.d.ts:129	inherited vendor infrastructure; no admission view door
+FormBuilder	isDestroyed	isDestroyed: boolean;	@syncfusion/ej2-base/src/base.d.ts:22	inherited vendor infrastructure; no admission view door
+FormBuilder	isServerRendered	isServerRendered: boolean;	@syncfusion/ej2-base/src/base.d.ts:25	inherited vendor infrastructure; no admission view door
+FormBuilder	allowServerDataBinding	allowServerDataBinding: boolean;	@syncfusion/ej2-base/src/base.d.ts:26	inherited vendor infrastructure; no admission view door
+FormBuilder	ignoreCollectionWatch	ignoreCollectionWatch: boolean;	@syncfusion/ej2-base/src/base.d.ts:41	inherited vendor infrastructure; no admission view door
+FormBuilder	serverDataBind	serverDataBind(newChanges?: { [key: string]: any; }): void;	@syncfusion/ej2-base/src/base.d.ts:74	inherited vendor infrastructure; no admission view door
+FormBuilder	addEventListener	addEventListener(eventName: string, handler: Function): void;	@syncfusion/ej2-base/src/base.d.ts:86	inherited vendor infrastructure; no admission view door
+FormBuilder	removeEventListener	removeEventListener(eventName: string, handler: Function): void;	@syncfusion/ej2-base/src/base.d.ts:94	inherited vendor infrastructure; no admission view door
+FormRenderer	schema	schema: Schema | string | Record<string, unknown> | null;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:102	typed staff preview start; server-saved nurse requirement
+FormRenderer	dataModel	dataModel: Record<string, FieldDataType> | null;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:108	not exposed by this admission workflow
+FormRenderer	layout	layout: FormLayout | string;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:114	not exposed by this admission workflow
+FormRenderer	className	className: string;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:120	not exposed by this admission workflow
+FormRenderer	customWidgetSettings	customWidgetSettings: CustomWidgetSettingModel[];	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:126	not exposed by this admission workflow
+FormRenderer	enableHtmlSanitizer	enableHtmlSanitizer: boolean;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:132	not exposed by this admission workflow
+FormRenderer	submit	submit: EmitType<SubmitEventArgs>;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:139	AdmissionFormRenderer.Submit; the sample admission passed
+FormRenderer	change	change: EmitType<ChangeEventArgs>;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:145	not exposed by this admission workflow
+FormRenderer	buttonClick	buttonClick: EmitType<ButtonClickEventArgs>;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:151	not exposed by this admission workflow
+FormRenderer	failure	failure: EmitType<FailureEventArgs>;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:157	not exposed by this admission workflow
+FormRenderer	created	created: EmitType<Object>;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:163	not exposed by this admission workflow
+FormRenderer	getComponent	getComponent(name: string): object | null;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:326	not exposed by this admission workflow
+FormRenderer	setFieldValue	setFieldValue(fieldName: string, value: any): void;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:334	not exposed by this admission workflow
+FormRenderer	element	element: ElementType;	@syncfusion/ej2-base/src/component.d.ts:17	inherited vendor infrastructure; no admission view door
+FormRenderer	root	root: any;	@syncfusion/ej2-base/src/component.d.ts:18	inherited vendor infrastructure; no admission view door
+FormRenderer	ej2StatePersistenceVersion	ej2StatePersistenceVersion: string;	@syncfusion/ej2-base/src/component.d.ts:20	inherited vendor infrastructure; no admission view door
+FormRenderer	enablePersistence	enablePersistence: boolean;	@syncfusion/ej2-base/src/component.d.ts:26	inherited vendor infrastructure; no admission view door
+FormRenderer	enableRtl	enableRtl: boolean;	@syncfusion/ej2-base/src/component.d.ts:32	inherited vendor infrastructure; no admission view door
+FormRenderer	locale	locale: string;	@syncfusion/ej2-base/src/component.d.ts:38	inherited vendor infrastructure; no admission view door
+FormRenderer	currentContext	currentContext: { calls?: Function; args?: any; };	@syncfusion/ej2-base/src/component.d.ts:45	inherited vendor infrastructure; no admission view door
+FormRenderer	isAngular	isAngular: boolean;	@syncfusion/ej2-base/src/component.d.ts:51	inherited vendor infrastructure; no admission view door
+FormRenderer	isReact	isReact: boolean;	@syncfusion/ej2-base/src/component.d.ts:52	inherited vendor infrastructure; no admission view door
+FormRenderer	isVue	isVue: boolean;	@syncfusion/ej2-base/src/component.d.ts:53	inherited vendor infrastructure; no admission view door
+FormRenderer	portals	portals: any;	@syncfusion/ej2-base/src/component.d.ts:54	inherited vendor infrastructure; no admission view door
+FormRenderer	refresh	refresh(): void;	@syncfusion/ej2-base/src/component.d.ts:74	inherited vendor infrastructure; no admission view door
+FormRenderer	getRootElement	getRootElement(): HTMLElement;	@syncfusion/ej2-base/src/component.d.ts:81	inherited vendor infrastructure; no admission view door
+FormRenderer	appendTo	appendTo(selector?: string | HTMLElement): void;	@syncfusion/ej2-base/src/component.d.ts:116	mount helper creates the actual control on its element
+FormRenderer	dataBind	dataBind(): void;	@syncfusion/ej2-base/src/component.d.ts:129	inherited vendor infrastructure; no admission view door
+FormRenderer	isDestroyed	isDestroyed: boolean;	@syncfusion/ej2-base/src/base.d.ts:22	inherited vendor infrastructure; no admission view door
+FormRenderer	isServerRendered	isServerRendered: boolean;	@syncfusion/ej2-base/src/base.d.ts:25	inherited vendor infrastructure; no admission view door
+FormRenderer	allowServerDataBinding	allowServerDataBinding: boolean;	@syncfusion/ej2-base/src/base.d.ts:26	inherited vendor infrastructure; no admission view door
+FormRenderer	ignoreCollectionWatch	ignoreCollectionWatch: boolean;	@syncfusion/ej2-base/src/base.d.ts:41	inherited vendor infrastructure; no admission view door
+FormRenderer	serverDataBind	serverDataBind(newChanges?: { [key: string]: any; }): void;	@syncfusion/ej2-base/src/base.d.ts:74	inherited vendor infrastructure; no admission view door
+FormRenderer	addEventListener	addEventListener(eventName: string, handler: Function): void;	@syncfusion/ej2-base/src/base.d.ts:86	inherited vendor infrastructure; no admission view door
+FormRenderer	removeEventListener	removeEventListener(eventName: string, handler: Function): void;	@syncfusion/ej2-base/src/base.d.ts:94	inherited vendor infrastructure; no admission view door
+FieldEdit	propertyName	propertyName: string;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:69	FieldEdit.PropertyName; discriminates required
+FieldEdit	propertyValue	propertyValue: any;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:73	FieldEdit.RequiredValue; boolean lane after matching required; other property kinds unbound
+FieldEdit	fieldName	fieldName: string;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:77	FieldEdit.FieldName; only the receiving nurse requirement is published
+DragStarted	componentName	componentName: string | null;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:14	not exposed by this admission workflow
+DragStarted	componentType	componentType: string;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:18	not exposed by this admission workflow
+DragStarted	sourceContainerId	sourceContainerId: string;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:22	not exposed by this admission workflow
+DragStarted	isNested	isNested: boolean;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:26	not exposed by this admission workflow
+DragOver	isNested	isNested: boolean;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:35	not exposed by this admission workflow
+Dropped	componentName	componentName: string;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:44	not exposed by this admission workflow
+Dropped	isReordered	isReordered: boolean;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:48	not exposed by this admission workflow
+Dropped	componentType	componentType: string;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:52	not exposed by this admission workflow
+Dropped	sourceContainerId	sourceContainerId: string;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:56	not exposed by this admission workflow
+Dropped	targetContainerId	targetContainerId: string;	@syncfusion/ej2-form-builder/src/form-builder/form-builder.d.ts:60	not exposed by this admission workflow
+Submission	data	data: Record<string, FieldDataType>;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:26	Submission.Data; typed arrivalRoute for the staff admission template
+Submission	isValid	isValid: boolean;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:28	not exposed by this admission workflow
+Change	fieldName	fieldName: string;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:13	not exposed by this admission workflow
+Change	label	label: string;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:15	not exposed by this admission workflow
+Change	value	value: FieldDataType;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:17	not exposed by this admission workflow
+Change	dataModel	dataModel: object;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:19	not exposed by this admission workflow
+ButtonClick	fieldName	fieldName: string;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:35	not exposed by this admission workflow
+ButtonClick	label	label: string;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:37	not exposed by this admission workflow
+ButtonClick	event	event: any;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:39	not exposed by this admission workflow
+Failure	error	error: any;	@syncfusion/ej2-form-renderer/src/form-renderer/form-renderer/form-renderer.d.ts:46	not exposed by this admission workflow

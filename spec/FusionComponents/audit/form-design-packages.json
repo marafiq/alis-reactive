@@ -1,0 +1,24 @@
+{
+  "version": "35.2.12",
+  "sha512": {
+    "Syncfusion.AspNetCore.Base": "vOZhY7A9Aq46bE3LR5XgTEgo0wYgpKHF5kweXTqx4Rvoi5egdg78CfsRHqCOm/xXTZJof1dfEsYUinZEFkf7iw==",
+    "Syncfusion.AspNetCore.Buttons": "1KQmtNkED1GtR1Al23hVUeIiIvg0B8um9URjE13mWsIggS0KQV4QO92dS/P4iMqa8DvM4jyxa1T7tzG+/i6uGw==",
+    "Syncfusion.AspNetCore.Calendars": "gdxtuE5A0HBOAZydSnw1O1L/AUHqhYTWL5aLATCkfzVh2K2BDRrOnbRPZtLUb0QnO3xhy0FAmC5C4rDgEiAFmA==",
+    "Syncfusion.AspNetCore.DropDowns": "i3Y3mB0m9FwRE1E9RKED6OS3GUHGAK+e+GP8iWxY091dQmg57qLtUceozehprNqJY+M2EA3SGg7usSOqOIRN6w==",
+    "Syncfusion.AspNetCore.FormBuilder": "en5tsLZRtYERhKI32yp+YlQ+PiX9oYFZ+RhpJl+jbo2vfwBbGj3X44D8uB1WmvRoYGftVreUGqHh466q6UuqtQ==",
+    "Syncfusion.AspNetCore.FormRenderer": "JGvI1eVjZvxcQUgDVwgTKcXCEgZGtU86VUtPhsnqEcaNOU321UNn3T9qdcPvENu4OOWhcWzX56+G1yQ6/t5y/A==",
+    "Syncfusion.AspNetCore.Grid": "+dwXb1TzKP7c2+ZFJ+7ulaxyu0D2YNk9ROUO1djpmeJZkHF4ScOXM5UjpAsHcvyRD00BDiVf1mOEeZsbmUsU0w==",
+    "Syncfusion.AspNetCore.ImageEditor": "miopgCM2utRQleY8w9IHRry32i85wSvyw2Ky0jlHzG2yA8DOSy7fCB+TNFOHbTWUvxjA6yh5oAUU6Zw+PnNpXg==",
+    "Syncfusion.AspNetCore.InPlaceEditor": "R8dayXZOQPXmIYgWQoN4uKPgk+8UAWt2jKJ7UPo5LGKVhtnrDQyCCTq4upsXw6xYzmElvG1RYhrRSyroRBOToA==",
+    "Syncfusion.AspNetCore.Inputs": "X/IlZh62ZZ3R4jMlG4WSrgCnMmd6mZRsuV4zHZSuFm90hGf71/YricnRrw7j4qPvJe0pbyv+aPowJ7unjVGtdw==",
+    "Syncfusion.AspNetCore.InteractiveChat": "2obv3RerkWOEjkuqWkrvLIwW157NwW+a0dmuPx/ZS/qQpLcBDIq5eu1y6IZxeVVvvi1U7jd7+89esb81hYAynQ==",
+    "Syncfusion.AspNetCore.Lists": "aWwRMzBfCmRj/bGgf3D1HuC2h+008zfhUIBuZM1LQ2lwTlHZvqTCJbeDCHm3SQYjVqO4D5wiu1gBX1fTvntfIw==",
+    "Syncfusion.AspNetCore.Navigations": "YsH4WHi9T4wVBXgfBoDtP0mhQx0yMlGkslJr7vT4wZVbCQzsFn2LWCWWbbGG08C6X1Ps0ZNRyrQSj7ejENJNNg==",
+    "Syncfusion.AspNetCore.Notifications": "tB2HIOsR3lvbfQSZhcZr05VlimRmXEZwGRI72oHybrzaziq4JZxfX9YNMdRgQoRYuLlew+nMi5SNkIzDqTjmZQ==",
+    "Syncfusion.AspNetCore.Popups": "QDehyavv5AfOtnyGWcmYCguVEgII+s/XsbJWvfFhm2q92O9xOhj4isfd/pkYUAGve7fHy5zS5fcqh6Hl6xzSSA==",
+    "Syncfusion.AspNetCore.QueryBuilder": "nlXXvn+duXFHbj3NR1BlefboS+27uLqL81DUQGEJ9t+4BQjjGvKzUvA1jWvAoccRAOMRgKW7y6OHesQy4BtcOA==",
+    "Syncfusion.AspNetCore.RichTextEditor": "A0ogzbalbPg1JyzS0yr7YOUKPW4YkdGcrBONuaL/BFKXv0MnY0InyGGgd/KhZA8D68NE9E058DuH68Q6NjWquQ==",
+    "Syncfusion.AspNetCore.SplitButtons": "P7ulRbADHAuqvpgOBw3c6DELOEDI5LGJU0DijEhlI5eNejqGLFArByz0U9vtZl/NgQF0m7FXKlC96lFKYLOuIQ==",
+    "Syncfusion.AspNetCore.Themes": "ocI70KSabCDvVYxRBIARFaBtoAt0XXOEGcRk3taXoAL5KnphdO0qUVc6Z9oOnRQJousA9d8SF04RD7arF8dOdw=="
+  }
+}

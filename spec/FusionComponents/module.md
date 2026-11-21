@@ -597,6 +597,8 @@ Each name is gate 2's; each door is the capability it carries.
 The meaning `M21.D1` and the defects `M21.X1` to `M21.X3` are in `spec/FusionComponents/features.json`, on the
 features they give.
 
+- `M21.N54` new: the admission app renders its own Form Builder and Form Renderer at 35.2.12. A field edit saves the required flag to the admission template. The visual condition editor saves its predicate to the device draft. The separate staff form and the reopened designer preview exercise the two renderer paths (M21.X1401 and M21.X1402). The public callback property is `onFieldPropertyChanged`. The [package inventory and schema](audit/form-design.md) gives the addon package versions, source paths and renderer behavior. The shared Fusion package remains at 33.1.47.
+
 ## Improvements
 
 - One naming for a slice's data (M21.D1, M21.X2). EJ2's builder writes C# data through Newtonsoft's process-wide

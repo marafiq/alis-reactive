@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionFormDesign
+@{
+    Layout = "/Care/AdmissionClinical/_FormDesignLayout.cshtml";
+    ViewData["Title"] = "Admission form design";
+    var plan = Html.ReactivePlan<AdmissionFormDesign>();
+}
+@section FormScript {
+    <script src="~/_content/Syncfusion.AspNetCore.FormBuilder/scripts/sf-form-builder.min.js"></script>
+}
+<h1>Admission form design</h1>
+<p>Choose Receiving nurse to edit its validation or Transfer notes to edit its visibility. Required changes save to the staff form. Reopen the device draft to review all edits in Preview form.</p>
+<nav aria-label="Admission forms">
+    <a href="@CarePages.FormPreview">Preview saved form</a>
+    <a href="@(CarePages.FormDesign + "?resume=true")">Reopen device draft</a>
+</nav>
+<p role="status" aria-label="Template changes" id="template-changes">No requirement changes in this session.</p>
+@(plan.AdmissionFormBuilder(Model.Id, Model.Schema)
+    .Reactive(builder => builder.OnFieldPropertyChanged, (changed, pipeline) => pipeline
+        .When(changed.PropertyName.Eq("required").And(changed.FieldName.Eq("handover")))
+        .Then(pipeline => pipeline.Post<AdmissionRequirement>(CarePages.FormDesign + "/required", request => request.Json(body => body
+            .Set(requirement => requirement.InputName, changed.FieldName)
+            .Set(requirement => requirement.Required, changed.RequiredValue)))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("template-changes").Text.Set(saved.Body)))))
+@Html.RenderPlan(plan)

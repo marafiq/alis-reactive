@@ -1,0 +1,71 @@
+{
+  "version": "35.2.12",
+  "verifiedNuGetPackages": 19,
+  "officialScriptsServed": 50,
+  "ordinaryListener": 0,
+  "changes": [
+    {
+      "propertyName": "required",
+      "propertyValue": false,
+      "fieldName": "handover",
+      "name": "onFieldPropertyChanged"
+    },
+    {
+      "propertyName": "required",
+      "propertyValue": true,
+      "fieldName": "handover",
+      "name": "onFieldPropertyChanged"
+    }
+  ],
+  "importedNurseRequired": false,
+  "importedPredicate": {
+    "condition": "and",
+    "rules": [
+      {
+        "label": "Arrival route",
+        "field": "route-field",
+        "operator": "equal",
+        "type": "string",
+        "value": "Hospital"
+      }
+    ]
+  },
+  "exportedSchemaVersion": "0.1.0",
+  "exportedNurseRequired": true,
+  "exportedPredicate": {
+    "condition": "and",
+    "rules": [
+      {
+        "label": "Arrival route",
+        "field": "route-field",
+        "operator": "equal",
+        "type": "string",
+        "value": "Planned"
+      }
+    ]
+  },
+  "reopenedInputSchema": null,
+  "reopenedNotes": {
+    "Hospital": "hidden",
+    "Planned": "visible",
+    "Respite": "hidden"
+  },
+  "submissionsAfterInvalid": 0,
+  "validSubmit": {
+    "data": {
+      "arrivalRoute": "Hospital",
+      "handover": "Elena Ruiz"
+    },
+    "isValid": true,
+    "name": "submit"
+  },
+  "submissionsAfterHidingAnAnsweredField": 1,
+  "conditionalRequiredBlank": {
+    "data": {
+      "arrivalRoute": "Hospital"
+    },
+    "isValid": true,
+    "name": "submit"
+  },
+  "pageErrors": []
+}

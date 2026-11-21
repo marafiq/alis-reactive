@@ -1,0 +1,47 @@
+<Project>
+    <PropertyGroup>
+        <AdmissionFormAssetVersion>35.2.12</AdmissionFormAssetVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageDownload Include="Syncfusion.AspNetCore.Base" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.Buttons" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.Calendars" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.DropDowns" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.FormBuilder" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.FormRenderer" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.Grid" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.ImageEditor" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.InPlaceEditor" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.Inputs" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.InteractiveChat" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.Lists" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.Navigations" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.Notifications" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.Popups" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.QueryBuilder" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.RichTextEditor" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.SplitButtons" Version="[$(AdmissionFormAssetVersion)]" />
+        <PackageDownload Include="Syncfusion.AspNetCore.Themes" Version="[$(AdmissionFormAssetVersion)]" />
+    </ItemGroup>
+    <ImportGroup Condition="Exists('$(NuGetPackageRoot)syncfusion.aspnetcore.formbuilder/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props')">
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.base/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.buttons/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.calendars/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.dropdowns/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.formbuilder/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.formrenderer/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.grid/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.imageeditor/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.inplaceeditor/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.inputs/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.interactivechat/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.lists/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.navigations/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.notifications/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.popups/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.querybuilder/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.richtexteditor/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.splitbuttons/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+        <Import Project="$(NuGetPackageRoot)syncfusion.aspnetcore.themes/$(AdmissionFormAssetVersion)/build/Microsoft.AspNetCore.StaticWebAssets.props" />
+    </ImportGroup>
+</Project>

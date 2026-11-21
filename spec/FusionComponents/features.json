@@ -24002,6 +24002,89 @@
      ]
     }
    ]
+  },
+  {
+   "id": "M21.F54",
+   "summary": "An admission coordinator changes the receiving nurse requirement through the app-local ASP.NET Core 35.2.12 Form Builder. The field-change callback saves the requirement for the staff form. The designer saves its full draft on the device and restores authored visibility conditions into its Form Renderer preview.",
+   "status": "new",
+   "types": [],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "proposed",
+     "text": "plan.AdmissionFormBuilder(Model.Id, Model.Schema).Reactive(builder => builder.OnFieldPropertyChanged, (changed, pipeline) => ...);",
+     "doors": [
+      "M21.N54",
+      "M12.N3"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "assignment",
+    "if",
+    "op",
+    "get",
+    "request",
+    "record",
+    "data",
+    "set",
+    "call"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive/Components/Onboarding/ComponentEventOnboarding.cs:13-34"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    }
+   ],
+   "core": [
+    "Q5",
+    "Q7",
+    "Q17"
+   ],
+   "meanings": [],
+   "oracle": "The required switch changes whether the saved template accepts a blank nurse. The rule dialog changes which arrival route displays transfer notes in the reopened device draft.",
+   "checker": [
+    "core:Q5",
+    "core:Q17"
+   ],
+   "defects": [
+    {
+     "id": "M21.X1401",
+     "rung": "behavior",
+     "defect": "The application saves the prior required flag when the coordinator changes it."
+    },
+    {
+     "id": "M21.X1402",
+     "rung": "behavior",
+     "defect": "Reopening the device draft imports the initial template again, restoring the original hospital visibility predicate."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X1401",
+     "page": "The coordinator edits the Receiving nurse field on the admission form designer and opens the saved rules in the staff preview.",
+     "gesture": "Open Receiving nurse in the admission form designer, change Required and open the saved form.",
+     "outcome": "The editor reports Receiving nurse is required. The saved hospital admission refuses a blank nurse with Enter the receiving nurse.",
+     "opposite": "Enter a nurse and submit again. The preview reports that the hospital admission passed.",
+     "defect": "The server keeps false for the required flag and reports Receiving nurse is optional."
+    },
+    {
+     "for": "M21.X1402",
+     "page": "The coordinator edits transfer notes visibility, reopens the saved device draft and previews it in the Form Builder.",
+     "gesture": "Change Conditional Visibility from Hospital to Planned, save the rule, reopen the device draft and open Preview form.",
+     "outcome": "The preview of the hospital arrival shows the arrival route and hides transfer notes.",
+     "opposite": "Changing the arrival route to Planned displays transfer notes. Changing it to Respite hides transfer notes again.",
+     "defect": "Reopening the designer imports the original hospital comparison and transfer notes remain visible for the hospital sample."
+    }
+   ],
+   "verdicts": []
   }
  ]
 }

@@ -1375,6 +1375,30 @@
           ]
         }
       ]
+    },
+    {
+      "id": "admission-form-design",
+      "area": "care",
+      "under": "admission",
+      "title": "Admission form design",
+      "user": "edits the receiving nurse requirement in the staff form and transfer notes visibility in the device draft",
+      "parts": [
+        {
+          "id": "designer",
+          "kind": "fusion",
+          "role": "the app-local visual Form Builder that edits the receiving nurse requirement and transfer notes visibility"
+        },
+        {
+          "id": "staffPreview",
+          "kind": "fusion",
+          "role": "the Form Renderer validating a sample admission with the saved template"
+        },
+        {
+          "id": "draft",
+          "kind": "endpoint",
+          "role": "the current care home admission rule draft"
+        }
+      ]
     }
   ],
   "placements": [
@@ -14878,6 +14902,40 @@
           "action": "Run.tla:Settle",
           "on": "the admission history flush after SAVE8"
         }
+      ]
+    },
+    {
+      "feature": "M21.F54",
+      "for": "M21.X1401",
+      "index": 0,
+      "screen": "admission-form-design",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "designer",
+        "staffPreview",
+        "draft"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F54",
+      "for": "M21.X1402",
+      "index": 0,
+      "screen": "admission-form-design",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "designer",
+        "staffPreview",
+        "draft"
+      ],
+      "harness": [
+        "seed"
       ]
     }
   ],

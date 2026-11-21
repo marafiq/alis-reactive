@@ -1857,6 +1857,21 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F54 M21.X1401 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/FormDesign.cshtml",
+      "/Care/AdmissionClinical/FormPreview.cshtml",
+      "/Care/AdmissionClinical/_FormDesignLayout.cshtml"
+    ]
+  },
+  "M21.F54 M21.X1402 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/FormDesign.cshtml",
+      "/Care/AdmissionClinical/_FormDesignLayout.cshtml"
+    ]
+  },
   "M21.F7 M21.X1003 0": {
     "modules": [],
     "views": [

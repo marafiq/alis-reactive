@@ -1090,6 +1090,12 @@ public static class Promises
         public const string M21_X1033_0 = "M21.F52 M21.X1033 0";
     }
 
+    public static class M21_F54
+    {
+        public const string M21_X1401_0 = "M21.F54 M21.X1401 0";
+        public const string M21_X1402_0 = "M21.F54 M21.X1402 0";
+    }
+
     public static class M22_F1
     {
         public const string X15_1_0 = "M22.F1 X15.1 0";
