@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Fri Nov 20 17:53:50 EST 2026
+Written at `date`: Fri Nov 20 23:41:20 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -41,10 +41,8 @@ unit: unbriefed ../framework-native-date NativeDateInput: its Rules name DateWir
   leaves by: the brief is completed, before any work
   read first: the files of a unit, below
   goes to: unit: briefed
-unit: landed ../framework-native-date-value NativeDateValue
-  next: git worktree remove ../framework-native-date-value
-  leaves by: `git worktree remove {worktree}`
-  goes to: gone
+unit: ready ../framework-native-date-value NativeDateValue
+  next: scripts/land-unit.sh ../framework-native-date-value 1733be893 "NativeDateValue preserves saved DateTime fields in MVC text boxes" ".landing/NativeDateValue"
 unit: ready ../fusion-audit FusionAudit
   next: scripts/land-unit.sh ../fusion-audit 9c77fd7d8 "Fusion audit: compare the pinned vendor contract and improve component onboarding" ".landing/FusionAudit"
 unit: returned ../fusion-combobox-data-manager FusionComboBoxDataManager: reply.md waits for read.md
@@ -63,6 +61,7 @@ unit: returned ../fusion-combobox-onboarding-replay FusionComboBoxOnboardingRepl
 unit: ready ../fusion-combobox-payload FusionComboBoxPayload
   next: scripts/land-unit.sh ../fusion-combobox-payload 9c77fd7d8 "Prove typed ComboBox changes on Helen Martinez's communication plan" ".landing/FusionComboBoxPayload"
 unit: returned ../fusion-combobox-server-search FusionComboBoxServerSearch: reply.md waits for read.md
+unit: unbriefed ../fusion-form-builder FusionFormBuilder: its Rules name AGENTS.md/CLAUDE.md, which the worktree lacks
 unit: ready ../movein-availability MoveInAvailability
   next: scripts/land-unit.sh ../movein-availability 6a418dc64 "MI.18.5, MI.20 and MI.21. Publish the world's bed changes to independently owned page and card streams. A held response checks current community access and preserves a newer displayed revision and holder. Reconnect re-reads the bed; the retry offer remains until every failed owner recovers or leaves." ".landing/MoveInAvailability"
 unit: ready ../movein-contacts MoveInContacts
@@ -99,12 +98,12 @@ unit: waiting ../net48-browser-host Net48BrowserHost: for MoveInDraftAdmission
 unit: waiting ../net48-twin-followthrough Net48TwinFollowThrough: for Net48BrowserHost
 unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
-lane: pushed at 16bafe33d on feature/rewrite: equal to the remote
+lane: pushed at 689bae1d2 on feature/fusion-query-builder: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 16bafe33d
+ci: unread at 689bae1d2
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -113,28 +112,29 @@ file: over CLAUDE.md: holds 338 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2080 lines, its limit 150
-file: over HANDOFF.md: holds 865 lines, its limit 150
+file: over HANDOFF.md: holds 866 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 33 units have landed since .claude/rules/process.md last changed
+machine: review due : 35 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
   goes to: gone
 
 ## Where it stands
-- Branch: feature/rewrite
-- HEAD: 16bafe33d Preserve saved DateTime values in Native textboxes
-- Full check: .work/logs/spec-check-16bafe33d.log: spec check at 16bafe33d: 40 of 40 checks pass
-- .work/last-run.txt: 20261120-174004-48382 16bafe33d
+- Branch: feature/fusion-query-builder
+- HEAD: 689bae1d2 Keep the U26 rewrapping check independent of appended features
+- Full check: .work/logs/spec-check-689bae1d2.log: spec check at 689bae1d2: 40 of 40 checks pass
+- .work/last-run.txt: 20261120-232544-18968 689bae1d2
 
 ## Landed since the commit before the last spec: STATE commit
-16bafe33d Preserve saved DateTime values in Native textboxes
-1733be893 spec: STATE and handoff at 76452da4c
+689bae1d2 Keep the U26 rewrapping check independent of appended features
+844e77052 Onboard the local Fusion Query Builder for resident review filters
+901319ae9 spec: STATE and handoff at 16bafe33d
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
-feature promises: 719; named by a browser test: 700; with no browser test: 19
+feature promises: 722; named by a browser test: 703; with no browser test: 19
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X2_0
   FusionAppLevelObjects  The confirm                                  M23_F2.M23_X3_0
   FusionAppLevelObjects  The page's toast                             M23_F1.M23_X1_0
@@ -179,7 +179,8 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 435 to 436
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 431 to 432
+- A rule or a tool's list not applied before the change: 436 to 438
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
