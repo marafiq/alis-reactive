@@ -1668,7 +1668,7 @@
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "251 refused plants caught and 88 accepted plants kept green; 39 of 39 checks proven both ways",
+      "detail": "251 refused plants caught and 88 accepted plants kept green; 39 of 39 checks proven both ways; check.py and its plants unchanged since that run",
       "digest": "79367bb905fe1ad1498feff14220443e0f0cd81b2b49e6ba17d0b0e6071ba9c9",
       "pass": true
     },
@@ -4359,7 +4359,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "c85faeceb22804d678b03b35b0de758f348ec658",
+  "read_at_head": "afa0656b9966054f5961c0013dfa6def0ac29b9e",
   "step": {
     "failing": [],
     "name": "End of session",

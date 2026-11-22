@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Sat Nov 21 02:43:23 EST 2026
+Written at `date`: Sun Nov 22 02:31:20 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complex
@@ -48,6 +48,7 @@ unit: landed ../framework-native-date-value NativeDateValue
   next: git worktree remove ../framework-native-date-value
   leaves by: `git worktree remove {worktree}`
   goes to: gone
+unit: unbriefed ../fusion-api-operations FusionApiOperations: its Done holds no line "At the base:"
 unit: ready ../fusion-audit FusionAudit
   next: scripts/land-unit.sh ../fusion-audit 9c77fd7d8 "Fusion audit: compare the pinned vendor contract and improve component onboarding" ".landing/FusionAudit"
 unit: returned ../fusion-combobox-data-manager FusionComboBoxDataManager: reply.md waits for read.md
@@ -67,6 +68,18 @@ unit: ready ../fusion-combobox-payload FusionComboBoxPayload
   next: scripts/land-unit.sh ../fusion-combobox-payload 9c77fd7d8 "Prove typed ComboBox changes on Helen Martinez's communication plan" ".landing/FusionComboBoxPayload"
 unit: returned ../fusion-combobox-server-search FusionComboBoxServerSearch: reply.md waits for read.md
 unit: unbriefed ../fusion-form-builder FusionFormBuilder: its Rules name AGENTS.md/CLAUDE.md, which the worktree lacks
+unit: unbriefed ../fusion-grid-api FusionGridApi: brief.md lacks Scope, Rules, Outcome, Done, Commands, Reply
+unit: unbriefed ../fusion-grid-bulk-actions GridBulkActions: its Rules name AGENTS.md/CLAUDE.md, grid.d.ts, which the worktree lacks
+unit: unbriefed ../fusion-grid-cell-review GridCellReview: its Rules name AGENTS.md/CLAUDE.md, syncfusion/ej2-grids/src/grid/base/grid.d.ts, interface.d.ts, which the worktree lacks
+unit: unbriefed ../fusion-grid-columns FusionGridColumns: its Rules name syncfusion/ej2-grids/src/grid/base/grid.d.ts, which the worktree lacks
+unit: unbriefed ../fusion-grid-contract FusionGridContract: its Rules name FusionSource.cs, .d.ts, which the worktree lacks
+unit: unbriefed ../fusion-grid-editor-api GridEditorApi: its Rules name AGENTS.md/CLAUDE.md, references/full-api.md, which the worktree lacks
+unit: unbriefed ../fusion-grid-exports FusionGridExports: its Rules name /SKILL.md, which the worktree lacks
+unit: unbriefed ../fusion-grid-large-census GridLargeCensus: its Done holds no line "At the base:"
+unit: unbriefed ../fusion-grid-query-api GridQueryApi: its Rules name AGENTS.md/CLAUDE.md, references/full-api.md, which the worktree lacks
+unit: unbriefed ../fusion-grid-remote FusionGridRemote: its Rules name /SKILL.md, grid.d.ts, interface.d.ts, FusionGrid.cs, which the worktree lacks
+unit: unbriefed ../fusion-grid-selection FusionGridSelection: its Rules name grid.d.ts, which the worktree lacks
+unit: unbriefed ../fusion-grid-ward-transfer GridWardTransfer: its Done holds no line "At the base:"
 unit: unbriefed ../fusion-query-builder FusionQueryBuilder: its Rules name AGENTS.md/CLAUDE.md, which the worktree lacks
 unit: ready ../movein-availability MoveInAvailability
   next: scripts/land-unit.sh ../movein-availability 6a418dc64 "MI.18.5, MI.20 and MI.21. Publish the world's bed changes to independently owned page and card streams. A held response checks current community access and preserves a newer displayed revision and holder. Reconnect re-reads the bed; the retry offer remains until every failed owner recovers or leaves." ".landing/MoveInAvailability"
@@ -106,11 +119,11 @@ unit: ready ../retire-picomatch-exception RetirePicomatchException
   next: scripts/land-unit.sh ../retire-picomatch-exception d13a4ce7f "GitHub withdrew GHSA-fc5q-39xc-vjpf on November 18. npm no longer reports it, so retire its exception under rewrite section 2.7. Picomatch stays pinned at 4.0.7. The audit refuses reported advisories by ID, including the retired ID if it returns." ".landing/RetirePicomatchException"
 unit: unbriefed ../tanstack-charts TanStackCharts: its Rules name /SKILL.md, Components/ConformanceComponent/ConformanceComponentHtml.cs, Care/Admission/RoomChoice.cshtml, which the worktree lacks
 unit: unbriefed ../tanstack-table TanStackTable: its Rules name Care/Residents/ResidentDischarges.cshtml, Care/Round/LeastDoseRoundController.cs, Care/MoveIn/PayerDesk.cshtml, which the worktree lacks
-lane: checking at c85faeceb on feature/rewrite
-  leaves by: the last line `scripts/full-check.sh` prints
-  exit line: "spec check at" its commit
-  goes to: lane: checked
-ci: unread at c85faeceb
+lane: landing at afa0656b9 on feature/rewrite
+  leaves by: the last line `scripts/land.sh` prints
+  exit line: "landed"
+  goes to: lane: landed
+ci: unread at afa0656b9
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -119,10 +132,10 @@ file: over CLAUDE.md: holds 338 lines, its limit 200
   exit line: "landed"
   goes to: gone
 file: over spec/CLAUDE.md: holds 2081 lines, its limit 150
-file: over HANDOFF.md: holds 890 lines, its limit 150
+file: over HANDOFF.md: holds 897 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 34 units have landed since .claude/rules/process.md last changed
+machine: review due : 35 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -130,13 +143,13 @@ machine: review due : 34 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: c85faeceb Record the parked browser validation follow-up
-- Full check: .work/logs/spec-check-c85faeceb.log: spec check at c85faeceb: 40 of 40 checks pass
-- .work/last-run.txt: 20261121-023017-9498 c85faeceb
+- HEAD: afa0656b9 Onboard one Fusion component from its pinned public API
+- Full check: .work/logs/spec-check-afa0656b9.log: spec check at afa0656b9: 40 of 40 checks pass
+- .work/last-run.txt: 20261122-022135-45571 afa0656b9
 
 ## Landed since the commit before the last spec: STATE commit
-c85faeceb Record the parked browser validation follow-up
-901319ae9 spec: STATE and handoff at 16bafe33d
+afa0656b9 Onboard one Fusion component from its pinned public API
+17afd4cc7 spec: STATE and handoff at c85faeceb
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
@@ -185,8 +198,7 @@ Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net10.cs:2
 Alis.Reactive.Fusion/FusionComponents/FusionToolbar/FusionToolbarHtml.Net48.cs:21
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A shell command or a script wrong in its own terms: 610 to 611
-- A fault found in an agent's work whose instruction the brief did not give: 12 to 13
+- A shell command or a script wrong in its own terms: 611 to 613
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-20, correcting the browser validation proposal: preserve existing use cases and establish the one shared operation befo
