@@ -41,7 +41,7 @@ function validate(slice, type) {
         }
     }
 }
-export function shippedSlices() {
+export function shippedSlices(sliceName) {
     const dotnet = process.env.DOTNET_ROOT;
     const sdk = JSON.parse(readFileSync("global.json","utf8")).sdk.version;
     const roslyn = join(dotnet,"sdk",sdk,"Roslyn","bincore");
@@ -64,10 +64,14 @@ export function shippedSlices() {
     for (const area of ["FusionComponents","FusionAppLevelObjects"]) {
         const dir = project + "/" + area;
         for (const name of readdirSync(dir,{withFileTypes:true}).filter(d=>d.isDirectory()).map(d=>d.name).sort()) {
-            files.push(dir + "/" + name + "/" + name + ".cs");
+            if (!sliceName || name === sliceName) files.push(dir + "/" + name + "/" + name + ".cs");
         }
     }
+    if (!files.length) throw Error("Unknown Fusion slice: " + sliceName);
     const slices = JSON.parse(execFileSync(join(dotnet,"dotnet"),[dll,...files],{encoding:"utf8",maxBuffer:16*1024*1024}));
-    for (const slice of slices) for (const type of slice.types) validate(slice,type);
+    for (const slice of slices) for (const type of slice.types) {
+        if (!sliceName) for (const member of type.members) delete member.emittedArguments;
+        validate(slice,type);
+    }
     return slices;
 }

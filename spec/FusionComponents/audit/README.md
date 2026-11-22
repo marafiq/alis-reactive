@@ -53,6 +53,62 @@ One existing typed example sends the filter text to the application's allergy en
 - Nine C# classes have no public EJ2 object context. The catalog lists them under each slice's `separate` field. They comprise Grid's DataResult, InPlaceEditor's three DOM classes and ActionBeginData, the two Smart render-options classes, Uploader.FilesChangedEventArgs, and Confirm. Uploader's `Files` is a projection through `GetFilesData` and `RawFile`. Its own `FilesChanged` event carries `filesData`; the component code calls EJ2's private trigger under the owner's November 17 exception. [Uploader declaration](../../../Alis.Reactive.Fusion/FusionComponents/FusionUploader/FusionUploader.cs) · [Component code](../../../Alis.Reactive.Fusion/FusionComponents/FusionUploader/fusion-uploader.ts)
 - Confirm exposes its own asynchronous `Ask(message)` with the run's abort signal. Its two host render helpers throw at this base. Toast does resolve to a pinned EJ2 object and exposes eight names; its render helpers also throw here. A public declaration or vendor catalog entry cannot establish an available end-to-end app object. [App-level contract](../../FusionAppLevelObjects/module.md) · [Confirm](../../../Alis.Reactive.Fusion/FusionAppLevelObjects/FusionConfirm/FusionConfirm.cs)
 
+## Which call forms and nested objects does a slice expose?
+
+Run the operation report for the slice under review. Use the repository root and the installed packages from the pinned inventory.
+
+```bash
+. scripts/toolchain-env.sh
+audit_lock="$HOME/.local/share/alis-toolchain/build.lock"
+/usr/bin/lockf -k "$audit_lock" caffeinate -i node spec/FusionComponents/audit/operations.mjs FusionGrid .landing/FusionAudit/grid-operations.json < /dev/null
+/usr/bin/lockf -k "$audit_lock" caffeinate -i node spec/FusionComponents/audit/operations.mjs FusionComboBox .landing/FusionAudit/combo-operations.json < /dev/null
+```
+
+For a new Fusion slice, use the package and its exported vendor class before adding the C# declaration.
+The QueryBuilder package is a pinned example available without a Fusion declaration.
+
+```bash
+/usr/bin/lockf -k "$audit_lock" caffeinate -i node spec/FusionComponents/audit/operations.mjs @syncfusion/ej2-querybuilder:QueryBuilder .landing/FusionAudit/querybuilder-operations.json < /dev/null
+```
+
+This report contains the vendor graph and an empty C# declaration list. It checks the installed package against
+the lock, resolves the public export from its package entry, and refuses an unknown package, missing class or type-only export.
+Read the actual version of that package in `versions`. After the first typed declaration exists, run the report
+again with the Fusion slice name to compare the emitted operations through both host manifests.
+
+Start at `objects[root]`. Each member carries its declaring source, access, signatures and separate operations.
+A call operation records the one-based signature, argument count and whether that count starts a variadic tail.
+Each optional suffix gives a separate count. Positions list their TypeScript types, alternatives for unions
+and vendor object IDs. Look up the package in `versions` for the installed declaration's exact version.
+
+Follow an edge's `to` in `objects`. Its `site` identifies the member value, event payload, signature argument or
+return, setter, or index. A shape has one representative path and an edge for every incoming use is retained
+on the referring shape. This keeps cycles navigable. Named reference types preserve instantiated type arguments.
+A public signature can use an interface marked `@hidden`. Its shape carries `docHidden` and lists its visible members.
+Grid's selectionSettings leads to SelectionSettingsModel, getColumns returns Column[], and selectCellsByRange
+takes IIndex in either of its two positions. No C# holder is required to follow any of those edges.
+
+Each operation cites C# source locations. Resolve them in `declarations` to read the operator, C# arguments, actual
+argument expressions and matching lines for both host manifests. A matching mirrored class gives candidates wherever
+that vendor shape occurs. Check whether the calling path actually exposes it. Name, operation and emitted argument
+count are progressively narrower candidate lists. A fixed argument counts toward the JavaScript call. An unrecognized
+argument-list expression has unknown arity. For ComboBox filtering.updateData, inspect each of the one-, two- and
+three-argument rows and the alternatives on dataSource. The argument count alone cannot distinguish a local row list
+from a DataManager or establish a compatible return, a real vendor default or the observed browser effect.
+
+The report follows vendor declarations, records each union branch and links the objects found through arrays,
+generic arguments and function types. Wrapper and nested callback positions inside one type can share an edge site.
+It does not expand variadic tuples into all of their positional forms, reconstruct weak or synthesized shapes without
+vendor declaration sites, or enumerate the descendants of DOM and other external objects. A slice without a pinned EJ2
+root lists its C# declarations with an empty vendor graph. Review these boundaries, C# projections, aliases and
+host-specific gestures against their sources and behavioral evidence. The frozen inventory keeps its original format.
+
+Replay the inventory checks after changing the report code or the vendor pin.
+
+```bash
+/usr/bin/lockf -k "$audit_lock" caffeinate -i node --test spec/FusionComponents/audit/operations.test.mjs < /dev/null
+```
+
 ## How do the current ComboBox declarations check out?
 
 Run the inventory command below with the baseline option omitted, then compare the current graph with the typed

@@ -1,6 +1,6 @@
 ---
 name: onboard-component
-description: Declare a JavaScript component or plugin in C# so every framework feature works for it, as one slice: a declaration class that mirrors its typed API member for member, a render helper that starts it, and its own browser code beside them. Use when a component, a plugin, an object it returns or an event's payload is declared, when a declaration changes, and when a view needs a member no declaration has.
+description: Inventory and expose the public API of a JavaScript component or plugin as a typed C# slice, then prove the API on the real browser object. Use for full onboarding, public API audits and upgrades, or adding a member, returned object, event payload, or callback to an existing component.
 ---
 
 # Onboard a component
@@ -13,6 +13,25 @@ declaration is missing information, and the C# carries it. The framework's own c
 do, on the same public surface, and the conformance library is the exemplar of every form below
 (`tests/Alis.Reactive.Conformance.App/Components/`).
 
+## How do I start the named component?
+
+Onboard one component per session. Find its live instance and a landed slice that renders and listens the same
+way. For a new Fusion slice, run the [operation inventory](../../../spec/FusionComponents/audit/README.md#which-call-forms-and-nested-objects-does-a-slice-expose)
+on its pinned package export. For an existing slice, run it by slice name. Read the
+[full API audit and proof reference](references/full-api.md) to follow signatures, nested shapes and variants.
+For a scoped change, use that same workflow on the operations it reaches.
+
+1. Record the requested operations and variants in the component's spec. Read the exact vendor declarations and
+   the source that implements them.
+2. Map the operations through the typed C# surface. For Fusion, compare the emitted operations with the pinned
+   inventory and both host manifests.
+3. Prove each supported variant through a real rendered component. Record the named failure each browser case
+   catches. Account for every open operation and every exclusion in the component's coverage record.
+
+A matching name identifies a declaration to inspect. Full onboarding requires a reviewed signature and browser
+evidence for every eligible operation and a reason for each exclusion. Record the exact use case if the public
+framework surface cannot express a vendor contract.
+
 ## Read the API before declaring
 
 - Start with the vendor's declarations and source at the version the app pins. Enumerate public instance
@@ -20,6 +39,12 @@ do, on the same public surface, and the conformance library is the exemplar of e
   object to the members a view reaches. Keep a verdict with the spec for each uncovered member: a typed
   declaration and proof, evidence still needed, or an exclusion with its reason. Vendor members marked private
   or hidden, and names found only in docs, need a use case raised to the owner.
+  A public method's named types can be marked hidden in the vendor docs. Read the required arguments
+  and observed return shape through the public method. Declare the parts that its callers use.
+- Record user gestures separately from public calls. The vendor's checkbox, toolbar or keyboard action can
+  run a public event or change the component even when its public instance has no matching method. The pinned Grid
+  header has a select-all gesture. Its public Grid declaration supplies selection by index and selected-record
+  reads. Name each actual operation and preserve the difference in the inventory.
 - A weak type such as `Object`, `any` or a loose union needs evidence from the installed vendor. Start with the
   code that constructs or consumes the value. Run the applicable real gesture on the pinned version and record
   the member's exact name, shape and presence in each lane the declaration covers. Use a rendered page on
@@ -32,6 +57,9 @@ do, on the same public surface, and the conformance library is the exemplar of e
   required and nullable. For example, ComboBox emits both row keys, and clearing a selection gives a null
   current row. Use the nullable data type for plain data and `nullable: true` for a live holder. Reserve
   `optional: true` for a member that can be absent.
+  On Fusion, preserve the pinned declaration's optionality, which ALIS022 checks when the vendor analyzer
+  is enabled. If every observed gesture carries an optional member, record that observation alongside the
+  declared shape. Keep unresolved discrepancies in the component's coverage record.
 - Read the return type of the actual public call. A method that starts asynchronous work and returns void
   uses `Method`. A call that returns a Promise uses `MethodAsync`, and a view can read its resolved data through
   the typed result. Follow a live object to its own public methods. ComboBox's spinner methods return void.
@@ -121,6 +149,12 @@ public Event<Raised> Raised => Event<Raised>();
 
 ## Write the render helper
 
+For Fusion, follow a landed helper on both hosts. Let the EJ2 builder render the component and register
+its markup with the typed plan or input field. Use the shared helper for options and the host-specific
+parts for rendering. The live declaration reaches the instance through the Fusion vendor's object path.
+See [the ComboBox render helper](../../../Alis.Reactive.Fusion/FusionComponents/FusionComboBox/FusionComboBoxHtml.cs).
+
+For an app-owned component whose slice constructs the browser object, use the custom mount pattern below.
 An extension method on `ReactivePlan<TModel>` builds the component's element with `TagBuilder` under an id the
 developer chooses, writes the component's start into an attribute its code reads with `plan.Json(start)`, and
 returns what `plan.Render<TComponent>(id, host)` gives; a component that is an input has a second helper on
@@ -130,9 +164,10 @@ so the component starts the same under every app's JSON naming; a member a page 
 `JsonIgnore` with `WhenWritingNull`, never as a null the code would hold
 (`tests/Alis.Reactive.Conformance.App/Components/ConformanceComponent/ConformanceStart.cs`).
 
-## Write the component's code
+## Write browser code for a slice that owns mounting
 
-The object's browser code sits beside its declaration, a TypeScript file named for it in kebab case
+If the slice owns mounting or plugin registration, put its browser code beside its declaration in a TypeScript
+file named for it in kebab case
 (`tests/Alis.Reactive.Conformance.App/Components/ConformancePeer/conformance-peer.ts`), held to the runtime's strict
 compiler options and typed lint. It reaches the framework through two events and one queue, and nothing else:
 - On `alis:mount`, whose detail names a root, it builds an object for each element below that root its marker
@@ -151,6 +186,17 @@ Cover absence or null as the contract permits. For a loose vendor type, keep the
 shape and the Playwright test that uses the resulting C# door. Rerun both on a vendor upgrade. For a payload
 method, exercise the supported argument forms and observe the vendor effect. Plant the defect each test names
 through the prove-behavior skill.
+
+For a bulk action, read the installed source and prove the set of affected records. Check the combinations the
+screen enables: current view, other pages, active filters, and existing selections outside a filter. Probe event
+payloads for both single and bulk gestures before declaring their shape. Local and
+server-backed sets can differ. Use stable record keys in the request and assert the actual records in the receipt.
+Check an untouched record as well as the records that changed.
+
+When a component owns pending edits, prove what its active editor accepts before the pipeline reads the batch.
+Use the actual typed request and verify the rejected call stays in the browser when validation runs there.
+If the endpoint also validates the request, prove its refusal and that the user can correct their edits.
+The [proof reference](references/full-api.md#how-do-the-proofs-expose-different-kinds-of-gaps) links landed examples.
 
 ## How does this look in a real Fusion slice?
 

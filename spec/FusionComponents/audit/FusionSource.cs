@@ -32,8 +32,11 @@ internal static class FusionSource
         var alias = call?.ArgumentList.Arguments.SingleOrDefault(arg => arg.NameColon?.Name.Identifier.ValueText == "name");
         var js = alias is null ? Attribute(member, "JsonPropertyName").SingleOrDefault() ?? JsonNamingPolicy.CamelCase.ConvertName(name) : Literal(alias.Expression);
         var result = method?.ReturnType ?? property!.Type;
+        var args = call?.ArgumentList.Arguments.FirstOrDefault(arg => arg.NameColon is null || arg.NameColon.Name.Identifier.ValueText == "arguments");
+        var emittedArguments = args?.Expression is CollectionExpressionSyntax collection && collection.Elements.All(element => element is ExpressionElementSyntax)
+            ? collection.Elements.Select(element => element.ToString()).ToArray() : args is null ? Array.Empty<string>() : null;
         return new {
-            name, js, @operator = operation, at = At(member), source = member.ToString(),
+            name, js, @operator = operation, at = At(member), source = member.ToString(), emittedArguments,
             result = result.ToString(), arguments = method?.ParameterList.Parameters.Select(p => p.Type + " " + p.Identifier.ValueText).ToArray(),
             generics = method?.TypeParameterList?.Parameters.Select(p => p.Identifier.ValueText).ToArray() ?? Array.Empty<string>()
         };
