@@ -81,7 +81,8 @@ how a unit collects those lines.
 | What proves a piece of work, by what command | 1.2 |
 | What is open now | `scripts/open.py` and `HANDOFF.md` |
 | How a unit lands and is pushed | `scripts/land-unit.sh`, `scripts/full-check.sh`, `scripts/push.sh` |
-| What governs what; each forbidden practice and the tool that refuses it; how a unit is worked; how confidence is determined; when a handoff is written and a session starts, how to begin and how to reorient; where a correction goes; when a fork is used | root CLAUDE.md |
+| What governs what; each forbidden practice and the tool that refuses it; how a unit is worked; how confidence is determined; when a handoff is written and a session starts, how to begin and how to reorient; where a correction goes | root CLAUDE.md |
+| How work is handed to an agent or Codex, and how it is read and landed | `.claude/skills/delegate/SKILL.md` |
 | The standard of one kind of file | its file under `.claude/rules` |
 | The standard, the command and the refusals of one project | that project's own CLAUDE.md |
 | The owner's decisions, in the owner's words | `spec/CLAUDE.md`; verbatim in `spec/NOTES.md` |
@@ -203,7 +204,7 @@ spec/                                         the design source: BRIEF.md, REWRI
 Beside the tree the repository keeps `.claude/settings.json`, `.claude/hooks/protect-generated.mjs`, `.claude/hooks/refuse-known-traps.mjs`,
 `.claude/rules/analyzers.md`, `.claude/rules/csharp.md`, `.claude/rules/docs.md`, `.claude/rules/tests.md`,
 `.claude/rules/views.md`, `.claude/rules/process.md`,
-`.claude/skills/onboard-component`, `.claude/skills/prove-behavior`, `.claude/skills/build-a-screen`, `.claude/agents/builder.md`,
+`.claude/skills/onboard-component`, `.claude/skills/prove-behavior`, `.claude/skills/build-a-screen`, `.claude/skills/delegate`, `.claude/agents/builder.md`,
 `.claude/agents/designer.md`, `.claude/agents/page-writer.md` and `.claude/agents/pragmatic-architect.md`, which
 the cut rewrites for the new tree, and `.github/actions`, `.github/dependabot.yml` and `.github/release.yml`. Each project
 holds a CLAUDE.md of its own: its standard, its command and what it refuses.

@@ -65,6 +65,10 @@ not read, and outside them a word that holds a slash is read as a path. So the t
 that is no path, a shard's fraction among them, are quoted, and a path or an option is written outside the quotes (the
 lead's mistakes, 2026-11-11).
 
+A section, a heading or the owner's words a rule file cites is read at its source before the line is written: a
+section by its heading at HEAD, the owner's words in `spec/NOTES.md`. A line that leaves a rule file is traced to its
+home first, a search finding its meaning there, and the commit names that home (the lead's mistakes, 2026-11-23).
+
 ## Workflow
 
 1. Read the actual source code for the feature.

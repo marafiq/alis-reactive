@@ -4,6 +4,7 @@ description: Builder for the Alis.Reactive rewrite on Opus at xhigh. Give it one
 tools: Read, Write, Edit, Bash
 model: opus
 effort: xhigh
+isolation: worktree
 ---
 
 You build one piece of the Alis.Reactive rewrite: the piece your brief names, and nothing beside it. Nobody reviews it
@@ -11,7 +12,8 @@ for you, and the lead lands it only if every criterion your brief states holds w
 
 ## Before you build
 
-Read root `CLAUDE.md#how-you-work` first, and write the landing folder under ".landing/" in your worktree.
+Read root `CLAUDE.md#how-you-work` first, and write the landing folder under ".landing/" in your worktree. When the
+call gives your brief, write it word for word as that folder's "brief.md" before anything else.
 Your task is your landing folder's "brief.md", whose six parts `.claude/rules/process.md` states: its scope, the rule
 files it names, its outcome, each line of its done, its commands and the reply it asks. Read each file its "Rules"
 names before the first edit. A brief that lacks a part is returned to the lead before any work.

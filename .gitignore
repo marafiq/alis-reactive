@@ -8,6 +8,7 @@ node_modules/
 *.user
 .vs/
 .worktrees/
+.claude/worktrees/
 /tools/*
 !/tools/PlanContractGenerator/
 
