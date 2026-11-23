@@ -63,8 +63,8 @@ def note_follow_up_landed(note):
     return note["parts"][3] in note["landed"], f"its follow-up {note['parts'][3]} landed"
 
 
-@guard("paths-equal-head")
-def paths_equal_head(unit):
+@guard("landed-on-the-lane")
+def landed_on_the_lane(unit):
     return unit["equal"], ""
 
 
@@ -210,6 +210,12 @@ def state_of(track, item):
     raise SystemExit(f"{PROCESS.as_posix()}: no row of the track {track} holds")
 
 
+def held_by_a_commit(tree, line):
+    base = git("rev-parse", "HEAD", cwd=tree)
+    found = git("log", "-F", f"--grep={line}", "--format=%H", f"{base}..HEAD").split()
+    return any(line in git("log", "-1", "--format=%B", commit).splitlines() for commit in found)
+
+
 def units():
     found = []
     for entry in git("worktree", "list", "--porcelain", "-z").split("\0\0"):
@@ -221,6 +227,8 @@ def units():
             files = {file: (folder / file).is_file() for file in ("brief.md", "paths.txt", "message.txt", "reply.md", "read.md")}
             paths = [line for line in (folder / "paths.txt").read_text().splitlines() if line] if files["paths.txt"] else []
             equal = bool(paths) and files["message.txt"] and all(((tree / path).read_bytes() if (tree / path).is_file() else None) == blob(path) for path in paths)
+            first = (folder / "message.txt").read_text().splitlines()[:1] if files["message.txt"] else []
+            equal = equal or bool(paths and first and first[0].strip() and held_by_a_commit(tree, first[0]))
             verdict = ""
             if files["read.md"]:
                 verdict = next((line for line in (folder / "read.md").read_text().splitlines() if line.startswith("verdict: ")), "")

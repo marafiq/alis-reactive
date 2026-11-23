@@ -192,9 +192,9 @@ a task takes, how each is started, what a brief carries, and how the work is rea
 ## Workflow
 
 - `main` is the trunk and the release line; a release is an annotated `vX.Y.Z[-rc.N]` tag on `main` (`spec/REWRITE.md`, 2.8).
-- The rewrite runs on `feature/rewrite` and lands on `main` by pull request; other work branches from `origin/main` in
-  a worktree (`feature/`, `fix/`, `chore/`): `git worktree add .worktrees/<name> -b feature/<name> origin/main`. A
-  SessionStart hook installs the pre-commit guard. `git stash` is never run: `stash@{0}` holds work that stays put.
+- Every unit lands on `feature/rewrite`; its one pull request ships 1.0 to `main` (the owner, 2026-11-23). `git stash`
+  is never run: `stash@{0}` holds work that stays put. Other work branches from `origin/main` in a worktree
+  (`feature/`, `fix/`, `chore/`): `git worktree add .worktrees/<name> -b feature/<name> origin/main`.
 - Each script is `spec/REWRITE.md`, section 2.1, joined with the commit that writes it; each pin is section 2.7, and
   Syncfusion's is the owner's (`node scripts/pin-syncfusion.mjs <version>`).
 - C# 14, compiled for `net48` and `net10.0`; `Alis.Reactive/CLAUDE.md` holds the one rule for a host's own code.

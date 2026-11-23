@@ -6,9 +6,10 @@ Nothing more is written here: no entry, no rung, no new step (the owner, 2026-11
 caught very quickly, not that they become their own maintenance"). A kind that grows while its holder stands moves
 that holder up a rung the same turn, from a line of root `CLAUDE.md` to the rule file that loads with that kind of
 file, then to a tool that refuses it, and its row names the new holder (the owner, 2026-11-23: "its not log and
-forgotten, its to enforce progressive learning"). The orient prints every row at a start and after a compaction, and
-every agent reads them before each piece. The 135 entries of 2026-11-12 to 2026-11-14, their thirty-eight classes and
-the checks that waited for the owner are in git at 2a4a56b59.
+forgotten, its to enforce progressive learning"). `scripts/land-unit.sh` refuses a landing in which a kind grew while
+its row and every file the row names stood. The orient prints every row at a start and after a compaction, and every
+agent reads them before each piece. The 135 entries of 2026-11-12 to 2026-11-14, their thirty-eight classes and the
+checks that waited for the owner are in git at 2a4a56b59.
 
 | Kind | Count | What catches it |
 |---|---:|---|
@@ -16,7 +17,7 @@ the checks that waited for the owner are in git at 2a4a56b59.
 | A rule or a tool's list not applied before the change | 437 | A commit is made only by the landing script: the gate, then every written browser test, then the run compared test by test with the one before, so no check a tool holds is skipped; `should` is written `must` (the owner, 2026-11-14). Held by: `scripts/land-unit.sh`, `scripts/gate.sh`, `scripts/land.sh` and the pre-commit hook `scripts/install-git-hooks.sh` installs, which refuses a commit they did not make; for a line that leaves a rule file, `.claude/rules/docs.md`, "Rule files" |
 | A number, a proof line or an absence not read from the run that proves it | 59 | The run's own result line, read when it prints; a search over every tracked file, with its count; a unit's doors read from its features, each feature's doors wherever their files are, never from its folder. Held by: `scripts/open.py`, `scripts/stamp.py` and root `CLAUDE.md`, "Confidence" |
 | A shell command or a script wrong in its own terms | 613 | An edit or a read of more than one line is a Python script that asserts each match's count before it writes, never a zsh one-liner; a search is `git grep`, never `grep --include`; `echo "exit $?"` straight after the command; the traps of zsh and git grep a builder met most, named in `.claude/agents/builder.md`. Held by: `.claude/hooks/refuse-known-traps.mjs`, which refuses the shapes met most before they run, and root `CLAUDE.md`, "How you work" |
-| Said to the owner in a way that hid or blurred what holds | 12 | A status says what works, how many units are left and each count; a question goes to the owner only for a principle or a scope the owner has not decided. Held by: `scripts/open.py`, whose output a status is, and root `CLAUDE.md`, "Sessions" |
+| Said to the owner in a way that hid or blurred what holds | 13 | A status says what works, how many units are left and each count; a question goes to the owner only for a principle or a scope the owner has not decided. Held by: `scripts/open.py`, whose output a status is; root `CLAUDE.md`, "Sessions"; and the opening of `.claude/rules/process.md`, which lands a piece of the process found open in the session that finds it |
 | The lead's own process put before the product | 6 | A push per unit, no check of a check, and a mistake written as a count. Held by: `scripts/push.sh` and root `CLAUDE.md`, "Spec-first" |
 | A costly agent run started before its environment was proven to run the brief's commands | 9 | A low-effort probe of the exact build and test commands in the agent's sandbox before a max-effort run, and the brief names those commands (the owner, 2026-11-14: "please use codex efficiently, do not waste very priced resources"). Held by: `.claude/skills/delegate/SKILL.md` |
 | The toolchain kept where the system deletes it: another session's folder under /private/tmp, which macOS's tmp_cleaner empties of old files at midnight | 2 | The pins live in the home folder's .local/share/alis-toolchain, which each session's environment file names and `scripts/doctor.sh` checks. Held by: `scripts/toolchain-env.sh` and `scripts/doctor.sh` |

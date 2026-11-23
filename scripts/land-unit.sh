@@ -70,6 +70,24 @@ for d in "${folders[@]}"; do
   if [ -f "$d/spec.py" ]; then python3 -I -B "$d/spec.py" . > /dev/null || { echo "[$batch] $slice: spec.py refused"; exit 1; }; fi
 done
 git add -- spec
+python3 -I -B - "$batch" HEAD --staged <<'HELD' || exit 1
+import re
+import subprocess
+import sys
+batch, before_ref, after_ref = sys.argv[1:4]
+def text(ref):
+    spec = ":spec/MISTAKES.md" if ref == "--staged" else f"{ref}:spec/MISTAKES.md"
+    return subprocess.run(["git", "show", spec], capture_output=True, text=True, check=True).stdout
+def rows(text):
+    return {row.group(1).strip(): (int(row.group(2)), row.group(3)) for row in re.finditer(r"^\| ([^|]+?) \| (\d+) \|(.*)$", text, re.M)}
+before, after = rows(text(before_ref)), rows(text(after_ref))
+compared = ["--cached", before_ref] if after_ref == "--staged" else [before_ref, after_ref]
+changed = set(subprocess.run(["git", "diff", "--name-only", *compared], capture_output=True, text=True, check=True).stdout.split())
+stood = [kind for kind, (count, holder) in after.items() if kind in before and count > before[kind][0] and holder == before[kind][1] and not changed & set(re.findall(r"`([^`]+)`", holder))]
+for kind in stood:
+    print(f"[{batch}] the kind \"{kind[:50]}\" grew from {before[kind][0]} to {after[kind][0]} while its row and every file it names stood: move its holder up a rung")
+sys.exit(1 if stood else 0)
+HELD
 python3 spec/tools/check.py --generate > /dev/null || { echo "[$batch] check.py --generate refused"; exit 1; }
 git checkout -- spec/STATE.json 2>/dev/null
 git add -- tests/Alis.Reactive.Conformance.World/Promises.g.cs tests/Alis.Reactive.Conformance.World/Gates.g.cs

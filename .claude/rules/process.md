@@ -1,14 +1,12 @@
 # The process
 
-The process is one state machine, and this file is its only statement. Each track below is a table whose rows are
-that track's states in the order they are tested: the first row whose guard holds is the state. `scripts/state.py`
-reads these tables as its data and runs each guard by the function of its name; a guard that the tables name and the
-script lacks, or the other way, stops it. The script prints each item's state, what to read first and the command
-that leaves it. The tables hold the hand-offs alone; how the work inside a state is done is its builder's.
-
-```bash
-python3 scripts/state.py
-```
+The process is one state machine, and this file is its only statement. Each track below is a table whose rows are that
+track's states in the order they are tested: the first row whose guard holds is the state. `scripts/state.py` reads
+these tables as its data and runs each guard by the function of its name; a guard that the tables name and the script
+lacks, or the other way, stops it. The script prints each item's state, what to read first and the command that leaves
+it. The tables hold the hand-offs alone; how the work inside a state is done is its builder's. A piece of the process
+that a session finds open lands in that session, never handed to the next as an open item (the owner, 2026-11-23: "why
+u have still open items").
 
 ## Track: a note of the owner's
 
@@ -22,7 +20,7 @@ python3 scripts/state.py
 
 | State | Guard | Read first | Leaves by | Exit line | Goes to | A failure goes to |
 |---|---|---|---|---|---|---|
-| unit: landed | paths-equal-head | nothing | `git worktree remove {worktree}` | none | gone | none |
+| unit: landed | landed-on-the-lane | nothing | `git worktree remove {worktree}` | none | gone | none |
 | unit: unbriefed | not brief-six-parts or not rules-name-files or not base-line | the files of a unit, below | the brief is completed, before any work | none | unit: briefed | none |
 | unit: dropped | verdict-drop | nothing | `git worktree remove --force {worktree}`, its reason kept in the queue of `HANDOFF.md` | none | gone | none |
 | unit: sent back | verdict-back | its "read.md" | the builder does what "read.md" names | each line of the brief's "Done" | unit: returned | unit: dropped, at a second return that fails |
@@ -74,7 +72,7 @@ python3 scripts/state.py
 | always | nothing: the last row of a track |
 | note-lacks-a-part | an entry of the notes block of `HANDOFF.md` holds fewer than five parts, or "?" as its kind, home or follow-up |
 | note-follow-up-landed | the entry's follow-up is a unit the script reads as landed |
-| paths-equal-head | "paths.txt" and "message.txt" stand and every path of "paths.txt" equals the lane's HEAD |
+| landed-on-the-lane | "paths.txt" and "message.txt" stand, and every path of "paths.txt" equals the lane's HEAD, or a commit since the unit's base holds the first line of "message.txt" as a line of its message |
 | brief-six-parts | "brief.md" holds the headings Scope, Rules, Outcome, Done, Commands and Reply |
 | rules-name-files | the brief's "Rules" name a file, and every file they name is in the unit's worktree |
 | base-line | the brief's "Done" holds a line "At the base:", what each proof command printed at the base before any work |

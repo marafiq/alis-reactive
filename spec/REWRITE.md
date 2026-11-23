@@ -119,7 +119,7 @@ scripts/                              section 2.7's scripts
 scripts/toolchain-env.sh              the sourced toolchain environment from ALIS_TOOLCHAIN or the home folder
 scripts/gate.sh                       the staged unit's checks, refusing main
 scripts/land.sh                       pause TLC, gate, run every browser test, compare regressions, stamp and commit, resume TLC
-scripts/land-unit.sh                  merge a worktree's landing folders, apply their spec edits and land one commit
+scripts/land-unit.sh                  merge a worktree's landing folders, apply their spec edits, refuse a kind of mistake grown while its holder stood, and land one commit
 scripts/full-check.sh                 the full spec check at HEAD, its log under .work/logs/
 scripts/push.sh                       push the checked branch, then its STATE and generated handoff together
 scripts/regressions.py                compare a browser run with the last landed run
