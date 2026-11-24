@@ -1,7 +1,7 @@
 import type { LiveCheck } from "../InputsAndIds/index";
 import type { Owner } from "../OwnershipAndState/index";
 import {
-  assertNever, notBuilt, type CheckedBody, type Expression, type FnExpression, type FormCheck, type FormPlace, type InputEntry, type PathStep, type PlanDocument, type Registration,
+  assertNever, notBuilt, type CheckedBody, type FnExpression, type FormCheck, type FormPlace, type InputEntry, type PathStep, type PlanDocument, type Registration,
   type RegistrationStep, type RuleGroup, type SentInput,
 } from "../Schema/index";
 import { called, Stop, value } from "../ValuesAndSources/index";
@@ -175,26 +175,8 @@ class Run {
     }
   }
 
-  #holds(test: Expression, ...values: unknown[]): boolean {
-    switch (test.kind) {
-      case "fn":
-        return this.#apply(test, values) === true;
-      case "lit":
-      case "obj":
-      case "ref":
-      case "get":
-      case "data":
-      case "as":
-      case "call":
-      case "answer":
-      case "record":
-      case "list":
-      case "op":
-      case "signal":
-        throw notBuilt("a rule's test written as a " + test.kind + " expression: the contract types a test and a condition as any expression, though C# writes each as a fn");
-      default:
-        return assertNever(test);
-    }
+  #holds(test: FnExpression, ...values: unknown[]): boolean {
+    return this.#apply(test, values) === true;
   }
 
   #isRefused(path: readonly PathStep[]): boolean {

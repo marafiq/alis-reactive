@@ -52,7 +52,9 @@ read. Read these whole, before anything else:
    line the command that counted it printed.
 3. **Objections**: the two strongest against your design, each with your answer.
 4. **Runs**: each command you ran on the finished files and the line it printed. A check your files meet is run
-   before you reply, so the lead runs it once where the work lands and never again.
+   before you reply, so the lead runs it once where the work lands and never again. A case you propose holds a line
+   only where the defect planted on that line was run and failed it; a plant not run is named unrun, never claimed
+   (the lead, 2026-11-23: a proposed case claimed to hold an order a plant then showed it did not).
 
 Plain text, no preamble, at most the lines your brief allows, and written as "reply.md" in your landing folder: after
 the rule lines, each line of the brief's "Done" as its command printed it, then what did not run.

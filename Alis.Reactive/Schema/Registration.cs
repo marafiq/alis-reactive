@@ -130,7 +130,7 @@ internal sealed class RuleGroup
 
     public IReadOnlyList<RegistrationStep> Path { get; }
 
-    public Expression When { get; }
+    public FnExpression When { get; }
 
     public IReadOnlyList<RuleField> Fields { get; }
 
@@ -159,9 +159,9 @@ internal sealed class RuleTest
         Message = message;
     }
 
-    public Expression Check { get; }
+    public FnExpression Check { get; }
 
-    public Expression When { get; }
+    public FnExpression When { get; }
 
     public string Message { get; }
 }

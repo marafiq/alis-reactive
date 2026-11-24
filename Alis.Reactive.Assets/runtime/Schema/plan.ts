@@ -56,7 +56,7 @@ export interface Source {
 }
 
 export interface Vendor {
-  readonly locate: Expression;
+  readonly locate: FnExpression;
   readonly listen: Listening;
 }
 
@@ -373,7 +373,7 @@ export type BoundListJson = "append" | "replace";
 
 export interface RuleGroup {
   readonly path: readonly RegistrationStep[];
-  readonly when: Expression;
+  readonly when: FnExpression;
   readonly fields: readonly RuleField[];
   readonly groups: readonly RuleGroup[];
 }
@@ -384,8 +384,8 @@ export interface RuleField {
 }
 
 export interface RuleTest {
-  readonly check: Expression;
-  readonly when: Expression;
+  readonly check: FnExpression;
+  readonly when: FnExpression;
   readonly message: string;
 }
 

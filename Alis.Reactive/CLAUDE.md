@@ -19,7 +19,8 @@ uses only the rows before its own. `spec/REWRITE.md` section 2.3 says why each r
   `Schema/`'s, written from `spec/Core/schema.md`: a union is an abstract class that names each kind's class, a
   kind's class is its kind and then its union (`SetStatement`), a constructor takes every field and none is
   nullable, and a closed choice is a sealed class with a private constructor and one instance a case, written as
-  its text (`Schema/Choice.cs`). A member that holds a kind is typed as its union, so the plan writes its kind.
+  its text (`Schema/Choice.cs`). A member that holds a kind is typed as its union, so the plan writes its kind; a member that holds one kind alone is
+  typed as that kind's class, which writes its kind as its own property (`FnExpression`).
   `Schema/PlanJson.cs` holds the options the plan is written with.
 - The TypeScript contract and the plan's JSON schema are generated from the grammar as System.Text.Json writes it
   (`tools/PlanContractGenerator`), never edited by hand, and `scripts/check.sh` fails on a grammar the tracked
@@ -65,5 +66,5 @@ scripts/check.sh --no-spec
 | A comment; an XML doc off the public surface | `WhenCodeIsWritten` |
 | A use of reflection, of `Activator`, of a type found by its name, of a compiled expression or of a regular expression | the build (RS0030, `BannedSymbols.txt`), each entry held by `WhenTheCoreIsCompiled` |
 | A read of type information off the owner's list | `WhenTheCoreIsCompiled` |
-| A node left open, a nullable field, a field typed as a kind's class, a kind written twice or by a class not named for it, a choice a case of which can be made outside it | the contract generator, held by `WhenThePlanContractIsGenerated` |
+| A node left open, a nullable field, a field typed as a kind's class whose union writes its kind, a kind written twice or by a class not named for it, a choice a case of which can be made outside it | the contract generator, held by `WhenThePlanContractIsGenerated` |
 | A grammar the tracked contract differs from | `scripts/check.sh`, its first step |

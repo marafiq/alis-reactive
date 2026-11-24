@@ -1,7 +1,7 @@
 import { assertNever, type ElementLocator, type Listening, type Locator, type Vendor } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
 import { isAnObject, type Context } from "./context";
-import { evaluate } from "./expressions";
+import { applied } from "./expressions";
 
 export type ElementFor = (id: string) => object | null;
 export type PluginFor = (name: string, key: string) => unknown;
@@ -68,13 +68,9 @@ function vendorOf(context: Context, name: string): Vendor {
 }
 
 function locateOf(context: Context, vendor: string): Locate {
-  const find = evaluate(vendorOf(context, vendor).locate, { ...context, scope: new Map() });
-  if (find.kind === "nothing" || typeof find.value !== "function") throw new Error("The vendor '" + vendor + "' locates its object by no function.");
-  const locate = find.value;
-  return (element) => {
-    const found: unknown = Reflect.apply(locate, undefined, [element]);
-    return found;
-  };
+  const locate = vendorOf(context, vendor).locate;
+  const unscoped: Context = { ...context, scope: new Map() };
+  return (element) => applied(locate, [element], unscoped);
 }
 
 function heldOn(element: object, locator: ElementLocator, locate: Locate): object {

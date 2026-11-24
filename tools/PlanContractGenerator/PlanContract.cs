@@ -104,7 +104,7 @@ public sealed class PlanContract
             JsonTypeInfoKind.Enumerable => ListOf(Visit(info.ElementType!, holder)),
             JsonTypeInfoKind.Dictionary => MapOf(Visit(info.ElementType!, holder)),
             JsonTypeInfoKind.Object when info.PolymorphismOptions is { } polymorphism => Named(Union(type, polymorphism)),
-            JsonTypeInfoKind.Object => Named(Node(WrittenWithItsKind(type, holder), info, kind: null)),
+            JsonTypeInfoKind.Object => Named(WrittenByItsClass(type, holder) ?? Node(type, info, kind: null)),
             _ => Named(Choice(type, holder)),
         };
     }
@@ -146,9 +146,9 @@ public sealed class PlanContract
         foreach (var derived in polymorphism.DerivedTypes)
         {
             var info = _options.GetTypeInfo(derived.DerivedType);
-            var isProperty = _isContract && derived.TypeDiscriminator == null;
+            var isProperty = derived.TypeDiscriminator == null;
             var property = isProperty
-                ? info.Properties.SingleOrDefault(candidate => candidate.AttributeProvider is MemberInfo member && member.Name == polymorphism.TypeDiscriminatorPropertyName)
+                ? info.Properties.SingleOrDefault(candidate => candidate.Name == polymorphism.TypeDiscriminatorPropertyName || (candidate.AttributeProvider is MemberInfo member && member.Name == polymorphism.TypeDiscriminatorPropertyName))
                 : null;
             var kind = isProperty
                 ? property?.PropertyType == typeof(string) ? property.Get?.Invoke(RuntimeHelpers.GetUninitializedObject(derived.DerivedType)) as string : null
@@ -180,16 +180,19 @@ public sealed class PlanContract
         return visited;
     }
 
-    private Type WrittenWithItsKind(Type type, string holder)
+    private string? WrittenByItsClass(Type type, string holder)
     {
         for (var union = type.BaseType; union != null && union != typeof(object); union = union.BaseType)
         {
-            var isAKindOfIt = _options.GetTypeInfo(union).PolymorphismOptions?.DerivedTypes.Any(derived => derived.DerivedType == type) ?? false;
-            if (isAKindOfIt)
-                throw new GrammarRefusedException($"{holder} is typed as {type.Name}, a kind of {union.Name}, so the plan would write it without its kind; type the member as {union.Name}.");
+            var registrations = _options.GetTypeInfo(union).PolymorphismOptions?.DerivedTypes.Where(derived => derived.DerivedType == type).ToList() ?? [];
+            if (registrations.Count == 0) continue;
+            if (registrations[0].TypeDiscriminator != null)
+                throw new GrammarRefusedException($"{holder} is typed as {type.Name}, a kind of {union.Name}, so the plan would write it without its kind; type the member as {union.Name}, or have {type.Name} write its kind as its own property.");
+            Visit(union, holder);
+            return type.Name;
         }
 
-        return type;
+        return null;
     }
 
     private string Node(Type type, JsonTypeInfo info, Kind? kind)

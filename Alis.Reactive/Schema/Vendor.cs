@@ -11,7 +11,7 @@ internal sealed class Vendor
         Listen = listen;
     }
 
-    public Expression Locate { get; }
+    public FnExpression Locate { get; }
 
     public Listening Listen { get; }
 }

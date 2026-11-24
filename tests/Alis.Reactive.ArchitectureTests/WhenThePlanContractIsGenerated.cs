@@ -431,10 +431,36 @@ public class WhenThePlanContractIsGenerated
         => Assert.That(Refusal<RoundWithARota>(), Is.EqualTo("WeekRota is a kind of Rota with no text for its kind."));
 
     [RefusedCase]
-    public void a_field_typed_as_a_kinds_class_is_refused()
+    public void a_field_typed_as_a_kind_its_union_writes_is_refused()
         => Assert.That(
             Refusal<RoundOfOneVisit>(),
-            Is.EqualTo("RoundOfOneVisit.first is typed as DayVisit, a kind of Visit, so the plan would write it without its kind; type the member as Visit."));
+            Is.EqualTo("RoundOfOneVisit.first is typed as DayVisit, a kind of Visit, so the plan would write it without its kind; type the member as Visit, or have DayVisit write its kind as its own property."));
+
+    [AcceptedCase]
+    public void a_field_typed_as_a_kind_that_writes_its_own_kind_is_written_with_it()
+    {
+        var call = new NightCall { Nurse = "Ada" };
+        Assert.That(PlanContract.Read(Options, typeof(RoundOfOneCall), []).TypeScript(), Is.EqualTo(
+            """
+            export interface RoundOfOneCall {
+              readonly first: NightCall;
+            }
+
+            export type Call = DayCall | NightCall;
+
+            export interface DayCall {
+              readonly kind: "day";
+            }
+
+            export interface NightCall {
+              readonly kind: "night";
+              readonly nurse: string;
+            }
+
+            """));
+        Assert.That(JsonSerializer.Serialize(new RoundOfOneCall { First = call }, Options), Is.EqualTo("{\"first\":{\"kind\":\"night\",\"nurse\":\"Ada\"}}"));
+        Assert.That(JsonSerializer.Serialize<Call>(call, Options), Is.EqualTo("{\"kind\":\"night\",\"nurse\":\"Ada\"}"));
+    }
 
     [RefusedCase]
     public void a_kind_two_unions_write_is_refused()
@@ -491,10 +517,10 @@ public class WhenThePlanContractIsGenerated
         => Assert.That(ContractRefusal<RoundWithARota>(), Is.EqualTo("WeekRota is a kind of Rota with no text for its kind."));
 
     [RefusedCase]
-    public void a_contract_field_typed_as_a_kinds_class_is_refused()
+    public void a_contract_field_typed_as_a_kind_its_union_writes_is_refused()
         => Assert.That(
             ContractRefusal<RoundOfOneVisit>(),
-            Is.EqualTo("RoundOfOneVisit.first is typed as DayVisit, a kind of Visit, so the plan would write it without its kind; type the member as Visit."));
+            Is.EqualTo("RoundOfOneVisit.first is typed as DayVisit, a kind of Visit, so the plan would write it without its kind; type the member as Visit, or have DayVisit write its kind as its own property."));
 
     [RefusedCase]
     public void a_contract_field_of_a_type_with_no_row_is_refused()
@@ -702,6 +728,25 @@ public class WhenThePlanContractIsGenerated
     private sealed class RoundOfOneVisit
     {
         public required DayVisit First { get; init; }
+    }
+
+    private sealed class RoundOfOneCall
+    {
+        public required NightCall First { get; init; }
+    }
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
+    [JsonDerivedType(typeof(DayCall), "day")]
+    [JsonDerivedType(typeof(NightCall))]
+    internal abstract class Call;
+
+    internal sealed class DayCall : Call;
+
+    internal sealed class NightCall : Call
+    {
+        public string Kind => "night";
+
+        public required string Nurse { get; init; }
     }
 
     private sealed class RoundWithTwoDays

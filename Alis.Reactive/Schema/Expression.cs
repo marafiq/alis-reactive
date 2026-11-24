@@ -12,7 +12,7 @@ namespace Alis.Reactive.Schema;
 [JsonDerivedType(typeof(DataExpression), "data")]
 [JsonDerivedType(typeof(AsExpression), "as")]
 [JsonDerivedType(typeof(CallExpression), "call")]
-[JsonDerivedType(typeof(FnExpression), "fn")]
+[JsonDerivedType(typeof(FnExpression))]
 [JsonDerivedType(typeof(AnswerExpression), "answer")]
 [JsonDerivedType(typeof(RecordExpression), "record")]
 [JsonDerivedType(typeof(ListExpression), "list")]
@@ -123,6 +123,8 @@ internal sealed class FnExpression : Expression
         Params = parameters;
         Body = body;
     }
+
+    public string Kind => "fn";
 
     public IReadOnlyList<string> Params { get; }
 

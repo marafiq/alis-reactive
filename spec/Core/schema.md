@@ -206,6 +206,9 @@ a list of `RuleTest`. `RuleTest` carries:
 - `when`: a `fn` of the instance, the rule's own condition;
 - `message`: the text C# wrote.
 
+`RuleGroup.when`, `RuleTest.check`, `RuleTest.when` and `Vendor.locate` hold a `fn` and no other kind, and the
+contract types each as `FnExpression`, a kind's class that writes its kind as its own property.
+
 The verdict on 65fdf118d's `FormField` (`items` as `fn(sent)`, `value` as `fn(i, sent)`) and `FormPluginData.live`,
 raised after the fact in the brief:
 - The item and value functions leave. A field is a path with `each`, read over one checked body, and the form
