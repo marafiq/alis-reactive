@@ -1,19 +1,19 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 13:44:12 EST 2026
+Written at `date`: Tue Nov 24 14:36:17 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (35): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, TextBodyCheck, WriterMove
+unit: landed (36): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, SplitValue, TextBodyCheck, WriterMove
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at 0a578a9ab on feature/rewrite
+lane: pushing at 6a7112399 on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at 0a578a9ab
+ci: unread at 6a7112399
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -26,21 +26,22 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 0a578a9ab values: the request writers' wire forms move to ValuesAndSources, and as writes its own kind; the plan's bytes unchanged
-- Full check: .work/logs/spec-check-0a578a9ab.log: spec check at 0a578a9ab: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-133410-66800 0a578a9ab
+- HEAD: 6a7112399 inputs: a binding carries its converted read and its blank as two fields, and the browser takes no expression apart
+- Full check: .work/logs/spec-check-6a7112399.log: spec check at 6a7112399: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-142219-33574 6a7112399
 
 ## Landed since the commit before the last spec: STATE commit
-0a578a9ab values: the request writers' wire forms move to ValuesAndSources, and as writes its own kind; the plan's bytes unchanged
-5c1dbadb6 spec: STATE and handoff at 83b406a43
+6a7112399 inputs: a binding carries its converted read and its blank as two fields, and the browser takes no expression apart
+f5b5e7454 spec: STATE and handoff at 0a578a9ab
 
 ## Open
-open: 19 promises with no browser test, 4 runtime cases not built, 14 doors not implemented
+open: 19 promises with no browser test, 1 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 440 to 441
-- A shell command or a script wrong in its own terms: 631 to 632
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 441 to 442
+- A number, a proof line or an absence not read from the run that proves it: 71 to 72
+- A shell command or a script wrong in its own terms: 632 to 636
 
 ## The owner's latest decisions
 spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
@@ -106,17 +107,16 @@ operators in spriti to land 1.0"); `spec/NOTES.md`'s table "After 1.0" holds whe
 Its units, in order:
 1. The plan narrowed to what C# writes: an input's value read and a rule's test, each case's own error text
    names the form C# writes. `RuleTest` and `RuleGroup` take a `FnExpression` (`Alis.Reactive/Schema/Registration.cs`)
-   and the one writer of `InputBinding` writes `coalesce(as(read, shape), blank)` (`Alis.Reactive/InputsAndIds/BoundInput.cs`);
-   the contract widens both to any expression, since the generator refuses a field typed as a kind's class
-   (`tools/PlanContractGenerator/CLAUDE.md`); no TLA+ spec models these fields. Its first half landed at 31e6361c3: a
+   and the one writer of `InputBinding` writes its `converted` read and its `blank` (`Alis.Reactive/InputsAndIds/BoundInput.cs`),
+   typed as the `as` and the `lit` it writes, each of which writes its own kind; no TLA+ spec models these fields. Its first half landed at 31e6361c3: a
    rule's test and condition and a vendor's locate typed as the `fn` C# writes, the plan's bytes unchanged. Its second
    half, `InputBinding`, is one family's design, `../input-form/.landing/InputForm/design.md` (its read, read.md;
    the model, scratch/tla2; the built move, `../writer-move`). The owner's yes to both decisions came 2026-11-24, and
    they land as four units, smallest first: the check of a text or file body landed at 6da8232ec (X16.46), and of
    a request that sends no body at 83b406a43 (X16.46's third promise); the writer's move, with `as` writing its own
-   kind and the plan's bytes unchanged, at 0a578a9ab; next the split
-   of `value` into `converted` and `blank`, then `sent` (the bug fix).
-   `InputsAndIds/model.ts`'s three cases stand until it lands.
+   kind and the plan's bytes unchanged, at 0a578a9ab; the split of `value` into `converted` and `blank`, with `lit`
+   writing its own kind, at 6a7112399, which removed `InputsAndIds/model.ts`'s three cases not built; next `sent`
+   (the bug fix).
 2. The form-data boundary: an enum sent in form data (the move-in app met it; the designer decides its form),
    an object stays refused until after 1.0 (the owner's yes of 2026-11-17); a text or file body's check landed
    at 6da8232ec (X16.46). On MVC 5 an action's model binds route values and the query beside the body
