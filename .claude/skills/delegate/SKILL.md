@@ -31,7 +31,9 @@ has read it at the source.
   it applied, by file and line at the base. The lead reads those at the source and the change against the brief,
   checks that each test and its planted failure prove the named behavior without re-running the worker's plants, runs
   the gate once where the work lands, and lands or drops it the same session with the reason (the owner, 2026-11-19:
-  "its not check and rubber stamp it"). A task whose check costs what the work costs is the lead's own.
+  "its not check and rubber stamp it"). A task whose check costs what the work costs is the lead's own. A consult's
+  answer is carried line by line: before the unit built from it lands, each line it decided is found in the change, or
+  named in the unit's message with its reason (the lead's mistake, 2026-11-24).
 - Codex consults read-only or takes one scoped build, its input closed, on its top model at max effort: one question or
   one piece, its lines and files named, a reply of bounded length, the repository read at the base and nothing written
   outside its own folder, with full permissions only when its sandbox blocks the brief's commands. A build and a
