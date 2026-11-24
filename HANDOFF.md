@@ -1,23 +1,23 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 14:36:17 EST 2026
+Written at `date`: Tue Nov 24 17:46:40 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (36): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, SplitValue, TextBodyCheck, WriterMove
+unit: landed (37): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, SplitValue, TextBodyCheck, WriterMove
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
-unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm
+unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at 6a7112399 on feature/rewrite
+lane: pushing at b824783d3 on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at 6a7112399
+ci: unread at b824783d3
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2096 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2103 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
@@ -26,22 +26,23 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 6a7112399 inputs: a binding carries its converted read and its blank as two fields, and the browser takes no expression apart
-- Full check: .work/logs/spec-check-6a7112399.log: spec check at 6a7112399: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-142219-33574 6a7112399
+- HEAD: b824783d3 inputs (sent): each input is sent by the form its binding carries, an enum by its rows, a blank start left out
+- Full check: .work/logs/spec-check-b824783d3.log: spec check at b824783d3: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-173234-40856 b824783d3
 
 ## Landed since the commit before the last spec: STATE commit
-6a7112399 inputs: a binding carries its converted read and its blank as two fields, and the browser takes no expression apart
-f5b5e7454 spec: STATE and handoff at 0a578a9ab
+b824783d3 inputs (sent): each input is sent by the form its binding carries, an enum by its rows, a blank start left out
+42bea373b spec: STATE and handoff at 6a7112399
 
 ## Open
-open: 19 promises with no browser test, 1 runtime cases not built, 14 doors not implemented
+open: 19 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 441 to 442
-- A number, a proof line or an absence not read from the run that proves it: 71 to 72
-- A shell command or a script wrong in its own terms: 632 to 636
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 442 to 451
+- A rule or a tool's list not applied before the change: 440 to 447
+- A number, a proof line or an absence not read from the run that proves it: 72 to 74
+- A shell command or a script wrong in its own terms: 636 to 643
 
 ## The owner's latest decisions
 spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
@@ -98,8 +99,7 @@ so the probe proves nothing there; the session that landed DefinitionOfDone star
 operators in spriti to land 1.0"); `spec/NOTES.md`'s table "After 1.0" holds where each comes back from.
 
 **3. The framework core to 1.0 (U1 to U22).** Done when:
-- `scripts/open.py` prints no core runtime case: `InputsAndIds/model.ts` three and `RequestsAndResponses/request.ts`
-  one (`Validation/forms.ts`'s landed at 6da8232ec);
+- `scripts/open.py` prints no core runtime case: met at b824783d3, "0 runtime cases not built";
 - X3.7, a date in a JSON response on MVC 5, passes on CI's Windows job;
 - `spec/REWRITE.md` section 4 states each of U1 to U22 closed with its result line (today it states U3, U4, U5,
   U8 to U13 closed and U1, U2, U14 to U16 landed; U6, U7, U17 to U22 are not stated);
@@ -115,21 +115,22 @@ Its units, in order:
    they land as four units, smallest first: the check of a text or file body landed at 6da8232ec (X16.46), and of
    a request that sends no body at 83b406a43 (X16.46's third promise); the writer's move, with `as` writing its own
    kind and the plan's bytes unchanged, at 0a578a9ab; the split of `value` into `converted` and `blank`, with `lit`
-   writing its own kind, at 6a7112399, which removed `InputsAndIds/model.ts`'s three cases not built; next `sent`
-   (the bug fix).
-2. The form-data boundary: an enum sent in form data (the move-in app met it; the designer decides its form),
-   an object stays refused until after 1.0 (the owner's yes of 2026-11-17); a text or file body's check landed
+   writing its own kind, at 6a7112399, which removed `InputsAndIds/model.ts`'s three cases not built; and `sent`,
+   the bug fix, at b824783d3: each input sent by the form its binding carries, which removed `request.ts`'s last case,
+   proved by X9.36 to X9.42, X13.11, X16.47, M7.X9 and M7.X10, each side failing on its own plant. Unit 1 is closed.
+2. The form-data boundary: an enum input in form data is sent by its rows since b824783d3 (the design's defect 1,
+   X9.36, X9.37, X9.39 and X16.47), an object stays refused until after 1.0 (the owner's yes of 2026-11-17); a text or file body's check landed
    at 6da8232ec (X16.46). On MVC 5 an action's model binds route values and the query beside the body
    (probe mvc5-value-provider-order), so a rule over a member a request sends in its path or query is checked at its
    start in the browser and bound on that endpoint; the meaning by host is designed whole and put to the owner
    before the core freeze (D16.5, D16.6).
 3. X3.7 written on the net48 host; CI's Windows job proves it.
-4. Nine parked core leads, each one verdict by the owner's test of 2026-11-20 (a reproduced defect, a reachable
+4. Eight parked core leads, each one verdict by the owner's test of 2026-11-20 (a reproduced defect, a reachable
    incomplete contract or an unproved promise is in; otherwise a row of the after-1.0 table), the raw text and
    single-file body check having landed at 6da8232ec as X16.46: the named enum in a pushed message, typed list construction from separate
    sources, plan shape alignment, standalone named rule sets, activated-row replacement, handler cleanup, the
-   attached-partial validation summary, an input over an enum whose zero has no name, and a row's "removing"
-   state after a failed removal (move-in part 9).
+   attached-partial validation summary, and a row's "removing" state after a failed removal (move-in part 9). An
+   input over an enum whose zero has no name landed at b824783d3 as X9.39.
 5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked.
 
 **4. After the framework package:** the selected Native components (date entry first), then every Fusion component,
