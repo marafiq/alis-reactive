@@ -2028,6 +2028,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `spec/NOTES.md` holds each, what the rewrite writes in its place and what brings it back: an arithmetic operator
   returns with .NET's meaning for each number type, as the sums are written (D6.11), through `spec/Schema/Schema.tla`'s
   `Operators` first.
+- The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
+  family with its model run under TLC: "yes to both - please re-orient on quality to make this change, quality can
+  not be lowered". The two decisions: `sent`, the bug fix, in which `InputBinding` carries the form its input is
+  sent in and the request's table of forms leaves; and the split of its `value` into `converted` and `blank`. They
+  land smallest first, each to the full bar: the check of a text or file body, which D16.5 states and no decision
+  needs (X16.46); the writer's move, with `as` writing its own kind and the plan's bytes unchanged; the split; then
+  `sent`.
 
 ## Modules
 

@@ -3885,6 +3885,10 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - The checked body is the endpoint's binding of the sent body. A sent member reads as the endpoint binds it:
     in form data an empty text binds null on both hosts (`probe:core-form-implicit-required`,
     `probe:mvc5-empty-text-null`). A member the body lacks reads its starting value (D16.6).
+  - A text or a file sent as the whole body binds no member, as no body does, so its check reads every member at its
+    start: a member sent in the path or the query is not read, as an endpoint that binds its model `[FromForm]`
+    leaves it. An endpoint that binds a plain model binds that member from the path or the query, and does not bind
+    from that body (X16.46).
   - Decision C: a request is checked on what it sends and on the starting values of the rest. A request that sends
     no container is checked on its `Set` members and its `Input`s, and no container's inputs are read. This replaces
     65fdf118d, which read the validated form's inputs for such a request.
@@ -4103,6 +4107,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   - `Validation.tla:UnsentInputsUnread`
   - `Validation.tla:OnlyTheNamedValidator`
   - `Validation.tla:NoTypedValueLost`
+- `Validation.tla:UnboundBodyChecksTheStarts`: a body that binds no member, the plan's none, text or file, is checked
+  with every member at its start, broken by a mutant that reads a member sent beside it (X16.46).
 - The four gaps the code had at bff9eb6c0 are ValidationToday's invariants, each a counterexample TLC prints from
   its own cfg: AnUnrenderedMemberRendersItsView, AListNotSentReadsItsStart, AConditionReadsTheObjectsStart and
   AnItemsListNotSentReadsTheItemsStart.
@@ -4319,6 +4325,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `X16.45` analyzer (D16.9): a synchronous check of a validator whose rule waits, reached: "A rule that waits
   (MustAsync, CustomAsync or WhenAsync) runs only in ValidateAsync." At build by ALIS006, and where the endpoint
   checks on code it does not follow (D18.6): new:N18.11.
+- `X16.46` behavior (D16.5): a request whose whole body is a text or a file, its Ward sent in the path, is checked
+  with every member at its start: over a model whose Ward starts null it shows "Ward is required." in the notice and
+  sends nothing, and over a model whose Ward starts as Admissions it is sent.
 
 ## Q17. Vendors and inversion
 

@@ -3701,6 +3701,20 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M8.F4 X16.46 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/BedNotes.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.46 1": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/BedNotes.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M8.F4 X16.5 0": {
     "modules": [],
     "views": [

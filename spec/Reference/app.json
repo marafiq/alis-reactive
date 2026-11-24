@@ -336,6 +336,12 @@
           "module": "RequestsAndResponses"
         },
         {
+          "id": "bedNotes",
+          "kind": "nativeSlice",
+          "role": "the bed notes page's NativeButton actions, Send note and Send photo, beside the native browser file picker Bed photo",
+          "module": "NativeComponents"
+        },
+        {
           "id": "kinCards",
           "kind": "partial",
           "role": "the contact cards, partials the page renders with Html.PartialFor, each with its own plan"
@@ -9668,6 +9674,40 @@
       "parts": [
         "intakeForm",
         "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.46",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeEndpoint",
+        "notice",
+        "bedNotes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.46",
+      "index": 1,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeEndpoint",
+        "notice",
+        "bedNotes"
       ],
       "harness": [
         "seed"

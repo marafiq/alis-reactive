@@ -11,5 +11,7 @@ public static partial class CarePages
     public const string RoomSave = Admission + "room-save";
     public const string BedAssignment = Admission + "bed-assignment";
     public const string BedAssignmentInAWard = Admission + "bed-assignment/in-a-ward";
+    public const string BedNotes = Admission + "bed-notes";
+    public const string BedNotesStartingInAdmissions = Admission + "bed-notes/starting-in-admissions";
     public const string WardAssignment = Admission + "ward-assignment";
 }

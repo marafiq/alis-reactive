@@ -1,0 +1,40 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedNotesPage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<BedNotesPage>();
+}
+<h1>Bed notes</h1>
+<label for="bed-photo">Bed photo</label>
+@plan.AdmissionFiles("bed-photo", false)
+@if (Model.StartsInAdmissions)
+{
+    @(Html.NativeButton("send-note", "Send note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<AdmissionsBedNote>(BedNoteEndpoints.AdmissionsNotes, request => request.Path(note => note.Ward, "North").Text("Bed by the window"))
+        .Validate<AdmissionsBedNoteRules>()
+        .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+    @(Html.NativeButton("send-photo", "Send photo").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<AdmissionsBedNote>(BedNoteEndpoints.AdmissionsPhotos, request => request.Path(note => note.Ward, "North")
+            .File(pipeline.Component<AdmissionFileInput>("bed-photo").Files.Items.At(0)))
+        .Validate<AdmissionsBedNoteRules>()
+        .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+}
+else
+{
+    @(Html.NativeButton("send-note", "Send note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "North").Text("Bed by the window"))
+        .Validate<BedNoteRules>()
+        .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+    @(Html.NativeButton("send-photo", "Send photo").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<BedNote>(BedNoteEndpoints.Photos, request => request.Path(note => note.Ward, "North")
+            .File(pipeline.Component<AdmissionFileInput>("bed-photo").Files.Items.At(0)))
+        .Validate<BedNoteRules>()
+        .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+}
+<p>Noted: <span id="noted"></span></p>
+@Html.RenderPlan(plan)

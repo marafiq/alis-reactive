@@ -2139,7 +2139,8 @@
         "Ownership.tla:RulesLeaveWithTheirOwner",
         "Ownership.tla:FailureReachesSummary",
         "Ownership.tla:InlineOnlyAtTheSentInput",
-        "Validation.tla:OnlyTheNamedValidator"
+        "Validation.tla:OnlyTheNamedValidator",
+        "Validation.tla:UnboundBodyChecksTheStarts"
       ],
       "defects": [
         {
@@ -2204,6 +2205,10 @@
         },
         {
           "id": "X16.41",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.46",
           "rung": "behavior"
         }
       ],
@@ -2324,6 +2329,22 @@
           "outcome": "\"Write the kin's full name.\" shows beside Name, and \"Give the kin's phone number.\" does not show beside Phone.",
           "opposite": "Pressing Tab again, leaving Phone empty, shows \"Give the kin's phone number.\" beside Phone as well.",
           "defect": "Blur checks every member of the container, so \"Give the kin's phone number.\" shows when Name is left."
+        },
+        {
+          "for": "X16.46",
+          "page": "A bed notes page whose Send note button posts the note Bed by the window as the whole text body to the ward's notes address, its Ward set to North in the path, checked by the validator of its model, RuleFor(n => n.Ward).NotEmpty().WithMessage(\"Ward is required.\"); the model's Ward starts null, the endpoint binds the model [FromForm] and answers \"{ward}: {note}\", which the page writes into noted, and the page's layout renders the notice.",
+          "gesture": "Click Send note.",
+          "outcome": "The notices status reads \"Notices: error: Ward is required.\" and no request reaches the notes address.",
+          "opposite": "On the bed notes page whose model's Ward starts as Admissions, Send note is sent and noted reads Admissions: Bed by the window.",
+          "defect": "The check reads a text body as form data and takes North from the path, so the note is sent; or it reads no member at all, not even its start, so the note whose Ward starts as Admissions is refused."
+        },
+        {
+          "for": "X16.46",
+          "page": "The same bed notes page, whose Send photo button posts the photo chosen in Bed photo as the whole body to the ward's photos address, its Ward set to North in the path, under the same validator; the endpoint binds the model [FromForm] and answers \"{ward}: {media type}, {length} bytes\", which the page writes into noted.",
+          "gesture": "Choose the photo bed.png of 4 bytes in Bed photo and click Send photo.",
+          "outcome": "The notices status reads \"Notices: error: Ward is required.\" and no request reaches the photos address.",
+          "opposite": "On the bed notes page whose model's Ward starts as Admissions, Send photo is sent and noted reads Admissions: image/png, 4 bytes.",
+          "defect": "The check reads a file body as form data and takes North from the path, so the photo is sent; or it reads no member at all, not even its start, so the photo whose Ward starts as Admissions is refused."
         }
       ],
       "verdicts": []

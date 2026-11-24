@@ -26,6 +26,9 @@ and a script URL in any tracked view, and a layout links a script by its file.
   "The whole point of the framework is tight, and you end up using dynamic").
 - A page carries only what a real application page would: no echo spans, no debug divs, nothing that exists
   only to be asserted. It reads as a product screen, not a test rig.
+- A new page of the conformance app adds its placement's line to `spec/Reference/page-doors.json`, which the gate
+  writes and refuses unstaged, so the unit that writes the page carries that file in its paths (the lead's mistake,
+  2026-11-24).
 
 Two meanings every view meets, restated from their D lines in `spec/Core/DESIGN.md`:
 - A member's name (D2.4 to D2.6, D2.9). A request body names each member as the endpoint's binder reads it: on

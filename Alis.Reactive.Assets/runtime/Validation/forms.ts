@@ -1,7 +1,7 @@
 import type { LiveCheck } from "../InputsAndIds/index";
 import type { Owner } from "../OwnershipAndState/index";
 import {
-  assertNever, notBuilt, type CheckedBody, type FnExpression, type FormCheck, type FormPlace, type InputEntry, type PathStep, type PlanDocument, type Registration,
+  assertNever, type CheckedBody, type FnExpression, type FormCheck, type FormPlace, type InputEntry, type PathStep, type PlanDocument, type Registration,
   type RegistrationStep, type RuleGroup, type SentInput,
 } from "../Schema/index";
 import { called, Stop, value } from "../ValuesAndSources/index";
@@ -202,15 +202,14 @@ function failuresOf(problem: unknown): readonly Failure[] {
 function checkedBody(registration: Registration, body: CheckedBody): unknown {
   switch (body.format) {
     case "none":
+    case "text":
+    case "file":
       return structuredClone(registration.start);
     case "urlEncoded":
     case "multipart":
       return bound(registration, structuredClone(registration.start), body.value, [], "form");
     case "json":
       return bound(registration, structuredClone(registration.start), body.value, [], "json");
-    case "text":
-    case "file":
-      throw notBuilt("a check of a " + body.format + " body, which binds no member");
     default:
       return assertNever(body.format);
   }

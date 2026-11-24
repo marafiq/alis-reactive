@@ -1350,6 +1350,7 @@ The remaining named specifications govern these application steps even though th
 | Validation.OnlyTheNamedValidator | MI.9.2 |
 | Validation.NoTypedValueLost | MI.10.3 |
 | Validation.ItemPeerAgrees | MI.10.3 |
+| Validation.UnboundBodyChecksTheStarts | Excluded: the app sends its packet note and its signature with NoValidation |
 
 These assignments follow the action bodies in [Request.tla](spec/RequestsAndResponses/Request.tla:178), [Composition.tla](spec/RequestsAndResponses/Composition.tla:43), [Lanes.tla](spec/Execution/Lanes.tla:59), [Run.tla](spec/Execution/Run.tla:381), [Ownership.tla](spec/OwnershipAndState/Ownership.tla:206), [Realtime.tla](spec/Realtime/Realtime.tla:46), and [CallbackProperty.tla](spec/Vendors/CallbackProperty.tla:127).
 

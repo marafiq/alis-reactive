@@ -310,6 +310,8 @@ public static class Promises
         public const string X16_19_0 = "M8.F4 X16.19 0";
         public const string X16_20_0 = "M8.F4 X16.20 0";
         public const string X16_41_0 = "M8.F4 X16.41 0";
+        public const string X16_46_0 = "M8.F4 X16.46 0";
+        public const string X16_46_1 = "M8.F4 X16.46 1";
     }
 
     public static class M9_F2

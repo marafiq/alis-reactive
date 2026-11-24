@@ -217,6 +217,8 @@ internal static class AppHost
             .Add<Care.IntakeValidator>()
             .Add<Care.FamilyValidator>()
             .Add<Care.BedAssignmentRules>()
+            .Add<Care.BedNoteRules>()
+            .Add<Care.AdmissionsBedNoteRules>()
             .Add<Care.DeputyAppointmentRules>()
             .Add<Care.DeputyNamelessAppointmentRules>()
             .Add<Care.HomeLeadRules>()

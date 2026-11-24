@@ -42,7 +42,9 @@ The rules govern every Playwright test. A compiler rule or a named check holds e
    proves only the happy path passes while the feature lies. A test written from a decision cannot find that
    decision's error: when a test pins a choice (a payload member the component does not pass reads as nothing),
    the other steps the same code decides (a write or a call through that path) are promises too, each with its
-   own test.
+   own test. Each side fails on a defect of its own, its plant run on it: an opposite outside the behavior's own case
+   passes the defect that breaks that side, as a form body's opposite passed a text body's check that read an empty
+   holder in place of the start (the lead's mistake, 2026-11-24).
 7. **No tautology.** Expected values are literals read from the promise, never computed by the code under
    test, copied from its output, or accepted as a recorded snapshot. A test never asserts what it typed or
    set itself, or what the compiler already guarantees. `ToHaveTextAsync` when the text is known, not

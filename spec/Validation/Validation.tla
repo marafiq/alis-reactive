@@ -5,7 +5,7 @@ CONSTANT Mutant
 
 Mutants == {"none", "ConditionReadsNothing", "ObjectStartFromModel", "NullHolderReadsNothing", "ChildRulesOverNull",
             "PopulateIgnored", "EmptyTextStaysText", "ReadsUnsentInputs", "RunsEveryRegistration", "TypedTextLeftOut",
-            "FailureUnderAnotherName", "PeerReadFromTheItem"}
+            "FailureUnderAnotherName", "PeerReadFromTheItem", "UnboundBodyReadsBeside"}
 
 ASSUME Mutant \in Mutants
 
@@ -25,7 +25,7 @@ vars == <<host, format, handling, sendsForm, nInput, nBeside, nStart, leadStart,
           plane, check, typed, start, peer>>
 
 Init ==
-    /\ format \in {"form", "json"}
+    /\ format \in {"form", "json", "none"}
     /\ sendsForm \in BOOLEAN
     /\ \/ /\ plane = "binding"
           /\ host \in {"net10", "net48"}
@@ -76,13 +76,15 @@ Spec == Init /\ [][Next]_vars
 
 Bound(text) == IF text = "empty" /\ format = "form" THEN "none" ELSE text
 
-NSent == (sendsForm /\ nInput # "absent") \/ nBeside
+BindsMembers == format # "none"
+
+NSent == BindsMembers /\ ((sendsForm /\ nInput # "absent") \/ nBeside)
 NSentText == IF nBeside THEN "x" ELSE nInput
-LeadNameSent == sendsForm /\ leadNameInput # "absent"
-LeadSent == sendsForm /\ (leadPhoneInput \/ leadNameInput # "absent")
-ItemsSent == sendsForm /\ row
+LeadNameSent == BindsMembers /\ sendsForm /\ leadNameInput # "absent"
+LeadSent == BindsMembers /\ sendsForm /\ (leadPhoneInput \/ leadNameInput # "absent")
+ItemsSent == BindsMembers /\ sendsForm /\ row
 ItemNameSent == ItemsSent /\ rowName # "absent"
-CountSent == sendsForm
+CountSent == BindsMembers /\ sendsForm
 
 FillsStart == format = "form" \/ host = "net48" \/ handling = "populate"
 AppendsList == format = "json" /\ host = "net10" /\ handling = "populate"
@@ -118,6 +120,7 @@ ServerFails ==
 BrowserN ==
     IF NSent THEN (IF Mutant = "EmptyTextStaysText" THEN NSentText ELSE Bound(NSentText))
     ELSE IF Mutant = "ReadsUnsentInputs" /\ nInput # "absent" THEN Bound(nInput)
+    ELSE IF Mutant = "UnboundBodyReadsBeside" /\ nBeside THEN NSentText
     ELSE nStart
 
 BrowserLeadPresent ==
@@ -154,7 +157,7 @@ BrowserFails ==
     \cup (IF BrowserCountRefused THEN {"count"} ELSE {})
     \cup (IF BrowserRunsOther THEN {"other"} ELSE {})
 
-Held == IF sendsForm THEN Bound(typed) ELSE start
+Held == IF BindsMembers /\ sendsForm THEN Bound(typed) ELSE start
 
 AtLeast(value, least) == value = "none" \/ (least = "mid" /\ value = "high")
 
@@ -178,6 +181,8 @@ EmptyTextAgrees == NSent => BrowserN = ServerN
 
 UnsentInputsUnread == ~NSent => BrowserN = ServerN
 
+UnboundBodyChecksTheStarts == ~BindsMembers => BrowserN = nStart /\ ServerN = nStart
+
 OnlyTheNamedValidator == ~BrowserRunsOther
 
 NoTypedValueLost == BrowserCountRefused = ServerCountRefused
@@ -191,5 +196,7 @@ ReachPopulatedList == ~(AppendsList /\ itemsStart = "seeded" /\ ItemsSent /\ Len
 ReachAnItemBelowItsPeer == ~(plane = "check" /\ check = "item" /\ Held = "low" /\ peer = "mid" /\ ~ServerPasses /\ Agreement)
 
 ReachConditionOnStart == ~(~LeadSent /\ leadStart = "object" /\ ~NSent /\ nStart = "none" /\ "n" \notin BrowserFails /\ Agreement)
+
+ReachUnboundBodyOnTheStarts == ~(~BindsMembers /\ nBeside /\ leadStart = "null" /\ nStart = "none" /\ "n" \in BrowserFails /\ Agreement)
 
 ====

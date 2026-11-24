@@ -44,6 +44,8 @@ names. Read these whole, before anything else:
   rules test; never commit, stash, push or reset, and never touch another worktree.
 - In zsh, git grep takes its options before the pattern, since one after it is read as a revision, and reads no \b;
   a separator line is quoted, echo "----", since zsh expands an unquoted word that starts with =.
+- A glob names its stem whole: "Validation*.cfg" matches ValidationToday's configs too, so one spec's configs are
+  "Validation.cfg" and "Validation.violates.*.cfg" (the lead's mistake, 2026-11-24).
 - Read no secret and no file that holds a credential, a machine's NuGet or npm configuration among them; list no user
   secrets.
 - Run no command your brief does not name, and no `scripts/check.sh`, TLC, package install or restore unless it
