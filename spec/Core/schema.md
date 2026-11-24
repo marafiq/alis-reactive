@@ -287,12 +287,14 @@ A listen release says when release removes the listener the step added (D12.8):
 | `nothing` | nothing | the read is nothing: a holder on the rest of the path starts null |
 | `unbound` | nothing | the pipeline stops: the binding cannot create a holder on the path, or a holder on it is polymorphic |
 
-The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
-`neg`, `coalesce`, `cond`, `nullableValue`, `nonNull`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `merge`, `trim`, `trimStart`,
+The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`,
+`coalesce`, `cond`, `nullableValue`, `nonNull`, `empty`, `matches`, `toArray`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `trim`, `trimStart`,
 `trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
 `sumDouble`, `sumDecimal`, `eqDecimal`, `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey`, `spanKey`, `year`,
 `month`, `day`, `hour`, `minute`, `second`, `dayOfWeek`, `emailAddress`, `creditCard`, `url`, `precisionScale` and
 `inFlags`.
+`add`, `sub`, `mul`, `mod`, `neg`, `finite` and `merge` leave, since no C# writes them, and come back from the table
+"After 1.0" of `spec/NOTES.md` (the owner, 2026-11-17 and 2026-11-23).
 `toNumber`,
 `toDate`, `toBoolean` and `toText` leave: `as` converts (D3.2, N3.1). The pattern of `matches` is a `lit` (D7.5,
 D16.11). The text operators carry .NET's meaning (`spec/Core/translated-members.md`) where JavaScript's own methods

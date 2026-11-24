@@ -14,11 +14,6 @@ internal sealed class Operator : IChoice
     internal static readonly Operator And = new("and");
     internal static readonly Operator Or = new("or");
     internal static readonly Operator Not = new("not");
-    internal static readonly Operator Add = new("add");
-    internal static readonly Operator Sub = new("sub");
-    internal static readonly Operator Mul = new("mul");
-    internal static readonly Operator Mod = new("mod");
-    internal static readonly Operator Neg = new("neg");
     internal static readonly Operator Coalesce = new("coalesce");
     internal static readonly Operator Cond = new("cond");
     internal static readonly Operator NullableValue = new("nullableValue");
@@ -26,12 +21,10 @@ internal sealed class Operator : IChoice
     internal static readonly Operator Empty = new("empty");
     internal static readonly Operator Matches = new("matches");
     internal static readonly Operator ToArray = new("toArray");
-    internal static readonly Operator Finite = new("finite");
     internal static readonly Operator CompareNumbers = new("compareNumbers");
     internal static readonly Operator CompareOrdinal = new("compareOrdinal");
     internal static readonly Operator CompareBooleans = new("compareBooleans");
     internal static readonly Operator CompareCulture = new("compareCulture");
-    internal static readonly Operator Merge = new("merge");
     internal static readonly Operator Trim = new("trim");
     internal static readonly Operator TrimStart = new("trimStart");
     internal static readonly Operator TrimEnd = new("trimEnd");

@@ -2023,6 +2023,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   browser test that reads what the model holds after and at the next read, and adds to the file's ninth part each
   place the source won over it and each gap it met. What the owner reads of the app is each behavior named as
   proven or not proven, never a count ("I need that complex app behavior asserted and proved").
+- The owner, 2026-11-17 and 2026-11-23 (verbatim in `spec/NOTES.md`): the seven operators no C# writes, `add`, `sub`,
+  `mul`, `mod`, `neg`, `finite` and `merge`, leave the grammar so the framework reaches 1.0. The table "After 1.0" of
+  `spec/NOTES.md` holds each, what the rewrite writes in its place and what brings it back: an arithmetic operator
+  returns with .NET's meaning for each number type, as the sums are written (D6.11), through `spec/Schema/Schema.tla`'s
+  `Operators` first.
 
 ## Modules
 

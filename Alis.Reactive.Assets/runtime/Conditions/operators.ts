@@ -1,4 +1,4 @@
-import { assertNever, notBuilt, type Operator } from "../Schema/index";
+import { assertNever, type Operator } from "../Schema/index";
 import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
 import { arrayOf, comparedBooleans, comparedCulture, comparedNumbers, comparedOrdinal, lower, nonNull, nullableValue, summedDecimals, summedDoubles, summedInts, trimmed, upper } from "../ArrayLambdas/index";
 import { decimalsEqual, precisionScaled } from "./decimals";
@@ -33,14 +33,6 @@ export function operated(op: Operator, terms: readonly Term[], collation: string
       return coalesced(termOf(op, terms, 0), termOf(op, terms, 1));
     case "cond":
       return chosen(termOf(op, terms, 0), termOf(op, terms, 1), termOf(op, terms, 2));
-    case "add":
-    case "sub":
-    case "mul":
-    case "mod":
-    case "neg":
-    case "finite":
-    case "merge":
-      throw notBuilt("the operator '" + op + "'");
     case "nullableValue":
       return nullableValue(termOf(op, terms, 0)());
     case "nonNull":
