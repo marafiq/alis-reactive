@@ -1,24 +1,24 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 03:47:40 EST 2026
+Written at `date`: Tue Nov 24 12:28:58 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 25, each in the notes block below
-unit: landed (32): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException
+note: open: 26, each in the notes block below
+unit: landed (33): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, TextBodyCheck
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at d85ac5e3e on feature/rewrite: equal to the remote
+lane: pushed at 6da8232ec on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at d85ac5e3e
+ci: unread at 6da8232ec
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2089 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2096 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
@@ -27,24 +27,25 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: d85ac5e3e A design's meaning is quoted from its D line, and a search over the app names every door and file it read
-- Full check: .work/logs/spec-check-d85ac5e3e.log: spec check at d85ac5e3e: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-033827-29586 d85ac5e3e
+- HEAD: 6da8232ec validation: a text or a file sent as the whole body binds no member, so its check reads every member at its start (X16.46)
+- Full check: .work/logs/spec-check-6da8232ec.log: spec check at 6da8232ec: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-121420-3604 6da8232ec
 
 ## Landed since the commit before the last spec: STATE commit
-d85ac5e3e A design's meaning is quoted from its D line, and a search over the app names every door and file it read
-15ff30a31 spec: STATE and handoff at 65e680e6b
+6da8232ec validation: a text or a file sent as the whole body binds no member, so its check reads every member at its start (X16.46)
+db7d21ce0 spec: STATE and handoff at d85ac5e3e
 
 ## Open
-open: 19 promises with no browser test, 5 runtime cases not built, 14 doors not implemented
+open: 19 promises with no browser test, 4 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 438 to 439
-- A number, a proof line or an absence not read from the run that proves it: 68 to 71
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 439 to 440
+- A rule or a tool's list not applied before the change: 438 to 439
+- A shell command or a script wrong in its own terms: 630 to 631
 
 ## The owner's latest decisions
-spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
+spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -73,6 +74,7 @@ spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is 
 - 2026-11-23 | direction | the queue of this file | queue | "keep worktree around"
 - 2026-11-23 | direction | the queue of this file | queue | "nah splitting inputbinidng now is such a huge change, explain in more detail, that could set us back to zero", then "yes, on input i will not approve that change in isolation, must have thought through design so prepare that, adhoc recommondations are forbidden"
 - 2026-11-24 | direction | the queue of this file | queue | "never lower the quality - just reminder"
+- 2026-11-24 | decision | spec/CLAUDE.md, the InputsAndIds decisions | InputForm | "yes to both - please re-orient on quality to make this change, quality can not be lowered", to design.md's two decisions: `sent`, the bug fix, and the split of `value` into `converted` and `blank`
 <!-- /notes -->
 
 ## Next
