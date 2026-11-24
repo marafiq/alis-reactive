@@ -1,24 +1,24 @@
 # Handoff
 
-Written at `date`: Mon Nov 23 19:12:33 EST 2026
+Written at `date`: Mon Nov 23 20:05:19 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 24, each in the notes block below
-unit: landed (26): SpecCiCold, MacTlc, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, RetirePicomatchException
+unit: landed (27): SpecCiCold, MacTlc, DefinitionOfDone, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, RetirePicomatchException
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 0e25f5f15 on feature/rewrite: equal to the remote
+lane: pushed at 72f01266e on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 0e25f5f15
+ci: unread at 72f01266e
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2081 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2084 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
@@ -27,23 +27,23 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 0e25f5f15 spec: STATE and handoff at bef720265
-- Full check: .work/logs/spec-check-0e25f5f15.log: spec check at 0e25f5f15: 40 of 40 checks pass
-- .work/last-run.txt: 20261123-184905-75789 bef720265
+- HEAD: 72f01266e 1.0 is done when the core framework, every Fusion component and selected Native components are done
+- Full check: .work/logs/spec-check-72f01266e.log: spec check at 72f01266e: 40 of 40 checks pass
+- .work/last-run.txt: 20261123-195059-37889 72f01266e
 
 ## Landed since the commit before the last spec: STATE commit
-0e25f5f15 spec: STATE and handoff at bef720265
+72f01266e 1.0 is done when the core framework, every Fusion component and selected Native components are done
+28d0387de spec: STATE and handoff at 0e25f5f15
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-None.
+- A rule or a tool's list not applied before the change: 437 to 438
 
 ## The owner's latest decisions
-spec/CLAUDE.md:9: - The owner, 2026-11-20, correcting the browser validation proposal: preserve existing use cases and establish the one shared operation befo
-spec/CLAUDE.md:10: - The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
+spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -75,25 +75,37 @@ spec/CLAUDE.md:10: - The owner, 2026-11-20: run TLC on the Mac to conserve hoste
 
 ## Next
 <!-- next -->
-### Next session: the path to 1.0
+### Next session: the framework package to 1.0
 
 The owner's order, 2026-11-23: the team process (landed), then the framework core to 1.0, then everything else. Every
 unit lands on `feature/rewrite`; its one pull request, #247, ships 1.0 (the owner, 2026-11-23). The worktrees of
 landed units stay (the owner, 2026-11-23: "keep worktree around"). Builds stay serial on this Mac; source
 `scripts/toolchain-env.sh` first.
 
-1.0 is done when `python3 scripts/open.py` prints nothing open (today 19 promises with no browser test, 7 runtime
-cases not built, 14 doors not implemented), `spec/REWRITE.md` section 4 states every unit closed with its result line,
-CI passes on PR #247 with its Windows job, and #247 merges to `main` for the annotated v1.0.0 tag.
+1.0's definition of done is the owner's (2026-11-23): "1.0 DoD is when all components of fusion, and selective native,
+and core framework are done where fusion will be onboarded one component with its full powers using skill. right now
+focus is on getting framework package to 1.0". So the focus now is the framework package, the core (U1 to U22).
 
 **1. The builder's worktree, first.** In a session started inside the lane, spawn the `builder` agent with a two-line
 brief: print `git rev-parse HEAD` and change nothing. It prints the lane's head; any other commit means
-`worktree.baseRef` is not applied, and that is fixed before a builder takes work.
+`worktree.baseRef` is not applied, and that is fixed before a builder takes work. A session started at the
+repository's root lists no `builder` and reads the root's `.claude/settings.json`, which holds no `worktree.baseRef`,
+so the probe proves nothing there; the session that landed DefinitionOfDone started at the root and left it.
 
 **2. The owner's question on the operators.** The owner will revisit why the operators are hard to
 implement. Facts for that talk, with no recommendation and no operator work before it:
 - The seven: add, sub, mul, mod, neg, finite, merge.
-- `Alis.Reactive/Schema/Operator.cs` declares them, and no C# door writes any of them.
+- `Alis.Reactive/Schema/Operator.cs` declares them, and no C# door writes any of them: no match in the core, Fusion,
+  Native or tests at 72f01266e.
+- In the redesign (65fdf118d) the seven were the framework's own building blocks, never an author's door: `add` and
+  `finite` a Sum's reduce (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:176`), `neg` a descending sort
+  (:268), `add` a month (`ElementExpressionCompiler.cs:34`), `merge` a request body (`RequestStep.cs:136`),
+  `finite` a number check (`BrowserRule.cs:178`), `mul`, `mod`, `sub` and `add` the Luhn check (`BrowserRules.cs:219-232`),
+  each with JavaScript's meaning. The rewrite wrote each use as an operator with .NET's meaning: `sumInt`, `sumDouble`
+  and `sumDecimal`, the compares with their keys swapped, the date parts, the request body kinds, `as` a number and
+  `creditCard`.
+- The owner's note of 2026-11-17 ("Yeah, let's remove it") names a table "After 1.0" in `spec/NOTES.md`; neither the
+  table nor the words are in `spec/NOTES.md` at 72f01266e.
 - `spec/Schema/Schema.tla` lists them in `Operators`, so any change to them starts there and reruns TLC.
 - `Alis.Reactive.Assets/runtime/Conditions/operators.ts` throws "not built" for each.
 - Nearby code: ArrayLambdas' summed ints, doubles and decimals, and `Conditions/decimals.ts`.
@@ -107,7 +119,10 @@ implement. Facts for that talk, with no recommendation and no operator work befo
 - the core's public surface text is read as the 1.0 surface, and README's examples come from tested pages.
 Its units, in order:
 1. The plan narrowed to what C# writes: an input's value read and a rule's test, each case's own error text
-   names the form C# writes.
+   names the form C# writes. `RuleTest` and `RuleGroup` take a `FnExpression` (`Alis.Reactive/Schema/Registration.cs`)
+   and the one writer of `InputBinding` writes `coalesce(as(read, shape), blank)` (`Alis.Reactive/InputsAndIds/BoundInput.cs`);
+   the contract widens both to any expression, since the generator refuses a field typed as a kind's class
+   (`tools/PlanContractGenerator/CLAUDE.md`); no TLA+ spec models these fields. A designer consult decides the form first.
 2. The form-data boundary: an enum sent in form data (the move-in app met it; the designer decides its form),
    an object stays refused until after 1.0 (the owner's yes of 2026-11-17), a text or file body's check
    verified against the request writer.
@@ -120,8 +135,8 @@ Its units, in order:
    state after a failed removal (move-in part 9).
 5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked.
 
-**4. Then:** Native (date entry first, then its follow-ups), Fusion U26 and U27 (14 render helpers, 18 promises),
-then PR #247 out of draft. The six packages pack at one version, so the tag comes once, at the end.
+**4. After the framework package:** the selected Native components (date entry first), then every Fusion component,
+one at a time with its full powers through `.claude/skills/onboard-component/SKILL.md`, then PR #247 out of draft. The six packages pack at one version, so the tag comes once, at the end.
 
 **Parked, each where it lives:** browser validation's shared key
 (`spec/Validation/browser-validation-proposal.md`, the owner's condition stands); TanStack Table
