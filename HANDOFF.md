@@ -1,19 +1,19 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 13:23:32 EST 2026
+Written at `date`: Tue Nov 24 13:44:12 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (34): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, TextBodyCheck
+unit: landed (35): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, TextBodyCheck, WriterMove
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at 83b406a43 on feature/rewrite
+lane: pushing at 0a578a9ab on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at 83b406a43
+ci: unread at 0a578a9ab
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -26,21 +26,21 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 83b406a43 validation: a request that sends no body is checked with every member at its start, X16.46's third promise
-- Full check: .work/logs/spec-check-83b406a43.log: spec check at 83b406a43: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-130912-13644 83b406a43
+- HEAD: 0a578a9ab values: the request writers' wire forms move to ValuesAndSources, and as writes its own kind; the plan's bytes unchanged
+- Full check: .work/logs/spec-check-0a578a9ab.log: spec check at 0a578a9ab: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-133410-66800 0a578a9ab
 
 ## Landed since the commit before the last spec: STATE commit
-83b406a43 validation: a request that sends no body is checked with every member at its start, X16.46's third promise
-1348e100c spec: STATE and handoff at 6da8232ec
+0a578a9ab values: the request writers' wire forms move to ValuesAndSources, and as writes its own kind; the plan's bytes unchanged
+5c1dbadb6 spec: STATE and handoff at 83b406a43
 
 ## Open
 open: 19 promises with no browser test, 4 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 439 to 440
-- Said to the owner in a way that hid or blurred what holds: 14 to 15
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 440 to 441
+- A shell command or a script wrong in its own terms: 631 to 632
 
 ## The owner's latest decisions
 spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
@@ -113,8 +113,8 @@ Its units, in order:
    half, `InputBinding`, is one family's design, `../input-form/.landing/InputForm/design.md` (its read, read.md;
    the model, scratch/tla2; the built move, `../writer-move`). The owner's yes to both decisions came 2026-11-24, and
    they land as four units, smallest first: the check of a text or file body landed at 6da8232ec (X16.46), and of
-   a request that sends no body at 83b406a43 (X16.46's third promise); next
-   the writer's move with `as` writing its own kind, the plan's bytes unchanged (`../writer-move`), then the split
+   a request that sends no body at 83b406a43 (X16.46's third promise); the writer's move, with `as` writing its own
+   kind and the plan's bytes unchanged, at 0a578a9ab; next the split
    of `value` into `converted` and `blank`, then `sent` (the bug fix).
    `InputsAndIds/model.ts`'s three cases stand until it lands.
 2. The form-data boundary: an enum sent in form data (the move-in app met it; the designer decides its form),
