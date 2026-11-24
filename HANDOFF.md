@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Mon Nov 23 19:02:08 EST 2026
+Written at `date`: Mon Nov 23 19:12:33 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 23, each in the notes block below
-unit: landed (27): SpecCiCold, MacTlc, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, OpenItems, RetirePicomatchException
+note: open: 24, each in the notes block below
+unit: landed (26): SpecCiCold, MacTlc, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, RetirePicomatchException
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at bef720265 on feature/rewrite: equal to the remote
+lane: pushed at 0e25f5f15 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at bef720265
+ci: unread at 0e25f5f15
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,20 +27,19 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: bef720265 process: every unit lands on feature/rewrite; a landing refuses a kind of mistake grown under a holder that stood; state reads a landed unit from the lane's history; the handoff prints each fact once
-- Full check: .work/logs/spec-check-bef720265.log: spec check at bef720265: 40 of 40 checks pass
+- HEAD: 0e25f5f15 spec: STATE and handoff at bef720265
+- Full check: .work/logs/spec-check-0e25f5f15.log: spec check at 0e25f5f15: 40 of 40 checks pass
 - .work/last-run.txt: 20261123-184905-75789 bef720265
 
 ## Landed since the commit before the last spec: STATE commit
-bef720265 process: every unit lands on feature/rewrite; a landing refuses a kind of mistake grown under a holder that stood; state reads a landed unit from the lane's history; the handoff prints each fact once
-516edb97d spec: STATE and handoff at 5dc4ee24a
+0e25f5f15 spec: STATE and handoff at bef720265
 
 ## Open
 open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Said to the owner in a way that hid or blurred what holds: 12 to 13
+None.
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-20, correcting the browser validation proposal: preserve existing use cases and establish the one shared operation befo
@@ -71,20 +70,27 @@ spec/CLAUDE.md:10: - The owner, 2026-11-20: run TLC on the Mac to conserve hoste
 - 2026-11-20 | direction | the queue of this file | queue | "please priortise framework over mvc5 or other. Framework, then fusion or mvc should go in parallel. The validation is built to work regardlessof consumers. But if consumer need something specific, we should design it like row level action which has same framework permitives"
 - 2026-11-20 | direction | the queue of this file | queue | "If you image if i decide to onboard *IF* TanStack components pure JS Table... then validation still work." "adapter is not default choice, i would prefer if none is needed for any consumer"
 - 2026-11-20 | direction | the queue of this file | queue | "new session will re-discover, bring concrete and fully thought through one proposal to do which aligns with framework vision, and not add lower quality or hacks." "We stay on same branch, and follow the process. Quality bar will be never be lowered. But I am okay to adapt modern LLM patterns to arrive at correct, and well designed solution"
+- 2026-11-23 | direction | the queue of this file | queue | "keep worktree around"
 <!-- /notes -->
 
 ## Next
 <!-- next -->
-### Next session
+### Next session: the path to 1.0
 
-The owner's order, 2026-11-23: the team process, then the framework core to 1.0, then everything else.
-Builds stay serial on this Mac; source `scripts/toolchain-env.sh` first.
+The owner's order, 2026-11-23: the team process (landed), then the framework core to 1.0, then everything else. Every
+unit lands on `feature/rewrite`; its one pull request, #247, ships 1.0 (the owner, 2026-11-23). The worktrees of
+landed units stay (the owner, 2026-11-23: "keep worktree around"). Builds stay serial on this Mac; source
+`scripts/toolchain-env.sh` first.
 
-**First, the builder's worktree.** In a session started inside the lane, spawn the `builder` agent with a two-line
+1.0 is done when `python3 scripts/open.py` prints nothing open (today 19 promises with no browser test, 7 runtime
+cases not built, 14 doors not implemented), `spec/REWRITE.md` section 4 states every unit closed with its result line,
+CI passes on PR #247 with its Windows job, and #247 merges to `main` for the annotated v1.0.0 tag.
+
+**1. The builder's worktree, first.** In a session started inside the lane, spawn the `builder` agent with a two-line
 brief: print `git rev-parse HEAD` and change nothing. It prints the lane's head; any other commit means
 `worktree.baseRef` is not applied, and that is fixed before a builder takes work.
 
-**Then the owner's question on the operators.** The owner will revisit why the operators are hard to
+**2. The owner's question on the operators.** The owner will revisit why the operators are hard to
 implement. Facts for that talk, with no recommendation and no operator work before it:
 - The seven: add, sub, mul, mod, neg, finite, merge.
 - `Alis.Reactive/Schema/Operator.cs` declares them, and no C# door writes any of them.
@@ -92,13 +98,7 @@ implement. Facts for that talk, with no recommendation and no operator work befo
 - `Alis.Reactive.Assets/runtime/Conditions/operators.ts` throws "not built" for each.
 - Nearby code: ArrayLambdas' summed ints, doubles and decimals, and `Conditions/decimals.ts`.
 
-**The team process.** Landed and closed: root CLAUDE.md at its 200-line limit; handing work to an agent in
-`.claude/skills/delegate/SKILL.md`; `worktree.baseRef` set to head and the isolation field on builder and page-writer;
-every unit lands on `feature/rewrite`, whose one pull request ships 1.0 (the owner, 2026-11-23); `scripts/land-unit.sh`
-refuses a landing in which a kind of mistake grew while its row and every file the row names stood; `scripts/state.py`
-reads a unit as landed when a commit since its base holds its message; this file prints each fact once.
-
-**The framework core to 1.0 (U1 to U22).** Done when:
+**3. The framework core to 1.0 (U1 to U22).** Done when:
 - `scripts/open.py` prints no core runtime case: `InputsAndIds/model.ts` three, `RequestsAndResponses/request.ts`
   one, `Validation/forms.ts` two, and the operators line after the owner's talk;
 - X3.7, a date in a JSON response on MVC 5, passes on CI's Windows job;
@@ -120,8 +120,8 @@ Its units, in order:
    state after a failed removal (move-in part 9).
 5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked.
 
-**Then:** Native (date entry first, then its follow-ups), Fusion U26 and U27 (14 render helpers, 18 promises),
-the release tag and PR #247. The six packages pack at one version, so the tag comes once, at the end.
+**4. Then:** Native (date entry first, then its follow-ups), Fusion U26 and U27 (14 render helpers, 18 promises),
+then PR #247 out of draft. The six packages pack at one version, so the tag comes once, at the end.
 
 **Parked, each where it lives:** browser validation's shared key
 (`spec/Validation/browser-validation-proposal.md`, the owner's condition stands); TanStack Table
