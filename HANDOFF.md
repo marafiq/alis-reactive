@@ -1,20 +1,19 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 12:28:58 EST 2026
+Written at `date`: Tue Nov 24 13:23:32 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 26, each in the notes block below
-unit: landed (33): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, TextBodyCheck
+note: open: 25, each in the notes block below
+unit: landed (34): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, TextBodyCheck
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 6da8232ec on feature/rewrite: equal to the remote
-  leaves by: the landing of a unit that is ready
-  read first: the queue of `HANDOFF.md`
-  exit line: "landed"
-  goes to: lane: landed
-ci: unread at 6da8232ec
+lane: pushing at 83b406a43 on feature/rewrite
+  leaves by: the last line `scripts/push.sh` prints
+  exit line: "remote equals HEAD"
+  goes to: lane: pushed
+ci: unread at 83b406a43
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,22 +26,21 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 6da8232ec validation: a text or a file sent as the whole body binds no member, so its check reads every member at its start (X16.46)
-- Full check: .work/logs/spec-check-6da8232ec.log: spec check at 6da8232ec: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-121420-3604 6da8232ec
+- HEAD: 83b406a43 validation: a request that sends no body is checked with every member at its start, X16.46's third promise
+- Full check: .work/logs/spec-check-83b406a43.log: spec check at 83b406a43: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-130912-13644 83b406a43
 
 ## Landed since the commit before the last spec: STATE commit
-6da8232ec validation: a text or a file sent as the whole body binds no member, so its check reads every member at its start (X16.46)
-db7d21ce0 spec: STATE and handoff at d85ac5e3e
+83b406a43 validation: a request that sends no body is checked with every member at its start, X16.46's third promise
+1348e100c spec: STATE and handoff at 6da8232ec
 
 ## Open
 open: 19 promises with no browser test, 4 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 439 to 440
-- A rule or a tool's list not applied before the change: 438 to 439
-- A shell command or a script wrong in its own terms: 630 to 631
+- A rule or a tool's list not applied before the change: 439 to 440
+- Said to the owner in a way that hid or blurred what holds: 14 to 15
 
 ## The owner's latest decisions
 spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
@@ -74,7 +72,6 @@ spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to t
 - 2026-11-23 | direction | the queue of this file | queue | "keep worktree around"
 - 2026-11-23 | direction | the queue of this file | queue | "nah splitting inputbinidng now is such a huge change, explain in more detail, that could set us back to zero", then "yes, on input i will not approve that change in isolation, must have thought through design so prepare that, adhoc recommondations are forbidden"
 - 2026-11-24 | direction | the queue of this file | queue | "never lower the quality - just reminder"
-- 2026-11-24 | decision | spec/CLAUDE.md, the InputsAndIds decisions | InputForm | "yes to both - please re-orient on quality to make this change, quality can not be lowered", to design.md's two decisions: `sent`, the bug fix, and the split of `value` into `converted` and `blank`
 <!-- /notes -->
 
 ## Next
@@ -100,8 +97,8 @@ so the probe proves nothing there; the session that landed DefinitionOfDone star
 operators in spriti to land 1.0"); `spec/NOTES.md`'s table "After 1.0" holds where each comes back from.
 
 **3. The framework core to 1.0 (U1 to U22).** Done when:
-- `scripts/open.py` prints no core runtime case: `InputsAndIds/model.ts` three, `RequestsAndResponses/request.ts`
-  one, `Validation/forms.ts` one;
+- `scripts/open.py` prints no core runtime case: `InputsAndIds/model.ts` three and `RequestsAndResponses/request.ts`
+  one (`Validation/forms.ts`'s landed at 6da8232ec);
 - X3.7, a date in a JSON response on MVC 5, passes on CI's Windows job;
 - `spec/REWRITE.md` section 4 states each of U1 to U22 closed with its result line (today it states U3, U4, U5,
   U8 to U13 closed and U1, U2, U14 to U16 landed; U6, U7, U17 to U22 are not stated);
@@ -114,16 +111,22 @@ Its units, in order:
    (`tools/PlanContractGenerator/CLAUDE.md`); no TLA+ spec models these fields. Its first half landed at 31e6361c3: a
    rule's test and condition and a vendor's locate typed as the `fn` C# writes, the plan's bytes unchanged. Its second
    half, `InputBinding`, is one family's design, `../input-form/.landing/InputForm/design.md` (its read, read.md;
-   the model, scratch/tla2; the built move, `../writer-move`). Two decisions wait on the owner's yes, `sent` (the bug
-   fix) and the split of `value` (not one); the check of a text, file or no body needs none and is built with them.
+   the model, scratch/tla2; the built move, `../writer-move`). The owner's yes to both decisions came 2026-11-24, and
+   they land as four units, smallest first: the check of a text or file body landed at 6da8232ec (X16.46), and of
+   a request that sends no body at 83b406a43 (X16.46's third promise); next
+   the writer's move with `as` writing its own kind, the plan's bytes unchanged (`../writer-move`), then the split
+   of `value` into `converted` and `blank`, then `sent` (the bug fix).
    `InputsAndIds/model.ts`'s three cases stand until it lands.
 2. The form-data boundary: an enum sent in form data (the move-in app met it; the designer decides its form),
-   an object stays refused until after 1.0 (the owner's yes of 2026-11-17), a text or file body's check
-   verified against the request writer.
+   an object stays refused until after 1.0 (the owner's yes of 2026-11-17); a text or file body's check landed
+   at 6da8232ec (X16.46). On MVC 5 an action's model binds route values and the query beside the body
+   (probe mvc5-value-provider-order), so a rule over a member a request sends in its path or query is checked at its
+   start in the browser and bound on that endpoint; the meaning by host is designed whole and put to the owner
+   before the core freeze (D16.5, D16.6).
 3. X3.7 written on the net48 host; CI's Windows job proves it.
-4. Ten parked core leads, each one verdict by the owner's test of 2026-11-20 (a reproduced defect, a reachable
-   incomplete contract or an unproved promise is in; otherwise a row of the after-1.0 table): the raw text and
-   single-file body check refusal, the named enum in a pushed message, typed list construction from separate
+4. Nine parked core leads, each one verdict by the owner's test of 2026-11-20 (a reproduced defect, a reachable
+   incomplete contract or an unproved promise is in; otherwise a row of the after-1.0 table), the raw text and
+   single-file body check having landed at 6da8232ec as X16.46: the named enum in a pushed message, typed list construction from separate
    sources, plan shape alignment, standalone named rule sets, activated-row replacement, handler cleanup, the
    attached-partial validation summary, an input over an enum whose zero has no name, and a row's "removing"
    state after a failed removal (move-in part 9).
