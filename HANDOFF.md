@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 03:27:10 EST 2026
+Written at `date`: Tue Nov 24 03:47:40 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (31): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException
+unit: landed (32): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 65e680e6b on feature/rewrite: equal to the remote
+lane: pushed at d85ac5e3e on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 65e680e6b
+ci: unread at d85ac5e3e
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,21 +27,21 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 65e680e6b A design's claim that a spec stands, a search's absence or a defect holds only by its run, its match and its source
-- Full check: .work/logs/spec-check-65e680e6b.log: spec check at 65e680e6b: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-031410-80423 65e680e6b
+- HEAD: d85ac5e3e A design's meaning is quoted from its D line, and a search over the app names every door and file it read
+- Full check: .work/logs/spec-check-d85ac5e3e.log: spec check at d85ac5e3e: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-033827-29586 d85ac5e3e
 
 ## Landed since the commit before the last spec: STATE commit
-65e680e6b A design's claim that a spec stands, a search's absence or a defect holds only by its run, its match and its source
-d352b3e53 spec: STATE and handoff at a8ed88396
+d85ac5e3e A design's meaning is quoted from its D line, and a search over the app names every door and file it read
+15ff30a31 spec: STATE and handoff at 65e680e6b
 
 ## Open
 open: 19 promises with no browser test, 5 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 435 to 438
-- A number, a proof line or an absence not read from the run that proves it: 61 to 68
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 438 to 439
+- A number, a proof line or an absence not read from the run that proves it: 68 to 71
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
