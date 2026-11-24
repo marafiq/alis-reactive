@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Mon Nov 23 20:05:19 EST 2026
+Written at `date`: Mon Nov 23 21:17:20 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 24, each in the notes block below
-unit: landed (27): SpecCiCold, MacTlc, DefinitionOfDone, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, RetirePicomatchException
+unit: landed (28): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, RetirePicomatchException
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 72f01266e on feature/rewrite: equal to the remote
+lane: pushed at 31e6361c3 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 72f01266e
+ci: unread at 31e6361c3
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -22,25 +22,28 @@ file: over spec/CLAUDE.md: holds 2084 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
+file: over HANDOFF.md: holds 154 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 72f01266e 1.0 is done when the core framework, every Fusion component and selected Native components are done
-- Full check: .work/logs/spec-check-72f01266e.log: spec check at 72f01266e: 40 of 40 checks pass
-- .work/last-run.txt: 20261123-195059-37889 72f01266e
+- HEAD: 31e6361c3 A rule's test and condition and a vendor's locate are typed as the fn C# writes
+- Full check: .work/logs/spec-check-31e6361c3.log: spec check at 31e6361c3: 40 of 40 checks pass
+- .work/last-run.txt: 20261123-210331-30584 31e6361c3
 
 ## Landed since the commit before the last spec: STATE commit
-72f01266e 1.0 is done when the core framework, every Fusion component and selected Native components are done
-28d0387de spec: STATE and handoff at 0e25f5f15
+31e6361c3 A rule's test and condition and a vendor's locate are typed as the fn C# writes
+3d1514828 spec: STATE and handoff at 72f01266e
 
 ## Open
-open: 19 promises with no browser test, 7 runtime cases not built, 14 doors not implemented
+open: 19 promises with no browser test, 6 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 437 to 438
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 434 to 435
+- A number, a proof line or an absence not read from the run that proves it: 59 to 60
+- A shell command or a script wrong in its own terms: 613 to 622
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
@@ -112,7 +115,7 @@ implement. Facts for that talk, with no recommendation and no operator work befo
 
 **3. The framework core to 1.0 (U1 to U22).** Done when:
 - `scripts/open.py` prints no core runtime case: `InputsAndIds/model.ts` three, `RequestsAndResponses/request.ts`
-  one, `Validation/forms.ts` two, and the operators line after the owner's talk;
+  one, `Validation/forms.ts` one, and the operators line after the owner's talk;
 - X3.7, a date in a JSON response on MVC 5, passes on CI's Windows job;
 - `spec/REWRITE.md` section 4 states each of U1 to U22 closed with its result line (today it states U3, U4, U5,
   U8 to U13 closed and U1, U2, U14 to U16 landed; U6, U7, U17 to U22 are not stated);
@@ -122,7 +125,11 @@ Its units, in order:
    names the form C# writes. `RuleTest` and `RuleGroup` take a `FnExpression` (`Alis.Reactive/Schema/Registration.cs`)
    and the one writer of `InputBinding` writes `coalesce(as(read, shape), blank)` (`Alis.Reactive/InputsAndIds/BoundInput.cs`);
    the contract widens both to any expression, since the generator refuses a field typed as a kind's class
-   (`tools/PlanContractGenerator/CLAUDE.md`); no TLA+ spec models these fields. A designer consult decides the form first.
+   (`tools/PlanContractGenerator/CLAUDE.md`); no TLA+ spec models these fields. Its first half landed at 31e6361c3: a
+   rule's test and condition and a vendor's locate typed as the `fn` C# writes, the plan's bytes unchanged. Its second
+   half, `InputBinding` as `read`, `shape` and `blank` (decision 2 of `../core-narrowed-plan/.landing/NarrowedPlan/answer.md`),
+   changes a node's fields and waits on the owner's yes; `InputsAndIds/model.ts`'s three cases stand until it lands. Two
+   shell commands of that session, wrong in their own terms, are counted with the next landing.
 2. The form-data boundary: an enum sent in form data (the move-in app met it; the designer decides its form),
    an object stays refused until after 1.0 (the owner's yes of 2026-11-17), a text or file body's check
    verified against the request writer.
