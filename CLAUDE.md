@@ -30,8 +30,7 @@ python3 scripts/open.py
 ```
 Builds run one at a time, with a read-only consult beside the build (the owner, 2026-11-17).
 Commands on this Mac: git grep's extended expressions take no \b and no \s; zsh ties the variable path to PATH, expands $var:A and runs a command held in a variable as one word, so a script is bash and writes ${var}; BSD sed's in-place edit takes ''; a tool that reads its input is started with < /dev/null.
-The browser runner takes --test or --all here and no --filter. A script bash is running is never edited; a planted
-file is restored by cp and touch, since mv keeps the old time.
+The browser runner takes --test or --all here and no --filter. A script bash is running is never edited; a planted file is restored by cp and touch, since mv keeps the old time.
 
 ## Vision: typed access to JavaScript objects
 
@@ -90,7 +89,8 @@ keeps (section 10); the modules and the owner's decisions are `spec/CLAUDE.md`'s
      an edit, name its row: the spec line, the door, the node it writes, the runtime that executes it, the test.
   3. Decide from the proof in hand: the TLA+ specs, the principles and the owner's decisions. A decision on a
      principle, a closed rule or the scope goes to the owner as one line: what already holds, the one thing a yes
-     changes, its cost and risk, then the lead's recommendation (the owner, 2026-11-14).
+     changes, its cost and risk, then the lead's recommendation (the owner, 2026-11-14), from a design thought through
+     whole, its family of cases, alternatives and counts read at the source, never ad hoc (the owner, 2026-11-23).
   4. Change one meaning in one commit, with every place that carries it; a batch of slices a builder finished lands
      as one commit, each slice named (the owner, 2026-11-17).
   5. Prove it on the rung that holds it, once: behavior by a `scripts/playwright.sh` result line, the test first failing
