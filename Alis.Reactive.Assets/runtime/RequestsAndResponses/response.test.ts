@@ -175,7 +175,7 @@ describe("when one Attempt reaches fetch, D10 chooses and decodes its answer", (
   });
 
   test("SentInputsKeepTheirEntries: the response holds the captured input under its sent binding name", async () => {
-    const entry = { id: "room", binding: { name: "Room", path: ["room"], value: { kind: "op", op: "coalesce", args: [{ kind: "as", expr: { kind: "lit", value: 7 }, shape: { kind: "nullable", inner: { kind: "number", of: "integer", text: "invariant", overflow: "nothing" } } }, { kind: "lit", value: null }] }, committed: "change", invalidClass: "invalid", message: "room-message" } } as const;
+    const entry = { id: "room", binding: { name: "Room", path: ["room"], converted: { kind: "as", expr: { kind: "lit", value: 7 }, shape: { kind: "nullable", inner: { kind: "number", of: "integer", text: "invariant", overflow: "nothing" } } }, blank: { kind: "lit", value: null }, committed: "change", invalidClass: "invalid", message: "room-message" } } as const;
     const send: Send = { ...get, query: { fields: [], inputs: { container: { kind: "captured", id: "admission", body: {}, inputs: [{ name: "Room", entry }] }, individual: [{ kind: "captured", input: { name: "OtherRoom", entry } }] } } };
     fetches(new Response(null, { status: 204 }));
     const { reply } = await attempt(prepared(send), routes("none"), signal(), pageUrl, untraced);

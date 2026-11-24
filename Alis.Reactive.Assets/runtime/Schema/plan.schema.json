@@ -1213,8 +1213,11 @@
             "$ref": "#/$defs/PathStep"
           }
         },
-        "value": {
-          "$ref": "#/$defs/Expression"
+        "converted": {
+          "$ref": "#/$defs/AsExpression"
+        },
+        "blank": {
+          "$ref": "#/$defs/LitExpression"
         },
         "committed": {
           "type": "string"
@@ -1229,7 +1232,8 @@
       "required": [
         "name",
         "path",
-        "value",
+        "converted",
+        "blank",
         "committed",
         "invalidClass",
         "message"

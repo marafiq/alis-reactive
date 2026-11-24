@@ -306,7 +306,8 @@ export interface ModelPluginData {
 export interface InputBinding {
   readonly name: string;
   readonly path: readonly PathStep[];
-  readonly value: Expression;
+  readonly converted: AsExpression;
+  readonly blank: LitExpression;
   readonly committed: string;
   readonly invalidClass: string;
   readonly message: string;

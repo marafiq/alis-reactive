@@ -324,7 +324,7 @@ Terms used throughout:
   - The redesign wrote these shapes by reflection over the type (`Alis.Reactive/Components/ArgumentShape.cs`,
     `ClrShape.SerializedProperties`); the contract carries the same feature.
 
-**Schema nodes.** `as`, the shapes of D3.1, `InputBinding.value`.
+**Schema nodes.** `as`, the shapes of D3.1, `InputBinding.converted` and `InputBinding.blank`.
 
 **Checker.**
 - `Absence.tla:FailedConversionReadsNothing`
@@ -366,8 +366,9 @@ Terms used throughout:
 **Doors.**
 - `N3.1` new: the grammar's `Operator` without `ToNumber`, `ToDate`, `ToBoolean` and `ToText`.
 - `N3.2` new: `internal sealed class FileShape` in `Alis.Reactive/Grammar/Shape.cs`, kind `file`.
-- `N3.3` new: `InputBinding.value`, one `Expr` C# writes as `coalesce(as(read, shape), blank)`, replacing
-  `value`, `shape` and `list`.
+- `N3.3` new: `InputBinding.converted`, the one `as` C# writes of the input's read to its shape, and
+  `InputBinding.blank`, the `lit` of the member's start, which the input's value reads where `converted` holds null or reads nothing;
+  they replace `value`, `shape` and `list`, and the browser takes no expression apart (the owner's yes of 2026-11-24).
 - `N3.4` new: the view's culture in the plan, its name, decimal separator and group separator, written once
   by C# where the view renders, with the endpoint host's number styles per .NET type.
 - `N3.5` new: the view's time zone, the app's choice per request (D3.12), one door on both hosts that takes a

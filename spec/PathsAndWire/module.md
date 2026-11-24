@@ -24,7 +24,7 @@ file itself, and a date at a live member as a JavaScript `Date`. Module 15 of `s
 The one read, `get` and `call`, and the conversion `as` at a value position are module 2's (Q2, Q7, X2.1, X3.1). A
 comparison's and a sort's date keys are modules 3, 4 and 8's (D6.12, D16.16). The request's wire, its body formats,
 its parts and how each part is sent, is module 6's (Q9): this module states what a value is in each form, and module
-6 which form a part takes. An input's binding, `coalesce(as(read, shape), blank)` (N3.3), is module 7's, and an
+6 which form a part takes. An input's binding, its `converted` read and its `blank` (N3.3), is module 7's, and an
 element id's derivation module 7's (D14.3). The plan's culture and time zone fields are module 14's door (N19.3);
 their meaning is this module's (D3.11, D3.12). A server error key shown at its input is module 8's (X1.5). A plugin
 handed no member path as text is module 13's (X2.2). Fusion's `AddReactiveFusion`, which set the naming Syncfusion's

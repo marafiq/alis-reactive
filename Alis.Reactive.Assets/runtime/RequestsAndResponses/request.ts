@@ -1,6 +1,6 @@
 import { Submission } from "../InputsAndIds/index";
 import {
-  assertNever, notBuilt, type Culture, type Expression, type HttpSend, type InputBinding, type MultipartPart, type PathPart, type PathStep, type ScalarWireForm, type SentBody,
+  assertNever, notBuilt, type Culture, type HttpSend, type InputBinding, type MultipartPart, type PathPart, type PathStep, type ScalarWireForm, type SentBody,
   type SentEnum, type SentField, type SentHeader, type SentInput, type SentInputs, type Shape, type TimeZone, type WireForm,
 } from "../Schema/index";
 import { plugin } from "../Plugins/index";
@@ -238,14 +238,9 @@ function readAt(holder: unknown, path: readonly PathStep[]): unknown {
   return current;
 }
 
-const unconverted = "The plan's input binding value is not coalesce(as(read, shape), blank), the one form C# writes it in.";
-
 function convertedShape(binding: InputBinding): Shape {
-  const value: Expression = binding.value;
-  if (value.kind !== "op" || value.op !== "coalesce") throw new Error(unconverted);
-  const [converted] = value.args;
-  if (converted?.kind !== "as") throw new Error(unconverted);
-  return converted.shape.kind === "nullable" ? converted.shape.inner : converted.shape;
+  const { shape } = binding.converted;
+  return shape.kind === "nullable" ? shape.inner : shape;
 }
 
 function wireFormOf(shape: Shape, name: string): WireForm {

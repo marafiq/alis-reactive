@@ -25,8 +25,9 @@ public sealed class WhenAnInputsValueIsAListOfObjects
         using var document = JsonDocument.Parse(json);
         var inputs = document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs");
 
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__CarePlan").GetProperty("value").GetRawText(),
-            Is.EqualTo("""{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":[0],"members":"optional","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"call","path":["getFilesData"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__CarePlan"},"args":[]},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["rawFile"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]}},"shape":{"kind":"nullable","inner":{"kind":"file"}}},{"kind":"lit","value":null}]}"""));
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__CarePlan").GetProperty("converted").GetRawText(),
+            Is.EqualTo("""{"kind":"as","expr":{"kind":"get","path":[0],"members":"optional","target":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"call","path":["getFilesData"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__CarePlan"},"args":[]},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["rawFile"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]}},"shape":{"kind":"nullable","inner":{"kind":"file"}}}"""));
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__CarePlan").GetProperty("blank").GetRawText(), Is.EqualTo("""{"kind":"lit","value":null}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 
@@ -40,8 +41,9 @@ public sealed class WhenAnInputsValueIsAListOfObjects
         using var document = JsonDocument.Parse(json);
         var inputs = document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs");
 
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__Scans").GetProperty("value").GetRawText(),
-            Is.EqualTo("""{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"call","path":["getFilesData"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__Scans"},"args":[]},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["rawFile"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]},"shape":{"kind":"nullable","inner":{"kind":"array","item":{"kind":"file"}}}},{"kind":"lit","value":[]}]}"""));
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__Scans").GetProperty("converted").GetRawText(),
+            Is.EqualTo("""{"kind":"as","expr":{"kind":"call","path":["map"],"members":"requiredIfHeld","target":{"kind":"call","path":["getFilesData"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__Scans"},"args":[]},"args":[{"kind":"fn","params":["liveItem1"],"body":{"kind":"get","path":["rawFile"],"members":"required","target":{"kind":"ref","name":"liveItem1"}}}]},"shape":{"kind":"nullable","inner":{"kind":"array","item":{"kind":"file"}}}}"""));
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_CarePlanForm__Scans").GetProperty("blank").GetRawText(), Is.EqualTo("""{"kind":"lit","value":[]}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 }

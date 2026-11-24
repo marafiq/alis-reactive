@@ -1,6 +1,6 @@
 import type { Owner } from "../OwnershipAndState/index";
 import {
-  assertNever, notBuilt, type AsExpression, type CheckedBody as CheckedForm, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type InputEntry, type ModelPluginData, type OpExpression, type PathStep,
+  assertNever, type CheckedBody as CheckedForm, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type InputEntry, type ModelPluginData, type PathStep,
   type PlanDocument, type SentInput, type SentInputs, type ValueRead,
 } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
@@ -112,7 +112,7 @@ export class PageInputs {
     }
     const [first] = inputs;
     const body = first !== undefined && typeof first[1].binding.path[0] === "number" ? [] : {};
-    for (const [, input] of inputs) write(body, input.binding.path, input.contribution.read(input.binding.value));
+    for (const [, input] of inputs) write(body, input.binding.path, boundValue(input));
     return { kind: "captured", id: containerId, body, inputs: inputs.map(sentInput) };
   }
 
@@ -151,7 +151,7 @@ export class PageInputs {
 
   valueOf(inputId: string): unknown {
     const input = this.#inputs.get(inputId);
-    return input === undefined ? undefined : input.contribution.read(input.binding.value);
+    return input === undefined ? undefined : boundValue(input);
   }
 
   checked(inputs: SentInputs, sentValue: unknown, entries: readonly CheckedEntry[]): CheckedBody | null {
@@ -199,7 +199,7 @@ export class PageInputs {
   typedText(sent: SentInput): string | null {
     const input = this.#inputs.get(sent.entry.id);
     if (input === undefined) throw new Stop("Input '" + sent.entry.id + "' left the page before its check read it.");
-    const converted = convertedRead(input.binding.value);
+    const { converted } = input.binding;
     const typed = input.contribution.read(converted.expr);
     if (typeof typed !== "string" || typed.trim() === "") return null;
     return input.contribution.read(converted) === null ? typed : null;
@@ -219,52 +219,9 @@ function sentInput([id, input]: readonly [string, Input]): SentInput {
   return { name: input.binding.name, entry: { id, binding: input.binding } };
 }
 
-const notCoalesced = "a typed text read through a binding whose value is not coalesce(as(read, shape), blank): the contract types InputBinding.value as any expression, though C# writes that form (N3.3)";
-
-function convertedRead(value: Expression): AsExpression {
-  switch (value.kind) {
-    case "op":
-      return coalescedRead(value);
-    case "lit":
-    case "obj":
-    case "ref":
-    case "get":
-    case "data":
-    case "as":
-    case "call":
-    case "fn":
-    case "answer":
-    case "record":
-    case "list":
-    case "signal":
-      throw notBuilt(notCoalesced);
-    default:
-      return assertNever(value);
-  }
-}
-
-function coalescedRead(value: OpExpression): AsExpression {
-  const [converted] = value.args;
-  if (value.op !== "coalesce" || converted === undefined) throw notBuilt(notCoalesced);
-  switch (converted.kind) {
-    case "as":
-      return converted;
-    case "lit":
-    case "obj":
-    case "ref":
-    case "get":
-    case "data":
-    case "call":
-    case "fn":
-    case "answer":
-    case "record":
-    case "list":
-    case "op":
-    case "signal":
-      throw notBuilt(notCoalesced);
-    default:
-      return assertNever(converted);
-  }
+function boundValue(input: Input): unknown {
+  const converted = input.contribution.read(input.binding.converted);
+  return converted === null ? input.contribution.read(input.binding.blank) : converted;
 }
 
 function write(holder: object, path: readonly PathStep[], value: unknown): void {

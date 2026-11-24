@@ -133,8 +133,9 @@ function plan(registrations: Registration[]): Plan {
 }
 
 function sent(name: string, path: Entry["binding"]["path"], message = ""): Sent {
-  const value: Entry["binding"]["value"] = { kind: "lit", value: null };
-  return { name, entry: { id: "input_" + name, binding: { name, path, value, committed: "change", invalidClass: "invalid", message } } };
+  const converted: Entry["binding"]["converted"] = { kind: "as", expr: { kind: "lit", value: null }, shape: { kind: "nullable", inner: { kind: "any" } } };
+  const blank: Entry["binding"]["blank"] = { kind: "lit", value: null };
+  return { name, entry: { id: "input_" + name, binding: { name, path, converted, blank, committed: "change", invalidClass: "invalid", message } } };
 }
 
 function shown(name: string, path: Entry["binding"]["path"]): Sent {

@@ -22,8 +22,9 @@ public sealed class WhenAnInputHasANumberBlank
         html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Input(m => m.Nights).Component<IntakeBox>().Value.Set("ready")));
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
         using var document = JsonDocument.Parse(json);
-        Assert.That(document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs").GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Nights").GetProperty("value").GetRawText(),
-            Is.EqualTo("""{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Nights"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}},{"kind":"lit","value":5}]}"""));
+        Assert.That(document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs").GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Nights").GetProperty("converted").GetRawText(),
+            Is.EqualTo("""{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Nights"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}}"""));
+        Assert.That(document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs").GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Nights").GetProperty("blank").GetRawText(), Is.EqualTo("""{"kind":"lit","value":5}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 
@@ -36,8 +37,9 @@ public sealed class WhenAnInputHasANumberBlank
         html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Input(m => m.Extra).Component<IntakeBox>().Value.Set("ready")));
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
         using var document = JsonDocument.Parse(json);
-        Assert.That(document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs").GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Extra").GetProperty("value").GetRawText(),
-            Is.EqualTo("""{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Extra"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}},{"kind":"lit","value":7}]}"""));
+        Assert.That(document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs").GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Extra").GetProperty("converted").GetRawText(),
+            Is.EqualTo("""{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Extra"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}}"""));
+        Assert.That(document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs").GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Extra").GetProperty("blank").GetRawText(), Is.EqualTo("""{"kind":"lit","value":7}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 }

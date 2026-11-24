@@ -120,7 +120,8 @@ or the connection before it opens (D21.11).
 
 `alis.model`'s `sent`, called with a request container's id and the key of its model, returns the body that container
 sends, built when it is called: each framework input of the page's input table whose element is inside the container's
-element, under its `InputBinding.path`, its value its `InputBinding.value` evaluated in the plan that contributed it.
+element, under its `InputBinding.path`, its value its `InputBinding.converted` evaluated in the plan that contributed it,
+or its `InputBinding.blank` where that holds null or reads nothing.
 The page lacking the container's element, no live plan rendering that container for that model (D14.8), and two
 inputs inside it under one scalar binding name (D13.4) each stop the pipeline. A container read is a `data` read over
 it (N13.1, D13.3), and `Live.body`'s `value` is that call.
@@ -145,12 +146,14 @@ compared ignoring case, stops the pipeline. Each reads the page's address when i
 `InputBinding` carries:
 - `name`: its binding name, the name the server speaks (D1.7);
 - `path`: its body path, with no `each`;
-- `value`: an expression C# writes as `coalesce(as(read, shape), blank)`, where blank is the member's start (N3.3);
+- `converted`: the `as` C# writes of the input's read to its shape, which reads nothing where the input is blank or
+  its text does not convert (N3.3);
+- `blank`: the `lit` of the member's start, the input's value where `converted` holds null or reads nothing (N3.3, D3.6);
 - `committed`: the event that commits its value;
 - `invalidClass`: the class an invalid input takes;
 - `message`: the id of its message element (D16.13).
 
-Its shape and list flag of 65fdf118d leave into `value`.
+Its shape and list flag of 65fdf118d leave into `converted`.
 
 `Container` carries:
 - `model`: the key of the model its block was rendered for (D14.8);
@@ -574,7 +577,7 @@ Today 33 kinds, proposed 53: twenty-one added, one removed (`try`, whose `finall
 
 Today, each shape has two handlers: the conversion switch and the switch that picks a default by shape, `bound`
 (`Alis.Reactive.Assets/runtime/grammar/shape.ts:31-45`). That second switch leaves, because the browser chooses
-no default by shape: C# writes the blank into each input's value (D3.6, N3.3).
+no default by shape: C# writes the blank into each input's binding (D3.6, N3.3).
 
 Each object locator has two switches, the object at `Alis.Reactive.Assets/runtime/objects/plan-objects.ts:14-18`
 and the subscription at `:27-31`. They become one switch that returns the locator's driver, its object and its
@@ -590,7 +593,7 @@ The diff beyond the kinds, each with the decision that makes it:
 - `answer` is the function a vendor calls for an answer, a value wherever a value goes, set into a property or
   passed as an argument (D17.12);
 - `Vendor.payload` leaves (D17.4);
-- `InputBinding` gains `message` (D16.13), and `shape` and `list` leave into `value` (N3.3);
+- `InputBinding` gains `message` (D16.13), and its `value`, `shape` and `list` become `converted` and `blank` (N3.3);
 - `FormPluginData` becomes one `Registration`, keyed by validator and rule set and by no element; its `summary` and
   `live` move to `model`'s `containers` as `Container`; and `FormField`'s `items` and `value` functions leave (D16.2,
   D14.8, D16.14);

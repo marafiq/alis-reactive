@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace Alis.Reactive.Schema;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
-[JsonDerivedType(typeof(LitExpression), "lit")]
+[JsonDerivedType(typeof(LitExpression))]
 [JsonDerivedType(typeof(ObjExpression), "obj")]
 [JsonDerivedType(typeof(RefExpression), "ref")]
 [JsonDerivedType(typeof(GetExpression), "get")]
@@ -31,6 +31,8 @@ internal sealed class LitExpression : Expression
     {
         Value = value;
     }
+
+    public string Kind => "lit";
 
     public JsonElement Value { get; }
 }

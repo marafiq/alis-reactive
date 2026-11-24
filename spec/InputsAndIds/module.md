@@ -7,8 +7,8 @@ renders and where the page composes its plans. Module 7 of `spec/CLAUDE.md`.
 ## Core questions
 
 - Q2: an input binds under MVC's binding name, the member's C# path under its view's prefix, on both hosts (D2.5).
-- Q3: an input's value is the one expression C# writes, `coalesce(as(read, shape), blank)` (N3.3), and blank is what
-  the member binds as (D3.5, D3.6).
+- Q3: an input's value is its `converted` read, the one `as` C# writes, or its `blank` where that holds null or reads nothing
+  (N3.3), and blank is what the member binds as (D3.5, D3.6).
 - Q7: an input a member binds is a source at every value position (D7.2), reached by its member (N14.4).
 - Q12: an input id a live plan holds is taken by no plan that starts later, a slot's content included (R14.6).
 - Q13: a member's value as its container sends it is the container's read (N13.1), read in its step from the inputs

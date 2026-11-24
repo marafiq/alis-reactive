@@ -16,9 +16,9 @@ internal sealed partial class BoundInput
 
     private readonly IReadOnlyList<PathStep> _path;
     private readonly Shape _shape;
-    private readonly Schema.Expression _blank;
+    private readonly LitExpression _blank;
 
-    private BoundInput(string id, string name, IReadOnlyList<PathStep> path, Shape shape, Schema.Expression blank, bool joinsTheBody)
+    private BoundInput(string id, string name, IReadOnlyList<PathStep> path, Shape shape, LitExpression blank, bool joinsTheBody)
     {
         Id = id;
         Name = name;
@@ -82,7 +82,8 @@ internal sealed partial class BoundInput
         => new(
             Name,
             _path,
-            new OpExpression(Operator.Coalesce, [new AsExpression(ReadOf(input), new NullableShape(InputShapes.From(_shape, input.Text))), _blank]),
+            new AsExpression(ReadOf(input), new NullableShape(InputShapes.From(_shape, input.Text))),
+            _blank,
             input.Committed,
             invalidClass,
             hidden ? "" : MessageId);

@@ -19,9 +19,13 @@ class Visit implements Owner {
 }
 
 const intake: Containers = { intake: { model: "Admission", kind: "form", summary: "intake_summary", live: [] } };
-const field = (name: string, path: Inputs[string]["path"], value: Source): Inputs[string] => ({ name, path, value, committed: "change", invalidClass: "invalid", message: "" });
-const literal = (value: number | string): Source => ({ kind: "lit", value });
-const fields: Inputs = { own: field("Nights", ["nights"], literal(5)) };
+type Converted = Inputs[string]["converted"];
+type Blank = Inputs[string]["blank"];
+const convertedFrom = (read: Source): Converted => ({ kind: "as", expr: read, shape: { kind: "nullable", inner: { kind: "any" } } });
+const field = (name: string, path: Inputs[string]["path"], converted: Converted, blank: Blank = { kind: "lit", value: null }): Inputs[string] =>
+  ({ name, path, converted, blank, committed: "change", invalidClass: "invalid", message: "" });
+const literal = (value: number | string): Blank => ({ kind: "lit", value });
+const fields: Inputs = { own: field("Nights", ["nights"], convertedFrom(literal(5))) };
 
 function plan(inputs: Inputs = fields, containers: Containers = intake, planId = "Admission"): Plan {
   return {
@@ -33,6 +37,7 @@ function plan(inputs: Inputs = fields, containers: Containers = intake, planId =
 }
 
 function literalValue(source: Source): unknown {
+  if (source.kind === "as") return literalValue(source.expr);
   if (source.kind !== "lit") throw new Error("This contribution reads a literal.");
   return source.value;
 }
@@ -49,7 +54,7 @@ describe("when alis.model reads what a container sends", () => {
     const inputs = page();
     const owner = new Visit();
     inputs.join(plan(), owner, "on the page", literalValue);
-    inputs.join(plan({ slot: field("Room", ["room"], { kind: "ref", name: "room" }) }, {}, "RoomCard"), owner, "in slot 'room'", () => "B-12");
+    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom({ kind: "ref", name: "room" })) }, {}, "RoomCard"), owner, "in slot 'room'", () => "B-12");
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5, room: "B-12" });
   });
 
@@ -75,7 +80,7 @@ describe("when alis.model reads what a container sends", () => {
     const inputs = page();
     const evaluated: string[] = [];
     inputs.join(plan(), new Visit(), "on the page", () => { evaluated.push("own"); return 5; });
-    inputs.join(plan({ slot: field("Nights", ["nights"], literal(8)) }, {}), new Visit(), "in slot 'card'", () => { evaluated.push("slot"); return 8; });
+    inputs.join(plan({ slot: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), new Visit(), "in slot 'card'", () => { evaluated.push("slot"); return 8; });
     expect(() => inputs.sent("intake", "Admission")).toThrow(/^Inputs 'own' and 'slot' both bind 'Nights' inside container 'intake'\.$/);
     expect(evaluated).toStrictEqual([]);
   });
@@ -83,16 +88,16 @@ describe("when alis.model reads what a container sends", () => {
   test("ReadFindsWhatItsContainerSends: an outside input is neither read nor a duplicate", () => {
     const inputs = page();
     inputs.join(plan(), new Visit(), "on the page", literalValue);
-    inputs.join(plan({ other: field("Nights", ["nights"], literal(8)) }, {}), new Visit(), "on the page", () => { throw new Error("The outside input was read."); });
+    inputs.join(plan({ other: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), new Visit(), "on the page", () => { throw new Error("The outside input was read."); });
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
   });
 
   test("indexed bindings build lists and dictionary keys without treating their distinct names as duplicates", () => {
     const inputs = page();
     inputs.join(plan({
-      own: field("Doses[0].Amount", ["doses", 0, "amount"], literal(2)),
-      slot: field("Doses[1].Amount", ["doses", 1, "amount"], literal(3)),
-      second: field("Rounds[night].Name", ["rounds", "night", "name"], literal("Ada")),
+      own: field("Doses[0].Amount", ["doses", 0, "amount"], convertedFrom(literal(2))),
+      slot: field("Doses[1].Amount", ["doses", 1, "amount"], convertedFrom(literal(3))),
+      second: field("Rounds[night].Name", ["rounds", "night", "name"], convertedFrom(literal("Ada"))),
     }), new Visit(), "on the page", literalValue);
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ doses: [{ amount: 2 }, { amount: 3 }], rounds: { night: { name: "Ada" } } });
   });
@@ -100,15 +105,15 @@ describe("when alis.model reads what a container sends", () => {
   test("a path beginning at a list position builds the container's list body", () => {
     const inputs = page();
     inputs.join(plan({
-      own: field("[0].Name", [0, "name"], literal("Ada")),
-      slot: field("[1].Name", [1, "name"], literal("Grace")),
+      own: field("[0].Name", [0, "name"], convertedFrom(literal("Ada"))),
+      slot: field("[1].Name", [1, "name"], convertedFrom(literal("Grace"))),
     }), new Visit(), "on the page", literalValue);
     expect(inputs.sent("intake", "Admission")).toStrictEqual([{ name: "Ada" }, { name: "Grace" }]);
   });
 
   test("a body key named like an inherited member remains its own data", () => {
     const inputs = page();
-    inputs.join(plan({ own: field("Map[__proto__].Name", ["map", "__proto__", "name"], literal("Ada")) }), new Visit(), "on the page", literalValue);
+    inputs.join(plan({ own: field("Map[__proto__].Name", ["map", "__proto__", "name"], convertedFrom(literal("Ada"))) }), new Visit(), "on the page", literalValue);
     expect(inputs.sent("intake", "Admission")).toStrictEqual(JSON.parse('{"map":{"__proto__":{"name":"Ada"}}}'));
   });
 
@@ -119,7 +124,7 @@ describe("when alis.model reads what a container sends", () => {
     inputs.join(plan(), new Visit(), "on the page", () => nights);
     const before = inputs.sent("intake", "Admission");
     nights = 9;
-    inputs.join(plan({ slot: field("Room", ["room"], literal("B-12")) }, {}), new Visit(), "in slot 'card'", literalValue);
+    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom(literal("B-12"))) }, {}), new Visit(), "in slot 'card'", literalValue);
     containers.set("intake", new Set(["own", "slot"]));
     expect(before).toStrictEqual({ nights: 5 });
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 9, room: "B-12" });
@@ -129,7 +134,7 @@ describe("when alis.model reads what a container sends", () => {
     const inputs = page();
     inputs.join(plan(), new Visit(), "on the page", literalValue);
     const slot = new Visit();
-    inputs.join(plan({ slot: field("Nights", ["nights"], literal(8)) }, {}), slot, "in slot 'card'", literalValue);
+    inputs.join(plan({ slot: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), slot, "in slot 'card'", literalValue);
     expect(() => inputs.sent("intake", "Admission")).toThrow(/^Inputs 'own' and 'slot' both bind 'Nights' inside container 'intake'\.$/);
     slot.release();
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
@@ -139,7 +144,7 @@ describe("when alis.model reads what a container sends", () => {
     const inputs = page();
     inputs.join(plan({}, intake), new Visit(), "on the page", literalValue);
     const slot = new Visit();
-    inputs.join(plan({ slot: field("Nights", ["nights"], literal(8)) }, {}), slot, "in slot 'card'", literalValue);
+    inputs.join(plan({ slot: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), slot, "in slot 'card'", literalValue);
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 8 });
     slot.release();
     expect(inputs.sent("intake", "Admission")).toStrictEqual({});
@@ -168,7 +173,7 @@ describe("when alis.model reads what a container sends", () => {
     const inputs = page();
     inputs.join(plan(), new Visit(), "on the page", literalValue);
     const refused = new Visit();
-    expect(() => { inputs.join(plan({ second: field("Room", ["room"], literal("B-12")), ...fields }, {}), refused, "in slot 'card'", literalValue); })
+    expect(() => { inputs.join(plan({ second: field("Room", ["room"], convertedFrom(literal("B-12"))), ...fields }, {}), refused, "in slot 'card'", literalValue); })
       .toThrow(/^Input 'own' is already held by plan 'Admission' on the page; plan 'Admission' in slot 'card' did not start\.$/);
     refused.release();
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
@@ -179,21 +184,16 @@ describe("when alis.model reads what a container sends", () => {
     const first = new Visit();
     inputs.join(plan(), first, "on the page", literalValue);
     first.release();
-    inputs.join(plan({ own: field("Nights", ["nights"], literal(9)) }), new Visit(), "in slot 'card'", literalValue);
+    inputs.join(plan({ own: field("Nights", ["nights"], convertedFrom(literal(9))) }), new Visit(), "in slot 'card'", literalValue);
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 9 });
   });
 });
 
 describe("when a check reads what a container sends", () => {
-  const typed = (text: string): Source => ({ kind: "op", op: "coalesce", args: [{ kind: "as", expr: literal(text), shape: { kind: "nullable", inner: { kind: "number", of: "integer", text: "view", overflow: "nothing" } } }, literal(0)] });
-  const counted = (text: string): Inputs => ({ own: field("Count", ["count"], typed(text)), outside: field("Name", ["name"], literal("Ada")) });
+  const typed = (text: string): Converted => ({ kind: "as", expr: literal(text), shape: { kind: "nullable", inner: { kind: "number", of: "integer", text: "view", overflow: "nothing" } } });
+  const counted = (text: string): Inputs => ({ own: field("Count", ["count"], typed(text), literal(0)), outside: field("Name", ["name"], convertedFrom(literal("Ada"))) });
   const read = (expression: Source): unknown => {
     if (expression.kind === "lit") return expression.value;
-    if (expression.kind === "op") {
-      const [converted, blank] = expression.args;
-      if (converted === undefined || blank === undefined) throw new Error("A binding coalesces its converted read with its blank.");
-      return read(converted) ?? read(blank);
-    }
     if (expression.kind !== "as" || expression.expr.kind !== "lit") throw new Error("This contribution reads a literal or a number typed into it.");
     const text = expression.expr.value;
     return typeof text === "string" && /^[0-9]+$/.test(text) ? Number(text) : null;
@@ -239,8 +239,8 @@ describe("when a check reads what a container sends", () => {
 
 describe("when an input is checked live", () => {
   const live = (validator: string, body: string): Containers[string]["live"][number] => ({ validator, ruleSet: "default", body: literal(body) });
-  const nights = field("Nights", ["nights"], literal(5));
-  const room = field("Room", ["room"], literal("B-12"));
+  const nights = field("Nights", ["nights"], convertedFrom(literal(5)));
+  const room = field("Room", ["room"], convertedFrom(literal("B-12")));
   const held: Inputs = { own: nights, second: room };
   const sentOwn = { name: "Nights", entry: { id: "own", binding: nights } };
   const sentSecond = { name: "Room", entry: { id: "second", binding: room } };
@@ -278,13 +278,13 @@ describe("when an answer shows where a request's failures go", () => {
     const inputs = page();
     const slot = new Visit();
     inputs.join(plan(), new Visit(), "on the page", literalValue);
-    inputs.join(plan({ slot: field("Room", ["room"], literal("B-12")) }, {}, "RoomCard"), slot, "in slot 'room'", literalValue);
+    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom(literal("B-12"))) }, {}, "RoomCard"), slot, "in slot 'room'", literalValue);
     const [own, room] = inputs.captured("intake", "Admission").inputs;
     if (own === undefined || room === undefined) throw new Error("The container sends two inputs.");
     expect([inputs.holds(own.entry), inputs.holds(room.entry)]).toStrictEqual([true, true]);
     slot.release();
     expect(inputs.holds(room.entry)).toBe(false);
-    inputs.join(plan({ slot: field("Room", ["room"], literal("B-12")) }, {}, "RoomCard"), new Visit(), "in slot 'room'", literalValue);
+    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom(literal("B-12"))) }, {}, "RoomCard"), new Visit(), "in slot 'room'", literalValue);
     expect([inputs.holds(own.entry), inputs.holds(room.entry)]).toStrictEqual([true, false]);
   });
 
@@ -334,7 +334,7 @@ describe("when a request captures what it sends", () => {
     inputs.join(plan(), new Visit(), "on the page", literalValue);
     expect(inputs.input("gone", "Ward")).toStrictEqual({ kind: "missing", id: "gone", name: "Ward" });
     expect(inputs.valueOf("gone")).toBeUndefined();
-    expect(inputs.input("own", "Stay")).toStrictEqual({ kind: "captured", input: { name: "Stay", entry: { id: "own", binding: field("Nights", ["nights"], literal(5)) } } });
+    expect(inputs.input("own", "Stay")).toStrictEqual({ kind: "captured", input: { name: "Stay", entry: { id: "own", binding: field("Nights", ["nights"], convertedFrom(literal(5))) } } });
     expect(inputs.valueOf("own")).toBe(5);
   });
 

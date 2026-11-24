@@ -450,7 +450,7 @@ function withInput(planId: string, event: string): Plan {
   return { ...plan, planId, objects: { ...plan.objects, repeated: { kind: "element", id: "repeated", vendor: "bell" }, $model: {
     kind: "plugin", name: "alis.model", key: "", listen: onAndOff, data: {
       kind: "model", containers: {}, inputs: {
-        repeated: { name: "Nights", path: ["nights"], value: { kind: "lit", value: 5 }, committed: "change", invalidClass: "invalid", message: "" },
+        repeated: { name: "Nights", path: ["nights"], converted: { kind: "as", expr: { kind: "lit", value: 5 }, shape: { kind: "nullable", inner: { kind: "any" } } }, blank: { kind: "lit", value: null }, committed: "change", invalidClass: "invalid", message: "" },
       },
     },
   } } };

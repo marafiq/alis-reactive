@@ -341,13 +341,13 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
 
 type Captured = Extract<Send["query"]["inputs"]["container"], { kind: "captured" }>;
 type Binding = Captured["inputs"][number]["entry"]["binding"];
-const bound = (name: string, path: Binding["path"], shape: Extract<Binding["value"], { kind: "as" }>["shape"]): Captured["inputs"][number] => ({
+const bound = (name: string, path: Binding["path"], shape: Binding["converted"]["shape"]): Captured["inputs"][number] => ({
   name,
   entry: {
     id: "Intake__" + name,
     binding: {
       name, path, committed: "change", invalidClass: "invalid", message: "",
-      value: { kind: "op", op: "coalesce", args: [{ kind: "as", expr: { kind: "lit", value: null }, shape: { kind: "nullable", inner: shape } }, { kind: "lit", value: null }] },
+      converted: { kind: "as", expr: { kind: "lit", value: null }, shape: { kind: "nullable", inner: shape } }, blank: { kind: "lit", value: null },
     },
   },
 });

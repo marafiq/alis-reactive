@@ -26,13 +26,13 @@ public sealed class WhenAnInputConversionKnowsItsTypes
         using var document = JsonDocument.Parse(json);
         var inputs = document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs");
 
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__Double").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__Double").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"number","of":"fraction","text":"view","overflow":"infinity"}}"""));
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__Single").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__Single").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"number","of":"fraction","text":"view","overflow":"infinity"}}"""));
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__Decimal").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__Decimal").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"number","of":"fraction","text":"view","overflow":"nothing"}}"""));
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__Integer").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__Integer").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
@@ -49,11 +49,11 @@ public sealed class WhenAnInputConversionKnowsItsTypes
         using var document = JsonDocument.Parse(json);
         var inputs = document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs");
 
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__WallText").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__WallText").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"string","date":"date","negativeZero":"0"}}"""));
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__MomentText").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__MomentText").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"string","date":"instant","negativeZero":"0"}}"""));
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__NumberText").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__NumberText").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"string","date":"none","negativeZero":"-0"}}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
@@ -70,11 +70,11 @@ public sealed class WhenAnInputConversionKnowsItsTypes
         using var document = JsonDocument.Parse(json);
         var inputs = document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs");
 
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__WallChoice").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__WallChoice").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"instant","from":"date"}}"""));
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__MomentChoice").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__MomentChoice").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"instant","from":"instant"}}"""));
-        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__TextChoice").GetProperty("value").GetProperty("args")[0].GetProperty("shape").GetRawText(),
+        Assert.That(inputs.GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_ConversionInputCard__TextChoice").GetProperty("converted").GetProperty("shape").GetRawText(),
             Is.EqualTo("""{"kind":"nullable","inner":{"kind":"instant","from":"none"}}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
