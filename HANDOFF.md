@@ -1,19 +1,19 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 18:21:01 EST 2026
+Written at `date`: Tue Nov 24 18:43:32 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (38): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove
+unit: landed (39): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at c1d8ada98 on feature/rewrite
+lane: pushing at d9d21764f on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at c1d8ada98
+ci: unread at d9d21764f
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -26,20 +26,21 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: c1d8ada98 Mistakes: a line a consult decided is carried line by line before its unit lands
-- Full check: .work/logs/spec-check-c1d8ada98.log: spec check at c1d8ada98: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-181138-90270 c1d8ada98
+- HEAD: d9d21764f Mistakes: what the queue says is open names only what a read or a run showed
+- Full check: .work/logs/spec-check-d9d21764f.log: spec check at d9d21764f: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-183412-99001 d9d21764f
 
 ## Landed since the commit before the last spec: STATE commit
-c1d8ada98 Mistakes: a line a consult decided is carried line by line before its unit lands
-cf3c9bb80 spec: STATE and handoff at b824783d3
+d9d21764f Mistakes: what the queue says is open names only what a read or a run showed
+02d49ede9 spec: STATE and handoff at c1d8ada98
 
 ## Open
 open: 19 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 451 to 452
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 452 to 453
+- A shell command or a script wrong in its own terms: 643 to 644
 
 ## The owner's latest decisions
 spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
@@ -117,9 +118,11 @@ Its units, in order:
    proved by X9.36 to X9.42, X13.11, X16.47, M7.X9 and M7.X10, each side failing on its own plant. One case of its
    family is open, found after it landed: a field left out under a list index ends the list when it is its item's only
    field (a probe on .NET 10.0.15: `Dates[1]` alone binds no item), since the consult's line for a list position was not
-   carried (counted at c1d8ada98). Its fix adds "leaveUnlessAlone" to WhenBlank and WhenNothing, two grammar cases, so
-   it waits for the owner's yes on the lead's design, `../sent-position/.landing/SentPosition/design.md` (choice A).
-   No input of the app's pages reaches it; DoseLines' request member `Doses[0].Status` can, and its tests were not read.
+   carried (counted at c1d8ada98). The lead's design, `../sent-position/.landing/SentPosition/design.md`, waits for the
+   owner's yes. Its recommendation, choice A, adds "leaveUnlessAlone" to WhenBlank, one grammar case, so an input's
+   request and read stop there, and refuses where the view renders a query or form data member that could empty its
+   item. No page of the app reaches a case of it (the design's searches 1 to 3); a JSON body keeps a list item's place
+   (D10.16, X9.31).
 2. The form-data boundary: an enum input in form data is sent by its rows since b824783d3 (the design's defect 1,
    X9.36, X9.37, X9.39 and X16.47), an object stays refused until after 1.0 (the owner's yes of 2026-11-17); a text or file body's check landed
    at 6da8232ec (X16.46). On MVC 5 an action's model binds route values and the query beside the body
