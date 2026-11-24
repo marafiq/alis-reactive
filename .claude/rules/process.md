@@ -20,7 +20,7 @@ u have still open items").
 
 | State | Guard | Read first | Leaves by | Exit line | Goes to | A failure goes to |
 |---|---|---|---|---|---|---|
-| unit: landed | landed-on-the-lane | nothing | `git worktree remove {worktree}` | none | gone | none |
+| unit: landed | landed-on-the-lane | nothing | nothing: its worktree stays (the owner, 2026-11-23: "keep worktree around") | none | none | none |
 | unit: unbriefed | not brief-six-parts or not rules-name-files or not base-line | the files of a unit, below | the brief is completed, before any work | none | unit: briefed | none |
 | unit: dropped | verdict-drop | nothing | `git worktree remove --force {worktree}`, its reason kept in the queue of `HANDOFF.md` | none | gone | none |
 | unit: sent back | verdict-back | its "read.md" | the builder does what "read.md" names | each line of the brief's "Done" | unit: returned | unit: dropped, at a second return that fails |

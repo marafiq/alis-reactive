@@ -6,6 +6,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
+  selected Native components are done, each Fusion component onboarded one at a time with its full powers through
+  `.claude/skills/onboard-component/SKILL.md`. The framework package reaches 1.0 first.
 - The owner, 2026-11-20, correcting the browser validation proposal: preserve existing use cases and establish the one shared operation before proposing a new overload. Each additional form needs a concrete case and a shown difference in meaning. The plan states what the browser reads and runs.
 - The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
   and records their results with the verified jar's SHA-256. Hosted CI verifies the current inputs and required
