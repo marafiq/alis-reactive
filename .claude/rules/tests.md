@@ -20,7 +20,9 @@ The rules govern every Playwright test. A compiler rule or a named check holds e
    public member's XML docs say, a behavior of the plan grammar (`spec/Core/schema.md`), or what a role sees on a
    screen. The fixture is the situation, When and what holds; the test is the promise as a sentence, as its line in
    the spec states it. A name that describes code (`writes_a_let_statement`,
-   `set_prop_mutation_writes_value_to_ej2_instance`) describes no promise.
+   `set_prop_mutation_writes_value_to_ej2_instance`) describes no promise. A test that passed keeps its fixture and
+   its name, since the land's run reads a renamed test as gone and lands nothing: a case of another situation takes a
+   fixture of its own (the lead's mistake, 2026-11-24).
 2. **The public surface only.** Arrange as a developer does: Razor helpers, plan builders, validators
    registered through DI, components declared on `Component`. No `InternalsVisibleTo`, which
    `WhenAnInternalIsExposed` refuses in every project, no internal constructor, no reflection. A behavior a developer cannot reach is given a public, typed door; it is

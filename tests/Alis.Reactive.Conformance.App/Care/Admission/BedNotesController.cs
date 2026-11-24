@@ -22,6 +22,12 @@ public sealed class BedNotesController : Controller
     [HttpPost(BedNoteEndpoints.AdmissionsNotes)]
     public Task<IActionResult> AdmissionsNote([FromForm] AdmissionsBedNote note) => Noted(note.Ward);
 
+    [HttpDelete(BedNoteEndpoints.Notes)]
+    public IActionResult ClearNotes([FromForm] BedNote note) => Cleared(note.Ward);
+
+    [HttpDelete(BedNoteEndpoints.AdmissionsNotes)]
+    public IActionResult ClearAdmissionsNotes([FromForm] AdmissionsBedNote note) => Cleared(note.Ward);
+
     [HttpPost(BedNoteEndpoints.Photos)]
     public IActionResult Photo([FromForm] BedNote note) => Photographed(note.Ward);
 
@@ -33,6 +39,8 @@ public sealed class BedNotesController : Controller
         using var reader = new StreamReader(Request.Body);
         return Content($"{ward}: {await reader.ReadToEndAsync()}", PlainText);
     }
+
+    private ContentResult Cleared(string? ward) => Content($"{ward}: notes cleared", PlainText);
 
     private ContentResult Photographed(string? ward) => Content($"{ward}: {Request.ContentType}, {Request.ContentLength} bytes", PlainText);
 }

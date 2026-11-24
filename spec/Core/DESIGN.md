@@ -4325,8 +4325,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `X16.45` analyzer (D16.9): a synchronous check of a validator whose rule waits, reached: "A rule that waits
   (MustAsync, CustomAsync or WhenAsync) runs only in ValidateAsync." At build by ALIS006, and where the endpoint
   checks on code it does not follow (D18.6): new:N18.11.
-- `X16.46` behavior (D16.5): a request whose whole body is a text or a file, its Ward sent in the path, is checked
-  with every member at its start: over a model whose Ward starts null it shows "Ward is required." in the notice and
+- `X16.46` behavior (D16.5): a request that sends no body, or a text or a file as its whole body, its Ward sent in
+  the path, is checked with every member at its start: over a model whose Ward starts null it shows "Ward is required." in the notice and
   sends nothing, and over a model whose Ward starts as Admissions it is sent.
 
 ## Q17. Vendors and inversion

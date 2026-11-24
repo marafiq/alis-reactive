@@ -6,7 +6,8 @@ these tables as its data and runs each guard by the function of its name; a guar
 lacks, or the other way, stops it. The script prints each item's state, what to read first and the command that leaves
 it. The tables hold the hand-offs alone; how the work inside a state is done is its builder's. A piece of the process
 that a session finds open lands in that session, never handed to the next as an open item (the owner, 2026-11-23: "why
-u have still open items").
+u have still open items"). What the queue of `HANDOFF.md` says landed names only the cases a promise's run proved (the
+lead's mistake, 2026-11-24).
 
 ## Track: a note of the owner's
 

@@ -2345,6 +2345,14 @@
           "outcome": "The notices status reads \"Notices: error: Ward is required.\" and no request reaches the photos address.",
           "opposite": "On the bed notes page whose model's Ward starts as Admissions, Send photo is sent and noted reads Admissions: image/png, 4 bytes.",
           "defect": "The check reads a file body as form data and takes North from the path, so the photo is sent; or it reads no member at all, not even its start, so the photo whose Ward starts as Admissions is refused."
+        },
+        {
+          "for": "X16.46",
+          "page": "The same bed notes page, whose Clear notes button sends a DELETE with no body to the ward's notes address, its Ward set to North in the path, under the same validator; the endpoint binds the model [FromForm] and answers \"{ward}: notes cleared\", which the page writes into noted.",
+          "gesture": "Click Clear notes.",
+          "outcome": "The notices status reads \"Notices: error: Ward is required.\" and no request reaches the notes address.",
+          "opposite": "On the bed notes page whose model's Ward starts as Admissions, Clear notes is sent and noted reads Admissions: notes cleared.",
+          "defect": "The check of a request with no body reads the path's North as form data, so the DELETE is sent; or it reads no member at all, not even its start, so the one whose Ward starts as Admissions is refused."
         }
       ],
       "verdicts": []

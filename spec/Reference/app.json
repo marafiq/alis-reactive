@@ -338,7 +338,7 @@
         {
           "id": "bedNotes",
           "kind": "nativeSlice",
-          "role": "the bed notes page's NativeButton actions, Send note and Send photo, beside the native browser file picker Bed photo",
+          "role": "the bed notes page's NativeButton actions, Send note, Send photo and Clear notes, beside the native browser file picker Bed photo",
           "module": "NativeComponents"
         },
         {
@@ -9700,6 +9700,23 @@
       "feature": "M8.F4",
       "for": "X16.46",
       "index": 1,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeEndpoint",
+        "notice",
+        "bedNotes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.46",
+      "index": 2,
       "screen": "admission",
       "hosts": [
         "net10"

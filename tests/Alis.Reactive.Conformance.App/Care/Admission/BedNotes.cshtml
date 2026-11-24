@@ -23,6 +23,10 @@
             .File(pipeline.Component<AdmissionFileInput>("bed-photo").Files.Items.At(0)))
         .Validate<AdmissionsBedNoteRules>()
         .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+    @(Html.NativeButton("clear-notes", "Clear notes").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Delete<AdmissionsBedNote>(BedNoteEndpoints.AdmissionsNotes, request => request.Path(note => note.Ward, "North"))
+        .Validate<AdmissionsBedNoteRules>()
+        .OnSuccess(Content.Text, (cleared, pipeline) => pipeline.Element("noted").Text.Set(cleared.Body))))
 }
 else
 {
@@ -35,6 +39,10 @@ else
             .File(pipeline.Component<AdmissionFileInput>("bed-photo").Files.Items.At(0)))
         .Validate<BedNoteRules>()
         .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+    @(Html.NativeButton("clear-notes", "Clear notes").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Delete<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "North"))
+        .Validate<BedNoteRules>()
+        .OnSuccess(Content.Text, (cleared, pipeline) => pipeline.Element("noted").Text.Set(cleared.Body))))
 }
 <p>Noted: <span id="noted"></span></p>
 @Html.RenderPlan(plan)
