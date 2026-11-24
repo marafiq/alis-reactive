@@ -75,7 +75,10 @@ A design the owner decides on, a landing folder's "design.md", names for each de
 whether a page of the app reaches it, each read at the source; an absence names the search and the line it printed; a
 claim that a TLA+ spec stands names its TLC run; a cause is read, never inferred (the lead's mistakes, 2026-11-24: a
 design called a defect before the app's actions were read, and stated a search's reach, a host's bind and a failure's
-cause no run had shown).
+cause no run had shown). The meaning it gives a case is quoted from the D line that states it, read before the case is
+written; a search over the app names every door a request can be written with, the files it read and those it did not,
+and each count is the line the command printed (the lead's mistakes, 2026-11-24: a check's meaning set before D16.5 was
+read, and "no page reaches it" from a search that missed the condensed doors and every lambda not named "request").
 
 ## Workflow
 
