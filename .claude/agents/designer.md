@@ -49,7 +49,11 @@ read. Read these whole, before anything else:
 
 1. **Rule lines applied**: each rule line you applied, by its file and line at the base SHA.
 2. **The answer**, decision by decision, every claim with the file and line you read it at, and every number as the
-   line the command that counted it printed.
+   line the command that counted it printed. A claim that a design leaves a TLA+ spec unchanged holds only by a TLC
+   run of the design's new case, with its mutant, on a copy of that spec; an absence found by a search names the match
+   the search must find if it holds, and a defect names the spec line it breaks and the app's own use read at the
+   source (the lead, 2026-11-24: a reply's "the spec does not change" stood on no run, its one writer on a search that
+   cannot match it, and a defect fell to the app's own actions).
 3. **Objections**: the two strongest against your design, each with your answer.
 4. **Runs**: each command you ran on the finished files and the line it printed. A check your files meet is run
    before you reply, so the lead runs it once where the work lands and never again. A case you propose holds a line

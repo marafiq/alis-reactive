@@ -69,6 +69,14 @@ A section, a heading or the owner's words a rule file cites is read at its sourc
 section by its heading at HEAD, the owner's words in `spec/NOTES.md`. A line that leaves a rule file is traced to its
 home first, a search finding its meaning there, and the commit names that home (the lead's mistakes, 2026-11-23).
 
+## A design put to the owner
+
+A design the owner decides on, a landing folder's "design.md", names for each defect the spec line it breaks and
+whether a page of the app reaches it, each read at the source; an absence names the search and the line it printed; a
+claim that a TLA+ spec stands names its TLC run; a cause is read, never inferred (the lead's mistakes, 2026-11-24: a
+design called a defect before the app's actions were read, and stated a search's reach, a host's bind and a failure's
+cause no run had shown).
+
 ## Workflow
 
 1. Read the actual source code for the feature.
