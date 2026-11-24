@@ -559,7 +559,7 @@ internal sealed class RequestPartsWriter
     private static RecordExpression FieldRecord(RequestMember named, (Expression Value, WireForm Form) sent, Expression when)
         => new ContractRecord<SentField>().Set(field => field.Name, named.Name).Set(field => field.Path, new ListExpression(named.Path.Select(step => ContractRecord<SentField>.Literal(step)).ToArray()))
             .Set(field => field.Value, sent.Value).Set(field => field.Form, WireRecords.Of(sent.Form))
-            .Set(field => field.WhenNothing, RequestValues.Absence(named.Lambda.ReturnType)).Set(field => field.When, when).Written;
+            .Set(field => field.WhenNothing, SentForms.Absence(named.Lambda.ReturnType)).Set(field => field.When, when).Written;
 
     private static RecordExpression FieldPart(Expression field)
         => new ContractRecord<FieldMultipartPart>().Set(part => part.Kind, "field").Set(part => part.Field, field).Written;
@@ -597,7 +597,7 @@ internal sealed class SentMember(string written, string name, bool inPath, Type 
 
     internal WireForm Form { get; } = form;
 
-    internal WhenNothing WhenNothing => RequestValues.Absence(ValueType);
+    internal WhenNothing WhenNothing => SentForms.Absence(ValueType);
 
     internal Expression Read { get; } = read;
 

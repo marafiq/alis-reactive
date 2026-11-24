@@ -2,9 +2,8 @@ using System;
 using System.Linq;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
-using Alis.Reactive.ValuesAndSources;
 
-namespace Alis.Reactive.RequestsAndResponses;
+namespace Alis.Reactive.ValuesAndSources;
 
 internal static class WireRecords
 {

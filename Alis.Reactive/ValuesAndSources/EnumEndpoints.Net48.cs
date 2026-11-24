@@ -9,7 +9,7 @@ using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
 using Alis.Reactive.TypeKnowledge;
 
-namespace Alis.Reactive.RequestsAndResponses;
+namespace Alis.Reactive.ValuesAndSources;
 
 internal static partial class EnumEndpoints
 {

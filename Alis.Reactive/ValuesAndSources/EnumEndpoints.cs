@@ -2,7 +2,7 @@ using System;
 using System.Text.Json;
 using Alis.Reactive.PathsAndWire;
 
-namespace Alis.Reactive.RequestsAndResponses;
+namespace Alis.Reactive.ValuesAndSources;
 
 internal static partial class EnumEndpoints
 {

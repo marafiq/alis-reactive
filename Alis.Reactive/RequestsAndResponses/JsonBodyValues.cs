@@ -70,7 +70,7 @@ internal static class JsonBodyValues
         var held = form.DataOptions.GetTypeInfo(typeof(TValue));
         var scalar = held.IsList(out var item) ? item : held;
         if (!EnumRows.IsEnum(scalar.Type)) return Leaf<TValue>(Value<TValue>(captured, form, writer, lambda.ToString()), writer, lambda);
-        var sent = RequestValues.JsonFormOf(typeof(TValue), form, writer, lambda.ToString());
+        var sent = SentForms.JsonFormOf(typeof(TValue), form, writer.Content, lambda.ToString());
         return Leaf(captured, writer, lambda, () => AnyShape.Instance).SentBy(member.Name, sent);
     }
 

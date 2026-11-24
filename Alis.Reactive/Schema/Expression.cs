@@ -10,7 +10,7 @@ namespace Alis.Reactive.Schema;
 [JsonDerivedType(typeof(RefExpression), "ref")]
 [JsonDerivedType(typeof(GetExpression), "get")]
 [JsonDerivedType(typeof(DataExpression), "data")]
-[JsonDerivedType(typeof(AsExpression), "as")]
+[JsonDerivedType(typeof(AsExpression))]
 [JsonDerivedType(typeof(CallExpression), "call")]
 [JsonDerivedType(typeof(FnExpression))]
 [JsonDerivedType(typeof(AnswerExpression), "answer")]
@@ -91,6 +91,8 @@ internal sealed class AsExpression : Expression
         Expr = expr;
         Shape = shape;
     }
+
+    public string Kind => "as";
 
     public Expression Expr { get; }
 
