@@ -1,49 +1,46 @@
 # Handoff
 
-Written at `date`: Mon Nov 23 21:17:20 EST 2026
+Written at `date`: Tue Nov 24 00:22:16 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 24, each in the notes block below
-unit: landed (28): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, RetirePicomatchException
+note: open: 25, each in the notes block below
+unit: landed (29): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
-unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
+unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 31e6361c3 on feature/rewrite: equal to the remote
+lane: pushed at 32d696913 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 31e6361c3
+ci: unread at 32d696913
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2084 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2089 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over HANDOFF.md: holds 154 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 31e6361c3 A rule's test and condition and a vendor's locate are typed as the fn C# writes
-- Full check: .work/logs/spec-check-31e6361c3.log: spec check at 31e6361c3: 40 of 40 checks pass
-- .work/last-run.txt: 20261123-210331-30584 31e6361c3
+- HEAD: 32d696913 The seven operators no C# writes leave the grammar, and the table "After 1.0" holds where each comes back from
+- Full check: .work/logs/spec-check-32d696913.log: spec check at 32d696913: 40 of 40 checks pass
+- .work/last-run.txt: 20261123-230732-24666 32d696913
 
 ## Landed since the commit before the last spec: STATE commit
-31e6361c3 A rule's test and condition and a vendor's locate are typed as the fn C# writes
-3d1514828 spec: STATE and handoff at 72f01266e
+32d696913 The seven operators no C# writes leave the grammar, and the table "After 1.0" holds where each comes back from
+a71c1f72f spec: STATE and handoff at 31e6361c3
 
 ## Open
-open: 19 promises with no browser test, 6 runtime cases not built, 14 doors not implemented
+open: 19 promises with no browser test, 5 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 434 to 435
-- A number, a proof line or an absence not read from the run that proves it: 59 to 60
-- A shell command or a script wrong in its own terms: 613 to 622
+- A shell command or a script wrong in its own terms: 622 to 630
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
@@ -57,7 +54,6 @@ spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is 
 - 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "Yeah, I'm fine with the native packages." "Are you going to write components from scratch? That is what the TypeScript component was written for, right? So we can exercise the framework with conformance app, so it stay faster."
 - 2026-11-18 | quality rule | spec/Reference/native.json and tests/Alis.Reactive.Conformance.App/CLAUDE.md | ConformanceMembers | "Does it have a property returning a complex object, method, multiple parameters? You know, all those combinations have been repeated like 100 times by me." "does conformance has promise. So you can test the lanes of sync and async."
 - 2026-11-18 | quality rule | tests/Alis.Reactive.Conformance.App/CLAUDE.md | MoveInSpec | "Build an app which has all possible combinations." "Where is chain request? Where is parallel request? Where is complex conditions within each module? Where is header? Where is query string? Where is hidden fields? Where is getting value from other component?"
-- 2026-11-17 | decision | spec/CLAUDE.md, the Conditions module's decisions, with a table "After 1.0" in spec/NOTES.md | Operators | "Yeah, let's remove it. Let me help you to close the framework, and it can come back later, but note it down somewhere in a structured way so we can follow up."
 - 2026-11-17 | process rule | .claude/rules/process.md | queue | "your whole goal is to get the tooling, the process, the quality rules, how to engage agents, how to scope their work, how to explicitly state what done means, and even for yourself, handoff before compaction notes, keeping it live, how to update status, the whole harness has to be reviewed." Left of it: a planted-defect line for each promise read by the landing script; the conformance app's coverage of the core's doors as a number; the independent inspection of the runtime and the core.
 - 2026-11-18 | decision | spec/CLAUDE.md | DecisionsByModule | "where you're gonna keep the decisions. So it cannot be one bulky file."
 - 2026-11-18 | quality rule | .claude/rules/views.md, and an analyzer of Alis.Reactive.Analyzers that refuses a plan opened over dynamic or object | TypedDoors | "Dude, why would you use dynamic? The whole point of the framework is tight, and you end up using dynamic. What a pity."
@@ -74,6 +70,8 @@ spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is 
 - 2026-11-20 | direction | the queue of this file | queue | "If you image if i decide to onboard *IF* TanStack components pure JS Table... then validation still work." "adapter is not default choice, i would prefer if none is needed for any consumer"
 - 2026-11-20 | direction | the queue of this file | queue | "new session will re-discover, bring concrete and fully thought through one proposal to do which aligns with framework vision, and not add lower quality or hacks." "We stay on same branch, and follow the process. Quality bar will be never be lowered. But I am okay to adapt modern LLM patterns to arrive at correct, and well designed solution"
 - 2026-11-23 | direction | the queue of this file | queue | "keep worktree around"
+- 2026-11-23 | correction | CLAUDE.md, Spec-first, the loop's step 3, and one count in spec/MISTAKES.md | DesignedAsks | "yes, on input i will not approve that change in isolation, must have thought through design so prepare that, adhoc recommondations are forbidden"
+- 2026-11-23 | direction | the queue of this file | queue | "nah splitting inputbinidng now is such a huge change, explain in more detail, that could set us back to zero", then "yes, on input i will not approve that change in isolation, must have thought through design so prepare that, adhoc recommondations are forbidden"
 <!-- /notes -->
 
 ## Next
@@ -95,27 +93,12 @@ brief: print `git rev-parse HEAD` and change nothing. It prints the lane's head;
 repository's root lists no `builder` and reads the root's `.claude/settings.json`, which holds no `worktree.baseRef`,
 so the probe proves nothing there; the session that landed DefinitionOfDone started at the root and left it.
 
-**2. The owner's question on the operators.** The owner will revisit why the operators are hard to
-implement. Facts for that talk, with no recommendation and no operator work before it:
-- The seven: add, sub, mul, mod, neg, finite, merge.
-- `Alis.Reactive/Schema/Operator.cs` declares them, and no C# door writes any of them: no match in the core, Fusion,
-  Native or tests at 72f01266e.
-- In the redesign (65fdf118d) the seven were the framework's own building blocks, never an author's door: `add` and
-  `finite` a Sum's reduce (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:176`), `neg` a descending sort
-  (:268), `add` a month (`ElementExpressionCompiler.cs:34`), `merge` a request body (`RequestStep.cs:136`),
-  `finite` a number check (`BrowserRule.cs:178`), `mul`, `mod`, `sub` and `add` the Luhn check (`BrowserRules.cs:219-232`),
-  each with JavaScript's meaning. The rewrite wrote each use as an operator with .NET's meaning: `sumInt`, `sumDouble`
-  and `sumDecimal`, the compares with their keys swapped, the date parts, the request body kinds, `as` a number and
-  `creditCard`.
-- The owner's note of 2026-11-17 ("Yeah, let's remove it") names a table "After 1.0" in `spec/NOTES.md`; neither the
-  table nor the words are in `spec/NOTES.md` at 72f01266e.
-- `spec/Schema/Schema.tla` lists them in `Operators`, so any change to them starts there and reruns TLC.
-- `Alis.Reactive.Assets/runtime/Conditions/operators.ts` throws "not built" for each.
-- Nearby code: ArrayLambdas' summed ints, doubles and decimals, and `Conditions/decimals.ts`.
+**2. The operators: landed at 32d696913.** The seven no C# wrote left the grammar (the owner, 2026-11-23: "ok remoe the
+operators in spriti to land 1.0"); `spec/NOTES.md`'s table "After 1.0" holds where each comes back from.
 
 **3. The framework core to 1.0 (U1 to U22).** Done when:
 - `scripts/open.py` prints no core runtime case: `InputsAndIds/model.ts` three, `RequestsAndResponses/request.ts`
-  one, `Validation/forms.ts` one, and the operators line after the owner's talk;
+  one, `Validation/forms.ts` one;
 - X3.7, a date in a JSON response on MVC 5, passes on CI's Windows job;
 - `spec/REWRITE.md` section 4 states each of U1 to U22 closed with its result line (today it states U3, U4, U5,
   U8 to U13 closed and U1, U2, U14 to U16 landed; U6, U7, U17 to U22 are not stated);
@@ -127,9 +110,9 @@ Its units, in order:
    the contract widens both to any expression, since the generator refuses a field typed as a kind's class
    (`tools/PlanContractGenerator/CLAUDE.md`); no TLA+ spec models these fields. Its first half landed at 31e6361c3: a
    rule's test and condition and a vendor's locate typed as the `fn` C# writes, the plan's bytes unchanged. Its second
-   half, `InputBinding` as `read`, `shape` and `blank` (decision 2 of `../core-narrowed-plan/.landing/NarrowedPlan/answer.md`),
-   changes a node's fields and waits on the owner's yes; `InputsAndIds/model.ts`'s three cases stand until it lands. Two
-   shell commands of that session, wrong in their own terms, are counted with the next landing.
+   half, `InputBinding`, is designed with unit 2 as one family before the owner decides, never in isolation (the owner,
+   2026-11-23): the consult `../input-form/.landing/InputForm/brief.md`, its answer `reply.md` there, read at the
+   source, then one design to the owner; `InputsAndIds/model.ts`'s three cases stand until it lands.
 2. The form-data boundary: an enum sent in form data (the move-in app met it; the designer decides its form),
    an object stays refused until after 1.0 (the owner's yes of 2026-11-17), a text or file body's check
    verified against the request writer.
