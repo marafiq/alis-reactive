@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 00:22:16 EST 2026
+Written at `date`: Tue Nov 24 00:43:18 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 25, each in the notes block below
-unit: landed (29): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException
+note: open: 24, each in the notes block below
+unit: landed (30): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignedAsks, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 32d696913 on feature/rewrite: equal to the remote
+lane: pushed at a8ed88396 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 32d696913
+ci: unread at a8ed88396
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,20 +27,21 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 32d696913 The seven operators no C# writes leave the grammar, and the table "After 1.0" holds where each comes back from
-- Full check: .work/logs/spec-check-32d696913.log: spec check at 32d696913: 40 of 40 checks pass
-- .work/last-run.txt: 20261123-230732-24666 32d696913
+- HEAD: a8ed88396 A recommendation to the owner comes from a design thought through whole, never ad hoc
+- Full check: .work/logs/spec-check-a8ed88396.log: spec check at a8ed88396: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-003029-7482 a8ed88396
 
 ## Landed since the commit before the last spec: STATE commit
-32d696913 The seven operators no C# writes leave the grammar, and the table "After 1.0" holds where each comes back from
-a71c1f72f spec: STATE and handoff at 31e6361c3
+a8ed88396 A recommendation to the owner comes from a design thought through whole, never ad hoc
+c9cfb5e0d spec: STATE and handoff at 32d696913
 
 ## Open
 open: 19 promises with no browser test, 5 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A shell command or a script wrong in its own terms: 622 to 630
+- A number, a proof line or an absence not read from the run that proves it: 60 to 61
+- Said to the owner in a way that hid or blurred what holds: 13 to 14
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
@@ -70,7 +71,6 @@ spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is 
 - 2026-11-20 | direction | the queue of this file | queue | "If you image if i decide to onboard *IF* TanStack components pure JS Table... then validation still work." "adapter is not default choice, i would prefer if none is needed for any consumer"
 - 2026-11-20 | direction | the queue of this file | queue | "new session will re-discover, bring concrete and fully thought through one proposal to do which aligns with framework vision, and not add lower quality or hacks." "We stay on same branch, and follow the process. Quality bar will be never be lowered. But I am okay to adapt modern LLM patterns to arrive at correct, and well designed solution"
 - 2026-11-23 | direction | the queue of this file | queue | "keep worktree around"
-- 2026-11-23 | correction | CLAUDE.md, Spec-first, the loop's step 3, and one count in spec/MISTAKES.md | DesignedAsks | "yes, on input i will not approve that change in isolation, must have thought through design so prepare that, adhoc recommondations are forbidden"
 - 2026-11-23 | direction | the queue of this file | queue | "nah splitting inputbinidng now is such a huge change, explain in more detail, that could set us back to zero", then "yes, on input i will not approve that change in isolation, must have thought through design so prepare that, adhoc recommondations are forbidden"
 <!-- /notes -->
 
