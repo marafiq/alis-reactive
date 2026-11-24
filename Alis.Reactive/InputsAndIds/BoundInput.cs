@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using Alis.Reactive.OwnershipAndState;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
 using Alis.Reactive.TypeKnowledge;
+using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.InputsAndIds;
 
@@ -17,14 +20,18 @@ internal sealed partial class BoundInput
     private readonly IReadOnlyList<PathStep> _path;
     private readonly Shape _shape;
     private readonly LitExpression _blank;
+    private readonly Type _member;
+    private readonly PlanContent _content;
 
-    private BoundInput(string id, string name, IReadOnlyList<PathStep> path, Shape shape, LitExpression blank, bool joinsTheBody)
+    private BoundInput(string id, string name, IReadOnlyList<PathStep> path, Shape shape, LitExpression blank, Type member, PlanContent content, bool joinsTheBody)
     {
         Id = id;
         Name = name;
         _path = path;
         _shape = shape;
         _blank = blank;
+        _member = member;
+        _content = content;
         JoinsTheBody = joinsTheBody;
     }
 
@@ -38,8 +45,9 @@ internal sealed partial class BoundInput
 
     internal bool JoinsTheBody { get; }
 
-    internal static BoundInput Of(MemberLambda lambda, MvcNames names, AppJson json, Func<JsonElement> positionStart)
+    internal static BoundInput Of(MemberLambda lambda, MvcNames names, PlanContent content, Func<JsonElement> positionStart)
     {
+        var json = content.Json;
         var app = json.App;
         var live = json.LiveForm;
         var path = new List<PathStep>(PrefixSteps(names.Prefix, app));
@@ -56,7 +64,7 @@ internal sealed partial class BoundInput
 
             var access = (MemberExpression)step.Node;
             if (holder.Kind != JsonTypeInfoKind.Object) throw NoBodyPath(lambda, step.Text, WrittenMember.DeclaringClass(access), holder);
-            if (WrittenMember.LeftOutByItsClass(access, app)) return InNoBody(lambda, names, live, positionStart());
+            if (WrittenMember.LeftOutByItsClass(access, app)) return InNoBody(lambda, names, content, positionStart());
             var member = WrittenMember.Of(access, holder, lambda.Lambda);
             sinceTheItem.Add(WrittenMember.Of(access, live.GetTypeInfo(holder.Type), lambda.Lambda));
             path.Add(new MemberStep(NameOf(member, step.Text)));
@@ -65,28 +73,60 @@ internal sealed partial class BoundInput
         var bindsAListItemThatIsAList = path[path.Count - 1] is IndexStep && app.GetTypeInfo(lambda.Lambda.Body.Type).IsList(out _);
         if (bindsAListItemThatIsAList) throw AListItemThatIsAList(names.Name);
         var blank = lambda.EndsAtAPosition ? positionStart() : StartOf(lambda, sinceTheItem);
-        var shape = InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank, names.Name);
+        var shape = InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank, names.Name, json);
         if (shape is NumberShape && blank.ValueKind == JsonValueKind.String)
         {
             using var number = JsonDocument.Parse(blank.GetString()!);
             blank = number.RootElement.Clone();
         }
 
-        return new BoundInput(lambda.Scope + "__" + names.IdOfTheName, names.Name, path, shape, new LitExpression(blank), true);
+        return new BoundInput(lambda.Scope + "__" + names.IdOfTheName, names.Name, path, shape, new LitExpression(blank), lambda.Lambda.Body.Type, content, true);
     }
 
-    private static BoundInput InNoBody(MemberLambda lambda, MvcNames names, JsonSerializerOptions live, JsonElement blank)
-        => new(lambda.Scope + "__" + names.IdOfTheName, names.Name, [], InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank, names.Name), new LitExpression(blank), false);
+    private static BoundInput InNoBody(MemberLambda lambda, MvcNames names, PlanContent content, JsonElement blank)
+    {
+        var member = lambda.Lambda.Body.Type;
+        var shape = InputShapes.Of(content.Json.LiveForm.GetTypeInfo(member), blank, names.Name, content.Json);
+        return new(lambda.Scope + "__" + names.IdOfTheName, names.Name, [], shape, new LitExpression(blank), member, content, false);
+    }
 
     internal InputBinding Binding(ComponentInput input, string invalidClass, bool hidden)
         => new(
             Name,
             _path,
-            new AsExpression(ReadOf(input), new NullableShape(InputShapes.From(_shape, input.Text))),
+            new AsExpression(ReadOf(input), new NullableShape(ConvertedShape(input))),
             _blank,
+            Sent(),
             input.Committed,
             invalidClass,
             hidden ? "" : MessageId);
+
+    private Shape ConvertedShape(ComponentInput input)
+        => InputShapes.HoldsAnEnum(_shape) ? EnumInputRows.Of(_shape, _member, _content.Json.LiveForm, input, Name) : InputShapes.From(_shape, input.Text);
+
+    private RecordExpression Sent()
+    {
+        var sendsFiles = _shape is FileShape or ArrayShape { Item: FileShape };
+        if (sendsFiles) return new ContractRecord<FilesInputSent>().Set(sent => sent.Kind, "files").Written;
+        var held = HeldForm.Live(_content.Json, _content.RendersUnder);
+        var form = WireRecords.Of(SentForms.SourceForm(_member, held, _content, Name));
+        var whenNothing = SentForms.Absence(_member);
+        var whenBlank = Unwritable(_shape, _blank.Value) ? WhenBlank.Leave : WhenBlank.Send;
+        if (!InputShapes.HoldsAnEnum(_shape))
+            return new ContractRecord<FieldInputSent>().Set(sent => sent.Kind, "field").Set(sent => sent.Form, form).Set(sent => sent.WhenNothing, whenNothing).Set(sent => sent.WhenBlank, whenBlank).Written;
+        return new ContractRecord<EnumInputSent>().Set(sent => sent.Kind, "enum").Set(sent => sent.Form, form)
+            .Set(sent => sent.Json, WireRecords.Of(SentForms.JsonFormOf(_member, held, _content, Name)))
+            .Set(sent => sent.WhenNothing, whenNothing).Set(sent => sent.WhenBlank, whenBlank).Written;
+    }
+
+    private static bool Unwritable(Shape shape, JsonElement blank) => blank.ValueKind != JsonValueKind.Null && shape switch
+    {
+        DateShape or InstantShape => true,
+        EnumShape enumeration => !enumeration.Values.Any(row => EnumRows.WrittenAlike(row.Live, blank)),
+        NullableShape nullable => Unwritable(nullable.Inner, blank),
+        ArrayShape array => blank.ValueKind == JsonValueKind.Array && blank.EnumerateArray().Any(item => Unwritable(array.Item, item)),
+        _ => false,
+    };
 
     private Schema.Expression ReadOf(ComponentInput input)
     {

@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NightCoverShift
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Night cover";
+    var plan = Html.ReactivePlan<NightCoverShift>();
+}
+<h1>Night cover</h1>
+@using (var shift = Html.BeginRequestContainer(plan, "night-cover"))
+{
+    @(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
+    <fieldset>
+        <legend>Cover</legend>
+        @(Html.InputField(plan, m => m.Cover, options => options.Label("Cover")).NativeDropDown(build => build.Items(NightCoverLists.Covers())))
+    </fieldset>
+    @(Html.NativeButton("save-cover", "Save cover").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<NightCoverShift>(NightCoverEndpoints.NightCovers, request => request.UrlEncoded(shift.Container, body => { }))
+        .Validate<NightCoverRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved-cover").Text.Set(saved.Body))))
+}
+<p>Saved: <span id="saved-cover"></span></p>
+@Html.RenderPlan(plan)

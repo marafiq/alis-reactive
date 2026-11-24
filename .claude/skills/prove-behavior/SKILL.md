@@ -31,7 +31,8 @@ scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_th
 
 ## Read the verdict
 
-- **caught**: read the failure message the tool prints. It must be the test's own assertion missing the outcome the
+- **caught**: read the failure message the tool prints, and the test's line it prints after it, which names the side
+  that broke. It must be the test's own assertion missing the outcome the
   promise names, such as expected 'Fully staffed' but was 'Short staffed'. A timeout waiting for the page, a
   missing element or every test red means the defect broke the page, not the promise: choose a narrower one.
   One case is a catch with a timeout: the promise is that a view renders a read, and the only way to break it is

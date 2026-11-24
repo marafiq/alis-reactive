@@ -87,7 +87,9 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 
 The rows are C#'s: each value of the enum as the source's form writes it, `held`, and as the live form writes it, `live` (D7.7). A
 value is compared with a row's `held` as JSON compares scalars, a text with a text and a number with a number. C# writes the shape
-where a source enters a live object's member or an argument; an element's text and HTML carry none, so an enum shows there as its
+where a source enters a live object's member or an argument, and in an input's `converted`, whose rows are what its component
+holds each value as: for a component whose value is text, the value's C# name, its number as invariant text and the text the live
+form writes; for one whose value is the enum, its live form (N3.3, X9.36). An element's text and HTML carry none, so an enum shows there as its
 source holds it, the `string` row's text as itself (D7.7, the owner, 2026-11-18).
 
 | Source | Result |

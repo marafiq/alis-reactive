@@ -38,7 +38,9 @@ The rules govern every Playwright test. A compiler rule or a named check holds e
 5. **Fails for the defect it names.** Before a test is kept, its author introduces the defect it guards (drop
    the condition, skip the conversion, send the wrong member) and watches the test fail. An assertion the
    broken code also satisfies is no assertion: "nothing is shown" proves nothing unless the same page shows
-   something when the promise holds.
+   something when the promise holds. The defect is planted on the path its outcome takes, read from the gesture to
+   the assertion at HEAD, and a catch is read at the test's line `scripts/plant-defect.sh` prints: a plant off that
+   path escapes, and one that breaks another side first proves nothing of its own (the lead's mistakes, 2026-11-24).
 6. **Both sides of every promise.** The case where the behavior happens and the case where it must not: the
    condition holds and fails; the rule refuses and accepts; the request is sent and is held back. A suite that
    proves only the happy path passes while the feature lies. A test written from a decision cannot find that
@@ -50,7 +52,9 @@ The rules govern every Playwright test. A compiler rule or a named check holds e
 7. **No tautology.** Expected values are literals read from the promise, never computed by the code under
    test, copied from its output, or accepted as a recorded snapshot. A test never asserts what it typed or
    set itself, or what the compiler already guarantees. `ToHaveTextAsync` when the text is known, not
-   `ToContainTextAsync`.
+   `ToContainTextAsync`. A literal of what a request carries is read from the code that writes it at HEAD
+   (`Alis.Reactive.Assets/runtime/RequestsAndResponses/wire.ts` for a field's text), never from memory (the lead's
+   mistake, 2026-11-24).
 8. **Independent and deterministic.** A fresh page for each test; no order between tests; no shared mutable
    data; per-page world keys, never process-global flags. No sleep, no retry, no skipped, ignored or
    commented-out test, no try/catch around an assertion. Wait for the observable state, never for time.

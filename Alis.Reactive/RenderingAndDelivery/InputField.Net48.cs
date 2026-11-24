@@ -50,7 +50,7 @@ public sealed partial class InputField<TModel, TValue>
         FieldPrefixes.RefuseAMoveAfterThePlanStarted(plan.StartPrefix, prefix, () => ViewPaths.Of(html), name);
         var live = plan.Writer.Content.Json.LiveForm;
         var lambda = MemberLambda.Of(member, text, name, typeof(TModel));
-        _bound = BoundInput.Of(lambda, new MvcNames(prefix, name, HtmlHelper.GenerateIdFromName(name)), plan.Writer.Content.Json, () => JsonSerializer.SerializeToElement(default(TValue), live.GetTypeInfo(typeof(TValue))));
+        _bound = BoundInput.Of(lambda, new MvcNames(prefix, name, HtmlHelper.GenerateIdFromName(name)), plan.Writer.Content, () => JsonSerializer.SerializeToElement(default(TValue), live.GetTypeInfo(typeof(TValue))));
         _classNames = DependencyResolver.Current.GetService<ReactiveClassNames>() ?? new ReactiveClassNames();
         ValueJson = ModelMetadata.FromLambdaExpression(member, html.ViewData).Model is TValue held ? plan.StartOf(held, _bound.Name) : "null";
     }

@@ -341,18 +341,27 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
 
 type Captured = Extract<Send["query"]["inputs"]["container"], { kind: "captured" }>;
 type Binding = Captured["inputs"][number]["entry"]["binding"];
-const bound = (name: string, path: Binding["path"], shape: Binding["converted"]["shape"]): Captured["inputs"][number] => ({
+type InputSent = Captured["inputs"][number]["sent"];
+const asField = (form: Extract<InputSent, { kind: "field" }>["form"]): InputSent => ({ kind: "field", form, whenNothing: "empty", whenBlank: "send" });
+const bound = (name: string, path: Binding["path"], shape: Binding["converted"]["shape"], sent: InputSent): Captured["inputs"][number] => ({
   name,
   entry: {
     id: "Intake__" + name,
     binding: {
       name, path, committed: "change", invalidClass: "invalid", message: "",
-      converted: { kind: "as", expr: { kind: "lit", value: null }, shape: { kind: "nullable", inner: shape } }, blank: { kind: "lit", value: null },
+      converted: { kind: "as", expr: { kind: "lit", value: null }, shape: { kind: "nullable", inner: shape } }, blank: { kind: "lit", value: null }, sent: { kind: "lit", value: null },
     },
   },
+  sent,
 });
-const ward = bound("Ward", ["ward"], { kind: "string", date: "none", negativeZero: "0" });
-const beds = bound("Beds", ["beds"], { kind: "number", of: "integer", text: "invariant", overflow: "nothing" });
+const ward = bound("Ward", ["ward"], { kind: "string", date: "none", negativeZero: "0" }, asField({ kind: "text" }));
+const beds = bound("Beds", ["beds"], { kind: "number", of: "integer", text: "invariant", overflow: "nothing" }, asField({ kind: "number" }));
+const shiftRows = [{ held: 0, live: 0, number: 0 }, { held: 1, live: 1, number: 0 }] as const;
+const shift = bound("Shift", ["shift"], { kind: "enum", flags: false, values: shiftRows }, {
+  kind: "enum", form: { kind: "enum", values: [{ held: 0, name: "Day" }, { held: 1, name: "Night" }] },
+  json: { kind: "enum", values: [{ held: 0, sent: "day" }, { held: 1, sent: "night" }] }, whenNothing: "leave", whenBlank: "send",
+});
+const due = bound("Due", ["due"], { kind: "date" }, { kind: "field", form: { kind: "date" }, whenNothing: "leave", whenBlank: "leave" });
 const container = (body: unknown, inputs: Captured["inputs"]): Send["query"]["inputs"] => ({ container: { kind: "captured", id: "intake", body, inputs }, individual: [] });
 const post = (body: Body): Send => ({ ...get(), method: "POST", body });
 
@@ -378,6 +387,21 @@ describe("when a request sends a container, a form or an input", () => {
     expect(json.body).toBe("{\"ward\":\"East\",\"room\":\"R4\"}");
     const multipart = prepare(post({ kind: "multipart", parts: [], inputs: container({ beds: 2.5 }, [beds]) }), clock, deDe);
     expect([...(multipart.body as FormData).entries()]).toStrictEqual([["Beds", "2,5"]]);
+  });
+
+  test("InputSentByItsForm: an enum input is sent by its row's C# name in form data and by its JSON row in a JSON body, and a date in a JSON body as its wire text", async () => {
+    const midnight = new Date(2026, 11, 1);
+    const form = prepare(post({ kind: "urlEncoded", fields: [], inputs: container({ shift: 1, due: midnight }, [shift, due]) }), clock, enUs);
+    expect(await new Response(form.body).text()).toBe("Shift=Night&Due=2026-12-01T00%3A00%3A00");
+    const json = prepare(post({ kind: "json", value: {}, guarded: [], enums: [], inputs: container({ shift: 1, due: midnight }, [shift, due]) }), clock, enUs);
+    expect(json.body).toBe("{\"shift\":\"night\",\"due\":\"2026-12-01\"}");
+  });
+
+  test("InputLeftOutWhereTheBodyLacksIt: an input the container's body does not hold sends no field and no JSON member", async () => {
+    const form = prepare(post({ kind: "urlEncoded", fields: [], inputs: container({ ward: "East" }, [ward, due]) }), clock, enUs);
+    expect(await new Response(form.body).text()).toBe("Ward=East");
+    const json = prepare(post({ kind: "json", value: {}, guarded: [], enums: [], inputs: container({ ward: "East" }, [ward, due]) }), clock, enUs);
+    expect(json.body).toBe("{\"ward\":\"East\"}");
   });
 
   test("FileOnlyInFormData: a file a form holds stops a GET or URL-encoded request that would send it", () => {

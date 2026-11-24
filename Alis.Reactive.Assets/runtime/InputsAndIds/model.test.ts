@@ -22,8 +22,12 @@ const intake: Containers = { intake: { model: "Admission", kind: "form", summary
 type Converted = Inputs[string]["converted"];
 type Blank = Inputs[string]["blank"];
 const convertedFrom = (read: Source): Converted => ({ kind: "as", expr: read, shape: { kind: "nullable", inner: { kind: "any" } } });
-const field = (name: string, path: Inputs[string]["path"], converted: Converted, blank: Blank = { kind: "lit", value: null }): Inputs[string] =>
-  ({ name, path, converted, blank, committed: "change", invalidClass: "invalid", message: "" });
+type Sent = Inputs[string]["sent"];
+const textSentValue = { kind: "field", form: { kind: "text" }, whenNothing: "empty", whenBlank: "send" } as const;
+const textField: Sent = { kind: "lit", value: textSentValue };
+const valued = (value: () => unknown) => (source: Source): unknown => (source === textField ? literalValue(source) : value());
+const field = (name: string, path: Inputs[string]["path"], converted: Converted, blank: Blank = { kind: "lit", value: null }, sent: Sent = textField): Inputs[string] =>
+  ({ name, path, converted, blank, sent, committed: "change", invalidClass: "invalid", message: "" });
 const literal = (value: number | string): Blank => ({ kind: "lit", value });
 const fields: Inputs = { own: field("Nights", ["nights"], convertedFrom(literal(5))) };
 
@@ -54,7 +58,7 @@ describe("when alis.model reads what a container sends", () => {
     const inputs = page();
     const owner = new Visit();
     inputs.join(plan(), owner, "on the page", literalValue);
-    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom({ kind: "ref", name: "room" })) }, {}, "RoomCard"), owner, "in slot 'room'", () => "B-12");
+    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom({ kind: "ref", name: "room" })) }, {}, "RoomCard"), owner, "in slot 'room'", valued(() => "B-12"));
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5, room: "B-12" });
   });
 
@@ -79,8 +83,8 @@ describe("when alis.model reads what a container sends", () => {
   test("OneValueOnEveryHost: two scalar bindings stop before either input is evaluated", () => {
     const inputs = page();
     const evaluated: string[] = [];
-    inputs.join(plan(), new Visit(), "on the page", () => { evaluated.push("own"); return 5; });
-    inputs.join(plan({ slot: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), new Visit(), "in slot 'card'", () => { evaluated.push("slot"); return 8; });
+    inputs.join(plan(), new Visit(), "on the page", valued(() => { evaluated.push("own"); return 5; }));
+    inputs.join(plan({ slot: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), new Visit(), "in slot 'card'", valued(() => { evaluated.push("slot"); return 8; }));
     expect(() => inputs.sent("intake", "Admission")).toThrow(/^Inputs 'own' and 'slot' both bind 'Nights' inside container 'intake'\.$/);
     expect(evaluated).toStrictEqual([]);
   });
@@ -88,7 +92,7 @@ describe("when alis.model reads what a container sends", () => {
   test("ReadFindsWhatItsContainerSends: an outside input is neither read nor a duplicate", () => {
     const inputs = page();
     inputs.join(plan(), new Visit(), "on the page", literalValue);
-    inputs.join(plan({ other: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), new Visit(), "on the page", () => { throw new Error("The outside input was read."); });
+    inputs.join(plan({ other: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), new Visit(), "on the page", valued(() => { throw new Error("The outside input was read."); }));
     expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
   });
 
@@ -121,7 +125,7 @@ describe("when alis.model reads what a container sends", () => {
     const containers = new Map([["intake", new Set(["own"])]]);
     const inputs = page(containers);
     let nights = 5;
-    inputs.join(plan(), new Visit(), "on the page", () => nights);
+    inputs.join(plan(), new Visit(), "on the page", valued(() => nights));
     const before = inputs.sent("intake", "Admission");
     nights = 9;
     inputs.join(plan({ slot: field("Room", ["room"], convertedFrom(literal("B-12"))) }, {}), new Visit(), "in slot 'card'", literalValue);
@@ -242,8 +246,8 @@ describe("when an input is checked live", () => {
   const nights = field("Nights", ["nights"], convertedFrom(literal(5)));
   const room = field("Room", ["room"], convertedFrom(literal("B-12")));
   const held: Inputs = { own: nights, second: room };
-  const sentOwn = { name: "Nights", entry: { id: "own", binding: nights } };
-  const sentSecond = { name: "Room", entry: { id: "second", binding: room } };
+  const sentOwn = { name: "Nights", entry: { id: "own", binding: nights }, sent: textSentValue };
+  const sentSecond = { name: "Room", entry: { id: "second", binding: room }, sent: textSentValue };
 
   test("each container that holds the input gives its live check over its own inputs, and a container that does not hold it gives none", () => {
     const inputs = page(new Map([["intake", new Set(["own", "second"])], ["kin", new Set(["own"])], ["ward", new Set(["second"])], ["bare", new Set(["own"])]]));
@@ -334,7 +338,7 @@ describe("when a request captures what it sends", () => {
     inputs.join(plan(), new Visit(), "on the page", literalValue);
     expect(inputs.input("gone", "Ward")).toStrictEqual({ kind: "missing", id: "gone", name: "Ward" });
     expect(inputs.valueOf("gone")).toBeUndefined();
-    expect(inputs.input("own", "Stay")).toStrictEqual({ kind: "captured", input: { name: "Stay", entry: { id: "own", binding: field("Nights", ["nights"], convertedFrom(literal(5))) } } });
+    expect(inputs.input("own", "Stay")).toStrictEqual({ kind: "captured", input: { name: "Stay", entry: { id: "own", binding: field("Nights", ["nights"], convertedFrom(literal(5))) }, sent: textSentValue } });
     expect(inputs.valueOf("own")).toBe(5);
   });
 
@@ -353,5 +357,33 @@ describe("when a request captures what it sends", () => {
     const inputs = page();
     expect(inputs.checked({ container: { kind: "missing", id: "intake" }, individual: [] }, null, [])).toBeNull();
     expect(inputs.checked({ container: { kind: "none" }, individual: [{ kind: "missing", id: "gone", name: "Ward" }] }, null, [])).toBeNull();
+  });
+});
+
+describe("when an input is sent by its binding's sent", () => {
+  const blankDate = (whenBlank: "send" | "leave"): Sent => ({ kind: "lit", value: { kind: "field", form: { kind: "date" }, whenNothing: "leave", whenBlank } });
+  const days = (itemWhenNothing: "empty" | "stop"): Sent => ({ kind: "lit", value: {
+    kind: "enum", form: { kind: "list", item: { kind: "enum", values: [{ held: 0, name: "Mon" }] }, itemWhenNothing },
+    json: { kind: "list", item: { kind: "enum", values: [{ held: 0, sent: "Mon" }] }, itemWhenNothing }, whenNothing: "leave", whenBlank: "send",
+  } });
+  const nothing: Source = { kind: "lit", value: null };
+
+  test("InputSentLeavesTheBlank: under whenBlank leave an input whose converted holds nothing is left out of the body its read and its request share", () => {
+    const left = page();
+    left.join(plan({ own: field("Due", ["due"], convertedFrom(nothing), literal("0001-01-01T00:00:00"), blankDate("leave")), second: field("Reason", ["reason"], convertedFrom(literal("Falls"))) }), new Visit(), "on the page", literalValue);
+    expect(left.sent("intake", "Admission")).toStrictEqual({ reason: "Falls" });
+    const sent = page();
+    sent.join(plan({ own: field("Due", ["due"], convertedFrom(nothing), literal("0001-01-01T00:00:00"), blankDate("send")), second: field("Reason", ["reason"], convertedFrom(literal("Falls"))) }), new Visit(), "on the page", literalValue);
+    expect(sent.sent("intake", "Admission")).toStrictEqual({ due: "0001-01-01T00:00:00", reason: "Falls" });
+  });
+
+  test("ItemNothingStopsTheRead: a list input whose item reads nothing where the item admits none stops the container's read, and one that admits null holds it", () => {
+    const visitDays: Source = { kind: "lit", value: [0, null] };
+    const stopped = page();
+    stopped.join(plan({ own: field("VisitDays", ["visitDays"], convertedFrom(visitDays), { kind: "lit", value: [] }, days("stop")) }), new Visit(), "on the page", literalValue);
+    expect(() => stopped.sent("intake", "Admission")).toThrow(/^The request's member 'VisitDays' must hold a list whose items all hold values\.$/);
+    const held = page();
+    held.join(plan({ own: field("VisitDays", ["visitDays"], convertedFrom(visitDays), { kind: "lit", value: [] }, days("empty")) }), new Visit(), "on the page", literalValue);
+    expect(held.sent("intake", "Admission")).toStrictEqual({ visitDays: [0, null] });
   });
 });

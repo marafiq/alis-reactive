@@ -5,6 +5,7 @@ using System.Text.Json.Serialization.Metadata;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
 using Alis.Reactive.TypeKnowledge;
+using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.InputsAndIds;
 
@@ -20,18 +21,19 @@ internal static partial class InputShapes
 
     private static readonly JsonElement NoStart = default;
 
-    internal static Shape Of(JsonTypeInfo member, JsonElement start, string input) => Of(member, start, NumberCulture.View, input);
+    internal static Shape Of(JsonTypeInfo member, JsonElement start, string input, AppJson json) => Of(member, start, NumberCulture.View, input, json);
 
-    internal static Shape Of(JsonTypeInfo member, JsonElement start, NumberCulture numbers, string input) => member switch
+    internal static Shape Of(JsonTypeInfo member, JsonElement start, NumberCulture numbers, string input, AppJson json) => member switch
     {
         JsonTypeInfo<string> or JsonTypeInfo<char> or JsonTypeInfo<char?> => new StringShape(DateMeaning.None, "0"),
         JsonTypeInfo<bool> or JsonTypeInfo<bool?> => BooleanShape.Instance,
         JsonTypeInfo<DateTime> or JsonTypeInfo<DateTime?> => DateShape.Instance,
         JsonTypeInfo<DateTimeOffset> or JsonTypeInfo<DateTimeOffset?> => new InstantShape(DateMeaning.None),
         _ when IsAHostsFile(member) => FileShape.Instance,
+        _ when EnumRows.IsEnum(member.Type) => LiveRows(member, input, json),
         _ when Integers.Contains(member.Type) => new NumberShape(NumberOf.Integer, numbers, ConversionShapes.OverflowOf(member)),
         _ when Fractions.Contains(member.Type) => new NumberShape(NumberOf.Fraction, numbers, ConversionShapes.OverflowOf(member)),
-        _ when member.IsList(out var item) && HoldsOneValue(item) => new ArrayShape(Nullable.GetUnderlyingType(item.Type) is null ? Of(item, NoStart, numbers, input) : new NullableShape(Of(item, NoStart, numbers, input))),
+        _ when member.IsList(out var item) && HoldsOneValue(item) => new ArrayShape(Nullable.GetUnderlyingType(item.Type) is null ? Of(item, NoStart, numbers, input, json) : new NullableShape(Of(item, NoStart, numbers, input, json))),
         _ when member.Kind == JsonTypeInfoKind.None => WrittenAs(start, numbers),
         _ => throw SentAsMoreThanOneText(input, member),
     };
@@ -45,7 +47,18 @@ internal static partial class InputShapes
         _ => shape,
     };
 
+    internal static bool HoldsAnEnum(Shape shape) => shape is EnumShape or ArrayShape { Item: EnumShape or NullableShape { Inner: EnumShape } };
+
     private static partial bool IsAHostsFile(JsonTypeInfo member);
+
+    private static EnumShape LiveRows(JsonTypeInfo member, string input, AppJson json)
+    {
+        var enumeration = EnumRows.EnumOf(member.Type);
+        var isFlags = json.NamesFlags(enumeration);
+        var live = member.Options.GetTypeInfo(enumeration);
+        var rows = EnumRows.Of(member.Type, isFlags, input, (value, _) => JsonSerializer.SerializeToElement(value, live)).Select(row => new LiveEnumValue(row.Held, row.Held, row.Number));
+        return new EnumShape(isFlags, isFlags ? [.. rows.OrderByDescending(row => row.Number)] : [.. rows]);
+    }
 
     private static bool HoldsOneValue(JsonTypeInfo item) => item.Kind == JsonTypeInfoKind.None || IsAHostsFile(item);
 

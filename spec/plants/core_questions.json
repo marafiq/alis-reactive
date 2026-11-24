@@ -166,6 +166,11 @@
     "file": "spec/Core/DESIGN.md",
     "old": "- `X13.10` behavior",
     "new": "- `X13.10` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.11` behavior",
+    "new": "- `X13.11` browser"
    }
   ],
   "expect": "Q13: Defects lists no defect with a rung"

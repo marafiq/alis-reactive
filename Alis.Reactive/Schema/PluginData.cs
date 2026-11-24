@@ -76,12 +76,13 @@ internal sealed class FormPluginData : PluginData
 
 internal sealed class InputBinding
 {
-    internal InputBinding(string name, IReadOnlyList<PathStep> path, AsExpression converted, LitExpression blank, string committed, string invalidClass, string message)
+    internal InputBinding(string name, IReadOnlyList<PathStep> path, AsExpression converted, LitExpression blank, Expression sent, string committed, string invalidClass, string message)
     {
         Name = name;
         Path = path;
         Converted = converted;
         Blank = blank;
+        Sent = sent;
         Committed = committed;
         InvalidClass = invalidClass;
         Message = message;
@@ -94,6 +95,8 @@ internal sealed class InputBinding
     public AsExpression Converted { get; }
 
     public LitExpression Blank { get; }
+
+    public Expression Sent { get; }
 
     public string Committed { get; }
 

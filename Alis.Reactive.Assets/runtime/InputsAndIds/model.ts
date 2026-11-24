@@ -1,7 +1,7 @@
 import type { Owner } from "../OwnershipAndState/index";
 import {
-  assertNever, type CheckedBody as CheckedForm, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type InputEntry, type ModelPluginData, type PathStep,
-  type PlanDocument, type SentInput, type SentInputs, type ValueRead,
+  assertNever, type CheckedBody as CheckedForm, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type InputEntry, type InputSent,
+  type ItemWhenNothing, type ModelPluginData, type PathStep, type PlanDocument, type SentInput, type SentInputs, type ValueRead,
 } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
 
@@ -38,7 +38,13 @@ interface Contribution {
 
 interface Input {
   readonly binding: InputBinding;
+  readonly sent: InputSent;
   readonly contribution: Contribution;
+}
+
+interface Bound {
+  readonly value: unknown;
+  readonly blank: boolean;
 }
 
 export interface LiveCheck {
@@ -79,7 +85,7 @@ export class PageInputs {
     }
     for (const model of data) {
       const contribution: Contribution = { planId: plan.planId, place, data: model, read };
-      for (const [id, binding] of Object.entries(model.inputs)) this.#inputs.set(id, { binding, contribution });
+      for (const [id, binding] of Object.entries(model.inputs)) this.#inputs.set(id, { binding, sent: read(binding.sent) as InputSent, contribution });
       for (const [id, container] of Object.entries(model.containers)) {
         let renderings = this.#containers.get(id);
         if (renderings === undefined) {
@@ -112,7 +118,12 @@ export class PageInputs {
     }
     const [first] = inputs;
     const body = first !== undefined && typeof first[1].binding.path[0] === "number" ? [] : {};
-    for (const [, input] of inputs) write(body, input.binding.path, boundValue(input));
+    for (const [, input] of inputs) {
+      const bound = boundOf(input);
+      if (bound.blank && leavesTheBlank(input.sent)) continue;
+      refuseAnItemThatReadsNothing(input, bound.value);
+      write(body, input.binding.path, bound.value);
+    }
     return { kind: "captured", id: containerId, body, inputs: inputs.map(sentInput) };
   }
 
@@ -146,12 +157,12 @@ export class PageInputs {
   input(inputId: string, name: string): InputCapture {
     const input = this.#inputs.get(inputId);
     if (input === undefined) return { kind: "missing", id: inputId, name };
-    return { kind: "captured", input: { name, entry: { id: inputId, binding: input.binding } } };
+    return { kind: "captured", input: { name, entry: { id: inputId, binding: input.binding }, sent: input.sent } };
   }
 
   valueOf(inputId: string): unknown {
     const input = this.#inputs.get(inputId);
-    return input === undefined ? undefined : boundValue(input);
+    return input === undefined ? undefined : boundOf(input).value;
   }
 
   checked(inputs: SentInputs, sentValue: unknown, entries: readonly CheckedEntry[]): CheckedBody | null {
@@ -216,12 +227,42 @@ export class PageInputs {
 }
 
 function sentInput([id, input]: readonly [string, Input]): SentInput {
-  return { name: input.binding.name, entry: { id, binding: input.binding } };
+  return { name: input.binding.name, entry: { id, binding: input.binding }, sent: input.sent };
 }
 
-function boundValue(input: Input): unknown {
+function boundOf(input: Input): Bound {
   const converted = input.contribution.read(input.binding.converted);
-  return converted === null ? input.contribution.read(input.binding.blank) : converted;
+  return converted === null ? { value: input.contribution.read(input.binding.blank), blank: true } : { value: converted, blank: false };
+}
+
+function leavesTheBlank(sent: InputSent): boolean {
+  switch (sent.kind) {
+    case "field":
+    case "enum":
+      return sent.whenBlank === "leave";
+    case "files":
+      return false;
+    default:
+      return assertNever(sent);
+  }
+}
+
+function itemWhenNothingOf(sent: InputSent): ItemWhenNothing | null {
+  switch (sent.kind) {
+    case "field":
+    case "enum":
+      return sent.form.kind === "list" ? sent.form.itemWhenNothing : null;
+    case "files":
+      return null;
+    default:
+      return assertNever(sent);
+  }
+}
+
+function refuseAnItemThatReadsNothing(input: Input, value: unknown): void {
+  if (itemWhenNothingOf(input.sent) !== "stop" || !Array.isArray(value)) return;
+  const readsNothing = (value as readonly unknown[]).some(item => item === undefined || item === null);
+  if (readsNothing) throw new Stop("The request's member '" + input.binding.name + "' must hold a list whose items all hold values.");
 }
 
 function write(holder: object, path: readonly PathStep[], value: unknown): void {

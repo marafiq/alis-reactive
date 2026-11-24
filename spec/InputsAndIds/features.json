@@ -298,6 +298,16 @@
           "id": "M7.X8",
           "rung": "refusal",
           "defect": "An input bound to a member the app's JSON options write as an object, a dictionary, or a list of objects, dictionaries or lists renders with a shape no form data field writes, so a request that sends it in a query or form data stops in the browser on code the framework has not built, and a JSON body sends what the component holds in no form its endpoint binds. The rewrite refuses it where its field renders, naming the doors that carry it (D14.3): \"Input 'Location' binds Place, which the app's JSON options write as an object\"."
+        },
+        {
+          "id": "M7.X9",
+          "rung": "refusal",
+          "defect": "An enum input whose component's value is neither text nor the enum, nor a list of either against a list, renders with rows no form its component holds, so the input reads its start whatever the person chooses. The rewrite refuses it where its field renders (D14.3): \"Input 'Cover' binds RotaCover, and its component's value is IReadOnlyList<string>, which holds no value of RotaCover\"."
+        },
+        {
+          "id": "M7.X10",
+          "rung": "refusal",
+          "defect": "An enum input whose rows hold two values in one text, the name one value's JSON converter writes and the C# name or the number of another, reads the first row's value for either, so the person's choice is sent as another value. The rewrite refuses it where its field renders (D9.13): \"Input 'Floor' holds First and Ground in one text, '1'\"."
         }
       ],
       "promises": [
@@ -385,6 +395,22 @@
           "outcome": "The page is refused where the view renders with \"Input 'Location' binds Place, which the app's JSON options write as an object, and an input binds a member the browser sends as one text, a list of texts or files: bind an input to each value it holds, render its view with Html.PartialFor, or Set it in a JSON body from the component that holds it.\"",
           "opposite": "An input of m => m.Location.Lat renders, and its save posts Location.Lat, which the endpoint binds and answers Latitude: 51.5.",
           "defect": "The page renders a text box over the whole location, and a request that sends it stops in the browser on code the framework has not built, so nothing the person types there reaches the endpoint."
+        },
+        {
+          "for": "M7.X9",
+          "page": "A rota page whose input binds m => m.Cover, a RotaCover of OneCarer and TwoCarers, rendered as a NativeCheckList with the boxes One carer and Two carers.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"Input 'Cover' binds RotaCover, and its component's value is IReadOnlyList<string>, which holds no value of RotaCover: render the field with a component whose value is text or RotaCover.\"",
+          "opposite": "The same input rendered as a NativeDropDown with the options One carer and Two carers, held by their C# names, renders, and Save posts Cover=TwoCarers for Two carers, which the endpoint answers Cover: TwoCarers.",
+          "defect": "The page renders a check list whose ticked boxes no row reads as one value, so the input reads its start whatever the person ticks."
+        },
+        {
+          "for": "M7.X10",
+          "page": "A floor choice page whose input binds m => m.Floor, a CareFloor of Ground, First and Second whose own JSON converter writes them as 1, 2 and 3, as the home numbers its floors, rendered as a NativeDropDown of the enum's select list.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"Input 'Floor' holds First and Ground in one text, '1', the number of First and the name Ground's JSON converter writes, so the browser cannot tell which one it holds; give Ground a JsonStringEnumMemberName no value's C# name or number spells.\"",
+          "opposite": "A wing choice page over a CareWing whose converter writes East as east-wing and West as west-wing, its drop-down the enum's select list, renders, and Save posts Wing=West for West, which the endpoint answers Wing: West.",
+          "defect": "The page renders, and a text two values hold reads the first row's value, so First, held as 1 by the select list, is sent as Ground."
         }
       ],
       "verdicts": [
@@ -754,6 +780,10 @@
           "id": "M7.X6",
           "rung": "behavior",
           "defect": "A pipeline in a partial's plan reaches an input by its member without the partial's prefix, or reaches another rendering's input, so each card of one partial reads the same element or none: the reach names the member under the prefix its plan started with (N14.4, D14.3)."
+        },
+        {
+          "id": "X13.11",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -822,6 +852,14 @@
           "opposite": "With the alternate card's name emptied and its Copy clicked again, its echo reads nothing and the next of kin card's still reads Ada.",
           "defect": "The reach drops the card's prefix, so both cards look for the id of Name with no prefix, which no input holds, and both pipelines stop with the echoes empty; or both reach the first card's input and both echo Ada.",
           "existing_test": "redesign WhenAPartialIsRenderedForTwoMembers.a_step_naming_an_input_by_its_member_reaches_the_input_its_own_rendering_rendered"
+        },
+        {
+          "for": "X13.11",
+          "page": "The quick cover page, whose Cover change writes the cover line from the container's read of Cover: Two carers on shift where it reads TwoCarers, else One carer on shift.",
+          "gesture": "Choose Agency cover in Cover.",
+          "outcome": "The cover line reads Two carers on shift.",
+          "opposite": "Choosing One carer, the cover line reads One carer on shift.",
+          "defect": "The read holds the text agency, or nothing, so the comparison fails and the cover line reads One carer on shift."
         }
       ],
       "verdicts": [

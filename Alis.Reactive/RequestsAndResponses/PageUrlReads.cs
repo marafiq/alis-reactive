@@ -23,7 +23,7 @@ internal static class PageUrlReads
         if (leaf.Kind != JsonTypeInfoKind.None) throw HoldsMoreThanOneValue(member, name, leaf);
         if (EnumRows.IsEnum(typeof(TValue))) throw IsAnEnum(member, name);
         var startWritten = StartOf(member, written);
-        var shape = InputShapes.Of(leaf, startWritten, NumberCulture.Invariant, name);
+        var shape = InputShapes.Of(leaf, startWritten, NumberCulture.Invariant, name, plan.Json);
         var start = new LitExpression(AsTheShapeHoldsIt(startWritten, shape));
         var read = new OpExpression(Operator.Coalesce, [new AsExpression(textOf(name), shape), start]);
         return new Computed<TValue>(read, HeldForm.PageText(plan.Json, plan.RendersUnder, read, start));

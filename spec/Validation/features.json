@@ -1397,7 +1397,8 @@
         "Validation.tla:ObjectStartAgrees",
         "Validation.tla:NewHolderAgrees",
         "Validation.tla:UnsentInputsUnread",
-        "Validation.tla:NoTypedValueLost"
+        "Validation.tla:NoTypedValueLost",
+        "ContainerRead.tla:ReadIsWhatTheEndpointBinds"
       ],
       "defects": [
         {
@@ -1422,6 +1423,10 @@
         },
         {
           "id": "X18.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.47",
           "rung": "behavior"
         }
       ],
@@ -1465,6 +1470,14 @@
           "outcome": "status reads Unnamed, Arrived.",
           "opposite": "Clicking Save intake with A in Name shows \"Write the resident's full name.\" beside Name, status stays as it was, and no request is sent.",
           "defect": "The check reads the container's inputs although the request does not send them, so the typed A fails and Mark arrived sends nothing."
+        },
+        {
+          "for": "X16.47",
+          "page": "The night cover page.",
+          "gesture": "Type Ada in Resident, choose Agency cover in Cover and click Save cover.",
+          "outcome": "\"The value 'agency' is not valid for Cover.\" shows beside Cover and in the form's summary, and saved-cover stays empty.",
+          "opposite": "Choosing Two carers and clicking Save cover shows Ada: TwoCarers in saved-cover and no message.",
+          "defect": "No check names an enum its live form writes as text, so the start is checked and sent, and saved-cover reads Ada: OneCarer."
         }
       ],
       "verdicts": [

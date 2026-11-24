@@ -431,7 +431,9 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
 ### 2.6 TLA+
 
 Each spec lives in its owning module's folder, `spec/<Module>/<Spec>.tla` beside its `.cfg`, `.violates.*.cfg` and
-`.holds.*.cfg` files; the owner is the module whose unit changes it. A feature in any module names the invariants it
+`.holds.*.cfg` files; the owner is the module whose unit changes it. A `.violates.` config is named for the invariant
+its mutant must violate, `<Spec>.violates.<Invariant>.cfg`, and a second mutant of that invariant adds its own name,
+`<Spec>.violates.<Invariant>.<Mutant>.cfg`. A feature in any module names the invariants it
 rests on in its `checker` field, and a test names the action it observes.
 
 | Spec | Owner | Models |

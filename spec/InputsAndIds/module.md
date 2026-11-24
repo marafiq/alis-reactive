@@ -8,14 +8,16 @@ renders and where the page composes its plans. Module 7 of `spec/CLAUDE.md`.
 
 - Q2: an input binds under MVC's binding name, the member's C# path under its view's prefix, on both hosts (D2.5).
 - Q3: an input's value is its `converted` read, the one `as` C# writes, or its `blank` where that holds null or reads nothing
-  (N3.3), and blank is what the member binds as (D3.5, D3.6).
+  (N3.3), and blank is what the member binds as (D3.5, D3.6); an enum input's rows are what its component holds each value
+  as (M7.X9, M7.X10), and its `sent` is the form a request sends its value in (N9.10, D9.13).
 - Q7: an input a member binds is a source at every value position (D7.2), reached by its member (N14.4).
 - Q12: an input id a live plan holds is taken by no plan that starts later, a slot's content included (R14.6).
 - Q13: a member's value as its container sends it is the container's read (N13.1), read in its step from the inputs
   the container holds then (`ContainerRead.tla`); a container that holds two inputs of one binding name sends nothing
   and its read stops (X13.2, X13.6, D13.4), and so does a read of a container the page lacks (X13.10, D9.15); a member
-  no input inside it binds reads its start (X13.7), a slot's input counts from its load to its unload (X13.8), and an
-  input outside the container is never read (X13.9).
+  no input inside it binds reads its start (X13.7), a slot's input counts from its load to its unload (X13.8), an
+  input outside the container is never read (X13.9), an enum text no row lists reads the start (X13.11), and a list
+  input whose item reads nothing where the item admits none stops the read with its send (X9.40).
 - Q14: one binding name and one id per member in every view that renders it (D14.3), a partial for a member by one
   typed door (D14.4), and the closed refusals within one plan and across plans (D14.6).
 - Q16: a failure shows at the message element of the input sent under its binding name, and in the summary place

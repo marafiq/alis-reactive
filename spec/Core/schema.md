@@ -122,8 +122,9 @@ or the connection before it opens (D21.11).
 sends, built when it is called: each framework input of the page's input table whose element is inside the container's
 element, under its `InputBinding.path`, its value its `InputBinding.converted` evaluated in the plan that contributed it,
 or its `InputBinding.blank` where that holds null or reads nothing.
-The page lacking the container's element, no live plan rendering that container for that model (D14.8), and two
-inputs inside it under one scalar binding name (D13.4) each stop the pipeline. A container read is a `data` read over
+The page lacking the container's element, no live plan rendering that container for that model (D14.8), two
+inputs inside it under one scalar binding name (D13.4), and a list input whose item reads nothing where its `sent`
+admits none (D9.10) each stop the pipeline. A container read is a `data` read over
 it (N13.1, D13.3), and `Live.body`'s `value` is that call.
 
 `alis.document`'s `query`, called with a member's binding name (D2.5), returns the first value of the page's query
@@ -149,6 +150,7 @@ compared ignoring case, stops the pipeline. Each reads the page's address when i
 - `converted`: the `as` C# writes of the input's read to its shape, which reads nothing where the input is blank or
   its text does not convert (N3.3);
 - `blank`: the `lit` of the member's start, the input's value where `converted` holds null or reads nothing (N3.3, D3.6);
+- `sent`: a `record` C# writes whose value is `InputSent`, the form a request sends the input's value in (N9.10);
 - `committed`: the event that commits its value;
 - `invalidClass`: the class an invalid input takes;
 - `message`: the id of its message element (D16.13).
@@ -371,7 +373,7 @@ and nothing where it holds null (D6.14).
 | `array` | | `item`: a shape | yes |
 | `nullable` | | `inner`: a shape that is not `nullable` | yes |
 | `object` | | `fields`: a map from wire name to `FieldConversion` | yes: C# states what a copied field that converts to nothing holds, as the member's JSON binding reads it (D3.13, D9.10) |
-| `enum` | `flags`: a boolean; `values`: a list of `LiveEnumValue` | | yes: where a source enters a live object's member or an argument, C# writes a row for each value of an enum the form its source holds it in and the live form write otherwise, each read from that form's own writing; a held form no row lists reads nothing; an element's text and HTML carry no such shape (D7.7, D9.13, D3.3) |
+| `enum` | `flags`: a boolean; `values`: a list of `LiveEnumValue` | | yes: C# writes the rows in two places. Where a source enters a live object's member or an argument, a row for each value of an enum the form its source holds it in and the live form write otherwise; in an input's `converted`, a row for each form its component holds a value in, for a component whose value is text the value's C# name, its number as text and the text its live form writes, for one whose value is the enum its live form; each read from that form's own writing; a held form no row lists reads nothing; an element's text and HTML carry no such shape (D7.7, D9.13, D3.3) |
 
 `FieldConversion` carries `shape`, a shape, and `nothing`, `omit` or `null`: the member's binding when its conversion reads nothing (D3.13, D9.10).
 
@@ -491,8 +493,17 @@ each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `H
 - `SentInputs`: `container` (`none`; `missing` with its `id`; or `captured` with its `id`, the `body` it sends and its
   `inputs`) and `individual`, a list of `missing` (with its `id` and `name`), `captured` (with its `input`) or
   `leftOut`, a named input whose condition failed, which C# writes as the `cond` of its binding over the lookup, so
-  it is never looked up and is in neither the check's inputs nor the reply's. A `SentInput` is its binding `name`
-  and its `entry`, the inputs table's `InputEntry`, its `id` and `binding`.
+  it is never looked up and is in neither the check's inputs nor the reply's. A `SentInput` is its binding `name`,
+  its `entry`, the inputs table's `InputEntry`, its `id` and `binding`, and its `sent`, the `InputSent` its binding's
+  `sent` evaluates to where its plan joined the page.
+- `InputSent`, the form a request sends an input's value in (D9.10, D9.13): `field` with its `form`, a wire form with no
+  `enum` or `flags` in it, `whenNothing` (`leave` or `empty`) and `whenBlank` (`send` or `leave`); `enum` with its
+  `form`, `enum`, `flags` or a `list` of one, `json`, its `JsonForm`, `whenNothing` and `whenBlank`; or `files`. The
+  browser sends a captured input's value by it: `files` as the files it holds; a value that reads nothing by
+  `whenNothing`; under `whenBlank` `leave`, a value that is the binding's `blank` is left out, since the form cannot
+  write that start, an enum's that no value names or a date's or an instant's, which the `lit` holds as text; else by
+  `form` in a query or form data, an item that reads nothing by its `itemWhenNothing`, and in a JSON body a `field` as
+  held, a date or an instant as its wire text, and an `enum` by `json`.
 - `GuardedMember`: `path`, the wire names to a JSON member a `When` guards or to a holder only such members fill,
   and `when`, the `or` of their bindings for a holder; or to a member of a value type whose JSON converter writes its
   default as `null`, and `when`, that its read reads something (D9.10); the browser takes it out of the body's `value`
@@ -593,7 +604,8 @@ The diff beyond the kinds, each with the decision that makes it:
 - `answer` is the function a vendor calls for an answer, a value wherever a value goes, set into a property or
   passed as an argument (D17.12);
 - `Vendor.payload` leaves (D17.4);
-- `InputBinding` gains `message` (D16.13), and its `value`, `shape` and `list` become `converted` and `blank` (N3.3);
+- `InputBinding` gains `message` (D16.13), its `value`, `shape` and `list` become `converted` and `blank` (N3.3), and it
+  gains `sent`, whose value is the contract `InputSent` (N9.10);
 - `FormPluginData` becomes one `Registration`, keyed by validator and rule set and by no element; its `summary` and
   `live` move to `model`'s `containers` as `Container`; and `FormField`'s `items` and `value` functions leave (D16.2,
   D14.8, D16.14);

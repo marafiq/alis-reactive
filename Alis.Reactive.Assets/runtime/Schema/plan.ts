@@ -308,6 +308,7 @@ export interface InputBinding {
   readonly path: readonly PathStep[];
   readonly converted: AsExpression;
   readonly blank: LitExpression;
+  readonly sent: Expression;
   readonly committed: string;
   readonly invalidClass: string;
   readonly message: string;
@@ -538,11 +539,123 @@ export type EvaluatedValue = unknown;
 export interface SentInput {
   readonly name: string;
   readonly entry: InputEntry;
+  readonly sent: InputSent;
 }
 
 export interface InputEntry {
   readonly id: string;
   readonly binding: InputBinding;
+}
+
+export type InputSent = FieldInputSent | EnumInputSent | FilesInputSent;
+
+export interface FieldInputSent {
+  readonly kind: "field";
+  readonly form: WireForm;
+  readonly whenNothing: WhenNothing;
+  readonly whenBlank: WhenBlank;
+}
+
+export type WireForm = TextScalarWireForm | NumberScalarWireForm | BooleanScalarWireForm | DateScalarWireForm | InstantScalarWireForm | WrittenScalarWireForm | EnumScalarWireForm | FlagsScalarWireForm | ListWireForm;
+
+export interface TextScalarWireForm {
+  readonly kind: "text";
+}
+
+export interface NumberScalarWireForm {
+  readonly kind: "number";
+}
+
+export interface BooleanScalarWireForm {
+  readonly kind: "boolean";
+}
+
+export interface DateScalarWireForm {
+  readonly kind: "date";
+}
+
+export interface InstantScalarWireForm {
+  readonly kind: "instant";
+}
+
+export interface WrittenScalarWireForm {
+  readonly kind: "written";
+}
+
+export interface EnumScalarWireForm {
+  readonly kind: "enum";
+  readonly values: readonly EnumValue[];
+}
+
+export interface EnumValue {
+  readonly held: JsonValue;
+  readonly name: string;
+}
+
+export interface FlagsScalarWireForm {
+  readonly kind: "flags";
+  readonly values: readonly FlagValue[];
+}
+
+export interface FlagValue {
+  readonly held: JsonValue;
+  readonly name: string;
+  readonly number: number;
+}
+
+export interface ListWireForm {
+  readonly kind: "list";
+  readonly item: ScalarWireForm;
+  readonly itemWhenNothing: ItemWhenNothing;
+}
+
+export type ScalarWireForm = TextScalarWireForm | NumberScalarWireForm | BooleanScalarWireForm | DateScalarWireForm | InstantScalarWireForm | WrittenScalarWireForm | EnumScalarWireForm | FlagsScalarWireForm;
+
+export type ItemWhenNothing = "empty" | "stop";
+
+export type WhenNothing = "leave" | "empty";
+
+export type WhenBlank = "send" | "leave";
+
+export interface EnumInputSent {
+  readonly kind: "enum";
+  readonly form: WireForm;
+  readonly json: JsonForm;
+  readonly whenNothing: WhenNothing;
+  readonly whenBlank: WhenBlank;
+}
+
+export type JsonForm = EnumJsonForm | FlagsJsonForm | ListJsonForm;
+
+export interface EnumJsonForm {
+  readonly kind: "enum";
+  readonly values: readonly JsonEnumValue[];
+}
+
+export interface JsonEnumValue {
+  readonly held: JsonValue;
+  readonly sent: JsonValue;
+}
+
+export interface FlagsJsonForm {
+  readonly kind: "flags";
+  readonly values: readonly JsonFlagValue[];
+}
+
+export interface JsonFlagValue {
+  readonly held: JsonValue;
+  readonly number: number;
+  readonly sent: JsonValue;
+}
+
+export interface ListJsonForm {
+  readonly kind: "list";
+  readonly item: JsonForm;
+  readonly itemWhenNothing: ItemWhenNothing;
+}
+
+export interface FilesInputSent {
+  readonly kind: "files";
 }
 
 export interface FormPlace {
@@ -606,53 +719,6 @@ export interface HeldValueRead {
   readonly value: EvaluatedValue;
 }
 
-export type ScalarWireForm = TextScalarWireForm | NumberScalarWireForm | BooleanScalarWireForm | DateScalarWireForm | InstantScalarWireForm | WrittenScalarWireForm | EnumScalarWireForm | FlagsScalarWireForm;
-
-export interface TextScalarWireForm {
-  readonly kind: "text";
-}
-
-export interface NumberScalarWireForm {
-  readonly kind: "number";
-}
-
-export interface BooleanScalarWireForm {
-  readonly kind: "boolean";
-}
-
-export interface DateScalarWireForm {
-  readonly kind: "date";
-}
-
-export interface InstantScalarWireForm {
-  readonly kind: "instant";
-}
-
-export interface WrittenScalarWireForm {
-  readonly kind: "written";
-}
-
-export interface EnumScalarWireForm {
-  readonly kind: "enum";
-  readonly values: readonly EnumValue[];
-}
-
-export interface EnumValue {
-  readonly held: JsonValue;
-  readonly name: string;
-}
-
-export interface FlagsScalarWireForm {
-  readonly kind: "flags";
-  readonly values: readonly FlagValue[];
-}
-
-export interface FlagValue {
-  readonly held: JsonValue;
-  readonly name: string;
-  readonly number: number;
-}
-
 export interface SentQuery {
   readonly fields: readonly SentField[];
   readonly inputs: SentInputs;
@@ -666,18 +732,6 @@ export interface SentField {
   readonly whenNothing: WhenNothing;
   readonly when: boolean;
 }
-
-export type WireForm = TextScalarWireForm | NumberScalarWireForm | BooleanScalarWireForm | DateScalarWireForm | InstantScalarWireForm | WrittenScalarWireForm | EnumScalarWireForm | FlagsScalarWireForm | ListWireForm;
-
-export interface ListWireForm {
-  readonly kind: "list";
-  readonly item: ScalarWireForm;
-  readonly itemWhenNothing: ItemWhenNothing;
-}
-
-export type ItemWhenNothing = "empty" | "stop";
-
-export type WhenNothing = "leave" | "empty";
 
 export interface SentInputs {
   readonly container: ContainerCapture;
@@ -742,35 +796,6 @@ export interface SentEnum {
   readonly name: string;
   readonly path: readonly string[];
   readonly form: JsonForm;
-}
-
-export type JsonForm = EnumJsonForm | FlagsJsonForm | ListJsonForm;
-
-export interface EnumJsonForm {
-  readonly kind: "enum";
-  readonly values: readonly JsonEnumValue[];
-}
-
-export interface JsonEnumValue {
-  readonly held: JsonValue;
-  readonly sent: JsonValue;
-}
-
-export interface FlagsJsonForm {
-  readonly kind: "flags";
-  readonly values: readonly JsonFlagValue[];
-}
-
-export interface JsonFlagValue {
-  readonly held: JsonValue;
-  readonly number: number;
-  readonly sent: JsonValue;
-}
-
-export interface ListJsonForm {
-  readonly kind: "list";
-  readonly item: JsonForm;
-  readonly itemWhenNothing: ItemWhenNothing;
 }
 
 export interface UrlEncodedSentBody {

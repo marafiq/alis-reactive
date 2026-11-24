@@ -214,6 +214,7 @@ internal static class AppHost
             .Add<Care.ArrivalIntakeRules>()
             .Add<Care.ArrivalDeskRules>()
             .Add<Care.ArrivalKinRules>()
+            .Add<Care.NightCoverRules>()
             .Add<Care.IntakeValidator>()
             .Add<Care.FamilyValidator>()
             .Add<Care.BedAssignmentRules>()

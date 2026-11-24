@@ -1219,6 +1219,9 @@
         "blank": {
           "$ref": "#/$defs/LitExpression"
         },
+        "sent": {
+          "$ref": "#/$defs/Expression"
+        },
         "committed": {
           "type": "string"
         },
@@ -1234,6 +1237,7 @@
         "path",
         "converted",
         "blank",
+        "sent",
         "committed",
         "invalidClass",
         "message"
@@ -2123,11 +2127,15 @@
         },
         "entry": {
           "$ref": "#/$defs/InputEntry"
+        },
+        "sent": {
+          "$ref": "#/$defs/InputSent"
         }
       },
       "required": [
         "name",
-        "entry"
+        "entry",
+        "sent"
       ],
       "additionalProperties": false
     },
@@ -2144,6 +2152,421 @@
       "required": [
         "id",
         "binding"
+      ],
+      "additionalProperties": false
+    },
+    "InputSent": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/FieldInputSent"
+        },
+        {
+          "$ref": "#/$defs/EnumInputSent"
+        },
+        {
+          "$ref": "#/$defs/FilesInputSent"
+        }
+      ]
+    },
+    "FieldInputSent": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "field"
+        },
+        "form": {
+          "$ref": "#/$defs/WireForm"
+        },
+        "whenNothing": {
+          "$ref": "#/$defs/WhenNothing"
+        },
+        "whenBlank": {
+          "$ref": "#/$defs/WhenBlank"
+        }
+      },
+      "required": [
+        "kind",
+        "form",
+        "whenNothing",
+        "whenBlank"
+      ],
+      "additionalProperties": false
+    },
+    "WireForm": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/TextScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/NumberScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/BooleanScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/DateScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/InstantScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/WrittenScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/EnumScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/FlagsScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/ListWireForm"
+        }
+      ]
+    },
+    "TextScalarWireForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "text"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "NumberScalarWireForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "number"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "BooleanScalarWireForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "boolean"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "DateScalarWireForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "date"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "InstantScalarWireForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "instant"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "WrittenScalarWireForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "written"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "EnumScalarWireForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "enum"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EnumValue"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "EnumValue": {
+      "type": "object",
+      "properties": {
+        "held": {},
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "held",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "FlagsScalarWireForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "flags"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FlagValue"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "FlagValue": {
+      "type": "object",
+      "properties": {
+        "held": {},
+        "name": {
+          "type": "string"
+        },
+        "number": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "held",
+        "name",
+        "number"
+      ],
+      "additionalProperties": false
+    },
+    "ListWireForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "list"
+        },
+        "item": {
+          "$ref": "#/$defs/ScalarWireForm"
+        },
+        "itemWhenNothing": {
+          "$ref": "#/$defs/ItemWhenNothing"
+        }
+      },
+      "required": [
+        "kind",
+        "item",
+        "itemWhenNothing"
+      ],
+      "additionalProperties": false
+    },
+    "ScalarWireForm": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/TextScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/NumberScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/BooleanScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/DateScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/InstantScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/WrittenScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/EnumScalarWireForm"
+        },
+        {
+          "$ref": "#/$defs/FlagsScalarWireForm"
+        }
+      ]
+    },
+    "ItemWhenNothing": {
+      "enum": [
+        "empty",
+        "stop"
+      ]
+    },
+    "WhenNothing": {
+      "enum": [
+        "leave",
+        "empty"
+      ]
+    },
+    "WhenBlank": {
+      "enum": [
+        "send",
+        "leave"
+      ]
+    },
+    "EnumInputSent": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "enum"
+        },
+        "form": {
+          "$ref": "#/$defs/WireForm"
+        },
+        "json": {
+          "$ref": "#/$defs/JsonForm"
+        },
+        "whenNothing": {
+          "$ref": "#/$defs/WhenNothing"
+        },
+        "whenBlank": {
+          "$ref": "#/$defs/WhenBlank"
+        }
+      },
+      "required": [
+        "kind",
+        "form",
+        "json",
+        "whenNothing",
+        "whenBlank"
+      ],
+      "additionalProperties": false
+    },
+    "JsonForm": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/EnumJsonForm"
+        },
+        {
+          "$ref": "#/$defs/FlagsJsonForm"
+        },
+        {
+          "$ref": "#/$defs/ListJsonForm"
+        }
+      ]
+    },
+    "EnumJsonForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "enum"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/JsonEnumValue"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "JsonEnumValue": {
+      "type": "object",
+      "properties": {
+        "held": {},
+        "sent": {}
+      },
+      "required": [
+        "held",
+        "sent"
+      ],
+      "additionalProperties": false
+    },
+    "FlagsJsonForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "flags"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/JsonFlagValue"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "JsonFlagValue": {
+      "type": "object",
+      "properties": {
+        "held": {},
+        "number": {
+          "type": "integer"
+        },
+        "sent": {}
+      },
+      "required": [
+        "held",
+        "number",
+        "sent"
+      ],
+      "additionalProperties": false
+    },
+    "ListJsonForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "list"
+        },
+        "item": {
+          "$ref": "#/$defs/JsonForm"
+        },
+        "itemWhenNothing": {
+          "$ref": "#/$defs/ItemWhenNothing"
+        }
+      },
+      "required": [
+        "kind",
+        "item",
+        "itemWhenNothing"
+      ],
+      "additionalProperties": false
+    },
+    "FilesInputSent": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "files"
+        }
+      },
+      "required": [
+        "kind"
       ],
       "additionalProperties": false
     },
@@ -2372,176 +2795,6 @@
       ],
       "additionalProperties": false
     },
-    "ScalarWireForm": {
-      "oneOf": [
-        {
-          "$ref": "#/$defs/TextScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/NumberScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/BooleanScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/DateScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/InstantScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/WrittenScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/EnumScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/FlagsScalarWireForm"
-        }
-      ]
-    },
-    "TextScalarWireForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "text"
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "additionalProperties": false
-    },
-    "NumberScalarWireForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "number"
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "additionalProperties": false
-    },
-    "BooleanScalarWireForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "boolean"
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "additionalProperties": false
-    },
-    "DateScalarWireForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "date"
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "additionalProperties": false
-    },
-    "InstantScalarWireForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "instant"
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "additionalProperties": false
-    },
-    "WrittenScalarWireForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "written"
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "additionalProperties": false
-    },
-    "EnumScalarWireForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "enum"
-        },
-        "values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/EnumValue"
-          }
-        }
-      },
-      "required": [
-        "kind",
-        "values"
-      ],
-      "additionalProperties": false
-    },
-    "EnumValue": {
-      "type": "object",
-      "properties": {
-        "held": {},
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "held",
-        "name"
-      ],
-      "additionalProperties": false
-    },
-    "FlagsScalarWireForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "flags"
-        },
-        "values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/FlagValue"
-          }
-        }
-      },
-      "required": [
-        "kind",
-        "values"
-      ],
-      "additionalProperties": false
-    },
-    "FlagValue": {
-      "type": "object",
-      "properties": {
-        "held": {},
-        "name": {
-          "type": "string"
-        },
-        "number": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "held",
-        "name",
-        "number"
-      ],
-      "additionalProperties": false
-    },
     "SentQuery": {
       "type": "object",
       "properties": {
@@ -2595,69 +2848,6 @@
         "when"
       ],
       "additionalProperties": false
-    },
-    "WireForm": {
-      "oneOf": [
-        {
-          "$ref": "#/$defs/TextScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/NumberScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/BooleanScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/DateScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/InstantScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/WrittenScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/EnumScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/FlagsScalarWireForm"
-        },
-        {
-          "$ref": "#/$defs/ListWireForm"
-        }
-      ]
-    },
-    "ListWireForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "list"
-        },
-        "item": {
-          "$ref": "#/$defs/ScalarWireForm"
-        },
-        "itemWhenNothing": {
-          "$ref": "#/$defs/ItemWhenNothing"
-        }
-      },
-      "required": [
-        "kind",
-        "item",
-        "itemWhenNothing"
-      ],
-      "additionalProperties": false
-    },
-    "ItemWhenNothing": {
-      "enum": [
-        "empty",
-        "stop"
-      ]
-    },
-    "WhenNothing": {
-      "enum": [
-        "leave",
-        "empty"
-      ]
     },
     "SentInputs": {
       "type": "object",
@@ -2914,105 +3104,6 @@
         "name",
         "path",
         "form"
-      ],
-      "additionalProperties": false
-    },
-    "JsonForm": {
-      "oneOf": [
-        {
-          "$ref": "#/$defs/EnumJsonForm"
-        },
-        {
-          "$ref": "#/$defs/FlagsJsonForm"
-        },
-        {
-          "$ref": "#/$defs/ListJsonForm"
-        }
-      ]
-    },
-    "EnumJsonForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "enum"
-        },
-        "values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/JsonEnumValue"
-          }
-        }
-      },
-      "required": [
-        "kind",
-        "values"
-      ],
-      "additionalProperties": false
-    },
-    "JsonEnumValue": {
-      "type": "object",
-      "properties": {
-        "held": {},
-        "sent": {}
-      },
-      "required": [
-        "held",
-        "sent"
-      ],
-      "additionalProperties": false
-    },
-    "FlagsJsonForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "flags"
-        },
-        "values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/JsonFlagValue"
-          }
-        }
-      },
-      "required": [
-        "kind",
-        "values"
-      ],
-      "additionalProperties": false
-    },
-    "JsonFlagValue": {
-      "type": "object",
-      "properties": {
-        "held": {},
-        "number": {
-          "type": "integer"
-        },
-        "sent": {}
-      },
-      "required": [
-        "held",
-        "number",
-        "sent"
-      ],
-      "additionalProperties": false
-    },
-    "ListJsonForm": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "list"
-        },
-        "item": {
-          "$ref": "#/$defs/JsonForm"
-        },
-        "itemWhenNothing": {
-          "$ref": "#/$defs/ItemWhenNothing"
-        }
-      },
-      "required": [
-        "kind",
-        "item",
-        "itemWhenNothing"
       ],
       "additionalProperties": false
     },

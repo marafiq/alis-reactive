@@ -152,4 +152,5 @@ fi
 
 echo "[plant] caught: $constant failed with the defect in place ($failed of $ran)."
 awk '/^[[:space:]]*Error Message:/ { showing = 1; next } /^[[:space:]]*Stack Trace:/ { showing = 0 } showing && NF { print "[plant]   " $0 }' "$log"
+grep -o -E "$tests/[^ :]+\.cs:line [0-9]+" "$log" | awk '!seen[$0]++ { print "[plant]   at " $0 }' || true
 rm -f "$log"

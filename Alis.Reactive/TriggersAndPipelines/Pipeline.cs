@@ -82,7 +82,7 @@ public sealed partial class Pipeline<TModel>
         var names = _writer.Content.NameInput(text);
         var lambda = MemberLambda.Of(member, text, names.Name, typeof(TModel));
         var live = _writer.Content.Json.LiveForm;
-        var input = InputsAndIds.BoundInput.Of(lambda, new MvcNames(names.Prefix, names.Name, names.Id), _writer.Content.Json,
+        var input = InputsAndIds.BoundInput.Of(lambda, new MvcNames(names.Prefix, names.Name, names.Id), _writer.Content,
             () => JsonSerializer.SerializeToElement(default(TValue), live.GetTypeInfo(typeof(TValue))));
         return new BoundInput<TValue>(input.Id, _writer);
     }

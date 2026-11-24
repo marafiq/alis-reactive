@@ -78,5 +78,27 @@
    }
   ],
   "expect": null
+ },
+ {
+  "name": "a second mutant of an invariant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ReadStopsWhenItsSendStops.UnlistedStopsTheSend.cfg",
+    "old": "CONSTANT Mutant = \"UnlistedStopsTheSend\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.ReadStopsWhenItsSendStops.UnlistedStopsTheSend.cfg: expected ReadStopsWhenItsSendStops violated, saw Model checking completed"
+ },
+ {
+  "name": "a second mutant's config with its other invariants in another order",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ReadStopsWhenItsSendStops.UnlistedStopsTheSend.cfg",
+    "old": "INVARIANT OneValueOnEveryHost\nINVARIANT ReadIsWhatTheEndpointBinds\n",
+    "new": "INVARIANT ReadIsWhatTheEndpointBinds\nINVARIANT OneValueOnEveryHost\n"
+   }
+  ],
+  "expect": null
  }
 ]

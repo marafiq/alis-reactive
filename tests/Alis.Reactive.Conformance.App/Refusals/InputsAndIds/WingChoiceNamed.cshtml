@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WingChoice
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Room move";
+    var plan = Html.ReactivePlan<WingChoice>();
+}
+<h1>Room move</h1>
+@using (var move = Html.BeginRequestContainer(plan, "wing-choice"))
+{
+    @(Html.InputField(plan, m => m.Wing, options => options.Label("Wing")).NativeDropDown(build => build.Items(Html.GetEnumSelectList<CareWing>())))
+    @(Html.NativeButton("move-room", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<WingChoice>(RefusalEndpoints.WingChoices, request => request.UrlEncoded(move.Container, body => { }))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

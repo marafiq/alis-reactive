@@ -12,4 +12,8 @@ public static partial class RefusalPages
     public const string DepartureRoomOnce = Area + "inputs-and-ids/departure/room-once";
     public const string OutingWholeLocation = Area + "inputs-and-ids/outing/whole-location";
     public const string OutingLocationsLatitude = Area + "inputs-and-ids/outing/locations-latitude";
+    public const string RotaCoverTicked = Area + "inputs-and-ids/rota/cover-ticked";
+    public const string RotaCoverChosen = Area + "inputs-and-ids/rota/cover-chosen";
+    public const string FloorChoiceNumbered = Area + "inputs-and-ids/floor-choice/numbered";
+    public const string WingChoiceNamed = Area + "inputs-and-ids/wing-choice/named";
 }

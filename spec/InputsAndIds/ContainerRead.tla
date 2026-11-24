@@ -4,23 +4,26 @@ EXTENDS Naturals, Sequences, FiniteSets
 CONSTANT Mutant
 
 Mutants == {"none", "DuplicatesSent", "TwoInputsReadTheLast", "BlankReadsNothing", "UnsentReadsNothing",
-            "CachedInputs", "PageWideRead"}
+            "CachedInputs", "PageWideRead", "UnlistedStopsTheSend", "UnlistedReadsItsText", "UnnamedStartSentAsHeld",
+            "JsonSentAsHeld", "ItemNothingStopsTheSendAlone"}
 
 ASSUME Mutant \in Mutants
 
 Inputs == {"own", "slot", "other"}
 
-Texts == {"n1", "n2", "blank"}
+Texts == {"n1", "n2", "blank", "unlisted", "itemNothing"}
 
 Hosts == {"form", "json"}
+
+Servers == {"net10", "net48"}
 
 DomOrder == <<"own", "slot">>
 
 ContainerOf(i) == IF i = "other" THEN "elsewhere" ELSE "container"
 
-VARIABLES containerOnPage, ownRendered, slotLoaded, slotLeft, text, read, readFrom, cached, cache
+VARIABLES containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused, read, readFrom, cached, cache
 
-page == <<containerOnPage, ownRendered, slotLoaded, slotLeft, text>>
+page == <<containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused>>
 vars == <<page, read, readFrom, cached, cache>>
 
 Range(s) == {s[i] : i \in DOMAIN s}
@@ -29,17 +32,30 @@ OnPage(i) == CASE i = "own" -> ownRendered
                [] i = "slot" -> slotLoaded
                [] i = "other" -> TRUE
 
-Value(i) == IF text[i] = "blank" THEN "start" ELSE text[i]
+Value(i) == IF text[i] \in {"blank", "unlisted"} THEN "start" ELSE text[i]
 
 Body == SelectSeq(DomOrder, LAMBDA i : OnPage(i))
 
-SendStops == ~containerOnPage \/ Len(Body) >= 2
+Unlisted(i) == text[i] = "unlisted" \/ (text[i] = "blank" /\ ~startNamed)
+
+SendStops == ~containerOnPage \/ Len(Body) >= 2 \/ (\E i \in Range(Body) : text[i] = "itemNothing")
+             \/ (Mutant = "UnlistedStopsTheSend" /\ \E i \in Range(Body) : Unlisted(i))
 
 BodyLeaves == IF Mutant = "DuplicatesSent" THEN containerOnPage ELSE ~SendStops
 
-Bind(h) == CASE Body = <<>> -> "start"
-             [] h = "form" -> Value(Body[1])
-             [] h = "json" -> Value(Body[Len(Body)])
+Sent(i) == CASE text[i] \in {"n1", "n2"} -> "name"
+             [] startNamed -> "name"
+             [] Mutant = "UnnamedStartSentAsHeld" -> "held"
+             [] OTHER -> "none"
+
+Bound(i, h, s) == CASE h = "json" -> IF Mutant = "JsonSentAsHeld" /\ heldRefused /\ s = "net10" THEN "refused" ELSE Value(i)
+                    [] Sent(i) = "name" -> Value(i)
+                    [] Sent(i) = "none" -> "start"
+                    [] OTHER -> IF s = "net10" THEN "refused" ELSE "start"
+
+Bind(h, s) == CASE Body = <<>> -> "start"
+                [] h = "form" -> Bound(Body[1], h, s)
+                [] h = "json" -> Bound(Body[Len(Body)], h, s)
 
 Table == {i \in Inputs : OnPage(i)}
 
@@ -47,14 +63,19 @@ Hits == IF Mutant = "PageWideRead" THEN Table ELSE {i \in Table : ContainerOf(i)
 
 Found == IF Mutant = "CachedInputs" /\ cached THEN cache ELSE Hits
 
-ValueRead(i) == IF text[i] = "blank" /\ Mutant = "BlankReadsNothing" THEN "nothing" ELSE Value(i)
+ValueRead(i) == CASE text[i] = "blank" /\ Mutant = "BlankReadsNothing" -> "nothing"
+                  [] text[i] = "unlisted" /\ Mutant = "UnlistedReadsItsText" -> "unlisted"
+                  [] OTHER -> Value(i)
 
 TwoFound == Cardinality(Found) >= 2
+
+ItemNothingFound == Mutant # "ItemNothingStopsTheSendAlone" /\ \E i \in Found : text[i] = "itemNothing"
 
 TakesTheLast == TwoFound /\ Mutant = "TwoInputsReadTheLast"
 
 ReadValue ==
     CASE ~containerOnPage -> "stop"
+      [] ItemNothingFound -> "stop"
       [] Found = {} -> IF Mutant = "UnsentReadsNothing" THEN "nothing" ELSE "start"
       [] TakesTheLast -> ValueRead("slot")
       [] TwoFound -> "stop"
@@ -75,6 +96,8 @@ Init ==
     /\ slotLoaded = FALSE
     /\ slotLeft = FALSE
     /\ text \in {t \in [Inputs -> Texts] : t["slot"] = "blank"}
+    /\ startNamed \in BOOLEAN
+    /\ heldRefused \in BOOLEAN
     /\ read = "unread"
     /\ readFrom = {}
     /\ cached = FALSE
@@ -93,7 +116,7 @@ Type(i, t) ==
     /\ text[i] # t
     /\ text' = [text EXCEPT ![i] = t]
     /\ Unread
-    /\ UNCHANGED <<containerOnPage, ownRendered, slotLoaded, slotLeft, cached, cache>>
+    /\ UNCHANGED <<containerOnPage, ownRendered, slotLoaded, slotLeft, startNamed, heldRefused, cached, cache>>
 
 LoadSlot ==
     /\ containerOnPage
@@ -101,7 +124,7 @@ LoadSlot ==
     /\ slotLoaded' = TRUE
     /\ \E t \in Texts : text' = [text EXCEPT !["slot"] = t]
     /\ Unread
-    /\ UNCHANGED <<containerOnPage, ownRendered, slotLeft, cached, cache>>
+    /\ UNCHANGED <<containerOnPage, ownRendered, slotLeft, startNamed, heldRefused, cached, cache>>
 
 UnloadSlot ==
     /\ slotLoaded
@@ -109,7 +132,7 @@ UnloadSlot ==
     /\ slotLeft' = TRUE
     /\ text' = [text EXCEPT !["slot"] = "blank"]
     /\ Unread
-    /\ UNCHANGED <<containerOnPage, ownRendered, cached, cache>>
+    /\ UNCHANGED <<containerOnPage, ownRendered, startNamed, heldRefused, cached, cache>>
 
 Next == Read \/ LoadSlot \/ UnloadSlot \/ \E i \in Inputs, t \in Texts : Type(i, t)
 
@@ -117,13 +140,13 @@ Spec == Init /\ [][Next]_vars
 
 Done == read # "unread"
 
-OneValueOnEveryHost == BodyLeaves => \A h \in Hosts : Bind(h) = Bind("form")
+OneValueOnEveryHost == BodyLeaves => \A h \in Hosts, s \in Servers : Bind(h, s) = Bind("form", "net10")
 
 ReadStopsWhenItsSendStops == Done => ((read = "stop") <=> SendStops)
 
-ReadIsWhatTheEndpointBinds == (Done /\ ~SendStops /\ Len(Body) = 1) => \A h \in Hosts : read = Bind(h)
+ReadIsWhatTheEndpointBinds == (Done /\ ~SendStops /\ Len(Body) = 1) => \A h \in Hosts, s \in Servers : read = Bind(h, s)
 
-AnUnsentMemberReadsWhatTheEndpointBinds == (Done /\ containerOnPage /\ Body = <<>>) => \A h \in Hosts : read = Bind(h)
+AnUnsentMemberReadsWhatTheEndpointBinds == (Done /\ containerOnPage /\ Body = <<>>) => \A h \in Hosts, s \in Servers : read = Bind(h, s)
 
 ReadSeesTheSlotThatJoinedOrLeftBeforeIt == (Done /\ containerOnPage) => (("slot" \in readFrom) <=> slotLoaded)
 
@@ -136,5 +159,13 @@ ReachStartOnceTheSlotLeft == ~(read = "start" /\ slotLeft /\ ~slotLoaded /\ ~own
 ReachBlankReadsItsStart == ~(read = "start" /\ Len(Body) = 1 /\ text[Body[1]] = "blank")
 
 ReachMissingContainerStops == ~(read = "stop" /\ ~containerOnPage)
+
+ReachUnlistedReadsItsStart == ~(read = "start" /\ Len(Body) = 1 /\ text[Body[1]] = "unlisted")
+
+ReachUnnamedStartLeftOut == ~(read = "start" /\ BodyLeaves /\ Len(Body) = 1 /\ text[Body[1]] = "blank" /\ ~startNamed)
+
+ReachHeldRefusedSentByRows == ~(heldRefused /\ BodyLeaves /\ Len(Body) = 1 /\ text[Body[1]] \in {"n1", "n2"})
+
+ReachItemNothingStopsTheRead == ~(read = "stop" /\ containerOnPage /\ Len(Body) = 1 /\ text[Body[1]] = "itemNothing")
 
 ====

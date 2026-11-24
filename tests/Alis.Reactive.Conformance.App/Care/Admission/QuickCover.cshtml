@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model QuickCoverShift
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quick cover";
+    var plan = Html.ReactivePlan<QuickCoverShift>();
+}
+<h1>Quick cover</h1>
+@using (var shift = Html.BeginRequestContainer(plan, "quick-cover"))
+{
+    @(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Cover, options => options.Label("Cover")).NativeDropDown(build => build.Items(NightCoverLists.Covers()))
+        .Reactive(cover => cover.Change, (changed, pipeline) => pipeline
+            .When(shift.Container.Read(m => m.Cover).Eq(NightCover.TwoCarers)).Then(pipeline => pipeline.Element("cover-line").Text.Set("Two carers on shift"))
+            .Else(pipeline => pipeline.Element("cover-line").Text.Set("One carer on shift"))))
+    @(Html.NativeButton("save-cover", "Save cover").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<QuickCoverShift>(NightCoverEndpoints.QuickCovers, request => request.UrlEncoded(shift.Container, body => { }))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved-cover").Text.Set(saved.Body))))
+}
+<p>Tonight: <span id="cover-line"></span></p>
+<p>Saved: <span id="saved-cover"></span></p>
+@Html.RenderPlan(plan)

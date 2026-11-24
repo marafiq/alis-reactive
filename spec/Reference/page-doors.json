@@ -3181,6 +3181,56 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F1 X9.36 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/NightCover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.37 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/QuickCover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.38 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/ShiftHandover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.39 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/CareReview.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.40 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/OpenVisitPlan.cshtml",
+      "/Care/Admission/VisitPlan.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.41 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/FollowUp.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.42 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/FollowUp.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F1 X9.8 0": {
     "modules": [],
     "views": [
@@ -3356,6 +3406,14 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M7.F1 M7.X10 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/InputsAndIds/FloorChoiceNumbered.cshtml",
+      "/Refusals/InputsAndIds/WingChoiceNamed.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M7.F1 M7.X3 0": {
     "modules": [],
     "views": [
@@ -3375,6 +3433,14 @@
     "views": [
       "/Refusals/InputsAndIds/OutingLocationsLatitude.cshtml",
       "/Refusals/InputsAndIds/OutingWholeLocation.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M7.F1 M7.X9 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/InputsAndIds/RotaCoverChosen.cshtml",
+      "/Refusals/InputsAndIds/RotaCoverTicked.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -3492,6 +3558,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M7.F3 X13.11 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/QuickCover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M7.F3 X13.2 0": {
     "modules": [],
     "views": [
@@ -3601,6 +3674,13 @@
     "modules": [],
     "views": [
       "/Care/Round/SupplyCount.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F3 X16.47 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/NightCover.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

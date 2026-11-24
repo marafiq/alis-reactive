@@ -1,7 +1,7 @@
 import { Submission } from "../InputsAndIds/index";
 import {
-  assertNever, notBuilt, type Culture, type HttpSend, type InputBinding, type MultipartPart, type PathPart, type PathStep, type ScalarWireForm, type SentBody,
-  type SentEnum, type SentField, type SentHeader, type SentInput, type SentInputs, type Shape, type TimeZone, type WireForm,
+  assertNever, type Culture, type HttpSend, type InputSent, type MultipartPart, type PathPart, type PathStep, type SentBody,
+  type SentEnum, type SentField, type SentHeader, type SentInput, type SentInputs, type TimeZone, type WhenNothing, type WireForm, type ItemWhenNothing as SentItemWhenNothing,
 } from "../Schema/index";
 import { plugin } from "../Plugins/index";
 import { Stop } from "../ValuesAndSources/index";
@@ -123,7 +123,7 @@ function bodyOf(body: SentBody, headers: Headers, writing: FormWriting): BodyIni
     case "none":
       return null;
     case "json": {
-      const value = withContainer(body.enums.reduce<unknown>((sent, member) => withEnum(sent, member), body.value), body.inputs);
+      const value = withContainer(body.enums.reduce<unknown>((sent, member) => withEnum(sent, member), body.value), body.inputs, writing.zone);
       refuseFiles(value);
       headers.set("Content-Type", "application/json");
       return JSON.stringify(value);
@@ -171,7 +171,7 @@ function appendInputs(form: URLSearchParams | FormData, inputs: SentInputs, zone
   const sent = container.body;
   if (sent instanceof Submission) for (const [name, entry] of sent.entries) appendEntry(form, name, entry);
   const members = sent instanceof Submission ? sent.members : sent;
-  for (const input of container.inputs) setInput(form, input, readAt(members, input.entry.binding.path), zone, place, request);
+  for (const input of container.inputs) setInput(form, input, members, zone, place, request);
 }
 
 function appendEntry(form: URLSearchParams | FormData, name: string, entry: FormDataEntryValue): void {
@@ -183,17 +183,26 @@ function appendEntry(form: URLSearchParams | FormData, name: string, entry: Form
   form.append(name, entry);
 }
 
-function setInput(form: URLSearchParams | FormData, input: SentInput, value: unknown, zone: TimeZone, place: TextPlace, request: object): void {
-  const binding = input.entry.binding;
-  const shape = convertedShape(binding);
+function setInput(form: URLSearchParams | FormData, input: SentInput, members: unknown, zone: TimeZone, place: TextPlace, request: object): void {
+  const path = input.entry.binding.path;
   form.delete(input.name);
-  if (shape.kind === "file" || (shape.kind === "array" && shape.item.kind === "file")) {
-    appendFiles(form, input.name, value);
-    return;
+  if (!holds(members, path)) return;
+  const value = readAt(members, path);
+  const sent = input.sent;
+  switch (sent.kind) {
+    case "files":
+      appendFiles(form, input.name, value);
+      return;
+    case "field":
+    case "enum": {
+      const field: SentField = { name: input.name, path: [], value: { kind: "held", value }, form: sent.form, whenNothing: sent.whenNothing, when: true };
+      for (const text of fieldTexts(field, zone, place)) form.append(input.name, text);
+      write(request, input.name.split("."), snapshot(value));
+      return;
+    }
+    default:
+      assertNever(sent);
   }
-  const field: SentField = { name: input.name, path: [], value: { kind: "held", value }, form: wireFormOf(shape, input.name), whenNothing: "empty", when: true };
-  for (const text of fieldTexts(field, zone, place)) form.append(input.name, text);
-  write(request, input.name.split("."), snapshot(value));
 }
 
 function appendFiles(form: URLSearchParams | FormData, name: string, value: unknown): void {
@@ -206,14 +215,87 @@ function appendFiles(form: URLSearchParams | FormData, name: string, value: unkn
   }
 }
 
-function withContainer(value: unknown, inputs: SentInputs): unknown {
+function withContainer(value: unknown, inputs: SentInputs, zone: TimeZone): unknown {
   const container = inputs.container;
   if (container.kind !== "captured") return value;
   const sent: unknown = container.body;
   const members = sent instanceof Submission ? sent.members : sent;
+  const json = Array.isArray(members) ? [] : {};
+  for (const input of container.inputs) {
+    const path = input.entry.binding.path;
+    if (!holds(members, path)) continue;
+    const member = jsonMember(readAt(members, path), input.sent, input.name, zone);
+    if (member !== undefined) write(json, path, member);
+  }
   const merged = typeof value === "object" && value !== null ? structuredClone(value) : {};
-  overwrite(merged, members);
+  overwrite(merged, json);
   return merged;
+}
+
+function jsonMember(value: unknown, sent: InputSent, name: string, zone: TimeZone): unknown {
+  switch (sent.kind) {
+    case "files":
+      return value;
+    case "field":
+      return value === undefined || value === null ? nothingInJson(sent.whenNothing) : fieldJson(value, sent.form, name, zone);
+    case "enum":
+      return value === undefined || value === null ? nothingInJson(sent.whenNothing) : enumJson(value, sent.json, name);
+    default:
+      return assertNever(sent);
+  }
+}
+
+function nothingInJson(whenNothing: WhenNothing): null | undefined {
+  switch (whenNothing) {
+    case "leave":
+      return undefined;
+    case "empty":
+      return null;
+    default:
+      return assertNever(whenNothing);
+  }
+}
+
+function fieldJson(value: unknown, form: WireForm, name: string, zone: TimeZone): unknown {
+  switch (form.kind) {
+    case "date":
+    case "instant":
+      return scalarText(value, form, name, zone, invariantPlace);
+    case "list": {
+      if (!Array.isArray(value)) throw new Stop("The request's member '" + name + "' must hold a list.");
+      const { item, itemWhenNothing } = form;
+      return Array.from(value as readonly unknown[], held => (held === undefined || held === null ? itemNothingInJson(itemWhenNothing, name) : fieldJson(held, item, name, zone)));
+    }
+    case "text":
+    case "number":
+    case "boolean":
+    case "written":
+    case "enum":
+    case "flags":
+      return value;
+    default:
+      return assertNever(form);
+  }
+}
+
+function itemNothingInJson(whenNothing: SentItemWhenNothing, name: string): null {
+  switch (whenNothing) {
+    case "empty":
+      return null;
+    case "stop":
+      throw new Stop("The request's member '" + name + "' must hold a list whose items all hold values.");
+    default:
+      return assertNever(whenNothing);
+  }
+}
+
+function holds(holder: unknown, path: readonly PathStep[]): boolean {
+  let current = holder;
+  for (const step of path) {
+    if (typeof current !== "object" || current === null || !Object.hasOwn(current, step)) return false;
+    current = Reflect.get(current, step);
+  }
+  return true;
 }
 
 function overwrite(holder: object, over: unknown): void {
@@ -236,40 +318,6 @@ function readAt(holder: unknown, path: readonly PathStep[]): unknown {
     current = Reflect.get(current, step);
   }
   return current;
-}
-
-function convertedShape(binding: InputBinding): Shape {
-  const { shape } = binding.converted;
-  return shape.kind === "nullable" ? shape.inner : shape;
-}
-
-function wireFormOf(shape: Shape, name: string): WireForm {
-  if (shape.kind === "array") return { kind: "list", item: scalarFormOf(shape.item.kind === "nullable" ? shape.item.inner : shape.item, name), itemWhenNothing: "empty" };
-  return scalarFormOf(shape, name);
-}
-
-function scalarFormOf(shape: Shape, name: string): ScalarWireForm {
-  switch (shape.kind) {
-    case "string":
-      return { kind: "text" };
-    case "number":
-      return { kind: "number" };
-    case "boolean":
-      return { kind: "boolean" };
-    case "date":
-      return { kind: "date" };
-    case "instant":
-      return { kind: "instant" };
-    case "file":
-    case "any":
-    case "array":
-    case "nullable":
-    case "object":
-    case "enum":
-      throw notBuilt("input '" + name + "' converts to the shape " + shape.kind + ", which no form data field writes as one text");
-    default:
-      return assertNever(shape);
-  }
 }
 
 function appendPart(form: FormData, part: MultipartPart, writing: FormWriting): void {

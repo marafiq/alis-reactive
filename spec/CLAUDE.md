@@ -2035,6 +2035,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   land smallest first, each to the full bar: the check of a text or file body, which D16.5 states and no decision
   needs (X16.46); the writer's move, with `as` writing its own kind and the plan's bytes unchanged; the split; then
   `sent`.
+- Chosen within the owner's yes, 2026-11-24, building `sent` from its consult's read: a start the field's form cannot
+  write, an enum's that no value names or a date's, is left out while the input holds it, by the binding's
+  `whenBlank`, since an empty field binds a nullable member null where the approved meaning binds the start; an enum
+  input's rows are what its component's value holds (text: the C# name, the number as text and the live form's text;
+  the enum: its live form), matched exactly as every enum shape is, so another casing of a C# name, which both hosts
+  bind, reads the start; a list input whose item reads nothing where the item admits none stops the container's read
+  with its send (`ContainerRead.tla`, ItemNothingStopsTheSendAlone). The owner can overrule each.
 
 ## Modules
 

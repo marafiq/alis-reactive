@@ -203,6 +203,13 @@ public static class Promises
         public const string X9_33_0 = "M6.F1 X9.33 0";
         public const string X9_34_0 = "M6.F1 X9.34 0";
         public const string X9_35_0 = "M6.F1 X9.35 0";
+        public const string X9_36_0 = "M6.F1 X9.36 0";
+        public const string X9_37_0 = "M6.F1 X9.37 0";
+        public const string X9_38_0 = "M6.F1 X9.38 0";
+        public const string X9_39_0 = "M6.F1 X9.39 0";
+        public const string X9_40_0 = "M6.F1 X9.40 0";
+        public const string X9_41_0 = "M6.F1 X9.41 0";
+        public const string X9_42_0 = "M6.F1 X9.42 0";
     }
 
     public static class M6_F2
@@ -246,6 +253,8 @@ public static class Promises
         public const string M7_X3_0 = "M7.F1 M7.X3 0";
         public const string M7_X7_0 = "M7.F1 M7.X7 0";
         public const string M7_X8_0 = "M7.F1 M7.X8 0";
+        public const string M7_X9_0 = "M7.F1 M7.X9 0";
+        public const string M7_X10_0 = "M7.F1 M7.X10 0";
     }
 
     public static class M7_F2
@@ -267,6 +276,7 @@ public static class Promises
         public const string X13_9_0 = "M7.F3 X13.9 0";
         public const string X13_10_0 = "M7.F3 X13.10 0";
         public const string M7_X6_0 = "M7.F3 M7.X6 0";
+        public const string X13_11_0 = "M7.F3 X13.11 0";
     }
 
     public static class M8_F1
@@ -291,6 +301,7 @@ public static class Promises
         public const string X16_3_0 = "M8.F3 X16.3 0";
         public const string X16_4_0 = "M8.F3 X16.4 0";
         public const string X16_6_0 = "M8.F3 X16.6 0";
+        public const string X16_47_0 = "M8.F3 X16.47 0";
     }
 
     public static class M8_F4

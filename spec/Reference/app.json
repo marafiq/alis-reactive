@@ -1318,7 +1318,7 @@
         {
           "id": "refusalInputs",
           "kind": "nativeSlice",
-          "role": "the NativeDropDown a refused page reads as a source",
+          "role": "the NativeDropDown a refused page reads as a source or binds an enum input with, and the NativeCheckList a refused enum input renders as",
           "module": "NativeComponents"
         }
       ]
@@ -14935,6 +14935,184 @@
           "action": "Run.tla:Settle",
           "on": "the admission history flush after SAVE8"
         }
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.36",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint",
+        "intakeValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F3",
+      "for": "X16.47",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint",
+        "intakeValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.37",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F3",
+      "for": "X13.11",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.38",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "enumNamesAlone"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.39",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.40",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "nativeInputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.41",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.42",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "M7.X9",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalEndpoint",
+        "refusalInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "M7.X10",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalEndpoint",
+        "refusalInputs"
+      ],
+      "harness": [
+        "seed"
       ]
     }
   ],

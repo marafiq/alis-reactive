@@ -280,7 +280,9 @@
         "Request.tla:NothingBindsAsDeclared",
         "Request.tla:ObjectNothingBindsAsDeclared",
         "Request.tla:ItemNothingBindsAsDeclared",
-        "Request.tla:FailedConditionLeavesThePartOut"
+        "Request.tla:FailedConditionLeavesThePartOut",
+        "ContainerRead.tla:OneValueOnEveryHost",
+        "ContainerRead.tla:ReadStopsWhenItsSendStops"
       ],
       "defects": [
         {
@@ -450,6 +452,34 @@
         },
         {
           "id": "X9.35",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.36",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.37",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.38",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.39",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.40",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.41",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.42",
           "rung": "behavior"
         }
       ],
@@ -726,6 +756,62 @@
           "outcome": "The POST's body is {\"settled\":{\"True\":2}} and the answer reads Settled 2.",
           "opposite": "On Ben Okafor's bed count, whose bed is not settled, the POST's body is {\"settled\":{\"False\":2}} and the answer reads Unsettled 2.",
           "defect": "The view refused where it renders, as a bool key was before, so no request leaves and the answer keeps its dash; or the key written true or false, a name neither host's writer gives it."
+        },
+        {
+          "for": "X9.36",
+          "page": "A night cover page whose container holds the Resident text box and the Cover drop-down over the Cover of its model, a NightCover whose own JSON converter writes OneCarer as one-carer and TwoCarers as two-carers, its options One carer, Two carers and Agency cover held as one-carer, two-carers and agency, a cover an imported rota lists; the model's validator checks RuleFor(c => c.Cover).IsInEnum(); Save cover posts the container as form data to an endpoint that binds it [FromForm] and answers \"{resident}: {cover}\", which the page writes into saved-cover.",
+          "gesture": "Type Ada in Resident, choose Two carers in Cover and click Save cover.",
+          "outcome": "The POST's body is Cover=TwoCarers&Resident=Ada, and saved-cover reads Ada: TwoCarers.",
+          "opposite": "With Cover left at One carer, the body is Cover=OneCarer&Resident=Ada and saved-cover reads Ada: OneCarer.",
+          "defect": "The input is sent as it holds its value, Cover=two-carers, which binds nothing under a model error, so saved-cover reads the start, Ada: OneCarer."
+        },
+        {
+          "for": "X9.37",
+          "page": "A quick cover page over a model no validator checks, whose Cover, a NightCover, starts as TwoCarers; its container holds the Resident text box and the Cover drop-down with the night cover page's three options, and Save cover posts the container as form data to an endpoint that binds it [FromForm] and answers \"{resident}: {cover}\", which the page writes into saved-cover.",
+          "gesture": "Type Ada in Resident, choose Agency cover in Cover and click Save cover.",
+          "outcome": "The POST's body is Cover=TwoCarers&Resident=Ada, and saved-cover reads Ada: TwoCarers.",
+          "opposite": "Choosing One carer, the body is Cover=OneCarer&Resident=Ada and saved-cover reads Ada: OneCarer.",
+          "defect": "The text is sent as it is held, Cover=agency, which binds nothing under a model error, so saved-cover reads Ada: OneCarer; or the request stops as a Set member's does, and saved-cover stays empty."
+        },
+        {
+          "for": "X9.38",
+          "page": "A shift handover page whose container holds the Note text box and the Shift drop-down over the Shift of its model, a HandoverShift of Day and Night that no converter of its own writes, its options Day and Night held by their C# names; Hand over posts the container as a JSON body to an endpoint that binds it [FromBody] and answers \"Handed over to the {shift} shift\", which the page writes into handed-over.",
+          "gesture": "Type Quiet night in Note, choose Night in Shift and click Hand over.",
+          "outcome": "The POST's body is {\"note\":\"Quiet night\",\"shift\":\"night\"}, and handed-over reads Handed over to the Night shift.",
+          "opposite": "Choosing Day, the body is {\"note\":\"Quiet night\",\"shift\":\"day\"} and handed-over reads Handed over to the Day shift.",
+          "defect": "The input is sent as the live form holds it, {\"note\":\"Quiet night\",\"shift\":1}, which this host's options refuse, so handed-over stays empty."
+        },
+        {
+          "for": "X9.39",
+          "page": "A care review page whose container holds the Note text box and the Level drop-down over the Level of its model, a ReviewLevel whose values are Independent, 1, and Assisted, 2, so the model's start, 0, is no value; its options are Choose a level, held as the empty text, and Independent and Assisted held as 1 and 2, as an enum's select list writes them; no validator checks the model; Save review posts the container as form data to an endpoint that binds it [FromForm] and answers \"{note}: level {level's number}\", which the page writes into reviewed, or 400 where its model holds an error.",
+          "gesture": "Type Stable in Note, leave Level at Choose a level and click Save review.",
+          "outcome": "The POST's body is Note=Stable, and reviewed reads Stable: level 0.",
+          "opposite": "Choosing Assisted, the body is Level=Assisted&Note=Stable and reviewed reads Stable: level 2.",
+          "defect": "The start is sent as held, Level=0, or as an empty field, Level=, each a model error, so reviewed stays empty; under the opposite, the option's number is no row, so the start is left out and reviewed reads Stable: level 0."
+        },
+        {
+          "for": "X9.40",
+          "page": "A visit plan page whose container holds the Resident text box and the Visit days check list over the VisitDays of its model, a list of VisitDay, Mon, Tue and Wed, its boxes Mon, Tue and Bank holiday, a day an older plan lists; Save plan sets the status Saving the visit plan, writes the container's read of Resident into plan-resident, then posts the container as form data to an endpoint that answers \"{resident}: {count} visit days\", which the page writes into saved-plan.",
+          "gesture": "Type Ada in Resident, tick Mon and Bank holiday, and click Save plan.",
+          "outcome": "save-status reads Saving the visit plan, plan-resident stays empty, saved-plan stays empty, and the console holds one error.",
+          "opposite": "On the open visit plan page, whose VisitDays lists the nullable of VisitDay, the same gesture writes Ada into plan-resident, posts Resident=Ada&VisitDays=Mon&VisitDays= and saved-plan reads Ada: 2 visit days.",
+          "defect": "The item is sent as an empty field for a list that takes no null, so a request reaches the address; or the request stops while the container's read goes on, so plan-resident reads Ada; under the opposite, every list with an item that reads nothing stops, so nothing is sent."
+        },
+        {
+          "for": "X9.41",
+          "page": "A follow-up page whose container holds the Reason text box and the Due text box over the Due of its model, a DateTime, starting at midnight on 1 December 2026, which the text box shows as 2026-12-01T00:00:00; a new model's Due is DateTime's own start; Save follow-up posts the container as form data to an endpoint that binds it [FromForm] and answers \"{reason}: due {due as yyyy-MM-dd HH:mm}\", which the page writes into followed-up.",
+          "gesture": "Type Falls in Reason, clear Due and click Save follow-up.",
+          "outcome": "The POST's body is Reason=Falls, and followed-up reads Falls: due 0001-01-01 00:00.",
+          "opposite": "With Due left at 2026-12-01, the body is Due=2026-12-01T00%3A00%3A00&Reason=Falls and followed-up reads Falls: due 2026-12-01 00:00.",
+          "defect": "The blank's text is written as a date, which stops the request, so followed-up stays empty; or the start's text is sent, Due=0001-01-01T00%3A00%3A00."
+        },
+        {
+          "for": "X9.42",
+          "page": "The follow-up page, whose Send to the GP posts the same container as a JSON body to an endpoint that binds it [FromBody] and answers \"{reason}: due {due as yyyy-MM-dd HH:mm}\", which the page writes into followed-up.",
+          "gesture": "Type Falls in Reason, leave Due at 2026-12-01 and click Send to the GP.",
+          "outcome": "The POST's body is {\"due\":\"2026-12-01\",\"reason\":\"Falls\"}, and followed-up reads Falls: due 2026-12-01 00:00.",
+          "opposite": "With Due cleared, the body is {\"reason\":\"Falls\"} and followed-up reads Falls: due 0001-01-01 00:00.",
+          "defect": "The date is sent as JSON writes a Date, \"2026-12-01T08:00:00.000Z\" in the browser's Los Angeles zone, which binds 08:00; under the opposite, the blank's text is sent, \"0001-01-01T00:00:00\"."
         }
       ],
       "verdicts": [

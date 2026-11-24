@@ -1823,6 +1823,12 @@ Terms used throughout:
   holds no items sends no field in a query or form data, which ends the outer list at its position on both hosts
   (`probe:mvc5-list-ends-at-missing-index`, `probe:core-query-list-of-lists-gap`), so the endpoint binds none of the
   items after it; the cure is an input for each item of the inner list, or the outer list sent whole in a JSON body.
+
+  An input is sent by the same tables, which C# writes into its binding's `sent` (N9.10); its value reads nothing only
+  where its blank, the member's start, is null. A start the field's form cannot write, an enum's that no value names or
+  a date's or an instant's, is left out while the input holds it, by the binding's `whenBlank`, so both hosts bind the
+  start (X9.39, X9.41). A list input whose item reads nothing where the item admits none stops the container's read as
+  it stops the request (D13.3, X9.40).
 - D9.11 A header is fixed text or a scalar source sent as text. A header that reads nothing is not sent. A
   header name is an HTTP token by RFC 9110, a name given twice ignoring case is refused, `Content-Type` is
   refused because the body format owns it, and `Accept` is refused because the success route's kind owns it (D10.6).
@@ -1857,6 +1863,10 @@ Terms used throughout:
   its endpoint binds: on net10 the request member's System.Text.Json form under MVC's `JsonOptions`
   (`probe:core-frombody-enum-forms`), on net48 its C# name, since MVC 5 binds a JSON body through its model binder
   (`probe:mvc5-json-binds-through-binder`); C# writes the rows from the held form to it, with the JSON body's door.
+  An enum input is sent by the rows C# writes into its binding's `sent` from the live form its conversion reads into
+  (N3.3): its C# name in a query or form data (X9.36), the form its endpoint binds in a JSON body (X9.38). A text the
+  input holds that no row of its conversion lists reads the member's start (D3.6), so a check fails it with the binder's
+  message (X16.47) and the request sends the start by its C# name (X9.37), or leaves it out where no value names it.
   An enum the app names as flags (N16.4, gate 1's P2) is sent by the wire form `flags`:
   - C# writes each row with the value's number too, the largest number first, the order in which `Enum.ToString`
     splits a flags value.
@@ -1997,7 +2007,8 @@ Terms used throughout:
     its request before it is sent; fetch itself refuses a line break and a character past Latin-1
     (`probe:js-header-values`).
 **Schema nodes.** `request`, its `send` a `record`, `list`, `lit`, `get`, `as` and `op`; the shape `file`; the
-contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flags` among them (D9.13).
+contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flags` among them (D9.13); the contract
+`InputSent`, the value of `InputBinding.sent` (N9.10).
 
 **Checker.**
 - `probe:core-frombody-enum-forms`
@@ -2089,6 +2100,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   in the block lambdas of Razor files only (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:59`)
   to the verbs of `Pipeline<TModel>` in every block, expression and `{}` lambdas both, in every file, since the
   defaults live in a startup file.
+- `N9.10` new: `InputBinding.sent`, a `record` C# writes whose value is the contract `InputSent` (schema.md): the form a
+  request sends the input's value in, written from the member's type as a `Set` member's (D9.10, D9.13), where the
+  browser had kept a table of forms of its own; no public door.
 
 **Evidence.**
 - B6: the request is a record of string-named fields (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:101`) typed by
@@ -2180,6 +2194,21 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   default, and left out when the read reads nothing, so the endpoint binds its start.
 - `X9.35` behavior (D1.4): a JSON body entry of a dictionary keyed by a `bool` is sent under the key `True` or `False`,
   as System.Text.Json and MVC's binding name both write it, and the endpoint binds that entry.
+- `X9.36` behavior (D9.13): an input bound to an enum its own JSON converter renames, inside a container sent as form data,
+  is sent by its C# name, which both hosts bind: Two carers, held as two-carers, posts Cover=TwoCarers.
+- `X9.37` behavior (D9.13, D3.6): an enum input whose text no row lists, where no check runs, is sent as the member's
+  start by its C# name, so both hosts bind the start.
+- `X9.38` behavior (D9.13): an enum input inside a container sent as a JSON body is sent in the form its endpoint binds:
+  under options that write enum names in camel case and read no number, Night is sent as "night".
+- `X9.39` behavior (D9.10, D9.13): an enum input whose member starts at a value no value of the enum names is left out
+  of form data while it holds that start, so both hosts bind it, and an option held as a value's number is sent by its
+  C# name.
+- `X9.40` behavior (D9.10, D13.3): a list input whose item reads nothing, where the item admits no null, stops its
+  container's read and the request that sends it; where the item admits null the item is sent as an empty field.
+- `X9.41` behavior (D3.8, D9.10): a non-nullable date input left blank is left out of form data, so the endpoint binds
+  its start.
+- `X9.42` behavior (D9.7, D3.8): a date input inside a container sent as a JSON body is sent as its wire text,
+  "yyyy-MM-dd" at midnight, and left out while blank.
 
 ## Q10. The request's flow and its response
 
@@ -3419,8 +3448,9 @@ plans name.
   binds from what the container sends. It runs in its step and reads the inputs inside the element then, so an input a
   slot loads into the container counts from its load, and one whose slot unloads counts no more. One input reads its
   value (N3.3), so a blank or unconverted one reads the member's start (D3.6); a member no input inside the container
-  binds reads its start (D4.2); two inputs under the name stop it (D13.4), and so does a container whose element the
-  page lacks, as each stops the container's request (D9.15) (`ContainerRead.tla`). A page-wide read by binding name is
+  binds reads its start (D4.2); two inputs under the name stop it (D13.4), and so do a container whose element the
+  page lacks and a list input whose item reads nothing where the item admits none, as each stops the container's
+  request (D9.15, D9.10) (`ContainerRead.tla`). A page-wide read by binding name is
   refused: two views can bind one name, so on a page a name names no single input. That ends the chain of guesses that
   read the last contributed input, then the plan's own. C# writes the read as a `data` read of the member's steps
   over `alis.model`'s `sent` of the container (schema.md), in the live form (D7.7), a list position between its steps
@@ -3506,6 +3536,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   binds the same name is never read.
 - `X13.10` behavior (D13.3, D9.15): a read of a container whose element the page lacks stops its pipeline, as the
   container's request stops.
+- `X13.11` behavior (D13.3, D3.6): a container's read of an enum input whose text no row lists reads the member's
+  start.
 
 ## Q14. MVC partials and ids
 
@@ -3560,7 +3592,10 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     input for each value it holds, `Html.PartialFor`, and `Set` in a JSON body from the component that holds it
     (M7.X8). A list of lists meets the same refusal, since an inner list that holds no items sends no field and ends
     the outer list there (D9.10). A file member and a list of files bind, and so does a component whose input is a
-    list of objects over a member that holds one (M7.N3).
+    list of objects over a member that holds one (M7.N3). An enum member binds a component whose value is text or the
+    enum, one value against one and a list against a list, and every other component is refused (M7.X9); its rows
+    read each value from texts no other value is held as, and an enum two of whose values one text names is refused
+    (M7.X10, D9.13).
   - A lambda is bound only when MVC's name names each step it takes from the model: a member, a single-argument
     indexer, an array position. MVC stops its name at any other call (`Find(..)`, `Substring(1)`) and keeps what lies
     outside it, so the form would post the input under a name that binds nothing; the framework counts the steps
@@ -4329,6 +4364,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `X16.46` behavior (D16.5): a request that sends no body, or a text or a file as its whole body, its Ward sent in
   the path, is checked with every member at its start: over a model whose Ward starts null it shows "Ward is required." in the notice and
   sends nothing, and over a model whose Ward starts as Admissions it is sent.
+- `X16.47` behavior (D16.7, D9.13): an enum input whose text no row lists fails its check with the binder's message,
+  "The value 'agency' is not valid for Cover.", beside the input and in the summary, and nothing is sent.
 
 ## Q17. Vendors and inversion
 

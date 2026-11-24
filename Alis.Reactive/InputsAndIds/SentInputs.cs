@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 
@@ -20,15 +21,79 @@ internal sealed class SentInputs
 
 internal sealed class SentInput
 {
-    internal SentInput(string name, InputEntry entry)
+    internal SentInput(string name, InputEntry entry, InputSent sent)
     {
         Name = name;
         Entry = entry;
+        Sent = sent;
     }
 
     public string Name { get; }
 
     public InputEntry Entry { get; }
+
+    public InputSent Sent { get; }
+}
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Kind))]
+[JsonDerivedType(typeof(FieldInputSent))]
+[JsonDerivedType(typeof(EnumInputSent))]
+[JsonDerivedType(typeof(FilesInputSent))]
+internal abstract class InputSent
+{
+    private protected InputSent()
+    {
+    }
+
+    public abstract string Kind { get; }
+}
+
+internal sealed class FieldInputSent : InputSent
+{
+    internal FieldInputSent(WireForm form, WhenNothing whenNothing, WhenBlank whenBlank)
+    {
+        Form = form;
+        WhenNothing = whenNothing;
+        WhenBlank = whenBlank;
+    }
+
+    public override string Kind => "field";
+
+    public WireForm Form { get; }
+
+    public WhenNothing WhenNothing { get; }
+
+    public WhenBlank WhenBlank { get; }
+}
+
+internal sealed class EnumInputSent : InputSent
+{
+    internal EnumInputSent(WireForm form, JsonForm json, WhenNothing whenNothing, WhenBlank whenBlank)
+    {
+        Form = form;
+        Json = json;
+        WhenNothing = whenNothing;
+        WhenBlank = whenBlank;
+    }
+
+    public override string Kind => "enum";
+
+    public WireForm Form { get; }
+
+    public JsonForm Json { get; }
+
+    public WhenNothing WhenNothing { get; }
+
+    public WhenBlank WhenBlank { get; }
+}
+
+internal sealed class FilesInputSent : InputSent
+{
+    internal FilesInputSent()
+    {
+    }
+
+    public override string Kind => "files";
 }
 
 internal sealed class InputEntry

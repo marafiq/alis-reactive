@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Execution;
 using Alis.Reactive.PathsAndWire;
@@ -27,12 +29,13 @@ public interface IInputComponent
 /// </remarks>
 public sealed class ComponentInput
 {
-    private ComponentInput(Schema.Expression read, string committed, StringShape text, bool listsObjects)
+    private ComponentInput(Schema.Expression read, string committed, StringShape text, bool listsObjects, Type value)
     {
         Read = read;
         Committed = committed;
         Text = text;
         ListsObjects = listsObjects;
+        Value = value;
     }
 
     internal Schema.Expression Read { get; }
@@ -43,6 +46,8 @@ public sealed class ComponentInput
 
     internal bool ListsObjects { get; }
 
+    internal Type Value { get; }
+
     internal static ComponentInput Declared(IInputComponent component, BlockWriter writer)
     {
         var declared = writer.Lambda(() =>
@@ -50,7 +55,7 @@ public sealed class ComponentInput
             var input = component.Input;
             return (input.Read, input);
         });
-        return new(declared.Body, declared.Value.Committed, declared.Value.Text, declared.Value.ListsObjects);
+        return new(declared.Body, declared.Value.Committed, declared.Value.Text, declared.Value.ListsObjects, declared.Value.Value);
     }
 
     /// <summary>Declares the input's value property and the event that commits it.</summary>
@@ -61,7 +66,7 @@ public sealed class ComponentInput
     /// <returns>The input's declaration.</returns>
     public static ComponentInput Of<TValue, TArgs>(ReadOnly<TValue> value, Event<TArgs> committedBy)
         where TArgs : JsObject, new()
-        => new(value.Expression, committedBy.Name, ConversionShapes.TextOf(value.Form.DataOptions.GetTypeInfo(typeof(TValue)), value.Form.RendersUnder), false);
+        => new(value.Expression, committedBy.Name, ConversionShapes.TextOf(value.Form.DataOptions.GetTypeInfo(typeof(TValue)), value.Form.RendersUnder), false, typeof(TValue));
 
     /// <summary>Declares the list of objects that is the input's value, such as the files an uploader lists, and the event that commits it.</summary>
     /// <remarks>Bound to a member that holds no list, the input's value is the list's first object.</remarks>
@@ -73,5 +78,5 @@ public sealed class ComponentInput
     public static ComponentInput Of<TItem, TArgs>(LiveObjects<TItem> value, Event<TArgs> committedBy)
         where TItem : JsObject, new()
         where TArgs : JsObject, new()
-        => new(value.Target, committedBy.Name, ConversionShapes.TextOfAnObject(value.Form.RendersUnder), true);
+        => new(value.Target, committedBy.Name, ConversionShapes.TextOfAnObject(value.Form.RendersUnder), true, typeof(IReadOnlyList<TItem>));
 }

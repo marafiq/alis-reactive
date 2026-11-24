@@ -48,6 +48,20 @@ internal sealed class WhenNothing : IChoice
     public string Text { get; }
 }
 
+[JsonConverter(typeof(ChoiceConverter<WhenBlank>))]
+internal sealed class WhenBlank : IChoice
+{
+    internal static readonly WhenBlank Send = new("send");
+    internal static readonly WhenBlank Leave = new("leave");
+
+    private WhenBlank(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
+}
+
 [JsonConverter(typeof(ChoiceConverter<ItemWhenNothing>))]
 internal sealed class ItemWhenNothing : IChoice
 {

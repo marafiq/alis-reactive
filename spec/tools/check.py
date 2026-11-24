@@ -509,7 +509,7 @@ def run_tlc(tla, cfg):
 def tlc_configs(name):
     folder = tla_file(name).parent
     main = folder / f"{name}.cfg"
-    violating = {match.group(1): path for path in sorted(folder.glob(f"{name}.violates.*.cfg")) for match in [re.match(rf"{name}\.violates\.(\w+)\.cfg$", path.name)] if match}
+    violating = {match.group(1): path for path in sorted(folder.glob(f"{name}.violates.*.cfg")) for match in [re.match(rf"{name}\.violates\.(\w+(?:\.\w+)?)\.cfg$", path.name)] if match}
     holding = sorted(folder.glob(f"{name}.holds.*.cfg"))
     return main, violating, holding
 
@@ -584,14 +584,15 @@ def check_tlc(brief, cached, step, *, recorded=False):
             elif spec_runs[main.name].get("green") is not True or spec_runs[main.name].get("violated") != []:
                 own.append(tlc_result_line(spec_runs[main.name], recorded))
             _, listed = tla_invariants(name)
-            unmutated = sorted(invariant for invariant in listed if invariant not in violating)
+            unmutated = sorted(invariant for invariant in listed if invariant not in {mutated.split(".")[0] for mutated in violating})
             if unmutated:
                 own.append("no violating cfg for " + ", ".join(unmutated))
             if not any(invariant.startswith("Reach") for invariant in violating):
                 own.append("no Reach witness")
         elif len(violating) != expectation["gaps"]:
             own.append(f"{len(violating)} gap cfgs, expected {expectation['gaps']}")
-        for invariant, cfg in violating.items():
+        for mutated, cfg in violating.items():
+            invariant = mutated.split(".")[0]
             if spec_runs[cfg.name].get("green") is not False or spec_runs[cfg.name].get("violated") != [invariant]:
                 own.append(f"{cfg.name}: expected {invariant} violated, saw {tlc_result_line(spec_runs[cfg.name], recorded)}")
         for cfg in holding:
