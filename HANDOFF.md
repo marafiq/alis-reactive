@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 00:43:18 EST 2026
+Written at `date`: Tue Nov 24 03:27:10 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 24, each in the notes block below
-unit: landed (30): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignedAsks, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException
+note: open: 25, each in the notes block below
+unit: landed (31): SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, RetirePicomatchException
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at a8ed88396 on feature/rewrite: equal to the remote
+lane: pushed at 65e680e6b on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at a8ed88396
+ci: unread at 65e680e6b
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,21 +27,21 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: a8ed88396 A recommendation to the owner comes from a design thought through whole, never ad hoc
-- Full check: .work/logs/spec-check-a8ed88396.log: spec check at a8ed88396: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-003029-7482 a8ed88396
+- HEAD: 65e680e6b A design's claim that a spec stands, a search's absence or a defect holds only by its run, its match and its source
+- Full check: .work/logs/spec-check-65e680e6b.log: spec check at 65e680e6b: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-031410-80423 65e680e6b
 
 ## Landed since the commit before the last spec: STATE commit
-a8ed88396 A recommendation to the owner comes from a design thought through whole, never ad hoc
-c9cfb5e0d spec: STATE and handoff at 32d696913
+65e680e6b A design's claim that a spec stands, a search's absence or a defect holds only by its run, its match and its source
+d352b3e53 spec: STATE and handoff at a8ed88396
 
 ## Open
 open: 19 promises with no browser test, 5 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A number, a proof line or an absence not read from the run that proves it: 60 to 61
-- Said to the owner in a way that hid or blurred what holds: 13 to 14
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 435 to 438
+- A number, a proof line or an absence not read from the run that proves it: 61 to 68
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
@@ -72,6 +72,7 @@ spec/CLAUDE.md:9: - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is 
 - 2026-11-20 | direction | the queue of this file | queue | "new session will re-discover, bring concrete and fully thought through one proposal to do which aligns with framework vision, and not add lower quality or hacks." "We stay on same branch, and follow the process. Quality bar will be never be lowered. But I am okay to adapt modern LLM patterns to arrive at correct, and well designed solution"
 - 2026-11-23 | direction | the queue of this file | queue | "keep worktree around"
 - 2026-11-23 | direction | the queue of this file | queue | "nah splitting inputbinidng now is such a huge change, explain in more detail, that could set us back to zero", then "yes, on input i will not approve that change in isolation, must have thought through design so prepare that, adhoc recommondations are forbidden"
+- 2026-11-24 | direction | the queue of this file | queue | "never lower the quality - just reminder"
 <!-- /notes -->
 
 ## Next
@@ -110,9 +111,10 @@ Its units, in order:
    the contract widens both to any expression, since the generator refuses a field typed as a kind's class
    (`tools/PlanContractGenerator/CLAUDE.md`); no TLA+ spec models these fields. Its first half landed at 31e6361c3: a
    rule's test and condition and a vendor's locate typed as the `fn` C# writes, the plan's bytes unchanged. Its second
-   half, `InputBinding`, is designed with unit 2 as one family before the owner decides, never in isolation (the owner,
-   2026-11-23): the consult `../input-form/.landing/InputForm/brief.md`, its answer `reply.md` there, read at the
-   source, then one design to the owner; `InputsAndIds/model.ts`'s three cases stand until it lands.
+   half, `InputBinding`, is one family's design, `../input-form/.landing/InputForm/design.md` (its read, read.md;
+   the model, scratch/tla2; the built move, `../writer-move`). Two decisions wait on the owner's yes, `sent` (the bug
+   fix) and the split of `value` (not one); the check of a text, file or no body needs none and is built with them.
+   `InputsAndIds/model.ts`'s three cases stand until it lands.
 2. The form-data boundary: an enum sent in form data (the move-in app met it; the designer decides its form),
    an object stays refused until after 1.0 (the owner's yes of 2026-11-17), a text or file body's check
    verified against the request writer.
