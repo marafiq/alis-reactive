@@ -1,19 +1,19 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 23:48:57 EST 2026
+Written at `date`: Wed Nov 25 01:06:10 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (44): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
+unit: landed (45): BodilessCheck, SpecCiCold, MacTlc, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
 unit: returned (8): FormDataBoundary, FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
-unit: building (1): MoveInOwners
+unit: building (2): ListFromSources, MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at c3aeae654 on feature/rewrite
+lane: pushing at cad8e3581 on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at c3aeae654
+ci: unread at cad8e3581
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -26,21 +26,20 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: c3aeae654 X3.7 written for the net48 twin: the resident card, its JsonResult address and its fixture, its run left to CI's Windows job
-- Full check: .work/logs/spec-check-c3aeae654.log: spec check at c3aeae654: 40 of 40 checks pass
+- HEAD: cad8e3581 Eight parked core leads judged: two in, one closed, five after 1.0 (CoreLeads)
+- Full check: .work/logs/spec-check-cad8e3581.log: spec check at cad8e3581: 40 of 40 checks pass
 - .work/last-run.txt: 20261124-233944-29250 c3aeae654
 
 ## Landed since the commit before the last spec: STATE commit
-c3aeae654 X3.7 written for the net48 twin: the resident card, its JsonResult address and its fixture, its run left to CI's Windows job
-31c256b0f spec: STATE and handoff at 45b14dc30
+cad8e3581 Eight parked core leads judged: two in, one closed, five after 1.0 (CoreLeads)
+25e19ea4a spec: STATE and handoff at c3aeae654
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 461 to 463
-- A shell command or a script wrong in its own terms: 655 to 658
+- A rule or a tool's list not applied before the change: 452 to 454
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
@@ -117,14 +116,18 @@ Its units, in order:
    start in the browser and bound on that endpoint; the meaning by host is designed whole and put to the owner
    before the core freeze (D16.5, D16.6). In design since 2026-11-24 in ../form-data-boundary (FormDataBoundary), a
    designer on Fable at xhigh, read-only, from 31c256b0f; its design.md is read at the source before it goes to the owner.
-3. X3.7 written on the net48 host; CI's Windows job proves it. In build since 2026-11-24 in ../x37-net48 (X37Net48), a
-   page-writer from 31c256b0f, its environment proven there: npm ci, the packs, the twin's and the tests' builds green.
+3. X3.7 written on the net48 host; CI's Windows job proves it. Landed at c3aeae654 (X37Net48): the twin's resident card,
+   resident 7's date of birth seeded by the test (Seed.TheResidentBornOn) and answered through N10.6, and its opposite
+   address answered through MVC 5's own Json; both views' code built on net48. The fixture runs on CI's Windows job
+   alone, which no run has read yet. The same unit makes the browser runner refuse a promise constant written without its
+   feature, naming the one it meant.
 4. Eight parked core leads, each one verdict by the owner's test of 2026-11-20 (a reproduced defect, a reachable
    incomplete contract or an unproved promise is in; otherwise a row of the after-1.0 table), the raw text and
    single-file body check having landed at 6da8232ec as X16.46: the named enum in a pushed message, typed list construction from separate
    sources, plan shape alignment, standalone named rule sets, activated-row replacement, handler cleanup, the
    attached-partial validation summary, and a row's "removing" state after a failed removal (move-in part 9). An
-   input over an enum whose zero has no name landed at b824783d3 as X9.39.
+   input over an enum whose zero has no name landed at b824783d3 as X9.39. In design since 2026-11-24 in ../core-leads
+   (CoreLeads), a designer on Fable at xhigh, read-only, from 25e19ea4a; its design.md is read at the source first.
 5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked.
 
 **3. After the framework package:** the selected Native components (date entry first), then every Fusion component,
