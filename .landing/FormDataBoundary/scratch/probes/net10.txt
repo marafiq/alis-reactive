@@ -1,0 +1,12 @@
+core-plain-no-body: DELETE /plain/North?Shift=Night binds 200 Ward=North Shift=Night
+core-plain-get: GET /plain/North?Shift=Night binds 200 Ward=North Shift=Night
+core-plain-text-body: POST /plain/North?Shift=Night with a text body binds 200 Ward=North Shift=Night
+core-plain-file-body: POST /plain/North?Shift=Night with a file body binds 200 Ward=North Shift=Night
+core-fromform-no-body: DELETE /form/North?Shift=Night binds 200 Ward=null Shift=null
+core-fromform-text-body: POST /form/North?Shift=Night with a text body binds 200 Ward=null Shift=null
+core-fromform-multipart-query: POST /form/North?Shift=Evening with a multipart body Text=x binds 200 Ward=null Shift=null
+core-plain-multipart-query: POST /plain/North?Shift=Evening with a multipart body Text=x binds 200 Ward=North Shift=Evening
+core-plain-multipart-query-and-body: POST /plain/North?Shift=Evening with a multipart body Shift=Night binds 200 Ward=North Shift=Night
+core-frombody-json-query: POST /json/North?Shift=Evening with {} binds 200 Ward=null Shift=null
+core-empty-query-text: DELETE /plain/North?Shift= binds 200 Ward=North Shift=null
+core-start-kept: DELETE /started/North binds 200 Ward=North Shift=Evening; with ?Shift= binds 200 Ward=North Shift=null

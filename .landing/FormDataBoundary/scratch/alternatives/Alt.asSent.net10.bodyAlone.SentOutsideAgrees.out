@@ -1,0 +1,55 @@
+TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802)
+Warning: Please run the Java VM which executes TLC with a throughput optimized garbage collector by passing the "-XX:+UseParallelGC" property.
+(Use the -nowarning option to disable this warning.)
+Running breadth-first search Model-Checking with fp 46 and seed 4278826861714435064 with 12 workers on 12 cores with 16384MB heap and 64MB offheap memory [pid: 21543] (Mac OS X 27.2 aarch64, Homebrew 27.0.1.0.3 x86_64, MSBDiskFPSet, DiskStateQueue).
+Parsing file /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/form-data-boundary/.landing/FormDataBoundary/scratch/alternatives/Validation.tla
+Parsing file /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/form-data-boundary/.landing/FormDataBoundary/scratch/alternatives/meta-Alt.asSent.net10.bodyAlone.SentOutsideAgrees/Naturals.tla
+Parsing file /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/form-data-boundary/.landing/FormDataBoundary/scratch/alternatives/meta-Alt.asSent.net10.bodyAlone.SentOutsideAgrees/Sequences.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module Validation
+Starting... (2026-11-24 23:22:04)
+Computing initial states...
+Computed 2 initial states...
+Computed 4 initial states...
+Computed 8 initial states...
+Computed 16 initial states...
+Computed 32 initial states...
+Computed 64 initial states...
+Computed 128 initial states...
+Computed 256 initial states...
+Computed 512 initial states...
+Computed 1024 initial states...
+Computed 2048 initial states...
+Computed 4096 initial states...
+Computed 8192 initial states...
+Computed 16384 initial states...
+Error: Invariant SentOutsideAgrees is violated by the initial state:
+/\ leadNameInput = "absent"
+/\ handling = "replace"
+/\ leadStart = "object"
+/\ rowName = "absent"
+/\ binding = "bodyAlone"
+/\ check = "item"
+/\ sendsForm = FALSE
+/\ nInput = "absent"
+/\ start = "none"
+/\ otherRegistered = FALSE
+/\ leadPhoneInput = FALSE
+/\ row = FALSE
+/\ itemsStart = "empty"
+/\ itemTypeName = "none"
+/\ nPlace = "path"
+/\ countText = "5"
+/\ host = "net10"
+/\ peer = "none"
+/\ plane = "binding"
+/\ leadStartName = "none"
+/\ leadTypeName = "none"
+/\ nStart = "none"
+/\ nBeside = FALSE
+/\ nPlaceText = "x"
+/\ typed = "none"
+/\ format = "none"
+
+Finished in 00s at (2026-11-24 23:22:04)
