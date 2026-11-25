@@ -1,19 +1,20 @@
 # Handoff
 
-Written at `date`: Wed Nov 25 01:55:18 EST 2026
+Written at `date`: Wed Nov 25 02:16:26 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 28, each in the notes block below
-unit: landed (46): BodilessCheck, SpecCiCold, MacTlc, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListFromSources, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
-unit: unbriefed (20): CheckoutTrap, NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
+note: open: 27, each in the notes block below
+note: closed 2026-11-25 | correction | spec/MISTAKES.md, and .claude/hooks/refuse-known-traps.mjs | CheckoutTrap | "these: its follow-up CheckoutTrap landed
+unit: landed (47): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListFromSources, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
 unit: returned (9): FormDataBoundary, FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms, ValidationForms
+unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at a00125348 on feature/rewrite
+lane: pushing at 3efe316b8 on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at a00125348
+ci: unread at 3efe316b8
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -26,23 +27,20 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: a00125348 X7.21 and X7.22: pipeline.List<T> builds a typed list from separate sources
-- Full check: .work/logs/spec-check-a00125348.log: spec check at a00125348: 40 of 40 checks pass
-- .work/last-run.txt: 20261125-014243-73607 a00125348
+- HEAD: 3efe316b8 The traps hook refuses a file restored from the index and a backtick outside single quotes (CheckoutTrap)
+- Full check: .work/logs/spec-check-3efe316b8.log: spec check at 3efe316b8: 40 of 40 checks pass
+- .work/last-run.txt: 20261125-020357-25220 3efe316b8
 
 ## Landed since the commit before the last spec: STATE commit
-a00125348 X7.21 and X7.22: pipeline.List<T> builds a typed list from separate sources
-830817f4b spec: STATE and handoff at cad8e3581
+3efe316b8 The traps hook refuses a file restored from the index and a backtick outside single quotes (CheckoutTrap)
+f2dd7543e spec: STATE and handoff at a00125348
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 463 to 464
-- A rule or a tool's list not applied before the change: 454 to 456
-- A shell command or a script wrong in its own terms: 658 to 660
-- A fault found in an agent's work whose instruction the brief did not give: 13 to 14
+- A shell command or a script wrong in its own terms: 660 to 664
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
