@@ -1,19 +1,19 @@
 # Handoff
 
-Written at `date`: Wed Nov 25 01:06:10 EST 2026
+Written at `date`: Wed Nov 25 01:55:18 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 25, each in the notes block below
-unit: landed (45): BodilessCheck, SpecCiCold, MacTlc, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
-unit: returned (8): FormDataBoundary, FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
-unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
-unit: building (2): ListFromSources, MoveInOwners
+note: open: 28, each in the notes block below
+unit: landed (46): BodilessCheck, SpecCiCold, MacTlc, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListFromSources, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
+unit: unbriefed (20): CheckoutTrap, NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
+unit: returned (9): FormDataBoundary, FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms, ValidationForms
+unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at cad8e3581 on feature/rewrite
+lane: pushing at a00125348 on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at cad8e3581
+ci: unread at a00125348
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -26,20 +26,23 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: cad8e3581 Eight parked core leads judged: two in, one closed, five after 1.0 (CoreLeads)
-- Full check: .work/logs/spec-check-cad8e3581.log: spec check at cad8e3581: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-233944-29250 c3aeae654
+- HEAD: a00125348 X7.21 and X7.22: pipeline.List<T> builds a typed list from separate sources
+- Full check: .work/logs/spec-check-a00125348.log: spec check at a00125348: 40 of 40 checks pass
+- .work/last-run.txt: 20261125-014243-73607 a00125348
 
 ## Landed since the commit before the last spec: STATE commit
-cad8e3581 Eight parked core leads judged: two in, one closed, five after 1.0 (CoreLeads)
-25e19ea4a spec: STATE and handoff at c3aeae654
+a00125348 X7.21 and X7.22: pipeline.List<T> builds a typed list from separate sources
+830817f4b spec: STATE and handoff at cad8e3581
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 452 to 454
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 463 to 464
+- A rule or a tool's list not applied before the change: 454 to 456
+- A shell command or a script wrong in its own terms: 658 to 660
+- A fault found in an agent's work whose instruction the brief did not give: 13 to 14
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
@@ -72,6 +75,9 @@ spec/CLAUDE.md:2036: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to t
 - 2026-11-23 | direction | the queue of this file | queue | "keep worktree around"
 - 2026-11-23 | direction | the queue of this file | queue | "nah splitting inputbinidng now is such a huge change, explain in more detail, that could set us back to zero", then "yes, on input i will not approve that change in isolation, must have thought through design so prepare that, adhoc recommondations are forbidden"
 - 2026-11-24 | direction | the queue of this file | queue | "never lower the quality - just reminder"
+- 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "C (Recommended)", to D16.5's question of a member sent outside the body (form-data-boundary-design.md, section 6)
+- 2026-11-25 | direction | the queue of this file | ValidationForms | "1 seems more aligned, but make sure that all use cases are satified, including where bulk edit say row gets validated. I would like to see each use case form here before you action it." "Its very critical to get this right with high quality code and keep grammer and dev experience." "Bulk Edit is not about checking one row alone, it has two use cases, if action is in row, then row validate, if its applying to all rows then all validate." "write these use cases a md document, take this to fable xhigh designer, ask it to deliver on correctness, grammer consistency, quality, typed and your document must contain small but complete use examples. so design from fable is expected to be complete, then it gets tla+ and then it lands without loosing quality"
+- 2026-11-25 | correction | spec/MISTAKES.md, and .claude/hooks/refuse-known-traps.mjs | CheckoutTrap | "these mistakes are making me question your critical recommondations, please stop doing these mistakes."
 <!-- /notes -->
 
 ## Next
