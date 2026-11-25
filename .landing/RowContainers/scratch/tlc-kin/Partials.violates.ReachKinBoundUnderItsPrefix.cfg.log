@@ -1,0 +1,51 @@
+TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802)
+Warning: Please run the Java VM which executes TLC with a throughput optimized garbage collector by passing the "-XX:+UseParallelGC" property.
+(Use the -nowarning option to disable this warning.)
+Running breadth-first search Model-Checking with fp 16 and seed 8982231524214410928 with 2 workers on 12 cores with 16384MB heap and 64MB offheap memory [pid: 33943] (Mac OS X 27.2 aarch64, Homebrew 27.0.1.0.3 x86_64, MSBDiskFPSet, DiskStateQueue).
+Parsing file /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/row-containers/.landing/RowContainers/scratch/tlc-kin/Partials.tla
+Parsing file /private/var/folders/ts/4m22lz5x5f92s0xkfy21j8j40000gn/T/Naturals.tla
+Parsing file /private/var/folders/ts/4m22lz5x5f92s0xkfy21j8j40000gn/T/Sequences.tla
+Parsing file /private/var/folders/ts/4m22lz5x5f92s0xkfy21j8j40000gn/T/FiniteSets.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module Partials
+Starting... (2026-11-25 14:01:20)
+Computing initial states...
+Computed 2 initial states...
+Computed 4 initial states...
+Computed 8 initial states...
+Computed 16 initial states...
+Computed 32 initial states...
+Computed 64 initial states...
+Computed 128 initial states...
+Computed 256 initial states...
+Computed 512 initial states...
+Finished computing initial states: 765 distinct states generated at 2026-11-25 14:01:20.
+Error: Invariant ReachKinBoundUnderItsPrefix is violated.
+Error: The behavior up to this point is:
+State 1: <Initial predicate>
+/\ phase = "rendering"
+/\ ownAt = "last"
+/\ door = [NextOfKin |-> "EditorFor", Guardian |-> "EditorFor"]
+/\ host = "net10"
+/\ nested = "EditorFor"
+/\ loaded = {}
+/\ live = <<>>
+
+State 2: <Render line 126, col 5 to line 129, col 54 of module Partials>
+/\ phase = "rendered"
+/\ ownAt = "last"
+/\ door = [NextOfKin |-> "EditorFor", Guardian |-> "EditorFor"]
+/\ host = "net10"
+/\ nested = "EditorFor"
+/\ loaded = {}
+/\ live = << <<"address", "NextOfKin">>,
+   <<"kin", "NextOfKin">>,
+   <<"address", "Guardian">>,
+   <<"kin", "Guardian">>,
+   <<"page", "Family">> >>
+
+767 states generated, 767 distinct states found, 763 states left on queue.
+The depth of the complete state graph search is 2.
+Finished in 00s at (2026-11-25 14:01:20)
