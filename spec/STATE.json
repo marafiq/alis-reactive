@@ -14,22 +14,22 @@
       "counts": {
         "cells": 117,
         "hosts": 26,
-        "placed": 733,
+        "placed": 737,
         "problems": 0,
         "rewrite": 0,
         "screens": 15
       },
-      "detail": "733 feature tests and 117 cell tests on 15 screens under 26 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
+      "detail": "737 feature tests and 117 cell tests on 15 screens under 26 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "bindings": {
       "counts": {
-        "constants": 860,
+        "constants": 864,
         "gates": 74,
         "marks": 131,
         "problems": 0
       },
-      "detail": "Gates.g.cs holds 74 gates and Promises.g.cs 860 constants, 131 of a held gate marked on them, each as the spec writes it",
+      "detail": "Gates.g.cs holds 74 gates and Promises.g.cs 864 constants, 131 of a held gate marked on them, each as the spec writes it",
       "pass": true
     },
     "carriers": {
@@ -57,7 +57,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 412,
+        "defects": 416,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1418,7 +1418,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 880,
+        "defects": 884,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1669,7 +1669,7 @@
         "unrefused": 0
       },
       "detail": "252 refused plants caught and 89 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "23f029d2e03848085fad3bab136b735721cbf55cc068bb976f5b292910b44196",
+      "digest": "fb2f268f03da11a89d605a90d8039034055dd58b8b4d48f73551aa7c8ba31c6e",
       "pass": true
     },
     "probes": {
@@ -1690,7 +1690,7 @@
         "mapped": 8909,
         "matrix_promised": 117,
         "matrix_runs": 117,
-        "promises": 733,
+        "promises": 737,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1700,7 +1700,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 441,
+        "defects": 445,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1718,10 +1718,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 850,
+        "tests": 854,
         "units": 27
       },
-      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 3, U10 5, U11 16, U12 0, U13 98, U14 6, U15 29, U16 0, U17 0, U18 97, U19 18, U20 8, U21 86, U22 7, U23 266, U24 57, U25 38, U26 108, U27 3",
+      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 3, U10 5, U11 16, U12 0, U13 98, U14 6, U15 29, U16 0, U17 0, U18 98, U19 18, U20 8, U21 86, U22 7, U23 269, U24 57, U25 38, U26 108, U27 3",
       "pass": true
     },
     "slice_tests": {
@@ -2266,23 +2266,23 @@
         "ContainerRead": {
           "ContainerRead.cfg": {
             "green": true,
-            "hash": "60e3350807fcd89991420627df8f433fb40a25aa9facf819a9d206fcc8788034",
+            "hash": "8e43cb3d06fe2343bbbc3ef3ea0971771e65c74a9d999f84bd29be6f203f5634",
             "line": "Model checking completed. No error has been found.",
-            "states": "56400 states generated, 5000 distinct states found, 0 states left on queue.",
+            "states": "114912 states generated, 8352 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "ContainerRead.violates.AnUnsentMemberReadsWhatTheEndpointBinds.cfg": {
             "green": false,
-            "hash": "b6d9e5ed1b069d0d2f16f49c1b4410b91665383f70a9495a142f4097f7083986",
+            "hash": "f17492dc8968d466de368c652ed8480556cc6a3526a8f55de5577a0479580a70",
             "line": "violated: AnUnsentMemberReadsWhatTheEndpointBinds",
-            "states": "812 states generated, 412 distinct states found, 288 states left on queue.",
+            "states": "1308 states generated, 588 distinct states found, 420 states left on queue.",
             "violated": [
               "AnUnsentMemberReadsWhatTheEndpointBinds"
             ]
           },
           "ContainerRead.violates.OneValueOnEveryHost.JsonSentAsHeld.cfg": {
             "green": false,
-            "hash": "67745c9180fc48cb84611f65c684e4206be21238043c483ea0ee31874c169272",
+            "hash": "4461b9de10a644b1681aa69cc0ae4c6d156a7e486750e002d68e2c6c41309e81",
             "line": "violated: OneValueOnEveryHost",
             "states": "",
             "violated": [
@@ -2291,7 +2291,7 @@
           },
           "ContainerRead.violates.OneValueOnEveryHost.UnnamedStartSentAsHeld.cfg": {
             "green": false,
-            "hash": "01616e91c54f9ccdeebd4bc7d44d6ce1ef9ec16adcb7836236cf17707c866b69",
+            "hash": "ca13a9a734b6572b389e00d5cc7d558811690e2dd032f3d296b2562c76c77566",
             "line": "violated: OneValueOnEveryHost",
             "states": "",
             "violated": [
@@ -2300,25 +2300,34 @@
           },
           "ContainerRead.violates.OneValueOnEveryHost.cfg": {
             "green": false,
-            "hash": "e2cc9976de3a4cf884ab5cb4469fd5b5b75e85298192d02e671f4d4ebec1f8e3",
+            "hash": "251c91663c9a990bf3f30cfc19301e5100995b958a597bc1ca8e395544423f47",
             "line": "violated: OneValueOnEveryHost",
             "states": "",
             "violated": [
               "OneValueOnEveryHost"
             ]
           },
+          "ContainerRead.violates.ReachBlankAloneStopsTheRead.cfg": {
+            "green": false,
+            "hash": "d9b4a51d7697572d2481fe58606496e16d4b74e53f91856de74c741cb0021526",
+            "line": "violated: ReachBlankAloneStopsTheRead",
+            "states": "5076 states generated, 2436 distinct states found, 2004 states left on queue.",
+            "violated": [
+              "ReachBlankAloneStopsTheRead"
+            ]
+          },
           "ContainerRead.violates.ReachBlankReadsItsStart.cfg": {
             "green": false,
-            "hash": "12c55b489a127834e72a84431d7b261e9e5e09315c4ffb47e7fff25b01caa496",
+            "hash": "9d818bd7b83ae8a842ffffed71b6f4da9ae1cbb470ebf197596687d7f6e3bc59",
             "line": "violated: ReachBlankReadsItsStart",
-            "states": "2372 states generated, 1252 distinct states found, 988 states left on queue.",
+            "states": "3852 states generated, 1932 distinct states found, 1572 states left on queue.",
             "violated": [
               "ReachBlankReadsItsStart"
             ]
           },
           "ContainerRead.violates.ReachHeldRefusedSentByRows.cfg": {
             "green": false,
-            "hash": "bb0c3f14e88cfdcc02c3b863f99f4462db422d8650e4d84c3c28761d00ce053d",
+            "hash": "20b41f96a7ad8c6e62298e7b913ef079a9dd9869710b91b194d3b4f8bd4a1eb2",
             "line": "violated: ReachHeldRefusedSentByRows",
             "states": "",
             "violated": [
@@ -2327,117 +2336,126 @@
           },
           "ContainerRead.violates.ReachItemNothingStopsTheRead.cfg": {
             "green": false,
-            "hash": "5c1080237d0252047c7e07d6cbd81983a5f5991088e178202fcb4942f786954a",
+            "hash": "f57c1608b975b1203d0dd586286f14827ae7d68a3fbebb4a808f001965f68531",
             "line": "violated: ReachItemNothingStopsTheRead",
-            "states": "2932 states generated, 1492 distinct states found, 1188 states left on queue.",
+            "states": "4664 states generated, 2264 distinct states found, 1864 states left on queue.",
             "violated": [
               "ReachItemNothingStopsTheRead"
             ]
           },
           "ContainerRead.violates.ReachMissingContainerStops.cfg": {
             "green": false,
-            "hash": "4778d78140dc98d725b543f5810b95bea43bd56711a732db6472f4d0264e7211",
+            "hash": "e8aa9b760c6f7ec25bba0802755c6c91f4f11d00c90df4524c1fc8af74966ac1",
             "line": "violated: ReachMissingContainerStops",
-            "states": "312 states generated, 312 distinct states found, 288 states left on queue.",
+            "states": "444 states generated, 444 distinct states found, 420 states left on queue.",
             "violated": [
               "ReachMissingContainerStops"
             ]
           },
           "ContainerRead.violates.ReachStartOnceTheSlotLeft.cfg": {
             "green": false,
-            "hash": "e34a957d9fca93b7d088eb7bb9d709b136ddd8a9c340f103295f2d70d0ee8efc",
+            "hash": "68cf59702f76a680a1f55a249065d7fac8e8fb4344dfebd5036a291b91d3e307",
             "line": "violated: ReachStartOnceTheSlotLeft",
-            "states": "18190 states generated, 2812 distinct states found, 1146 states left on queue.",
+            "states": "35588 states generated, 4620 distinct states found, 1964 states left on queue.",
             "violated": [
               "ReachStartOnceTheSlotLeft"
             ]
           },
           "ContainerRead.violates.ReachStopOnceASlotsInputJoins.cfg": {
             "green": false,
-            "hash": "804a858aae9d451ead1a31bffea3c7431be9c88b11d556bd75573d85952b0673",
+            "hash": "622f13650f48cd46c71cec7bc23b342ddb4a0499ca08229c3845a19368e3a645",
             "line": "violated: ReachStopOnceASlotsInputJoins",
-            "states": "9391 states generated, 2196 distinct states found, 1185 states left on queue.",
+            "states": "17840 states generated, 3583 distinct states found, 2002 states left on queue.",
             "violated": [
               "ReachStopOnceASlotsInputJoins"
             ]
           },
           "ContainerRead.violates.ReachUnlistedReadsItsStart.cfg": {
             "green": false,
-            "hash": "154b1b14a57b470b5e5f6fb23d7de2988fefd149869bdd21f7491c12b41ef785",
+            "hash": "b95ccbb89769655ae7141cf6676f8aaaf05439aaed8cd4adc28fe3faac68e631",
             "line": "violated: ReachUnlistedReadsItsStart",
-            "states": "2652 states generated, 1372 distinct states found, 1088 states left on queue.",
+            "states": "4260 states generated, 2100 distinct states found, 1716 states left on queue.",
             "violated": [
               "ReachUnlistedReadsItsStart"
             ]
           },
           "ContainerRead.violates.ReachUnnamedStartLeftOut.cfg": {
             "green": false,
-            "hash": "f3fddb4128e20a5f375669899fed85fd1e270c2f921fa1ac0878a8ed0767b032",
+            "hash": "9878fe9a9638c1bb0a7d21b500c5479255975db46d74bc5ee2fb0aad9a92b528",
             "line": "violated: ReachUnnamedStartLeftOut",
-            "states": "2451 states generated, 1283 distinct states found, 1023 states left on queue.",
+            "states": "3984 states generated, 1984 distinct states found, 1624 states left on queue.",
             "violated": [
               "ReachUnnamedStartLeftOut"
             ]
           },
           "ContainerRead.violates.ReadFindsWhatItsContainerSends.cfg": {
             "green": false,
-            "hash": "25549364fed19c2f5fb48adc62c5f23ac0a4c8870acaac2d808fce28e63579c7",
+            "hash": "b81e604b6afeb73f893d98aef829b5608d5951589b8d7a589102b425861f0bd0",
             "line": "violated: ReadFindsWhatItsContainerSends",
-            "states": "812 states generated, 412 distinct states found, 288 states left on queue.",
+            "states": "1308 states generated, 588 distinct states found, 420 states left on queue.",
             "violated": [
               "ReadFindsWhatItsContainerSends"
             ]
           },
           "ContainerRead.violates.ReadIsWhatTheEndpointBinds.UnlistedReadsItsText.cfg": {
             "green": false,
-            "hash": "65779909e3aa68d3971aaa21e16000b87217300638657dcc7600b0964546865a",
+            "hash": "77304de2be3796c4a72c54e3c5359fce121baab29e259e0489b8c4cec497f8d9",
             "line": "violated: ReadIsWhatTheEndpointBinds",
-            "states": "2652 states generated, 1372 distinct states found, 1088 states left on queue.",
+            "states": "4260 states generated, 2100 distinct states found, 1716 states left on queue.",
             "violated": [
               "ReadIsWhatTheEndpointBinds"
             ]
           },
           "ContainerRead.violates.ReadIsWhatTheEndpointBinds.cfg": {
             "green": false,
-            "hash": "b51f976f61ae5e13934651acd7f5643b39edfeab45d7bc11d690cb6cbe912572",
+            "hash": "9c91f368859068f2449fba751596d422772236a1308603d6169ae0bf1c554f49",
             "line": "violated: ReadIsWhatTheEndpointBinds",
-            "states": "2372 states generated, 1252 distinct states found, 988 states left on queue.",
+            "states": "3852 states generated, 1932 distinct states found, 1572 states left on queue.",
             "violated": [
               "ReadIsWhatTheEndpointBinds"
             ]
           },
           "ContainerRead.violates.ReadSeesTheSlotThatJoinedOrLeftBeforeIt.cfg": {
             "green": false,
-            "hash": "725a02c7003c2884aac433d2603055faeccf7b5cbac93e05b1eefe12fd053d53",
+            "hash": "66cb9196de5d0e2bc9dfb8eeccbe3ab468950c3e596cf5c09758947bb56f6d80",
             "line": "violated: ReadSeesTheSlotThatJoinedOrLeftBeforeIt",
-            "states": "18281 states generated, 4145 distinct states found, 2421 states left on queue.",
+            "states": "36012 states generated, 6780 distinct states found, 4020 states left on queue.",
             "violated": [
               "ReadSeesTheSlotThatJoinedOrLeftBeforeIt"
             ]
           },
+          "ContainerRead.violates.ReadStopsWhenItsSendStops.BlankAloneStopsTheSendAlone.cfg": {
+            "green": false,
+            "hash": "35cf6cce68d1fa830ced2b62ad9004e8cb08305161b2502c87425a3712d028e3",
+            "line": "violated: ReadStopsWhenItsSendStops",
+            "states": "5076 states generated, 2436 distinct states found, 2004 states left on queue.",
+            "violated": [
+              "ReadStopsWhenItsSendStops"
+            ]
+          },
           "ContainerRead.violates.ReadStopsWhenItsSendStops.ItemNothingStopsTheSendAlone.cfg": {
             "green": false,
-            "hash": "62224a77763f0790af8ccce8312f372f6819aed7f886aae2e39dd036805a5437",
+            "hash": "a3b4cc79e28dbaad285d6122fdfb2260a439847b23f64ec1ea4bd28f1211b1d1",
             "line": "violated: ReadStopsWhenItsSendStops",
-            "states": "2932 states generated, 1492 distinct states found, 1188 states left on queue.",
+            "states": "4668 states generated, 2268 distinct states found, 1860 states left on queue.",
             "violated": [
               "ReadStopsWhenItsSendStops"
             ]
           },
           "ContainerRead.violates.ReadStopsWhenItsSendStops.UnlistedStopsTheSend.cfg": {
             "green": false,
-            "hash": "d5ba75312d6176b4aa74a6303efa7bd34dcc1efd4be158b44d2089c9addcca34",
+            "hash": "5296711e016bcfc076ea0dc039389a9e26ad2ad51864026cca82069474039376",
             "line": "violated: ReadStopsWhenItsSendStops",
-            "states": "2482 states generated, 1298 distinct states found, 1030 states left on queue.",
+            "states": "3914 states generated, 1954 distinct states found, 1602 states left on queue.",
             "violated": [
               "ReadStopsWhenItsSendStops"
             ]
           },
           "ContainerRead.violates.ReadStopsWhenItsSendStops.cfg": {
             "green": false,
-            "hash": "24b6e21cc42af4bbc286a2fee1aa7278f300a418e795ab13436b3a557ff7d63b",
+            "hash": "565132a27c7ba8bf5e592cbfeacfa121ffd9d0e08717ff7f44f13c1f7ef1de7b",
             "line": "violated: ReadStopsWhenItsSendStops",
-            "states": "9401 states generated, 2196 distinct states found, 1184 states left on queue.",
+            "states": "18056 states generated, 3600 distinct states found, 2001 states left on queue.",
             "violated": [
               "ReadStopsWhenItsSendStops"
             ]
@@ -4440,7 +4458,7 @@
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 53m 3h, U4 1b 18m 3a, U5 1b 21m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 3b 17m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 21m 21a, U18 97b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 86b 14m 1a 1h, U22 7b 4m, U23 266b, U24 57b 1a, U25 38b 1a, U26 108b 35a, U27 3b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 53m 3h, U4 1b 18m 3a, U5 1b 21m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 3b 17m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 21m 21a, U18 98b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 86b 14m 1a 1h, U22 7b 4m, U23 269b, U24 57b 1a, U25 38b 1a, U26 108b 35a, U27 3b",
       "pass": true
     },
     "verdicts": {
@@ -4458,7 +4476,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "314f0b4b4801d4c46f900a9a2bbf5cf14249aede",
+  "read_at_head": "5d9328da297e0b8cc24cbc116f15b2c51939ef4a",
   "step": {
     "failing": [],
     "name": "End of session",

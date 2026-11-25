@@ -1,24 +1,24 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 20:30:04 EST 2026
+Written at `date`: Tue Nov 24 22:17:25 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (41): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, MarkdownLand, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, ZshModifier
+unit: landed (42): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListPosition, MarkdownLand, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
-unit: building (2): ListPosition, MoveInOwners
+unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 314f0b4b4 on feature/rewrite: equal to the remote
+lane: pushed at 5d9328da2 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 314f0b4b4
+ci: unread at 5d9328da2
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2103 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2108 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
@@ -27,23 +27,24 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 314f0b4b4 hook: a letter after a bare variable and a colon, which zsh reads as a modifier, is refused
-- Full check: .work/logs/spec-check-314f0b4b4.log: spec check at 314f0b4b4: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-201718-66896 314f0b4b4
+- HEAD: 5d9328da2 A field left out under a list index that leaves its item no field stops the request, or is refused where the view renders.
+- Full check: .work/logs/spec-check-5d9328da2.log: spec check at 5d9328da2: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-220421-53730 5d9328da2
 
 ## Landed since the commit before the last spec: STATE commit
-314f0b4b4 hook: a letter after a bare variable and a colon, which zsh reads as a modifier, is refused
-f92088e98 spec: STATE and handoff at 1bce0ab2e
+5d9328da2 A field left out under a list index that leaves its item no field stops the request, or is refused where the view renders.
+8c853f563 spec: STATE and handoff at 314f0b4b4
 
 ## Open
 open: 19 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A shell command or a script wrong in its own terms: 646 to 649
+None.
 
 ## The owner's latest decisions
-spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
+spec/CLAUDE.md:9: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
+spec/CLAUDE.md:2036: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -102,15 +103,13 @@ and left it, the second with its commands run through the traps hook by hand (co
   U8 to U13 closed and U1, U2, U14 to U16 landed; U6, U7, U17 to U22 are not stated);
 - the core's public surface text is read as the 1.0 surface, and README's examples come from tested pages.
 Its units, in order:
-1. The plan narrowed to what C# writes: landed in five units, the last, `sent`, at b824783d3 (X9.36 to X9.42, X13.11,
-   X16.47, M7.X9 and M7.X10, each side failing on its own plant). One case of its family is open: a field left out
-   under a list index ends the list when it is its item's only field (a probe on .NET 10.0.15: `Dates[1]` alone binds no
-   item). The lead's design, `../sent-position/.landing/SentPosition/design.md`, waits for the owner's yes: choice A
-   adds "leaveUnlessAlone" to WhenBlank, one grammar case, so an input's request and read stop there, and refuses where
-   the view renders a query or form data member that could empty its item; no page of the app reaches a case of it (the
-   design's searches 1 to 3). On a yes it is one unit in a fresh worktree from the lane's head: D9.10's new row,
-   schema.md, ContainerRead.tla's new input kind with its mutant and witness, four browser promises red first, the code,
-   a plant on each side.
+1. The plan narrowed to what C# writes: landed in six units, the last at 5d9328da2, ListPosition, the owner's yes of
+   2026-11-24 to choice A: a field left out under a list index that leaves its item no field stops the request, its
+   container's read and check with it ("leaveUnlessAlone" on WhenBlank), or is refused where the view renders a query or
+   form data member that could empty its item (X9.43 to X9.46, each side failing on its own plant;
+   ContainerRead.tla's BlankAloneStopsTheSendAlone and ReachBlankAloneStopsTheRead). Its gap, named in its reply: an
+   empty list or a files input with no file sends no part, so an item whose only field is one of these still ends the
+   list; choice A covers whenBlank and whenNothing alone.
 2. The form-data boundary: an enum input in form data is sent by its rows since b824783d3 (the design's defect 1,
    X9.36, X9.37, X9.39 and X16.47), an object stays refused until after 1.0 (the owner's yes of 2026-11-17); a text or file body's check landed
    at 6da8232ec (X16.46). On MVC 5 an action's model binds route values and the query beside the body
