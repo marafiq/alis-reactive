@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 22:17:25 EST 2026
+Written at `date`: Tue Nov 24 22:42:06 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (42): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListPosition, MarkdownLand, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, ZshModifier
+unit: landed (43): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 5d9328da2 on feature/rewrite: equal to the remote
+lane: pushed at 45b14dc30 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 5d9328da2
+ci: unread at 45b14dc30
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,20 +27,22 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 5d9328da2 A field left out under a list index that leaves its item no field stops the request, or is refused where the view renders.
-- Full check: .work/logs/spec-check-5d9328da2.log: spec check at 5d9328da2: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-220421-53730 5d9328da2
+- HEAD: 45b14dc30 land: every unit's mistake counts are carried from its worktree, and a spec.py that edits one is refused
+- Full check: .work/logs/spec-check-45b14dc30.log: spec check at 45b14dc30: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-223246-3320 45b14dc30
 
 ## Landed since the commit before the last spec: STATE commit
-5d9328da2 A field left out under a list index that leaves its item no field stops the request, or is refused where the view renders.
-8c853f563 spec: STATE and handoff at 314f0b4b4
+45b14dc30 land: every unit's mistake counts are carried from its worktree, and a spec.py that edits one is refused
+4e65460bb spec: STATE and handoff at 5d9328da2
 
 ## Open
 open: 19 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-None.
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 453 to 461
+- A rule or a tool's list not applied before the change: 448 to 452
+- A shell command or a script wrong in its own terms: 649 to 655
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
