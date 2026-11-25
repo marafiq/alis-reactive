@@ -1,53 +1,52 @@
 # Handoff
 
-Written at `date`: Wed Nov 25 12:53:13 EST 2026
+Written at `date`: Wed Nov 25 17:07:45 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 30, each in the notes block below
-note: closed 2026-11-25 | correction | spec/MISTAKES.md | MistakesAsRules | "please stop doing silly mistakes, while u wa: its follow-up MistakesAsRules landed
-unit: landed (48): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
-unit: building (2): ContainerOnly, MoveInOwners
-unit: unbriefed (21): FormDataBoundary, NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable, ValidationForms
-unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
+note: open: 29, each in the notes block below
+unit: landed (51): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
+unit: building (2): FormDataBoundary, MoveInOwners
+unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
+unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
+unit: waiting (2): RowContainers, ValidationForms
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at 2f84ee35b on feature/rewrite
+lane: pushing at 49dd77295 on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at 2f84ee35b
+ci: unread at 49dd77295
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2108 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2115 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over HANDOFF.md: holds 152 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 2f84ee35b Mistakes condensed to rules: each kind's row states the rules that stop it and what holds them (MistakesAsRules)
-- Full check: .work/logs/spec-check-2f84ee35b.log: spec check at 2f84ee35b: 40 of 40 checks pass
-- .work/last-run.txt: 20261125-020357-25220 3efe316b8
+- HEAD: 49dd77295 requests (ContainerOnly): the request container is the one door, and it sends the hidden inputs inside it in a form body
+- Full check: .work/logs/spec-check-49dd77295.log: spec check at 49dd77295: 40 of 40 checks pass
+- .work/last-run.txt: 20261125-164038-7773 49dd77295
 
 ## Landed since the commit before the last spec: STATE commit
-2f84ee35b Mistakes condensed to rules: each kind's row states the rules that stop it and what holds them (MistakesAsRules)
-f2986ea66 spec: STATE and handoff at 3efe316b8
+49dd77295 requests (ContainerOnly): the request container is the one door, and it sends the hidden inputs inside it in a form body
+48839f502 spec: STATE and handoff at 2f84ee35b
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 464 to 465
-- A rule or a tool's list not applied before the change: 456 to 459
-- A shell command or a script wrong in its own terms: 664 to 665
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 465 to 469
+- A rule or a tool's list not applied before the change: 459 to 473
+- A shell command or a script wrong in its own terms: 665 to 673
 
 ## The owner's latest decisions
-spec/CLAUDE.md:9: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
-spec/CLAUDE.md:2036: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
+spec/CLAUDE.md:9: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): one concept on the developer's surface, the request container.
+spec/CLAUDE.md:13: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): the container takes care of hidden fields in the browser, since
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -79,9 +78,7 @@ spec/CLAUDE.md:2036: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to t
 - 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "C (Recommended)", to D16.5's question of a member sent outside the body (form-data-boundary-design.md, section 6)
 - 2026-11-25 | direction | the queue of this file | ValidationForms | "1 seems more aligned, but make sure that all use cases are satified, including where bulk edit say row gets validated. I would like to see each use case form here before you action it." "Its very critical to get this right with high quality code and keep grammer and dev experience." "Bulk Edit is not about checking one row alone, it has two use cases, if action is in row, then row validate, if its applying to all rows then all validate." "write these use cases a md document, take this to fable xhigh designer, ask it to deliver on correctness, grammer consistency, quality, typed and your document must contain small but complete use examples. so design from fable is expected to be complete, then it gets tla+ and then it lands without loosing quality"
 - 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | ValidationForms | "i approve it", to the five lines of .worktrees/validation-forms/.landing/ValidationForms/design.md, section 10
-- 2026-11-25 | decision | spec/CLAUDE.md, the request decisions | ContainerOnly | "i approve it but, we agreed to use container instead of form, lets settle this here forever. u are welcome to use form in TS to build the payload for http but"
-- 2026-11-25 | decision | spec/CLAUDE.md, the request decisions | ContainerOnly | "yes", to the two lines of .worktrees/container-only/.landing/ContainerOnly/design.md, section 12: a control the plan does not know is no longer sent, and Container.kind leaves the plan
-- 2026-11-25 | correction | spec/MISTAKES.md | MistakesAsRules | "please stop doing silly mistakes, while u wait, makde mistakes condense so they are rules ...u gotta stop doing this."
+- 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "if a input is part of body and validator on server already works great. and if dev also sent in query, it dev business logic how it will be validated. There is no solution around this problem is there. so i lean toward no"; then "yes lets go with no. and note down the quirk", to the design's section 8 (a query member carried in the body too): not built, and the quirk written where D16.5 and the Query door's XML doc state it
 <!-- /notes -->
 
 ## Next
@@ -98,12 +95,10 @@ landed units stay (the owner, 2026-11-23: "keep worktree around"). Builds stay s
 and core framework are done where fusion will be onboarded one component with its full powers using skill. right now
 focus is on getting framework package to 1.0". So the focus now is the framework package, the core (U1 to U22).
 
-**1. The builder's worktree, first.** In a session started inside the lane, spawn the `builder` agent with a two-line
-brief: print `git rev-parse HEAD` and change nothing. It prints the lane's head; any other commit means
-`worktree.baseRef` is not applied, and that is fixed before a builder takes work. A session started at the
-repository's root lists no `builder` and reads the root's `.claude/settings.json`, which holds no `worktree.baseRef`,
-so the probe proves nothing there; the sessions that landed DefinitionOfDone and MarkdownLand started at the root
-and left it, the second with its commands run through the traps hook by hand (counted at 1bce0ab2e).
+**1. Start inside the lane.** `cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite && claude`:
+the lane's agents, hooks and rules load only there (the 2026-11-25 session started at the root, a mistake). First spawn
+`builder` with a two-line brief: print `git rev-parse HEAD`, change nothing; any commit but the lane's head means
+`worktree.baseRef` is not applied.
 
 **2. The framework core to 1.0 (U1 to U22).** Done when:
 - `scripts/open.py` prints no core runtime case: met at b824783d3, "0 runtime cases not built";
@@ -115,20 +110,20 @@ Its units, in order:
 1. The plan narrowed to what C# writes: landed in six units, the last at 5d9328da2 (ListPosition, choice A of
    2026-11-24, X9.43 to X9.46). Its gap: an empty list or a files input with no file sends no part, so an item whose
    only field is one of these still ends the list.
-2. The forms, three units in this order, each its spec lines, TLA+, tests and code in one commit, as ListPosition
-   landed at 5d9328da2; a spec-only unit first was dropped, since its tree would contradict the 79 views:
-   - ContainerOnly, building in ../container-only from f2986ea66, a builder on Opus at xhigh: the developer writes a
-     request container and never a form; a request sends what its plan declares; `Container.kind` leaves the plan (the
-     owner, 2026-11-25: "lets settle this here forever", and "yes" to the design's two lines).
-   - FormDataBoundary, in ../form-data-boundary, from the lane's head once ContainerOnly lands: the owner chose C on
-     2026-11-25, a member sent outside the body read where MVC's binder reads it (the design's section 6 and 7); section
-     8 was not asked. An enum input in form data is sent by its rows since b824783d3 and a text or file body's check
-     landed at 6da8232ec (X16.46).
-   - ValidationForms, in ../validation-forms, last: the five lines the owner approved on 2026-11-25, written from
-     ContainerOnly's design, Appendix A; its Validation.tla change meets FormDataBoundary's and its ContainerRead.tla
-     change meets ContainerOnly's, so it moves to the head after both.
-   Each design's read is design-read.md in its landing folder; FormDataBoundary's and ValidationForms' worktrees carry
-   the lead's counts of their designs.
+2. The forms, four units, one at a time, each its spec lines, TLA+, tests and code in one commit, as ListPosition
+   landed at 5d9328da2. Every design question is answered and every probe ran before its build (2026-11-25), each
+   brief naming what it rests on, so no question goes to the owner unless a run prints other than its brief states.
+   Each worktree and its .landing is backed up as backup/rewrite/<worktree> on GitHub, rerun before a session ends:
+   `bash .work/tools/backup-worktree.sh ../<worktree> <worktree>`.
+   - ContainerOnly landed at 49dd77295, "839 selected, 839 ran, 839 passed", spec check 40 of 40: one request container,
+     its hidden inputs sent in a form body (the owner, 2026-11-25). A unit whose paths hold scripts/land-unit.sh lands from
+     a copy, `cp ../<worktree>/scripts/land-unit.sh .work/land-unit-run.sh`, since cp rewrites the script bash is reading.
+   - FormDataBoundary, ../form-data-boundary, After ContainerOnly; ValidationForms, ../validation-forms, After
+     FormDataBoundary; RowContainers, ../row-containers, After ValidationForms.
+   A waiting unit moves once the unit before it is landed and pushed, in its worktree by one command,
+   `bash .landing/<Name>/move.sh <the lane's head>`: spec/MISTAKES.md from HEAD, the head checked out, npm ci, the
+   lead's counts re-applied by counts.py beside it. Then its brief's "At the base:" commands, a `builder` on Opus at
+   xhigh with the brief, read.md, `scripts/land-unit.sh`, `scripts/full-check.sh`, `scripts/push.sh`, `scripts/ci.py`.
 3. X3.7 on the net48 host: landed at c3aeae654, proven by CI's Windows job at f2986ea66 ("ci at f2986ea66: 10 of 10
    jobs passed"; verify-net48 "Passed the_date_of_birth_shows_its_own_day_in_a_browser_whose_clock_is_behind_the_servers").
 4. Eight parked core leads: judged at cad8e3581 (CoreLeads), two in, one closed, five after 1.0. In: typed list
