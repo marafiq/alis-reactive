@@ -1,19 +1,20 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 18:43:32 EST 2026
+Written at `date`: Tue Nov 24 19:47:20 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (39): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove
+unit: landed (40): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, MarkdownLand, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at d9d21764f on feature/rewrite
-  leaves by: the last line `scripts/push.sh` prints
-  exit line: "remote equals HEAD"
-  goes to: lane: pushed
-ci: unread at d9d21764f
+lane: pushed at 1bce0ab2e on feature/rewrite: equal to the remote
+  leaves by: the landing of a unit that is ready
+  read first: the queue of `HANDOFF.md`
+  exit line: "landed"
+  goes to: lane: landed
+ci: unread at 1bce0ab2e
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -21,26 +22,28 @@ file: over spec/CLAUDE.md: holds 2103 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
+file: over HANDOFF.md: holds 152 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: d9d21764f Mistakes: what the queue says is open names only what a read or a run showed
-- Full check: .work/logs/spec-check-d9d21764f.log: spec check at d9d21764f: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-183412-99001 d9d21764f
+- HEAD: 1bce0ab2e land: a unit of Markdown alone takes the Markdown path, the checks that read Markdown and no browser run
+- Full check: .work/logs/spec-check-1bce0ab2e.log: spec check at 1bce0ab2e: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-193411-15465 1bce0ab2e
 
 ## Landed since the commit before the last spec: STATE commit
-d9d21764f Mistakes: what the queue says is open names only what a read or a run showed
-02d49ede9 spec: STATE and handoff at c1d8ada98
+1bce0ab2e land: a unit of Markdown alone takes the Markdown path, the checks that read Markdown and no browser run
+146e93859 spec: STATE and handoff at d9d21764f
 
 ## Open
 open: 19 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 452 to 453
-- A shell command or a script wrong in its own terms: 643 to 644
+- A rule or a tool's list not applied before the change: 447 to 448
+- A shell command or a script wrong in its own terms: 644 to 646
+- The lead's own process put before the product: 6 to 7
 
 ## The owner's latest decisions
 spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
