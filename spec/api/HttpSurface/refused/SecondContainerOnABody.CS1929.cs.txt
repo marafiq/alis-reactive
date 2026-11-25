@@ -6,6 +6,6 @@ namespace Intake;
 
 public static class SecondContainerOnABody
 {
-    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake, RequestContainer<IntakeRequest> details)
-        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake).Inputs(details));
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake, RequestContainer<IntakeRequest> details)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake).Inputs(details));
 }

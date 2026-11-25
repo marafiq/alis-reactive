@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A time picker: EJ2's TimePicker, which holds the time of day a person chose.
 /// </summary>
 /// <remarks>
-/// A picker bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. A handler of
+/// A picker bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. A handler of
 /// <see cref="Change"/> reads the committed time.
 /// </remarks>
 /// <typeparam name="TValue">The type of the member the picker binds, a date that admits null, since the picker holds null until a choice.</typeparam>

@@ -316,12 +316,9 @@ export interface InputBinding {
 
 export interface Container {
   readonly model: string;
-  readonly kind: ContainerKind;
   readonly summary: string;
   readonly live: readonly Live[];
 }
-
-export type ContainerKind = "form" | "element";
 
 export interface Live {
   readonly validator: string;

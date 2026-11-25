@@ -1,0 +1,15 @@
+[plant] running the test M9_F2.M9_X254_0 without the defect
+[plant] [playwright:result] M9_F2.M9_X254_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 0.89s Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionSignsInAVisitor("net10").reception_files_the_visit_while_the_rejected_prescription_remains_unchanged
+[plant] planted in Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts; running the test M9_F2.M9_X254_0
+[plant] [playwright:result] M9_F2.M9_X254_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 0.55s Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionSignsInAVisitor("net10").reception_files_the_visit_while_the_rejected_prescription_remains_unchanged
+[plant] caught: M9_F2.M9_X254_0 failed with the defect in place (1 of 1).
+[plant]        Assert.That(sent.PostData!.Split('&').Select(field => field.Split('=')[0]).Order(StringComparer.Ordinal), Is.EqualTo(new[] { "Consent", "CoordinatorId", "Copies", "Desk", "DraftId", "OperationId", "Relationship", "ResidentId", "VisitorName", "__RequestVerificationToken" }))
+[plant]     Expected is <System.String[10]>, actual is <System.Linq.Enumerable+OrderedIterator`2[System.String,System.String]>
+[plant]     Values differ at index [2]
+[plant]     Expected string length 6 but was 13. Strings differ at index 2.
+[plant]     Expected: "Copies"
+[plant]     But was:  "CoordinatorId"
+[plant]     -------------^
+[plant]   at tests/Alis.Reactive.Conformance.PlaywrightTests/PartialsAndSlots/MoveIn/WhenReceptionSignsInAVisitor.cs:line 103
+[plant] restored Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts
+exit 0

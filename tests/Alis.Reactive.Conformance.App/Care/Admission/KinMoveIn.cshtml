@@ -9,7 +9,7 @@
     var plan = Html.ReactivePlan<KinMoveIn>();
 }
 <h1>Move in</h1>
-@using (var moveIn = Html.BeginRequestForm(plan, "move-in"))
+@using (var moveIn = Html.BeginRequestContainer(plan, "move-in"))
 {
     <section aria-label="Next of kin">
         <h2>Next of kin</h2>
@@ -21,7 +21,7 @@
     </section>
     <button type="button" @Html.Raises(plan, KinMoveIns.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(KinMoveIns.Save, pipeline => pipeline
-        .Post<KinMoveIn>(KinMoveInEndpoints.MoveIns, request => request.Form(moveIn.Form))
+        .Post<KinMoveIn>(KinMoveInEndpoints.MoveIns, request => request.Inputs(moveIn.Container))
         .OnSuccess(Content.Text, (bound, pipeline) => pipeline.Element("bound").Text.Set(bound.Body))));
 }
 <p>Saved contacts: <span id="bound">-</span></p>

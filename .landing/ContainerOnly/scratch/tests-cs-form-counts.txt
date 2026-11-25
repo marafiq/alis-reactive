@@ -1,0 +1,7 @@
+f2986ea66:tests/Alis.Reactive.ArchitectureTests/WhenClaudeRunsAHook.cs:1
+f2986ea66:tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAContainerReadsAMember.cs:1
+f2986ea66:tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:7
+f2986ea66:tests/Alis.Reactive.ModuleTests/RequestsAndResponses/WhenARequestSendsABody.cs:1
+f2986ea66:tests/Alis.Reactive.ModuleTests/RequestsAndResponses/WhenARequestSendsInputs.cs:6
+f2986ea66:tests/Alis.Reactive.ModuleTests/RequestsAndResponses/WhenARequestSetsAMember.cs:1
+f2986ea66:tests/Alis.Reactive.ModuleTests/Validation/WhenABlockChecksItsInputsLive.cs:2

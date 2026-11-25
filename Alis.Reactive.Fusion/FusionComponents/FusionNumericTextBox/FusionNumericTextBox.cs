@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A numeric text box: EJ2's NumericTextBox, which holds a number a person types or steps with its spin buttons.
 /// </summary>
 /// <remarks>
-/// A box bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. A handler of
+/// A box bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. A handler of
 /// <see cref="Change"/> reads the committed number.
 /// </remarks>
 /// <typeparam name="TValue">The type of the member the box binds, a number that admits null, since the box holds null until set.</typeparam>

@@ -11,7 +11,7 @@
     var plan = Html.ReactivePlan<CarePlanDocument>();
 }
 <h1>Care plan</h1>
-@using (var document = Html.BeginRequestForm(plan, "care-plan-upload"))
+@using (var document = Html.BeginRequestContainer(plan, "care-plan-upload"))
 {
     <fieldset>
         <legend>Care plan</legend>
@@ -22,7 +22,7 @@
     <p>Files chosen: <output id="chosen">0</output></p>
     <button type="button" @Html.Raises(plan, CarePlanUploads.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(CarePlanUploads.Save, pipeline => pipeline
-        .Post<CarePlanDocument>(CarePlanUploadEndpoints.CarePlans, request => request.Form(document.Form))
+        .Post<CarePlanDocument>(CarePlanUploadEndpoints.CarePlans, request => request.Inputs(document.Container))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
 }
 <p>Saved care plan: <output id="saved">Not saved</output></p>

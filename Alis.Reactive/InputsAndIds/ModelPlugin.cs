@@ -16,9 +16,9 @@ internal static class ModelPlugin
         plan.BindsInput(inputId, binding);
         DeclaredIn(plan);
     }
-    internal static void Contains(PlanContent plan, string id, ContainerKind kind, string summary, IReadOnlyList<Live> live)
+    internal static void Contains(PlanContent plan, string id, string summary, IReadOnlyList<Live> live)
     {
-        plan.RendersContainer(id, new Container(plan.Model, kind, summary, live));
+        plan.RendersContainer(id, new Container(plan.Model, summary, live));
         DeclaredIn(plan);
     }
 
@@ -27,8 +27,6 @@ internal static class ModelPlugin
     internal static Expression Captured(PlanContent plan, string containerId, string model) => Called(plan, "captured", containerId, model);
 
     internal static Expression Sends(PlanContent plan, string containerId, string model) => Called(plan, "sends", containerId, model);
-
-    internal static Expression Submits(PlanContent plan, string formId, string model) => Called(plan, "submits", formId, model);
 
     internal static Expression Input(PlanContent plan, string inputId, string name) => Called(plan, "input", inputId, name);
 

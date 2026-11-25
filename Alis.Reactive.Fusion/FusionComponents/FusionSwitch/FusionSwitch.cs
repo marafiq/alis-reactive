@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A switch: EJ2's Switch, which a person turns on or off.
 /// </summary>
 /// <remarks>
-/// A switch bound to a member is an input: a form sends its <see cref="Checked"/> and a check reads it. EJ2 raises
+/// A switch bound to a member is an input: a request container sends its <see cref="Checked"/> and a check reads it. EJ2 raises
 /// <see cref="Change"/> when a person flips the switch.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-buttons", "Switch")]

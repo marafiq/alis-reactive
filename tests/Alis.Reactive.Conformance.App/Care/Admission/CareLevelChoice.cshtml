@@ -11,14 +11,14 @@
     var plan = Html.ReactivePlan<CareLevelChoice>();
 }
 <h1>Care</h1>
-@using (var care = Html.BeginRequestForm(plan, "care"))
+@using (var care = Html.BeginRequestContainer(plan, "care"))
 {
     <fieldset>
         <legend>Care level</legend>
         @(Html.InputField(plan, m => m.CareLevel).ConformanceComponent(new ConformanceStart { Text = "Care levels", Value = Model.CareLevel, Options = ["none", "residential", "nursing"] }))
     </fieldset>
     @(Html.NativeButton("save-care", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<CareLevelChoice>(CareLevelChoiceEndpoints.Choices, request => request.Form(care.Form))
+        .Post<CareLevelChoice>(CareLevelChoiceEndpoints.Choices, request => request.Inputs(care.Container))
         .Validate<CareLevelChoiceRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("care-status").Text.Set(saved.Body))))
 }

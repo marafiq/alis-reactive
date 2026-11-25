@@ -154,11 +154,11 @@ NothingRunsWhileItWaits. Keep the continuation of a condition together, before a
   `tests/Alis.Reactive.Conformance.App/Care/Admission/ArrivalDesk.cshtml`.
 - Send named values as JSON? `Json` takes a body block whose `Set` calls select request members.
   `tests/Alis.Reactive.Conformance.App/Care/Round/DoseLines.cshtml`.
-- Send URL-encoded fields? `UrlEncoded` takes the body block, preceded by the typed form or container if sent.
+- Send URL-encoded fields? `UrlEncoded` takes the body block, preceded by the container's handle if sent.
   `tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAdmit.cshtml`.
 - Send one text body? `Text` takes that text source instead of a body with named members.
   `tests/Alis.Reactive.Conformance.App/Care/Round/NightHandover.cshtml`.
-- Send native fields and files? `Form` takes the form handle; the condensed POST body is multipart.
+- Send a container's inputs and files? `Multipart` takes the container's handle and a body whose `File` sends each file.
   `tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeDocuments.cshtml`.
 - Send a member only under a condition? `When` on the parts or body takes the condition, then `Then` adds the part.
   `tests/Alis.Reactive.Conformance.App/Care/Round/DoseLines.cshtml`.
@@ -247,8 +247,9 @@ Two requests started together, each with its own route, in
   `tests/Alis.Reactive.Conformance.App/Care/Admission/ArrivalDesk.cshtml`.
 - Send that group? `Inputs` takes its `Container` handle and includes framework inputs inside it from every plan.
   `tests/Alis.Reactive.Conformance.App/Care/Admission/ArrivalDesk.cshtml`.
-- Include the browser's form submission set? `BeginRequestForm` supplies a `Form` handle for native controls too.
-  `tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAdmit.cshtml`.
+- Send a control the view writes itself? Declare it an input with `InputField.Render`, or name its value with `Set`; a
+  request container sends the framework inputs inside it, and in a URL-encoded or a multipart body its hidden inputs.
+  `tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml`.
 - Include an input outside both? Request `Input` takes the request member and the view's typed `Input` handle.
   `tests/Alis.Reactive.Conformance.App/Care/Admission/RoomChoice.cshtml`.
 - Hide a bound input? `InputField` takes the plan and member; its options' `Hidden` keeps the binding and send.

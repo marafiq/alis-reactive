@@ -23,9 +23,9 @@ A member's four names and the wire that carries them (D2.3, `MemberPath`) are mo
 name the contract holds. The analyzers' code is module 20's: the reflection analyzer (N18.1), the declaration analyzer
 (N18.2), the override analyzer ALIS025 (N18.5) and the rungs of D18.6, with `TypedDslExemptionAttribute`, ALIS009's
 exemption. A declaration's vocabulary, `LiveObject<T>()`, `LiveObjects<T>()`, `Method`, `MethodAsync` and the property
-declarations Q18 keeps, is module 11's. A check's starts, the table of D16.6 by host and format, are module
-8's; this module says where a start comes from. The request's container and its `Form` and `Inputs` (N18.3) are
-module 6's and module 7's doors; X18.3 sits here as the verdict on the request member found by name. This module
+declarations Q18 keeps, is module 11's. A check's starts, the table of D16.6 by host and format, are module 8's; this
+module says where a start comes from. The request's container and its `Inputs` (N18.3) are module 6's and module 7's
+doors; X18.3 sits here as the verdict on the request member found by name. This module
 claims three doors by door: `NativeButtonBuilder<TModel>.Type`, `NativeTextBoxBuilder<TModel, TProp>.Type` and
 `NativeActionLinkBuilder<TModel>.Attr`. The rest of each builder is module 24's, the action link module 25's.
 

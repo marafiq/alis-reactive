@@ -180,9 +180,6 @@ Alis.Reactive.RenderingAndDelivery.RequestBlocks
 Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>
 Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>.Container.get -> Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>!
 Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>.Dispose() -> void
-Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>
-Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>.Dispose() -> void
-Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>.Form.get -> Alis.Reactive.RequestsAndResponses.RequestForm<TModel>!
 Alis.Reactive.RenderingAndDelivery.RequestServices
 Alis.Reactive.RenderingAndDelivery.RequestTimeZone
 Alis.Reactive.RenderingAndDelivery.RowEntries<TRow>
@@ -239,7 +236,6 @@ Alis.Reactive.RequestsAndResponses.PageUrl<TPage>
 Alis.Reactive.RequestsAndResponses.PageUrl<TPage>.Read<TValue>(System.Linq.Expressions.Expression<System.Func<TPage, TValue>!>! member) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
 Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>
 Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>.Read<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
-Alis.Reactive.RequestsAndResponses.RequestForm<TModel>
 Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>
 Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>.Body.get -> Alis.Reactive.Declarations.ReadOnly<TBody>!
 Alis.Reactive.RequestsAndResponses.Response<TRequest>
@@ -284,7 +280,6 @@ Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Header<TValue>(string! na
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Json(Alis.Reactive.RequestsAndResponses.RequestContainer<TRequest>! container, System.Action<Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Json(System.Action<Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Multipart(Alis.Reactive.RequestsAndResponses.RequestContainer<TRequest>! container, System.Action<Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
-Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Multipart(Alis.Reactive.RequestsAndResponses.RequestForm<TRequest>! form, System.Action<Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Multipart(System.Action<Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
@@ -295,7 +290,6 @@ Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Query<TValue>(System.Linq
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Text(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Text(string! text) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.UrlEncoded(Alis.Reactive.RequestsAndResponses.RequestContainer<TRequest>! container, System.Action<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
-Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.UrlEncoded(Alis.Reactive.RequestsAndResponses.RequestForm<TRequest>! form, System.Action<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.UrlEncoded(System.Action<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!>!
 Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>
@@ -821,7 +815,6 @@ static Alis.Reactive.RenderingAndDelivery.PlanHtml.Raises<TModel>(this System.We
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.ReactivePlan<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html) -> Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>!
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.RenderPlan<TModel>(this System.Web.Mvc.HtmlHelper! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan) -> System.Web.IHtmlString!
 static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestContainer<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! containerId) -> Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>!
-static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestForm<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! containerId) -> Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>!
 static Alis.Reactive.RenderingAndDelivery.RequestServices.AddReactiveRequests(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.TriggersAndPipelines.RequestDefaults!>! requests) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RenderingAndDelivery.RequestTimeZone.RendersUnder(this System.Web.HttpContextBase! context, System.TimeZoneInfo! timeZone) -> void
 static Alis.Reactive.RenderingAndDelivery.TracingServices.AddReactiveTracing(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Tracing.ReactiveTracing!>! tracing) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
@@ -841,8 +834,6 @@ static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRe
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!
-static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Form<TRequest>(this Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>! request, Alis.Reactive.RequestsAndResponses.RequestForm<TRequest>! form) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
-static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Form<TRequest>(this Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>! request, Alis.Reactive.RequestsAndResponses.RequestForm<TRequest>! form) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TMember, TValue>(this Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TMember, TValue>(this Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TMember, TValue>(this Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!

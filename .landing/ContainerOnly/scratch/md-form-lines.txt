@@ -1,0 +1,7 @@
+f2986ea66:.claude/rules/analyzers.md:100:   the compiler meets one; a rule whose spec line reads every file has a refused case in a hand-written file too.
+f2986ea66:.claude/skills/build-a-screen/SKILL.md:161:- Send native fields and files? `Form` takes the form handle; the condensed POST body is multipart.
+f2986ea66:.claude/skills/build-a-screen/SKILL.md:250:- Include the browser's form submission set? `BeginRequestForm` supplies a `Form` handle for native controls too.
+f2986ea66:README.md:8:MVC 5 (.NET Framework 4.8), who want dynamic pages without hand-written scripts, and who want to bring
+f2986ea66:tests/Alis.Reactive.Conformance.App/CLAUDE.md:24:  hold a form (the owner, 2026-11-08: "forms are not always possible -- could be a container"); `Html.BeginRequestForm`
+f2986ea66:tests/Alis.Reactive.Conformance.App/CLAUDE.md:103:  `Html.BeginRequestForm`, ended by `using`, with the pipeline that sends it inside the block
+f2986ea66:tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md:61:  (`Vendors/Bench/WhenAConditionComparesATextBoxWithAComponentsMember.cs`). A form's submission set leaves as

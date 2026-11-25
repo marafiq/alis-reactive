@@ -8,7 +8,8 @@ public static partial class CarePages
     public const string OpenRoom = Admission + "open-room";
     public const string IntakeContact = Admission + "intake-contact";
     public const string IntakeAdmit = Admission + "intake-admit";
-    public const string IntakeAdmitWardApart = Admission + "intake-admit/ward-apart";
+    public const string IntakeAdmitWithoutTheWard = Admission + "intake-admit/without-the-ward";
+    public const string IntakeHandover = Admission + "intake-handover";
     public const string VisitAdmit = Admission + "visit-admit";
     public const string VisitAdmitOwnSection = Admission + "visit-admit/own-section";
     public const string BadgeDesk = Admission + "badge-desk";

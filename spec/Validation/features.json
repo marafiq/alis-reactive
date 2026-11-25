@@ -1163,7 +1163,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Post<CareRota>(careSavesUrl, request => request.Form(careRota.Form)).Validate<CareRotaRules>(CareRotaRules.Care)",
+          "text": "pipeline.Post<CareRota>(careSavesUrl, request => request.Inputs(careRota.Container)).Validate<CareRotaRules>(CareRotaRules.Care)",
           "doors": [
             "N10.7"
           ]
@@ -2312,10 +2312,10 @@
         },
         {
           "for": "X16.18",
-          "page": "A supplies page whose native form holds a hand-written <input name=\"Code\">, the form's summary and Submit, which posts the form; the endpoint answers a 400 for Code, \"Unknown code.\"",
+          "page": "A supplies page whose container holds the view's own Code text box, declared a component, the container's summary and Submit, which posts the container's inputs with Code set from that component; the endpoint answers a 400 for Code, \"Unknown code.\"",
           "gesture": "Type ZZ9 in Code and click Submit.",
-          "outcome": "\"Unknown code.\" shows in the form's summary and nothing shows beside the input.",
-          "opposite": "A framework input of Code in the same form shows the message beside it and in the summary.",
+          "outcome": "\"Unknown code.\" shows in the container's summary and nothing shows beside the text box.",
+          "opposite": "A framework input of Code in the same container shows the message beside it and in the summary.",
           "defect": "The message element is found by an id built from the name, so the message shows nowhere, or beside an element the page did not give it."
         },
         {

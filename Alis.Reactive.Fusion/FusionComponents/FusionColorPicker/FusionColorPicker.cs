@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A color picker: EJ2's ColorPicker, which holds a member's color as hex text.
 /// </summary>
 /// <remarks>
-/// A color picker bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2
+/// A color picker bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2
 /// raises <see cref="Change"/> when a person picks a color, which commits it.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-inputs", "ColorPicker")]

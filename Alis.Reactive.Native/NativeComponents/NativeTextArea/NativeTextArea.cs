@@ -7,7 +7,7 @@ namespace Alis.Reactive.Native.NativeComponents;
 /// A text area: an HTML <c>textarea</c> that holds a member's text.
 /// </summary>
 /// <remarks>
-/// A text area bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it.
+/// A text area bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it.
 /// </remarks>
 [Mirrors("lib.dom", "HTMLTextAreaElement")]
 public sealed class NativeTextArea : NativeComponent, IInputComponent

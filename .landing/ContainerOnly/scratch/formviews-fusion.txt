@@ -1,0 +1,10 @@
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/AllergyIntake.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/BedAllocation.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/CarePlanUpload.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/GuardianAllergies.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/IntakeCheck.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/LanguageIntake.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/MedicationIntake.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/WardPlacement.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Handover/SummarySending.cshtml

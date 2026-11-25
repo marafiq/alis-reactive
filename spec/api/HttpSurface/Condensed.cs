@@ -7,8 +7,6 @@ namespace Alis.Reactive.Pipelines;
 
 public static class CondensedStandIns
 {
-    public static QueriedParts<TRequest> Form<TRequest>(this QueryParts<TRequest> request, RequestForm<TRequest> form) => throw new NotSupportedException();
-
     public static QueriedParts<TRequest> Inputs<TRequest>(this QueryParts<TRequest> request, RequestContainer<TRequest> container) => throw new NotSupportedException();
 
     public static QueriedParts<TRequest> Set<TRequest, TValue>(this QueriedParts<TRequest> request, Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
@@ -46,8 +44,6 @@ public static class CondensedStandIns
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
         => throw new NotSupportedException();
-
-    public static BodiedParts<TRequest> Form<TRequest>(this BodyParts<TRequest> request, RequestForm<TRequest> form) => throw new NotSupportedException();
 
     public static BodiedParts<TRequest> Inputs<TRequest>(this BodyParts<TRequest> request, RequestContainer<TRequest> container) => throw new NotSupportedException();
 

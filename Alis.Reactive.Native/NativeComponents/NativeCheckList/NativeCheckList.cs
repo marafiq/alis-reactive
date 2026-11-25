@@ -8,7 +8,7 @@ namespace Alis.Reactive.Native.NativeComponents;
 /// A check list: a list of check boxes that holds one member, its value the checked boxes' values.
 /// </summary>
 /// <remarks>
-/// A check list bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. A write
+/// A check list bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. A write
 /// of <see cref="Value"/> checks exactly the boxes whose values it holds, a write of nothing checks none, and a
 /// write raises no <see cref="Change"/>.
 /// </remarks>

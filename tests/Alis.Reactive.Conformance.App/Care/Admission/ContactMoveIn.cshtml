@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<ContactMoveIn>();
 }
 <h1>Move in</h1>
-@using (var moveIn = Html.BeginRequestForm(plan, "move-in"))
+@using (var moveIn = Html.BeginRequestContainer(plan, "move-in"))
 {
     @(Html.InputField(plan, m => m.Phone, options => options.Label("Phone")).NativeTextBox())
     <section aria-label="Next of kin">
@@ -20,7 +20,7 @@
     @(Html.InputField(plan, m => m.Email, options => options.Label("Email")).NativeTextBox())
     <button type="button" @Html.Raises(plan, ContactMoveIns.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(ContactMoveIns.Save, pipeline => pipeline
-        .Post<ContactMoveIn>(ContactMoveInEndpoints.MoveIns, request => request.Form(moveIn.Form))
+        .Post<ContactMoveIn>(ContactMoveInEndpoints.MoveIns, request => request.Inputs(moveIn.Container))
         .OnSuccess(Content.Text, (bound, pipeline) => pipeline.Element("bound").Text.Set(bound.Body))));
 }
 <p>Saved: <span id="bound">-</span></p>

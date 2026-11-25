@@ -1,0 +1,55 @@
+[check] the plan contract, generated from the grammar
+[contract] wrote plan.ts and plan.schema.json to /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Assets/runtime/Schema
+diff --git a/Alis.Reactive.Assets/runtime/Schema/plan.schema.json b/Alis.Reactive.Assets/runtime/Schema/plan.schema.json
+index cf65b7208..a3337438c 100644
+--- a/Alis.Reactive.Assets/runtime/Schema/plan.schema.json
++++ b/Alis.Reactive.Assets/runtime/Schema/plan.schema.json
+@@ -1250,9 +1250,6 @@
+         "model": {
+           "type": "string"
+         },
+-        "kind": {
+-          "$ref": "#/$defs/ContainerKind"
+-        },
+         "summary": {
+           "type": "string"
+         },
+@@ -1265,18 +1262,11 @@
+       },
+       "required": [
+         "model",
+-        "kind",
+         "summary",
+         "live"
+       ],
+       "additionalProperties": false
+     },
+-    "ContainerKind": {
+-      "enum": [
+-        "form",
+-        "element"
+-      ]
+-    },
+     "Live": {
+       "type": "object",
+       "properties": {
+diff --git a/Alis.Reactive.Assets/runtime/Schema/plan.ts b/Alis.Reactive.Assets/runtime/Schema/plan.ts
+index c3cfbf8d1..0cf864c60 100644
+--- a/Alis.Reactive.Assets/runtime/Schema/plan.ts
++++ b/Alis.Reactive.Assets/runtime/Schema/plan.ts
+@@ -316,13 +316,10 @@ export interface InputBinding {
+ 
+ export interface Container {
+   readonly model: string;
+-  readonly kind: ContainerKind;
+   readonly summary: string;
+   readonly live: readonly Live[];
+ }
+ 
+-export type ContainerKind = "form" | "element";
+-
+ export interface Live {
+   readonly validator: string;
+   readonly ruleSet: string;
+[check] The grammar generates another contract than the tracked one: stage the plan.ts and plan.schema.json it wrote.
+exit 1

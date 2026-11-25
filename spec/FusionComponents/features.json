@@ -122,7 +122,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionMultiSelect<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionMultiSelect<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N1",
       "M7.N3"
@@ -239,7 +239,7 @@
      "page": "An intake page whose allergy FusionMultiSelect is rendered with the items Penicillin and Latex handed over with the view, of an allergy class whose display label member carries [JsonPropertyName(\"label\")], and Fields(a => a.DisplayLabel, a => a.AllergyCode).",
      "gesture": "Click the allergy box to open its list.",
      "outcome": "The list shows Penicillin and Latex.",
-     "opposite": "Choosing Latex shows Latex in the box, and the form sends its code 9.",
+     "opposite": "Choosing Latex shows Latex in the box, and the container sends its code 9.",
      "defect": "EJ2 writes the handed items through Newtonsoft as displayLabel while the field names label, so the list shows two empty options."
     },
     {
@@ -1596,7 +1596,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionAutoComplete<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionAutoComplete<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N5",
       "M7.N3"
@@ -1719,7 +1719,7 @@
      "page": "An intake page whose medication FusionAutoComplete is rendered with the items Warfarin and Metformin handed over with the view, of a medication class whose display label member carries [JsonPropertyName(\"label\")], and Fields(m => m.DisplayLabel, m => m.DisplayLabel).",
      "gesture": "Type war in the medication box.",
      "outcome": "The suggestions show Warfarin.",
-     "opposite": "Typing met instead suggests Metformin, and choosing it sends Metformin with the form.",
+     "opposite": "Typing met instead suggests Metformin, and choosing it sends Metformin with its container.",
      "defect": "EJ2 writes the handed items through Newtonsoft as displayLabel while the field names label, so typing war suggests nothing."
     },
     {
@@ -3625,7 +3625,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionCheckBox bound to a member of bool is an input: its Checked, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionCheckBox bound to a member of bool is an input: its Checked, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N10",
       "M7.N3"
@@ -4461,7 +4461,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionColorPicker bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionColorPicker bound to a member is an input: its Value, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N12",
       "M7.N3"
@@ -4781,7 +4781,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionComboBox<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionComboBox<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N13",
       "M7.N3"
@@ -5013,7 +5013,7 @@
      "page": "An intake page whose preferred language FusionComboBox is rendered with the languages Tagalog and Punjabi handed over with the view, of a language class whose display label member carries [JsonPropertyName(\"label\")], and Fields(l => l.DisplayLabel, l => l.LanguageCode).",
      "gesture": "Open the language box's popup.",
      "outcome": "The list shows Tagalog and Punjabi.",
-     "opposite": "Choosing Punjabi shows Punjabi in the box, and the form sends its code pa.",
+     "opposite": "Choosing Punjabi shows Punjabi in the box, and the container sends its code pa.",
      "defect": "EJ2 writes the handed items through Newtonsoft as displayLabel while the field names label, so the list shows two empty options."
     },
     {
@@ -6003,7 +6003,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionDatePicker<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends, a DateTime? as its wall text with no offset and a DateTimeOffset? as the browser's clock with its offset (D3.8, D3.9), and what a check reads.",
+     "text": "A FusionDatePicker<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a request container sends, a DateTime? as its wall text with no offset and a DateTimeOffset? as the browser's clock with its offset (D3.8, D3.9), and what a check reads.",
      "doors": [
       "M21.N15",
       "M7.N3"
@@ -6336,7 +6336,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionDateRangePicker bound to a member of DateTime[] or DateTime[]? is an input: its Value, committed by Change, is what a form sends, each day's text with no offset (D3.8), and what a check reads.",
+     "text": "A FusionDateRangePicker bound to a member of DateTime[] or DateTime[]? is an input: its Value, committed by Change, is what a request container sends, each day's text with no offset (D3.8), and what a check reads.",
      "doors": [
       "M21.N16",
       "M7.N3"
@@ -6693,7 +6693,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionDateTimePicker<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends, a DateTime? as its wall text with no offset and a DateTimeOffset? as the browser's clock with its offset (D3.8, D3.9), and what a check reads.",
+     "text": "A FusionDateTimePicker<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a request container sends, a DateTime? as its wall text with no offset and a DateTimeOffset? as the browser's clock with its offset (D3.8, D3.9), and what a check reads.",
      "doors": [
       "M21.N17",
       "M7.N3"
@@ -7848,7 +7848,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionDropDownList<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionDropDownList<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N20",
       "M7.N3"
@@ -7962,7 +7962,7 @@
      "page": "An admission page whose ward FusionDropDownList is rendered with the wards Maple and Cedar handed over with the view, of a ward class whose display label member carries [JsonPropertyName(\"label\")], and Fields(w => w.DisplayLabel, w => w.WardCode).",
      "gesture": "Click the ward list to open it.",
      "outcome": "The list shows Maple and Cedar.",
-     "opposite": "Choosing Cedar shows Cedar in the list, and the form sends its code C2.",
+     "opposite": "Choosing Cedar shows Cedar in the list, and the container sends its code C2.",
      "defect": "EJ2 writes the handed wards through Newtonsoft as displayLabel while the field names label, so the list shows two empty options."
     },
     {
@@ -8256,7 +8256,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionDropDownTree bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionDropDownTree bound to a member is an input: its Value, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N21",
       "M7.N3"
@@ -8670,7 +8670,7 @@
     },
     {
      "line": "proposed",
-     "text": "field.FusionUploader() and field.FusionUploader(build => ..) render the uploader under the field's id and binding name with automatic upload off, so the files go with the form; the framework's own component code raises FilesChanged once the uploader holds the chosen files, since EJ2's change follows a server upload alone.",
+     "text": "field.FusionUploader() and field.FusionUploader(build => ..) render the uploader under the field's id and binding name with automatic upload off, so the files go with its request container; the framework's own component code raises FilesChanged once the uploader holds the chosen files, since EJ2's change follows a server upload alone.",
      "doors": [
       "M21.N22",
       "M7.N2",
@@ -8805,7 +8805,7 @@
    ],
    "promises": [
     {
-     "page": "An admission's care plan document, rendered by field.FusionUploader() for a model whose CarePlan is an IFormFile, whose FilesChanged handler sets the element chosen's text to the count of the uploader's Files, and whose Save button posts the form as form data to an endpoint that echoes the file name of the CarePlan it bound; chosen starts as 0.",
+     "page": "An admission's care plan document, rendered by field.FusionUploader() for a model whose CarePlan is an IFormFile, whose FilesChanged handler sets the element chosen's text to the count of the uploader's Files, and whose Save button sends its container as form data to an endpoint that echoes the file name of the CarePlan it bound; chosen starts as 0.",
      "gesture": "Choose care-plan.pdf in the uploader, then click Save.",
      "outcome": "chosen reads 1 at once, the network log holds no request until Save, and the echo reads care-plan.pdf.",
      "opposite": "Clicking Save with no file chosen, the echo reads no file.",
@@ -11711,7 +11711,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionMaskedTextBox bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionMaskedTextBox bound to a member is an input: its Value, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N25",
       "M7.N3"
@@ -14820,7 +14820,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionMultiColumnComboBox<TValue> bound to a member is an input: its Value, a string? as EJ2 declares it, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionMultiColumnComboBox<TValue> bound to a member is an input: its Value, a string? as EJ2 declares it, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N31",
       "M7.N3"
@@ -14939,7 +14939,7 @@
      "page": "A bed assignment page whose bed FusionMultiColumnComboBox is rendered with the beds 12A Maple and 14B Cedar handed over with the view, of a bed class whose display label member carries [JsonPropertyName(\"label\")], and Fields(b => b.DisplayLabel, b => b.BedCode).",
      "gesture": "Open the bed box's popup and click the row of bed 12A.",
      "outcome": "The bed box shows 12A Maple.",
-     "opposite": "Choosing the row of bed 14B instead shows 14B Cedar, and the form sends its code 14B.",
+     "opposite": "Choosing the row of bed 14B instead shows 14B Cedar, and the container sends its code 14B.",
      "defect": "EJ2 writes the handed beds through Newtonsoft as displayLabel while the field names label, so the box shows no text after the choice."
     },
     {
@@ -15229,7 +15229,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionNumericTextBox<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionNumericTextBox<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N32",
       "M7.N3"
@@ -15620,7 +15620,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionOtpInput bound to a member of text is an input: its Value, committed by ValueChanged once every box holds a digit, is what a form sends and a check reads.",
+     "text": "A FusionOtpInput bound to a member of text is an input: its Value, committed by ValueChanged once every box holds a digit, is what a request container sends and a check reads.",
      "doors": [
       "M21.N33",
       "M7.N3"
@@ -17336,7 +17336,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionRating bound to a member of double is an input: its Value, committed by ValueChanged, is what a form sends and a check reads.",
+     "text": "A FusionRating bound to a member of double is an input: its Value, committed by ValueChanged, is what a request container sends and a check reads.",
      "doors": [
       "M21.N37",
       "M7.N3"
@@ -17663,7 +17663,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionRichTextEditor bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionRichTextEditor bound to a member is an input: its Value, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N38",
       "M7.N3"
@@ -17786,10 +17786,10 @@
     },
     {
      "for": "M21.X1038",
-     "page": "A handover summary page whose form holds the Summary's FusionRichTextEditor, starting at <p>Ate a full lunch.</p>, and a Send button that posts the form URL-encoded to the page's endpoint, which answers the summary it bound.",
+     "page": "A handover summary page whose own form holds the Summary's FusionRichTextEditor, starting at <p>Ate a full lunch.</p>, and a submit button that posts the form URL-encoded to the page's endpoint, which answers the fields it read.",
      "gesture": "Click Send.",
-     "outcome": "The request's body is Summary=%3Cp%3EAte+a+full+lunch.%3C%2Fp%3E, and the page shows the bound <p>Ate a full lunch.</p>.",
-     "opposite": "A blank summary sends Summary= alone, and the page shows No summary.",
+     "outcome": "The request's body is Summary=%3Cp%3EAte+a+full+lunch.%3C%2Fp%3E, and the page shows the one field it read, Summary.",
+     "opposite": "A blank summary posts Summary= alone, and the page shows Summary.",
      "defect": "The editor's textarea keeps the name EJ2 gives it, the editor's id, so the body carries the content under that id too."
     }
    ],
@@ -19607,7 +19607,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionSlider<TValue> bound to a member is an input: its Value, the member's own type, committed by Changed when the handle settles, is what a form sends and a check reads.",
+     "text": "A FusionSlider<TValue> bound to a member is an input: its Value, the member's own type, committed by Changed when the handle settles, is what a request container sends and a check reads.",
      "doors": [
       "M21.N41",
       "M7.N3"
@@ -20282,7 +20282,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionSmartTextArea bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionSmartTextArea bound to a member is an input: its Value, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N43",
       "M7.N3"
@@ -21540,7 +21540,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionSwitch bound to a member of bool is an input: its Checked, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionSwitch bound to a member of bool is an input: its Checked, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N46",
       "M7.N3"
@@ -22186,7 +22186,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionTextArea bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionTextArea bound to a member is an input: its Value, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N48",
       "M7.N3"
@@ -22619,7 +22619,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionTextBox bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionTextBox bound to a member is an input: its Value, committed by Change, is what a request container sends and a check reads.",
      "doors": [
       "M21.N49",
       "M7.N3"
@@ -23057,7 +23057,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionTimePicker<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends, a DateTime? as its wall text with no offset and a DateTimeOffset? as the browser's clock with its offset (D3.8, D3.9), and what a check reads.",
+     "text": "A FusionTimePicker<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a request container sends, a DateTime? as its wall text with no offset and a DateTimeOffset? as the browser's clock with its offset (D3.8, D3.9), and what a check reads.",
      "doors": [
       "M21.N50",
       "M7.N3"

@@ -1,0 +1,123 @@
+TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802)
+Warning: Please run the Java VM which executes TLC with a throughput optimized garbage collector by passing the "-XX:+UseParallelGC" property.
+(Use the -nowarning option to disable this warning.)
+Running breadth-first search Model-Checking with fp 28 and seed 5892586588728103860 with 2 workers on 12 cores with 16384MB heap and 64MB offheap memory [pid: 72660] (Mac OS X 27.2 aarch64, Homebrew 27.0.1.0.3 x86_64, MSBDiskFPSet, DiskStateQueue).
+Parsing file /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/.landing/ContainerOnly/scratch/tlc-request-mutant/Request.tla
+Parsing file /private/var/folders/ts/4m22lz5x5f92s0xkfy21j8j40000gn/T/Naturals.tla
+Parsing file /private/var/folders/ts/4m22lz5x5f92s0xkfy21j8j40000gn/T/Sequences.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module Request
+Starting... (2026-11-25 02:41:53)
+Computing initial states...
+Computed 2 initial states...
+Computed 4 initial states...
+Computed 8 initial states...
+Computed 16 initial states...
+Computed 32 initial states...
+Computed 64 initial states...
+Computed 128 initial states...
+Computed 256 initial states...
+Computed 512 initial states...
+Computed 1024 initial states...
+Computed 2048 initial states...
+Computed 4096 initial states...
+Computed 8192 initial states...
+Computed 16384 initial states...
+Computed 32768 initial states...
+Computed 65536 initial states...
+Computed 131072 initial states...
+Computed 262144 initial states...
+Computed 524288 initial states...
+Computed 1048576 initial states...
+Computed 2097152 initial states...
+Computed 4194304 initial states...
+Finished computing initial states: 5308656 distinct states generated at 2026-11-25 02:42:09.
+Error: Invariant FailedCheckSendsNothing is violated.
+Error: The behavior up to this point is:
+State 1: <Initial predicate>
+/\ routeStops = FALSE
+/\ loadings = 0
+/\ successRoute = FALSE
+/\ chainedWhen = FALSE
+/\ routes = 0
+/\ final = "none"
+/\ stopped = FALSE
+/\ outcomes = <<"ok", "ok">>
+/\ entered = FALSE
+/\ pc = "check"
+/\ reqRoutes = {}
+/\ guardOk = FALSE
+/\ method = "GET"
+/\ chained = FALSE
+/\ defaultLoadings = 0
+/\ defaultLoadingStops = FALSE
+/\ checkPasses = FALSE
+/\ takesDefaults = FALSE
+/\ part = "flow"
+/\ holds = 0
+/\ config = [ placeholder |-> "filled",
+  filler |-> "scalar",
+  file |-> "none",
+  method |-> "GET",
+  format |-> "file" ]
+/\ defaultFinallies = 0
+/\ finallies = 0
+/\ outerEntered = FALSE
+/\ defRoutes = {}
+/\ submittedNatively = FALSE
+/\ finallyStops = FALSE
+/\ routeRan = <<"unset", "unset">>
+/\ policy = FALSE
+/\ loadingStops = FALSE
+/\ chainedRan = FALSE
+/\ held = FALSE
+/\ afterRan = FALSE
+/\ sends = 0
+/\ attempt = 1
+
+State 2: <NativeSubmit line 271, col 5 to line 278, col 126 of module Request>
+/\ routeStops = FALSE
+/\ loadings = 0
+/\ successRoute = FALSE
+/\ chainedWhen = FALSE
+/\ routes = 0
+/\ final = "none"
+/\ stopped = FALSE
+/\ outcomes = <<"ok", "ok">>
+/\ entered = FALSE
+/\ pc = "check"
+/\ reqRoutes = {}
+/\ guardOk = FALSE
+/\ method = "GET"
+/\ chained = FALSE
+/\ defaultLoadings = 0
+/\ defaultLoadingStops = FALSE
+/\ checkPasses = FALSE
+/\ takesDefaults = FALSE
+/\ part = "flow"
+/\ holds = 0
+/\ config = [ placeholder |-> "filled",
+  filler |-> "scalar",
+  file |-> "none",
+  method |-> "GET",
+  format |-> "file" ]
+/\ defaultFinallies = 0
+/\ finallies = 0
+/\ outerEntered = FALSE
+/\ defRoutes = {}
+/\ submittedNatively = TRUE
+/\ finallyStops = FALSE
+/\ routeRan = <<"unset", "unset">>
+/\ policy = FALSE
+/\ loadingStops = FALSE
+/\ chainedRan = FALSE
+/\ held = FALSE
+/\ afterRan = FALSE
+/\ sends = 1
+/\ attempt = 1
+
+5308660 states generated, 5308660 distinct states found, 5308416 states left on queue.
+The depth of the complete state graph search is 2.
+The average outdegree of the complete state graph is 0 (minimum is 0, the maximum 0 and the 95th percentile is 0).
+Finished in 16s at (2026-11-25 02:42:09)

@@ -9,7 +9,7 @@
     var plan = Html.ReactivePlan<IntakeBed>();
 }
 <h1>Intake</h1>
-@using (Html.BeginRequestForm(plan, "intake"))
+@using (Html.BeginRequestContainer(plan, "intake"))
 {
     @(Html.NativeHiddenField(plan, m => m.AssignedBed).Reactive(field => field.Change, (changed, pipeline) => pipeline
         .Element("bed-echo").Text.Set(pipeline.Input(m => m.AssignedBed).Component<NativeHiddenField>().Value)))

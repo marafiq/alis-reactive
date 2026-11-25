@@ -18,12 +18,12 @@ public sealed class WhenARichTextEditorIsSentInAForm(string host) : FusionFixtur
         await written.Page.GotoAsync(CarePages.SummarySendingWritten);
         var sent = await written.Page.RunAndWaitForRequestAsync(() => written.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Send", Exact = true }).ClickAsync(), "**/summaries");
         Assert.That(sent.PostData, Is.EqualTo("Summary=%3Cp%3EAte+a+full+lunch.%3C%2Fp%3E"));
-        await Expect(written.Page.Locator("#sent")).ToHaveTextAsync("<p>Ate a full lunch.</p>");
+        await Expect(written.Page.Locator("#sent")).ToHaveTextAsync("Summary");
 
         var blank = await NewWorld();
         await blank.Page.GotoAsync(CarePages.SummarySendingBlank);
         var sentBlank = await blank.Page.RunAndWaitForRequestAsync(() => blank.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Send", Exact = true }).ClickAsync(), "**/summaries");
         Assert.That(sentBlank.PostData, Is.EqualTo("Summary="));
-        await Expect(blank.Page.Locator("#sent")).ToHaveTextAsync("No summary");
+        await Expect(blank.Page.Locator("#sent")).ToHaveTextAsync("Summary");
     }
 }

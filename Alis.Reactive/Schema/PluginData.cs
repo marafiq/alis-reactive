@@ -107,35 +107,18 @@ internal sealed class InputBinding
 
 internal sealed class Container
 {
-    internal Container(string model, ContainerKind kind, string summary, IReadOnlyList<Live> live)
+    internal Container(string model, string summary, IReadOnlyList<Live> live)
     {
         Model = model;
-        Kind = kind;
         Summary = summary;
         Live = live;
     }
 
     public string Model { get; }
 
-    public ContainerKind Kind { get; }
-
     public string Summary { get; }
 
     public IReadOnlyList<Live> Live { get; }
-}
-
-[JsonConverter(typeof(ChoiceConverter<ContainerKind>))]
-internal sealed class ContainerKind : IChoice
-{
-    internal static readonly ContainerKind Form = new("form");
-    internal static readonly ContainerKind Element = new("element");
-
-    private ContainerKind(string text)
-    {
-        Text = text;
-    }
-
-    public string Text { get; }
 }
 
 internal sealed class Live

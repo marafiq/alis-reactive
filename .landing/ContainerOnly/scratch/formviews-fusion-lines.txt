@@ -1,0 +1,22 @@
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/AllergyIntake.cshtml:2:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/AllergyIntake.cshtml:18:            .FusionMultiSelect(Model.Allergies, build => build.Fields((Allergy a) => a.DisplayLabel, a => a.AllergyCode)))
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/BedAllocation.cshtml:2:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/BedAllocation.cshtml:18:            .FusionMultiColumnComboBox<BedAllocation, string?, CareBed, string>(Model.Beds, build => build.Fields((CareBed b) => b.DisplayLabel, b => b.BedCode)))
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/CarePlanUpload.cshtml:3:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/CarePlanUpload.cshtml:19:            .FusionUploader()
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/GuardianAllergies.cshtml:2:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/IntakeCheck.cshtml:2:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/IntakeCheck.cshtml:19:            .FusionMultiSelect(HelensAllergies.Offered(), build => build.Fields((HelenAllergy a) => a.Name, a => a.Code)))
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/LanguageIntake.cshtml:2:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/LanguageIntake.cshtml:18:            .FusionComboBox(Model.Languages, build => build.Fields((CareLanguage l) => l.DisplayLabel, l => l.LanguageCode)))
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/MedicationIntake.cshtml:2:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/MedicationIntake.cshtml:18:            .FusionAutoComplete(Model.Medications, build => build.Fields((Medication m) => m.DisplayLabel, m => m.DisplayLabel)))
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml:2:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml:22:            .FusionComboBox(Model.WeekdayProviders, build => build
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml:33:        var providers = pipeline.Input(resident => resident.ProviderCode).Component<FusionComboBox<string?>>();
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml:43:        var services = pipeline.Input(resident => resident.ProviderCode).Component<FusionComboBox<string?>>();
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml:53:        var providers = pipeline.Input(resident => resident.ProviderCode).Component<FusionComboBox<string?>>();
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/WardPlacement.cshtml:2:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/WardPlacement.cshtml:18:            .FusionDropDownList(Model.Wards, build => build.Fields((HomeWard w) => w.DisplayLabel, w => w.WardCode)))
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Handover/SummarySending.cshtml:2:@using Alis.Reactive.Fusion.FusionComponents
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Handover/SummarySending.cshtml:17:        @(Html.InputField(plan, m => m.Summary, options => options.Label("Summary")).FusionRichTextEditor())

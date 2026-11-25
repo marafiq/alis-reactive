@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A text area: EJ2's TextArea, which holds a member's text over several lines.
 /// </summary>
 /// <remarks>
-/// A text area bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2 raises
+/// A text area bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2 raises
 /// <see cref="Input"/> at each keystroke and <see cref="Change"/> when the area loses focus after its text changed,
 /// which commits the text.
 /// </remarks>

@@ -11,14 +11,14 @@
     var plan = Html.ReactivePlan<FamilyForm>();
 }
 <h1>Helen Martinez's intake</h1>
-@using (var family = Html.BeginRequestForm(plan, "family"))
+@using (var family = Html.BeginRequestContainer(plan, "family"))
 {
     <fieldset>
         <legend>Guardian's allergies</legend>
         @await Html.PartialFor(m => m.Guardian, "/Care/AdmissionClinical/GuardianAllergyBox.cshtml")
     </fieldset>
     @(Html.NativeButton("save", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<FamilyForm>(GuardianAllergyEndpoints.Family, request => request.Form(family.Form))
+        .Post<FamilyForm>(GuardianAllergyEndpoints.Family, request => request.Inputs(family.Container))
         .Validate<FamilyValidator>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
 }

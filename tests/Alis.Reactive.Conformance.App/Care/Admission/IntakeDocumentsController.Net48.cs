@@ -10,7 +10,7 @@ public sealed class IntakeDocumentsController : Controller
 
     [HttpGet]
     [Address(CarePages.IntakeDocuments)]
-    public ActionResult OfAResident() => View("/Care/Admission/IntakeDocuments.cshtml", new IntakeDocuments());
+    public ActionResult OfAResident() => View("/Care/Admission/IntakeDocuments.cshtml", new IntakeDocuments { Documents = [new IntakeDocument(), new IntakeDocument()] });
 
     [HttpPost]
     [Address(IntakeDocumentsEndpoints.Saves)]

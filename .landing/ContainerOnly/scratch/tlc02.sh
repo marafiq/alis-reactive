@@ -1,0 +1,10 @@
+cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only
+( cd .landing/ContainerOnly/scratch/tlc-request-base && /opt/homebrew/opt/openjdk/bin/java -cp "$HOME/.local/share/tlaplus/tla2tools.jar" tlc2.TLC -deadlock -workers 2 -metadir states -config Request.cfg Request.tla < /dev/null > tlc.log 2>&1 )
+echo "== tlc-request-base"; grep -E 'Model checking completed|^Error:|states generated|is violated' .landing/ContainerOnly/scratch/tlc-request-base/tlc.log
+( cd .landing/ContainerOnly/scratch/tlc-request-none && /opt/homebrew/opt/openjdk/bin/java -cp "$HOME/.local/share/tlaplus/tla2tools.jar" tlc2.TLC -deadlock -workers 2 -metadir states -config Request.cfg Request.tla < /dev/null > tlc.log 2>&1 )
+echo "== tlc-request-none"; grep -E 'Model checking completed|^Error:|states generated|is violated' .landing/ContainerOnly/scratch/tlc-request-none/tlc.log
+( cd .landing/ContainerOnly/scratch/tlc-request-mutant && /opt/homebrew/opt/openjdk/bin/java -cp "$HOME/.local/share/tlaplus/tla2tools.jar" tlc2.TLC -deadlock -workers 2 -metadir states -config Request.violates.FailedCheckSendsNothing.ContainerSubmitsNatively.cfg Request.tla < /dev/null > tlc.log 2>&1 )
+echo "== tlc-request-mutant"; grep -E 'Model checking completed|^Error:|states generated|is violated' .landing/ContainerOnly/scratch/tlc-request-mutant/tlc.log
+( cd .landing/ContainerOnly/scratch/tlc-handwritten-mutant-five && /opt/homebrew/opt/openjdk/bin/java -cp "$HOME/.local/share/tlaplus/tla2tools.jar" tlc2.TLC -deadlock -workers 2 -metadir states -config ContainerRead.HandWrittenControlSent.fiveOnly.cfg ContainerRead.tla < /dev/null > tlc.log 2>&1 )
+echo "== tlc-handwritten-mutant-five"; grep -E 'Model checking completed|^Error:|states generated|is violated' .landing/ContainerOnly/scratch/tlc-handwritten-mutant-five/tlc.log
+wc -l .landing/ContainerOnly/scratch/tlc-request-none/Request.tla .landing/ContainerOnly/scratch/tlc-request-base/Request.tla .landing/ContainerOnly/scratch/tlc-handwritten/ContainerRead.tla .landing/ContainerOnly/scratch/tlc-base/ContainerRead.tla

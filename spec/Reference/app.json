@@ -18,7 +18,7 @@
     "gc": "Playwright's Page.RequestGCAsync, confirmed by the page's own weak hold"
   },
   "partKinds": {
-    "native": "a plain element or a hand-written control in the view's markup: the core reaches an element by id (M5.N1), markup raises an app event from it (M1.D3), and a native form sends its hand-written controls (D9.15); never a framework input, which a consumer renders (M7.N2)",
+    "native": "a plain element or a hand-written control in the view's markup: the core reaches an element by id (M5.N1) and markup raises an app event from it (M1.D3); never a framework input, which a consumer renders (M7.N2)",
     "conformance": "a declaration of the conformance library, spec/Reference/native.json, named by the part's declares",
     "fusion": "a Syncfusion component through its Fusion slice; never a part of a core module's test",
     "nativeSlice": "a Native slice's component (NativeDrawer, NativeToast, NativeConfirm, NativeLoader, NativeActionLink, NativeCheckList and the rest)",
@@ -332,7 +332,7 @@
         {
           "id": "documents",
           "kind": "native",
-          "role": "the intake form's document rows, each a hand-written file input and caption the form sends (D9.15)",
+          "role": "the intake container's document rows, each a file input the view declares a component and a caption input",
           "module": "RequestsAndResponses"
         },
         {
@@ -656,7 +656,7 @@
         {
           "id": "receptionForm",
           "kind": "form",
-          "role": "the visitor sign-in and native successful controls at the reception desk"
+          "role": "the visitor sign-in at the reception desk: the view's own form, posted natively, around the reception container"
         },
         {
           "id": "receptionReceipt",
@@ -15207,6 +15207,23 @@
       ],
       "parts": [
         "refusalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.47",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
       ],
       "harness": [
         "seed"

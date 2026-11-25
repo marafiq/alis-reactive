@@ -1,0 +1,9 @@
+cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only
+( cd .landing/ContainerOnly/scratch/tlc-base && /opt/homebrew/opt/openjdk/bin/java -cp "$HOME/.local/share/tlaplus/tla2tools.jar" tlc2.TLC -deadlock -workers 2 -metadir states -config ContainerRead.cfg ContainerRead.tla < /dev/null > tlc.log 2>&1 )
+echo "== tlc-base"; grep -E 'Model checking completed|^Error:|states generated|is violated' .landing/ContainerOnly/scratch/tlc-base/tlc.log
+( cd .landing/ContainerOnly/scratch/tlc-handwritten-none && /opt/homebrew/opt/openjdk/bin/java -cp "$HOME/.local/share/tlaplus/tla2tools.jar" tlc2.TLC -deadlock -workers 2 -metadir states -config ContainerRead.cfg ContainerRead.tla < /dev/null > tlc.log 2>&1 )
+echo "== tlc-handwritten-none"; grep -E 'Model checking completed|^Error:|states generated|is violated' .landing/ContainerOnly/scratch/tlc-handwritten-none/tlc.log
+( cd .landing/ContainerOnly/scratch/tlc-handwritten-mutant && /opt/homebrew/opt/openjdk/bin/java -cp "$HOME/.local/share/tlaplus/tla2tools.jar" tlc2.TLC -deadlock -workers 2 -metadir states -config ContainerRead.violates.AnUnsentMemberReadsWhatTheEndpointBinds.HandWrittenControlSent.cfg ContainerRead.tla < /dev/null > tlc.log 2>&1 )
+echo "== tlc-handwritten-mutant"; grep -E 'Model checking completed|^Error:|states generated|is violated' .landing/ContainerOnly/scratch/tlc-handwritten-mutant/tlc.log
+( cd .landing/ContainerOnly/scratch/tlc-handwritten-witness && /opt/homebrew/opt/openjdk/bin/java -cp "$HOME/.local/share/tlaplus/tla2tools.jar" tlc2.TLC -deadlock -workers 2 -metadir states -config ContainerRead.violates.ReachAHandWrittenControlLeftUnsent.cfg ContainerRead.tla < /dev/null > tlc.log 2>&1 )
+echo "== tlc-handwritten-witness"; grep -E 'Model checking completed|^Error:|states generated|is violated' .landing/ContainerOnly/scratch/tlc-handwritten-witness/tlc.log

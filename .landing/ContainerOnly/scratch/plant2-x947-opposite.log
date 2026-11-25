@@ -1,0 +1,18 @@
+[plant] running the test M6_F1.X9_47_0 without the defect
+[plant] [playwright:result] M6_F1.X9_47_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.60s Alis.Reactive.Conformance.PlaywrightTests.RequestsAndResponses.WhenAContainerHoldsAHiddenInput("net10").its_form_body_sends_the_hidden_input_under_its_name_and_its_query_sends_none
+[plant] planted in Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts; running the test M6_F1.X9_47_0
+[plant] [playwright:result] M6_F1.X9_47_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 2.38s Alis.Reactive.Conformance.PlaywrightTests.RequestsAndResponses.WhenAContainerHoldsAHiddenInput("net10").its_form_body_sends_the_hidden_input_under_its_name_and_its_query_sends_none
+[plant] caught: M6_F1.X9_47_0 failed with the defect in place (1 of 1).
+[plant]      Microsoft.Playwright.PlaywrightException : Locator expected to have text 'Name Ada'
+[plant]   But was: 'Name Ada; Shift Night; Ward North' 
+[plant]   Call log:
+[plant]     - Expect "ToHaveTextAsync" Locator("#received") with timeout 740ms
+[plant]     - waiting for Locator("#received")
+[plant]       - locator resolved to <span id="received" aria-busy="true">Desk Front; Name Ada; Shift Night; Ward North</span>
+[plant]       - unexpected value "Desk Front; Name Ada; Shift Night; Ward North"
+[plant]       8 × locator resolved to <span id="received">Name Ada; Shift Night; Ward North</span>
+[plant]         - unexpected value "Name Ada; Shift Night; Ward North"
+[plant]   Aria snapshot:
+[plant]   - text: Name Ada; Shift Night; Ward North
+[plant]   at tests/Alis.Reactive.Conformance.PlaywrightTests/RequestsAndResponses/Admission/WhenAContainerHoldsAHiddenInput.cs:line 24
+[plant] restored Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts

@@ -12,7 +12,7 @@
     var plan = Html.ReactivePlan<ConformanceEntries>();
 }
 <h1>The bench</h1>
-@using (var entries = Html.BeginRequestForm(plan, "entries"))
+@using (var entries = Html.BeginRequestContainer(plan, "entries"))
 {
     <fieldset>
         <legend>First entry</legend>
@@ -23,7 +23,7 @@
         @(Html.InputField(plan, m => m.Entries[1].Code).ConformanceComponent(new ConformanceStart { Text = "Codes", Value = Model.Entries[1].Code, Options = ["a-1", "a-2"] }))
     </fieldset>
     @(Html.NativeButton("save", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<ConformanceEntries>(BenchEndpoints.FormEntries, request => request.Form(entries.Form))
+        .Post<ConformanceEntries>(BenchEndpoints.FormEntries, request => request.Inputs(entries.Container))
         .Validate<EntriesRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("shown").Text.Set(saved.Body))))
 }

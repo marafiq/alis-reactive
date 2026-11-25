@@ -1,0 +1,87 @@
+f2986ea66:tests/Alis.Reactive.Conformance.App/Bench/Http/HttpBesideHidden.cshtml:16:    <input type="hidden" name="Batch" value="@Model.Batch">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Bench/Http/HttpBesideHidden.cshtml:18:    <button type="button" @Html.Raises(plan, HttpCells.Load)>Load</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/AddressAdmission.cshtml:13:    <button type="button" @Html.Raises(plan, AddressAdmissions.LoadTheHomeAddress)>Load the home address</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/AddressAdmission.cshtml:14:    <button type="button" @Html.Raises(plan, AddressAdmissions.LoadThePostalAddress)>Load the postal address</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/AddressedMoveIn.cshtml:18:        @Html.EditorFor(m => m.Home, "/Care/Admission/MoveInAddress.cshtml")
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/AddressedMoveIn.cshtml:22:        @Html.EditorFor(m => m.Postal, "/Care/Admission/MoveInAddress.cshtml")
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/AddressedMoveIn.cshtml:24:    <button type="button" @Html.Raises(plan, AddressedMoveIns.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/AdmissionApplication.cshtml:19:    <button type="button" @Html.Raises(plan, AdmissionApplications.Apply)>Apply</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/AdmissionDesk.cshtml:20:        <button type="button" @Html.Raises(plan, AdmissionDeskButtons.Admit)>Admit</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/AdmitResident.cshtml:23:    <button type="button" @Html.Raises(plan, AdmitResidentButtons.Admit)>Admit</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/BedCommit.cshtml:16:    <button type="button" @Html.Raises(plan, BedCommits.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/BedCommitWithAConflictRoute.cshtml:16:    <button type="button" @Html.Raises(plan, BedCommits.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/ChartSave.cshtml:20:    <button type="button" @Html.Raises(plan, ChartSaveButtons.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/ContactMoveIn.Net48.cshtml:21:    <button type="button" @Html.Raises(plan, ContactMoveIns.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/ContactMoveIn.cshtml:21:    <button type="button" @Html.Raises(plan, ContactMoveIns.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAdmit.cshtml:15:    @Html.AntiForgeryToken()
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAdmit.cshtml:17:    <label>Code <input name="Code"></label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAdmit.cshtml:18:    <button type="button" @Html.Raises(plan, IntakeAdmissions.Admit)>Admit</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAdmit.cshtml:24:    <select name="Ward" form="@Model.WardForm">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAndKin.cshtml:19:        <button type="button" @Html.Raises(plan, IntakeAndKinButtons.OpenTheLine)>Open the line</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAndKin.cshtml:20:        <button type="button" @Html.Raises(plan, IntakeAndKinButtons.CloseTheLine)>Close the line</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAndKin.cshtml:21:        <button type="button" @Html.Raises(plan, IntakeAndKinButtons.SaveIntake)>Save intake</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeAndKin.cshtml:34:        <button type="button" @Html.Raises(plan, IntakeAndKinButtons.SaveNextOfKin)>Save next of kin</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeBed.cshtml:16:    <button type="button" @Html.Raises(plan, IntakeBeds.AssignB12)>Assign B-12</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeContact.cshtml:24:    <button type="button" @Html.Raises(plan, IntakeContacts.SendContact)>Send contact</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeContact.cshtml:25:    <button type="button" @Html.Raises(plan, IntakeContacts.SendAll)>Send all</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeDocuments.cshtml:21:        <label>File <input type="file" name="Documents[0].File"></label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeDocuments.cshtml:22:        <label>Caption <input type="text" name="Documents[0].Caption"></label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeDocuments.cshtml:26:        <label>File <input type="file" name="Documents[1].File"></label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeDocuments.cshtml:27:        <label>Caption <input type="text" name="Documents[1].Caption"></label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeDocuments.cshtml:29:    <button type="button" @Html.Raises(plan, IntakeDocumentSaves.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/KinDesk.cshtml:18:        @Html.EditorFor(m => m.NextOfKin, "/Care/Admission/KinDeskContact.cshtml")
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/KinDeskCheckedOnTheServer.cshtml:18:        @Html.EditorFor(m => m.NextOfKin, "/Care/Admission/KinDeskContact.cshtml")
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/KinMoveIn.cshtml:22:    <button type="button" @Html.Raises(plan, KinMoveIns.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/MoveInWithKin.cshtml:23:    <button type="button" @Html.Raises(plan, MoveInsWithKin.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/NameIntake.Net48.cshtml:20:    <button type="button" @Html.Raises(plan, NameIntakes.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/OvernightStay.cshtml:16:    <button type="button" @Html.Raises(plan, OvernightStays.AddTheOvernight)>Add the overnight</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/OvernightStay.cshtml:17:    <button type="button" @Html.Raises(plan, OvernightStays.RemoveTheOvernight)>Remove the overnight</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/OvernightStay.cshtml:18:    <button type="button" @Html.Raises(plan, OvernightStays.Quote)>Quote</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/QuickAdmission.cshtml:19:    <button type="button" @Html.Raises(plan, QuickAdmissions.Admit)>Admit</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/ResidentIntake.cshtml:22:    <button type="button" @Html.Raises(plan, ResidentIntakeButtons.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/RespiteQuote.cshtml:16:        <button type="button" @Html.Raises(plan, RespiteQuotes.Quote)>Quote</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/ShortStay.cshtml:19:    <button type="button" @Html.Raises(plan, ShortStays.Quote)>Quote</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/SignInWithANickname.cshtml:17:    <button type="button" @Html.Raises(plan, SignIns.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/SignInWithTwoNames.cshtml:17:    <button type="button" @Html.Raises(plan, SignIns.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/StayExtension.cshtml:16:    <button type="button" @Html.Raises(plan, StayExtensions.AddTheExtension)>Add the extension</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/StayExtension.cshtml:17:    <button type="button" @Html.Raises(plan, StayExtensions.Quote)>Quote</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/StrengthIntake.cshtml:27:        <input type="hidden" name="Strength" value="1.5" />
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/StrengthIntake.cshtml:28:        <button type="submit">Send</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/AllergyIntake.cshtml:20:    <button type="button" @Html.Raises(plan, AllergyIntakes.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/BedAllocation.cshtml:20:    <button type="button" @Html.Raises(plan, BedAllocations.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/CarePlanUpload.cshtml:23:    <button type="button" @Html.Raises(plan, CarePlanUploads.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/LanguageIntake.cshtml:20:    <button type="button" @Html.Raises(plan, LanguageIntakes.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/MedicationIntake.cshtml:20:    <button type="button" @Html.Raises(plan, MedicationIntakes.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml:19:        <button type="button" @Html.Raises(plan, TransportBookings.BrowseWeekdays)>Browse weekday providers</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml:20:        <button type="button" @Html.Raises(plan, TransportBookings.BrowseWeekends)>Browse weekend services</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml:25:        <button type="button" @Html.Raises(plan, TransportBookings.UseFamilyTransport)>Use family transport</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/TransportProviders.cshtml:28:    <button type="button" @Html.Raises(plan, TransportBookings.SaveArrangement)>Save transport</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/WardPlacement.cshtml:20:    <button type="button" @Html.Raises(plan, WardPlacements.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Handover/SummarySending.cshtml:19:    <button type="button" @Html.Raises(plan, SummarySendings.Send)>Send</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml:16:    @Html.AntiForgeryToken()
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml:18:    @Html.HiddenFor(m => m.ResidentId)
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml:22:    <label>Relationship @Html.DropDownListFor(m => m.Relationship, Html.GetEnumSelectList<ContactRelationship>())</label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml:23:    <label><input type="checkbox" name="@Html.NameFor(m => m.Consent)" value="true"> Visitor consent</label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml:24:    @(count.Render<NativeTextBox>(Html.TextBoxFor(m => m.Copies, new { type = "number", id = count.Id })))
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml:25:    <label>Reserved badge <input name="ReservedBadge" value="Staff" disabled></label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml:26:    <label>Reception document caption <input name="@nameof(DocumentsPage.Caption)" form="reception-documents" value="Reception intake"></label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml:27:    <button type="submit" name="Navigation" value="true" formmethod="post" formenctype="application/x-www-form-urlencoded"
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/Reception.cshtml:51:<label>Reception desk <input form="reception" name="@Html.NameFor(m => m.Desk)" value="@Model.Desk"></label>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/ReceptionDocuments.cshtml:14:    @Html.AntiForgeryToken()
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/ReceptionDocuments.cshtml:15:    @Html.HiddenFor(m => m.Version)
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/ReceptionDocuments.cshtml:16:    @Html.HiddenFor(m => m.Kind)
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/MoveIn/ReceptionDocuments.cshtml:19:    @(plan.Render<AdmissionFileInput>("reception-document", Html.TextBoxFor(m => m.Files, new { type = "file", id = "reception-document" }))
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Record/FluidsCard.cshtml:13:    <button type="button" @Html.Raises(plan, FluidsCards.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Record/FluidsChart.cshtml:17:    <button type="button" @Html.Raises(plan, FluidsCharts.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Record/FluidsChartLabelledByArity.cshtml:17:    <button type="button" @Html.Raises(plan, FluidsCharts.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Record/WeightCard.cshtml:13:    <button type="button" @Html.Raises(plan, WeightCards.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/DoseDesk.cshtml:14:    <button type="button" @Html.Raises(plan, DoseStrengthButtons.SaveDesk)>Save desk</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/DoseIntake.cshtml:15:    <input type="hidden" name="Resident" value="@Model.Resident">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/DoseIntake.cshtml:16:    <input type="hidden" name="Medicine" value="@Model.Medicine">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/DoseIntake.cshtml:17:    <button type="button" @Html.Raises(plan, DoseIntakeEvents.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/DoseSave.cshtml:15:    <input type="hidden" name="Resident" value="@Model.Resident">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/DoseSave.cshtml:16:    <input type="hidden" name="Medicine" value="@Model.Medicine">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/DoseSave.cshtml:17:    <button type="button" @Html.Raises(plan, DoseSaveEvents.Save)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/DoseStrengths.cshtml:17:        <button type="button" @Html.Raises(plan, DoseStrengthButtons.SaveBoard)>Save</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/DoseStrengths.cshtml:24:<button type="button" @Html.Raises(plan, DoseStrengthButtons.OpenBostonDesk)>Open Boston desk</button>
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Round/SupplyCodes.cshtml:17:        <label>Code <input name="Code" type="text"></label>

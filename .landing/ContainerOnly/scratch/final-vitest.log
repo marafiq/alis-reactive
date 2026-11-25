@@ -1,0 +1,10 @@
+
+ RUN  v5.1.0 /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only
+
+
+ Test Files  41 passed (41)
+      Tests  867 passed (867)
+   Start at  14:15:34
+   Duration  583ms (import 35%, tests 30%, transform 27%, worker 5%, environment 4%)
+
+exit 0

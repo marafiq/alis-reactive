@@ -1,0 +1,33 @@
+TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802)
+Warning: Please run the Java VM which executes TLC with a throughput optimized garbage collector by passing the "-XX:+UseParallelGC" property.
+(Use the -nowarning option to disable this warning.)
+Running breadth-first search Model-Checking with fp 95 and seed 8167752788718314622 with 2 workers on 12 cores with 16384MB heap and 64MB offheap memory [pid: 72577] (Mac OS X 27.2 aarch64, Homebrew 27.0.1.0.3 x86_64, MSBDiskFPSet, DiskStateQueue).
+Parsing file /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/.landing/ContainerOnly/scratch/tlc-handwritten-none/ContainerRead.tla
+Parsing file /private/var/folders/ts/4m22lz5x5f92s0xkfy21j8j40000gn/T/Naturals.tla
+Parsing file /private/var/folders/ts/4m22lz5x5f92s0xkfy21j8j40000gn/T/Sequences.tla
+Parsing file /private/var/folders/ts/4m22lz5x5f92s0xkfy21j8j40000gn/T/FiniteSets.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module ContainerRead
+Starting... (2026-11-25 02:39:47)
+Computing initial states...
+Computed 2 initial states...
+Computed 4 initial states...
+Computed 8 initial states...
+Computed 16 initial states...
+Computed 32 initial states...
+Computed 64 initial states...
+Computed 128 initial states...
+Computed 256 initial states...
+Computed 512 initial states...
+Finished computing initial states: 864 distinct states generated at 2026-11-25 02:39:47.
+Model checking completed. No error has been found.
+  Estimates of the probability that TLC did not check all reachable states
+  because two distinct states had the same fingerprint:
+  calculated (optimistic):  val = 1.9E-10
+  based on the actual fingerprints:  val = 2.3E-11
+229824 states generated, 16704 distinct states found, 0 states left on queue.
+The depth of the complete state graph search is 5.
+The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 7 and the 95th percentile is 7).
+Finished in 00s at (2026-11-25 02:39:48)

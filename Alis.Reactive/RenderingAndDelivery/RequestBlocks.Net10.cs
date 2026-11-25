@@ -9,15 +9,6 @@ namespace Alis.Reactive.RenderingAndDelivery;
 /// </summary>
 public static class RequestBlocks
 {
-    /// <summary>Opens a native form as a request container of the view: a block, ended by <c>using</c>, that holds the form's markup.</summary>
-    /// <param name="html">The view's HTML helper.</param>
-    /// <param name="plan">The view's plan.</param>
-    /// <param name="containerId">The id of the form's element.</param>
-    /// <returns>The block, whose <c>Form</c> a request sends.</returns>
-    public static RequestFormBlock<TModel> BeginRequestForm<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string containerId)
-        => new(html.ViewContext.Writer, plan, containerId,
-            () => FieldPrefixes.RefuseAMoveInsideThePlan(plan.StartPrefix, html.ViewData.TemplateInfo.HtmlFieldPrefix, () => ViewPaths.Of(html)));
-
     /// <summary>Opens a fieldset as a request container of the view: a block, ended by <c>using</c>, that holds the container's markup.</summary>
     /// <param name="html">The view's HTML helper.</param>
     /// <param name="plan">The view's plan.</param>

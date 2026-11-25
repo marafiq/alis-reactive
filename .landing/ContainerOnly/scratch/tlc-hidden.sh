@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -uo pipefail
+for d in '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/.landing/ContainerOnly/scratch/tlc-hidden-/' '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/.landing/ContainerOnly/scratch/tlc-hidden-violates-AHiddenInputReachesAFormBodyAlone-HiddenLeftUnsent/' '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/.landing/ContainerOnly/scratch/tlc-hidden-violates-AHiddenInputReachesAFormBodyAlone-HiddenSentOutsideAFormBody/' '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/.landing/ContainerOnly/scratch/tlc-hidden-violates-ReachAHiddenInputInAFormBody/'; do
+  ( cd "$d" && caffeinate -i /opt/homebrew/opt/openjdk/bin/java -cp "$HOME/.local/share/tlaplus/tla2tools.jar" tlc2.TLC -deadlock -workers 2 -metadir states -config ContainerRead.cfg ContainerRead.tla < /dev/null > tlc.log 2>&1; echo "exit $?" >> tlc.log )
+done

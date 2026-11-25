@@ -7,7 +7,7 @@ namespace Alis.Reactive.Native.NativeComponents;
 /// A drop-down: an HTML <c>select</c> that holds a member's value.
 /// </summary>
 /// <remarks>
-/// A drop-down bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it, as text
+/// A drop-down bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it, as text
 /// the endpoint binds to the member's type.
 /// </remarks>
 [Mirrors("lib.dom", "HTMLSelectElement")]

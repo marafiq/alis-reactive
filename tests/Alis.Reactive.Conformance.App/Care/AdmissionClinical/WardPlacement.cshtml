@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<WardPlacement>();
 }
 <h1>Ward placement</h1>
-@using (var placement = Html.BeginRequestForm(plan, "ward-placement"))
+@using (var placement = Html.BeginRequestContainer(plan, "ward-placement"))
 {
     <fieldset>
         <legend>Ward</legend>
@@ -19,7 +19,7 @@
     </fieldset>
     <button type="button" @Html.Raises(plan, WardPlacements.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(WardPlacements.Save, pipeline => pipeline
-        .Post<WardPlacement>(WardPlacementEndpoints.Placements, request => request.Form(placement.Form))
+        .Post<WardPlacement>(WardPlacementEndpoints.Placements, request => request.Inputs(placement.Container))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
 }
 <p id="saved">Not saved</p>

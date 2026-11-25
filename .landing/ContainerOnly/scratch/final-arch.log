@@ -1,0 +1,408 @@
+  Determining projects to restore...
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tools/PlanContractGenerator/PlanContractGenerator.csproj (in 109 ms).
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj (in 166 ms).
+  7 of 9 projects are up-to-date for restore.
+  Alis.Reactive.Analyzers -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Analyzers/bin/Debug/netstandard2.0/Alis.Reactive.Analyzers.dll
+  Alis.Reactive.Conformance.World -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.World/bin/Debug/net10.0/Alis.Reactive.Conformance.World.dll
+  Alis.Reactive -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/bin/Debug/net10.0/Alis.Reactive.dll
+  PlanContractGenerator -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tools/PlanContractGenerator/bin/Debug/net10.0/Alis.Reactive.PlanContractGenerator.dll
+  Alis.Reactive.Native -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Native/bin/Debug/net10.0/Alis.Reactive.Native.dll
+  Alis.Reactive.OpenTelemetry -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.OpenTelemetry/bin/Debug/net10.0/Alis.Reactive.OpenTelemetry.dll
+  Alis.Reactive.Fusion -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Fusion/bin/Debug/net10.0/Alis.Reactive.Fusion.dll
+  Alis.Reactive.Conformance.App -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App/bin/Debug/net10.0/Alis.Reactive.Conformance.App.dll
+  Alis.Reactive.ArchitectureTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/bin/Debug/net10.0/Alis.Reactive.ArchitectureTests.dll
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/bin/Debug/net10.0/Alis.Reactive.ArchitectureTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+  Failed a_build_target_that_writes_a_file_git_lists_is_refused [7 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_build_target_that_writes_a_file_git_lists_is_refused() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 147
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_build_target_that_writes_a_file_git_lists_is_refused() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 147
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed a_build_target_that_writes_its_file_on_every_build_is_refused [< 1 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_build_target_that_writes_its_file_on_every_build_is_refused() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 158
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_build_target_that_writes_its_file_on_every_build_is_refused() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 158
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed a_file_an_alis_analyzer_refuses_fails_the_build_of_a_net10_app_that_names_a_consumer_package_alone_with_its_id [< 1 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_file_an_alis_analyzer_refuses_fails_the_build_of_a_net10_app_that_names_a_consumer_package_alone_with_its_id() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 111
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_file_an_alis_analyzer_refuses_fails_the_build_of_a_net10_app_that_names_a_consumer_package_alone_with_its_id() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 111
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed a_file_an_alis_analyzer_refuses_fails_the_build_of_a_net48_app_that_names_a_consumer_package_alone_with_its_id [< 1 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_file_an_alis_analyzer_refuses_fails_the_build_of_a_net48_app_that_names_a_consumer_package_alone_with_its_id() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 129
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_file_an_alis_analyzer_refuses_fails_the_build_of_a_net48_app_that_names_a_consumer_package_alone_with_its_id() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 129
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed a_net10_app_that_maps_no_static_assets_is_refused_for_each_packages_browser_file_it_does_not_serve [1 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_net10_app_that_maps_no_static_assets_is_refused_for_each_packages_browser_file_it_does_not_serve() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 86
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.GetResult()
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.<>c__DisplayClass3_0.<PerformWork>b__0()
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass1_0`1.<DoIsolated>b__0(Object _)
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass2_0.<DoIsolated>b__0(Object s)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated(ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated[T](Func`1 func)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.PerformWork()
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_net10_app_that_maps_no_static_assets_is_refused_for_each_packages_browser_file_it_does_not_serve() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 86
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.GetResult()
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.<>c__DisplayClass3_0.<PerformWork>b__0()
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass1_0`1.<DoIsolated>b__0(Object _)
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass2_0.<DoIsolated>b__0(Object s)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated(ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated[T](Func`1 func)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.PerformWork()
+
+  Failed a_net48_app_on_the_packs_is_left_with_nothing_git_lists_and_each_packages_browser_file_beside_its_ignore_file [< 1 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_net48_app_on_the_packs_is_left_with_nothing_git_lists_and_each_packages_browser_file_beside_its_ignore_file() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 169
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.a_net48_app_on_the_packs_is_left_with_nothing_git_lists_and_each_packages_browser_file_beside_its_ignore_file() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 169
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed git_lists_no_file_a_build_of_the_fresh_net10_app_wrote [53 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.BuiltOnThePacks(String app) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 266
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.git_lists_no_file_a_build_of_the_fresh_net10_app_wrote() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 51
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.BuiltOnThePacks(String app) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 266
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.git_lists_no_file_a_build_of_the_fresh_net10_app_wrote() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 51
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed git_lists_no_file_a_build_of_the_fresh_net48_app_wrote [45 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.BuiltByVisualStudiosMsBuildOnThePacks(String app) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 272
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.git_lists_no_file_a_build_of_the_fresh_net48_app_wrote() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 64
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.BuiltByVisualStudiosMsBuildOnThePacks(String app) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 272
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.git_lists_no_file_a_build_of_the_fresh_net48_app_wrote() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 64
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed the_fresh_net10_apps_static_web_assets_serve_each_packages_browser_file_under_its_content_path [< 1 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.BuiltOnThePacks(String app) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 266
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.the_fresh_net10_apps_static_web_assets_serve_each_packages_browser_file_under_its_content_path() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 75
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.GetResult()
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.<>c__DisplayClass3_0.<PerformWork>b__0()
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass1_0`1.<DoIsolated>b__0(Object _)
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass2_0.<DoIsolated>b__0(Object s)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated(ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated[T](Func`1 func)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.PerformWork()
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.BuiltOnThePacks(String app) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 266
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.the_fresh_net10_apps_static_web_assets_serve_each_packages_browser_file_under_its_content_path() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 75
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.GetResult()
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.<>c__DisplayClass3_0.<PerformWork>b__0()
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass1_0`1.<DoIsolated>b__0(Object _)
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass2_0.<DoIsolated>b__0(Object s)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated(ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated[T](Func`1 func)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.PerformWork()
+
+  Failed the_same_net10_app_mapping_its_static_assets_serves_each_packages_browser_file_as_its_pack_holds_it [< 1 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.the_same_net10_app_mapping_its_static_assets_serves_each_packages_browser_file_as_its_pack_holds_it() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 101
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.GetResult()
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.<>c__DisplayClass3_0.<PerformWork>b__0()
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass1_0`1.<DoIsolated>b__0(Object _)
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass2_0.<DoIsolated>b__0(Object s)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated(ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated[T](Func`1 func)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.PerformWork()
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.the_same_net10_app_mapping_its_static_assets_serves_each_packages_browser_file_as_its_pack_holds_it() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 101
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.GetResult()
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.<>c__DisplayClass3_0.<PerformWork>b__0()
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass1_0`1.<DoIsolated>b__0(Object _)
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass2_0.<DoIsolated>b__0(Object s)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated(ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated[T](Func`1 func)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.PerformWork()
+
+  Failed the_same_net10_app_with_its_enum_marked_builds [< 1 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.the_same_net10_app_with_its_enum_marked_builds() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 120
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.the_same_net10_app_with_its_enum_marked_builds() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 120
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+  Failed the_same_net48_app_with_its_enum_marked_builds [< 1 ms]
+  Error Message:
+   System.IO.DirectoryNotFoundException : Could not find a part of the path '/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/nupkgs'.
+  Stack Trace:
+     at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.the_same_net48_app_with_its_enum_marked_builds() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 138
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized, String expression)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions enumerationOptions)
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.ThePacksVersion() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 254
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.Project(String framework, String package, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 199
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.WriteApp(WrittenFolder written, String framework, String package, String shift, String targetOfItsOwn) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 185
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.the_same_net48_app_with_its_enum_marked_builds() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 138
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+
+Failed!  - Failed:    12, Passed:   330, Skipped:     0, Total:   342, Duration: 1 m 38 s - Alis.Reactive.ArchitectureTests.dll (net10.0)
+exit 1

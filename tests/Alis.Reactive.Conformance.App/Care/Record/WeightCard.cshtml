@@ -7,12 +7,12 @@
 @{
     var plan = Html.ReactivePlan<WeightCard>();
 }
-@using (var card = Html.BeginRequestForm(plan, "weight-card"))
+@using (var card = Html.BeginRequestContainer(plan, "weight-card"))
 {
     @(Html.InputField(plan, m => m.Value, options => options.Label("Kilograms")).NativeTextBox())
     <button type="button" @Html.Raises(plan, WeightCards.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(WeightCards.Save, pipeline => pipeline
-        .Post<WeightCard>(ChartCardEndpoints.Weights, request => request.Form(card.Form))
+        .Post<WeightCard>(ChartCardEndpoints.Weights, request => request.Inputs(card.Container))
         .OnSuccess(Content.Text, (charted, pipeline) => pipeline.Element("weight-charted").Text.Set(charted.Body))));
 }
 <p>Charted: <span id="weight-charted"></span></p>

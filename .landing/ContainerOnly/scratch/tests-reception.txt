@@ -1,0 +1,3 @@
+f2986ea66:tests/Alis.Reactive.Conformance.PlaywrightTests/InputsAndIds/Admission/WhenASlotsContentRendersAnIdThePageHolds.cs
+f2986ea66:tests/Alis.Reactive.Conformance.PlaywrightTests/PartialsAndSlots/MoveIn/WhenReceptionSignsInAVisitor.cs
+f2986ea66:tests/Alis.Reactive.Conformance.PlaywrightTests/PartialsAndSlots/MoveIn/WhenReceptionUsesFormTokens.cs

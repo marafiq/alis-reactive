@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A rating: EJ2's Rating, a row of symbols a person clicks to give a score.
 /// </summary>
 /// <remarks>
-/// A rating bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. A handler of
+/// A rating bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. A handler of
 /// <see cref="ValueChanged"/> reads the committed score.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-inputs", "Rating")]

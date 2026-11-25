@@ -12,7 +12,7 @@
     var plan = Html.ReactivePlan<StrictConformanceForm>();
 }
 <h1>The bench</h1>
-@using (var codes = Html.BeginRequestForm(plan, "codes"))
+@using (var codes = Html.BeginRequestContainer(plan, "codes"))
 {
     <fieldset>
         <legend>Code</legend>
@@ -20,7 +20,7 @@
     </fieldset>
     @(Html.InputField(plan, m => m.IsStrict, options => options.Label("Strict")).NativeCheckBox())
     @(Html.NativeButton("save", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<StrictConformanceForm>(BenchEndpoints.FormStrict, request => request.Form(codes.Form))
+        .Post<StrictConformanceForm>(BenchEndpoints.FormStrict, request => request.Inputs(codes.Container))
         .Validate<StrictCodeRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("shown").Text.Set(saved.Body))))
 }

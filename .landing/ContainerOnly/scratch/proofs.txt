@@ -1,0 +1,11 @@
+CarePlanUpload on the container, before any other view: [playwright:result] M21_F22.M21_X1014_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget
+ALIS_TLC_WORKERS=2 python3 spec/tools/check.py --check tlc (scratch/tlc-check.log, exit 0): {"pass": true, "detail": "every spec green, every invariant killed by its mutant, every witness reached", "counts": {"specs": 17, "met": 17}
+  ContainerRead.cfg: "Model checking completed. No error has been found." "229824 states generated, 16704 distinct states found, 0 states left on queue."
+  ContainerRead.violates.AnUnsentMemberReadsWhatTheEndpointBinds.HandWrittenControlSent.cfg: "violated: AnUnsentMemberReadsWhatTheEndpointBinds"
+  ContainerRead.violates.ReachAHandWrittenControlLeftUnsent.cfg: "violated: ReachAHandWrittenControlLeftUnsent" (the witness reached)
+  Request.cfg: "Model checking completed. No error has been found." "18308256 states generated, 18308256 distinct states found, 0 states left on queue."
+  Request.violates.FailedCheckSendsNothing.ContainerSubmitsNatively.cfg: "violated: FailedCheckSendsNothing"
+Red before the code, M6_F1.X9_15_0 (scratch/red-x915.log): "Locator expected to have text 'Ward East, Code none, fields 1' But was: 'Ward East, Code A7, fields 1'"; [playwright:result] M6_F1.X9_15_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget
+Red before the code, M21_F38.M21_X1038_0 (scratch/red-x1038.log): "Locator expected to have text 'Summary' But was: '<p>Ate a full lunch.</p>'"; [playwright:result] M21_F38.M21_X1038_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget
+Probe, a declared NativeCheckBox while unchecked: source Alis.Reactive.Native/NativeComponents/NativeCheckBox/NativeCheckBox.cs ComponentInput.Of(Checked, committedBy: Change), a bool, and wire.ts scalarText "boolean" writes "false"; run M9_F2.M9_X254_0 on the container (scratch/probe-x254.log) at WhenReceptionSignsInAVisitor.cs:103: Consent is in the body with the box unchecked ("Values differ at index [9] Missing: < \"__RequestVerificationToken\", ... >", index 0 "Consent" matched). Decided: the literal at :103 gains "Consent".
+Red before the code, M9_F2.M9_X254_0 with the :103 literal changed (scratch/red-x254.log): "Expected: \"Consent\" But was: \"CoordinatorId\""; [playwright:result] M9_F2.M9_X254_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget

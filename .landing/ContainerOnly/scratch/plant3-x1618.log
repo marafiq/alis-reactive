@@ -1,0 +1,13 @@
+[plant] running the test M8_F4.X16_18_0 without the defect
+[plant] [playwright:result] M8_F4.X16_18_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.82s Alis.Reactive.Conformance.PlaywrightTests.Validation.WhenAHandWrittenInputFailsOnTheServer("net10").the_message_shows_in_the_forms_summary_and_nowhere_beside_the_input
+[plant] planted in tests/Alis.Reactive.Conformance.App/Care/Round/SupplyCodes.cshtml; running the test M8_F4.X16_18_0
+[plant] [playwright:result] M8_F4.X16_18_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 2.28s Alis.Reactive.Conformance.PlaywrightTests.Validation.WhenAHandWrittenInputFailsOnTheServer("net10").the_message_shows_in_the_forms_summary_and_nowhere_beside_the_input
+[plant] caught: M8_F4.X16_18_0 failed with the defect in place (1 of 1).
+[plant]      Microsoft.Playwright.PlaywrightException : Locator expected to have text '['Unknown code.']'
+[plant]   But was: '[]' 
+[plant]   Call log:
+[plant]     - Expect "ToHaveTextAsync" GetByRole(AriaRole.Listitem) with timeout 740ms
+[plant]     - waiting for GetByRole(AriaRole.Listitem)
+[plant]       9 × locator resolved to 0 elements
+[plant]   at tests/Alis.Reactive.Conformance.PlaywrightTests/Validation/Round/WhenAHandWrittenInputFailsOnTheServer.cs:line 21
+[plant] restored tests/Alis.Reactive.Conformance.App/Care/Round/SupplyCodes.cshtml

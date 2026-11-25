@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { PageInputs } from "./index";
+import { PageInputs, type HiddenInput } from "./index";
 
 type Plan = Parameters<PageInputs["join"]>[0];
 type Owner = Parameters<PageInputs["join"]>[1];
@@ -18,7 +18,7 @@ class Visit implements Owner {
   release(): void { for (const drop of this.drops.splice(0)) drop(); }
 }
 
-const intake: Containers = { intake: { model: "Admission", kind: "form", summary: "intake_summary", live: [] } };
+const intake: Containers = { intake: { model: "Admission", summary: "intake_summary", live: [] } };
 type Converted = Inputs[string]["converted"];
 type Blank = Inputs[string]["blank"];
 const convertedFrom = (read: Source): Converted => ({ kind: "as", expr: read, shape: { kind: "nullable", inner: { kind: "any" } } });
@@ -46,11 +46,11 @@ function literalValue(source: Source): unknown {
   return source.value;
 }
 
-function page(containers = new Map([["intake", new Set(["own", "slot", "second"])]]), forms = new Map<string, () => FormData>()): PageInputs {
+function page(containers = new Map([["intake", new Set(["own", "slot", "second"])]]), hidden: readonly HiddenInput[] = []): PageInputs {
   return new PageInputs(id => {
     const inputs = containers.get(id);
     return inputs === undefined ? null : input => inputs.has(input);
-  }, id => forms.get(id)?.() ?? null);
+  }, id => (containers.has(id) ? hidden : null));
 }
 
 describe("when alis.model reads what a container sends", () => {
@@ -252,10 +252,10 @@ describe("when an input is checked live", () => {
   test("each container that holds the input gives its live check over its own inputs, and a container that does not hold it gives none", () => {
     const inputs = page(new Map([["intake", new Set(["own", "second"])], ["kin", new Set(["own"])], ["ward", new Set(["second"])], ["bare", new Set(["own"])]]));
     inputs.join(plan(held, {
-      intake: { model: "Admission", kind: "form", summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
-      kin: { model: "Admission", kind: "element", summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
-      ward: { model: "Admission", kind: "element", summary: "ward_summary", live: [live("WardRules", "the ward's body")] },
-      bare: { model: "Admission", kind: "element", summary: "bare_summary", live: [] },
+      intake: { model: "Admission", summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
+      kin: { model: "Admission", summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
+      ward: { model: "Admission", summary: "ward_summary", live: [live("WardRules", "the ward's body")] },
+      bare: { model: "Admission", summary: "bare_summary", live: [] },
     }), new Visit(), "on the page", literalValue);
     expect(inputs.liveChecksOf("own")).toStrictEqual([
       { registration: "AdmissionRules:default", body: "the intake's body", inputs: [sentOwn, sentSecond] },
@@ -267,8 +267,8 @@ describe("when an input is checked live", () => {
     const inputs = page(new Map([["kin", new Set(["own"])]]));
     const owner = new Visit();
     inputs.join(plan(held, {
-      intake: { model: "Admission", kind: "form", summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
-      kin: { model: "Admission", kind: "element", summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
+      intake: { model: "Admission", summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
+      kin: { model: "Admission", summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
     }), owner, "on the page", literalValue);
     expect(inputs.liveChecksOf("own")).toStrictEqual([{ registration: "KinRules:default", body: "the kin's body", inputs: [sentOwn] }]);
     owner.release();
@@ -307,30 +307,22 @@ describe("when a request captures what it sends", () => {
     const inputs = page(new Map());
     inputs.join(plan(), new Visit(), "on the page", literalValue);
     expect(inputs.sends("intake", "Admission")).toStrictEqual({ kind: "missing", id: "intake" });
-    expect(inputs.submits("intake", "Admission")).toStrictEqual({ kind: "missing", id: "intake" });
   });
 
   test("ContainerOfItsOwnModel: a container rendered for another model stops the request where it is read", () => {
     const inputs = page();
     inputs.join(plan(), new Visit(), "on the page", literalValue);
     expect(() => inputs.sends("intake", "Visit")).toThrow(/^Container 'intake' is rendered for model 'Admission', not 'Visit'\.$/);
-    expect(inputs.sends("intake", "Admission")).toMatchObject({ kind: "captured", id: "intake", body: { nights: 5 } });
+    expect(inputs.sends("intake", "Admission")).toMatchObject({ kind: "captured", id: "intake", body: { members: { nights: 5 }, hidden: [] } });
   });
 
-  test("SubmissionSetAtTheRead: a native form's submission set is built when the request reads it, beside its framework inputs' body", () => {
-    let code = "A7";
-    const inputs = page(undefined, new Map([["intake", () => {
-      const submitted = new FormData();
-      submitted.append("Code", code);
-      return submitted;
-    }]]));
+  test("AHiddenInputReachesAFormBodyAlone: a request's capture carries the hidden inputs inside its container, and its check reads no member from them", () => {
+    const inputs = page(undefined, [{ name: "Shift", value: "Night" }]);
     inputs.join(plan(), new Visit(), "on the page", literalValue);
-    const captured = inputs.submits("intake", "Admission");
-    if (captured.kind !== "captured") throw new Error("The form is on the page.");
-    code = "B9";
-    const submission = captured.body as { entries: FormData; members: object };
-    expect([...submission.entries.entries()]).toStrictEqual([["Code", "A7"]]);
-    expect(submission.members).toStrictEqual({ nights: 5 });
+    const container = inputs.sends("intake", "Admission");
+    expect(container).toMatchObject({ kind: "captured", body: { members: { nights: 5 }, hidden: [{ name: "Shift", value: "Night" }] } });
+    expect(inputs.checked({ container, individual: [] }, null, [])?.body).toStrictEqual({ nights: 5 });
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
   });
 
   test("RecordsAMissingInput: an input the page lacks is recorded missing and its value reads nothing", () => {

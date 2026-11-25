@@ -7,16 +7,16 @@ import { Stop } from "../ValuesAndSources/index";
 
 type ReadValue = (expression: Expression) => unknown;
 type Inside = (containerId: string) => ((inputId: string) => boolean) | null;
-type SubmissionOf = (formId: string) => FormData | null;
+type HiddenOf = (containerId: string) => readonly HiddenInput[] | null;
 
-export class Submission {
-  readonly entries: FormData;
+export interface HiddenInput {
+  readonly name: string;
+  readonly value: string;
+}
+
+export interface ContainerBody {
   readonly members: object;
-
-  constructor(entries: FormData, members: object) {
-    this.entries = entries;
-    this.members = members;
-  }
+  readonly hidden: readonly HiddenInput[];
 }
 
 export interface CheckedEntry {
@@ -62,13 +62,13 @@ export interface CapturedContainer {
 
 export class PageInputs {
   readonly #inside: Inside;
-  readonly #submissionOf: SubmissionOf;
+  readonly #hiddenOf: HiddenOf;
   readonly #inputs = new Map<string, Input>();
   readonly #containers = new Map<string, Map<Contribution, Container>>();
 
-  constructor(inside: Inside, submissionOf: SubmissionOf) {
+  constructor(inside: Inside, hiddenOf: HiddenOf) {
     this.#inside = inside;
-    this.#submissionOf = submissionOf;
+    this.#hiddenOf = hiddenOf;
   }
 
   join(plan: PlanDocument, owner: Owner, place: string, read: ReadValue): void {
@@ -147,15 +147,11 @@ export class PageInputs {
   }
 
   sends(containerId: string, modelKey: string): ContainerCapture {
-    if (this.#inside(containerId) === null) return { kind: "missing", id: containerId };
-    return this.captured(containerId, modelKey);
-  }
-
-  submits(formId: string, modelKey: string): ContainerCapture {
-    const submitted = this.#submissionOf(formId);
-    if (submitted === null) return { kind: "missing", id: formId };
-    const captured = this.captured(formId, modelKey);
-    return { ...captured, body: new Submission(submitted, captured.body) };
+    const hidden = this.#hiddenOf(containerId);
+    if (hidden === null) return { kind: "missing", id: containerId };
+    const captured = this.captured(containerId, modelKey);
+    const body: ContainerBody = { members: captured.body, hidden };
+    return { ...captured, body };
   }
 
   input(inputId: string, name: string): InputCapture {
@@ -193,7 +189,7 @@ export class PageInputs {
       case "missing":
         return null;
       case "captured":
-        merge(body, container.body instanceof Submission ? container.body.members : container.body);
+        merge(body, (container.body as ContainerBody).members);
         return { body, inputs: [...container.inputs, ...individual] };
       default:
         return assertNever(container);

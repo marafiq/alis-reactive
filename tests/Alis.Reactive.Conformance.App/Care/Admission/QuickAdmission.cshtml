@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<QuickAdmission>();
 }
 <h1>Admit a resident</h1>
-@using (var admission = Html.BeginRequestForm(plan, "quick-admission"))
+@using (var admission = Html.BeginRequestContainer(plan, "quick-admission"))
 {
     <fieldset>
         <legend>Name</legend>
@@ -19,7 +19,7 @@
     <button type="button" @Html.Raises(plan, QuickAdmissions.Admit)>Admit</button>
     Html.On(plan, trigger => trigger.CustomEvent(QuickAdmissions.Admit, pipeline =>
     {
-        pipeline.Post<QuickAdmission>(CareEndpoints.QuickAdmissionAdmissions, request => request.Form(admission.Form))
+        pipeline.Post<QuickAdmission>(CareEndpoints.QuickAdmissionAdmissions, request => request.Inputs(admission.Container))
             .Validate<QuickAdmissionRules>();
         pipeline.Element("admission-log").Text.Set("Sent");
     }));

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { prepare, sentParts, Submission } from "./index";
+import { prepare, sentParts } from "./index";
 
 type Send = Parameters<typeof prepare>[0];
 type Field = Send["query"]["fields"][number];
@@ -362,24 +362,15 @@ const shift = bound("Shift", ["shift"], { kind: "enum", flags: false, values: sh
   json: { kind: "enum", values: [{ held: 0, sent: "day" }, { held: 1, sent: "night" }] }, whenNothing: "leave", whenBlank: "send",
 });
 const due = bound("Due", ["due"], { kind: "date" }, { kind: "field", form: { kind: "date" }, whenNothing: "leave", whenBlank: "leave" });
-const container = (body: unknown, inputs: Captured["inputs"]): Send["query"]["inputs"] => ({ container: { kind: "captured", id: "intake", body, inputs }, individual: [] });
+type Hidden = readonly { readonly name: string; readonly value: string }[];
+const container = (members: unknown, inputs: Captured["inputs"], hidden: Hidden = []): Send["query"]["inputs"] => ({ container: { kind: "captured", id: "intake", body: { members, hidden }, inputs }, individual: [] });
 const post = (body: Body): Send => ({ ...get(), method: "POST", body });
 
-describe("when a request sends a container, a form or an input", () => {
+describe("when a request sends a container or an input", () => {
   test("ContainerUnderItsBindingNames: a GET sends each framework input inside the container in its query, in its wire form", () => {
     const prepared = prepare({ ...get([field("Ward", "North", { kind: "text" })]), query: { fields: [field("Ward", "North", { kind: "text" })], inputs: container({ ward: "East", beds: 3 }, [ward, beds]) } }, clock, enUs);
     expect(prepared.url).toBe("/Residents?Ward=East&Beds=3");
     expect(prepared.inputs.map(input => input.name)).toStrictEqual(["Ward", "Beds"]);
-  });
-
-  test("SubmissionSetAsTheBrowserBuildsIt: a form's controls are sent, its framework inputs replace their name's entries and the token replaces the form's own", async () => {
-    const submitted = new FormData();
-    submitted.append("Code", "A7");
-    submitted.append("Ward", "typed");
-    submitted.append("__RequestVerificationToken", "the form's");
-    const body: Body = { kind: "urlEncoded", fields: [], inputs: container(new Submission(submitted, { ward: "East" }), [ward]) };
-    const prepared = prepare({ ...post(body), antiforgery: { kind: "token", value: "framework", place: { kind: "field", name: "__RequestVerificationToken" } } }, clock, enUs);
-    expect(await new Response(prepared.body).text()).toBe("Code=A7&__RequestVerificationToken=framework&Ward=East");
   });
 
   test("ContainerInAnyBody: a JSON body holds the container's inputs over the members it sets, and multipart sends them as fields", () => {
@@ -387,6 +378,29 @@ describe("when a request sends a container, a form or an input", () => {
     expect(json.body).toBe("{\"ward\":\"East\",\"room\":\"R4\"}");
     const multipart = prepare(post({ kind: "multipart", parts: [], inputs: container({ beds: 2.5 }, [beds]) }), clock, deDe);
     expect([...(multipart.body as FormData).entries()]).toStrictEqual([["Beds", "2,5"]]);
+  });
+
+  test("AHiddenInputReachesAFormBodyAlone: a URL-encoded and a multipart body send the container's hidden inputs under their names, and a JSON body and a GET's query send none", async () => {
+    const hidden: Hidden = [{ name: "Shift", value: "Night" }, { name: "Unit", value: "East" }];
+    const form = prepare(post({ kind: "urlEncoded", fields: [], inputs: container({ ward: "North" }, [ward], hidden) }), clock, enUs);
+    expect(await new Response(form.body).text()).toBe("Shift=Night&Unit=East&Ward=North");
+    const multipart = prepare(post({ kind: "multipart", parts: [], inputs: container({ ward: "North" }, [ward], hidden) }), clock, enUs);
+    expect([...(multipart.body as FormData).entries()]).toStrictEqual([["Shift", "Night"], ["Unit", "East"], ["Ward", "North"]]);
+    const json = prepare(post({ kind: "json", value: {}, guarded: [], enums: [], inputs: container({ ward: "North" }, [ward], hidden) }), clock, enUs);
+    expect(json.body).toBe("{\"ward\":\"North\"}");
+    const query = prepare({ ...get(), query: { fields: [], inputs: container({ ward: "North" }, [ward], hidden) } }, clock, enUs);
+    expect(query.url).toBe("/Residents?Ward=North");
+  });
+
+  test("AHiddenInputGivesWayToTheRequestsOwnMember: an input, a field, a part and the antiforgery field the request sends under a hidden input's name replace it, and a part whose condition failed replaces nothing", async () => {
+    const hidden: Hidden = [{ name: "Ward", value: "South" }, { name: "Note", value: "hidden" }, { name: "__RequestVerificationToken", value: "view" }, { name: "Due", value: "hidden" }];
+    const token: Send["antiforgery"] = { kind: "token", value: "plan", place: { kind: "field", name: "__RequestVerificationToken" } };
+    const sent = prepare({ ...post({ kind: "urlEncoded", fields: [field("Note", "late", { kind: "text" })], inputs: container({ ward: "North" }, [ward, due], hidden) }), antiforgery: token }, clock, enUs);
+    expect(await new Response(sent.body).text()).toBe("__RequestVerificationToken=plan&Note=late&Ward=North");
+    const leftOut = prepare(sentParts({ ...post({ kind: "urlEncoded", fields: [{ ...field("Note", "late", { kind: "text" }), when: false }], inputs: container({}, [ward], hidden) }), antiforgery: token }), clock, enUs);
+    expect(await new Response(leftOut.body).text()).toBe("Note=hidden&__RequestVerificationToken=plan&Due=hidden");
+    const part = prepare(post({ kind: "multipart", parts: [{ kind: "field", field: field("Note", "late", { kind: "text" }) }], inputs: container({}, [], hidden) }), clock, enUs);
+    expect([...(part.body as FormData).entries()]).toStrictEqual([["Ward", "South"], ["__RequestVerificationToken", "view"], ["Due", "hidden"], ["Note", "late"]]);
   });
 
   test("InputSentByItsForm: an enum input is sent by its row's C# name in form data and by its JSON row in a JSON body, and a date in a JSON body as its wire text", async () => {
@@ -404,11 +418,13 @@ describe("when a request sends a container, a form or an input", () => {
     expect(json.body).toBe("{\"ward\":\"East\"}");
   });
 
-  test("FileOnlyInFormData: a file a form holds stops a GET or URL-encoded request that would send it", () => {
-    const submitted = new FormData();
-    submitted.append("Photo", new File(["x"], "photo.png"));
-    expect(() => prepare({ ...get(), query: { fields: [], inputs: container(new Submission(submitted, {}), []) } }, clock, enUs))
-      .toThrow(/^The request's form control 'Photo' holds a file, which is sent only in multipart form data\.$/);
+  test("FileOnlyInFormData: a file a container's input holds stops a GET or URL-encoded request that would send it", () => {
+    const photo = bound("Photo", ["photo"], { kind: "file" }, { kind: "files" });
+    const held = { photo: new File(["x"], "photo.png") };
+    expect(() => prepare({ ...get(), query: { fields: [], inputs: container(held, [photo]) } }, clock, enUs))
+      .toThrow(/^The request's file input 'Photo' holds a file, which is sent only in multipart form data\.$/);
+    expect(() => prepare(post({ kind: "urlEncoded", fields: [], inputs: container(held, [photo]) }), clock, enUs))
+      .toThrow(/^The request's file input 'Photo' holds a file, which is sent only in multipart form data\.$/);
   });
 
   test("MissingStopsAtTheGuard: a container or an input the page lacks stops the request where it is prepared", () => {

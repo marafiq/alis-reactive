@@ -10,14 +10,15 @@
     var plan = Html.ReactivePlan<SupplyCodes>();
 }
 <h1>Supply codes</h1>
-@using (var codes = Html.BeginRequestForm(plan, "supply-codes"))
+@using (var codes = Html.BeginRequestContainer(plan, "supply-codes"))
 {
     <fieldset>
         <legend>Code</legend>
-        <label>Code <input name="Code" type="text"></label>
+        <label for="supply-code">Code</label>
+        @(plan.Render<NativeTextBox>("supply-code", Html.Raw("<input type=\"text\" id=\"supply-code\">")))
     </fieldset>
     @(Html.NativeButton("submit-code", "Submit").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<SupplyCodes>(SupplyCodesEndpoints.Codes, request => request.Form(codes.Form))
+        .Post<SupplyCodes>(SupplyCodesEndpoints.Codes, request => request.Multipart(codes.Container, body => body.Set(r => r.Code, pipeline.Component<NativeTextBox>("supply-code").Value)))
         .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("received").Text.Set(received.Body))
         .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))
 }

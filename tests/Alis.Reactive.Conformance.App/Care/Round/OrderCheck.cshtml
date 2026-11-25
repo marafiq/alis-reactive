@@ -11,14 +11,14 @@
     var plan = Html.ReactivePlan<RoundOrder>();
 }
 <h1>Medication order</h1>
-@using (var order = Html.BeginRequestForm(plan, "round-order"))
+@using (var order = Html.BeginRequestContainer(plan, "round-order"))
 {
     <fieldset>
         <legend>Order</legend>
         @(Html.InputField(plan, m => m.Strength, options => options.Label("Strength")).NativeTextBox())
     </fieldset>
     @(Html.NativeButton("save-order", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<RoundOrder>(CareEndpoints.OrderCheckOrders, request => request.Form(order.Form))
+        .Post<RoundOrder>(CareEndpoints.OrderCheckOrders, request => request.Inputs(order.Container))
         .Validate<RoundValidator>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
 }

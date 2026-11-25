@@ -11,7 +11,7 @@
     var plan = Html.ReactivePlan<IntakeForm>();
 }
 <h1>Helen Martinez's intake</h1>
-@using (var intake = Html.BeginRequestForm(plan, "intake"))
+@using (var intake = Html.BeginRequestContainer(plan, "intake"))
 {
     <fieldset>
         <legend>Allergies</legend>
@@ -19,7 +19,7 @@
             .FusionMultiSelect(HelensAllergies.Offered(), build => build.Fields((HelenAllergy a) => a.Name, a => a.Code)))
     </fieldset>
     @(Html.NativeButton("save", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<IntakeForm>(IntakeCheckEndpoints.Intake, request => request.Form(intake.Form))
+        .Post<IntakeForm>(IntakeCheckEndpoints.Intake, request => request.Inputs(intake.Container))
         .Validate<IntakeValidator>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
 }

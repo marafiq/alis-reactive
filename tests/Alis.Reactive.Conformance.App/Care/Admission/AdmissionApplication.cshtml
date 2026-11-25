@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<AdmissionApplication>();
 }
 <h1>Apply for a place</h1>
-@using (var application = Html.BeginRequestForm(plan, "admission-application"))
+@using (var application = Html.BeginRequestContainer(plan, "admission-application"))
 {
     <fieldset>
         <legend>Applicant</legend>
@@ -18,7 +18,7 @@
     </fieldset>
     <button type="button" @Html.Raises(plan, AdmissionApplications.Apply)>Apply</button>
     Html.On(plan, trigger => trigger.CustomEvent(AdmissionApplications.Apply, pipeline => pipeline
-        .Post<AdmissionApplication>(AdmissionApplicationEndpoints.Applications, request => request.Header(AdmissionApplicationEndpoints.ApplicantHeader, application.Form.Read(m => m.Name)))
+        .Post<AdmissionApplication>(AdmissionApplicationEndpoints.Applications, request => request.Header(AdmissionApplicationEndpoints.ApplicantHeader, application.Container.Read(m => m.Name)))
         .WhileLoading(pipeline => pipeline.Element("application-status").Text.Set("Sending"))
         .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("application-status").Text.Set(received.Body))
         .OnError((failed, pipeline) => pipeline.Element("application-status").Text.Set("Not received"))

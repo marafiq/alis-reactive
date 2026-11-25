@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<AddressedMoveIn>();
 }
 <h1>Move in</h1>
-@using (var moveIn = Html.BeginRequestForm(plan, "move-in"))
+@using (var moveIn = Html.BeginRequestContainer(plan, "move-in"))
 {
     @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
     <section aria-label="Home address">
@@ -23,7 +23,7 @@
     </section>
     <button type="button" @Html.Raises(plan, AddressedMoveIns.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(AddressedMoveIns.Save, pipeline => pipeline
-        .Post<AddressedMoveIn>(AddressedMoveInEndpoints.MoveIns, request => request.Form(moveIn.Form))
+        .Post<AddressedMoveIn>(AddressedMoveInEndpoints.MoveIns, request => request.Inputs(moveIn.Container))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("move-in-status").Text.Set(saved.Body))
         .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))));
 }

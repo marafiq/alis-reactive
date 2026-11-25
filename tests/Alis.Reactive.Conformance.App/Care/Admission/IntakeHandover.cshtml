@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model IntakeHandover
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Hand over";
+    var plan = Html.ReactivePlan<IntakeHandover>();
+}
+<h1>Hand over</h1>
+<input type="hidden" name="Unit" value="East">
+@using (var handover = Html.BeginRequestContainer(plan, "handover"))
+{
+    @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    @Html.HiddenFor(m => m.Shift)
+    <input type="hidden" name="Ward" value="North">
+    <input type="hidden" name="Bed" value="4" disabled>
+    <button type="button" @Html.Raises(plan, IntakeHandovers.HandOver)>Hand over</button>
+    <button type="button" @Html.Raises(plan, IntakeHandovers.LookUp)>Look up</button>
+    Html.On(plan, trigger => trigger.CustomEvent(IntakeHandovers.HandOver, pipeline => pipeline
+        .Post<IntakeHandover>(IntakeHandoverEndpoints.Handovers, request => request.UrlEncoded(handover.Container, body => body.Set(r => r.Desk, "Front")))
+        .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("received").Text.Set(received.Body))));
+    Html.On(plan, trigger => trigger.CustomEvent(IntakeHandovers.LookUp, pipeline => pipeline
+        .Get<IntakeHandover>(IntakeHandoverEndpoints.Handovers, request => request.Inputs(handover.Container))
+        .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("received").Text.Set(received.Body))));
+}
+<p>Received by the desk: <span id="received">-</span></p>
+@Html.RenderPlan(plan)

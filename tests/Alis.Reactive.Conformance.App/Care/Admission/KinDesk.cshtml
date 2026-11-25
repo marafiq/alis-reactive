@@ -11,14 +11,14 @@
     var plan = Html.ReactivePlan<KinDesk>();
 }
 <h1>Kin desk</h1>
-@using (var desk = Html.BeginRequestForm(plan, "kin-desk"))
+@using (var desk = Html.BeginRequestContainer(plan, "kin-desk"))
 {
     <fieldset>
         <legend>Next of kin</legend>
         @Html.EditorFor(m => m.NextOfKin, "/Care/Admission/KinDeskContact.cshtml")
     </fieldset>
     @(Html.NativeButton("save-kin", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<KinDesk>(CareEndpoints.KinDeskDesks, request => request.Form(desk.Form))
+        .Post<KinDesk>(CareEndpoints.KinDeskDesks, request => request.Inputs(desk.Container))
         .Validate<KinDeskRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("kin-status").Text.Set(saved.Body))
         .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))

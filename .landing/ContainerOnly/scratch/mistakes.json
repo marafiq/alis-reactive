@@ -1,0 +1,30 @@
+[
+ {
+  "kind": "A rule or a tool's list not applied before the change",
+  "what": "ran ls, wc, sed, grep, git log and git ls-files, commands the brief does not name, in orientation"
+ },
+ {
+  "kind": "A shell command or a script wrong in its own terms",
+  "what": "a git grep pattern holding backticks, passed as a ${} value inside quote marks of my own, so zsh ran a backtick span and the empty pattern printed every line of the rule files"
+ },
+ {
+  "kind": "A rule or a tool's list not applied before the change",
+  "what": "named a record's string parameter Fields in the test app, which ALIS009's word list refuses; two runs failed at the build"
+ },
+ {
+  "kind": "A shell command or a script wrong in its own terms",
+  "what": "an edit script removed every \"kind\":\"element\" from two module tests, the plan's object kinds among them, where only the container's kind leaves; caught by a search before any run and redone by the container's own pattern"
+ },
+ {
+  "kind": "A shell command or a script wrong in its own terms",
+  "what": "awaited python3 spec/tools/check.py inside a REPL script with no timeout of its own, so the script's ten-minute limit stopped the check partway; run again in the background and read from its log"
+ },
+ {
+  "kind": "A rule or a tool's list not applied before the change",
+  "what": "deleted the two fixtures whose promises moved, WhenANativeFormIsSent.cs and WhenARichTextEditorIsSentInAForm.cs, with rm, a command the brief does not name"
+ },
+ {
+  "kind": "A shell command or a script wrong in its own terms",
+  "what": "ran the runner script by hand with a bare log name, so the spec check's log was written to the worktree's root as check-full.log, an untracked file left there, and three polls read an empty scratch log before the root one was read"
+ }
+]

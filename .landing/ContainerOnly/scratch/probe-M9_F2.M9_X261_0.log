@@ -1,0 +1,86 @@
+[playwright:runner] building the browser bundle, then tests/Alis.Reactive.Conformance.PlaywrightTests
+
+  Alis.Reactive/wwwroot/js/alis-reactive.js  198.8kb
+
+⚡ Done in 11ms
+
+  Alis.Reactive/wwwroot/js/alis-reactive-hub.js  111.2kb
+
+⚡ Done in 5ms
+
+  ....Reactive.OpenTelemetry/wwwroot/js/alis-reactive-opentelemetry.js  57.4kb
+
+⚡ Done in 16ms
+
+  Alis.Reactive.Native/wwwroot/js/alis-reactive-native.js  21.3kb
+
+⚡ Done in 2ms
+
+  Alis.Reactive.Fusion/wwwroot/js/alis-reactive-fusion.js  5.7kb
+
+⚡ Done in 1ms
+
+  Alis.Reactive.Fusion/wwwroot/js/alis-reactive-fusion-templates.js  977b 
+
+⚡ Done in 1ms
+
+  ....Reactive.Conformance.App/wwwroot/js/alis-reactive-conformance.js  44.3kb
+
+⚡ Done in 2ms
+
+  ...ormance.App/wwwroot/js/care/admissionclinical/supplier-queries.js   3.6kb
+  ...formance.App/wwwroot/js/care/admissionclinical/equipment-stock.js   3.3kb
+  ...Reactive.Conformance.App/wwwroot/js/care/movein/admission-page.js   2.0kb
+  ...active.Conformance.App/wwwroot/js/bench/plugins/shift-log-desk.js   1.9kb
+  ....Reactive.Conformance.App/wwwroot/js/bench/vendors/bench-clock.js   1.4kb
+  ...Reactive.Conformance.App/wwwroot/js/bench/plugins/visitor-desk.js   1.1kb
+  tests/Alis.Reactive.Conformance.App/wwwroot/js/world/care-session.js   1.1kb
+  ...ormance.App/wwwroot/js/bench/plugins/visitor-desk-open-at-load.js  1012b 
+  ...App/wwwroot/js/care/record/card-radio-with-a-stuck-unsubscribe.js   967b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/care/record/card-radio.js   902b 
+  ...s.Reactive.Conformance.App/wwwroot/js/bench/plugins/night-desk.js   772b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/bench/sources/page-log.js   731b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/care/record/card-tally.js   521b 
+  ...pp/wwwroot/js/care/residents/serving-station-with-a-paged-list.js   520b 
+  ...active.Conformance.App/wwwroot/js/care/residents/roster-rounds.js   500b 
+  ....Reactive.Conformance.App/wwwroot/js/care/round/throwing-trace.js   490b 
+  ...ctive.Conformance.App/wwwroot/js/bench/declarations/page-tally.js   483b 
+  ...eactive.Conformance.App/wwwroot/js/care/admission/move-in-bell.js   479b 
+  ...s.Reactive.Conformance.App/wwwroot/js/bench/vendors/page-tally.js   478b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/care/round/round-tally.js   477b 
+  ...and 10 more output files...
+
+⚡ Done in 8ms
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Alis.Reactive.Analyzers -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Analyzers/bin/Release/netstandard2.0/Alis.Reactive.Analyzers.dll
+  Alis.Reactive.TestRules -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.TestRules/bin/Release/netstandard2.0/Alis.Reactive.TestRules.dll
+  Alis.Reactive.Conformance.World -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.World/bin/Release/net10.0/Alis.Reactive.Conformance.World.dll
+  Alis.Reactive -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/bin/Release/net10.0/Alis.Reactive.dll
+  Alis.Reactive.Fusion -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Fusion/bin/Release/net10.0/Alis.Reactive.Fusion.dll
+  Alis.Reactive.OpenTelemetry -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.OpenTelemetry/bin/Release/net10.0/Alis.Reactive.OpenTelemetry.dll
+  Alis.Reactive.Native -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Native/bin/Release/net10.0/Alis.Reactive.Native.dll
+  Alis.Reactive.Conformance.App -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App/bin/Release/net10.0/Alis.Reactive.Conformance.App.dll
+  Alis.Reactive.Conformance.PlaywrightTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/bin/Release/net10.0/Alis.Reactive.Conformance.PlaywrightTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.45
+[playwright:runner] filter: FullyQualifiedName~Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionUsesFormTokens
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/bin/Release/net10.0/Alis.Reactive.Conformance.PlaywrightTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+NUnit Adapter 6.3.1.0: Test execution started
+Running selected tests in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/bin/Release/net10.0/Alis.Reactive.Conformance.PlaywrightTests.dll
+   NUnit3TestExecutor discovered 1 of 1 NUnit test cases using Current Discovery mode, Non-Explicit run
+  Passed the_reactive_reception_sends_one_form_token_and_records_the_visitors_receipt [1 s]
+
+Test Run Successful.
+Total tests: 1
+     Passed: 1
+ Total time: 2.5034 Seconds
+Results File: /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/TestResults/20261125-124259-93188/run.trx
+[playwright:runner] log: tests/Alis.Reactive.Conformance.PlaywrightTests/TestResults/20261125-124259-93188/run.log
+[playwright:result] M9_F2.M9_X261_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.70s Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionUsesFormTokens("antiforgeryField").the_reactive_reception_sends_one_form_token_and_records_the_visitors_receipt
+exit 0

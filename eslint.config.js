@@ -19,6 +19,8 @@ const besideTheTable = ".";
 
 const findsARootsPlans = "Alis.Reactive.Assets/runtime/Execution/plan-scripts.ts";
 
+const readsAContainersHiddenInputs = "Alis.Reactive.Assets/runtime/InputsAndIds/page.ts";
+
 const aWideQuery =
   "CallExpression[callee.type='MemberExpression'][callee.property.name=/^(querySelector|querySelectorAll|getElementsByClassName|getElementsByTagName|getElementsByName|closest|matches)$/]";
 
@@ -122,7 +124,7 @@ export default defineConfig(
   },
   {
     files: ["Alis.Reactive.Assets/runtime/**/*.ts", "tests/Alis.Reactive.ArchitectureTests/LintCases/**/*.ts"],
-    ignores: [findsARootsPlans],
+    ignores: [findsARootsPlans, readsAContainersHiddenInputs],
     rules: {
       "no-restricted-syntax": ["error", { selector: aWideQuery, message: "An element is found by its id: what the page needs to know, the plan carries." }],
     },

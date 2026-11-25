@@ -109,6 +109,10 @@ parts += ["",
           *attribution.read_text().splitlines()]
 Path(out).write_text("\n".join(parts) + "\n")
 PYMESSAGE
+: > "$W/retired-$batch.txt" || exit 1
+for d in "${folders[@]}"; do
+  if [ -f "$d/retired.txt" ]; then cat "$d/retired.txt" >> "$W/retired-$batch.txt" || exit 1; fi
+done
 caffeinate -i bash scripts/land.sh "$batch" "$W/msg-$batch.txt" > "$W/land-$batch.log" 2>&1
 if [ -z "$(git status --porcelain --untracked-files=no -- . ':!HANDOFF.md')" ] && [ "$(git log -1 --format=%s)" = "$title" ]; then
   echo "[$batch] landed $(git rev-parse --short=9 HEAD): $(grep -E 'selected, .* ran|^\[gate\] the Markdown path: every check passed\.$' "$W/land-$batch.log" | tail -1)"

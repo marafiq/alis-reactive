@@ -11,7 +11,7 @@
     var plan = Html.ReactivePlan<ShiftPlan>();
 }
 <h1>Rota</h1>
-@using (var shift = Html.BeginRequestForm(plan, "shift"))
+@using (var shift = Html.BeginRequestContainer(plan, "shift"))
 {
     <fieldset>
         <legend>Starts</legend>
@@ -22,7 +22,7 @@
         @(Html.InputField(plan, m => m.Length, options => options.Label("Length")).NativeTextBox())
     </fieldset>
     @(Html.NativeButton("save-shift", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<ShiftPlan>(CareEndpoints.ShiftPlanShifts, request => request.Form(shift.Form))
+        .Post<ShiftPlan>(CareEndpoints.ShiftPlanShifts, request => request.Inputs(shift.Container))
         .Validate<ShiftPlanRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))
         .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))

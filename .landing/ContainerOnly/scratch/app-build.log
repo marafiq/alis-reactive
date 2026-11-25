@@ -1,0 +1,16 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Alis.Reactive.Analyzers -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Analyzers/bin/Release/netstandard2.0/Alis.Reactive.Analyzers.dll
+  Alis.Reactive.Conformance.World -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.World/bin/Release/net10.0/Alis.Reactive.Conformance.World.dll
+  Alis.Reactive -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/bin/Release/net10.0/Alis.Reactive.dll
+  Alis.Reactive.OpenTelemetry -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.OpenTelemetry/bin/Release/net10.0/Alis.Reactive.OpenTelemetry.dll
+  Alis.Reactive.Native -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Native/bin/Release/net10.0/Alis.Reactive.Native.dll
+  Alis.Reactive.Fusion -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Fusion/bin/Release/net10.0/Alis.Reactive.Fusion.dll
+  Alis.Reactive.Conformance.App -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App/bin/Release/net10.0/Alis.Reactive.Conformance.App.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:09.26
+exit 0

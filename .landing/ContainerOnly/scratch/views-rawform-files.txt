@@ -1,0 +1,5 @@
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/RoomIntake.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/StrengthIntake.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/VisitRoutine.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/VisitWeek.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/CarePlanFiling.cshtml

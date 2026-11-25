@@ -1,0 +1,18 @@
+[plant] running the test M6_F1.X9_27_0 without the defect
+[plant] [playwright:result] M6_F1.X9_27_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.78s Alis.Reactive.Conformance.PlaywrightTests.RequestsAndResponses.WhenAFormSendsTwoDocumentsBesideTheirCaptions("net10").the_endpoint_binds_each_file_with_its_name_its_size_and_the_caption_of_its_row
+[plant] planted in tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeDocuments.cshtml; running the test M6_F1.X9_27_0
+[plant] [playwright:result] M6_F1.X9_27_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 2.31s Alis.Reactive.Conformance.PlaywrightTests.RequestsAndResponses.WhenAFormSendsTwoDocumentsBesideTheirCaptions("net10").the_endpoint_binds_each_file_with_its_name_its_size_and_the_caption_of_its_row
+[plant] caught: M6_F1.X9_27_0 failed with the defect in place (1 of 1).
+[plant]      Microsoft.Playwright.PlaywrightException : Locator expected to have text 'Ada Byron; consent.pdf 1024 Consent; Überweisung.pdf 2048 Referral'
+[plant]   But was: 'Ada Byron; consent.pdf 1024 Consent; consent.pdf 1024 Referral' 
+[plant]   Call log:
+[plant]     - Expect "ToHaveTextAsync" Locator("#saved") with timeout 740ms
+[plant]     - waiting for Locator("#saved")
+[plant]       2 × locator resolved to <span id="saved" aria-busy="true">-</span>
+[plant]         - unexpected value "-"
+[plant]       7 × locator resolved to <span id="saved">Ada Byron; consent.pdf 1024 Consent; consent.pdf …</span>
+[plant]         - unexpected value "Ada Byron; consent.pdf 1024 Consent; consent.pdf 1024 Referral"
+[plant]   Aria snapshot:
+[plant]   - text: Ada Byron; consent.pdf 1024 Consent; consent.pdf 1024 Referral
+[plant]   at tests/Alis.Reactive.Conformance.PlaywrightTests/RequestsAndResponses/Admission/WhenAFormSendsTwoDocumentsBesideTheirCaptions.cs:line 30
+[plant] restored tests/Alis.Reactive.Conformance.App/Care/Admission/IntakeDocuments.cshtml

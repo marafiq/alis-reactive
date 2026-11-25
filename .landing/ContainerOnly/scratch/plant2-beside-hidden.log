@@ -1,0 +1,16 @@
+[plant] running the test Cells.http_beside_hidden without the defect
+[plant] [playwright:result] Cells.http_beside_hidden 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.74s Alis.Reactive.Conformance.PlaywrightTests.Vendors.WhenAFormSendsAHiddenInputBesideAComponentsMember("net10").the_form_data_holds_the_hidden_batch_and_the_value_the_component_holds
+[plant] planted in Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts; running the test Cells.http_beside_hidden
+[plant] [playwright:result] Cells.http_beside_hidden 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 2.30s Alis.Reactive.Conformance.PlaywrightTests.Vendors.WhenAFormSendsAHiddenInputBesideAComponentsMember("net10").the_form_data_holds_the_hidden_batch_and_the_value_the_component_holds
+[plant] caught: Cells.http_beside_hidden failed with the defect in place (1 of 1).
+[plant]      Microsoft.Playwright.PlaywrightException : Locator expected to have text 'B-2026-11-10: a-1'
+[plant]   But was: ': a-1' 
+[plant]   Call log:
+[plant]     - Expect "ToHaveTextAsync" Locator("#shown") with timeout 740ms
+[plant]     - waiting for Locator("#shown")
+[plant]       9 × locator resolved to <p id="shown">: a-1</p>
+[plant]         - unexpected value ": a-1"
+[plant]   Aria snapshot:
+[plant]   - paragraph: ": a-1"
+[plant]   at tests/Alis.Reactive.Conformance.PlaywrightTests/Vendors/Bench/WhenAFormSendsAHiddenInputBesideAComponentsMember.cs:line 21
+[plant] restored Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts

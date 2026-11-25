@@ -1,0 +1,34 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Alis.Reactive.Analyzers -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Analyzers/bin/Debug/netstandard2.0/Alis.Reactive.Analyzers.dll
+  Alis.Reactive.Conformance.World -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.World/bin/Debug/net10.0/Alis.Reactive.Conformance.World.dll
+  Alis.Reactive -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/bin/Debug/net10.0/Alis.Reactive.dll
+  PlanContractGenerator -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tools/PlanContractGenerator/bin/Debug/net10.0/Alis.Reactive.PlanContractGenerator.dll
+  Alis.Reactive.Native -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Native/bin/Debug/net10.0/Alis.Reactive.Native.dll
+  Alis.Reactive.OpenTelemetry -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.OpenTelemetry/bin/Debug/net10.0/Alis.Reactive.OpenTelemetry.dll
+  Alis.Reactive.Fusion -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Fusion/bin/Debug/net10.0/Alis.Reactive.Fusion.dll
+  Alis.Reactive.Conformance.App -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App/bin/Debug/net10.0/Alis.Reactive.Conformance.App.dll
+  Alis.Reactive.ArchitectureTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/bin/Debug/net10.0/Alis.Reactive.ArchitectureTests.dll
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/bin/Debug/net10.0/Alis.Reactive.ArchitectureTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+  Failed git_lists_no_file_a_build_of_the_fresh_net48_app_wrote [642 ms]
+  Error Message:
+   System.InvalidOperationException : tests/Alis.Reactive.Consumer.Net48 did not build on the packs in nupkgs/ by Visual Studio's MSBuild:
+MSBUILD : error MSB1001: Unknown switch.
+Switch: -tl:off
+
+For switch syntax, type "MSBuild -help"
+
+  Stack Trace:
+     at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.BuiltByVisualStudiosMsBuildOnThePacks(String app) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 273
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.git_lists_no_file_a_build_of_the_fresh_net48_app_wrote() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 64
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+1)    at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.BuiltByVisualStudiosMsBuildOnThePacks(String app) in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 273
+   at Alis.Reactive.ArchitectureTests.WhenAConsumerAppIsBuilt.git_lists_no_file_a_build_of_the_fresh_net48_app_wrote() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/WhenAConsumerAppIsBuilt.cs:line 64
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+
+Failed!  - Failed:     1, Passed:   349, Skipped:     0, Total:   350, Duration: 2 m 4 s - Alis.Reactive.ArchitectureTests.dll (net10.0)
+exit 1

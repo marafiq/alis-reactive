@@ -179,7 +179,8 @@ tests/
                                               WhenAConsumerAppIsBuilt (section 2.9), over README's examples
                                               WhenADocShowsAnExample (section 2.9), and over the runner's selection
                                               and result WhenAPlaywrightRunStarts and WhenAPlaywrightRunEnds (section
-                                              2.5), over the reader of the doors a test's pages call
+                                              2.5), over the land's reading of a retired test WhenALandingRetiresATest, over
+                                              the reader of the doors a test's pages call
                                               WhenAPagesDoorsAreRead (section 4), over the net48 time zone table
                                               WhenTheWindowsZoneTableIsWritten (section 2.7), over the lint's rules
                                               WhenTheLintIsConfigured (section 2.7), over npm's audit report
@@ -1160,10 +1161,11 @@ gives; three need the harness's restart or gc verb; and one needs a list written
 writes. Of the bench's ninety-eight placed cells, ninety-five stand, each test red: nine of its properties, nine of its
 methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen of its sources, its three absences,
 its sixteen requests and three of its lanes, a slot loaded on start, a slot's listener gone at its unload and a step
-that waits on the confirm's answer. The sixteenth request cell, http.beside.hidden, sends a form's inputs: a view's
-request container is declared as the lead proposes it, `Html.BeginRequestForm` and `Html.BeginRequestContainer`, each a
-block a view ends by `using` (N14.3), a form the owner decides before the unit that builds it, and the conformance
-component is declared an input. Its six validation cells stand on that block: each request names the validator that
+that waits on the confirm's answer. The sixteenth request cell, http.beside.hidden, sends a container's inputs and
+the hidden input the view wrote inside it (D9.15): a view's request container is declared by
+`Html.BeginRequestContainer`, a block a view ends by `using` (N14.3; the owner,
+2026-11-25), and the conformance component is declared an input. Its six validation cells stand on that block: each
+request names the validator that
 checks it (`Validate<TValidator>()`), the plain rule and the rule under `When` two validators of one form, since no door
 names a rule set (D16.2 sends that form to gate 2); the validators are written and not registered until U17 builds the
 startup call, and the form endpoint answers what it bound until N16.1's door. Since 2026-11-16 the app registers them,

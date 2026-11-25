@@ -1,0 +1,84 @@
+spec check at f2986ea66: 37 of 40 checks pass
+phase D, step 7: The fluent API, gate 2
+next: Write spec/Fluent/sentences.json; present gate 2.
+PASS survival: brief, notes, file map, check, compact hook and pushed branch [files 4]
+     brief, notes, map, check, hook and branch in place
+PASS main_surface: main's PublicAPI text per package and target framework [Alis.Reactive net48 372, Alis.Reactive net10.0 372, Alis.Reactive.Fusion net48 2249, Alis.Reactive.Fusion net10.0 2249, Alis.Reactive.Native net48 234, Alis.Reactive.Native net10.0 225, Alis.Reactive.FluentValidator net48 113, Alis.Reactive.FluentValidator net10.0 113, Alis.Reactive.NativeTagHelpers net10.0 127, Alis.Reactive.DesignSystem net48 131, Alis.Reactive.DesignSystem net10.0 131]
+     main's surface written for every package and target framework
+PASS inventory: doors, kinds, case labels, analyzer ids and tests as TSV [doors 9347, both 1874, moved 98, main_only 4344, redesign_only 3031, tests 4153, kinds 33, analyzers 13, cases 268]
+     every door, kind, analyzer and case row equals its source line by line, and every test count its attributes
+PASS core_questions: Q1 to Q18 answered [answered 18, total 18, defects 418]
+     every question answered with resolving evidence, checker and rungs
+PASS core_tlc: the TLC specs of Q4, Q9 with Q10, Q11, Q12, Q17 and the date wire form green [specs 7, met 7]
+     every spec green, every invariant killed by its mutant, every witness reached
+PASS questions: every core design question answered [answered 21, total 21, defects 447]
+     every question answered with resolving evidence, checker and rungs
+PASS evidence: every G, B and P evidence item placed in a section's Evidence [placed 31, total 31]
+     every G, B and P item has a home
+PASS tlc: every TLC spec meets its expectation [specs 17, met 17]
+     every spec green, every invariant killed by its mutant, every witness reached
+PASS probes: every server fact a spec assumes is pinned by a probe, and every browser fact names the proof the rewrite ships [facts 405, net10 130, net48 87, node 62, browser 126]
+     every fact printed by its probe or found at its source line, every browser fact with the proof the rewrite ships
+PASS history: every regression SHA tied to a spec line [rows 41, required 40]
+     every regression SHA on its branch and tied to a spec line
+PASS kinds: grammar, schema and spec node sets equal; one handler per kind [today 33, proposed 53, added 21, removed 1, several_handlers_today 11, written 53]
+     grammar, plan.schema.json and schema.md agree on today's 33; proposed 53 equals Schema.tla's node set, one handler each; diff +answer,clock,data,each,enum,file,held,listen,living,located,nothing,off,on,request,returned,signal,start,stop,stream,unbound,zone -try; 11 kinds have two handlers today; the rewrite's grammar writes 53 of the proposed set and no other
+PASS gate1: owner gate 1: the core design
+     gate 1 answered yes
+PASS doors_mapped: every public door mapped to one feature [features 112, rows 8909, mapped 8909, unmapped 0, doubled 0, core_doors_homeless 0]
+     every spec door in exactly one feature, every core door named by a module
+PASS verdicts: every main-only door has a verdict; a refusal names its carriers [features 112, rows 8909, mapped 8909, unmapped 0, doubled 0, main_only 4156, main_only_in_features 4156]
+     every main-only door has a verdict, and every refusal names its carriers
+PASS main_delta: every shipped file main changed after the spec's main SHA cited at main's tip, every public member it added with a verdict [files 4, members 6, cited 4]
+     each of 4 shipped files main changed from 623dd4a27 to 7b9e987cc is cited there by a feature's sentence, and each of 6 public declarations or exports it added has a verdict
+PASS features_core: every feature mapped to the core [features 112, rows 8909, mapped 8909, unmapped 0, doubled 0]
+     every feature rests on answered questions, schema nodes and checked invariants
+PASS features_lost: every module and feature on either line carried: features lost 0 [lost 0, uncarried_doors 0, types_in_no_feature 0]
+     features lost 0
+PASS module_cites: every module.md cite resolves at the SHA it names [cites 1052, unresolved 0]
+     every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules
+FAIL fluent: every module's sentences consistent [members 541, lambda_parameters 463, F1_names 141, F1_rows 141, F1_synonym_groups 26, F2_cells 255, F2_compiling 151, F2_refused 5, F2_gaps 99, F2_failing 0, F2_gap_doors 8, F2_positions 15, F2_position_gaps 3, F2_sources 17, F2_source_gaps 4, F2_forms 32, F2_forms_as_named 31, F3_names 35, F3_differ 21, F3_same_under_rules 15, F3_kept 6, F3_stale_kept 0, F4_parameters 455, F4_slots 92, F4_no_row 0, F4_other_name 0, F4_data 143, F4_hides 0, F4_rows 11, F4_rows_unused 1, F5_parameters 110, F5_rows 47, F5_untyped 0, F5_stale_rows 0, F1 pass, F2 fail, F3 pass, F4 pass, F5 pass]
+     F2 spec/api/refused.sh FAIL PageFormGone.CS0411 expected [CS0411 ] observed [CS1061 ] exit 1: /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/spec/api/RefusedRun/Refused.cs(11,72): error CS1061: 'Pipeline<IntakeView>' does not contain a definition for 'Form' and no accessible extension method 'Form' accepting a first argument of type 'Pipeline<IntakeView>' could be found (are you missing a using directive or an assembly reference?) [/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/spec/api/RefusedRun/HttpSurface.csproj]
+PASS gate2: owner gate 2: the fluent API
+     gate 2 answered yes
+PASS matrix: the conformance matrix, every cell run by FusionMultiSelect's or ConformanceComponent's declaration [cells 103, bullets 36, syncfusion 60, own 19, native 101, carried 2, problems 0]
+     MultiSelect covers 60 of 103 cells from its .d.ts and tests 19 of them as its own; ConformanceComponent runs 101 of 103, and FusionMultiSelect carries the other 2
+PASS native_behaviors: every behavior native.json states names tests of the spec [behaviors 50, problems 0]
+     50 behaviors on 12 declarations of native.json, each naming tests of the spec
+PASS defects: every defect on its highest rung, every core defect in a feature; no test for a type or analyzer defect [features 112, rows 8909, mapped 8909, unmapped 0, doubled 0, defects 886, core_defects_unplaced 0]
+     every defect on its rung, every core defect in a feature; no promise for a type or analyzer defect
+PASS carriers: every D line and module meaning carried by a resolving defect, invariant, probe, check, cell or delivery test [d_lines 243, meanings 56, uncarried 0, defect 244, invariant 36, probe 76, check 4, cell 55, delivery 1]
+     each of 243 D lines and 56 module meanings has at least one carrier that resolves: a defect naming it in an id group, or an invariant, probe or check it names, or a matrix cell or delivery test resting on it
+PASS promises: every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise [features 112, rows 8909, mapped 8909, unmapped 0, doubled 0, promises 739, matrix_runs 117, matrix_promised 117]
+     every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise
+PASS rewrite_units: every feature in exactly one rewrite unit [units 27, features 112, tests 856, problems 0]
+     27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 3, U10 5, U11 16, U12 0, U13 98, U14 6, U15 29, U16 0, U17 0, U18 98, U19 18, U20 8, U21 86, U22 7, U23 271, U24 57, U25 38, U26 108, U27 3
+PASS paths: every path of the staged tree and main's tip kept by REWRITE.md's section 2 or retired by its section 3, so the cut drops nothing by omission [paths 216, problems 0]
+     each of 216 paths of the staged tree and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both
+PASS unit_proofs: every rewrite unit proves something: a browser test lands in it, a module test reads a node its core features write, an analyzer case of its features, or a harness test [units 27, harness_tests 10, problems 0]
+     each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 53m 3h, U4 1b 18m 3a, U5 1b 21m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 3b 17m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 21m 21a, U18 98b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 86b 14m 1a 1h, U22 7b 4m, U23 271b, U24 57b 1a, U25 38b 1a, U26 108b 35a, U27 3b
+PASS names: every module named alike in the module table, REWRITE.md's tree, SliceTree and TLA+ table, and spec/ [problems 0, modules 26, core 20, slice_rows 16, tla 17, spec_entries 41]
+     each of the module table's 20 core modules is a folder of section 2.1's Alis.Reactive/ and in one of 16 SliceTree rows, each of its 26 modules a folder of section 2.1's projects and spec/<Module>/module.md; each of 17 TLA+ specs in section 2.6 sits at spec/<Owner>/ and TLC runs it; each of spec/'s 41 entries is a module folder or named by section 2.1's spec line
+PASS rewrite_cites: every cite REWRITE.md makes names its SHA and resolves there [cites 6, problems 0]
+     each of 6 cites REWRITE.md makes names its SHA and resolves there
+PASS packages: every package REWRITE.md packs is main's or a decided door's, ships bundles only, and every dependency and kept reference is pinned at its version [packages 6, pins 28, references 29, problems 0]
+     section 2.9 packs 6 ids, main's but Alis.Reactive.FluentValidator and the decided Alis.Reactive.OpenTelemetry; each ships only bundles, each dependency and each of 29 references the kept projects take is pinned in section 2.7 at its version
+PASS test_rules: every rule and smell of tests.md held by a test rule or a named check [rules 10, smells 13, ids 13, problems 0]
+     tests.md's 10 rules and 13 smells each held in REWRITE.md by test rules TEST001 to TEST013 or a named check, every test rule holding one
+PASS claude_md: root CLAUDE.md and rules carry the spec-first order [problems 0]
+     root CLAUDE.md is spec-first: the 7 lines replaced, the thesis, principles, stability rules and modules named, and a unit's order test-first: spec lines, TLC, tests from their promises failing, code, planted defects, commit
+PASS hedges: zero hedge words [hedges 0, files 115]
+     no hedge word in the spec's prose
+PASS no_comments: no comment in the spec's Python or TLA+ [comments 0]
+     no comment in the spec's Python or TLA+
+FAIL actions: every action of the async lanes' specs named by one promise, the test app's endpoint holding it [actions 75, named 74, unnamed 1, promises 141]
+     1 of 75 actions named by no promise: Request.tla:NativeSubmit
+PASS app: every test placed on the care home app, no core test loading Syncfusion, no environment on a care screen [screens 15, hosts 26, placed 739, cells 117, rewrite 0, problems 0]
+     739 feature tests and 117 cell tests on 15 screens under 26 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it
+PASS slice_tests: every rendered slice of Native, Fusion and their app-level objects with a placed behavior test of its own [slices 67, unrendered 3, problems 0]
+     67 rendered slices each with a placed behavior test; M21.F2, M25.F6, M24.F1 are the bases slices declare on and render nothing
+PASS bindings: the generated gates and promise constants are what the spec writes, never a hand's [gates 75, constants 866, marks 131, problems 0]
+     Gates.g.cs holds 75 gates and Promises.g.cs 866 constants, 131 of a held gate marked on them, each as the spec writes it
+FAIL plants: every other check fails on each refused plant with its text and stays green on each accepted plant, run in throwaway worktrees [caught 253, kept 86, proven 39, checks 39, failed 4, unrefused 0, unaccepted 0]
+     actions BROKE two actions of Next swapped: 1 of 75 actions named by no promise: Request.tla:NativeSubmit; actions BROKE Next rewrapped one disjunct group per line: 1 of 75 actions named by no promise: Request.tla:NativeSubmit; actions MISSED a new action in a spec's Next: 2 of 76 actions named by no promise: Request.tla:NativeSubmit, Tracing.tla:Pause; fluent BROKE two concept rows in another order: F2 spec/api/refused.sh FAIL PageFormGone.CS0411 expected [CS0411 ] observed [CS1061 ] exit 1: /Users/muhammadadnanrafiq/Documents/Code/alis-
+exit 1

@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj (in 120 ms).
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/Alis.Reactive.csproj (in 120 ms).
+  1 of 3 projects are up-to-date for restore.
+  Alis.Reactive.Analyzers -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Analyzers/bin/Debug/netstandard2.0/Alis.Reactive.Analyzers.dll
+  Alis.Reactive -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/bin/Debug/net10.0/Alis.Reactive.dll
+  Alis.Reactive.ModuleTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/bin/Debug/net10.0/Alis.Reactive.ModuleTests.dll
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/bin/Debug/net10.0/Alis.Reactive.ModuleTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:  1467, Skipped:     0, Total:  1467, Duration: 19 s - Alis.Reactive.ModuleTests.dll (net10.0)
+exit 0

@@ -730,7 +730,7 @@
         "Q14"
       ],
       "meanings": [],
-      "oracle": "MVC's binding name and id of a member under the view's TemplateInfo prefix on both hosts (probe:core-template-prefix-name, probe:core-sanitized-id), the same derivation the input's render takes (D14.3), and the form's own submission set for the value a container sends (D13.3).",
+      "oracle": "MVC's binding name and id of a member under the view's TemplateInfo prefix on both hosts (probe:core-template-prefix-name, probe:core-sanitized-id), the same derivation the input's render takes (D14.3), and the browser's own submission of the same controls for the value a container sends (D13.3).",
       "checker": [
         "core:Q13",
         "core:Q14",

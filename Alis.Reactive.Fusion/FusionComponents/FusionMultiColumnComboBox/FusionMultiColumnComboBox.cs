@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// row from, which holds the text of the row's value.
 /// </summary>
 /// <remarks>
-/// A box bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2 raises
+/// A box bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2 raises
 /// <see cref="Change"/> when a person chooses a row or the value changes.
 /// </remarks>
 /// <typeparam name="TValue">The type of the rows' value member, which the change payload's value holds.</typeparam>

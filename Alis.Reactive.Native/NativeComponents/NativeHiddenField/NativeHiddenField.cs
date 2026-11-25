@@ -7,7 +7,7 @@ namespace Alis.Reactive.Native.NativeComponents;
 /// A hidden field: a hidden HTML <c>input</c> that holds a member's value.
 /// </summary>
 /// <remarks>
-/// A hidden field bound to a member is an input like any other: a form sends its <see cref="Value"/> and a check
+/// A hidden field bound to a member is an input like any other: a request container sends its <see cref="Value"/> and a check
 /// reads it. It has no person to commit it, so its <see cref="Change"/> is raised when a write changes the value,
 /// and not after a write of the same text. A hidden input takes no focus.
 /// </remarks>

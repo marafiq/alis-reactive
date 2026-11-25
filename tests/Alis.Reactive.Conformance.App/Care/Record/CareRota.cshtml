@@ -10,18 +10,18 @@
     var plan = Html.ReactivePlan<CareRota>();
 }
 <h1>Care rota</h1>
-@using (var careRota = Html.BeginRequestForm(plan, "care-rota"))
+@using (var careRota = Html.BeginRequestContainer(plan, "care-rota"))
 {
     <fieldset>
         <legend>Name</legend>
         @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
     </fieldset>
     @(Html.NativeButton("save-care", "Save care").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<CareRota>(CareRotaEndpoints.CareSaves, request => request.Form(careRota.Form))
+        .Post<CareRota>(CareRotaEndpoints.CareSaves, request => request.Inputs(careRota.Container))
         .Validate<CareRotaRules>(CareRotaRules.Care)
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
     @(Html.NativeButton("save-rota", "Save rota").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<CareRota>(CareRotaEndpoints.RotaSaves, request => request.Form(careRota.Form))
+        .Post<CareRota>(CareRotaEndpoints.RotaSaves, request => request.Inputs(careRota.Container))
         .Validate<CareRotaRules>(CareRotaRules.Rota)
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
 }

@@ -1,0 +1,12 @@
+  Determining projects to restore...
+/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App.Net48/Alis.Reactive.Conformance.App.Net48.csproj : error NU1015: The following PackageReference item(s) do not have a version specified: AlisReactive, AlisReactive.Native
+  Failed to restore /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App.Net48/Alis.Reactive.Conformance.App.Net48.csproj (in 20 ms).
+
+Build FAILED.
+
+/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App.Net48/Alis.Reactive.Conformance.App.Net48.csproj : error NU1015: The following PackageReference item(s) do not have a version specified: AlisReactive, AlisReactive.Native
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.40
+exit 1

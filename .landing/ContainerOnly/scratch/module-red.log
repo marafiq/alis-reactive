@@ -1,0 +1,109 @@
+  Determining projects to restore...
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/Alis.Reactive.ModuleTests.csproj (in 716 ms).
+  2 of 3 projects are up-to-date for restore.
+  Alis.Reactive.Analyzers -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Analyzers/bin/Debug/netstandard2.0/Alis.Reactive.Analyzers.dll
+  Alis.Reactive -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/bin/Debug/net10.0/Alis.Reactive.dll
+  Alis.Reactive.ModuleTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/bin/Debug/net10.0/Alis.Reactive.ModuleTests.dll
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/bin/Debug/net10.0/Alis.Reactive.ModuleTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+  Failed a_block_accepts_the_prefix_its_plan_started_with_and_encodes_its_element_id [11 ms]
+  Error Message:
+     Assert.That(json, Is.EqualTo(Head + "\"" + """kin\u0026care":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.Family","summary":"kin\u0026care_summary","live":[]}""" + Tail))
+  Expected string length 637 but was 654. Strings differ at index 575.
+  Expected: "...eTests.InputsAndIds.Family","summary":"kin\\u0026care_summa..."
+  But was:  "...eTests.InputsAndIds.Family","kind":"element","summary":"ki..."
+  -------------------------------------------^
+
+  Stack Trace:
+     at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.a_block_accepts_the_prefix_its_plan_started_with_and_encodes_its_element_id() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 163
+
+1)    at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.a_block_accepts_the_prefix_its_plan_started_with_and_encodes_its_element_id() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 163
+
+
+  Failed a_hidden_input_leaves_its_message_id_available_to_a_container [1 ms]
+  Error Message:
+     Assert.That(json, Is.EqualTo(MoveInPlans.Head + "\"" + """Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"name":"Room","path":["room"],"converted":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room"}},"shape":{"kind":"nullable","inner":{"kind":"string","date":"none","negativeZero":"0"}}},"blank":{"kind":"lit","value":""},"sent":""" + MoveInPlans.TextSent + ""","committed":"change","invalidClass":"alis-has-error","message":""}},"containers":{"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.MoveIn","summary":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message_summary","live":[]}}}},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room","vendor":"native"}""" + MoveInPlans.Tail))
+  Expected string length 1826 but was 1843. Strings differ at index 1568.
+  Expected: "...eTests.InputsAndIds.MoveIn","summary":"Alis_Reactive_Modul..."
+  But was:  "...eTests.InputsAndIds.MoveIn","kind":"element","summary":"Al..."
+  -------------------------------------------^
+
+  Stack Trace:
+     at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.a_hidden_input_leaves_its_message_id_available_to_a_container() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 125
+
+1)    at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.a_hidden_input_leaves_its_message_id_available_to_a_container() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 125
+
+
+  Failed a_view_reaches_a_container_another_view_renders_without_registering_it_again [< 1 ms]
+  Error Message:
+     Assert.That(ownerJson, Is.EqualTo(Head + "\"" + """kin":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.Family","summary":"kin_summary","live":[]}""" + Tail))
+  Expected string length 617 but was 634. Strings differ at index 565.
+  Expected: "...eTests.InputsAndIds.Family","summary":"kin_summary","live"..."
+  But was:  "...eTests.InputsAndIds.Family","kind":"element","summary":"ki..."
+  -------------------------------------------^
+
+  Stack Trace:
+     at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.a_view_reaches_a_container_another_view_renders_without_registering_it_again() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 38
+
+1)    at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.a_view_reaches_a_container_another_view_renders_without_registering_it_again() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 38
+
+
+  Failed an_element_container_renders_a_fieldset_and_its_own_summary [< 1 ms]
+  Error Message:
+     Assert.That(json, Is.EqualTo(Head + "\"" + """kin":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.Family","summary":"kin_summary","live":[]}""" + Tail))
+  Expected string length 617 but was 634. Strings differ at index 565.
+  Expected: "...eTests.InputsAndIds.Family","summary":"kin_summary","live"..."
+  But was:  "...eTests.InputsAndIds.Family","kind":"element","summary":"ki..."
+  -------------------------------------------^
+
+  Stack Trace:
+     at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.an_element_container_renders_a_fieldset_and_its_own_summary() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 27
+
+1)    at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.an_element_container_renders_a_fieldset_and_its_own_summary() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 27
+
+
+  Failed two_containers_keep_two_summaries_and_their_inputs_whichever_renders_first [1 ms]
+  Error Message:
+     Assert.That(json, Is.EqualTo(MoveInPlans.Head + "\"" + """Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights":{"name":"Nights","path":["nights"],"converted":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}},"blank":{"kind":"lit","value":5},"sent":""" + MoveInPlans.NumberSent + ""","committed":"change","invalidClass":"alis-has-error","message":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights_message"},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"name":"Room","path":["room"],"converted":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room"}},"shape":{"kind":"nullable","inner":{"kind":"string","date":"none","negativeZero":"0"}}},"blank":{"kind":"lit","value":""},"sent":""" + MoveInPlans.TextSent + ""","committed":"change","invalidClass":"alis-has-error","message":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message"}},"containers":{"intake":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.MoveIn","summary":"intake_summary","live":[]},"kin":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.MoveIn","summary":"kin_summary","live":[]}}}},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights","vendor":"native"},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room","vendor":"native"}""" + MoveInPlans.Tail))
+  Expected string length 2879 but was 2913. Strings differ at index 2422.
+  Expected: "...eTests.InputsAndIds.MoveIn","summary":"intake_summary","li..."
+  But was:  "...eTests.InputsAndIds.MoveIn","kind":"element","summary":"in..."
+  -------------------------------------------^
+
+  Stack Trace:
+     at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.two_containers_keep_two_summaries_and_their_inputs_whichever_renders_first() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 65
+
+1)    at Alis.Reactive.ModuleTests.InputsAndIds.WhenAViewRendersARequestContainer.two_containers_keep_two_summaries_and_their_inputs_whichever_renders_first() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/InputsAndIds/WhenAViewRendersARequestContainer.cs:line 65
+
+
+  Failed a_block_whose_model_has_no_registered_validator_is_checked_live_by_none [4 ms]
+  Error Message:
+     Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","summary":"intake_summary","live":[]},"kin":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","summary":"kin_summary","live":[]}}"""))
+  Expected string length 203 but was 237. Strings differ at index 68.
+  Expected: "...eTests.Validation.Supplies","summary":"intake_summary","li..."
+  But was:  "...eTests.Validation.Supplies","kind":"element","summary":"in..."
+  -------------------------------------------^
+
+  Stack Trace:
+     at Alis.Reactive.ModuleTests.Validation.WhenABlockChecksItsInputsLive.a_block_whose_model_has_no_registered_validator_is_checked_live_by_none() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/Validation/WhenABlockChecksItsInputsLive.cs:line 43
+
+1)    at Alis.Reactive.ModuleTests.Validation.WhenABlockChecksItsInputsLive.a_block_whose_model_has_no_registered_validator_is_checked_live_by_none() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/Validation/WhenABlockChecksItsInputsLive.cs:line 43
+
+
+  Failed an_element_container_is_checked_live_by_its_models_registered_validator_under_the_default_rule_set_over_what_it_sends [4 ms]
+  Error Message:
+     Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","summary":"intake_summary","live":[""" + SentByIntake + "]}}"))
+  Expected string length 517 but was 534. Strings differ at index 68.
+  Expected: "...eTests.Validation.Supplies","summary":"intake_summary","li..."
+  But was:  "...eTests.Validation.Supplies","kind":"element","summary":"in..."
+  -------------------------------------------^
+
+  Stack Trace:
+     at Alis.Reactive.ModuleTests.Validation.WhenABlockChecksItsInputsLive.an_element_container_is_checked_live_by_its_models_registered_validator_under_the_default_rule_set_over_what_it_sends() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/Validation/WhenABlockChecksItsInputsLive.cs:line 26
+
+1)    at Alis.Reactive.ModuleTests.Validation.WhenABlockChecksItsInputsLive.an_element_container_is_checked_live_by_its_models_registered_validator_under_the_default_rule_set_over_what_it_sends() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/Validation/WhenABlockChecksItsInputsLive.cs:line 26
+
+
+
+Failed!  - Failed:     7, Passed:  1460, Skipped:     0, Total:  1467, Duration: 18 s - Alis.Reactive.ModuleTests.dll (net10.0)
+exit 1

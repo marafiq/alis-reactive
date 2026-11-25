@@ -9,29 +9,32 @@
 @{
     var plan = Html.ReactivePlan<ReceptionPage>();
     var count = Html.InputField(plan, m => m.Copies, options => options.Label("Badge copies"));
+    var relationship = Html.InputField(plan, m => m.Relationship, options => options.Label("Relationship"));
+    var consent = Html.InputField(plan, m => m.Consent, options => options.Label("Visitor consent"));
+    var desk = Html.InputField(plan, m => m.Desk, options => options.Label("Reception desk"));
 }
 <h2>Visitor reception</h2>
-@using (var reception = Html.BeginRequestForm(plan, "reception"))
+<form id="reception-sign-in" method="post" action="@Url.Action(nameof(MoveInDeskController.SignInVisitor), "MoveInDesk", new { Model.DraftId })">
+@using (var reception = Html.BeginRequestContainer(plan, "reception"))
 {
     @Html.AntiForgeryToken()
     @(Html.NativeHiddenField(plan, m => m.DraftId))
-    @Html.HiddenFor(m => m.ResidentId)
+    @(Html.NativeHiddenField(plan, m => m.ResidentId))
     @(Html.NativeHiddenField(plan, m => m.CoordinatorId))
     @(Html.NativeHiddenField(plan, m => m.OperationId))
     @(Html.InputField(plan, m => m.VisitorName, options => options.Label("Visitor name")).NativeTextBox())
-    <label>Relationship @Html.DropDownListFor(m => m.Relationship, Html.GetEnumSelectList<ContactRelationship>())</label>
-    <label><input type="checkbox" name="@Html.NameFor(m => m.Consent)" value="true"> Visitor consent</label>
+    @(relationship.Render<NativeDropDown>(Html.DropDownListFor(m => m.Relationship, Html.GetEnumSelectList<ContactRelationship>(), new { id = relationship.Id })))
+    @(consent.Render<NativeCheckBox>(Html.Raw($"<input type=\"checkbox\" name=\"{Html.NameFor(m => m.Consent)}\" value=\"true\" id=\"{consent.Id}\">")))
     @(count.Render<NativeTextBox>(Html.TextBoxFor(m => m.Copies, new { type = "number", id = count.Id })))
     <label>Reserved badge <input name="ReservedBadge" value="Staff" disabled></label>
-    <label>Reception document caption <input name="@nameof(DocumentsPage.Caption)" form="reception-documents" value="Reception intake"></label>
     <button type="submit" name="Navigation" value="true" formmethod="post" formenctype="application/x-www-form-urlencoded"
             formaction="@Url.Action(nameof(MoveInDeskController.SignInVisitor), "MoveInDesk", new { Model.DraftId })">Sign in and open receipt</button>
     @(Html.NativeButton("save-visitor", "Save visitor").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
         .Post<ReceptionPage>(MoveInEndpoints.Reception, request => request
             .Path(m => m.DraftId, Model.DraftId)
-            .Header(MoveInEndpoints.CoordinatorHeader, reception.Form.Read(m => m.CoordinatorId))
-            .Header(MoveInEndpoints.OperationHeader, reception.Form.Read(m => m.OperationId))
-            .UrlEncoded(reception.Form, body => { }))
+            .Header(MoveInEndpoints.CoordinatorHeader, reception.Container.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, reception.Container.Read(m => m.OperationId))
+            .UrlEncoded(reception.Container, body => body.Input(r => r.Desk, pipeline.Input(m => m.Desk))))
         .Validate<ReceptionRules>()
         .WhileLoading(pipeline => pipeline.Element("reception-answer").Text.Set("Signing in the visitor."))
         .OnSuccess(Content.Html, (receipt, pipeline) =>
@@ -48,7 +51,10 @@
             pipeline.Notice().Error("Reception could not confirm this sign-in.");
         })))
 }
-<label>Reception desk <input form="reception" name="@Html.NameFor(m => m.Desk)" value="@Model.Desk"></label>
+</form>
+@(desk.Render<NativeTextBox>(Html.TextBoxFor(m => m.Desk, new { id = desk.Id, form = "reception-sign-in" })))
+<label for="reception-document-caption">Reception document caption</label>
+@(plan.Render<NativeTextBox>("reception-document-caption", Html.TextBox("ReceptionDocumentCaption", "Reception intake", new { id = "reception-document-caption" })))
 <p id="reception-answer" role="status"></p>
 <div id="reception-receipt"></div>
 @Html.ActionLink("Admission history", nameof(MoveInDeskController.AdmissionHistory), "MoveInDesk", new { Model.DraftId })

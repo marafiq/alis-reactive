@@ -22,7 +22,8 @@ The rules govern every Playwright test. A compiler rule or a named check holds e
    the spec states it. A name that describes code (`writes_a_let_statement`,
    `set_prop_mutation_writes_value_to_ej2_instance`) describes no promise. A test that passed keeps its fixture and
    its name, since the land's run reads a renamed test as gone and lands nothing: a case of another situation takes a
-   fixture of its own (the lead's mistake, 2026-11-24).
+   fixture of its own (the lead's mistake, 2026-11-24). A test whose promise the owner reverses is retired, the one door
+   for a test that goes: a line of its unit's "retired.txt" names it, its promise and the test that carries it now.
 2. **The public surface only.** Arrange as a developer does: Razor helpers, plan builders, validators
    registered through DI, components declared on `Component`. No `InternalsVisibleTo`, which
    `WhenAnInternalIsExposed` refuses in every project, no internal constructor, no reflection. A behavior a developer cannot reach is given a public, typed door; it is

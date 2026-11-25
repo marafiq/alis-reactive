@@ -1,0 +1,16 @@
+[plant] running the test M9_F2.M9_X254_0 without the defect
+[plant] [playwright:result] M9_F2.M9_X254_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 0.89s Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionSignsInAVisitor("net10").reception_files_the_visit_while_the_rejected_prescription_remains_unchanged
+[plant] planted in tests/Alis.Reactive.Conformance.App/Care/MoveIn/ReceptionDocuments.cshtml; running the test M9_F2.M9_X254_0
+[plant] [playwright:result] M9_F2.M9_X254_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 1.62s Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionSignsInAVisitor("net10").reception_files_the_visit_while_the_rejected_prescription_remains_unchanged
+[plant] caught: M9_F2.M9_X254_0 failed with the defect in place (1 of 1).
+[plant]      Microsoft.Playwright.PlaywrightException : Locator expected to have text 'DOC1 · arrival.txt · 17 bytes · Consent · Reception intake'
+[plant]   But was: 'DOC1 · arrival.txt · 17 bytes · Consent · ' 
+[plant]   Call log:
+[plant]     - Expect "ToHaveTextAsync" Locator("#document-DOC1") with timeout 740ms
+[plant]     - waiting for Locator("#document-DOC1")
+[plant]       9 × locator resolved to <p id="document-DOC1">DOC1 · arrival.txt · 17 bytes · Consent · </p>
+[plant]         - unexpected value "DOC1 · arrival.txt · 17 bytes · Consent · "
+[plant]   Aria snapshot:
+[plant]   - paragraph: DOC1 · arrival.txt · 17 bytes · Consent ·
+[plant]   at tests/Alis.Reactive.Conformance.PlaywrightTests/PartialsAndSlots/MoveIn/WhenReceptionSignsInAVisitor.cs:line 113
+[plant] restored tests/Alis.Reactive.Conformance.App/Care/MoveIn/ReceptionDocuments.cshtml

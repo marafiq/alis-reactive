@@ -1,0 +1,98 @@
+f2986ea66:spec/Analyzers/module.md:47:  GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Form`,
+f2986ea66:spec/BRIEF.md:36:**What it is.** Alis.Reactive lets a team on ASP.NET MVC write dynamic UI entirely in typed, fluent C# in its views, with no hand-written JavaScript. Both hosts are first-class:
+f2986ea66:spec/BRIEF.md:379:  - `g.Form(params Expression<Func<TModel, object?>>[])` erases the type that `p.Bound<TProp>` keeps (`GatherBuilder.cs:167`, `:176-178`; `PipelineBuilder.cs:142`).
+f2986ea66:spec/BRIEF.md:380:  - `Form` names three things: the validated form, an element, and named fields.
+f2986ea66:spec/CLAUDE.md:464:  container, and no type is named PageForm. The native `<form>` stays the browser's way to send a form's body (`Form`), and the core
+f2986ea66:spec/CLAUDE.md:946:  and puts it to the owner in the handoff: `Html.BeginRequestForm(plan, containerId)` and
+f2986ea66:spec/CLAUDE.md:948:  block a view ends by `using`, as it ends MVC's own BeginForm helper: `RequestFormBlock<TModel>`, whose `Form` is
+f2986ea66:spec/CLAUDE.md:949:  the `RequestForm<TModel>`, and `RequestContainerBlock<TModel>`, whose `Container` is the
+f2986ea66:spec/CLAUDE.md:955:  `Form(form)` on a request with a body sends the submission set as multipart, whose text holds a boundary the
+f2986ea66:spec/CLAUDE.md:1352:  member of `RequestContainer<TModel>`, the handle a block's `Form` or `Container` holds and
+f2986ea66:spec/Core/schema.md:396:  - `query`, which a GET's `Form`, `Inputs` and `Input`s fill (N10.7);
+f2986ea66:spec/Core/schema.md:398:    with the inputs it sends: a native form's submission set, a container's framework inputs, its `Input`s (D9.6 to
+f2986ea66:spec/FusionComponents/features.json:8803:     "defect": "Both lines name the uploader's input by the member's path (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs:34-36 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:106-110 at 65fdf118d). EJ2 copies a chosen file into a hidden input under the input's name (@syncfusion/ej2-inputs/src/uploader/uploader.js:391, :1706-1716), which the browser's own submission of a native form sends; a helper that sets no name leaves EJ2 to name the input by its id (:372-375), so the endpoint binds no file into the member."
+f2986ea66:spec/FusionComponents/features.json:8816:     "page": "An admission's care plan draft, rendered by field.FusionUploader() outside a native form, so EJ2 shows its Clear button once a file is listed, for a model whose CarePlan is an IFormFile, whose FilesChanged handler sets the element chosen's text to the count of the uploader's Files; chosen starts as 0.",
+f2986ea66:spec/InputsAndIds/features.json:733:      "oracle": "MVC's binding name and id of a member under the view's TemplateInfo prefix on both hosts (probe:core-template-prefix-name, probe:core-sanitized-id), the same derivation the input's render takes (D14.3), and the form's own submission set for the value a container sends (D13.3).",
+f2986ea66:spec/NativeAppLevelObjects/features.json:405:          "text": "pipeline.Post<IntakeView, ResidentForm>(\"/Residents\", request => request.Form(\"drawer-resident-form\")).WhileLoading(pipeline => pipeline.Element(\"resident-form-status\").Text.Set(\"Saving resident...\")).Finally(pipeline => pipeline.Element(\"resident-form-status\").Text.Set(\"\"));",
+f2986ea66:spec/PathsAndWire/DateWire.tla:35:Text(form, d, m, time, hasZone, zone) ==
+f2986ea66:spec/REWRITE.md:1058:method of `string`, in a view through the code Razor's generator writes and in a hand-written file, at the source
+f2986ea66:spec/REWRITE.md:1164:request container is declared as the lead proposes it, `Html.BeginRequestForm` and `Html.BeginRequestContainer`, each a
+f2986ea66:spec/Reference/app.json:21:    "native": "a plain element or a hand-written control in the view's markup: the core reaches an element by id (M5.N1), markup raises an app event from it (M1.D3), and a native form sends its hand-written controls (D9.15); never a framework input, which a consumer renders (M7.N2)",
+f2986ea66:spec/Reference/app.json:335:          "role": "the intake form's document rows, each a hand-written file input and caption the form sends (D9.15)",
+f2986ea66:spec/Reference/move-in.md:404:| Reception | `ReceptionPage`; sibling native `BeginRequestForm`, never inside another form or the move-in container |
+f2986ea66:spec/Reference/move-in.md:675:1. The reception view uses `BeginRequestForm`; its Save action POSTs E46 through `UrlEncoded(form, …)`, sending framework VisitorName and native Relationship, Consent, Desk and Copies controls, including a Desk control associated by its `form` attribute.
+f2986ea66:spec/Reference/move-in.md:676:2. Disabled controls, unchecked checkboxes and controls assigned to a different form contribute exactly the browser’s submission set; `Form` on the document intake companion sends its native file controls as multipart.
+f2986ea66:spec/Reference/move-in.md:677:3. A submit button with native form submission attributes sends the same reception form directly to E46 and receives the HTML receipt as navigation, while its reactive Save action keeps the receipt in the page.
+f2986ea66:spec/RequestsAndResponses/features.json:116:          "text": "p.Post(Url.SandboxRoute(\"SubmitResident\", \"Drawer\")).Gather(g => g.Form())",
+f2986ea66:spec/RequestsAndResponses/features.json:121:          "text": "p.Post(Url.SandboxRoute(\"SaveShiftNote\", \"Drawer\")).Gather(g => g.Form(\"shift-note-form\"))",
+f2986ea66:spec/RequestsAndResponses/features.json:126:          "text": ".Gather(g => g.Form(m => m.Value, m => m.ResidentId))",
+f2986ea66:spec/RequestsAndResponses/features.json:136:          "text": "pipeline.Post<IntakeRequest>(\"/Wards/{ward}/Intake\", request => request.Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Form(intake))",
+f2986ea66:spec/RequestsAndResponses/features.json:143:          "text": "pipeline.Post<IntakeRequest>(\"/Wards/{ward}/Intake\", request => request.Path(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Multipart(body => body.Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Form(intake)))",
+f2986ea66:spec/RequestsAndResponses/features.json:546:          "page": "A native form intake holding Name and a hand-written input named Code, a select named Ward outside the form's element with form=\"intake\", under the antiforgery field place; a POST sends Form(intake) as URL-encoded, and the endpoint echoes Ward, Code and the number of antiforgery fields it read.",
+f2986ea66:spec/RequestsAndResponses/features.json:550:          "defect": "The control outside the element dropped, so Ward reads none; the hand-written input dropped, so Code reads none; or the form's own antiforgery field kept beside the framework's, so fields reads 2."
+f2986ea66:spec/RequestsAndResponses/features.json:940:          "reason": "It sends every registered input of the page, which no request names: a request names what it sends, a native form by Form(form), any container by Inputs(container) and one input by Input (D9.15).",
+f2986ea66:spec/RequestsAndResponses/features.json:1655:          "page": "A request written only as Post<AdmissionRequest>(url, request => request.Form(admission)).OnSuccess(..), under defaults with ShowValidationErrors(); the server answers 400 with an error at Name.",
+f2986ea66:spec/RequestsAndResponses/module.md:53:  `Set`, one body door, `Form(form)`, `Inputs(container)` and `Input(r => r.Member, input)`. Refused, each with its
+f2986ea66:spec/RequestsAndResponses/module.md:58:  `Input` (N9.3), and its `Form(formId)` to `Form(form)` over the form's typed handle (N18.3).
+f2986ea66:spec/RequestsAndResponses/module.md:83:  `Form(form)`, `Inputs(container)` and `Input` each name it, on a page with many forms or none (D9.15).
+f2986ea66:spec/TypeKnowledge/module.md:27:8's; this module says where a start comes from. The request's container and its `Form` and `Inputs` (N18.3) are
+f2986ea66:spec/Validation/features.json:1166:          "text": "pipeline.Post<CareRota>(careSavesUrl, request => request.Form(careRota.Form)).Validate<CareRotaRules>(CareRotaRules.Care)",
+f2986ea66:spec/Validation/features.json:2315:          "page": "A supplies page whose native form holds a hand-written <input name=\"Code\">, the form's summary and Submit, which posts the form; the endpoint answers a 400 for Code, \"Unknown code.\"",
+f2986ea66:spec/api/HttpSurface/Condensed.cs:10:    public static QueriedParts<TRequest> Form<TRequest>(this QueryParts<TRequest> request, RequestForm<TRequest> form) => throw new NotSupportedException();
+f2986ea66:spec/api/HttpSurface/Condensed.cs:50:    public static BodiedParts<TRequest> Form<TRequest>(this BodyParts<TRequest> request, RequestForm<TRequest> form) => throw new NotSupportedException();
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:15:    public static void OnLoad(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:18:    public static void InAHandler(Rendered<CensusBoard, IntakeView> board, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:21:    public static void InEachBranch(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:31:    public static void InEachParallelBranch(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:39:    public static void InEachPartOfARequest(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:42:        pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:52:    public static void AChainReadsEveryReplyAroundIt(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:53:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:73:    public static void InTheDefaults(IServiceCollection services, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:80:    public static void ManyStatementsInEveryStage(Rendered<CensusBoard, IntakeView> board, RequestForm<IntakeRequest> intake, string[] wards)
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:100:            pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake).Set(r => r.Ward, counted.Ward))
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:201:    private static void EveryModule<TModel>(Pipeline<TModel> pipeline, ITypedSource<string?> text, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:212:        pipeline.Post<TModel, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake).Set(r => r.Name, text))
+f2986ea66:spec/api/HttpSurface/EveryStage.cs:216:    private static void EveryRouteModule<TModel>(Pipeline<TModel> pipeline, ITypedSource<string?> text, ITypedSource<ValidationProblem> problem, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/Objects.cs:64:public sealed class RequestForm<TModel> : RequestContainer<TModel>
+f2986ea66:spec/api/HttpSurface/Objects.cs:66:    private RequestForm()
+f2986ea66:spec/api/HttpSurface/Parts.cs:43:    public BodiedParts<TRequest> UrlEncoded(RequestForm<TRequest> form, Action<UrlEncodedBody<TRequest>> body) => throw new NotSupportedException();
+f2986ea66:spec/api/HttpSurface/Parts.cs:49:    public BodiedParts<TRequest> Multipart(RequestForm<TRequest> form, Action<MultipartBody<TRequest>> body) => throw new NotSupportedException();
+f2986ea66:spec/api/HttpSurface/Usage.cs:33:    public static void CondensedIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/Usage.cs:35:                .Form(intake)
+f2986ea66:spec/api/HttpSurface/Usage.cs:43:    public static void FullIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/Usage.cs:99:    public static void SaveIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/Usage.cs:133:    public static void EveryQueryPart(Pipeline<IntakeView> pipeline, RequestForm<BedQuery> bedSearch, RequestContainer<BedQuery> bedFilters)
+f2986ea66:spec/api/HttpSurface/Usage.cs:157:                .Form(bedSearch))
+f2986ea66:spec/api/HttpSurface/Usage.cs:169:    public static void EveryBodyPart(Pipeline<IntakeView> pipeline, RequestContainer<BedRequest> beds, RequestForm<BedRequest> bedForm)
+f2986ea66:spec/api/HttpSurface/Usage.cs:227:                .Form(bedForm)
+f2986ea66:spec/api/HttpSurface/Usage.cs:241:    public static void ChecksWithNoRequest(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/refused/BodyOnNoContent.CS1061.cs.txt:10:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/refused/BodyOnNoContent.CS1061.cs.txt:11:        => pipeline.Put<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/HttpSurface/refused/ChainedReadsAnotherType.CS1661.CS1678.cs.txt:10:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/refused/ChainedReadsAnotherType.CS1661.CS1678.cs.txt:11:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/HttpSurface/refused/FormInJson.CS1929.cs.txt:9:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/refused/FormInJson.CS1929.cs.txt:11:            .Json(body => body.Form(intake)));
+f2986ea66:spec/api/HttpSurface/refused/FormOfContainer.CS1503.cs.txt:11:            .Form(intake));
+f2986ea66:spec/api/HttpSurface/refused/FormWithNoForm.CS1501.cs.txt:10:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form());
+f2986ea66:spec/api/HttpSurface/refused/NoRetryOnPost.CS0411.cs.txt:10:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/refused/NoRetryOnPost.CS0411.cs.txt:11:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/HttpSurface/refused/NoRetryOnPostAfterSuccess.CS0411.cs.txt:10:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/refused/NoRetryOnPostAfterSuccess.CS0411.cs.txt:11:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/HttpSurface/refused/PageFormGone.CS0411.cs.txt:11:            .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("intake").ShowValidationErrors(refused.Body));
+f2986ea66:spec/api/HttpSurface/refused/SecondContainerOnABody.CS1929.cs.txt:9:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake, RequestContainer<IntakeRequest> details)
+f2986ea66:spec/api/HttpSurface/refused/SecondContainerOnABody.CS1929.cs.txt:10:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake).Inputs(details));
+f2986ea66:spec/api/HttpSurface/refused/SecondContainerOnGet.CS1929.cs.txt:9:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<BedQuery> search, RequestContainer<BedQuery> filters)
+f2986ea66:spec/api/HttpSurface/refused/SecondContainerOnGet.CS1929.cs.txt:10:        => pipeline.Get<BedQuery>("/Wards/{ward}/Beds", query => query.Form(search).Inputs(filters));
+f2986ea66:spec/api/HttpSurface/refused/SecondSuccessRoute.CS0411.cs.txt:10:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/refused/SecondSuccessRoute.CS0411.cs.txt:11:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/HttpSurface/refused/ValidatorOfAnotherType.CS0311.cs.txt:10:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/refused/ValidatorOfAnotherType.CS0311.cs.txt:11:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/HttpSurface/refused/VerbAsExtension.CS1501.cs.txt:10:    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/HttpSurface/refused/VerbAsExtension.CS1501.cs.txt:11:        => pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake));
+f2986ea66:spec/api/plants/HidesReply.F4.cs.txt:9:    public static void ANestedReplyNamedAsTheReplyAroundIt(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/plants/HidesReply.F4.cs.txt:10:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/plants/HidesReply.F4.cs.txt:12:                .Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/api/plants/OtherName.F4.cs.txt:9:    public static void ARoutePipelineNamedForItsRole(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+f2986ea66:spec/api/plants/OtherName.F4.cs.txt:10:        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+f2986ea66:spec/probes/AspNetCoreBinding/HttpProbes.cs:86:    static StringContent FormBody(string form) => new(form, Encoding.UTF8, "application/x-www-form-urlencoded");

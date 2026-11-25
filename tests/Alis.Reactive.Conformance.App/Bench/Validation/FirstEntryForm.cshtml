@@ -11,14 +11,14 @@
     var plan = Html.ReactivePlan<ConformanceFirst>();
 }
 <h1>The bench</h1>
-@using (var first = Html.BeginRequestForm(plan, "first"))
+@using (var first = Html.BeginRequestContainer(plan, "first"))
 {
     <fieldset>
         <legend>First entry</legend>
         @await Html.PartialFor(m => m.First, "/Bench/Validation/EntryCode.cshtml")
     </fieldset>
     @(Html.NativeButton("save", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<ConformanceFirst>(BenchEndpoints.FormFirst, request => request.Form(first.Form))
+        .Post<ConformanceFirst>(BenchEndpoints.FormFirst, request => request.Inputs(first.Container))
         .Validate<FirstRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("shown").Text.Set(saved.Body))))
 }

@@ -43,9 +43,9 @@ Kept from the core, each the analyzer that holds its rule:
   names analyzer.
 - `N18.11` ALIS006, kept as an error, the validator analyzer; main reports it as a warning
   (`Alis.Reactive.Analyzers/Validation/ServerOnlyConditionAnalyzer.cs:24` at 623dd4a27).
-- `N18.13` ALIS035, the row-action analyzer: a `NativeActionLink` whose block's one request at its own level is no
-  GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Form`,
-  `Inputs`, `Input` or a header (D17.15).
+- `N18.13` ALIS035, the row-action analyzer: a `NativeActionLink` whose block's one request at its own level is no GET,
+  whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Inputs`, `Input` or
+  a header (D17.15).
 - `N17.2` the vendor contract analyzer, ALIS014 to ALIS022 and the type check ALIS037 (D17.5).
 - `N16.5` ALIS038, the flags analyzer; `M1.N6` ALIS039, the app event analyzer.
 - `N18.14` ALIS040, the nullable source analyzer: a source whose nullability differs from its argument's or operand's

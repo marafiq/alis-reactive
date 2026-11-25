@@ -1,0 +1,12 @@
+[plant] running the test M21_F38.M21_X1038_0 without the defect
+[plant] [playwright:result] M21_F38.M21_X1038_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 2.46s Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenARichTextEditorIsSentInAForm("net10").the_body_holds_the_content_once_under_the_members_binding_name
+[plant] planted in Alis.Reactive.Fusion/FusionComponents/FusionRichTextEditor/FusionRichTextEditorHtml.cs; running the test M21_F38.M21_X1038_0
+[plant] [playwright:result] M21_F38.M21_X1038_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 1.99s Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenARichTextEditorIsSentInAForm("net10").the_body_holds_the_content_once_under_the_members_binding_name
+[plant] caught: M21_F38.M21_X1038_0 failed with the defect in place (1 of 1).
+[plant]        Assert.That(sent.PostData, Is.EqualTo("Summary=%3Cp%3EAte+a+full+lunch.%3C%2Fp%3E"))
+[plant]     Expected string length 42 but was 93. Strings differ at index 0.
+[plant]     Expected: "Summary=%3Cp%3EAte+a+full+lunch.%3C%2Fp%3E"
+[plant]     But was:  "Alis_Reactive_Conformance_App_Care_SummarySending__Summary=%3..."
+[plant]     -----------^
+[plant]   at tests/Alis.Reactive.Conformance.PlaywrightTests/FusionComponents/FusionRichTextEditor/WhenARichTextEditorIsSentInAForm.cs:line 19
+[plant] restored Alis.Reactive.Fusion/FusionComponents/FusionRichTextEditor/FusionRichTextEditorHtml.cs

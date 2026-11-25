@@ -48,6 +48,11 @@ names. Read these whole, before anything else:
   lead's mistake, 2026-11-24).
 - A glob names its stem whole: "Validation*.cfg" matches ValidationToday's configs too, so one spec's configs are
   "Validation.cfg" and "Validation.violates.*.cfg" (the lead's mistake, 2026-11-24).
+- In a REPL script every shell call is awaited, or ends in a then that logs its exit while the script ends on another
+  value: a call left unawaited may never run. A run past the REPL's ten minutes, the browser run of every test or the
+  spec check, is started that way with its log under the landing folder's scratch, and a later script reads the log; a
+  log is never given a bare name, which writes it at the worktree's root. A git grep pattern that holds a backtick is
+  handed to the shell helper as a value, never inside quote marks of its own (the builder's mistakes, 2026-11-25).
 - Read no secret and no file that holds a credential, a machine's NuGet or npm configuration among them; list no user
   secrets.
 - Run no command your brief does not name, and no `scripts/check.sh`, TLC, package install or restore unless it

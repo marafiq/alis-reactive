@@ -15,20 +15,6 @@ public sealed class WhenABlockChecksItsInputsLive
     private const string SentByIntake = """{"validator":"Alis.Reactive.ModuleTests.Validation.SuppliesRules","ruleSet":"default","body":{"kind":"record","fields":[{"name":"format","value":{"kind":"lit","value":"urlEncoded"}},{"name":"value","value":{"kind":"call","path":["sent"],"members":"required","target":{"kind":"obj","id":"$model"},"args":[{"kind":"lit","value":"intake"},{"kind":"lit","value":"Alis.Reactive.ModuleTests.Validation.Supplies"}]}}]}}""";
 
     [Test]
-    public void a_form_is_checked_live_by_its_models_registered_validator_under_the_default_rule_set_over_what_it_sends()
-    {
-        var html = Views.Of(new Supplies(), _ => { }, services => services.AddReactiveFluentValidation(validation => validation.Add<SuppliesRules>()));
-        var plan = html.ReactivePlan<Supplies>();
-        using (html.BeginRequestForm(plan, "intake")) { }
-        var json = JsonOf(html.RenderPlan(plan));
-        using var written = JsonDocument.Parse(json);
-        var objects = written.RootElement.GetProperty("objects");
-        Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","kind":"form","summary":"intake_summary","live":[""" + SentByIntake + "]}}"));
-        Assert.That(objects.GetProperty("$form:Alis.Reactive.ModuleTests.Validation.SuppliesRules:default").GetRawText(), Is.EqualTo(Registered));
-        Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
-    }
-
-    [Test]
     public void an_element_container_is_checked_live_by_its_models_registered_validator_under_the_default_rule_set_over_what_it_sends()
     {
         var html = Views.Of(new Supplies(), _ => { }, services => services.AddReactiveFluentValidation(validation => validation.Add<SuppliesRules>()));
@@ -37,7 +23,7 @@ public sealed class WhenABlockChecksItsInputsLive
         var json = JsonOf(html.RenderPlan(plan));
         using var written = JsonDocument.Parse(json);
         var objects = written.RootElement.GetProperty("objects");
-        Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","kind":"element","summary":"intake_summary","live":[""" + SentByIntake + "]}}"));
+        Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","summary":"intake_summary","live":[""" + SentByIntake + "]}}"));
         Assert.That(objects.GetProperty("$form:Alis.Reactive.ModuleTests.Validation.SuppliesRules:default").GetRawText(), Is.EqualTo(Registered));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
@@ -47,14 +33,14 @@ public sealed class WhenABlockChecksItsInputsLive
     {
         var html = Views.Of(new Supplies(), _ => { }, services => services.AddReactiveFluentValidation(validation => validation.Add<DeputyCardRules>()));
         var plan = html.ReactivePlan<Supplies>();
-        using (html.BeginRequestForm(plan, "intake"))
+        using (html.BeginRequestContainer(plan, "intake"))
         {
             using (html.BeginRequestContainer(plan, "kin")) { }
         }
         var json = JsonOf(html.RenderPlan(plan));
         using var written = JsonDocument.Parse(json);
         var objects = written.RootElement.GetProperty("objects");
-        Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","kind":"form","summary":"intake_summary","live":[]},"kin":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","kind":"element","summary":"kin_summary","live":[]}}"""));
+        Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","summary":"intake_summary","live":[]},"kin":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","summary":"kin_summary","live":[]}}"""));
         Assert.That(objects.EnumerateObject().Select(member => member.Name), Is.EqualTo(new[] { "$model" }));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }

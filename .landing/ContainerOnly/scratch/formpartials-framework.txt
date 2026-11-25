@@ -1,0 +1,10 @@
+f2986ea66:tests/Alis.Reactive.Conformance.App/Bench/Validation/EntryCode.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/ContactMoveInKinCard.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/KinContactCard.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/KinDeskContact.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/MoveInAddress.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/MoveInNextOfKin.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/RespitePreviousStay.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/SignInGuestName.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/SignInGuestNickname.cshtml
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/GuardianAllergyBox.cshtml

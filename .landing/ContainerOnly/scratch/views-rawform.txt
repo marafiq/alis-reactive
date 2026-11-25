@@ -1,0 +1,14 @@
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/RoomIntake.cshtml:12:<form method="get" action="@CarePages.RoomIntake">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/StrengthIntake.cshtml:26:    <form method="post" action="@StrengthIntakeEndpoints.IntakesInGerman" target="sent-strength">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/VisitRoutine.cshtml:12:<form method="post" action="@CarePages.VisitRoutine">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/Admission/VisitWeek.cshtml:12:<form method="post" action="@CarePages.VisitWeek">
+f2986ea66:tests/Alis.Reactive.Conformance.App/Care/AdmissionClinical/CarePlanFiling.cshtml:12:<form method="post" enctype="multipart/form-data" action="@CarePages.CarePlanFiling">
+f2986ea66:tests/Alis.Reactive.Poc.App/Admissions/Intake.cshtml:10:@using (Html.BeginForm("Intake", "Admissions", FormMethod.Post))
+f2986ea66:tests/Alis.Reactive.Poc.App/Admissions/Preferences.cshtml:9:@using (Html.BeginForm("Intake", "Admissions", FormMethod.Post))
+f2986ea66:tests/Alis.Reactive.Poc.App/Families/ContactsByEditor.cshtml:9:@using (Html.BeginForm("Family", "Families", FormMethod.Post))
+f2986ea66:tests/Alis.Reactive.Poc.App/Families/Family.cshtml:11:@using (Html.BeginForm("Family", "Families", FormMethod.Post))
+f2986ea66:tests/Alis.Reactive.Poc.App/Families/FamilyByHint.cshtml:9:@using (Html.BeginForm("Family", "Families", FormMethod.Post))
+f2986ea66:tests/Alis.Reactive.Poc.App/Families/FamilyByNamedTemplate.cshtml:9:@using (Html.BeginForm("Family", "Families", FormMethod.Post))
+f2986ea66:tests/Alis.Reactive.Poc.App/Families/FamilyBySlot.cshtml:9:@using (Html.BeginForm("Family", "Families", FormMethod.Post))
+f2986ea66:tests/Alis.Reactive.Poc.App/Families/FamilyPrefixMovedInsidePlan.cshtml:10:@using (Html.BeginForm("Family", "Families", FormMethod.Post))
+f2986ea66:tests/Alis.Reactive.Poc.App/Rounds/Round.cshtml:10:@using (Html.BeginForm("Round", "Rounds", new { culture = CultureInfo.CurrentCulture.Name }, FormMethod.Post))

@@ -1,0 +1,12 @@
+f2986ea66:.claude/rules/analyzers.md:100:   the compiler meets one; a rule whose spec line reads every file has a refused case in a hand-written file too.
+f2986ea66:.claude/skills/build-a-screen/SKILL.md:161:- Send native fields and files? `Form` takes the form handle; the condensed POST body is multipart.
+f2986ea66:.claude/skills/build-a-screen/SKILL.md:250:- Include the browser's form submission set? `BeginRequestForm` supplies a `Form` handle for native controls too.
+f2986ea66:Alis.Reactive.Assets/runtime/InputsAndIds/model.test.ts:320:  test("SubmissionSetAtTheRead: a native form's submission set is built when the request reads it, beside its framework inputs' body", () => {
+f2986ea66:Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:133:      appendFields(form, body.fields, writing.zone, writing.place, writing.request);
+f2986ea66:Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:134:      appendInputs(form, body.inputs, writing.zone, writing.place, writing.request);
+f2986ea66:Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:140:      for (const part of body.parts) appendPart(form, part, writing);
+f2986ea66:Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:141:      appendInputs(form, body.inputs, writing.zone, writing.place, writing.request);
+f2986ea66:Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:172:  if (sent instanceof Submission) for (const [name, entry] of sent.entries) appendEntry(form, name, entry);
+f2986ea66:Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:174:  for (const input of container.inputs) setInput(form, input, members, zone, place, request);
+f2986ea66:Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:194:      appendFiles(form, input.name, value);
+f2986ea66:Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts:326:      appendFields(form, [part.field], writing.zone, writing.place, writing.request);

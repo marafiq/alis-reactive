@@ -1,0 +1,135 @@
+[check] the plan contract, generated from the grammar
+[contract] wrote plan.ts and plan.schema.json to /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Assets/runtime/Schema
+[check] the net48 time zone table, generated from CLDR's windowsZones.xml at its pin
+[windows-zones] Alis.Reactive/PathsAndWire/WindowsZones.g.Net48.cs: 142 Windows time zone ids of CLDR release-49, each with its IANA id of territory 001.
+[check] npm audit
+[npm-audit] no advisories reported
+[check] the Syncfusion pin
+pin-syncfusion --check: Syncfusion 33.1.47 pinned in Directory.Packages.props, package.json and package-lock.json
+[check] tsc -b over the runtime, the OpenTelemetry adapter, the Native components, the Fusion components and templates and conformance app
+[check] eslint over the runtime, the OpenTelemetry adapter, the Native components, the Fusion components and templates and conformance app
+[check] vitest over the runtime's and the adapter's pure tests
+
+ RUN  v5.1.0 /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only
+
+
+ Test Files  41 passed (41)
+      Tests  870 passed (870)
+   Start at  16:36:34
+   Duration  683ms (import 33%, transform 32%, tests 27%, worker 5%, environment 4%)
+
+[check] the browser bundle
+
+  Alis.Reactive/wwwroot/js/alis-reactive.js  198.7kb
+
+⚡ Done in 11ms
+
+  Alis.Reactive/wwwroot/js/alis-reactive-hub.js  111.2kb
+
+⚡ Done in 5ms
+
+  ....Reactive.OpenTelemetry/wwwroot/js/alis-reactive-opentelemetry.js  57.4kb
+
+⚡ Done in 22ms
+
+  Alis.Reactive.Native/wwwroot/js/alis-reactive-native.js  21.3kb
+
+⚡ Done in 2ms
+
+  Alis.Reactive.Fusion/wwwroot/js/alis-reactive-fusion.js  5.7kb
+
+⚡ Done in 1ms
+
+  Alis.Reactive.Fusion/wwwroot/js/alis-reactive-fusion-templates.js  977b 
+
+⚡ Done in 1ms
+
+  ....Reactive.Conformance.App/wwwroot/js/alis-reactive-conformance.js  44.3kb
+
+⚡ Done in 3ms
+
+  ...ormance.App/wwwroot/js/care/admissionclinical/supplier-queries.js   3.6kb
+  ...formance.App/wwwroot/js/care/admissionclinical/equipment-stock.js   3.3kb
+  ...Reactive.Conformance.App/wwwroot/js/care/movein/admission-page.js   2.0kb
+  ...active.Conformance.App/wwwroot/js/bench/plugins/shift-log-desk.js   1.9kb
+  ....Reactive.Conformance.App/wwwroot/js/bench/vendors/bench-clock.js   1.4kb
+  ...Reactive.Conformance.App/wwwroot/js/bench/plugins/visitor-desk.js   1.1kb
+  tests/Alis.Reactive.Conformance.App/wwwroot/js/world/care-session.js   1.1kb
+  ...ormance.App/wwwroot/js/bench/plugins/visitor-desk-open-at-load.js  1012b 
+  ...App/wwwroot/js/care/record/card-radio-with-a-stuck-unsubscribe.js   967b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/care/record/card-radio.js   902b 
+  ...s.Reactive.Conformance.App/wwwroot/js/bench/plugins/night-desk.js   772b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/bench/sources/page-log.js   731b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/care/record/card-tally.js   521b 
+  ...pp/wwwroot/js/care/residents/serving-station-with-a-paged-list.js   520b 
+  ...active.Conformance.App/wwwroot/js/care/residents/roster-rounds.js   500b 
+  ....Reactive.Conformance.App/wwwroot/js/care/round/throwing-trace.js   490b 
+  ...ctive.Conformance.App/wwwroot/js/bench/declarations/page-tally.js   483b 
+  ...eactive.Conformance.App/wwwroot/js/care/admission/move-in-bell.js   479b 
+  ...s.Reactive.Conformance.App/wwwroot/js/bench/vendors/page-tally.js   478b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/care/round/round-tally.js   477b 
+  ...and 10 more output files...
+
+⚡ Done in 7ms
+[check] dotnet restore, locked
+  Determining projects to restore...
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.World/Alis.Reactive.Conformance.World.csproj (in 142 ms).
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/Alis.Reactive.Conformance.PlaywrightTests.csproj (in 155 ms).
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.TestRules/Alis.Reactive.TestRules.csproj (in 156 ms).
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.OpenTelemetry/Alis.Reactive.OpenTelemetry.csproj (in 149 ms).
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Native/Alis.Reactive.Native.csproj (in 143 ms).
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App/Alis.Reactive.Conformance.App.csproj (in 128 ms).
+  Restored /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj (in 151 ms).
+  8 of 15 projects are up-to-date for restore.
+[check] dotnet build -c Release
+  Alis.Reactive.Analyzers -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Analyzers/bin/Release/netstandard2.0/Alis.Reactive.Analyzers.dll
+  Alis.Reactive.Conformance.World -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.World/bin/Release/net48/Alis.Reactive.Conformance.World.dll
+  Alis.Reactive.TestRules -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.TestRules/bin/Release/netstandard2.0/Alis.Reactive.TestRules.dll
+  Alis.Reactive.Conformance.World -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.World/bin/Release/net10.0/Alis.Reactive.Conformance.World.dll
+  Alis.Reactive -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/bin/Release/net48/Alis.Reactive.dll
+  Alis.Reactive.TestRules.AnalyzerTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.TestRules.AnalyzerTests/bin/Release/net10.0/Alis.Reactive.TestRules.AnalyzerTests.dll
+  Alis.Reactive -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/bin/Release/net10.0/Alis.Reactive.dll
+  Alis.Reactive.Native -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Native/bin/Release/net48/Alis.Reactive.Native.dll
+  Alis.Reactive.OpenTelemetry -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.OpenTelemetry/bin/Release/net48/Alis.Reactive.OpenTelemetry.dll
+  Alis.Reactive.Fusion -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Fusion/bin/Release/net48/Alis.Reactive.Fusion.dll
+  Alis.Reactive.AnalyzerTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.AnalyzerTests/bin/Release/net10.0/Alis.Reactive.AnalyzerTests.dll
+  PlanContractGenerator -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tools/PlanContractGenerator/bin/Release/net10.0/Alis.Reactive.PlanContractGenerator.dll
+  Alis.Reactive.ModuleTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/bin/Release/net10.0/Alis.Reactive.ModuleTests.dll
+  Alis.Reactive.Native -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Native/bin/Release/net10.0/Alis.Reactive.Native.dll
+  Alis.Reactive.Fusion -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Fusion/bin/Release/net10.0/Alis.Reactive.Fusion.dll
+  Alis.Reactive.OpenTelemetry -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.OpenTelemetry/bin/Release/net10.0/Alis.Reactive.OpenTelemetry.dll
+  Alis.Reactive.Conformance.App -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App/bin/Release/net10.0/Alis.Reactive.Conformance.App.dll
+  Alis.Reactive.ArchitectureTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/bin/Release/net10.0/Alis.Reactive.ArchitectureTests.dll
+  Alis.Reactive.Conformance.PlaywrightTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/bin/Release/net10.0/Alis.Reactive.Conformance.PlaywrightTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:10.11
+[check] the doors each browser test's pages call
+[page-doors] the doors the built pages of 832 promises call, written to spec/Reference/page-doors.json
+[check] dotnet format --verify-no-changes
+Warnings were encountered while loading the workspace. Set the verbosity option to the 'diagnostic' level to log warnings.
+[check] dotnet test tests/Alis.Reactive.ArchitectureTests, but WhenAConsumerAppIsBuilt
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ArchitectureTests/bin/Release/net10.0/Alis.Reactive.ArchitectureTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:   338, Skipped:     0, Total:   338, Duration: 1 m 46 s - Alis.Reactive.ArchitectureTests.dll (net10.0)
+[check] dotnet test tests/Alis.Reactive.AnalyzerTests
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.AnalyzerTests/bin/Release/net10.0/Alis.Reactive.AnalyzerTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:  1066, Skipped:     0, Total:  1066, Duration: 1 m 41 s - Alis.Reactive.AnalyzerTests.dll (net10.0)
+[check] dotnet test tests/Alis.Reactive.TestRules.AnalyzerTests
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.TestRules.AnalyzerTests/bin/Release/net10.0/Alis.Reactive.TestRules.AnalyzerTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:   163, Skipped:     0, Total:   163, Duration: 14 s - Alis.Reactive.TestRules.AnalyzerTests.dll (net10.0)
+[check] dotnet test tests/Alis.Reactive.ModuleTests
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.ModuleTests/bin/Release/net10.0/Alis.Reactive.ModuleTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:  1467, Skipped:     0, Total:  1467, Duration: 19 s - Alis.Reactive.ModuleTests.dll (net10.0)
+[check] every check passed.
+exit 0

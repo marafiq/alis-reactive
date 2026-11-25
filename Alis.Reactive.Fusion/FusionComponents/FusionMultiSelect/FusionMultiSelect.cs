@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A multi-select box: EJ2's MultiSelect, which holds the list of values a person chose from its items.
 /// </summary>
 /// <remarks>
-/// A box bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2 raises
+/// A box bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2 raises
 /// <see cref="Change"/> when the box loses focus after a choice, so a handler of it reads the committed values.
 /// </remarks>
 /// <typeparam name="TValue">The type of the member the box binds, a list that admits null, since the box holds null until a choice.</typeparam>

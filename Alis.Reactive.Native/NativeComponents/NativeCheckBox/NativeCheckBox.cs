@@ -7,7 +7,7 @@ namespace Alis.Reactive.Native.NativeComponents;
 /// A check box: an HTML <c>input</c> that holds a member of bool.
 /// </summary>
 /// <remarks>
-/// A check box bound to a member is an input: a form sends its <see cref="Checked"/> and a check reads it. A
+/// A check box bound to a member is an input: a request container sends its <see cref="Checked"/> and a check reads it. A
 /// handler of <see cref="Change"/> reads the box's state after the click from <see cref="Checked"/>.
 /// </remarks>
 [Mirrors("lib.dom", "HTMLInputElement")]

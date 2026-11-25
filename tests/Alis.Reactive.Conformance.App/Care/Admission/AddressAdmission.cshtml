@@ -8,7 +8,7 @@
     var plan = Html.ReactivePlan<AddressAdmission>();
 }
 <h1>Admission</h1>
-@using (Html.BeginRequestForm(plan, "address-admission"))
+@using (Html.BeginRequestContainer(plan, "address-admission"))
 {
     <button type="button" @Html.Raises(plan, AddressAdmissions.LoadTheHomeAddress)>Load the home address</button>
     <button type="button" @Html.Raises(plan, AddressAdmissions.LoadThePostalAddress)>Load the postal address</button>

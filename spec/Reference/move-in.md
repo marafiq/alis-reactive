@@ -401,7 +401,7 @@ Every view opens its own `ReactivePlan` and ends with `RenderPlan`. Plans do not
 | Waitlist | `WaitlistPage`; independent `waitlist` container outside `move-in` |
 | Documents upload | `DocumentsPage`; independent `admission-documents` container outside `move-in` |
 | Deposit | `DepositPage`; independent `deposit` container outside `move-in` |
-| Reception | `ReceptionPage`; sibling native `BeginRequestForm`, never inside another form or the move-in container |
+| Reception | `ReceptionPage`; a sibling container inside the view's own form, never inside the move-in container |
 | Bed card | `BedCardPage {DraftId,BedId,Revision}`; independent plan and shared availability connection |
 | Coordinator line | `CoordinatorLinePage {DraftId,CoordinatorId,Message}`; independent container `coordinator-line` |
 | Allocation owner A | `AllocationOwnerPage {DraftId,Reference}`; slot `allocation-owner`; owns the dynamic component listeners |
@@ -668,13 +668,13 @@ A vendor with one callback property supports the page and nested admission work.
 5. `OnSearch` reads `SearchArgs.Query` through `Argument(0)`, rejects `IsEmpty` or fewer than three characters, GETs E43 for `"Cedar"`, and passes the returned names to `SearchArgs.Show` through its existing `MethodAt(1, …)`.
 6. The declaration uses `DefineCallbackProperties`, `CallbackProperties`, `Listening` and `Vendor`; a throwing prior callback does not prevent the remaining live listeners from hearing the event.
 
-**MI.30. Reception’s native submission**
+**MI.30. Reception’s container beside the browser’s own submission**
 
-Reception sends the browser’s actual successful-control set.
+Reception’s form is the view’s own, and its container sends what the plan declares and the hidden inputs inside it (D9.15).
 
-1. The reception view uses `BeginRequestForm`; its Save action POSTs E46 through `UrlEncoded(form, …)`, sending framework VisitorName and native Relationship, Consent, Desk and Copies controls, including a Desk control associated by its `form` attribute.
-2. Disabled controls, unchecked checkboxes and controls assigned to a different form contribute exactly the browser’s submission set; `Form` on the document intake companion sends its native file controls as multipart.
-3. A submit button with native form submission attributes sends the same reception form directly to E46 and receives the HTML receipt as navigation, while its reactive Save action keeps the receipt in the page.
+1. The reception view writes its own form around a request container; its Save action POSTs E46 through `UrlEncoded(container, …)`, sending VisitorName, Relationship, Consent, Copies and Desk, each a framework input, MVC’s own controls declared inputs among them (`InputField.Render`), and Desk, outside the form and joined to it by its `form` attribute, by `Input`.
+2. A control the view writes by hand is not sent by Save, save a hidden input, which its URL-encoded body sends under its own name, the view’s antiforgery field among them (D9.15): a disabled control stays out of it as it stays out of the browser’s own post, and the document companion sends its file by `File` from its declared component and its caption by `Set` from the caption’s declared component.
+3. A submit button with native form submission attributes posts the view’s own form directly to E46 and receives the HTML receipt as navigation, while its reactive Save action keeps the receipt in the page.
 4. `ConformanceElement.Opened` reads Type and nullable `Detail.Room`, uses `IsNull`/`NotNull` before opening apartment7, and `Keydown.Key` handles Enter without treating an absent detail as a room.
 
 **MI.31. Request defaults and recovery**
@@ -820,7 +820,7 @@ Host restart and collection cases use the existing harness’s `Restart` and `Co
 
 These tables map specified uses. They do not report executed proof.
 
-**The 142 door-map names**
+**The 141 door-map names**
 
 | Name | Feature.interaction |
 |---|---|
@@ -863,7 +863,6 @@ These tables map specified uses. They do not report executed proof.
 | Finally | MI.16.3; MI.31.1–3 |
 | Find | MI.14.2 |
 | Fixed | MI.24.4; MI.27.5 |
-| Form | MI.30.2 |
 | FormField | MI.31.2 |
 | Get | MI.1.1–2; MI.23.1 |
 | Gt | MI.20.1, accepting a newer revision |
@@ -1565,8 +1564,8 @@ Nothing of MI.5, MI.6 or MI.7 is blocked by it. Four places meet it:
 
 ### MI.30 — reception sign-in and admission history
 
-1. M9.X250–254. The reception form is a sibling of the move-in container. E46 accepts the successful controls of that form. The native submitter supplies the action, POST method and URL encoding and navigates to the receipt. The reactive Save sends X-Coordinator and X-Operation and loads the returned MVC receipt into its own slot beside the form. Its ordinary status element reports progress and failures. An ordinary HTML submitter has no custom-header setting. It sends the same actor and operation in form fields. Both paths send the host-issued form token. MVC validates the native navigation from its posted field. On the net10 host the reactive request sends its configured antiforgery header as well. MI.31 owns the reception startup profile. Both paths check the draft, resident, coordinator access and operation before recording the acknowledgement and its history entry.
-2. The browser validator reads registered input members. The native number input for Copies is registered with the typed reception field so the shared range rule reads the very same control that native navigation sends. Its form also holds plain Relationship and Consent controls and claims the external Desk. Disabled controls, an unchecked checkbox and a control owned by the document companion stay out of the sign-in. The companion's Form request sends its own native file to the admission document intake.
+1. M9.X250–254. The reception view's own form, a sibling of the move-in container, holds the reception container. E46 accepts the fields that form posts and those the container's Save sends. The native submitter supplies the action, POST method and URL encoding and navigates to the receipt. The reactive Save sends X-Coordinator and X-Operation and loads the returned MVC receipt into its own slot beside the form. Its ordinary status element reports progress and failures. An ordinary HTML submitter has no custom-header setting. It sends the same actor and operation in form fields. Both paths send the host-issued form token. MVC validates the native navigation from its posted field. On the net10 host the reactive request sends its configured antiforgery header as well. MI.31 owns the reception startup profile. Both paths check the draft, resident, coordinator access and operation before recording the acknowledgement and its history entry.
+2. The browser validator reads registered input members. The native number input for Copies is registered with the typed reception field so the shared range rule reads the very same control that native navigation sends. Relationship and Consent are MVC's own controls in the form, declared inputs, and the external Desk is a declared input the form claims by its `form` attribute. A disabled control stays out of the sign-in, and an unchecked Consent stays out of the native navigation while Save sends it false. The companion's request sends the file of its declared file component to the admission document intake.
 3. E47 reads the draft's history records under current community access and resolves each reception reference against its stored acknowledgement. E46 explicitly returns application/json for its business errors. MVC content negotiation returned text/json to Chromium for the barred visitor. The typed error route reads application/json or a +json subtype. A barred visitor and a dropped request cannot write an acknowledgement. A refused medication edit stays in the main editor when reception succeeds.
 4. The reception room reader reads the real opened event's type and nullable detail before it opens the indicated apartment. An Enter key confirms the current room at reception only after a room is known.
 

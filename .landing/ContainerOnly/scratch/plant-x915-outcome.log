@@ -1,0 +1,19 @@
+[plant] running the test M6_F1.X9_15_0 without the defect
+[plant] [playwright:result] M6_F1.X9_15_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.91s Alis.Reactive.Conformance.PlaywrightTests.RequestsAndResponses.WhenAContainerHoldsAControlTheViewWroteByHand("antiforgeryField").it_sends_its_framework_inputs_the_input_outside_it_and_one_antiforgery_field_and_leaves_the_hand_written_control_out
+[plant] planted in Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts; running the test M6_F1.X9_15_0
+[plant] [playwright:result] M6_F1.X9_15_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 2.45s Alis.Reactive.Conformance.PlaywrightTests.RequestsAndResponses.WhenAContainerHoldsAControlTheViewWroteByHand("antiforgeryField").it_sends_its_framework_inputs_the_input_outside_it_and_one_antiforgery_field_and_leaves_the_hand_written_control_out
+[plant] caught: M6_F1.X9_15_0 failed with the defect in place (1 of 1).
+[plant]      Microsoft.Playwright.PlaywrightException : Locator expected to have text 'Ward East, Code none, fields 1'
+[plant]   But was: 'Ward none, Code none, fields 1' 
+[plant]   Call log:
+[plant]     - Expect "ToHaveTextAsync" Locator("#received") with timeout 740ms
+[plant]     - waiting for Locator("#received")
+[plant]       - locator resolved to <span id="received" aria-busy="true">-</span>
+[plant]       - unexpected value "-"
+[plant]       8 × locator resolved to <span id="received">Ward none, Code none, fields 1</span>
+[plant]         - unexpected value "Ward none, Code none, fields 1"
+[plant]   Aria snapshot:
+[plant]   - text: Ward none, Code none, fields 1
+[plant]   at tests/Alis.Reactive.Conformance.PlaywrightTests/RequestsAndResponses/Admission/WhenAContainerHoldsAControlTheViewWroteByHand.cs:line 23
+[plant] restored Alis.Reactive.Assets/runtime/RequestsAndResponses/request.ts
+exit 0

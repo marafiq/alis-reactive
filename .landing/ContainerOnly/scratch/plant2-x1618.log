@@ -1,0 +1,6 @@
+[plant] running the test M8_F4.X16_18_0 without the defect
+[plant] [playwright:result] M8_F4.X16_18_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.78s Alis.Reactive.Conformance.PlaywrightTests.Validation.WhenAHandWrittenInputFailsOnTheServer("net10").the_message_shows_in_the_forms_summary_and_nowhere_beside_the_input
+[plant] planted in tests/Alis.Reactive.Conformance.App/Care/Round/SupplyCodes.cshtml; running the test M8_F4.X16_18_0
+[plant] [playwright:result] M8_F4.X16_18_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.83s Alis.Reactive.Conformance.PlaywrightTests.Validation.WhenAHandWrittenInputFailsOnTheServer("net10").the_message_shows_in_the_forms_summary_and_nowhere_beside_the_input
+[plant] ESCAPED: M8_F4.X16_18_0 passed with the defect in place (1 of 1).
+[plant] restored tests/Alis.Reactive.Conformance.App/Care/Round/SupplyCodes.cshtml

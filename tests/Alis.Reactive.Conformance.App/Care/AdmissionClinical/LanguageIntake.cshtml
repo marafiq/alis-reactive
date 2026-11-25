@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<LanguageIntake>();
 }
 <h1>Language intake</h1>
-@using (var intake = Html.BeginRequestForm(plan, "language-intake"))
+@using (var intake = Html.BeginRequestContainer(plan, "language-intake"))
 {
     <fieldset>
         <legend>Preferred language</legend>
@@ -19,7 +19,7 @@
     </fieldset>
     <button type="button" @Html.Raises(plan, LanguageIntakes.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(LanguageIntakes.Save, pipeline => pipeline
-        .Post<LanguageIntake>(LanguageIntakeEndpoints.Languages, request => request.Form(intake.Form))
+        .Post<LanguageIntake>(LanguageIntakeEndpoints.Languages, request => request.Inputs(intake.Container))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
 }
 <p id="saved">Not saved</p>

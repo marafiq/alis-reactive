@@ -1,0 +1,52 @@
+f2986ea66:Alis.Reactive.Native/NativeComponents/NativeCheckBox/NativeCheckBox.cs:10:/// A check box bound to a member is an input: a form sends its <see cref="Checked"/> and a check reads it. A
+f2986ea66:Alis.Reactive.Native/NativeComponents/NativeCheckList/NativeCheckList.cs:11:/// A check list bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. A write
+f2986ea66:Alis.Reactive.Native/NativeComponents/NativeCheckList/NativeCheckListHtml.cs:17:    /// A form's own submission sends a member the app's JSON writes as a list as one entry for each checked box,
+f2986ea66:Alis.Reactive.Native/NativeComponents/NativeCheckList/NativeCheckListHtml.cs:27:    /// A form's own submission sends a member the app's JSON writes as a list as one entry for each checked box,
+f2986ea66:Alis.Reactive.Native/NativeComponents/NativeDropDown/NativeDropDown.cs:10:/// A drop-down bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it, as text
+f2986ea66:Alis.Reactive.Native/NativeComponents/NativeHiddenField/NativeHiddenField.cs:10:/// A hidden field bound to a member is an input like any other: a form sends its <see cref="Value"/> and a check
+f2986ea66:Alis.Reactive.Native/NativeComponents/NativeRadioGroup/NativeRadioGroup.cs:10:/// A radio group bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. A
+f2986ea66:Alis.Reactive.Native/NativeComponents/NativeTextArea/NativeTextArea.cs:10:/// A text area bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it.
+f2986ea66:Alis.Reactive.Native/NativeComponents/NativeTextBox/NativeTextBox.cs:10:/// A text box bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. Its
+f2986ea66:Alis.Reactive/Conditions/Choices.cs:19:    /// <param name="fallback">The value used in its place, written in the form the source holds its value in.</param>
+f2986ea66:Alis.Reactive/Conditions/Choices.cs:36:    /// <param name="fallback">The value used in its place, written in the form the source holds its value in.</param>
+f2986ea66:Alis.Reactive/Conditions/Choices.cs:68:    /// <param name="whenTrue">The value read when the condition is true, written in the form the source holds its value in.</param>
+f2986ea66:Alis.Reactive/Conditions/Choices.cs:76:    /// <param name="whenFalse">The value read otherwise, written in the form the source holds its value in.</param>
+f2986ea66:Alis.Reactive/Conditions/Comparisons.cs:22:    /// <param name="right">The value it is compared with, written in the form the source holds its value in.</param>
+f2986ea66:Alis.Reactive/Conditions/Comparisons.cs:34:    /// <param name="right">The value it is compared with, written in the form the source holds its value in.</param>
+f2986ea66:Alis.Reactive/Conditions/MembershipTests.cs:25:    /// <param name="values">The values, each written in the form the source holds its value in.</param>
+f2986ea66:Alis.Reactive/Conditions/MembershipTests.cs:37:    /// <param name="values">The values, each written in the form the source holds its value in.</param>
+f2986ea66:Alis.Reactive/InputsAndIds/MemberLambda.cs:129:                "An input's lambda reads its member from a value the view holds, not from the view's model, as m => visitor.Name over a foreach's item does, so MVC names it by that value and the form posts it under no member: read the member through the model, as m => m.Visitors[i].Name in a for loop.");
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.Net10.cs:12:    /// <summary>Opens a native form as a request container of the view: a block, ended by <c>using</c>, that holds the form's markup.</summary>
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.Net10.cs:15:    /// <param name="containerId">The id of the form's element.</param>
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.Net48.cs:12:    /// <summary>Opens a native form as a request container of the view: a block, ended by <c>using</c>, that holds the form's markup.</summary>
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.Net48.cs:15:    /// <param name="containerId">The id of the form's element.</param>
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.cs:11:/// A native form a view renders as a request container: the block that holds the form's markup.
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.cs:14:/// The block renders the form's element and its one summary, and ends the element where the block ends, as
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.cs:15:/// <c>using (Html.BeginForm())</c> does. A request sends the form by <see cref="Form"/>. The validator registered for
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.cs:16:/// <typeparamref name="TModel"/> checks the form's inputs as a person works: typing clears an input's message, and
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.cs:17:/// leaving the input or committing its value checks its member over what the form sends, showing the first failure at
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.cs:20:/// <typeparam name="TModel">The model of the view that renders the form.</typeparam>
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.cs:31:    /// <summary>Gets the form's handle, which a request sends and a step validates.</summary>
+f2986ea66:Alis.Reactive/RenderingAndDelivery/RequestBlocks.cs:34:    /// <summary>Ends the block: closes the form's element.</summary>
+f2986ea66:Alis.Reactive/RenderingAndDelivery/Rows.cs:69:    /// header, an input, a form, or a date, a fraction, flags or a list, are refused where the view renders: render a
+f2986ea66:Alis.Reactive/RenderingAndDelivery/ValidateAntiForgeryHeaderAttribute.Net48.cs:10:/// field, on MVC 5, whose own filter reads the form alone.
+f2986ea66:Alis.Reactive/RequestsAndResponses/JsonBodyValues.cs:153:                $"'{member}' is read from a member {own.Cause} writes, and a JSON body sends a member in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or send it in form data.");
+f2986ea66:Alis.Reactive/RequestsAndResponses/JsonBodyValues.cs:164:                    $"'{member}' holds what a JSON converter of the app's writes, and a JSON body sends a member in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or send it in form data.");
+f2986ea66:Alis.Reactive/RequestsAndResponses/JsonBodyValues.cs:227:            $"'{member}' holds '{property.Name}', which {writesIt} writes, and a JSON body sends it in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or set its other members.");
+f2986ea66:Alis.Reactive/RequestsAndResponses/JsonBodyValues.cs:249:            $"'{member}' holds '{property.Name}', which a JSON converter of the app's writes, and a JSON body sends it in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or set its other members.");
+f2986ea66:Alis.Reactive/RequestsAndResponses/JsonBodyValues.cs:259:                $"'{member}' holds '{property.Name}', whose enum a live object holds as {held.GetRawText()} for {value}, a form its endpoint does not read as {value}; let the endpoint read the form the live object holds, or send the rows from JSON the server writes.");
+f2986ea66:Alis.Reactive/RequestsAndResponses/RequestContainer.cs:41:/// A request container that is a native form, whose submission set a request sends as the browser builds it.
+f2986ea66:Alis.Reactive/RequestsAndResponses/RequestContainer.cs:43:/// <typeparam name="TModel">The model the form's block was rendered for.</typeparam>
+f2986ea66:Alis.Reactive/RequestsAndResponses/RequestPartsWriter.cs:390:                $"'{request}' sends a {BodyName} body, and the app sends the antiforgery token in the form field {TokenField}, which no host reads in that body; " +
+f2986ea66:Alis.Reactive/TriggersAndPipelines/CondensedRequests.cs:56:    /// <summary>Sends a native form's submission set as the browser builds it: a GET's in its query, any other request's as multipart fields and files.</summary>
+f2986ea66:Alis.Reactive/TriggersAndPipelines/CondensedRequests.cs:58:    /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
+f2986ea66:Alis.Reactive/TriggersAndPipelines/CondensedRequests.cs:164:    /// <summary>Sends a native form's submission set as the browser builds it: a GET's in its query, any other request's as multipart fields and files.</summary>
+f2986ea66:Alis.Reactive/TriggersAndPipelines/CondensedRequests.cs:166:    /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
+f2986ea66:Alis.Reactive/TriggersAndPipelines/Pipeline.cs:181:    /// A member in the query or a form body goes under its own name, with no parameter prefix, as MVC binds them. The
+f2986ea66:Alis.Reactive/TriggersAndPipelines/Pipeline.cs:200:    /// A member in the query or a form body goes under its own name, with no parameter prefix, as MVC binds them. The
+f2986ea66:Alis.Reactive/TriggersAndPipelines/Pipeline.cs:219:    /// A member in the query or a form body goes under its own name, with no parameter prefix, as MVC binds them. The
+f2986ea66:Alis.Reactive/TriggersAndPipelines/RequestDefaults.cs:79:    /// <param name="place">Where the token is sent: the header or the form field.</param>
+f2986ea66:Alis.Reactive/TriggersAndPipelines/RequestParts.cs:288:    /// <summary>Sends a URL-encoded body whose fields the lambda sets, with a native form's submission set.</summary>
+f2986ea66:Alis.Reactive/TriggersAndPipelines/RequestParts.cs:289:    /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
+f2986ea66:Alis.Reactive/TriggersAndPipelines/RequestParts.cs:307:    /// <summary>Sends a multipart body whose fields and files the lambda sets, with a native form's submission set.</summary>
+f2986ea66:Alis.Reactive/TriggersAndPipelines/RequestParts.cs:308:    /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>

@@ -1,0 +1,125 @@
+[playwright:runner] building the browser bundle, then tests/Alis.Reactive.Conformance.PlaywrightTests
+
+  Alis.Reactive/wwwroot/js/alis-reactive.js  198.8kb
+
+⚡ Done in 11ms
+
+  Alis.Reactive/wwwroot/js/alis-reactive-hub.js  111.2kb
+
+⚡ Done in 5ms
+
+  ....Reactive.OpenTelemetry/wwwroot/js/alis-reactive-opentelemetry.js  57.4kb
+
+⚡ Done in 15ms
+
+  Alis.Reactive.Native/wwwroot/js/alis-reactive-native.js  21.3kb
+
+⚡ Done in 2ms
+
+  Alis.Reactive.Fusion/wwwroot/js/alis-reactive-fusion.js  5.7kb
+
+⚡ Done in 1ms
+
+  Alis.Reactive.Fusion/wwwroot/js/alis-reactive-fusion-templates.js  977b 
+
+⚡ Done in 1ms
+
+  ....Reactive.Conformance.App/wwwroot/js/alis-reactive-conformance.js  44.3kb
+
+⚡ Done in 2ms
+
+  ...ormance.App/wwwroot/js/care/admissionclinical/supplier-queries.js   3.6kb
+  ...formance.App/wwwroot/js/care/admissionclinical/equipment-stock.js   3.3kb
+  ...Reactive.Conformance.App/wwwroot/js/care/movein/admission-page.js   2.0kb
+  ...active.Conformance.App/wwwroot/js/bench/plugins/shift-log-desk.js   1.9kb
+  ....Reactive.Conformance.App/wwwroot/js/bench/vendors/bench-clock.js   1.4kb
+  ...Reactive.Conformance.App/wwwroot/js/bench/plugins/visitor-desk.js   1.1kb
+  tests/Alis.Reactive.Conformance.App/wwwroot/js/world/care-session.js   1.1kb
+  ...ormance.App/wwwroot/js/bench/plugins/visitor-desk-open-at-load.js  1012b 
+  ...App/wwwroot/js/care/record/card-radio-with-a-stuck-unsubscribe.js   967b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/care/record/card-radio.js   902b 
+  ...s.Reactive.Conformance.App/wwwroot/js/bench/plugins/night-desk.js   772b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/bench/sources/page-log.js   731b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/care/record/card-tally.js   521b 
+  ...pp/wwwroot/js/care/residents/serving-station-with-a-paged-list.js   520b 
+  ...active.Conformance.App/wwwroot/js/care/residents/roster-rounds.js   500b 
+  ....Reactive.Conformance.App/wwwroot/js/care/round/throwing-trace.js   490b 
+  ...ctive.Conformance.App/wwwroot/js/bench/declarations/page-tally.js   483b 
+  ...eactive.Conformance.App/wwwroot/js/care/admission/move-in-bell.js   479b 
+  ...s.Reactive.Conformance.App/wwwroot/js/bench/vendors/page-tally.js   478b 
+  ...lis.Reactive.Conformance.App/wwwroot/js/care/round/round-tally.js   477b 
+  ...and 10 more output files...
+
+⚡ Done in 7ms
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Alis.Reactive.TestRules -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.TestRules/bin/Release/netstandard2.0/Alis.Reactive.TestRules.dll
+  Alis.Reactive.Analyzers -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Analyzers/bin/Release/netstandard2.0/Alis.Reactive.Analyzers.dll
+  Alis.Reactive.Conformance.World -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.World/bin/Release/net10.0/Alis.Reactive.Conformance.World.dll
+  Alis.Reactive -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive/bin/Release/net10.0/Alis.Reactive.dll
+  Alis.Reactive.OpenTelemetry -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.OpenTelemetry/bin/Release/net10.0/Alis.Reactive.OpenTelemetry.dll
+  Alis.Reactive.Native -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Native/bin/Release/net10.0/Alis.Reactive.Native.dll
+  Alis.Reactive.Fusion -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/Alis.Reactive.Fusion/bin/Release/net10.0/Alis.Reactive.Fusion.dll
+  Alis.Reactive.Conformance.App -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.App/bin/Release/net10.0/Alis.Reactive.Conformance.App.dll
+  Alis.Reactive.Conformance.PlaywrightTests -> /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/bin/Release/net10.0/Alis.Reactive.Conformance.PlaywrightTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.45
+[playwright:runner] filter: (FullyQualifiedName~Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionSignsInAVisitor&Name=the_desk_refuses_a_barred_visitor_without_recording_an_acknowledgement)
+Test run for /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/bin/Release/net10.0/Alis.Reactive.Conformance.PlaywrightTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+NUnit Adapter 6.3.1.0: Test execution started
+Running selected tests in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/bin/Release/net10.0/Alis.Reactive.Conformance.PlaywrightTests.dll
+   NUnit3TestExecutor discovered 1 of 1 NUnit test cases using Current Discovery mode, Non-Explicit run
+[playwright:ready] GET /care/move-ins/D100 rendered 'Move-in D100' on net10.
+[playwright:ready] POST /world/end ended the move-in readiness world on net10 with zero parked gates.
+  Failed the_desk_refuses_a_barred_visitor_without_recording_an_acknowledgement [1 s]
+  Error Message:
+   Microsoft.Playwright.PlaywrightException : Locator expected to have text 'This visitor is barred from signing in.'
+But was: 'Reception could not accept the submitted details.' 
+Call log:
+  - Expect "ToHaveTextAsync" Locator("#reception-answer") with timeout 740ms
+  - waiting for Locator("#reception-answer")
+    9 × locator resolved to <p role="status" id="reception-answer">Reception could not accept the submitted details.</p>
+      - unexpected value "Reception could not accept the submitted details."
+Aria snapshot:
+- status: Reception could not accept the submitted details.
+  Stack Trace:
+     at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, FrameExpectOptions expectOptions, Object expected, String message, String title) in /_/src/Playwright/Core/AssertionsBase.cs:line 97
+   at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, ExpectedTextValue[] expectedText, Object expected, String message, String title, FrameExpectOptions options) in /_/src/Playwright/Core/AssertionsBase.cs:line 69
+   at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, ExpectedTextValue textValue, Object expected, String message, String title, FrameExpectOptions options) in /_/src/Playwright/Core/AssertionsBase.cs:line 61
+   at Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionSignsInAVisitor.the_desk_refuses_a_barred_visitor_without_recording_an_acknowledgement() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/PartialsAndSlots/MoveIn/WhenReceptionSignsInAVisitor.cs:line 57
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.<>c__DisplayClass1_0.<Execute>b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+1)    at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, FrameExpectOptions expectOptions, Object expected, String message, String title) in /_/src/Playwright/Core/AssertionsBase.cs:line 97
+   at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, ExpectedTextValue[] expectedText, Object expected, String message, String title, FrameExpectOptions options) in /_/src/Playwright/Core/AssertionsBase.cs:line 69
+   at Microsoft.Playwright.Core.AssertionsBase.ExpectImplAsync(String expression, ExpectedTextValue textValue, Object expected, String message, String title, FrameExpectOptions options) in /_/src/Playwright/Core/AssertionsBase.cs:line 61
+   at Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionSignsInAVisitor.the_desk_refuses_a_barred_visitor_without_recording_an_acknowledgement() in /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/PartialsAndSlots/MoveIn/WhenReceptionSignsInAVisitor.cs:line 57
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.BeforeAndAfterTestCommand.<>c__DisplayClass1_0.<Execute>b__0()
+   at NUnit.Framework.Internal.Commands.DelegatingTestCommand.RunTestMethodInThreadAbortSafeZone(TestExecutionContext context, Action action)
+
+
+Test Run Failed.
+Total tests: 1
+     Failed: 1
+ Total time: 3.8849 Seconds
+Results File: /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/container-only/tests/Alis.Reactive.Conformance.PlaywrightTests/TestResults/20261125-124249-92750/run.trx
+[playwright:runner] log: tests/Alis.Reactive.Conformance.PlaywrightTests/TestResults/20261125-124249-92750/run.log
+[playwright:result] failed (Failed): Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionSignsInAVisitor("net10").the_desk_refuses_a_barred_visitor_without_recording_an_acknowledgement
+[playwright:result] M9_F2.M9_X252_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 1.14s Alis.Reactive.Conformance.PlaywrightTests.PartialsAndSlots.WhenReceptionSignsInAVisitor("net10").the_desk_refuses_a_barred_visitor_without_recording_an_acknowledgement
+exit 1

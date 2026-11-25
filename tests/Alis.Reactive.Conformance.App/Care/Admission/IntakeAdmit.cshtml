@@ -10,22 +10,16 @@
     var plan = Html.ReactivePlan<IntakeAdmission>();
 }
 <h1>Admit</h1>
-@using (var intake = Html.BeginRequestForm(plan, "intake"))
+@(Html.InputField(plan, m => m.Ward, options => options.Label("Ward")).NativeDropDown(o => o.Items(IntakeAdmissions.Wards).Placeholder("Choose a ward")))
+@using (var intake = Html.BeginRequestContainer(plan, "intake"))
 {
     @Html.AntiForgeryToken()
     @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
     <label>Code <input name="Code"></label>
     <button type="button" @Html.Raises(plan, IntakeAdmissions.Admit)>Admit</button>
     Html.On(plan, trigger => trigger.CustomEvent(IntakeAdmissions.Admit, pipeline => pipeline
-        .Post<IntakeAdmission>(IntakeAdmissionEndpoints.Admissions, request => request.UrlEncoded(intake.Form, body => { }))
+        .Post<IntakeAdmission>(IntakeAdmissionEndpoints.Admissions, request => request.UrlEncoded(intake.Container, body => body.Input(r => r.Ward, pipeline.Input(m => m.Ward))))
         .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("received").Text.Set(received.Body))));
 }
-<label>Ward
-    <select name="Ward" form="@Model.WardForm">
-        <option value="">Choose a ward</option>
-        <option>North</option>
-        <option>East</option>
-    </select>
-</label>
 <p>Received by the desk: <span id="received">-</span></p>
 @Html.RenderPlan(plan)

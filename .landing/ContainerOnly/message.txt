@@ -1,0 +1,58 @@
+requests (ContainerOnly): the request container is the one door, and it sends the hidden inputs inside it in a form body
+
+The owner, 2026-11-25: "we agreed to use container instead of form, lets settle this here forever" and "yeah container
+should take care of hidden fields in TS runtime since we remove form semantics in chstml and for good reasons, then TS
+runtime still will use form but in TS", "to build the payload not as replacement of container" (spec/NOTES.md:1646-1647;
+spec/CLAUDE.md:9-17). Html.BeginRequestForm, RequestFormBlock<TModel>, RequestForm<TModel>, the UrlEncoded and Multipart
+overloads over a form and the two condensed Form doors leave the surface; RequestContainer<TModel> is sealed; the plan's
+container carries no kind. A request sends what its plan declares and, in a URL-encoded or a multipart body, each hidden
+input inside its container's element with a name and not disabled, under its own name, before the request's own
+members, which replace one of the same name; a JSON body and a GET's query carry none, and the check reads no member
+from one (D9.15, D14.8, D16.5, X9.47). page.ts reads them inside the element found by id, the one more file the lint
+lets query (eslint.config.js, WhenTheLintIsConfigured). ContainerRead.tla gains the hidden input, its invariant, its
+witness and two mutants. 73 views move to the container; the bench cell http.beside.hidden keeps its hand-written
+hidden Batch. WhenAContainerHoldsAHiddenInput (X9.47) and WhenAContainerHoldsAControlTheViewWroteByHand (X9.15) are
+new; WhenARichTextEditorIsSentInAForm keeps its name; WhenANativeFormIsSent is retired by
+.landing/ContainerOnly/retired.txt, which scripts/regressions.py reads through land-unit.sh and land.sh
+(WhenALandingRetiresATest, tests.md, process.md). Round one's carriers of what a container sends are
+held to it: X9.15, the 2026-11-08 decision line, REWRITE.md's bench cell, MI.30 and move-in's door map (141 names), and the
+build-a-screen skill.
+
+git -C ../container-only rev-parse --short=9 HEAD: f2986ea66
+Probe, File over an item index: [playwright:result] M6_F1.X9_27_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 2.00s
+Probe, NativeCheckBox unchecked: index 0 "Consent" matched; "Values differ at index [9] Missing:  < "__RequestVerificationToken", ... >"
+Probe, the reception under net10 before the hidden inputs: [playwright:result] M9_F2.M9_X252_0 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 1.14s
+[playwright:result] M9_F2.M9_X250_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 0.54s
+[playwright:result] M9_F2.M9_X261_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.70s
+CarePlanUpload on the container: [playwright:result] M21_F22.M21_X1014_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 2.70s
+{"pass": true, "detail": "every spec green, every invariant killed by its mutant, every witness reached", "counts": {"specs": 17, "met": 17}
+ContainerRead.cfg: "Model checking completed. No error has been found." "492480 states generated, 33408 distinct states found, 0 states left on queue."
+ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenLeftUnsent.cfg and .HiddenSentOutsideAFormBody.cfg: "violated: AHiddenInputReachesAFormBodyAlone"
+ContainerRead.violates.ReachAHiddenInputInAFormBody.cfg: "violated: ReachAHiddenInputInAFormBody"
+ContainerRead.violates.AnUnsentMemberReadsWhatTheEndpointBinds.HandWrittenControlSent.cfg: "violated: AnUnsentMemberReadsWhatTheEndpointBinds"
+ContainerRead.violates.ReachAHandWrittenControlLeftUnsent.cfg: "violated: ReachAHandWrittenControlLeftUnsent"
+Request.cfg: "18308256 states generated, 18308256 distinct states found, 0 states left on queue."; ContainerSubmitsNatively: "violated: FailedCheckSendsNothing"
+Red, M6_F1.X9_15_0: "Locator expected to have text 'Ward East, Code none, fields 1' But was: 'Ward East, Code A7, fields 1'"
+Red, M21_F38.M21_X1038_0: "Locator expected to have text 'Summary' But was: '<p>Ate a full lunch.</p>'"
+Red, M9_F2.M9_X254_0 with :103 changed: "Expected: "Consent" But was: "CoordinatorId""
+Red, M6_F1.X9_47_0: "Locator expected to have text 'Desk Front; Name Ada; Shift Night; Ward North' But was: 'Desk Front; Name Ada'"
+[playwright:result] M6_F1.X9_15_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.80s
+[playwright:result] M21_F38.M21_X1038_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 2.51s
+[playwright:result] M6_F1.X9_47_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.68s
+[playwright:result] M9_F2.M9_X254_0 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 0.92s
+[plant] caught: M6_F1.X9_47_0, four plants: URL-encoded hidden inputs dropped (:21), the query given them (:24), the disabled one sent (:21), one outside the element sent (:21)
+[plant] caught: M9_F2.M9_X254_0, three plants: the hidden token dropped (:line 103), setInput's delete by name dropped (:line 103, Consent twice), the caption's Set dropped (:line 113)
+[plant] caught: M6_F1.X9_27_0 (:30), M8_F4.X16_18_0 (:line 21), Cells.http_beside_hidden (:21), M21_F38.M21_X1038_0 twice (the name attribute :19, the null content :25), M6_F1.X9_15_0 three times (the fields :23, contains :31, the token appended)
+Passed!  - Failed:     0, Passed:  1467, Skipped:     0, Total:  1467, Duration: 19 s - Alis.Reactive.ModuleTests.dll (net10.0)
+Test Files  41 passed (41); Tests  870 passed (870)
+Passed!  - Failed:     0, Passed:   338, Skipped:     0, Total:   338 - Alis.Reactive.ArchitectureTests.dll (net10.0), in the gate, all but WhenAConsumerAppIsBuilt
+Failed!  - Failed:     1, Passed:   349, Skipped:     0, Total:   350 - Alis.Reactive.ArchitectureTests.dll (net10.0), under a private index: the one is the fresh MVC 5 app, "MSBUILD : error MSB1001: Unknown switch. Switch: -tl:off", CI's Windows job
+Packed 6 packages to ./nupkgs (version 0.0.0-containeronly.20261125205807).
+The net48 twin's Release build on those packs: 0 Warning(s), 0 Error(s)
+git grep -n -E 'BeginRequestForm|RequestForm|[.]Form[(]|[.]Form[)]' over the shipped projects, spec/api, tests, .claude, CLAUDE.md, README.md and spec/CLAUDE.md: 45 lines, none a request door (41 read source.Form or sent.Form, spec/CLAUDE.md:10 the owner's decision, three endpoint constants named Form)
+scripts/check.sh --no-spec: [check] every check passed.
+[playwright:result] all 1/1: 839 selected, 839 ran, 839 passed, 0 failed, 0 over budget, slowest 4.44s
+spec check at f2986ea66: 40 of 40 checks pass
+
+Not run: MVC 5 and the net48 browser run, CI's Windows job; WhenAConsumerAppIsBuilt's fresh MVC 5 app; land-unit.sh to
+land.sh to regressions.py with the retired line before this land; delivery.sh's consumerNet10 browser run.

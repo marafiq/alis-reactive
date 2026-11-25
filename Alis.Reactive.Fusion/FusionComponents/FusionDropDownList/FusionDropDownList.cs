@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// chosen.
 /// </summary>
 /// <remarks>
-/// A list bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2 raises
+/// A list bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2 raises
 /// <see cref="Change"/> when a person chooses an item or the value changes.
 /// </remarks>
 /// <typeparam name="TValue">The type of the member the list binds, which admits null, since the list holds null until a choice.</typeparam>

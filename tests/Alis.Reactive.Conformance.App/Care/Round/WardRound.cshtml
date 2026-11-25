@@ -11,14 +11,14 @@
     var plan = Html.ReactivePlan<WardRoundDose>();
 }
 <h1>Ward round</h1>
-@using (var dose = Html.BeginRequestForm(plan, "ward-dose"))
+@using (var dose = Html.BeginRequestContainer(plan, "ward-dose"))
 {
     <fieldset>
         <legend>Dose</legend>
         @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
     </fieldset>
     @(Html.NativeButton("save-dose", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<WardRoundDose>(CareEndpoints.WardDoses, request => request.Form(dose.Form).Path(sent => sent.Ward, pipeline.PageUrl<WardRoundDose>(CarePages.WardRound).Read(page => page.Ward)))
+        .Post<WardRoundDose>(CareEndpoints.WardDoses, request => request.Inputs(dose.Container).Path(sent => sent.Ward, pipeline.PageUrl<WardRoundDose>(CarePages.WardRound).Read(page => page.Ward)))
         .Validate<WardRoundDoseRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))
         .Chained((saved, pipeline) => pipeline
