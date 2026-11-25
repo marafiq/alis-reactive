@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 19:47:20 EST 2026
+Written at `date`: Tue Nov 24 20:30:04 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (40): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, MarkdownLand, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove
+unit: landed (41): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, MarkdownLand, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
-unit: building (1): MoveInOwners
+unit: building (2): ListPosition, MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 1bce0ab2e on feature/rewrite: equal to the remote
+lane: pushed at 314f0b4b4 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 1bce0ab2e
+ci: unread at 314f0b4b4
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -22,28 +22,25 @@ file: over spec/CLAUDE.md: holds 2103 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over HANDOFF.md: holds 152 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 1bce0ab2e land: a unit of Markdown alone takes the Markdown path, the checks that read Markdown and no browser run
-- Full check: .work/logs/spec-check-1bce0ab2e.log: spec check at 1bce0ab2e: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-193411-15465 1bce0ab2e
+- HEAD: 314f0b4b4 hook: a letter after a bare variable and a colon, which zsh reads as a modifier, is refused
+- Full check: .work/logs/spec-check-314f0b4b4.log: spec check at 314f0b4b4: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-201718-66896 314f0b4b4
 
 ## Landed since the commit before the last spec: STATE commit
-1bce0ab2e land: a unit of Markdown alone takes the Markdown path, the checks that read Markdown and no browser run
-146e93859 spec: STATE and handoff at d9d21764f
+314f0b4b4 hook: a letter after a bare variable and a colon, which zsh reads as a modifier, is refused
+f92088e98 spec: STATE and handoff at 1bce0ab2e
 
 ## Open
 open: 19 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 447 to 448
-- A shell command or a script wrong in its own terms: 644 to 646
-- The lead's own process put before the product: 6 to 7
+- A shell command or a script wrong in its own terms: 646 to 649
 
 ## The owner's latest decisions
 spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
@@ -84,7 +81,8 @@ spec/CLAUDE.md:2031: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to t
 The owner's order, 2026-11-23: the team process (landed), then the framework core to 1.0, then everything else. Every
 unit lands on `feature/rewrite`; its one pull request, #247, ships 1.0 (the owner, 2026-11-23). The worktrees of
 landed units stay (the owner, 2026-11-23: "keep worktree around"). Builds stay serial on this Mac; source
-`scripts/toolchain-env.sh` first.
+`scripts/toolchain-env.sh` first. A unit of Markdown alone lands by `scripts/land.sh`'s Markdown path since 1bce0ab2e
+(the owner, 2026-11-24: "for md file changes u do not need whole flow to run").
 
 1.0's definition of done is the owner's (2026-11-23): "1.0 DoD is when all components of fusion, and selective native,
 and core framework are done where fusion will be onboarded one component with its full powers using skill. right now
@@ -94,38 +92,25 @@ focus is on getting framework package to 1.0". So the focus now is the framework
 brief: print `git rev-parse HEAD` and change nothing. It prints the lane's head; any other commit means
 `worktree.baseRef` is not applied, and that is fixed before a builder takes work. A session started at the
 repository's root lists no `builder` and reads the root's `.claude/settings.json`, which holds no `worktree.baseRef`,
-so the probe proves nothing there; the session that landed DefinitionOfDone started at the root and left it.
+so the probe proves nothing there; the sessions that landed DefinitionOfDone and MarkdownLand started at the root
+and left it, the second with its commands run through the traps hook by hand (counted at 1bce0ab2e).
 
-**2. The operators: landed at 32d696913.** The seven no C# wrote left the grammar (the owner, 2026-11-23: "ok remoe the
-operators in spriti to land 1.0"); `spec/NOTES.md`'s table "After 1.0" holds where each comes back from.
-
-**3. The framework core to 1.0 (U1 to U22).** Done when:
+**2. The framework core to 1.0 (U1 to U22).** Done when:
 - `scripts/open.py` prints no core runtime case: met at b824783d3, "0 runtime cases not built";
 - X3.7, a date in a JSON response on MVC 5, passes on CI's Windows job;
 - `spec/REWRITE.md` section 4 states each of U1 to U22 closed with its result line (today it states U3, U4, U5,
   U8 to U13 closed and U1, U2, U14 to U16 landed; U6, U7, U17 to U22 are not stated);
 - the core's public surface text is read as the 1.0 surface, and README's examples come from tested pages.
 Its units, in order:
-1. The plan narrowed to what C# writes: an input's value read and a rule's test, each case's own error text
-   names the form C# writes. `RuleTest` and `RuleGroup` take a `FnExpression` (`Alis.Reactive/Schema/Registration.cs`)
-   and the one writer of `InputBinding` writes its `converted` read and its `blank` (`Alis.Reactive/InputsAndIds/BoundInput.cs`),
-   typed as the `as` and the `lit` it writes, each of which writes its own kind; no TLA+ spec models these fields. Its first half landed at 31e6361c3: a
-   rule's test and condition and a vendor's locate typed as the `fn` C# writes, the plan's bytes unchanged. Its second
-   half, `InputBinding`, is one family's design, `../input-form/.landing/InputForm/design.md` (its read, read.md;
-   the model, scratch/tla2; the built move, `../writer-move`). The owner's yes to both decisions came 2026-11-24, and
-   they land as four units, smallest first: the check of a text or file body landed at 6da8232ec (X16.46), and of
-   a request that sends no body at 83b406a43 (X16.46's third promise); the writer's move, with `as` writing its own
-   kind and the plan's bytes unchanged, at 0a578a9ab; the split of `value` into `converted` and `blank`, with `lit`
-   writing its own kind, at 6a7112399, which removed `InputsAndIds/model.ts`'s three cases not built; and `sent`,
-   the bug fix, at b824783d3: each input sent by the form its binding carries, which removed `request.ts`'s last case,
-   proved by X9.36 to X9.42, X13.11, X16.47, M7.X9 and M7.X10, each side failing on its own plant. One case of its
-   family is open, found after it landed: a field left out under a list index ends the list when it is its item's only
-   field (a probe on .NET 10.0.15: `Dates[1]` alone binds no item), since the consult's line for a list position was not
-   carried (counted at c1d8ada98). The lead's design, `../sent-position/.landing/SentPosition/design.md`, waits for the
-   owner's yes. Its recommendation, choice A, adds "leaveUnlessAlone" to WhenBlank, one grammar case, so an input's
-   request and read stop there, and refuses where the view renders a query or form data member that could empty its
-   item. No page of the app reaches a case of it (the design's searches 1 to 3); a JSON body keeps a list item's place
-   (D10.16, X9.31).
+1. The plan narrowed to what C# writes: landed in five units, the last, `sent`, at b824783d3 (X9.36 to X9.42, X13.11,
+   X16.47, M7.X9 and M7.X10, each side failing on its own plant). One case of its family is open: a field left out
+   under a list index ends the list when it is its item's only field (a probe on .NET 10.0.15: `Dates[1]` alone binds no
+   item). The lead's design, `../sent-position/.landing/SentPosition/design.md`, waits for the owner's yes: choice A
+   adds "leaveUnlessAlone" to WhenBlank, one grammar case, so an input's request and read stop there, and refuses where
+   the view renders a query or form data member that could empty its item; no page of the app reaches a case of it (the
+   design's searches 1 to 3). On a yes it is one unit in a fresh worktree from the lane's head: D9.10's new row,
+   schema.md, ContainerRead.tla's new input kind with its mutant and witness, four browser promises red first, the code,
+   a plant on each side.
 2. The form-data boundary: an enum input in form data is sent by its rows since b824783d3 (the design's defect 1,
    X9.36, X9.37, X9.39 and X16.47), an object stays refused until after 1.0 (the owner's yes of 2026-11-17); a text or file body's check landed
    at 6da8232ec (X16.46). On MVC 5 an action's model binds route values and the query beside the body
@@ -141,7 +126,7 @@ Its units, in order:
    input over an enum whose zero has no name landed at b824783d3 as X9.39.
 5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked.
 
-**4. After the framework package:** the selected Native components (date entry first), then every Fusion component,
+**3. After the framework package:** the selected Native components (date entry first), then every Fusion component,
 one at a time with its full powers through `.claude/skills/onboard-component/SKILL.md`, then PR #247 out of draft. The six packages pack at one version, so the tag comes once, at the end.
 
 **Parked, each where it lives:** browser validation's shared key
