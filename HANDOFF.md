@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Wed Nov 25 02:16:26 EST 2026
+Written at `date`: Wed Nov 25 12:53:13 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 27, each in the notes block below
-note: closed 2026-11-25 | correction | spec/MISTAKES.md, and .claude/hooks/refuse-known-traps.mjs | CheckoutTrap | "these: its follow-up CheckoutTrap landed
-unit: landed (47): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListFromSources, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
-unit: returned (9): FormDataBoundary, FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms, ValidationForms
-unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
-unit: building (1): MoveInOwners
+note: open: 30, each in the notes block below
+note: closed 2026-11-25 | correction | spec/MISTAKES.md | MistakesAsRules | "please stop doing silly mistakes, while u wa: its follow-up MistakesAsRules landed
+unit: landed (48): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
+unit: building (2): ContainerOnly, MoveInOwners
+unit: unbriefed (21): FormDataBoundary, NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable, ValidationForms
+unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at 3efe316b8 on feature/rewrite
+lane: pushing at 2f84ee35b on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at 3efe316b8
+ci: unread at 2f84ee35b
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -22,25 +22,28 @@ file: over spec/CLAUDE.md: holds 2108 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
+file: over HANDOFF.md: holds 152 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 3efe316b8 The traps hook refuses a file restored from the index and a backtick outside single quotes (CheckoutTrap)
-- Full check: .work/logs/spec-check-3efe316b8.log: spec check at 3efe316b8: 40 of 40 checks pass
+- HEAD: 2f84ee35b Mistakes condensed to rules: each kind's row states the rules that stop it and what holds them (MistakesAsRules)
+- Full check: .work/logs/spec-check-2f84ee35b.log: spec check at 2f84ee35b: 40 of 40 checks pass
 - .work/last-run.txt: 20261125-020357-25220 3efe316b8
 
 ## Landed since the commit before the last spec: STATE commit
-3efe316b8 The traps hook refuses a file restored from the index and a backtick outside single quotes (CheckoutTrap)
-f2dd7543e spec: STATE and handoff at a00125348
+2f84ee35b Mistakes condensed to rules: each kind's row states the rules that stop it and what holds them (MistakesAsRules)
+f2986ea66 spec: STATE and handoff at 3efe316b8
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A shell command or a script wrong in its own terms: 660 to 664
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 464 to 465
+- A rule or a tool's list not applied before the change: 456 to 459
+- A shell command or a script wrong in its own terms: 664 to 665
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
@@ -75,7 +78,10 @@ spec/CLAUDE.md:2036: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to t
 - 2026-11-24 | direction | the queue of this file | queue | "never lower the quality - just reminder"
 - 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "C (Recommended)", to D16.5's question of a member sent outside the body (form-data-boundary-design.md, section 6)
 - 2026-11-25 | direction | the queue of this file | ValidationForms | "1 seems more aligned, but make sure that all use cases are satified, including where bulk edit say row gets validated. I would like to see each use case form here before you action it." "Its very critical to get this right with high quality code and keep grammer and dev experience." "Bulk Edit is not about checking one row alone, it has two use cases, if action is in row, then row validate, if its applying to all rows then all validate." "write these use cases a md document, take this to fable xhigh designer, ask it to deliver on correctness, grammer consistency, quality, typed and your document must contain small but complete use examples. so design from fable is expected to be complete, then it gets tla+ and then it lands without loosing quality"
-- 2026-11-25 | correction | spec/MISTAKES.md, and .claude/hooks/refuse-known-traps.mjs | CheckoutTrap | "these mistakes are making me question your critical recommondations, please stop doing these mistakes."
+- 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | ValidationForms | "i approve it", to the five lines of .worktrees/validation-forms/.landing/ValidationForms/design.md, section 10
+- 2026-11-25 | decision | spec/CLAUDE.md, the request decisions | ContainerOnly | "i approve it but, we agreed to use container instead of form, lets settle this here forever. u are welcome to use form in TS to build the payload for http but"
+- 2026-11-25 | decision | spec/CLAUDE.md, the request decisions | ContainerOnly | "yes", to the two lines of .worktrees/container-only/.landing/ContainerOnly/design.md, section 12: a control the plan does not know is no longer sent, and Container.kind leaves the plan
+- 2026-11-25 | correction | spec/MISTAKES.md | MistakesAsRules | "please stop doing silly mistakes, while u wait, makde mistakes condense so they are rules ...u gotta stop doing this."
 <!-- /notes -->
 
 ## Next
@@ -106,33 +112,34 @@ and left it, the second with its commands run through the traps hook by hand (co
   U8 to U13 closed and U1, U2, U14 to U16 landed; U6, U7, U17 to U22 are not stated);
 - the core's public surface text is read as the 1.0 surface, and README's examples come from tested pages.
 Its units, in order:
-1. The plan narrowed to what C# writes: landed in six units, the last at 5d9328da2, ListPosition, the owner's yes of
-   2026-11-24 to choice A: a field left out under a list index that leaves its item no field stops the request, its
-   container's read and check with it ("leaveUnlessAlone" on WhenBlank), or is refused where the view renders a query or
-   form data member that could empty its item (X9.43 to X9.46, each side failing on its own plant;
-   ContainerRead.tla's BlankAloneStopsTheSendAlone and ReachBlankAloneStopsTheRead). Its gap, named in its reply: an
-   empty list or a files input with no file sends no part, so an item whose only field is one of these still ends the
-   list; choice A covers whenBlank and whenNothing alone.
-2. The form-data boundary: an enum input in form data is sent by its rows since b824783d3 (the design's defect 1,
-   X9.36, X9.37, X9.39 and X16.47), an object stays refused until after 1.0 (the owner's yes of 2026-11-17); a text or file body's check landed
-   at 6da8232ec (X16.46). On MVC 5 an action's model binds route values and the query beside the body
-   (probe mvc5-value-provider-order), so a rule over a member a request sends in its path or query is checked at its
-   start in the browser and bound on that endpoint; the meaning by host is designed whole and put to the owner
-   before the core freeze (D16.5, D16.6). In design since 2026-11-24 in ../form-data-boundary (FormDataBoundary), a
-   designer on Fable at xhigh, read-only, from 31c256b0f; its design.md is read at the source before it goes to the owner.
-3. X3.7 written on the net48 host; CI's Windows job proves it. Landed at c3aeae654 (X37Net48): the twin's resident card,
-   resident 7's date of birth seeded by the test (Seed.TheResidentBornOn) and answered through N10.6, and its opposite
-   address answered through MVC 5's own Json; both views' code built on net48. The fixture runs on CI's Windows job
-   alone, which no run has read yet. The same unit makes the browser runner refuse a promise constant written without its
-   feature, naming the one it meant.
-4. Eight parked core leads, each one verdict by the owner's test of 2026-11-20 (a reproduced defect, a reachable
-   incomplete contract or an unproved promise is in; otherwise a row of the after-1.0 table), the raw text and
-   single-file body check having landed at 6da8232ec as X16.46: the named enum in a pushed message, typed list construction from separate
-   sources, plan shape alignment, standalone named rule sets, activated-row replacement, handler cleanup, the
-   attached-partial validation summary, and a row's "removing" state after a failed removal (move-in part 9). An
-   input over an enum whose zero has no name landed at b824783d3 as X9.39. In design since 2026-11-24 in ../core-leads
-   (CoreLeads), a designer on Fable at xhigh, read-only, from 25e19ea4a; its design.md is read at the source first.
-5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked.
+1. The plan narrowed to what C# writes: landed in six units, the last at 5d9328da2 (ListPosition, choice A of
+   2026-11-24, X9.43 to X9.46). Its gap: an empty list or a files input with no file sends no part, so an item whose
+   only field is one of these still ends the list.
+2. The forms, three units in this order, each its spec lines, TLA+, tests and code in one commit, as ListPosition
+   landed at 5d9328da2; a spec-only unit first was dropped, since its tree would contradict the 79 views:
+   - ContainerOnly, building in ../container-only from f2986ea66, a builder on Opus at xhigh: the developer writes a
+     request container and never a form; a request sends what its plan declares; `Container.kind` leaves the plan (the
+     owner, 2026-11-25: "lets settle this here forever", and "yes" to the design's two lines).
+   - FormDataBoundary, in ../form-data-boundary, from the lane's head once ContainerOnly lands: the owner chose C on
+     2026-11-25, a member sent outside the body read where MVC's binder reads it (the design's section 6 and 7); section
+     8 was not asked. An enum input in form data is sent by its rows since b824783d3 and a text or file body's check
+     landed at 6da8232ec (X16.46).
+   - ValidationForms, in ../validation-forms, last: the five lines the owner approved on 2026-11-25, written from
+     ContainerOnly's design, Appendix A; its Validation.tla change meets FormDataBoundary's and its ContainerRead.tla
+     change meets ContainerOnly's, so it moves to the head after both.
+   Each design's read is design-read.md in its landing folder; FormDataBoundary's and ValidationForms' worktrees carry
+   the lead's counts of their designs.
+3. X3.7 on the net48 host: landed at c3aeae654, proven by CI's Windows job at f2986ea66 ("ci at f2986ea66: 10 of 10
+   jobs passed"; verify-net48 "Passed the_date_of_birth_shows_its_own_day_in_a_browser_whose_clock_is_behind_the_servers").
+4. Eight parked core leads: judged at cad8e3581 (CoreLeads), two in, one closed, five after 1.0. In: typed list
+   construction from separate sources, landed at a00125348 (ListFromSources, X7.21 and X7.22); a named rule set for a
+   check with no request, N16.3, which ValidationForms builds as F5's door. Closed: plan shape alignment. After 1.0, as
+   rows of the table in spec/NOTES.md: the named enum in a pushed message; activated-row replacement, a row's
+   "removing" state and handler cleanup; the attached-partial validation summary.
+5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked. One gap is decided first: a 204 to
+   a JSON route is a content failure, since response.ts reads no Content-Type as no JSON before it reads the body, while
+   an empty JSON body reads as none, and no D line states a 204 under `OnSuccess<T>` (a search of spec/Core/DESIGN.md
+   for "204" and "No Content" printed nothing; raised by ListFromSources' builder, read at the source in its read.md).
 
 **3. After the framework package:** the selected Native components (date entry first), then every Fusion component,
 one at a time with its full powers through `.claude/skills/onboard-component/SKILL.md`, then PR #247 out of draft. The six packages pack at one version, so the tag comes once, at the end.
