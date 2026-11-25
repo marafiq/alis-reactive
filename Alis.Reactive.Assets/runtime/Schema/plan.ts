@@ -615,7 +615,7 @@ export type ItemWhenNothing = "empty" | "stop";
 
 export type WhenNothing = "leave" | "empty";
 
-export type WhenBlank = "send" | "leave";
+export type WhenBlank = "send" | "leave" | "leaveUnlessAlone";
 
 export interface EnumInputSent {
   readonly kind: "enum";

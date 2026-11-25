@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FollowUpBooking
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Follow-up booking";
+    var plan = Html.ReactivePlan<FollowUpBooking>();
+}
+<h1>Follow-up booking</h1>
+@using (var booking = Html.BeginRequestContainer(plan, "follow-up-booking"))
+{
+    @(Html.InputField(plan, m => m.FollowUp, options => options.Label("Follow-up")).NativeTextBox())
+    @(Html.NativeButton("book-follow-up", "Book follow-up").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Get<FollowUpBookingQuery>(RequestsAndResponsesEndpoints.FollowUpBookings, request => request
+            .Query(r => r.Visits[0].Note, "Bloods")
+            .Query(r => r.Visits[1].When, booking.Container.Read(m => m.FollowUp))
+            .Query(r => r.Visits[1].Note, "Review"))
+        .OnSuccess(Content.Text, (booked, pipeline) => pipeline.Element("booked").Text.Set(booked.Body))))
+}
+<p>Booked: <span id="booked"></span></p>
+@Html.RenderPlan(plan)

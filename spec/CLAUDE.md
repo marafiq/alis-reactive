@@ -6,6 +6,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
+  left out under a list index that leaves its item with no field stops the request, or is refused where the view
+  renders. `WhenBlank` gains "leaveUnlessAlone", which C# writes where an input's path holds a list index and it would
+  write "leave", and a query or form data member past a list position that can be left out, with no member of its item
+  always sent, is refused where the view renders (D9.10).
 - The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
   selected Native components are done, each Fusion component onboarded one at a time with its full powers through
   `.claude/skills/onboard-component/SKILL.md`. The framework package reaches 1.0 first.

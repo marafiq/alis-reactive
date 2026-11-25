@@ -1818,6 +1818,7 @@ Terms used throughout:
   | a nullable value type or text | an empty field, which binds a null item (`probe:core-query-nullable-enum-items`, `probe:mvc5-empty-list-item-null`) |
   | a non-nullable value type | the request stops, since no field binds back as nothing |
   | an object | the request stops: an empty field ends the list at that item on net10 (`probe:core-query-list-of-objects-empty-item`) and binds a null item on MVC 5, and an item left out ends the list there on both hosts (`probe:core-query-list-of-objects-gap`, `probe:mvc5-list-ends-at-missing-index`) |
+  | an object that sends no field, each of its fields left out where it holds a start its form cannot write or reads nothing | the request stops, since an item left out ends the list there on both hosts; a request's member that can be left out, with no member of its item always sent, is refused where the view renders |
 
   An input bound to a list position whose item is itself a list is refused where the view renders, since a list that
   holds no items sends no field in a query or form data, which ends the outer list at its position on both hosts
@@ -1829,6 +1830,14 @@ Terms used throughout:
   a date's or an instant's, is left out while the input holds it, by the binding's `whenBlank`, so both hosts bind the
   start (X9.39, X9.41). A list input whose item reads nothing where the item admits none stops the container's read as
   it stops the request (D13.3, X9.40).
+  An input whose path holds a list index, its lambda's or its prefix's (a dictionary's entry is no index), that its
+  binding leaves out while it holds its blank, by `whenBlank` or by a null blank's `whenNothing` "leave", is written
+  `whenBlank` "leaveUnlessAlone": it is left out while it holds its blank, so beside another field of its item the
+  endpoint binds its start, and where no other input of the container writes a field of its item the container's read,
+  its check and its request stop (X9.43, X9.44, X9.45, `ContainerRead.tla`). A request's member in a query or form data
+  past a list position, left out where it reads nothing or where its condition fails, is refused where the view renders
+  when no member of its item is always sent, a literal, a text or a nullable member outside every condition (X9.46); in
+  a JSON body its item is an object that keeps its place (D10.16).
 - D9.11 A header is fixed text or a scalar source sent as text. A header that reads nothing is not sent. A
   header name is an HTTP token by RFC 9110, a name given twice ignoring case is refused, `Content-Type` is
   refused because the body format owns it, and `Accept` is refused because the success route's kind owns it (D10.6).
@@ -2209,6 +2218,19 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   its start.
 - `X9.42` behavior (D9.7, D3.8): a date input inside a container sent as a JSON body is sent as its wire text,
   "yyyy-MM-dd" at midnight, and left out while blank.
+- `X9.43` behavior (D9.10, D13.3): a date input bound to a list position, left blank, stops its container's read and
+  the request that sends it, since leaving it out would end the list there; holding a date, it is sent.
+- `X9.44` behavior (D9.10): a date input inside a list item, left blank, is left out beside another field of its item,
+  so the endpoint binds its start, and stops the request where it is its item's only field.
+- `X9.45` behavior (D9.10): an input inside a list item over an object written as one value that starts null, a link,
+  which reads nothing while it is empty, is left out beside another field of its item and stops the request where it
+  is its item's only field.
+- `X9.46` refusal (D9.10): a query member past a list position set from a source of a date, its item's only member, is
+  refused where the view renders with "The request sends '{member}' in its query past a list position from a value it
+  leaves out when it reads nothing, and no member of '{item}' is always sent, so the item would send no field and the
+  endpoint's list would end before it on both hosts; send beside it a member of the item that is always sent, a
+  literal, a text or a nullable member outside every condition, or send the list in a JSON body."; beside a member of
+  its item set from a literal the page renders and the request sends both.
 
 ## Q10. The request's flow and its response
 
@@ -3449,8 +3471,8 @@ plans name.
   slot loads into the container counts from its load, and one whose slot unloads counts no more. One input reads its
   value (N3.3), so a blank or unconverted one reads the member's start (D3.6); a member no input inside the container
   binds reads its start (D4.2); two inputs under the name stop it (D13.4), and so do a container whose element the
-  page lacks and a list input whose item reads nothing where the item admits none, as each stops the container's
-  request (D9.15, D9.10) (`ContainerRead.tla`). A page-wide read by binding name is
+  page lacks, a list input whose item reads nothing where the item admits none and an input left out under a list
+  index that leaves its item no field, as each stops the container's request (D9.15, D9.10) (`ContainerRead.tla`). A page-wide read by binding name is
   refused: two views can bind one name, so on a page a name names no single input. That ends the chain of guesses that
   read the last contributed input, then the plan's own. C# writes the read as a `data` read of the member's steps
   over `alis.model`'s `sent` of the container (schema.md), in the live form (D7.7), a list position between its steps

@@ -53,6 +53,7 @@ internal sealed class WhenBlank : IChoice
 {
     internal static readonly WhenBlank Send = new("send");
     internal static readonly WhenBlank Leave = new("leave");
+    internal static readonly WhenBlank LeaveUnlessAlone = new("leaveUnlessAlone");
 
     private WhenBlank(string text)
     {

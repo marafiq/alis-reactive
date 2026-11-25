@@ -1,7 +1,7 @@
 import type { Owner } from "../OwnershipAndState/index";
 import {
   assertNever, type CheckedBody as CheckedForm, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type InputEntry, type InputSent,
-  type ItemWhenNothing, type ModelPluginData, type PathStep, type PlanDocument, type SentInput, type SentInputs, type ValueRead,
+  type ItemWhenNothing, type ModelPluginData, type PathStep, type PlanDocument, type SentInput, type SentInputs, type ValueRead, type WhenBlank,
 } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
 
@@ -118,12 +118,16 @@ export class PageInputs {
     }
     const [first] = inputs;
     const body = first !== undefined && typeof first[1].binding.path[0] === "number" ? [] : {};
+    const leftUnlessAlone: InputBinding[] = [];
     for (const [, input] of inputs) {
       const bound = boundOf(input);
-      if (bound.blank && leavesTheBlank(input.sent)) continue;
+      const whenBlank = bound.blank ? whenBlankOf(input.sent) : "send";
+      if (whenBlank === "leaveUnlessAlone") leftUnlessAlone.push(input.binding);
+      if (whenBlank !== "send") continue;
       refuseAnItemThatReadsNothing(input, bound.value);
       write(body, input.binding.path, bound.value);
     }
+    for (const binding of leftUnlessAlone) refuseAnItemLeftWithNoField(body, binding, containerId);
     return { kind: "captured", id: containerId, body, inputs: inputs.map(sentInput) };
   }
 
@@ -235,16 +239,35 @@ function boundOf(input: Input): Bound {
   return converted === null ? { value: input.contribution.read(input.binding.blank), blank: true } : { value: converted, blank: false };
 }
 
-function leavesTheBlank(sent: InputSent): boolean {
+function whenBlankOf(sent: InputSent): WhenBlank {
   switch (sent.kind) {
     case "field":
     case "enum":
-      return sent.whenBlank === "leave";
+      return sent.whenBlank;
     case "files":
-      return false;
+      return "send";
     default:
       return assertNever(sent);
   }
+}
+
+function refuseAnItemLeftWithNoField(body: object, binding: InputBinding, containerId: string): void {
+  if (holds(body, itemOf(binding.path))) return;
+  throw new Stop("Input '" + binding.name + "' is left out while it holds its blank, and no other input of container '" + containerId +
+    "' writes a field of its item, so the endpoint's list would end before it on both hosts.");
+}
+
+function itemOf(path: readonly PathStep[]): readonly PathStep[] {
+  let end = path.length;
+  while (end > 0 && typeof path[end - 1] !== "number") end -= 1;
+  return path.slice(0, end);
+}
+
+function holds(holder: unknown, path: readonly PathStep[]): boolean {
+  const [step, ...past] = path;
+  if (step === undefined) return true;
+  if (typeof holder !== "object" || holder === null || !Object.hasOwn(holder, step)) return false;
+  return holds(Reflect.get(holder, step), past);
 }
 
 function itemWhenNothingOf(sent: InputSent): ItemWhenNothing | null {

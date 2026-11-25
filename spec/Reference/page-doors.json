@@ -3231,6 +3231,35 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F1 X9.43 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/VisitDates.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.44 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/VisitRound.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.45 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/VideoCalls.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.46 0": {
+    "modules": [],
+    "views": [
+      "/Refusals/RequestsAndResponses/FollowUpBookingByItsDate.cshtml",
+      "/Refusals/RequestsAndResponses/FollowUpBookingWithItsNote.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F1 X9.8 0": {
     "modules": [],
     "views": [

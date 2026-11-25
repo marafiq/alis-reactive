@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitDates
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visit dates";
+    var plan = Html.ReactivePlan<VisitDates>();
+}
+<h1>Visit dates</h1>
+@using (var visits = Html.BeginRequestContainer(plan, "visit-dates"))
+{
+    @(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Dates[0], options => options.Label("First visit")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Dates[1], options => options.Label("Second visit")).NativeTextBox())
+    @(Html.NativeButton("save-visits", "Save visits").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        pipeline.Element("save-status").Text.Set("Saving the visits");
+        pipeline.Element("visits-resident").Text.Set(visits.Container.Read(m => m.Resident));
+        pipeline.Post<VisitDates>(VisitDatesEndpoints.Visits, request => request.UrlEncoded(visits.Container, body => { }))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved-visits").Text.Set(saved.Body));
+    }))
+}
+<p><span id="save-status"></span> for <span id="visits-resident"></span></p>
+<p>Saved: <span id="saved-visits"></span></p>
+@Html.RenderPlan(plan)

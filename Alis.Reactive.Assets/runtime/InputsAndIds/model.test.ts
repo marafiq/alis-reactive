@@ -361,7 +361,7 @@ describe("when a request captures what it sends", () => {
 });
 
 describe("when an input is sent by its binding's sent", () => {
-  const blankDate = (whenBlank: "send" | "leave"): Sent => ({ kind: "lit", value: { kind: "field", form: { kind: "date" }, whenNothing: "leave", whenBlank } });
+  const blankDate = (whenBlank: "send" | "leave" | "leaveUnlessAlone"): Sent => ({ kind: "lit", value: { kind: "field", form: { kind: "date" }, whenNothing: "leave", whenBlank } });
   const days = (itemWhenNothing: "empty" | "stop"): Sent => ({ kind: "lit", value: {
     kind: "enum", form: { kind: "list", item: { kind: "enum", values: [{ held: 0, name: "Mon" }] }, itemWhenNothing },
     json: { kind: "list", item: { kind: "enum", values: [{ held: 0, sent: "Mon" }] }, itemWhenNothing }, whenNothing: "leave", whenBlank: "send",
@@ -375,6 +375,19 @@ describe("when an input is sent by its binding's sent", () => {
     const sent = page();
     sent.join(plan({ own: field("Due", ["due"], convertedFrom(nothing), literal("0001-01-01T00:00:00"), blankDate("send")), second: field("Reason", ["reason"], convertedFrom(literal("Falls"))) }), new Visit(), "on the page", literalValue);
     expect(sent.sent("intake", "Admission")).toStrictEqual({ due: "0001-01-01T00:00:00", reason: "Falls" });
+  });
+
+  test("ReadStopsWhenItsSendStops: under whenBlank leaveUnlessAlone a blank input is left out, and stops the container's read where no other input writes a field of its item", () => {
+    const blankWhen = (): Inputs[string] => field("Visits[0].When", ["visits", 0, "when"], convertedFrom(nothing), literal("0001-01-01T00:00:00"), blankDate("leaveUnlessAlone"));
+    const alone = page();
+    alone.join(plan({ own: blankWhen(), second: field("Resident", ["resident"], convertedFrom(literal("Ada"))) }), new Visit(), "on the page", literalValue);
+    expect(() => alone.sent("intake", "Admission")).toThrow(/^Input 'Visits\[0\]\.When' is left out while it holds its blank, and no other input of container 'intake' writes a field of its item, so the endpoint's list would end before it on both hosts\.$/);
+    const beside = page();
+    beside.join(plan({ own: blankWhen(), second: field("Visits[0].Note", ["visits", 0, "note"], convertedFrom(literal("Bloods"))) }), new Visit(), "on the page", literalValue);
+    expect(beside.sent("intake", "Admission")).toStrictEqual({ visits: [{ note: "Bloods" }] });
+    const dated = page();
+    dated.join(plan({ own: field("Visits[0].When", ["visits", 0, "when"], convertedFrom(literal("2026-12-01T00:00:00")), literal("0001-01-01T00:00:00"), blankDate("leaveUnlessAlone")) }), new Visit(), "on the page", literalValue);
+    expect(dated.sent("intake", "Admission")).toStrictEqual({ visits: [{ when: "2026-12-01T00:00:00" }] });
   });
 
   test("ItemNothingStopsTheRead: a list input whose item reads nothing where the item admits none stops the container's read, and one that admits null holds it", () => {

@@ -9,4 +9,7 @@ public static partial class CarePages
     public const string VisitPlan = Admission + "visit-plan";
     public const string OpenVisitPlan = Admission + "open-visit-plan";
     public const string FollowUp = Admission + "follow-up";
+    public const string VisitDates = Admission + "visit-dates";
+    public const string VisitRound = Admission + "visit-round";
+    public const string VideoCalls = Admission + "video-calls";
 }

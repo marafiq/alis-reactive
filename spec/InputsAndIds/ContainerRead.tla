@@ -5,13 +5,13 @@ CONSTANT Mutant
 
 Mutants == {"none", "DuplicatesSent", "TwoInputsReadTheLast", "BlankReadsNothing", "UnsentReadsNothing",
             "CachedInputs", "PageWideRead", "UnlistedStopsTheSend", "UnlistedReadsItsText", "UnnamedStartSentAsHeld",
-            "JsonSentAsHeld", "ItemNothingStopsTheSendAlone"}
+            "JsonSentAsHeld", "ItemNothingStopsTheSendAlone", "BlankAloneStopsTheSendAlone"}
 
 ASSUME Mutant \in Mutants
 
 Inputs == {"own", "slot", "other"}
 
-Texts == {"n1", "n2", "blank", "unlisted", "itemNothing"}
+Texts == {"n1", "n2", "blank", "unlisted", "itemNothing", "blankAlone"}
 
 Hosts == {"form", "json"}
 
@@ -38,7 +38,7 @@ Body == SelectSeq(DomOrder, LAMBDA i : OnPage(i))
 
 Unlisted(i) == text[i] = "unlisted" \/ (text[i] = "blank" /\ ~startNamed)
 
-SendStops == ~containerOnPage \/ Len(Body) >= 2 \/ (\E i \in Range(Body) : text[i] = "itemNothing")
+SendStops == ~containerOnPage \/ Len(Body) >= 2 \/ (\E i \in Range(Body) : text[i] \in {"itemNothing", "blankAlone"})
              \/ (Mutant = "UnlistedStopsTheSend" /\ \E i \in Range(Body) : Unlisted(i))
 
 BodyLeaves == IF Mutant = "DuplicatesSent" THEN containerOnPage ELSE ~SendStops
@@ -71,11 +71,14 @@ TwoFound == Cardinality(Found) >= 2
 
 ItemNothingFound == Mutant # "ItemNothingStopsTheSendAlone" /\ \E i \in Found : text[i] = "itemNothing"
 
+BlankAloneFound == Mutant # "BlankAloneStopsTheSendAlone" /\ \E i \in Found : text[i] = "blankAlone"
+
 TakesTheLast == TwoFound /\ Mutant = "TwoInputsReadTheLast"
 
 ReadValue ==
     CASE ~containerOnPage -> "stop"
       [] ItemNothingFound -> "stop"
+      [] BlankAloneFound -> "stop"
       [] Found = {} -> IF Mutant = "UnsentReadsNothing" THEN "nothing" ELSE "start"
       [] TakesTheLast -> ValueRead("slot")
       [] TwoFound -> "stop"
@@ -167,5 +170,7 @@ ReachUnnamedStartLeftOut == ~(read = "start" /\ BodyLeaves /\ Len(Body) = 1 /\ t
 ReachHeldRefusedSentByRows == ~(heldRefused /\ BodyLeaves /\ Len(Body) = 1 /\ text[Body[1]] \in {"n1", "n2"})
 
 ReachItemNothingStopsTheRead == ~(read = "stop" /\ containerOnPage /\ Len(Body) = 1 /\ text[Body[1]] = "itemNothing")
+
+ReachBlankAloneStopsTheRead == ~(read = "stop" /\ containerOnPage /\ Len(Body) = 1 /\ text[Body[1]] = "blankAlone")
 
 ====

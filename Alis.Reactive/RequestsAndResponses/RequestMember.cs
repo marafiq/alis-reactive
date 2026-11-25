@@ -41,6 +41,18 @@ internal sealed class RequestMember
         return new RequestMember(member, name, steps, [.. steps.Select(step => StepOf(member, step, app))]);
     }
 
+    internal IEnumerable<string> ItemsPastAPosition()
+    {
+        var written = "";
+        for (var at = 0; at < _steps.Count; at++)
+        {
+            var step = _steps[at];
+            var text = step.IsPosition ? "[" + step.Text + "]" : step.Text;
+            written += step.IsPosition || at == 0 ? text : "." + text;
+            if (Path[at] is IndexStep) yield return written;
+        }
+    }
+
     internal static bool Holds(string holder, string member)
         => member.Equals(holder, StringComparison.OrdinalIgnoreCase) || member.StartsWith(holder + ".", StringComparison.OrdinalIgnoreCase) ||
             member.StartsWith(holder + "[", StringComparison.OrdinalIgnoreCase);

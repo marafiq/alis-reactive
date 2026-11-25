@@ -17,7 +17,8 @@ renders and where the page composes its plans. Module 7 of `spec/CLAUDE.md`.
   and its read stops (X13.2, X13.6, D13.4), and so does a read of a container the page lacks (X13.10, D9.15); a member
   no input inside it binds reads its start (X13.7), a slot's input counts from its load to its unload (X13.8), an
   input outside the container is never read (X13.9), an enum text no row lists reads the start (X13.11), and a list
-  input whose item reads nothing where the item admits none stops the read with its send (X9.40).
+  input whose item reads nothing where the item admits none stops the read with its send (X9.40), and so does an input
+  under a list index left out while blank where no other field of its item is sent (X9.43 to X9.45).
 - Q14: one binding name and one id per member in every view that renders it (D14.3), a partial for a member by one
   typed door (D14.4), and the closed refusals within one plan and across plans (D14.6).
 - Q16: a failure shows at the message element of the input sent under its binding name, and in the summary place

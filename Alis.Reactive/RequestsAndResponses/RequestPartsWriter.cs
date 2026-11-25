@@ -32,6 +32,7 @@ internal sealed class RequestPartsWriter
     private readonly List<(IReadOnlyList<JsonStep> Path, JsonLeaf Leaf)> _json = [];
     private readonly HashSet<string> _jsonMembers = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<Expression> _fields = [];
+    private readonly List<(Expression Field, RequestMember Member, bool Guarded, bool LeftWhenItReadsNothing)> _positioned = [];
     private Body _body = Body.None;
     private Expression _whole = Nothing;
     private Expression _container = NoContainer;
@@ -219,6 +220,8 @@ internal sealed class RequestPartsWriter
                 throw new InvalidOperationException($"The URL '{_url.Url}' has the placeholder {part.Member}, and the request has no member named {part.Member}; add the member, or take the placeholder out of the URL.");
         }
 
+        RefuseAnItemLeftWithNoField(_query, "query");
+        RefuseAnItemLeftWithNoField(_fields, "form data");
         foreach (var capture in _captures) _writer.Write(capture);
         _closed = true;
     }
@@ -316,7 +319,7 @@ internal sealed class RequestPartsWriter
         if (SentByAnInput(member)) return Skipped(stage);
         Open(stage);
         var (held, form) = RequestValues.LiteralHeld(value, _writer, member.Lambda.ToString());
-        Add(member, (RequestValues.Held(held), form), path, held);
+        Add(member, (RequestValues.Held(held), form), path, held, value is null);
         if (path) _pathJson.Add(() => (BodySteps(member), JsonBodyValues.Literal(value, _writer, member.Lambda)));
         return _stage;
     }
@@ -326,7 +329,7 @@ internal sealed class RequestPartsWriter
         if (SentByAnInput(member)) return Skipped(stage);
         Open(stage);
         var sent = RequestValues.Source(value, _writer, member.Lambda.ToString(), path ? _captures.Add : Capture);
-        Add(member, (sent.Value, sent.Form), path, Sources.Of(value));
+        Add(member, (sent.Value, sent.Form), path, Sources.Of(value), true);
         if (path) _pathJson.Add(() => (BodySteps(member), JsonBodyValues.Captured<TValue>(sent.Captured, Sources.FormOf(value), _writer, member)));
         return _stage;
     }
@@ -336,7 +339,7 @@ internal sealed class RequestPartsWriter
         if (SentByAnInput(member)) return Skipped(stage);
         Open(stage);
         if (_body == Body.Json) AddJson(member, JsonBodyValues.Literal(value, _writer, member.Lambda));
-        else AddField(member, RequestValues.Literal(value, _writer, member.Lambda.ToString()));
+        else AddField(member, RequestValues.Literal(value, _writer, member.Lambda.ToString()), value is null);
         return _stage;
     }
 
@@ -351,7 +354,7 @@ internal sealed class RequestPartsWriter
         }
 
         var sent = RequestValues.Source(value, _writer, member.Lambda.ToString(), Capture);
-        AddField(member, (sent.Value, sent.Form));
+        AddField(member, (sent.Value, sent.Form), true);
         return _stage;
     }
 
@@ -463,7 +466,7 @@ internal sealed class RequestPartsWriter
         return _stage;
     }
 
-    private void Add(RequestMember named, (Expression Value, WireForm Form) sent, bool path, Expression read)
+    private void Add(RequestMember named, (Expression Value, WireForm Form) sent, bool path, Expression read, bool canReadNothing)
     {
         Named(named);
         var member = named.Lambda;
@@ -497,6 +500,7 @@ internal sealed class RequestPartsWriter
 
         var queried = FieldRecord(named, sent, When);
         _query.Add(queried);
+        Positioned(queried, named, canReadNothing);
         Checks(queried, named, Guarded(sent.Value));
         _sent.Add(sentMember);
         _setMembers[named.Name] = () =>
@@ -506,15 +510,42 @@ internal sealed class RequestPartsWriter
         };
     }
 
-    private void AddField(RequestMember named, (Expression Value, WireForm Form) sent)
+    private void AddField(RequestMember named, (Expression Value, WireForm Form) sent, bool canReadNothing)
     {
         Named(named);
         var field = FieldRecord(named, sent, When);
         var placed = _body == Body.Multipart ? FieldPart(field) : field;
         _fields.Add(placed);
+        Positioned(placed, named, canReadNothing);
         Checks(placed, named, Guarded(sent.Value));
         _setMembers[named.Name] = () => _fields.Remove(placed);
     }
+
+    private void Positioned(Expression field, RequestMember member, bool canReadNothing)
+        => _positioned.Add((field, member, _guards.Count > 0, canReadNothing && SentForms.Absence(member.Lambda.ReturnType) == WhenNothing.Leave));
+
+    private void RefuseAnItemLeftWithNoField(List<Expression> sent, string place)
+    {
+        var members = _positioned.Where(member => sent.Contains(member.Field)).ToArray();
+        var alwaysSent = members.Where(member => !member.Guarded && !member.LeftWhenItReadsNothing).Select(member => member.Member.Name).ToArray();
+        foreach (var member in members.Where(member => member.Guarded || member.LeftWhenItReadsNothing))
+        {
+            foreach (var item in member.Member.ItemsPastAPosition())
+            {
+                var itemSendsAField = alwaysSent.Any(name => RequestMember.Holds(item, name));
+                if (!itemSendsAField) throw AnItemLeftWithNoField(member.Member.Name, place, LeftOutBy(member.Guarded, member.LeftWhenItReadsNothing), item);
+            }
+        }
+    }
+
+    private static string LeftOutBy(bool guarded, bool leftWhenItReadsNothing)
+    {
+        if (!guarded) return "from a value it leaves out when it reads nothing";
+        return leftWhenItReadsNothing ? "under a condition, from a value it leaves out when it reads nothing" : "under a condition, which leaves it out where the condition fails";
+    }
+
+    private static InvalidOperationException AnItemLeftWithNoField(string member, string place, string leftOutBy, string item)
+        => new($"The request sends '{member}' in its {place} past a list position {leftOutBy}, and no member of '{item}' is always sent, so the item would send no field and the endpoint's list would end before it on both hosts; send beside it a member of the item that is always sent, a literal, a text or a nullable member outside every condition, or send the list in a JSON body.");
 
     private void AddJson(RequestMember member, JsonLeaf leaf)
     {

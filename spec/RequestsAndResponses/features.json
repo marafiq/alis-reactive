@@ -481,6 +481,22 @@
         {
           "id": "X9.42",
           "rung": "behavior"
+        },
+        {
+          "id": "X9.43",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.44",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.45",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.46",
+          "rung": "refusal"
         }
       ],
       "promises": [
@@ -812,6 +828,38 @@
           "outcome": "The POST's body is {\"due\":\"2026-12-01\",\"reason\":\"Falls\"}, and followed-up reads Falls: due 2026-12-01 00:00.",
           "opposite": "With Due cleared, the body is {\"reason\":\"Falls\"} and followed-up reads Falls: due 0001-01-01 00:00.",
           "defect": "The date is sent as JSON writes a Date, \"2026-12-01T08:00:00.000Z\" in the browser's Los Angeles zone, which binds 08:00; under the opposite, the blank's text is sent, \"0001-01-01T00:00:00\"."
+        },
+        {
+          "for": "X9.43",
+          "page": "A visit dates page whose container holds the Resident text box and the First visit and Second visit text boxes over Dates[0] and Dates[1] of its model, a list of DateTime starting at midnight on 30 November and 1 December 2026, which the boxes show as 2026-11-30T00:00:00 and 2026-12-01T00:00:00; Save visits sets the status Saving the visits, writes the container's read of Resident into visits-resident, then posts the container as form data to an endpoint that binds it [FromForm] and answers \"{resident}: visits on {each date as yyyy-MM-dd, joined by a comma and a space}\", which the page writes into saved-visits.",
+          "gesture": "Type Ada in Resident, clear Second visit and click Save visits.",
+          "outcome": "save-status reads Saving the visits, visits-resident stays empty, saved-visits stays empty, and the console holds one error.",
+          "opposite": "With Second visit left at 2026-12-01, the POST's body is Dates%5B0%5D=2026-11-30T00%3A00%3A00&Dates%5B1%5D=2026-12-01T00%3A00%3A00&Resident=Ada, visits-resident reads Ada and saved-visits reads Ada: visits on 2026-11-30, 2026-12-01.",
+          "defect": "The blank date is left out as a date outside a list is, so the list ends at its position and saved-visits reads Ada: visits on 2026-11-30; or the request stops while the container's read goes on, so visits-resident reads Ada; under the opposite, every date input under a list index stops, so nothing is sent."
+        },
+        {
+          "for": "X9.44",
+          "page": "A visit round page whose container holds the Resident text box, the First visit and First visit note text boxes over Visits[0].When and Visits[0].Note, and the Follow-up visit text box over Visits[1].When, its model's Visits a list of RoundVisit, each a When, a DateTime, and a Note, a text, starting at a first visit at midnight on 30 November 2026 noted Bloods and a follow-up at midnight on 1 December 2026; a new RoundVisit's When is DateTime's own start; Save round sets the status Saving the round, then posts the container as form data to an endpoint that binds it [FromForm] and answers \"{resident}: {each visit's When as yyyy-MM-dd, joined by a comma and a space}\", which the page writes into saved-round.",
+          "gesture": "Type Ada in Resident, clear Follow-up visit and click Save round.",
+          "outcome": "save-status reads Saving the round, saved-round stays empty, and the console holds one error.",
+          "opposite": "Clearing First visit in its place, the POST's body is Visits%5B0%5D.Note=Bloods&Visits%5B1%5D.When=2026-12-01T00%3A00%3A00&Resident=Ada, and saved-round reads Ada: 0001-01-01, 2026-12-01.",
+          "defect": "The blank follow-up is left out, so its item sends no field, the list ends before it and saved-round reads Ada: 2026-11-30; under the opposite, a blank date under a list index stops whatever else its item sends, so nothing is sent."
+        },
+        {
+          "for": "X9.45",
+          "page": "A video calls page whose container holds the Resident text box, the First call and First call note text boxes over Calls[0].Link and Calls[0].Note, and the Follow-up call text box over Calls[1].Link, its model's Calls a list of VideoCall, each a Link, a Uri that starts null, and a Note, a text, starting at a first call noted Bloods and a follow-up call; Save calls sets the status Saving the calls, then posts the container as form data to an endpoint that binds it [FromForm] and answers \"{resident}: {each call's Link, or no link where it holds none, joined by a comma and a space}\", which the page writes into saved-calls.",
+          "gesture": "Type Ada in Resident and https://meet.example.org/ada in First call, leave Follow-up call empty and click Save calls.",
+          "outcome": "save-status reads Saving the calls, saved-calls stays empty, and the console holds one error.",
+          "opposite": "Typing Ada in Resident and https://meet.example.org/review in Follow-up call and leaving First call empty, the POST's body is Calls%5B0%5D.Note=Bloods&Calls%5B1%5D.Link=https%3A%2F%2Fmeet.example.org%2Freview&Resident=Ada, and saved-calls reads Ada: no link, https://meet.example.org/review.",
+          "defect": "The empty follow-up reads nothing and is left out by its whenNothing, so its item sends no field, the list ends before it and saved-calls reads Ada: https://meet.example.org/ada; under the opposite, an input under a list index that reads nothing stops whatever else its item sends, so nothing is sent."
+        },
+        {
+          "for": "X9.46",
+          "page": "A follow-up booking page whose container holds the Follow-up text box over its model's FollowUp, a DateTime starting at midnight on 1 December 2026, and whose Book follow-up gets the bookings endpoint with a query that sets Visits[0].Note from the literal Bloods and Visits[1].When from the container's read of FollowUp, its request a FollowUpBookingQuery whose Visits is a list of BookedVisit, each a When, a DateTime, and a Note, a text.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"The request sends 'Visits[1].When' in its query past a list position from a value it leaves out when it reads nothing, and no member of 'Visits[1]' is always sent, so the item would send no field and the endpoint's list would end before it on both hosts; send beside it a member of the item that is always sent, a literal, a text or a nullable member outside every condition, or send the list in a JSON body.\"",
+          "opposite": "The page whose query also sets Visits[1].Note from the literal Review renders, and Book follow-up gets the bookings endpoint at ?Visits%5B0%5D.Note=Bloods&Visits%5B1%5D.When=2026-12-01&Visits%5B1%5D.Note=Review, which answers 2 visits, the follow-up on 2026-12-01 for Review, and the page writes it into booked.",
+          "defect": "The page renders, and where the read reads nothing the query leaves Visits[1] with no field, so the endpoint binds one visit."
         }
       ],
       "verdicts": [

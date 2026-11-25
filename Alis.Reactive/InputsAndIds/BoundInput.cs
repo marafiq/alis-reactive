@@ -111,12 +111,22 @@ internal sealed partial class BoundInput
         var held = HeldForm.Live(_content.Json, _content.RendersUnder);
         var form = WireRecords.Of(SentForms.SourceForm(_member, held, _content, Name));
         var whenNothing = SentForms.Absence(_member);
-        var whenBlank = Unwritable(_shape, _blank.Value) ? WhenBlank.Leave : WhenBlank.Send;
+        var whenBlank = WhenBlankOf(whenNothing);
         if (!InputShapes.HoldsAnEnum(_shape))
             return new ContractRecord<FieldInputSent>().Set(sent => sent.Kind, "field").Set(sent => sent.Form, form).Set(sent => sent.WhenNothing, whenNothing).Set(sent => sent.WhenBlank, whenBlank).Written;
         return new ContractRecord<EnumInputSent>().Set(sent => sent.Kind, "enum").Set(sent => sent.Form, form)
             .Set(sent => sent.Json, WireRecords.Of(SentForms.JsonFormOf(_member, held, _content, Name)))
             .Set(sent => sent.WhenNothing, whenNothing).Set(sent => sent.WhenBlank, whenBlank).Written;
+    }
+
+    private WhenBlank WhenBlankOf(WhenNothing whenNothing)
+    {
+        var unwritable = Unwritable(_shape, _blank.Value);
+        var leftOutWhileBlank = unwritable || (_blank.Value.ValueKind == JsonValueKind.Null && whenNothing == WhenNothing.Leave);
+        if (!leftOutWhileBlank) return WhenBlank.Send;
+        var underAListIndex = _path.Any(step => step is IndexStep);
+        if (underAListIndex) return WhenBlank.LeaveUnlessAlone;
+        return unwritable ? WhenBlank.Leave : WhenBlank.Send;
     }
 
     private static bool Unwritable(Shape shape, JsonElement blank) => blank.ValueKind != JsonValueKind.Null && shape switch

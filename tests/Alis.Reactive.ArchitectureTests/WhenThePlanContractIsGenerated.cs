@@ -343,7 +343,7 @@ public class WhenThePlanContractIsGenerated
             TokenPlace={"oneOf":[{"$ref":"#/$defs/HeaderTokenPlace"},{"$ref":"#/$defs/FieldTokenPlace"}]}
             UrlEncodedSentBody={"type":"object","properties":{"kind":{"const":"urlEncoded"},"fields":{"type":"array","items":{"$ref":"#/$defs/SentField"}},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["kind","fields","inputs"],"additionalProperties":false}
             ValueRead={"oneOf":[{"$ref":"#/$defs/NothingValueRead"},{"$ref":"#/$defs/HeldValueRead"}]}
-            WhenBlank={"enum":["send","leave"]}
+            WhenBlank={"enum":["send","leave","leaveUnlessAlone"]}
             WhenNothing={"enum":["leave","empty"]}
             WireForm={"oneOf":[{"$ref":"#/$defs/TextScalarWireForm"},{"$ref":"#/$defs/NumberScalarWireForm"},{"$ref":"#/$defs/BooleanScalarWireForm"},{"$ref":"#/$defs/DateScalarWireForm"},{"$ref":"#/$defs/InstantScalarWireForm"},{"$ref":"#/$defs/WrittenScalarWireForm"},{"$ref":"#/$defs/EnumScalarWireForm"},{"$ref":"#/$defs/FlagsScalarWireForm"},{"$ref":"#/$defs/ListWireForm"}]}
             WrittenScalarWireForm={"type":"object","properties":{"kind":{"const":"written"}},"required":["kind"],"additionalProperties":false}

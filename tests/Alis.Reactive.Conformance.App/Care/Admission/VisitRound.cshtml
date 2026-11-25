@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visit round";
+    var plan = Html.ReactivePlan<VisitRound>();
+}
+<h1>Visit round</h1>
+@using (var round = Html.BeginRequestContainer(plan, "visit-round"))
+{
+    @(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Visits[0].When, options => options.Label("First visit")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Visits[0].Note, options => options.Label("First visit note")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Visits[1].When, options => options.Label("Follow-up visit")).NativeTextBox())
+    @(Html.NativeButton("save-round", "Save round").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        pipeline.Element("save-status").Text.Set("Saving the round");
+        pipeline.Post<VisitRound>(VisitRoundEndpoints.Rounds, request => request.UrlEncoded(round.Container, body => { }))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved-round").Text.Set(saved.Body));
+    }))
+}
+<p><span id="save-status"></span></p>
+<p>Saved: <span id="saved-round"></span></p>
+@Html.RenderPlan(plan)

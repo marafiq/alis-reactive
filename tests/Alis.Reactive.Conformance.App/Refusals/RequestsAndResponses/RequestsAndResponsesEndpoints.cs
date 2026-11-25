@@ -9,4 +9,6 @@ public static class RequestsAndResponsesEndpoints
     public const string CodedStaffing = Root + "rounds/coded-staffing";
 
     public const string Staffing = Root + "rounds/staffing";
+
+    public const string FollowUpBookings = Root + "follow-up-booking/bookings";
 }

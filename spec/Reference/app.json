@@ -15114,6 +15114,69 @@
       "harness": [
         "seed"
       ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.43",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.44",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.45",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.46",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
     }
   ],
   "cells": [

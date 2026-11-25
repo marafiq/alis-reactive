@@ -2428,7 +2428,8 @@
     "WhenBlank": {
       "enum": [
         "send",
-        "leave"
+        "leave",
+        "leaveUnlessAlone"
       ]
     },
     "EnumInputSent": {

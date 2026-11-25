@@ -123,8 +123,9 @@ sends, built when it is called: each framework input of the page's input table w
 element, under its `InputBinding.path`, its value its `InputBinding.converted` evaluated in the plan that contributed it,
 or its `InputBinding.blank` where that holds null or reads nothing.
 The page lacking the container's element, no live plan rendering that container for that model (D14.8), two
-inputs inside it under one scalar binding name (D13.4), and a list input whose item reads nothing where its `sent`
-admits none (D9.10) each stop the pipeline. A container read is a `data` read over
+inputs inside it under one scalar binding name (D13.4), a list input whose item reads nothing where its `sent`
+admits none, and an input its `whenBlank` `leaveUnlessAlone` leaves out where no other input writes a field of its item
+(D9.10) each stop the pipeline. A container read is a `data` read over
 it (N13.1, D13.3), and `Live.body`'s `value` is that call.
 
 `alis.document`'s `query`, called with a member's binding name (D2.5), returns the first value of the page's query
@@ -497,11 +498,14 @@ each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `H
   its `entry`, the inputs table's `InputEntry`, its `id` and `binding`, and its `sent`, the `InputSent` its binding's
   `sent` evaluates to where its plan joined the page.
 - `InputSent`, the form a request sends an input's value in (D9.10, D9.13): `field` with its `form`, a wire form with no
-  `enum` or `flags` in it, `whenNothing` (`leave` or `empty`) and `whenBlank` (`send` or `leave`); `enum` with its
+  `enum` or `flags` in it, `whenNothing` (`leave` or `empty`) and `whenBlank` (`send`, `leave` or `leaveUnlessAlone`); `enum` with its
   `form`, `enum`, `flags` or a `list` of one, `json`, its `JsonForm`, `whenNothing` and `whenBlank`; or `files`. The
   browser sends a captured input's value by it: `files` as the files it holds; a value that reads nothing by
   `whenNothing`; under `whenBlank` `leave`, a value that is the binding's `blank` is left out, since the form cannot
-  write that start, an enum's that no value names or a date's or an instant's, which the `lit` holds as text; else by
+  write that start, an enum's that no value names or a date's or an instant's, which the `lit` holds as text; under
+  `leaveUnlessAlone`, which C# writes for an input whose path holds a list index where it would write `leave` and where a
+  null `blank` meets `whenNothing` `leave`, that value is left out the same way, and the container's capture stops where
+  no other input writes a field of its item (D9.10); else by
   `form` in a query or form data, an item that reads nothing by its `itemWhenNothing`, and in a JSON body a `field` as
   held, a date or an instant as its wire text, and an `enum` by `json`.
 - `GuardedMember`: `path`, the wire names to a JSON member a `When` guards or to a holder only such members fill,
