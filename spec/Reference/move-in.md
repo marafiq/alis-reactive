@@ -820,7 +820,7 @@ Host restart and collection cases use the existing harness’s `Restart` and `Co
 
 These tables map specified uses. They do not report executed proof.
 
-**The 142 door-map names**
+**The 141 door-map names**
 
 | Name | Feature.interaction |
 |---|---|
@@ -863,7 +863,6 @@ These tables map specified uses. They do not report executed proof.
 | Finally | MI.16.3; MI.31.1–3 |
 | Find | MI.14.2 |
 | Fixed | MI.24.4; MI.27.5 |
-| Form | MI.30.2 |
 | FormField | MI.31.2 |
 | Get | MI.1.1–2; MI.23.1 |
 | Gt | MI.20.1, accepting a newer revision |

@@ -34,6 +34,9 @@ has read it at the source.
   "its not check and rubber stamp it"). A task whose check costs what the work costs is the lead's own. A consult's
   answer is carried line by line: before the unit built from it lands, each line it decided is found in the change, or
   named in the unit's message with its reason (the lead's mistake, 2026-11-24).
+- A worker's change is read and landed only once its turn has ended: no tool call in its output since its reply, and a
+  message that stops it answered with the files it changed. Its worktree is the land's source, so an edit it makes while
+  the land runs misses the commit (the lead's mistake, 2026-11-25: two edits of ContainerOnly's spec.py landed after it).
 - Codex consults read-only or takes one scoped build, its input closed, on its top model at max effort: one question or
   one piece, its lines and files named, a reply of bounded length, the repository read at the base and nothing written
   outside its own folder, with full permissions only when its sandbox blocks the brief's commands. A build and a
