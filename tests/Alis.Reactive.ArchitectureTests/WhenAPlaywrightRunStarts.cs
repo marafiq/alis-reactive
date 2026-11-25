@@ -387,6 +387,18 @@ public class WhenAPlaywrightRunStarts
     }
 
     [RefusedCase]
+    public void a_test_constant_the_spec_does_not_hold_is_refused_with_the_constant_its_name_ends()
+    {
+        using var written = new WrittenFolder();
+
+        var withoutItsFeature = Select(written, TheSpec, TheAssembly, "--test", "X1_2_0");
+
+        Assert.That(withoutItsFeature.Errors.Trim(), Is.EqualTo("[playwright:select] 'X1_2_0' is no promise constant of the spec; a constant names its feature first: M1_F1.X1_2_0."));
+        Assert.That(withoutItsFeature.ExitCode, Is.EqualTo(2));
+        Assert.That(Select(written, TheSpec, TheAssembly, "--test", "M9_F1.X9_1_0").Errors.Trim(), Is.EqualTo("[playwright:select] 'M9_F1.X9_1_0' is no promise constant of the spec."));
+    }
+
+    [RefusedCase]
     public void a_selection_no_host_served_here_runs_is_refused()
     {
         using var written = new WrittenFolder();

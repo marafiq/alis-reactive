@@ -10,9 +10,12 @@ internal sealed class TwinWorld
 
     internal TwinHostOrders HostOrders { get; } = new();
 
+    internal DateTime? DateOfBirth { get; private set; }
+
     internal void Take(Seed seed, string noticeFolder)
     {
         if (seed.ResolverLeftUnset is true) ResolverLeftUnset = true;
+        if (seed.DateOfBirth is { } born) DateOfBirth = born;
         if (seed.Notice is not { } notice) return;
 
         Directory.CreateDirectory(noticeFolder);

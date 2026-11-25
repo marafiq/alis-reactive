@@ -37,6 +37,12 @@ function refuse(message) {
   process.exit(2);
 }
 
+function refuseAConstantOfNoPromise(constant, landed) {
+  const meant = [...new Set(landed.map(row => row.constant).filter(whole => whole.endsWith(`.${constant}`)))];
+  if (meant.length === 0) refuse(`'${constant}' is no promise constant of the spec.`);
+  refuse(`'${constant}' is no promise constant of the spec; a constant names its feature first: ${meant.join(", ")}.`);
+}
+
 function parse(argv) {
   const options = { selectors: [] };
   for (let index = 0; index < argv.length; index += 1) {
@@ -110,8 +116,11 @@ function wanted(selector, landed, written) {
       return new Set(landed.filter(row => row.promise.startsWith(`${selector.value} `)).map(row => row.promise));
     case "screen":
       return new Set(landed.filter(row => row.screen === selector.value).map(row => row.promise));
-    case "test":
-      return new Set(landed.filter(row => row.constant === selector.value).map(row => row.promise));
+    case "test": {
+      const named = landed.filter(row => row.constant === selector.value);
+      if (named.length === 0) refuseAConstantOfNoPromise(selector.value, landed);
+      return new Set(named.map(row => row.promise));
+    }
     case "pool":
       if (!pools.includes(selector.value)) refuse(`'${selector.value}' is no pool; the pools are ${pools.join(", ")}.`);
       return new Set(written.keys());

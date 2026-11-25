@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Alis.Reactive.Conformance.World;
@@ -90,6 +91,8 @@ public sealed class Seed
 
     public MoveInChange? MoveIn { get; set; }
 
+    public DateTime? DateOfBirth { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed Carer(string name) => new Seed().AndCarer(name);
@@ -171,6 +174,8 @@ public sealed class Seed
     public static Seed TheNotice(string text) => new() { Notice = text };
 
     public static Seed TheResolverLeftUnset() => new() { ResolverLeftUnset = true };
+
+    public static Seed TheResidentBornOn(int year, int month, int day) => new() { DateOfBirth = new DateTime(year, month, day) };
 
     public Seed AndCarer(string name)
     {

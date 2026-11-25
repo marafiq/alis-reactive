@@ -18,7 +18,9 @@ which serves the pages `spec/Reference/app.json` places under the host net48.
   an app that never set one does.
 - A request names its culture and its time zone as the conformance app's does, from the same closed lists and with
   the same 400 pages (`RequestCulturesAndZones.cs`). `World/` keeps each world by the cookie "world" and answers
-  the seed, its end and the host orders `tests/Alis.Reactive.Conformance.App/Components/component-host.ts` waits on.
+  the seed, its end and the host orders `tests/Alis.Reactive.Conformance.App/Components/component-host.ts` waits on,
+  and holds the date of birth a seed gives the record screen's resident card (`World/TwinWorld.cs`), since a care
+  screen's endpoint reads its world's seeded domain and answers no constant.
 - An attribute route of MVC 5 starts with no "/", so `AddressAttribute.cs` takes a page's address as the world
   contract names it and trims its leading "/".
 - An exception a page throws answers with its type and message as the page's heading (`ErrorPage.cs`), the

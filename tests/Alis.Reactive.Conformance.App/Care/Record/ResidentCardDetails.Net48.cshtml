@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentCardDetails
+@{
+    var plan = Html.ReactivePlan<ResidentCardDetails>();
+}
+<h2>Details</h2>
+<button type="button" @Html.Raises(plan, ResidentCardButtons.Load)>Load</button>
+<p>Date of birth: <span id="dob">Not loaded</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentCardButtons.Load, pipeline => pipeline
+        .Get(Model.Resident)
+        .OnSuccess(Content.Json<ResidentDetails>(), (resident, pipeline) => pipeline.Element("dob").Text.Set(resident.Body.Read(details => details.DateOfBirth)))));
+}
+@Html.RenderPlan(plan)
