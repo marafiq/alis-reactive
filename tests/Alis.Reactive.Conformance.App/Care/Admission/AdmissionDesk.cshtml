@@ -11,7 +11,7 @@
 }
 <h1>Admission desk</h1>
 <section aria-label="Admission">
-    @using (var admission = Html.BeginRequestForm(plan, "admission"))
+    @using (var admission = Html.BeginRequestContainer(plan, "admission"))
     {
         <fieldset>
             <legend>Name</legend>
@@ -19,7 +19,7 @@
         </fieldset>
         <button type="button" @Html.Raises(plan, AdmissionDeskButtons.Admit)>Admit</button>
         Html.On(plan, trigger => trigger.CustomEvent(AdmissionDeskButtons.Admit, pipeline => pipeline
-            .Post<AdmissionRequest>(AdmissionDeskEndpoints.Admissions, request => request.Form(admission.Form))
+            .Post<AdmissionRequest>(AdmissionDeskEndpoints.Admissions, request => request.Inputs(admission.Container))
             .OnSuccess(Content.Text, (admitted, pipeline) => pipeline.Element("admission-status").Text.Set(admitted.Body))));
     }
     <p>Admission: <span id="admission-status">Not admitted</span></p>

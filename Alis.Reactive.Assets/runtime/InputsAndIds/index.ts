@@ -1,2 +1,2 @@
-export { PageInputs, Submission, type CheckedBody, type CheckedEntry, type LiveCheck } from "./model";
+export { PageInputs, type CheckedBody, type CheckedEntry, type ContainerBody, type HiddenInput, type LiveCheck } from "./model";
 export { pageInputs } from "./page";

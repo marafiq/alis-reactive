@@ -9,7 +9,7 @@
     var plan = Html.ReactivePlan<ShortStay>();
 }
 <h1>Short stay</h1>
-@using (var stay = Html.BeginRequestForm(plan, "short-stay"))
+@using (var stay = Html.BeginRequestContainer(plan, "short-stay"))
 {
     @(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
     if (Model.AsksNights)
@@ -17,7 +17,7 @@
         @(Html.InputField(plan, m => m.Nights, options => options.Label("Nights")).NativeTextBox())
     }
     <button type="button" @Html.Raises(plan, ShortStays.Quote)>Quote</button>
-    Html.On(plan, trigger => trigger.CustomEvent(ShortStays.Quote, pipeline => pipeline.Element("quote").Text.Set(stay.Form.Read(m => m.Nights))));
+    Html.On(plan, trigger => trigger.CustomEvent(ShortStays.Quote, pipeline => pipeline.Element("quote").Text.Set(stay.Container.Read(m => m.Nights))));
 }
 <p>Nights quoted: <span id="quote">-</span></p>
 @Html.RenderPlan(plan)

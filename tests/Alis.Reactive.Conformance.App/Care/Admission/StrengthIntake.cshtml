@@ -10,11 +10,11 @@
     var plan = Html.ReactivePlan<StrengthIntake>();
 }
 <h1>Intake strength</h1>
-@using (var intake = Html.BeginRequestForm(plan, "strength-intake"))
+@using (var intake = Html.BeginRequestContainer(plan, "strength-intake"))
 {
     @(Html.InputField(plan, m => m.Strength, options => options.Label("Strength")).NativeTextBox())
     @(Html.NativeButton("save-strength", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<StrengthIntake>(StrengthIntakeEndpoints.IntakesInGerman, request => request.Form(intake.Form))
+        .Post<StrengthIntake>(StrengthIntakeEndpoints.IntakesInGerman, request => request.Inputs(intake.Container))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved-strength").Html.Set(saved.Body))))
 }
 <section aria-label="Saved strength">

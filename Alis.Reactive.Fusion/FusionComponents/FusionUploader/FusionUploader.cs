@@ -5,11 +5,11 @@ using Alis.Reactive.RequestsAndResponses;
 namespace Alis.Reactive.Fusion.FusionComponents;
 
 /// <summary>
-/// A file uploader: EJ2's Uploader, which lists the files a person chose, sent with the form and not uploaded on
+/// A file uploader: EJ2's Uploader, which lists the files a person chose, sent with its request container and not uploaded on
 /// its own.
 /// </summary>
 /// <remarks>
-/// An uploader bound to a file member is an input: a form sends its <see cref="Files"/> and a check reads them.
+/// An uploader bound to a file member is an input: a request container sends its <see cref="Files"/> and a check reads them.
 /// <see cref="FilesChanged"/> is raised once the list holds a change, so a handler of it reads the files listed.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-inputs", "Uploader")]

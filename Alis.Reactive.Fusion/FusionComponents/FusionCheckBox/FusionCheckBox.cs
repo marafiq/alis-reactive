@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A check box: EJ2's CheckBox, which holds whether a member of <see cref="bool"/> is true.
 /// </summary>
 /// <remarks>
-/// A check box bound to a member is an input: a form sends its <see cref="Checked"/> and a check reads it. EJ2 raises
+/// A check box bound to a member is an input: a request container sends its <see cref="Checked"/> and a check reads it. EJ2 raises
 /// <see cref="Change"/> when a person checks or clears it.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-buttons", "CheckBox")]

@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model IntakeAdmission
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admit";
+    var plan = Html.ReactivePlan<IntakeAdmission>();
+}
+<h1>Admit</h1>
+@(Html.InputField(plan, m => m.Ward, options => options.Label("Ward")).NativeDropDown(o => o.Items(IntakeAdmissions.Wards).Placeholder("Choose a ward")))
+@using (var intake = Html.BeginRequestContainer(plan, "intake"))
+{
+    @Html.AntiForgeryToken()
+    @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    <label>Code <input name="Code"></label>
+    <button type="button" @Html.Raises(plan, IntakeAdmissions.Admit)>Admit</button>
+    Html.On(plan, trigger => trigger.CustomEvent(IntakeAdmissions.Admit, pipeline => pipeline
+        .Post<IntakeAdmission>(IntakeAdmissionEndpoints.Admissions, request => request.UrlEncoded(intake.Container, body => { }))
+        .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("received").Text.Set(received.Body))));
+}
+<p>Received by the desk: <span id="received">-</span></p>
+@Html.RenderPlan(plan)

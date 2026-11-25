@@ -5,7 +5,7 @@
 @{
     var plan = Html.ReactivePlan<NoteDraft>();
 }
-@using (Html.BeginRequestForm(plan, "note-draft"))
+@using (Html.BeginRequestContainer(plan, "note-draft"))
 {
     @(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
 }

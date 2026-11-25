@@ -1732,7 +1732,7 @@ Terms used throughout:
   state machine whose state, the busy targets it holds from its guards to the end of its defaults' `Finally`, does not
   nest in `let`, `try` and `if` (`spec/NOTES.md`, 2026-11-08).
 - D9.2 The builder is staged: each part is written at most once, a GET has no body format, and every door that
-  sends inputs names what it sends (D9.15): no door sends the inputs of a form the request is taken to check.
+  sends inputs names what it sends (D9.15): no door sends the inputs of a container the request is taken to check.
 - D9.3 The method is GET, HEAD, OPTIONS, POST, PUT or DELETE. GET, HEAD and OPTIONS send no body; POST, PUT and
   DELETE send one. PATCH is not a method of 1.0 (spec/CLAUDE.md, the owner, 2026-11-07). An action answers HEAD only
   under `[HttpHead]` and OPTIONS only under `[HttpOptions]`, on both hosts: net10 answers HEAD to an `[HttpGet]`
@@ -1915,30 +1915,34 @@ Terms used throughout:
     a JSON body the split value is written in the form its endpoint binds, with the JSON body's door.
 - D9.14 A hidden input is an input: it binds by its binding name and shape, and a request sends it when the
   container it sends holds it (D9.15).
-- D9.15 What a request sends is closed, and holds on a page with many forms or none (the owner, 2026-11-08):
+- D9.15 What a request sends is closed, and holds on a page with many containers or none (the owner, 2026-11-08 and
+  2026-11-25):
   - `Set(r => r.Member, value)`: a member from any source (Q7), a response's body included.
-  - `Form(form)`: a native `<form>`'s submission set as the browser builds it, `new FormData(form)`: every
-    form-associated control the form owns, one outside its element through the `form` attribute included,
-    hand-written inputs and file inputs among them, each under its `name`. It is sent only as form data
-    (URL-encoded or multipart) or as a GET's query, since a submission set is form data. In form-field mode the
-    framework's antiforgery field replaces any the form holds (`FormData.set`, D9.22), so the endpoint reads one.
-    Each framework input the form owns replaces its name's entries with its wire form (`FormData.set`), so the body
-    the check reads is the body sent; a hand-written control is sent as the browser holds it, and its failures show
-    in the container's summary only (D10.18).
-  - `Inputs(container)`: the framework inputs inside one element of any kind (a form, a fieldset, a table row, a
-    drawer's body), rendered by any plan, nested elements included, each under its binding name, in any body.
-  - `Input(r => r.Member, pipeline.Input(m => m.Member))`: one input of the request's own view, wherever it sits,
-    sent under the request member's binding name. The value type both lambdas share makes a member of another type
-    not compile (X9.3).
-  - A request sends at most one container, through `Form` or `Inputs`, and that container is the request's: its
+  - `Inputs(container)`: the framework inputs inside one request container, the element its block renders (D14.8),
+    rendered by any plan, containers nested inside it included, each under its binding name, in any body and in a GET's
+    query. A control of the view's own markup inside the container, hand-written or rendered by MVC's own helper, is no
+    framework input, and no request sends it but a hidden one: the view declares it an input
+    (`InputField<TModel, TValue>.Render<TComponent>`), or names its value by `Set` and its file by `File`. A hidden
+    input inside the container's element, an `input` of type "hidden" with a name and not disabled, MVC's `HiddenFor`
+    and its antiforgery field among them, is sent under its own name with its value in a URL-encoded or a multipart
+    body, read when the container is captured. A member the request sends under that name, by `Set`, by an input or
+    as its antiforgery field, replaces it, and so does one it leaves out where it reads nothing or holds its blank; a
+    part whose condition failed was never gathered (D10.16) and replaces nothing. A JSON body and a GET's query carry
+    none: a JSON member is named by the endpoint's contract and a hidden text has no declared type, and an antiforgery
+    token never rides in a URL (the lead, within the owner's decision of 2026-11-25). A form the view writes around a
+    container is the browser's to send, and no request reads it.
+  - `Input(r => r.Member, pipeline.Input(m => m.Member))`: one input of the request's own view, wherever it sits, sent
+    under the request member's binding name. The value type both lambdas share makes a member of another type not
+    compile (X9.3).
+  - A request sends at most one container, through `Inputs` or its body door, and that container is the request's: its
     summary is where the request's failures show (D16.13). The types hold it: the full form's body door takes the
-    container as its first argument (`Json(container, body => ..)`, `UrlEncoded(form, body => ..)`), a GET's and the
-    condensed `Form` and `Inputs` return a stage that offers no second, and no body offers either
-    (`SecondContainerOnABody`, `SecondContainerOnGet`, `ContainerInsideABody` in `spec/api/refused.sh`), in the chain; a
-    parts object two statements write is ALIS030's (N18.7). A container is typed by its model, and a request takes
-    only a container of its own model (N18.3).
-  - When an input and a set member send the same binding name, the input's value is sent, as the body the check
-    reads (Q16); two inputs that send one scalar binding name are D13.4's.
+    container as its first argument (`Json(container, body => ..)`, `UrlEncoded(container, body => ..)`,
+    `Multipart(container, body => ..)`), a GET's and the condensed `Inputs` return a stage that offers no second, and no
+    body offers one (`SecondContainerOnABody`, `SecondContainerOnGet`, `ContainerInsideABody` in `spec/api/refused.sh`),
+    in the chain; a parts object two statements write is ALIS030's (N18.7). A container is typed by its model, and a
+    request takes only a container of its own model (N18.3).
+  - When an input and a set member send the same binding name, the input's value is sent, as the body the check reads
+    (Q16); two inputs that send one scalar binding name are D13.4's.
   - A container whose element the page lacks stops the request, and so does an `Input` whose input the page lacks.
   - The run records each input it sent, under the binding name it sent it by (D10.18).
 - D9.16 A file is the shape `file`, sent only in form data or as the whole body. A set member of file shape in a
@@ -2084,19 +2088,17 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `probe:mvc5-query-key-case`
 - `probe:js-query-get-case`
 **Doors.**
-- kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:14-32`), as N10.7's
-  verbs; `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`) as N10.7's `Set`; `Header`,
-  in the request lambda; and `Form(formId)` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:146`), its meaning
-  narrowed to a native form's submission set and its argument the form's typed handle (D9.15, N18.3). `Gather` and
-  `Gather<TRequest>` go to N10.7's request lambda, and `AsJson` and `AsFormData` to its body doors. The inputs of an
-  element of another kind that it sent are `Inputs(container)`'s.
-- refused: `Form()`, the inputs of the form the request checks, since a request names what it sends; its feature is
-  carried by `Form(form)` and `Inputs(container)` (D9.15).
+- kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:14-32`), as
+  N10.7's verbs; `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`) as N10.7's `Set`;
+  and `Header`, in the request lambda. `Gather` and `Gather<TRequest>` go to N10.7's request lambda, and `AsJson` and
+  `AsFormData` to its body doors.
+- refused: `Form(formId)` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:146`), the inputs of an element a
+  string names, carried by `Inputs(container)` over the container's typed handle (D9.15, N18.3); `Form()`, the inputs of
+  the form the request checks, since a request names what it sends, carried by `Inputs(container)` (D9.15).
 - `N9.1` new: `internal sealed class HttpSend` in `Alis.Reactive/Requests`, with its parts `PathPart`,
   `SentField`, `SentBody` and `SentHeader`, generated into the plan's TypeScript, the value of a `request`'s `send`
   (D10.23); it replaces the hand-typed `HttpRequest` (`Alis.Reactive.Assets/runtime/plugins/http.ts:10-18`).
-- `N9.2` new: the staged builder: a GET builder with no body format, `Form` only over a native form and only in form
-  data or a GET's query, and one container a request.
+- `N9.2` new: the staged builder: a GET builder with no body format, and one container a request.
 - `N9.3` new: a named input typed by the member it fills, `Input(r => r.Member, pipeline.Input(m => m.Member))`
   (N10.7, N14.4), replacing `Form(params Expression<Func<TModel, object?>>[])`
   (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`). Its fallback to another view's input of the same
@@ -2136,8 +2138,7 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 
 **Defects.**
 - `X9.1` type (D9.2): a body format on a GET does not compile: new:N9.2.
-- `X9.2` type: `Form()` naming no form does not compile, and neither does `Form` given a container that is not a
-  form: new:N9.2.
+- `X9.2` type: `Inputs()` naming no container does not compile: new:N9.2.
 - `X9.3` type: a named input whose type the request member does not hold does not compile: new:N9.3.
 - `X9.4` analyzer (D9.16): a file-shaped set member in a GET or a JSON body: new:N9.4.
 - `X9.5` analyzer: a placeholder no member fills: "The URL '{url}' has the placeholder {name}, and the request has no
@@ -2154,11 +2155,13 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `X9.12` analyzer: a fixed header value with a line break: "The header {name} holds a line break, which HTTP does
   not carry in a field value; send it in the body." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X9.13` behavior: a header read as text past US-ASCII sends no request, and the console names the header.
-- `X9.14` type: `Form` inside a JSON body does not compile: new:N9.2.
-- `X9.15` behavior: a native form's `<select form="intake">` outside the form's element is sent with the form's other
-  controls and its hand-written `<input name="Code">`, and the endpoint reads one antiforgery field.
-- `X9.16` behavior (D14.8): a fieldset container inside the intake form: the fieldset's request sends the fieldset's inputs
-  only, and the form's request sends both.
+- `X9.14` type: `Inputs` inside a JSON body's lambda does not compile, since the body door takes the container:
+  new:N9.2.
+- `X9.15` behavior (D9.15): a container sends its framework inputs, and of the controls the view wrote by hand inside
+  it a hidden one alone: its text input is not sent, an input outside its element is sent by `Input`, and the endpoint
+  reads one antiforgery field.
+- `X9.16` behavior (D14.8): a container inside the intake container: the inner container's request sends its own inputs
+  only, and the outer container's request sends both.
 - `X9.17` behavior (D14.8): a request that reaches a container by its id under a model it was not rendered for stops before
   it sends, the network log holds no request, and the console names the id and both models.
 - `X9.18` behavior: a component holding `"night-shift"`, the held form of `Night` under `JsonStringEnumMemberName`, sets
@@ -2240,6 +2243,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   endpoint's list would end before it on both hosts; send beside it a member of the item that is always sent, a
   literal, a text or a nullable member outside every condition, or send the list in a JSON body."; beside a member of
   its item set from a literal the page renders and the request sends both.
+- `X9.47` behavior (D9.15): a hidden input inside a container's element, MVC's `HiddenFor` and one the view wrote, is
+  sent under its name in the container's URL-encoded body beside its framework inputs, and a disabled one and one
+  outside the element are not; the same container's GET query carries none of them.
 
 ## Q10. The request's flow and its response
 
@@ -2454,7 +2460,7 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
     the browser infers nothing: each element and component its success route writes outside any condition (a text, an
     HTML, a class, an appended text, whether it is hidden, a component's member or method, a component a payload
     holds among them, such as a row action's control), the element its `Into(elementId)` loads and the element of
-    the container its `Form` or `Inputs` sends. The test a class or an appended text is written under, the door's
+    the container its `Inputs` sends. The test a class or an appended text is written under, the door's
     own, is no condition of the route.
     A component a payload holds is held by the id of its element, which the plan reads when the request starts
     through the element path its vendor names, the component itself under `ComponentVendor.Native`, and the browser
@@ -2618,11 +2624,11 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     form's types in `VerbsAgree`. So a door the view calls with one type
     argument is an instance member of the type it is called on: the verbs, `PageUrl<TPage>()` and
     `Container<TContainer>(containerId)` on `Pipeline<TModel>`, `OnSuccess<T>` and `OnError<T>` on the request types. A
-    door with no type argument to name (`Set`, `Form`, `Inputs`, `Input`, `OnSuccess(pipeline => ..)`, `Into`,
+    door with no type argument to name (`Set`, `Inputs`, `Input`, `OnSuccess(pipeline => ..)`, `Into`,
     `Download`, `Notice`, `ShowValidationErrors`, `Validate(container)`) is an extension method over them. The modules: the verbs,
     the request types, `RequestDefaults` and `NoModel` are `Pipelines`', as the POC's `Pipelines/Requests.cs` is, since
     each takes a pipeline; the objects a request reads (`Response`, `Failure`, `Content`, `Markup`, `ResponseFile`,
-    `BrowserFile`, `PageUrl`, `ValidationProblem`, `RequestContainer`, `RequestForm`) are `Requests`', which names no
+    `BrowserFile`, `PageUrl`, `ValidationProblem`, `RequestContainer`) are `Requests`', which names no
     pipeline; `AddReactiveRequests` and
     the net48 filter are `Hosting`'s. `Hosting` depends on `Pipelines`, `Pipelines` on `Requests`, and none returns
     (`spec/api/HttpSurface` builds with each type in its module's namespace).
@@ -2630,8 +2636,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     and `Delete`, each `(url)` or `<TRequest>(url, request => ..)`. The request lambda holds the HTTP parts: `Path(r =>
     r.M, value)`, `Query(r => r.M, value)`, `Header(name, value)`, and on POST, PUT and DELETE one body door, `Json`,
     `UrlEncoded`, `Multipart`, `Text` or `File`. The doors that send inputs (D9.15) are `Inputs(container)` and
-    `Input(r => r.M, input)` in every body and on a GET, and `Form(form)` in a URL-encoded or multipart body and on a
-    GET; a GET's inputs go to its query. A value is a literal or any source (Q7); a member lambda dot-walks
+    `Input(r => r.M, input)`, in every body and on a GET; a GET's inputs go to its query. A value is a literal or any
+    source (Q7); a member lambda dot-walks
     (`r => r.Handover.Round`) in `Query` and `Set`, while `Path` takes a member of the request itself (D9.4). `Header`
     refuses `Content-Type`, `Accept`, the headers the framework writes and the Fetch Standard's forbidden request
     headers (D9.11).
@@ -2642,13 +2648,13 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     `Chained` receives that reply. A body door returns a stage that offers no second body door (`SecondBodyDoor`), a
     `Text` or `File` body one that offers no `Set` and a `Set` one that offers no whole body (`SetAfterAWholeBody`,
     `AWholeBodyAfterSet`), the full form's body door takes the container (`ContainerInsideABody`), a GET's and the
-    condensed `Form` and `Inputs` return a stage that offers no second (`SecondContainerOnGet`,
+    condensed `Inputs` return a stage that offers no second (`SecondContainerOnGet`,
     `SecondContainerOnABody`), and `Chained` ends the sentence (`SecondChained`), each in `spec/api/refused.sh`. A stage
     holds in the chain; a staged value used twice, a parts object two statements write or a request held in a variable
     and written twice, is ALIS030's, so a request's parts are one chain (N18.7).
     ALIS030 refuses what no type stages: a second `Busy` or `NoBusy`, `Busy` beside `NoDefaults()`, a status outside
     300 to 599, a second route for one status, a second catch-all and a second `WhileLoading` or `Finally` (N18.7). A `Set` on a file member stays D9.16's analyzer, since `Set` takes a member of any
-    type, and a file input a GET's `Form` or `Inputs` sends stops the request when it is sent (D9.16). A file member is `IFormFile`
+    type, and a file input a GET's `Inputs` sends stops the request when it is sent (D9.16). A file member is `IFormFile`
     or a list of it on net10 and MVC 5's posted-file base or a list of it on net48, behind `#if NET48`. A request
     `Header(name, source)` whose source's wire form is a list or an object is refused where the view renders, as the
     POC refuses a list in a path segment (`poc/Alis.Reactive.Poc/Types/WireForms.cs`), since no C# constraint names a
@@ -2691,7 +2697,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     header's name follows (D9.11), and `Set-Cookie` and `Set-Cookie2` in any case, the Fetch Standard's forbidden
     response header names, which the browser never hands a page, so a read of either reads null on every answer.
   - the condensed doors, which write the plan the full form writes: `Set(r => r.M, value)`, placed by
-    D9.4, D9.6 and D9.9 into `Path`, `Query` or the body the request names, else multipart (D10.22); `Form(form)` and
+    D9.4, D9.6 and D9.9 into `Path`, `Query` or the body the request names, else multipart (D10.22);
     `Inputs(container)`, sent as multipart fields and file parts, a GET's into its query; `Input(r => r.M, input)`,
     placed as `Set` is. Every request is checked by the validator registered for `TRequest` (D16.2), whatever it sends;
     `OnSuccess(pipeline => ..)` of kind none, `OnSuccess<T>((reply, pipeline) => ..)` and `OnError<T>(status, ..)` of kind
@@ -2723,7 +2729,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   ```csharp illustration
   pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request
           .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
-          .Form(intake))
+          .Inputs(intake))
       .OnSuccess<IntakeCreated>((created, pipeline) => pipeline.Notice().Success("Resident admitted"))
       .Chained((created, next) => next
           .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
@@ -2732,9 +2738,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 
   pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request
           .Path(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
-          .Multipart(body => body
-              .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
-              .Form(intake)))
+          .Multipart(intake, body => body
+              .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))))
       .Validate<IntakeValidator>()
       .OnSuccess(Content.Json<IntakeCreated>(), (created, pipeline) => pipeline.Notice().Success("Resident admitted"))
       .OnError(400, Content.Json<ValidationProblem>(), (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
@@ -2745,7 +2750,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   ```
   The first is the condensed form under defaults that hold `ShowBusy()`, `ShowValidationErrors()` and a catch-all notice;
   the second writes the same plan less those defaults' parts, which both compose identically. `intake` is the
-  `RequestForm<IntakeRequest>` the view's form block returns (N14.3).
+  `RequestContainer<IntakeRequest>` the view's container block returns (N14.3).
 - `N10.6` new: the net48 JSON response door, a result that writes its body through System.Text.Json under the
   options the app registers with the framework (D2.6, D2.9), so dates are ISO 8601 (D3.10) and names follow
   the app's naming on both hosts.
@@ -3464,7 +3469,7 @@ plans name.
   | the contracts `busy`, `notice` and `reconnect`, by plugin name (D10.21, D21.11), and the app-level confirm and drawer, by fixed id | the page |
   | the one live-validation listener (D12.7) | the page |
   | a validator's registration under a rule set, its fields by binding name, item fields by `[*]` | the plan that renders the request or the container that checks by it, keyed by validator and rule set |
-  | the table of containers by element id, each with its model, its kind, its summary and its live check | the page, each entry under its owner |
+  | the table of containers by element id, each with its model, its summary and its live check | the page, each entry under its owner |
   | the inputs a container sends or checks: those inside its element at that moment | the container |
   | the inputs a request sent, by binding name, each as the inputs table held it | the request, until it settles |
   | a request's failures: every one in its summary place, each also at the input it sent under that key | the request's container's summary, else the notice |
@@ -3520,19 +3525,17 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `ContainerRead.tla:ReadFindsWhatItsContainerSends`
 
 **Doors.**
-- kept: `Form(formId)`, its meaning narrowed to a native form's submission set and its argument the form's typed
-  handle (D9.15, N18.3).
-- refused: `Form()`, carried by `Form(form)` and `Inputs(container)`, which name what they send (D9.2); `Form(fields)`,
-  carried by `Input(r => r.Member, input)` (N9.3); `Validate<TValidator>(formId)`, carried by a request's own check
-  (D16.2) and the check with no request, `Validate(container)` (N16.3); `ValidationErrors(formId)`, carried by
-  `ShowValidationErrors(problem)` (N10.7); `PageForm`, which no door returns, since a request's failures show at its own summary
-  place (D16.13); `Html.FormSummary(formId)` (`Alis.Reactive/Razor/PlanExtensions.cs:98`), carried by the container's
-  block (N14.3).
+- refused: `Form(formId)` and `Form()`, carried by `Inputs(container)`, which names what it sends (D9.2, D9.15, N18.3);
+  `Form(fields)`, carried by `Input(r => r.Member, input)` (N9.3); `Validate<TValidator>(formId)`, carried by a
+  request's own check (D16.2) and the check with no request, `Validate(container)` (N16.3); `ValidationErrors(formId)`,
+  carried by `ShowValidationErrors(problem)` (N10.7); `PageForm`, which no door returns, since a request's failures show
+  at its own summary place (D16.13); `Html.FormSummary(formId)` (`Alis.Reactive/Razor/PlanExtensions.cs:98`), carried by
+  the container's block (N14.3).
 - `N13.1` new: a container's typed read of a member as the container sends it, the one read by binding name (D13.3); its
   form went to gate 2. It carries `p.Bound(m => ..)`, whose page-wide read by name is refused. No line and no compiled
   sentence wrote its form, so it is the owner's to decide (G13); U3 declares the lead's proposal as a signature, for
   the views to be written on: `container.Read(m => m.Member)`, a member of the container's handle
-  `RequestContainer<TModel>`, which a view reaches as its block's `Form` or `Container`, or by
+  `RequestContainer<TModel>`, which a view reaches as its block's `Container`, or by
   `pipeline.Container<TModel>(containerId)` from another view, as `PageUrl<TPage>.Read` reads a page URL member (the
   lead, 2026-11-13, `spec/CLAUDE.md`).
 
@@ -3689,13 +3692,15 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     partial's sections on both hosts (`probe:core-partial-section-dropped`,
     `probe:mvc5-sections-checked-in-layouts-only`). The page shows that defect.
   - A refusal by render order is refused: three commits guessed it, narrowed it and removed it.
-- D14.8 A request container is a block in its view as well (N14.3): a native form, or an element of any other kind.
-  It renders the container's element and its one summary, so no record of summaries rendered is needed (D13.6), and
-  returns the container's handle, typed by the view's model: `RequestForm<TModel>` for a form, and
-  `RequestContainer<TModel>` for any container, a form included. Another view reaches a container by
-  `pipeline.Container<TModel>(containerId)`, which `Inputs` sends. A request that sends a container no live plan
-  renders under that id and model stops before it sends, with one error naming the id and both models, as a plan
-  composition defect (D14.6).
+- D14.8 A request container is a block in its view as well (N14.3):
+  `Html.BeginRequestContainer(plan, containerId)` renders the container's element, a fieldset, and its one summary, so no
+  record of summaries rendered is needed (D13.6), and returns the container's handle, `RequestContainer<TModel>`, typed
+  by the view's model. A fieldset nests wherever a view's markup goes, inside a form the view writes itself and inside
+  another container, and the browser sends nothing from it on its own, so a container sends only by a request: its
+  framework inputs, and in a URL-encoded or a multipart body the hidden inputs inside its element (D9.15). Another
+  view reaches a container by `pipeline.Container<TModel>(containerId)`, which `Inputs` sends. A request that sends a
+  container no live plan renders under that id and model stops before it sends, with one error naming the id and both
+  models, as a plan composition defect (D14.6).
 
 **Schema nodes.** None new: the plan's object locators by element id, the plugin data `model` (inputs by id) and
 `slot` (container ids).
@@ -3728,12 +3733,12 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `N14.2` new: the plan's two doors as every view of the POC writes them, `Html.ReactivePlan<TModel>()`, which opens a
   view's plan, and `Html.RenderPlan(plan)`, the view's last line, which writes it. Both lines carry the two doors;
   what is new is the rule that holds them, ALIS041 (N18.15).
-- `N14.3` new: the request container as a block of its view, which renders the container's element and its summary
-  and returns its typed handle (D14.8), and `pipeline.Container<TModel>(containerId)` for another view; their forms go
-  to gate 2. No line and no compiled sentence wrote the block's form, so it is the owner's to decide (G13); U3
-  declares the lead's proposal as signatures, for the views to be written on: `Html.BeginRequestForm(plan,
-  containerId)` and `Html.BeginRequestContainer(plan, containerId)`, each a block a view ends by `using`, as it
-  ends MVC's own `Html.BeginForm`, whose `Form` or `Container` is the handle (the lead, 2026-11-12, `spec/CLAUDE.md`).
+- `N14.3` new: the request container as a block of its view,
+  `Html.BeginRequestContainer(plan, containerId)`, which a view ends by `using`, as it ends MVC's own `Html.BeginForm`,
+  which renders the container's element and its summary and whose `Container` is its typed handle (D14.8), and
+  `pipeline.Container<TModel>(containerId)` for another view. One concept, the request container (the owner, 2026-11-25):
+  the `Html.BeginRequestForm` the lead declared beside it, its block and `RequestForm<TModel>` leave, each carried by the
+  container's door (the lead's mistake, 2026-11-12, `spec/CLAUDE.md`).
 - `N14.4` new: `pipeline.Input(m => m.Member)`, the input a member binds, typed by the member's value as
   `BoundInput<TValue>`, which a request sends (`Input`, D9.15) and whose `.Component<T>()` reaches the component by the
   id D14.3 gives it. It replaces both lines' `Component<TComponent>(Expression<Func<TModel, object?>>)`, whose
@@ -3961,6 +3966,11 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     65fdf118d, which read the validated form's inputs for such a request.
   - The check with no request, `Validate(container)` (N16.3), and live validation read their container's inputs, as
     the container sends them.
+  - A hidden input a container's form body sends beside its framework inputs (D9.15) is no input of the check: the
+    check reads no member from it, so a member such an input alone sends reads as one the body lacks (D16.6), where
+    the endpoint binds the input's value. It is a value sent outside the plan's inputs, which the browser's check
+    does not read; a member a rule reads is sent by a declared input, `NativeHiddenField` for a value the view holds
+    hidden, or by `Set`.
   - Under `CascadeMode.Stop` the endpoint runs a rule's checks in order and stops at the first that fails, so C#
     writes each later check of the rule to pass where an earlier one whose condition held failed, and the browser
     shows the rule's first failure alone, as the endpoint answers (X16.40). A child validator after the rule's checks
@@ -4079,9 +4089,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     clears the message of each input it sent, then shows its own failures.
   - The first failure of each binding name also shows at the message element of the framework input the request sent
     under that name (D10.18), as MVC's ValidationMessageFor shows the first error of its key: an input inside its
-    container, or its `Input`. A `Set` member, and a control of a native form's
-    submission set that is no framework input, have no message element, so their failures show in the summary place
-    only. An input that left the page before the answer shows nothing inline.
+    container, or its `Input`. A `Set` member has no message element, so its failures show in the summary place only. An
+    input that left the page before the answer shows nothing inline.
   - Both are MVC's own pattern: a validation summary that holds property errors, and a message for each field.
   - No DOM visibility is read, so a message inside a hidden panel is still in the summary. The form of the
     summary goes to gate 2.
@@ -4298,14 +4307,14 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   WhenOnServer or UnlessOnServer." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
 - `X16.14` analyzer: on net48, a start the binder cannot create: "{Type} has no public parameterless constructor, so
   the endpoint cannot bind it; give {Type} a public parameterless constructor." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
-- `X16.15` behavior: a request that sends only set members, on a page with no form, shows "Ward is required." in
+- `X16.15` behavior: a request that sends only set members, on a page with no container, shows "Ward is required." in
   the notice and sends nothing.
 - `X16.16` behavior: an `Input` of the request's view outside every container, sent under `r => r.Ward`, shows the
   server's "Ward is required." at its own message element and in the notice.
 - `X16.17` behavior (D19.7): the page and a slot's partial each render an input that binds `Name`; the slot's request sends
   its own container, and its 400 for `Name` shows at the slot's input and in the slot container's summary only.
-- `X16.18` behavior: a native form's hand-written `<input name="Code">` fails on the server, and its message shows
-  in the form's summary only.
+- `X16.18` behavior: a request that sends its container and a `Set` member is refused by the server for that member, and
+  the message shows in the container's summary only.
 - `X16.19` behavior: the slot that holds the sent input reloads while the request is in flight; the 400's message
   shows in the page container's summary and not at the reloaded input.
 - `X16.20` behavior (D19.7): a live fieldset container inside a live form container: blurring the empty name both hold
@@ -5238,7 +5247,7 @@ shapes, starts and the payload's path of each event.
 - `N18.1` new: the reflection analyzer of D18.4, with the owner's exception list.
 - `N18.2` new: the declaration analyzer of D18.3, which replaces `JsObject`'s run-time member scan. Built in POC 13e
   (ALIS023, ALIS024).
-- `N18.3` new: a container typed by its model (N14.3), and a request's `Form` and `Inputs` that take only a
+- `N18.3` new: a container typed by its model (N14.3), and a request's `Inputs` and body doors that take only a
   container of the request's model.
 - `N18.4` new: the typed doors of D18.5 for the button type, the text box type and the action link's attributes.
 - `N18.5` new: the override analyzer of D18.3: an override in an app's model carries the JSON name and the
@@ -5278,8 +5287,8 @@ shapes, starts and the payload's path of each event.
   no member path, and on net48 a model type with no public parameterless constructor (D16.5, D16.6, D16.8, D16.10,
   D16.11, D16.14, M8.D1).
 - `N18.13` new: ALIS035, the row-action analyzer: a `NativeActionLink` whose block's one request at its own level is no
-  GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Form`,
-  `Inputs`, `Input` or a header (D17.15).
+  GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Inputs`,
+  `Input` or a header (D17.15).
 - `N18.14` new: ALIS040, the nullable source analyzer: a source passed where a method's or a plugin's argument or a
   condition operator's right operand takes its type with other nullability, which C# reports as the warning CS8620,
   is refused as an error in every compilation that references the core, whatever the app does with warnings (D7.3,
@@ -5378,7 +5387,7 @@ shapes, starts and the payload's path of each event.
 - D19.7 The form plugin's data is one registration, one validator under one rule set and keyed by both, holding the
   model's start, the bound scalars, objects and lists of D16.6 and D16.7, and a rule tree whose groups follow the
   validator's child validators (D16.3). A container is an entry of `model`'s data, keyed by its element id, with its
-  model, its kind (a form or another element), its summary's id and its live check. The brief's item raised after the
+  model, its summary's id and its live check. The brief's item raised after the
   fact is decided: `FormField`'s `items` and `value` functions leave for paths with `each`, and `live` stays, as
   `Live`, a container's, naming the check it runs.
 - D19.8 A number shape carries what a text converts under: `of`, an integer or a fraction, which picks the culture's

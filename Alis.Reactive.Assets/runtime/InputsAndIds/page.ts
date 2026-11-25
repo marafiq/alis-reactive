@@ -1,5 +1,7 @@
 import { PageInputs } from "./model";
 
+const aHiddenInputItSends = "input[type=\"hidden\"][name]:not([name=\"\"]):not(:disabled)";
+
 export const pageInputs = new PageInputs(id => {
   const container = document.getElementById(id);
   if (container === null) return null;
@@ -8,6 +10,7 @@ export const pageInputs = new PageInputs(id => {
     return input !== null && container.contains(input);
   };
 }, id => {
-  const form = document.getElementById(id);
-  return form instanceof HTMLFormElement ? new FormData(form) : null;
+  const container = document.getElementById(id);
+  if (container === null) return null;
+  return [...container.querySelectorAll<HTMLInputElement>(aHiddenInputItSends)].map(input => ({ name: input.name, value: input.value }));
 });

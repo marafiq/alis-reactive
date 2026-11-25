@@ -100,7 +100,7 @@ public sealed class WhenReceptionSignsInAVisitor(string host) : ConformanceFixtu
         var sent = await world.Page.RunAndWaitForRequestAsync(() => world.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Save visitor", Exact = true }).ClickAsync(), "**/D100/reception");
         Assert.That(await sent.HeaderValueAsync("X-Coordinator"), Is.EqualTo("CO1"));
         Assert.That(await sent.HeaderValueAsync("X-Operation"), Is.EqualTo("11111111-1111-4111-8111-111111111111"));
-        Assert.That(sent.PostData!.Split('&').Select(field => field.Split('=')[0]).Order(StringComparer.Ordinal), Is.EqualTo(new[] { "CoordinatorId", "Copies", "Desk", "DraftId", "OperationId", "Relationship", "ResidentId", "VisitorName", "__RequestVerificationToken" }));
+        Assert.That(sent.PostData!.Split('&').Select(field => field.Split('=')[0]).Order(StringComparer.Ordinal), Is.EqualTo(new[] { "Consent", "CoordinatorId", "Copies", "Desk", "DraftId", "OperationId", "Relationship", "ResidentId", "VisitorName", "__RequestVerificationToken" }));
         await Expect(world.Page.Locator("#visitor-receipt")).ToHaveTextAsync("Alice Ward signed in for Helen Ward at North desk");
         await Expect(world.Page).ToHaveURLAsync(CarePages.MoveIn);
         await Expect(world.Page.Locator("#reception-answer")).ToHaveTextAsync("Visitor signed in.");

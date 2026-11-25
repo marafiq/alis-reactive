@@ -38,28 +38,6 @@ public sealed class WhenARequestSendsInputs
     }
 
     [Test]
-    public void a_native_form_is_sent_as_its_submission_set_as_multipart_by_default_and_url_encoded_when_named()
-    {
-        var multipart = FormPlan((pipeline, form) => pipeline.Post<IntakeSend>("/intakes", request => request.Form(form)));
-        Assert.That(RequestPage.Send(multipart, "body").GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"multipart"}},{"name":"parts","value":{"kind":"list","items":[]}},{"name":"inputs","value":""" + ContainerInputs("submits", "intake") + "}]}"));
-        var encoded = FormPlan((pipeline, form) => pipeline.Post<IntakeSend>("/intakes", request => request.UrlEncoded(form, body => body.Set(r => r.Ward, "North"))));
-        Assert.That(RequestPage.Send(encoded, "body").GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"urlEncoded"}},{"name":"fields","value":{"kind":"list","items":[""" + WardNorth + """]}},{"name":"inputs","value":""" + ContainerInputs("submits", "intake") + "}]}"));
-        Assert.That(PlanSchema.ProblemsOf(multipart), Is.Empty);
-        Assert.That(PlanSchema.ProblemsOf(encoded), Is.Empty);
-    }
-
-    [Test]
-    public void a_get_sends_a_native_forms_submission_set_in_its_query()
-    {
-        var plan = FormPlan((pipeline, form) => pipeline.Get<IntakeSend>("/intakes", request => request.Form(form)));
-        Assert.That(RequestPage.Send(plan, "query").GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"fields","value":{"kind":"list","items":[]}},{"name":"inputs","value":""" + ContainerInputs("submits", "intake") + "}]}"));
-        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
-    }
-
-    [Test]
     public void each_body_that_names_a_container_sends_its_inputs_beside_the_members_it_sets()
     {
         var json = RequestPage.Rendered(pipeline => pipeline.Post<IntakeSend>("/intakes", request => request.Json(pipeline.Container<IntakeSend>("contact"), body => body.Set(r => r.Beds, 2))));
@@ -71,8 +49,8 @@ public sealed class WhenARequestSendsInputs
         var multipart = RequestPage.Rendered(pipeline => pipeline.Delete<IntakeSend>("/intakes", request => request.Multipart(pipeline.Container<IntakeSend>("contact"), body => body.Set(r => r.Ward, "North"))));
         Assert.That(RequestPage.Send(multipart, "body").GetRawText(), Is.EqualTo(
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"multipart"}},{"name":"parts","value":{"kind":"list","items":[{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"field"}},{"name":"field","value":""" + WardNorth + """}]}]}},{"name":"inputs","value":""" + ContainerInputs("sends", "contact") + "}]}"));
-        var form = FormPlan((pipeline, handle) => pipeline.Put<IntakeSend>("/intakes", request => request.Multipart(handle, body => { })));
-        Assert.That(Inputs(RequestPage.Send(form, "body")), Is.EqualTo(ContainerInputs("submits", "intake")));
+        var block = ContainerPlan((pipeline, handle) => pipeline.Put<IntakeSend>("/intakes", request => request.Multipart(handle, body => { })));
+        Assert.That(Inputs(RequestPage.Send(block, "body")), Is.EqualTo(ContainerInputs("sends", "intake")));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
         Assert.That(PlanSchema.ProblemsOf(encoded), Is.Empty);
         Assert.That(PlanSchema.ProblemsOf(multipart), Is.Empty);
@@ -175,13 +153,13 @@ public sealed class WhenARequestSendsInputs
         return Views.TextOf(html.RenderPlan(plan))["<script type=\"application/json\" data-reactive-plan>".Length..^"</script>".Length];
     }
 
-    private static string FormPlan(Action<Pipeline<IntakeSend>, RequestForm<IntakeSend>> write)
+    private static string ContainerPlan(Action<Pipeline<IntakeSend>, RequestContainer<IntakeSend>> write)
     {
         var html = Views.Of(new IntakeSend(), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
         var plan = html.ReactivePlan<IntakeSend>();
-        using (var form = html.BeginRequestForm(plan, "intake"))
+        using (var block = html.BeginRequestContainer(plan, "intake"))
         {
-            html.On(plan, trigger => trigger.DomReady(pipeline => write(pipeline, form.Form)));
+            html.On(plan, trigger => trigger.DomReady(pipeline => write(pipeline, block.Container)));
         }
 
         return Views.TextOf(html.RenderPlan(plan))["<script type=\"application/json\" data-reactive-plan>".Length..^"</script>".Length];

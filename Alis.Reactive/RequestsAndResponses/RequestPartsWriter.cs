@@ -84,8 +84,6 @@ internal sealed class RequestPartsWriter
 
     internal int Sends(int stage, string containerId, string model) => Contains(stage, containerId, ModelPlugin.Sends(_writer.Content, containerId, model));
 
-    internal int Submits(int stage, string formId, string model) => Contains(stage, formId, ModelPlugin.Submits(_writer.Content, formId, model));
-
     internal int Input<TRequest, TMember>(int stage, Expression<Func<TRequest, TMember>> member, string inputId, Func<int, int> placed)
     {
         var name = Member(member).Name;

@@ -1250,9 +1250,6 @@
         "model": {
           "type": "string"
         },
-        "kind": {
-          "$ref": "#/$defs/ContainerKind"
-        },
         "summary": {
           "type": "string"
         },
@@ -1265,17 +1262,10 @@
       },
       "required": [
         "model",
-        "kind",
         "summary",
         "live"
       ],
       "additionalProperties": false
-    },
-    "ContainerKind": {
-      "enum": [
-        "form",
-        "element"
-      ]
     },
     "Live": {
       "type": "object",

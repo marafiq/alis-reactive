@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// chosen nodes.
 /// </summary>
 /// <remarks>
-/// A drop-down tree bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2
+/// A drop-down tree bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2
 /// raises <see cref="Change"/> when a person chooses a node or the value changes, which commits it.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-dropdowns", "DropDownTree")]

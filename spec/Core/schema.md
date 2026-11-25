@@ -160,7 +160,6 @@ Its shape and list flag of 65fdf118d leave into `converted`.
 
 `Container` carries:
 - `model`: the key of the model its block was rendered for (D14.8);
-- `kind`: `form` or `element`, the element its block rendered;
 - `summary`: its summary element's id (D13.6);
 - `live`: none, or the `Live` its inputs are checked by (D16.15).
 
@@ -393,11 +392,10 @@ no argument type of its own (D9.1).
 - `HttpSend`, the value of a `request`'s `send` (D9.1, N9.1):
   - `method`: GET, HEAD, OPTIONS, POST, PUT or DELETE (D9.3);
   - `url`, a page path or an absolute `http` or `https` URI, as path parts and the URL's own query (D9.23);
-  - `query`, which a GET's `Form`, `Inputs` and `Input`s fill (N10.7);
-  - `body`: none, JSON, URL-encoded, multipart with its fields and file parts, text, or one file as the whole body,
-    with the inputs it sends: a native form's submission set, a container's framework inputs, its `Input`s (D9.6 to
-    D9.10, D9.15, D9.16, D9.21), and in JSON the enums its sources hold, each with its rows from the held form to the
-    form its endpoint binds (D9.13);
+  - `query`, which a GET's `Inputs` and `Input`s fill (N10.7);
+  - `body`: none, JSON, URL-encoded, multipart with its fields and file parts, text, or one file as the whole body, with
+    the inputs it sends: a container's framework inputs and its `Input`s (D9.6 to D9.10, D9.15, D9.16, D9.21), and in
+    JSON the enums its sources hold, each with its rows from the held form to the form its endpoint binds (D9.13);
   - `headers`, the `Accept` its success route's kind takes among them (D9.11, D9.12, D10.6);
   - `antiforgery`: none, or the token C# wrote where the view rendered and its place, the header or the field, on a
     POST, PUT or DELETE to the page's origin (D9.22);
@@ -491,7 +489,8 @@ each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `H
   A `value` is a `ValueRead`, `nothing` or `held` with its `value`, so a value that reads nothing is apart from a
   held null; an evaluated value is a leaf the contract writes as `unknown`, since it holds the user's data, a
   `Date` or a `File`.
-- `SentInputs`: `container` (`none`; `missing` with its `id`; or `captured` with its `id`, the `body` it sends and its
+- `SentInputs`: `container` (`none`; `missing` with its `id`; or `captured` with its `id`, the `body` it sends, an
+  evaluated value that holds what its inputs write and the hidden inputs inside its element (D9.15), and its
   `inputs`) and `individual`, a list of `missing` (with its `id` and `name`), `captured` (with its `input`) or
   `leftOut`, a named input whose condition failed, which C# writes as the `cond` of its binding over the lookup, so
   it is never looked up and is in neither the check's inputs nor the reply's. A `SentInput` is its binding `name`,

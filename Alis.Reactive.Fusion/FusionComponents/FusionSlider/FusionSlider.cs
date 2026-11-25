@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A slider: EJ2's Slider, which holds a number on a scale, or two for a range.
 /// </summary>
 /// <remarks>
-/// A slider bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2 raises
+/// A slider bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2 raises
 /// <see cref="Change"/> while a person drags a handle and <see cref="Changed"/> once the drag ends, which commits the
 /// value.
 /// </remarks>

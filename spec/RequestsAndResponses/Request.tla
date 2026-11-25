@@ -8,7 +8,7 @@ Mutants == {"none", "PlaceholderUnchecked", "DateInPath", "FileInJson", "NullFor
             "ChainedAfterError", "StepsAfterStop", "RetryAnyPost", "RetryPastAttempts", "LoadingEachAttempt",
             "FailedConditionSendsNothing", "ChainedIgnoresCondition", "CatchAllRunsOnSuccess",
             "EmptyFieldForObject", "EmptyFieldForObjectItem", "OneFlagForBothLayers", "HoldBeforeLoading",
-            "HoldOnAFailedGuard"}
+            "HoldOnAFailedGuard", "ContainerSubmitsNatively"}
 
 ASSUME Mutant \in Mutants
 
@@ -178,9 +178,9 @@ Limit == MaxAttempts + (IF Mutant = "RetryPastAttempts" THEN 1 ELSE 0)
 Check ==
     /\ pc = "check"
     /\ IF checkPasses \/ Mutant = "FailedCheckSends"
-         THEN (pc' = IF takesDefaults THEN "defaultLoading" ELSE "loading") /\ UNCHANGED stopped
-         ELSE pc' = "done" /\ stopped' = TRUE
-    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, entered, final, routeRan, chainedRan, afterRan, layers>>
+         THEN (pc' = IF takesDefaults THEN "defaultLoading" ELSE "loading") /\ UNCHANGED <<stopped, sends>>
+         ELSE pc' = "done" /\ stopped' = TRUE /\ sends' = sends + (IF Mutant = "ContainerSubmitsNatively" THEN 1 ELSE 0)
+    /\ UNCHANGED <<part, config, scenario, attempt, loadings, finallies, routes, entered, final, routeRan, chainedRan, afterRan, layers>>
 
 DefaultLoading ==
     /\ pc = "defaultLoading"

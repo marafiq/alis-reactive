@@ -15,18 +15,16 @@ public sealed class WhenAContainerReadsAMember
 {
     private const string Sent = """{"kind":"call","path":["sent"],"members":"required","target":{"kind":"obj","id":"$model"},"args":[{"kind":"lit","value":"intake"},{"kind":"lit","value":"Alis.Reactive.ModuleTests.InputsAndIds.ReadCard"}]}""";
 
-    [TestCase("form")]
     [TestCase("element")]
     [TestCase("reached")]
     public void each_handle_reads_the_sent_body_by_wire_name_in_its_step(string handle)
     {
         var html = Views.Of(new ReadCard());
         var plan = html.ReactivePlan<ReadCard>();
-        using var form = handle == "form" ? html.BeginRequestForm(plan, "intake") : null;
         using var element = handle == "element" ? html.BeginRequestContainer(plan, "intake") : null;
         html.On(plan, trigger => trigger.DomReady(pipeline =>
         {
-            var container = form?.Form ?? element?.Container ?? pipeline.Container<ReadCard>("intake");
+            var container = element?.Container ?? pipeline.Container<ReadCard>("intake");
             pipeline.Component<IntakeBox>("status").Value.Set(container.Read(m => m.Kin.Name));
         }));
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));

@@ -11,7 +11,7 @@
     var plan = Html.ReactivePlan<ChartSave>();
 }
 <h1>Admission chart</h1>
-@using (var chart = Html.BeginRequestForm(plan, "chart"))
+@using (var chart = Html.BeginRequestContainer(plan, "chart"))
 {
     <fieldset>
         <legend>Diet</legend>
@@ -19,7 +19,7 @@
     </fieldset>
     <button type="button" @Html.Raises(plan, ChartSaveButtons.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(ChartSaveButtons.Save, HandlerPolicy.Skip, pipeline => pipeline
-        .Post<ChartSave>(CareEndpoints.ChartSaves, request => request.Form(chart.Form))
+        .Post<ChartSave>(CareEndpoints.ChartSaves, request => request.Inputs(chart.Container))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("chart-status").Text.Set(saved.Body))));
 }
 <p>Status: <span id="chart-status">Not saved</span></p>

@@ -13,7 +13,7 @@
     .is-invalid { outline: 2px solid red; }
 </style>
 <h1>Resident intake</h1>
-@using (var intake = Html.BeginRequestForm(plan, "resident-intake"))
+@using (var intake = Html.BeginRequestContainer(plan, "resident-intake"))
 {
     <fieldset>
         <legend>Name</legend>
@@ -21,7 +21,7 @@
     </fieldset>
     <button type="button" @Html.Raises(plan, ResidentIntakeButtons.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(ResidentIntakeButtons.Save, pipeline => pipeline
-        .Post<ResidentIntake>(ResidentIntakeEndpoints.Intakes, request => request.Form(intake.Form))
+        .Post<ResidentIntake>(ResidentIntakeEndpoints.Intakes, request => request.Inputs(intake.Container))
         .Validate<ResidentIntakeRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("intake-status").Text.Set(saved.Body))));
 }

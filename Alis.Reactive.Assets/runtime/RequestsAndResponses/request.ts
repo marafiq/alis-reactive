@@ -1,14 +1,12 @@
-import { Submission } from "../InputsAndIds/index";
 import {
-  assertNever, type Culture, type HttpSend, type InputSent, type MultipartPart, type PathPart, type PathStep, type SentBody,
+  assertNever, type CapturedContainerCapture, type Culture, type HttpSend, type InputSent, type MultipartPart, type PathPart, type PathStep, type SentBody,
   type SentEnum, type SentField, type SentHeader, type SentInput, type SentInputs, type TimeZone, type WhenNothing, type WireForm, type ItemWhenNothing as SentItemWhenNothing,
 } from "../Schema/index";
+import type { ContainerBody } from "../InputsAndIds/index";
 import { plugin } from "../Plugins/index";
 import { Stop } from "../ValuesAndSources/index";
 import { captureBusy, type CapturedBusy } from "./busy";
 import { enumJson, fieldTexts, formDataPlace, held, invariantPlace, scalarText, type TextPlace } from "./wire";
-
-export { Submission };
 
 export interface PreparedRequest {
   readonly method: HttpSend["method"];
@@ -130,6 +128,7 @@ function bodyOf(body: SentBody, headers: Headers, writing: FormWriting): BodyIni
     }
     case "urlEncoded": {
       const form = new URLSearchParams();
+      appendHidden(form, body.inputs, body.fields.map(field => field.name));
       appendFields(form, body.fields, writing.zone, writing.place, writing.request);
       appendInputs(form, body.inputs, writing.zone, writing.place, writing.request);
       if (writing.token !== undefined) form.set(writing.token.name, writing.token.value);
@@ -137,6 +136,7 @@ function bodyOf(body: SentBody, headers: Headers, writing: FormWriting): BodyIni
     }
     case "multipart": {
       const form = new FormData();
+      appendHidden(form, body.inputs, body.parts.map(partName));
       for (const part of body.parts) appendPart(form, part, writing);
       appendInputs(form, body.inputs, writing.zone, writing.place, writing.request);
       if (writing.token !== undefined) form.set(writing.token.name, writing.token.value);
@@ -168,19 +168,28 @@ function appendFields(form: URLSearchParams | FormData, fields: readonly SentFie
 function appendInputs(form: URLSearchParams | FormData, inputs: SentInputs, zone: TimeZone, place: TextPlace, request: object): void {
   const container = inputs.container;
   if (container.kind !== "captured") return;
-  const sent = container.body;
-  if (sent instanceof Submission) for (const [name, entry] of sent.entries) appendEntry(form, name, entry);
-  const members = sent instanceof Submission ? sent.members : sent;
-  for (const input of container.inputs) setInput(form, input, members, zone, place, request);
+  for (const input of container.inputs) setInput(form, input, containerBody(container).members, zone, place, request);
 }
 
-function appendEntry(form: URLSearchParams | FormData, name: string, entry: FormDataEntryValue): void {
-  if (typeof entry === "string") {
-    form.append(name, entry);
-    return;
+function appendHidden(form: URLSearchParams | FormData, inputs: SentInputs, sentNames: readonly string[]): void {
+  const container = inputs.container;
+  if (container.kind !== "captured") return;
+  for (const hidden of containerBody(container).hidden) if (!sentNames.includes(hidden.name)) form.append(hidden.name, hidden.value);
+}
+
+function partName(part: MultipartPart): string {
+  switch (part.kind) {
+    case "field":
+      return part.field.name;
+    case "file":
+      return part.name;
+    default:
+      return assertNever(part);
   }
-  if (form instanceof URLSearchParams) throw new Stop("The request's form control '" + name + "' holds a file, which is sent only in multipart form data.");
-  form.append(name, entry);
+}
+
+function containerBody(container: CapturedContainerCapture): ContainerBody {
+  return container.body as ContainerBody;
 }
 
 function setInput(form: URLSearchParams | FormData, input: SentInput, members: unknown, zone: TimeZone, place: TextPlace, request: object): void {
@@ -218,8 +227,7 @@ function appendFiles(form: URLSearchParams | FormData, name: string, value: unkn
 function withContainer(value: unknown, inputs: SentInputs, zone: TimeZone): unknown {
   const container = inputs.container;
   if (container.kind !== "captured") return value;
-  const sent: unknown = container.body;
-  const members = sent instanceof Submission ? sent.members : sent;
+  const members: unknown = containerBody(container).members;
   const json = Array.isArray(members) ? [] : {};
   for (const input of container.inputs) {
     const path = input.entry.binding.path;

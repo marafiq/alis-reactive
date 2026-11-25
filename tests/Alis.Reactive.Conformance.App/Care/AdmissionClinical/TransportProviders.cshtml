@@ -12,7 +12,7 @@
 
 <h1>Resident transport</h1>
 
-@using (var booking = Html.BeginRequestForm(plan, "transport-booking"))
+@using (var booking = Html.BeginRequestContainer(plan, "transport-booking"))
 {
     <fieldset>
         <legend>Transport provider</legend>
@@ -55,7 +55,7 @@
     }));
 
     Html.On(plan, trigger => trigger.CustomEvent(TransportBookings.SaveArrangement, pipeline => pipeline
-        .Post<TransportProviders>(TransportBookings.Save, request => request.Form(booking.Form))
+        .Post<TransportProviders>(TransportBookings.Save, request => request.Inputs(booking.Container))
         .OnSuccess(Content.Text, (confirmation, pipeline) =>
         {
             pipeline.Element("booking-confirmation").Text.Set(confirmation.Body);

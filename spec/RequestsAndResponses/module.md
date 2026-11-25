@@ -50,12 +50,12 @@ analyzers, whose code is module 20's.
   instance verbs on `Pipeline<TModel>`, with `Head` and `Options` beside them (D9.3).
 - What a request sends: main's `GatherBuilder<TModel>` and `GatherExtensions`, the redesign's
   `GatherBuilder<TRequest, TModel>`, and both lines' `Gather` go to N10.7's request lambda: `Path`, `Query`, `Header`,
-  `Set`, one body door, `Form(form)`, `Inputs(container)` and `Input(r => r.Member, input)`. Refused, each with its
+  `Set`, one body door, `Inputs(container)` and `Input(r => r.Member, input)`. Refused, each with its
   carriers in `spec/RequestsAndResponses/features.json`: main's `Static`, `RouteParam`, `FromUrl`, `Plugin<T>` and
   `Include(refId, name)`, whose strings name members; main's `FromEvent` and the payload forms of `Header` and
   `RouteParam`, main's second syntax for a source; and main's `IncludeAll` and the redesign's `Form()`, which name no
   form or container they send (D9.15). The redesign's `Form(params Expression<Func<TModel, object?>>[])` goes to
-  `Input` (N9.3), and its `Form(formId)` to `Form(form)` over the form's typed handle (N18.3).
+  `Input` (N9.3), and its `Form(formId)` to `Inputs(container)` over the container's typed handle (N18.3).
 - The body format: both lines' `AsJson` and `AsFormData` go to the body doors `Json`, `UrlEncoded`, `Multipart`,
   `Text` and `File` (D9.21), and the condensed body is multipart (D10.22).
 - The routes: both lines' `Response(r => ..)` and `ResponseBuilder<TModel>` go to the routes on the request (N10.7):
@@ -80,7 +80,7 @@ analyzers, whose code is module 20's.
   (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:31-35` at 623dd4a27), and the redesign's `Form()` the
   inputs of the form the request is taken to check (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:129` at
   65fdf118d);
-  `Form(form)`, `Inputs(container)` and `Input` each name it, on a page with many forms or none (D9.15).
+  `Inputs(container)` and `Input` each name it, on a page with many containers or none (D9.15).
 - A sent member is typed by the request class. Main names it by a string and takes its value as an object
   (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:40` at 623dd4a27), a placeholder by a string
   (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:117` at 623dd4a27) and a page query key by a string

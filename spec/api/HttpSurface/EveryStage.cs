@@ -12,13 +12,13 @@ namespace Intake;
 
 public static class EveryStage
 {
-    public static void OnLoad(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+    public static void OnLoad(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake)
         => EveryModule(pipeline, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward), intake);
 
-    public static void InAHandler(Rendered<CensusBoard, IntakeView> board, RequestForm<IntakeRequest> intake)
+    public static void InAHandler(Rendered<CensusBoard, IntakeView> board, RequestContainer<IntakeRequest> intake)
         => board.Reactive(b => b.Counted, (counted, pipeline) => EveryModule(pipeline, counted.Ward, intake));
 
-    public static void InEachBranch(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+    public static void InEachBranch(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake)
     {
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
         pipeline.When(ward.Eq("north"))
@@ -28,7 +28,7 @@ public static class EveryStage
             .Else(pipeline => EveryModule(pipeline, ward, intake));
     }
 
-    public static void InEachParallelBranch(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+    public static void InEachParallelBranch(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake)
     {
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
         pipeline.Parallel(
@@ -36,10 +36,10 @@ public static class EveryStage
             pipeline => EveryModule(pipeline, ward, intake));
     }
 
-    public static void InEachPartOfARequest(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+    public static void InEachPartOfARequest(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake)
     {
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
-        pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+        pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake))
             .WhileLoading(pipeline => EveryModule(pipeline, ward, intake))
             .Finally(pipeline => EveryModule(pipeline, ward, intake))
             .OnError<ValidationProblem>(400, (refused, pipeline) => EveryRouteModule(pipeline, refused.Headers.Get("X-Reason"), refused.Body, intake))
@@ -49,8 +49,8 @@ public static class EveryStage
             .Chained((answered, pipeline) => EveryModule(pipeline, answered.Request.Read(r => r.Ward), intake));
     }
 
-    public static void AChainReadsEveryReplyAroundIt(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
-        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
+    public static void AChainReadsEveryReplyAroundIt(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake))
             .OnSuccess<IntakeCreated>((created, pipeline) => pipeline
                 .When(created.Status.Eq(201).And(created.Body.Read(c => c.Resident.Id).Gt(0)))
                 .Then(pipeline => pipeline.Element("admitted").Text.Set(created.Request.Read(r => r.Name)))
@@ -70,14 +70,14 @@ public static class EveryStage
                         .Set(h => h.Version, summary.Headers.Get("ETag")))
                     .OnSuccess(pipeline => pipeline.Notice().Success("Handed over"))));
 
-    public static void InTheDefaults(IServiceCollection services, RequestForm<IntakeRequest> intake)
+    public static void InTheDefaults(IServiceCollection services, RequestContainer<IntakeRequest> intake)
         => services.AddReactiveRequests(requests => requests
             .WhileLoading(pipeline => EveryModule(pipeline, pipeline.Element("app-status").Text, intake))
             .Finally(pipeline => EveryModule(pipeline, pipeline.Element("app-status").Text, intake))
             .OnError(401, Content.None, (expired, pipeline) => EveryModule(pipeline, expired.Headers.Get("WWW-Authenticate"), intake))
             .OnError((failed, pipeline) => EveryModule(pipeline, failed.Headers.Get("X-Error"), intake)));
 
-    public static void ManyStatementsInEveryStage(Rendered<CensusBoard, IntakeView> board, RequestForm<IntakeRequest> intake, string[] wards)
+    public static void ManyStatementsInEveryStage(Rendered<CensusBoard, IntakeView> board, RequestContainer<IntakeRequest> intake, string[] wards)
         => board.Reactive(b => b.Counted, (counted, pipeline) =>
         {
             pipeline.Element("status").Text.Set(counted.Ward);
@@ -97,7 +97,7 @@ public static class EveryStage
                     pipeline.Element("north").Classes.Remove("current");
                     pipeline.Validate(intake);
                 });
-            pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake).Set(r => r.Ward, counted.Ward))
+            pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake).Set(r => r.Ward, counted.Ward))
                 .WhileLoading(pipeline =>
                 {
                     pipeline.Element("status").Text.Set("Sending");
@@ -198,7 +198,7 @@ public static class EveryStage
                 pipeline.Element("sign-in").Classes.Add("shown");
             }));
 
-    private static void EveryModule<TModel>(Pipeline<TModel> pipeline, ITypedSource<string?> text, RequestForm<IntakeRequest> intake)
+    private static void EveryModule<TModel>(Pipeline<TModel> pipeline, ITypedSource<string?> text, RequestContainer<IntakeRequest> intake)
     {
         var ward = pipeline.PageUrl<TModel, IntakePage>().Read(q => q.Ward);
         pipeline.When(ward.Eq("north")).Then(pipeline => pipeline.Element("ward").Text.Set(ward));
@@ -209,11 +209,11 @@ public static class EveryStage
             .Else(pipeline => pipeline.Element("status").Classes.Add("quiet"));
         pipeline.Validate(intake);
         pipeline.Unload("resident-card");
-        pipeline.Post<TModel, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake).Set(r => r.Name, text))
+        pipeline.Post<TModel, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake).Set(r => r.Name, text))
             .OnSuccess(Content.Html, (loaded, pipeline) => pipeline.Into("resident-card", loaded.Body));
     }
 
-    private static void EveryRouteModule<TModel>(Pipeline<TModel> pipeline, ITypedSource<string?> text, ITypedSource<ValidationProblem> problem, RequestForm<IntakeRequest> intake)
+    private static void EveryRouteModule<TModel>(Pipeline<TModel> pipeline, ITypedSource<string?> text, ITypedSource<ValidationProblem> problem, RequestContainer<IntakeRequest> intake)
     {
         pipeline.ShowValidationErrors(problem);
         EveryModule(pipeline, text, intake);

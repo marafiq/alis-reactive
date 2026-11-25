@@ -66,7 +66,7 @@ public sealed class Rows<TModel, TRow>
     /// <remarks>
     /// The steps hold one request at their own level, a GET whose values are the view's own or read from the row, so a
     /// new tab, a middle click or a copied link opens what a click loads. Steps with no such GET, or a GET that sends a
-    /// header, an input, a form, or a date, a fraction, flags or a list, are refused where the view renders: render a
+    /// header, an input, or a date, a fraction, flags or a list, are refused where the view renders: render a
     /// button for them.
     /// </remarks>
     /// <param name="source">The call of the helper's plugin that takes the action's controls and returns the object that raises the action.</param>

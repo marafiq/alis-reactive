@@ -1,5 +1,6 @@
 import sys
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 NS = {"t": "http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}
 
@@ -21,9 +22,33 @@ def outcomes(run_folder):
     return result
 
 
-before_folder, after_folder, before_sha = sys.argv[1], sys.argv[2], sys.argv[3]
+def retired_lines(retired_file):
+    retired = {}
+    for line in Path(retired_file).read_text().splitlines():
+        if not line.strip():
+            continue
+        parts = [part.strip() for part in line.split("|")]
+        if len(parts) != 3 or not all(parts):
+            raise SystemExit(f"a line of {retired_file} is not '<class.method> | <promise constant> | <class.method that now carries it>': {line}")
+        retired[parts[0]] = parts[2]
+    return retired
+
+
+before_folder, after_folder, before_sha, retired_file = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 before, after = outcomes(before_folder), outcomes(after_folder)
-passed_before = sorted(key for key, outcome in before.items() if outcome == "Passed")
+retired = retired_lines(retired_file)
+refused = []
+for key, carrier in retired.items():
+    if key in after:
+        refused.append(f"retired and still run: {key}")
+    elif before.get(key) != "Passed":
+        refused.append(f"retired and not passed at {before_sha}: {key}")
+    elif after.get(carrier) != "Passed":
+        refused.append(f"retired, and its carrier did not pass: {key} -> {carrier}")
+    elif carrier in before:
+        refused.append(f"retired, and its carrier ran at {before_sha}: {key} -> {carrier}")
+retired_now = {key: carrier for key, carrier in retired.items() if key not in after and before.get(key) == "Passed" and after.get(carrier) == "Passed" and carrier not in before}
+passed_before = sorted(key for key, outcome in before.items() if outcome == "Passed" and key not in retired_now)
 failing = [key for key in passed_before if key in after and after[key] != "Passed"]
 
 
@@ -50,9 +75,13 @@ for key in failing:
     print(f"passed at {before_sha}, {after[key].lower()} now: {key}")
 for key in gone:
     print(f"passed at {before_sha}, gone now: {key}")
+for key, carrier in retired_now.items():
+    print(f"retired: {key}, its promise carried by {carrier}")
+for line in refused:
+    print(line)
 newly = sorted(key for key, outcome in after.items() if outcome == "Passed" and before.get(key) != "Passed")
 print(f"{len(passed_before)} passed at {before_sha}; {len(newly)} pass now that did not")
-if failing or gone:
-    print(f"{len(failing)} that passed at {before_sha} fail now and {len(gone)} are gone")
+if failing or gone or refused:
+    print(f"{len(failing)} that passed at {before_sha} fail now, {len(gone)} are gone and {len(refused)} retired lines are refused")
     sys.exit(1)
 print(f"no test that passed at {before_sha} fails or is gone")

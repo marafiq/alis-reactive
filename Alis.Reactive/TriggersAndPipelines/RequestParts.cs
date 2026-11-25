@@ -27,8 +27,6 @@ public sealed class QueryParts<TRequest>
     internal QueryParts<TRequest> PlacedInput<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.Source(stage, member, input.Value, _parts.FillsAPlaceholder(member))));
 
-    internal QueriedParts<TRequest> Submitted(RequestForm<TRequest> form) => new(_parts, _parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))));
-
     internal QueriedParts<TRequest> Sent(RequestContainer<TRequest> container) => new(_parts, _parts.Sends(_stage, container.ElementId, ClassNames.ModelKey(typeof(TRequest))));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
@@ -207,8 +205,6 @@ public sealed class BodyParts<TRequest>
     internal BodiedParts<TRequest> PlacedInput<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         => new(_parts, _parts.Multipart(_stage, stage => _parts.Input(stage, member, input.Id, placed => _parts.PlacedSource(placed, member, input.Value))));
 
-    internal BodiedParts<TRequest> Submitted(RequestForm<TRequest> form) => new(_parts, _parts.Multipart(_parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))), _ => { }));
-
     internal BodiedParts<TRequest> Sent(RequestContainer<TRequest> container) => new(_parts, _parts.Multipart(_parts.Sends(_stage, container.ElementId, ClassNames.ModelKey(typeof(TRequest))), _ => { }));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
@@ -285,13 +281,6 @@ public sealed class BodyParts<TRequest>
     /// <returns>The request's parts, which take no second body.</returns>
     public BodiedParts<TRequest> UrlEncoded(Action<UrlEncodedBody<TRequest>> body) => new(_parts, _parts.UrlEncoded(_stage, stage => body(new UrlEncodedBody<TRequest>(_parts, stage))));
 
-    /// <summary>Sends a URL-encoded body whose fields the lambda sets, with a native form's submission set.</summary>
-    /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
-    /// <param name="body">The body's members.</param>
-    /// <returns>The request's parts, which take no second body.</returns>
-    public BodiedParts<TRequest> UrlEncoded(RequestForm<TRequest> form, Action<UrlEncodedBody<TRequest>> body)
-        => new(_parts, _parts.UrlEncoded(_parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))), stage => body(new UrlEncodedBody<TRequest>(_parts, stage))));
-
     /// <summary>Sends a URL-encoded body whose fields the lambda sets, with the framework inputs of a container.</summary>
     /// <param name="container">The container whose framework inputs the request sends; it becomes the request's container, where its failures show.</param>
     /// <param name="body">The body's members.</param>
@@ -303,13 +292,6 @@ public sealed class BodyParts<TRequest>
     /// <param name="body">The body's members.</param>
     /// <returns>The request's parts, which take no second body.</returns>
     public BodiedParts<TRequest> Multipart(Action<MultipartBody<TRequest>> body) => new(_parts, _parts.Multipart(_stage, stage => body(new MultipartBody<TRequest>(_parts, stage))));
-
-    /// <summary>Sends a multipart body whose fields and files the lambda sets, with a native form's submission set.</summary>
-    /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
-    /// <param name="body">The body's members.</param>
-    /// <returns>The request's parts, which take no second body.</returns>
-    public BodiedParts<TRequest> Multipart(RequestForm<TRequest> form, Action<MultipartBody<TRequest>> body)
-        => new(_parts, _parts.Multipart(_parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))), stage => body(new MultipartBody<TRequest>(_parts, stage))));
 
     /// <summary>Sends a multipart body whose fields and files the lambda sets, with the framework inputs of a container.</summary>
     /// <param name="container">The container whose framework inputs the request sends; it becomes the request's container, where its failures show.</param>

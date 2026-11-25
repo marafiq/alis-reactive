@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A date range picker: EJ2's DateRangePicker, which holds the first and the last day of the range a person chose.
 /// </summary>
 /// <remarks>
-/// A picker bound to a member is an input: a form sends its <see cref="Value"/>, the range's two days, and a check
+/// A picker bound to a member is an input: a request container sends its <see cref="Value"/>, the range's two days, and a check
 /// reads it. A handler of <see cref="Change"/> reads the committed range.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-calendars", "DateRangePicker")]

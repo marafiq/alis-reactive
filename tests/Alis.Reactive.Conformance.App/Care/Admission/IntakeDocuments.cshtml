@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<IntakeDocuments>();
 }
 <h1>Admission: documents</h1>
-@using (var intake = Html.BeginRequestForm(plan, "intake-documents"))
+@using (var intake = Html.BeginRequestContainer(plan, "intake-documents"))
 {
     <fieldset>
         <legend>Resident</legend>
@@ -18,17 +18,21 @@
     </fieldset>
     <fieldset>
         <legend>First document</legend>
-        <label>File <input type="file" name="Documents[0].File"></label>
-        <label>Caption <input type="text" name="Documents[0].Caption"></label>
+        <label for="first-document-file">File</label>
+        @(plan.Render<IntakeDocumentFile>("first-document-file", Html.Raw("<input type=\"file\" id=\"first-document-file\">")))
+        @(Html.InputField(plan, m => m.Documents[0].Caption, options => options.Label("Caption")).NativeTextBox())
     </fieldset>
     <fieldset>
         <legend>Second document</legend>
-        <label>File <input type="file" name="Documents[1].File"></label>
-        <label>Caption <input type="text" name="Documents[1].Caption"></label>
+        <label for="second-document-file">File</label>
+        @(plan.Render<IntakeDocumentFile>("second-document-file", Html.Raw("<input type=\"file\" id=\"second-document-file\">")))
+        @(Html.InputField(plan, m => m.Documents[1].Caption, options => options.Label("Caption")).NativeTextBox())
     </fieldset>
     <button type="button" @Html.Raises(plan, IntakeDocumentSaves.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(IntakeDocumentSaves.Save, pipeline => pipeline
-        .Post<IntakeDocuments>(IntakeDocumentsEndpoints.Saves, request => request.Form(intake.Form))
+        .Post<IntakeDocuments>(IntakeDocumentsEndpoints.Saves, request => request.Multipart(intake.Container, body => body
+            .File(m => m.Documents[0].File, pipeline.Component<IntakeDocumentFile>("first-document-file").Files.Items.At(0))
+            .File(m => m.Documents[1].File, pipeline.Component<IntakeDocumentFile>("second-document-file").Files.Items.At(0))))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
 }
 <p>Saved: <span id="saved">-</span></p>

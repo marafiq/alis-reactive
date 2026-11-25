@@ -53,12 +53,6 @@ public static class CondensedRequests
     public static GetRequest<TModel, TRequest, Response<TRequest, Markup>> Into<TModel, TRequest>(this GetRequest<TModel, TRequest> request, string elementId)
         => request.OnSuccess(Content.Html, (reply, pipeline) => pipeline.Into(elementId, reply.Body));
 
-    /// <summary>Sends a native form's submission set as the browser builds it: a GET's in its query, any other request's as multipart fields and files.</summary>
-    /// <param name="request">The request's parts.</param>
-    /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
-    /// <returns>The request's parts, which take no second container.</returns>
-    public static QueriedParts<TRequest> Form<TRequest>(this QueryParts<TRequest> request, RequestForm<TRequest> form) => request.Submitted(form);
-
     /// <summary>Sends the framework inputs inside a container: a GET's in its query, any other request's as multipart fields and files.</summary>
     /// <param name="request">The request's parts.</param>
     /// <param name="container">The container whose framework inputs the request sends; it becomes the request's container, where its failures show.</param>
@@ -160,12 +154,6 @@ public static class CondensedRequests
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
         => request.PlacedSource(member, value);
-
-    /// <summary>Sends a native form's submission set as the browser builds it: a GET's in its query, any other request's as multipart fields and files.</summary>
-    /// <param name="request">The request's parts.</param>
-    /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
-    /// <returns>The request's parts, which take no second container.</returns>
-    public static BodiedParts<TRequest> Form<TRequest>(this BodyParts<TRequest> request, RequestForm<TRequest> form) => request.Submitted(form);
 
     /// <summary>Sends the framework inputs inside a container: a GET's in its query, any other request's as multipart fields and files.</summary>
     /// <param name="request">The request's parts.</param>

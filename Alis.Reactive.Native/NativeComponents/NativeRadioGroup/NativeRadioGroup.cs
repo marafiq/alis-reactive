@@ -7,7 +7,7 @@ namespace Alis.Reactive.Native.NativeComponents;
 /// A radio group: radios that hold one member, its value the chosen radio's value.
 /// </summary>
 /// <remarks>
-/// A radio group bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. A
+/// A radio group bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. A
 /// write of <see cref="Value"/> checks the radio of that value and no other, so a value no radio holds checks
 /// none, and a write raises no <see cref="Change"/>.
 /// </remarks>

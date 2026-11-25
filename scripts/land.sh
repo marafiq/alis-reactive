@@ -45,7 +45,9 @@ else
   run="${run%/}"
   test "$(basename "$run")" != "$last_run" || { echo "[land] the browser run wrote no new folder"; exit 1; }
   grep -q -E '"label": "all"' "$run/selection.json" || { echo "[land] the newest run is not --all: $run"; exit 1; }
-  python3 -I "$T/regressions.py" "$R/$last_run" "$run" "$last_sha" > "$W/regress-$n.txt"
+  retired="$W/retired-$n.txt"
+  test -f "$retired" || : > "$retired"
+  python3 -I "$T/regressions.py" "$R/$last_run" "$run" "$last_sha" "$retired" > "$W/regress-$n.txt"
   cat "$W/regress-$n.txt"
   grep -q -x "no test that passed at $last_sha fails or is gone" "$W/regress-$n.txt" || { echo "[land] a test that passed before fails; not committed"; exit 1; }
   test -z "$(git diff --name-only -- . ':!HANDOFF.md')" || { echo "[land] the browser run left unstaged changes:"; git diff --name-only -- . ':!HANDOFF.md'; exit 1; }

@@ -6,6 +6,6 @@ namespace Intake;
 
 public static class SecondContainerOnGet
 {
-    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<BedQuery> search, RequestContainer<BedQuery> filters)
-        => pipeline.Get<BedQuery>("/Wards/{ward}/Beds", query => query.Form(search).Inputs(filters));
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestContainer<BedQuery> search, RequestContainer<BedQuery> filters)
+        => pipeline.Get<BedQuery>("/Wards/{ward}/Beds", query => query.Inputs(search).Inputs(filters));
 }

@@ -10,14 +10,14 @@
     var plan = Html.ReactivePlan<DeputyAppointment>();
 }
 <h1>Deputy</h1>
-@using (var appointment = Html.BeginRequestForm(plan, "deputy-appointment"))
+@using (var appointment = Html.BeginRequestContainer(plan, "deputy-appointment"))
 {
     <fieldset>
         <legend>Phone</legend>
         @(Html.InputField(plan, m => m.Deputy!.Phone, options => options.Label("Phone")).NativeTextBox())
     </fieldset>
     @(Html.NativeButton("save-deputy", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<DeputyAppointment>(DeputyAppointmentEndpoints.Appointments, request => request.Form(appointment.Form))
+        .Post<DeputyAppointment>(DeputyAppointmentEndpoints.Appointments, request => request.Inputs(appointment.Container))
         .Validate<DeputyAppointmentRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
 }

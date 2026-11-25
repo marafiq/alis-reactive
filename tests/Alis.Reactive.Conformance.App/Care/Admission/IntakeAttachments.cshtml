@@ -11,12 +11,12 @@
     var plan = Html.ReactivePlan<IntakeAttachments>();
 }
 <h1>Admission attachments</h1>
-@using (var intake = Html.BeginRequestForm(plan, "intake-attachments"))
+@using (var intake = Html.BeginRequestContainer(plan, "intake-attachments"))
 {
     @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
     @(Html.InputField(plan, m => m.Attachments, options => options.Label("Attachments")).AttachmentPicker())
     @(Html.NativeButton("save-attachments", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<IntakeAttachments>(CarePages.IntakeAttachments, request => request.Form(intake.Form))
+        .Post<IntakeAttachments>(CarePages.IntakeAttachments, request => request.Inputs(intake.Container))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
 }
 <p>Saved: <output id="saved" aria-label="Saved">-</output></p>

@@ -11,7 +11,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// item chosen.
 /// </summary>
 /// <remarks>
-/// A box bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2 raises
+/// A box bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2 raises
 /// <see cref="Change"/> when a person chooses an item of the list or the value changes.
 /// </remarks>
 /// <typeparam name="TValue">The type of the member the box binds, which admits null, since the box holds null until a choice.</typeparam>

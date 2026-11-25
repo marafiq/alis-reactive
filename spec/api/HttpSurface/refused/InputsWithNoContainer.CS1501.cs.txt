@@ -4,8 +4,8 @@ using Alis.Reactive.Requests;
 
 namespace Intake;
 
-public static class FormWithNoForm
+public static class InputsWithNoContainer
 {
     public static void Refused(Pipeline<IntakeView> pipeline)
-        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form());
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs());
 }

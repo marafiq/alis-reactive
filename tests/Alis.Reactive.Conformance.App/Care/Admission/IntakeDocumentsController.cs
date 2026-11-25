@@ -8,7 +8,7 @@ public sealed class IntakeDocumentsController : Controller
     private const string PlainText = "text/plain";
 
     [HttpGet(CarePages.IntakeDocuments)]
-    public IActionResult OfAResident() => View("/Care/Admission/IntakeDocuments.cshtml", new IntakeDocuments());
+    public IActionResult OfAResident() => View("/Care/Admission/IntakeDocuments.cshtml", new IntakeDocuments { Documents = [new IntakeDocument(), new IntakeDocument()] });
 
     [HttpPost(IntakeDocumentsEndpoints.Saves)]
     public IActionResult Save([FromForm] IntakeDocuments intake)

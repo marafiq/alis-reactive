@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A rich text editor: EJ2's RichTextEditor, which holds a member's formatted text as HTML.
 /// </summary>
 /// <remarks>
-/// An editor bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2 raises
+/// An editor bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2 raises
 /// <see cref="Change"/> when the editor loses focus after its content changed, which commits the content.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-richtexteditor", "RichTextEditor")]

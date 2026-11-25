@@ -100,5 +100,49 @@
    }
   ],
   "expect": null
+ },
+ {
+  "name": "a hand-written control's mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.AnUnsentMemberReadsWhatTheEndpointBinds.HandWrittenControlSent.cfg",
+    "old": "CONSTANT Mutant = \"HandWrittenControlSent\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.AnUnsentMemberReadsWhatTheEndpointBinds.HandWrittenControlSent.cfg: expected AnUnsentMemberReadsWhatTheEndpointBinds violated, saw Model checking completed"
+ },
+ {
+  "name": "a container's native submission mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/RequestsAndResponses/Request.violates.FailedCheckSendsNothing.ContainerSubmitsNatively.cfg",
+    "old": "CONSTANT Mutant = \"ContainerSubmitsNatively\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Request.violates.FailedCheckSendsNothing.ContainerSubmitsNatively.cfg: expected FailedCheckSendsNothing violated, saw Model checking completed"
+ },
+ {
+  "name": "a hidden input's unsent mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenLeftUnsent.cfg",
+    "old": "CONSTANT Mutant = \"HiddenLeftUnsent\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenLeftUnsent.cfg: expected AHiddenInputReachesAFormBodyAlone violated, saw Model checking completed"
+ },
+ {
+  "name": "a hidden input's mutant that sends it outside a form body disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenSentOutsideAFormBody.cfg",
+    "old": "CONSTANT Mutant = \"HiddenSentOutsideAFormBody\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenSentOutsideAFormBody.cfg: expected AHiddenInputReachesAFormBodyAlone violated, saw Model checking completed"
  }
 ]

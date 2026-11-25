@@ -11,7 +11,7 @@
     var plan = Html.ReactivePlan<LeastDoseRound>();
 }
 <h1>Medication round</h1>
-@using (var round = Html.BeginRequestForm(plan, "least-dose-round"))
+@using (var round = Html.BeginRequestContainer(plan, "least-dose-round"))
 {
     <fieldset>
         <legend>Least dose</legend>
@@ -26,7 +26,7 @@
         @(Html.InputField(plan, m => m.Amounts[1], options => options.Label("Amount")).NativeTextBox())
     </fieldset>
     @(Html.NativeButton("save-round", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<LeastDoseRound>(CareEndpoints.LeastDoseRounds, request => request.Form(round.Form))
+        .Post<LeastDoseRound>(CareEndpoints.LeastDoseRounds, request => request.Inputs(round.Container))
         .Validate<LeastDoseRoundRules>()
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))
         .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))

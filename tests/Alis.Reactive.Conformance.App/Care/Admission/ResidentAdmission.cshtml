@@ -8,7 +8,7 @@
     var plan = Html.ReactivePlan<ResidentAdmission>();
 }
 <h1>Admission</h1>
-@using (var admission = Html.BeginRequestForm(plan, "admission"))
+@using (var admission = Html.BeginRequestContainer(plan, "admission"))
 {
     using (var resident = Html.BeginRequestContainer(plan, "resident"))
     {

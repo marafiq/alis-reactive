@@ -6,6 +6,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): one concept on the developer's surface, the request container.
+  Html.BeginRequestForm, its block, RequestForm<TModel> and Form(form) leave, each carried by the container's door; a
+  request sends what its plan declares and the hidden inputs inside its container (below), and nothing else, the
+  browser's `FormData` builds the body it sends, and the plan's container carries no kind.
+- The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): the container takes care of hidden fields in the browser, since
+  views hold no form semantics. A hidden input inside a container's element, with a name and not disabled, is sent
+  under its name in a URL-encoded or a multipart body, `FormData` building that payload in TypeScript and never
+  replacing the container. The lead's reading within it: a JSON body and a GET's query carry none, since a hidden text
+  has no declared type and an antiforgery token never rides in a URL (D9.15, D14.8, D16.5). The owner can overrule it.
 - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
   left out under a list index that leaves its item with no field stops the request, or is refused where the view
   renders. `WhenBlank` gains "leaveUnlessAlone", which C# writes where an input's path holds a list index and it would
@@ -461,8 +470,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-08: a page holds many forms or none, and a request works without a form on the full form's
   parts; no door, default or check assumes one form per page or a form behind every request.
 - The owner, 2026-11-08: forms nest, sit out of band, or are containers of any kind; the concept is the request
-  container, and no type is named PageForm. The native `<form>` stays the browser's way to send a form's body (`Form`), and the core
-  sends any container's framework inputs (`Inputs`) and the view's own input (`Input`) beside it, losing no feature.
+  container, and no type is named PageForm. The core sends a container's framework inputs (`Inputs`), in a form body
+  the hidden inputs inside it too (D9.15), and the view's own input (`Input`) beside it; `FormData` is the browser's way
+  to build a form-data body (the owner, 2026-11-25).
 - The owner, 2026-11-08: a rule the source states is the compiler's. A type stages the door; where no type can, an
   analyzer refuses it; a refusal where the view renders names what only the render knows (the app's options, a value
   read at run time, another view). Every compiler rule of both lines carries a verdict in the core design.
@@ -938,26 +948,23 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   keeps its row of `spec/Reference/matrix.json` with D7.5 and X7.4, and holds no promise, no placement and no
   browser test. The text `Matches` tests is a condition's left operand, which source.ConditionLeft proves. The
   bench places ninety-eight cells. The owner can overrule it.
-- The lead, 2026-11-12, on the C# form of a view's request container, which D14.8 states as a block and N14.3
-  sent to gate 2. No line writes it, and no sentence of `spec/api`, of a module's features, of the POC or of the
-  redesign compiles it: the handles are parameters in `spec/api`, and the POC's nine forms are MVC's own
-  BeginForm helper, none sent by a pipeline. By G13 the form is the owner's before the unit that builds it. Seven
-  bench cells and every care screen's form are views U3 writes, so U3 declares the lead's proposal as signatures
-  and puts it to the owner in the handoff: `Html.BeginRequestForm(plan, containerId)` and
-  `Html.BeginRequestContainer(plan, containerId)`, doors of `RenderingAndDelivery` on each host, each returning a
-  block a view ends by `using`, as it ends MVC's own BeginForm helper: `RequestFormBlock<TModel>`, whose `Form` is
-  the `RequestForm<TModel>`, and `RequestContainerBlock<TModel>`, whose `Container` is the
-  `RequestContainer<TModel>`. A pipeline that sends the form is written inside the block, and another view
-  reaches the container by `pipeline.Container<TModel>(containerId)`. The live check a block names (D16.15) is
-  declared with the first view that names one. The cost of another form: one line of each view that holds a
-  container. The owner decides it.
+- The lead, 2026-11-12, on the C# form of a view's request container, which D14.8 states as a block and N14.3 sent to
+  gate 2. No line writes it, and no sentence of `spec/api`, of a module's features, of the POC or of the redesign
+  compiles it: the handles are parameters in `spec/api`, and the POC's nine forms are MVC's own BeginForm helper, none
+  sent by a pipeline. By G13 the form is the owner's before the unit that builds it. Seven bench cells and every care
+  screen's form are views U3 writes, so U3 declares the lead's proposal as signatures and puts it to the owner in the
+  handoff: `Html.BeginRequestContainer(plan, containerId)`, a door of `RenderingAndDelivery` on each host, returning a
+  block a view ends by `using`, as it ends MVC's own BeginForm helper: `RequestContainerBlock<TModel>`, whose
+  `Container` is the `RequestContainer<TModel>`. A pipeline that sends the container is written inside the block, and
+  another view reaches the container by `pipeline.Container<TModel>(containerId)`. The live check a block names (D16.15)
+  is declared with the first view that names one. The cost of another form: one line of each view that holds a
+  container. The owner, 2026-11-25, decided it: container, never form.
 - The lead, 2026-11-12, on the cell http.beside.hidden, whose promise read the form data as it leaves the page:
-  `Form(form)` on a request with a body sends the submission set as multipart, whose text holds a boundary the
-  browser makes, so no test reads it whole as a literal. The promise reads what the endpoint bound, which the
-  page shows: the test app's batch notes endpoint answers the batch and the code, and shown reads
-  "B-2026-11-10: a-1". The conformance component is an input by `spec/Reference/native.json`'s `input`, so its
-  declaration is an `IInputComponent`, and a second render helper renders it for a field. The owner can overrule
-  it.
+  `Inputs(container)` on a request with a body sends its inputs as multipart, whose text holds a boundary the browser
+  makes, so no test reads it whole as a literal. The promise reads what the endpoint bound, which the page shows: the
+  test app's batch notes endpoint answers the batch and the code, and shown reads "B-2026-11-10: a-1". The conformance
+  component is an input by `spec/Reference/native.json`'s `input`, so its declaration is an `IInputComponent`, and a
+  second render helper renders it for a field. The owner can overrule it.
 - The lead, 2026-11-12, settling what three forks read into while writing twenty refusal pages, each form fixed
   by its test. A message is its X line's text with each placeholder filled as the view writes the thing: `{term}`
   is the lambda's body ("d.Seal == seal"), `{member}` and `{read}` a lambda's path ("d.Seal", "owed.Due"),
@@ -1349,7 +1356,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The lead, 2026-11-13, declaring N13.1, a container's typed read of a member as it sends it, designed by a Fable
   agent at xhigh and decided from its answer read at the source. No line and no compiled sentence wrote its form, so
   by G13 it is the owner's, and U3 declares the lead's proposal as a signature: `container.Read(m => m.Member)`, a
-  member of `RequestContainer<TModel>`, the handle a block's `Form` or `Container` holds and
+  member of `RequestContainer<TModel>`, the handle a block's `Container` holds and
   `pipeline.Container<TModel>(containerId)` returns, named `Read` as `PageUrl<TPage>.Read`, a payload's `Read` and a
   method result's are. It is no second door beside `pipeline.Input(m => m.Member)`, which reaches the input by its id
   and reads its component's members in their own types (D13.3, D7.2). D7.7 now puts the read in the live form, since

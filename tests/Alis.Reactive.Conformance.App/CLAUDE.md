@@ -20,9 +20,9 @@ its views.
   answers a constant. A test observes what the server received, the values the person entered as the server stored
   them, and what changed, by the next read of that model (the owner, 2026-11-18: "Sending request isn't enough ...
   you gotta build the domain model of the apps in memory so that you can observe real behavior").
-- A screen's inputs sit in a request container, `Html.BeginRequestContainer`, since containers nest and a form cannot
-  hold a form (the owner, 2026-11-08: "forms are not always possible -- could be a container"); `Html.BeginRequestForm`
-  is for a page that sends its body as the browser's own form does and nests nothing.
+- A screen's inputs sit in a request container, `Html.BeginRequestContainer`: containers nest, sit inside a form the
+  view writes itself, and send only by a request (the owner, 2026-11-08: "forms are not always possible -- could be a
+  container"; 2026-11-25: "we agreed to use container instead of form").
 - A screen reads as a product's: it holds what its user does, a model of its own that no other screen shares, and
   nothing that exists only to be asserted.
 - `SliceTree.txt` orders its slices, so no screen reaches into another's model, and the framework's analyzers read
@@ -99,8 +99,8 @@ its views.
   events its buttons raise, declared as static members, and a view for each cell, named for it. A page starts its
   component from what its world holds, so one page serves a cell and its opposite case. A cell that holds a
   Native input binds it to a member of the page's model through `Html.InputField`, with the label a person finds
-  it by (`Bench/Sources/SourceConditionRight.cshtml`). A cell that sends a form renders it as a block,
-  `Html.BeginRequestForm`, ended by `using`, with the pipeline that sends it inside the block
+  it by (`Bench/Sources/SourceConditionRight.cshtml`). A cell that sends a container's inputs renders it as a block,
+  `Html.BeginRequestContainer`, ended by `using`, with the pipeline that sends it inside the block
   (`Bench/Http/HttpBesideHidden.cshtml`); the conformance component bound to a member is rendered by its second
   render helper, for a field (`Components/ConformanceComponent/ConformanceComponentHtml.cs`). `Bench/Vendors/`
   holds the pages of module 12's feature tests, each on the conformance declaration that holds its vendor kind;

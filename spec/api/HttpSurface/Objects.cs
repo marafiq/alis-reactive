@@ -52,20 +52,13 @@ public sealed class ValidationProblem
     public IReadOnlyDictionary<string, IReadOnlyList<string>> Errors { get; init; } = new Dictionary<string, IReadOnlyList<string>>();
 }
 
-public class RequestContainer<TModel>
+public sealed class RequestContainer<TModel>
 {
-    private protected RequestContainer()
+    private RequestContainer()
     {
     }
 
     public TypedSource<TValue> Read<TValue>(Expression<Func<TModel, TValue>> member) => throw new NotSupportedException();
-}
-
-public sealed class RequestForm<TModel> : RequestContainer<TModel>
-{
-    private RequestForm()
-    {
-    }
 }
 
 public sealed class Notice

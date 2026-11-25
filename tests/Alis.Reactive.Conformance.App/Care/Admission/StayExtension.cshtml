@@ -9,13 +9,13 @@
     var plan = Html.ReactivePlan<StayExtension>();
 }
 <h1>Stay extension</h1>
-@using (var stay = Html.BeginRequestForm(plan, "stay"))
+@using (var stay = Html.BeginRequestContainer(plan, "stay"))
 {
     @(Html.InputField(plan, m => m.Nights, options => options.Label("Nights")).NativeTextBox())
     <div id="stay-extension"></div>
     <button type="button" @Html.Raises(plan, StayExtensions.AddTheExtension)>Add the extension</button>
     <button type="button" @Html.Raises(plan, StayExtensions.Quote)>Quote</button>
-    Html.On(plan, trigger => trigger.CustomEvent(StayExtensions.Quote, pipeline => pipeline.Element("quote").Text.Set(stay.Form.Read(m => m.Nights))));
+    Html.On(plan, trigger => trigger.CustomEvent(StayExtensions.Quote, pipeline => pipeline.Element("quote").Text.Set(stay.Container.Read(m => m.Nights))));
 }
 <p>Nights quoted: <span id="quote">-</span></p>
 @{

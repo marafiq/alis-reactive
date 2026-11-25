@@ -10,7 +10,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// app's endpoint writes the suggestion.
 /// </summary>
 /// <remarks>
-/// An area bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2 raises
+/// An area bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2 raises
 /// <see cref="Change"/> when the area loses focus after its text changed, which commits the text.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-inputs", "SmartTextArea")]

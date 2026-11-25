@@ -10,14 +10,14 @@
     var plan = Html.ReactivePlan<VisitBooking>();
 }
 <h1>Book a visit</h1>
-@using (var visit = Html.BeginRequestForm(plan, "visit-booking"))
+@using (var visit = Html.BeginRequestContainer(plan, "visit-booking"))
 {
     <fieldset>
         <legend>Visit</legend>
         @(Html.InputField(plan, m => m.At, options => options.Label("At")).NativeTextBox())
     </fieldset>
     @(Html.NativeButton("save-visit", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<VisitBooking>(VisitBookingEndpoints.Visits, request => request.Form(visit.Form))
+        .Post<VisitBooking>(VisitBookingEndpoints.Visits, request => request.Inputs(visit.Container))
         .Validate<VisitValidator>()
         .OnSuccess(Content.Text, (booked, pipeline) => pipeline.Element("booked").Text.Set(booked.Body))))
 }

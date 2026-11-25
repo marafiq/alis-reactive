@@ -8,7 +8,7 @@
     var plan = Html.ReactivePlan<NextOfKinAdmission>();
 }
 <h1>Admission</h1>
-@using (Html.BeginRequestForm(plan, "next-of-kin"))
+@using (Html.BeginRequestContainer(plan, "next-of-kin"))
 {
     <fieldset>
         <legend>Name</legend>

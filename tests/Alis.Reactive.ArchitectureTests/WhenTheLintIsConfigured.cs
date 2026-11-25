@@ -10,6 +10,8 @@ public class WhenTheLintIsConfigured
     private const string App = "tests/Alis.Reactive.Conformance.App/";
     private const string Cases = "tests/Alis.Reactive.ArchitectureTests/LintCases/";
     private const string BesideTheFileThatFindsARootsPlans = "Alis.Reactive.Assets/runtime/Execution/";
+    private const string TheFileThatReadsAContainersHiddenInputs = "Alis.Reactive.Assets/runtime/InputsAndIds/page.ts";
+    private const string BesideTheFileThatReadsAContainersHiddenInputs = "Alis.Reactive.Assets/runtime/InputsAndIds/";
     private const string Equality = "eqeqeq";
     private const string BooleanCondition = "@typescript-eslint/strict-boolean-expressions";
     private const string ExhaustiveSwitch = "@typescript-eslint/switch-exhaustiveness-check";
@@ -264,6 +266,31 @@ public class WhenTheLintIsConfigured
         {
             File.Delete(Path.Combine(Repository.Root, written));
         }
+    }
+
+    [RefusedCase]
+    public void a_wide_query_beside_the_one_file_that_reads_a_containers_hidden_inputs_is_refused()
+    {
+        var written = WriteIn(BesideTheFileThatReadsAContainersHiddenInputs, "export function found(root: ParentNode): number {\n  return root.querySelectorAll(\"input\").length;\n}\n");
+        try
+        {
+            var (_, messages) = Lint(written);
+
+            Assert.That(messages, Is.EqualTo(new[] { new Message(written, RestrictedSyntax, Error, 2) }));
+        }
+        finally
+        {
+            File.Delete(Path.Combine(Repository.Root, written));
+        }
+    }
+
+    [AcceptedCase]
+    public void the_one_file_that_reads_a_containers_hidden_inputs_queries_inside_its_element()
+    {
+        var (files, messages) = Lint(TheFileThatReadsAContainersHiddenInputs);
+
+        Assert.That(files, Is.EqualTo(new[] { TheFileThatReadsAContainersHiddenInputs }), "The lint did not read the file");
+        Assert.That(messages, Is.Empty);
     }
 
     [AcceptedCase]

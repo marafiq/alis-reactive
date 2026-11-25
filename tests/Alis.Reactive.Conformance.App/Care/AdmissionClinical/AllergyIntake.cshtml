@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<AllergyIntake>();
 }
 <h1>Clinical intake</h1>
-@using (var clinical = Html.BeginRequestForm(plan, "clinical"))
+@using (var clinical = Html.BeginRequestContainer(plan, "clinical"))
 {
     <fieldset>
         <legend>Allergies</legend>
@@ -19,7 +19,7 @@
     </fieldset>
     <button type="button" @Html.Raises(plan, AllergyIntakes.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(AllergyIntakes.Save, pipeline => pipeline
-        .Post<AllergyIntake>(AllergyIntakeEndpoints.Intakes, request => request.Form(clinical.Form))
+        .Post<AllergyIntake>(AllergyIntakeEndpoints.Intakes, request => request.Inputs(clinical.Container))
         .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
 }
 <p id="saved">Not saved</p>

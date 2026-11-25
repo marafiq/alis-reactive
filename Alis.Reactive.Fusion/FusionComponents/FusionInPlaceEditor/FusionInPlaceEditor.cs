@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// An in-place editor: EJ2's InPlaceEditor, a value shown as text that a person clicks to edit and saves.
 /// </summary>
 /// <remarks>
-/// An editor bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. EJ2 raises
+/// An editor bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2 raises
 /// <see cref="EndEdit"/> when a person finishes editing, the event that commits the input.
 /// </remarks>
 /// <typeparam name="TValue">The type of the member the editor binds, which admits null, since the editor holds null until a value is set.</typeparam>

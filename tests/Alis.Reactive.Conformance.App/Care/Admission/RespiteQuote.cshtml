@@ -10,11 +10,11 @@
 }
 <h1>Respite quote</h1>
 <section aria-label="Quote">
-    @using (var quote = Html.BeginRequestForm(plan, "respite-quote"))
+    @using (var quote = Html.BeginRequestContainer(plan, "respite-quote"))
     {
         @(Html.InputField(plan, m => m.Nights, options => options.Label("Nights")).NativeTextBox())
         <button type="button" @Html.Raises(plan, RespiteQuotes.Quote)>Quote</button>
-        Html.On(plan, trigger => trigger.CustomEvent(RespiteQuotes.Quote, pipeline => pipeline.Element("quote").Text.Set(quote.Form.Read(m => m.Nights))));
+        Html.On(plan, trigger => trigger.CustomEvent(RespiteQuotes.Quote, pipeline => pipeline.Element("quote").Text.Set(quote.Container.Read(m => m.Nights))));
     }
     <p>Nights quoted: <span id="quote">-</span></p>
 </section>

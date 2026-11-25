@@ -35,6 +35,7 @@
     <Compile Include="$(ConformanceApp)Care/Record/VisitBoard.cs" Link="ConformanceApp/Care/Record/VisitBoard.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/AdmitResident.cs" Link="ConformanceApp/Care/Admission/AdmitResident.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/IntakeDocuments.cs" Link="ConformanceApp/Care/Admission/IntakeDocuments.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/IntakeDocumentFile.cs" Link="ConformanceApp/Care/Admission/IntakeDocumentFile.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/RoomNumbering.cs" Link="ConformanceApp/Care/Admission/RoomNumbering.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/RoomIntake.cs" Link="ConformanceApp/Care/Admission/RoomIntake.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/SavedIntake.cs" Link="ConformanceApp/Care/Admission/SavedIntake.cs" />

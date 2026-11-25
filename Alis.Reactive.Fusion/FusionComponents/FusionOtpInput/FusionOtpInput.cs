@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A one-time code input: EJ2's OtpInput, a row of boxes that each hold one character of a code a person types.
 /// </summary>
 /// <remarks>
-/// An input bound to a member is an input of the form: a form sends its <see cref="Value"/> and a check reads it. EJ2
+/// An input bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. EJ2
 /// raises <see cref="Input"/> at each character and <see cref="ValueChanged"/> when the input loses focus after its
 /// code changed, which commits the code.
 /// </remarks>

@@ -40,13 +40,9 @@ public sealed class BodyParts<TRequest>
 
     public BodiedParts<TRequest> UrlEncoded(Action<UrlEncodedBody<TRequest>> body) => throw new NotSupportedException();
 
-    public BodiedParts<TRequest> UrlEncoded(RequestForm<TRequest> form, Action<UrlEncodedBody<TRequest>> body) => throw new NotSupportedException();
-
     public BodiedParts<TRequest> UrlEncoded(RequestContainer<TRequest> container, Action<UrlEncodedBody<TRequest>> body) => throw new NotSupportedException();
 
     public BodiedParts<TRequest> Multipart(Action<MultipartBody<TRequest>> body) => throw new NotSupportedException();
-
-    public BodiedParts<TRequest> Multipart(RequestForm<TRequest> form, Action<MultipartBody<TRequest>> body) => throw new NotSupportedException();
 
     public BodiedParts<TRequest> Multipart(RequestContainer<TRequest> container, Action<MultipartBody<TRequest>> body) => throw new NotSupportedException();
 

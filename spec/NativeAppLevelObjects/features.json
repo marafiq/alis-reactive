@@ -402,7 +402,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Post<IntakeView, ResidentForm>(\"/Residents\", request => request.Form(\"drawer-resident-form\")).WhileLoading(pipeline => pipeline.Element(\"resident-form-status\").Text.Set(\"Saving resident...\")).Finally(pipeline => pipeline.Element(\"resident-form-status\").Text.Set(\"\"));",
+          "text": "pipeline.Post<IntakeView, ResidentForm>(\"/Residents\", request => request.Inputs(pipeline.Container<IntakeView, ResidentForm>(\"drawer-resident-form\"))).WhileLoading(pipeline => pipeline.Element(\"resident-form-status\").Text.Set(\"Saving resident...\")).Finally(pipeline => pipeline.Element(\"resident-form-status\").Text.Set(\"\"));",
           "doors": [
             "N10.7",
             "M5.N1",

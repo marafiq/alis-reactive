@@ -10,7 +10,7 @@ namespace Alis.Reactive.RequestsAndResponses;
 /// A request container of a view: the element whose inputs a request sends and whose summary shows that request's failures.
 /// </summary>
 /// <typeparam name="TModel">The model the container's block was rendered for.</typeparam>
-public class RequestContainer<TModel>
+public sealed class RequestContainer<TModel>
 {
     private readonly PlanContent _plan;
 
@@ -37,13 +37,3 @@ public class RequestContainer<TModel>
     public TypedSource<TValue> Read<TValue>(Expression<Func<TModel, TValue>> member) => ContainerReads.Of(_plan, ElementId, member);
 }
 
-/// <summary>
-/// A request container that is a native form, whose submission set a request sends as the browser builds it.
-/// </summary>
-/// <typeparam name="TModel">The model the form's block was rendered for.</typeparam>
-public sealed class RequestForm<TModel> : RequestContainer<TModel>
-{
-    internal RequestForm(string elementId, PlanContent plan) : base(elementId, plan)
-    {
-    }
-}

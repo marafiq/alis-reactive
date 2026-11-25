@@ -133,14 +133,14 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Post<IntakeRequest>(\"/Wards/{ward}/Intake\", request => request.Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Form(intake))",
+          "text": "pipeline.Post<IntakeRequest>(\"/Wards/{ward}/Intake\", request => request.Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Inputs(intake))",
           "doors": [
             "N10.7"
           ]
         },
         {
           "line": "proposed",
-          "text": "pipeline.Post<IntakeRequest>(\"/Wards/{ward}/Intake\", request => request.Path(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Multipart(body => body.Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Form(intake)))",
+          "text": "pipeline.Post<IntakeRequest>(\"/Wards/{ward}/Intake\", request => request.Path(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Multipart(intake, body => body.Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))))",
           "doors": [
             "N10.7"
           ]
@@ -497,6 +497,10 @@
         {
           "id": "X9.46",
           "rung": "refusal"
+        },
+        {
+          "id": "X9.47",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -543,11 +547,11 @@
         },
         {
           "for": "X9.15",
-          "page": "A native form intake holding Name and a hand-written input named Code, a select named Ward outside the form's element with form=\"intake\", under the antiforgery field place; a POST sends Form(intake) as URL-encoded, and the endpoint echoes Ward, Code and the number of antiforgery fields it read.",
+          "page": "A container intake holding Name and a hand-written input named Code beside MVC's own antiforgery field, a Ward drop-down outside the container's element, under the antiforgery field place; a POST sends Inputs(intake) and Input(r => r.Ward, pipeline.Input(m => m.Ward)) as URL-encoded, and the endpoint echoes Ward, Code and the number of antiforgery fields it read.",
           "gesture": "Type Ada, pick East, type A7 into Code and click Admit.",
-          "outcome": "The echo reads Ward East, Code A7, fields 1.",
-          "opposite": "With the select's form attribute removed, the echo reads Ward none.",
-          "defect": "The control outside the element dropped, so Ward reads none; the hand-written input dropped, so Code reads none; or the form's own antiforgery field kept beside the framework's, so fields reads 2."
+          "outcome": "The echo reads Ward East, Code none, fields 1.",
+          "opposite": "With the request's Input of Ward taken out, the echo reads Ward none.",
+          "defect": "The hand-written control sent, so Code reads A7; the view's own antiforgery field sent beside the framework's, so fields reads 2; or the input outside the element dropped, so Ward reads none."
         },
         {
           "for": "X9.16",
@@ -860,6 +864,14 @@
           "outcome": "The page is refused where the view renders with \"The request sends 'Visits[1].When' in its query past a list position from a value it leaves out when it reads nothing, and no member of 'Visits[1]' is always sent, so the item would send no field and the endpoint's list would end before it on both hosts; send beside it a member of the item that is always sent, a literal, a text or a nullable member outside every condition, or send the list in a JSON body.\"",
           "opposite": "The page whose query also sets Visits[1].Note from the literal Review renders, and Book follow-up gets the bookings endpoint at ?Visits%5B0%5D.Note=Bloods&Visits%5B1%5D.When=2026-12-01&Visits%5B1%5D.Note=Review, which answers 2 visits, the follow-up on 2026-12-01 for Review, and the page writes it into booked.",
           "defect": "The page renders, and where the read reads nothing the query leaves Visits[1] with no field, so the endpoint binds one visit."
+        },
+        {
+          "for": "X9.47",
+          "page": "A handover page whose container handover holds the Name text box, MVC's own HiddenFor over the model's Shift, Night, a hidden input the view wrote named Ward holding North and a disabled one named Bed holding 4, beside a hidden input named Unit holding East outside the container's element; Hand over posts UrlEncoded(handover, body => body.Set(r => r.Desk, \"Front\")) and Look up gets the same endpoint with Inputs(handover), and the endpoint echoes each field it read with its value, by name.",
+          "gesture": "Type Ada into Name and click Hand over, then click Look up.",
+          "outcome": "After Hand over the echo reads Desk Front; Name Ada; Shift Night; Ward North.",
+          "opposite": "After Look up the echo reads Name Ada: the query carries no hidden input.",
+          "defect": "The hidden inputs left out of the form body, so the echo reads Desk Front; Name Ada; the disabled one or the one outside the element sent, so Bed or Unit shows; or the hidden inputs carried into the query, so Look up's echo reads Name Ada; Shift Night; Ward North."
         }
       ],
       "verdicts": [
@@ -937,7 +949,7 @@
         {
           "door": "GatherBuilder<TModel>.IncludeAll() -> GatherBuilder<TModel!>!",
           "verdict": "refused",
-          "reason": "It sends every registered input of the page, which no request names: a request names what it sends, a native form by Form(form), any container by Inputs(container) and one input by Input (D9.15).",
+          "reason": "It sends every registered input of the page, which no request names: a request names what it sends, any container by Inputs(container) and one input by Input (D9.15).",
           "carriers": [
             "N10.7",
             "N9.2"
@@ -1652,7 +1664,7 @@
         },
         {
           "for": "X10.12",
-          "page": "A request written only as Post<AdmissionRequest>(url, request => request.Form(admission)).OnSuccess(..), under defaults with ShowValidationErrors(); the server answers 400 with an error at Name.",
+          "page": "A request written only as Post<AdmissionRequest>(url, request => request.Inputs(admission)).OnSuccess(..), under defaults with ShowValidationErrors(); the server answers 400 with an error at Name.",
           "gesture": "Click Admit.",
           "outcome": "Name shows the server's message inside the admission form, and the form's summary lists it.",
           "opposite": "Under defaults without ShowValidationErrors(), the catch-all notice shows and Name shows nothing.",

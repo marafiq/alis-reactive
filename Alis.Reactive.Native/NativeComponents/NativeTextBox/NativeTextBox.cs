@@ -7,7 +7,7 @@ namespace Alis.Reactive.Native.NativeComponents;
 /// A text box: an HTML <c>input</c> that holds a member's text.
 /// </summary>
 /// <remarks>
-/// A text box bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. Its
+/// A text box bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. Its
 /// <see cref="Change"/> is raised once a person commits the text, so a handler of it reads the committed text
 /// from <see cref="Value"/>.
 /// </remarks>

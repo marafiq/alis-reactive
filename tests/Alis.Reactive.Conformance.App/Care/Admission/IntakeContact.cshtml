@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<ContactIntake>();
 }
 <h1>Intake</h1>
-@using (var intake = Html.BeginRequestForm(plan, "intake"))
+@using (var intake = Html.BeginRequestContainer(plan, "intake"))
 {
     @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
     using (var contact = Html.BeginRequestContainer(plan, "contact"))
@@ -24,7 +24,7 @@
     <button type="button" @Html.Raises(plan, IntakeContacts.SendContact)>Send contact</button>
     <button type="button" @Html.Raises(plan, IntakeContacts.SendAll)>Send all</button>
     Html.On(plan, trigger => trigger.CustomEvent(IntakeContacts.SendAll, pipeline => pipeline
-        .Post<ContactIntake>(IntakeContactEndpoints.Contacts, request => request.Inputs(intake.Form))
+        .Post<ContactIntake>(IntakeContactEndpoints.Contacts, request => request.Inputs(intake.Container))
         .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("received").Text.Set(received.Body))));
 }
 <p>Received by the desk: <span id="received">-</span></p>

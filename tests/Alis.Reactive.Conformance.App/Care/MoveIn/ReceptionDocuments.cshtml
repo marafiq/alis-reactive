@@ -9,11 +9,8 @@
 @{
     var plan = Html.ReactivePlan<DocumentsPage>();
 }
-@using (var documents = Html.BeginRequestForm(plan, "reception-documents"))
+@using (var documents = Html.BeginRequestContainer(plan, "reception-documents"))
 {
-    @Html.AntiForgeryToken()
-    @Html.HiddenFor(m => m.Version)
-    @Html.HiddenFor(m => m.Kind)
     @(Html.NativeHiddenField(plan, m => m.LastModified[0]))
     <label for="reception-document">Reception document</label>
     @(plan.Render<AdmissionFileInput>("reception-document", Html.TextBoxFor(m => m.Files, new { type = "file", id = "reception-document" }))
@@ -29,7 +26,11 @@
             .Path(m => m.DraftId, Model.DraftId)
             .Header(MoveInEndpoints.CoordinatorHeader, draft.Read(m => m.CoordinatorId))
             .Header(MoveInEndpoints.OperationHeader, draft.Read(m => m.OperationId))
-            .Form(documents.Form))
+            .Multipart(documents.Container, body => body
+                .Set(r => r.Version, Model.Version)
+                .Set(r => r.Kind, Model.Kind)
+                .Set(r => r.Caption, pipeline.Component<NativeTextBox>("reception-document-caption").Value)
+                .File(m => m.Files, pipeline.Component<AdmissionFileInput>("reception-document").Files.Items)))
         .OnSuccess<DocumentReply>((filed, pipeline) => pipeline.Get<ReceiptQuery>(CareEndpoints.MoveInReceipts, request => request
             .Query(m => m.DraftId, filed.Body.Read(r => r.Admission.DraftId))
             .Query(m => m.Reference, filed.Body.Read(r => r.Admission.Documents.Receipt.Id))).Into("reception-document-receipt"))

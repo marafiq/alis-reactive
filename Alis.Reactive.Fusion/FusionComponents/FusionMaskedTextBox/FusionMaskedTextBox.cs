@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// A masked text box: EJ2's MaskedTextBox, a text box that holds the characters its mask admits.
 /// </summary>
 /// <remarks>
-/// A box bound to a member is an input: a form sends its <see cref="Value"/> and a check reads it. A handler of
+/// A box bound to a member is an input: a request container sends its <see cref="Value"/> and a check reads it. A handler of
 /// <see cref="Change"/> reads the committed value.
 /// </remarks>
 [Mirrors("@syncfusion/ej2-inputs", "MaskedTextBox")]

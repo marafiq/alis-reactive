@@ -7,12 +7,12 @@
 @{
     var plan = Html.ReactivePlan<FluidsCard>();
 }
-@using (var card = Html.BeginRequestForm(plan, "fluids-card"))
+@using (var card = Html.BeginRequestContainer(plan, "fluids-card"))
 {
     @(Html.InputField(plan, m => m.Value, options => options.Label("Millilitres")).NativeTextBox())
     <button type="button" @Html.Raises(plan, FluidsCards.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(FluidsCards.Save, pipeline => pipeline
-        .Post<FluidsCard>(ChartCardEndpoints.Fluids, request => request.Form(card.Form))
+        .Post<FluidsCard>(ChartCardEndpoints.Fluids, request => request.Inputs(card.Container))
         .OnSuccess(Content.Text, (charted, pipeline) => pipeline.Element("fluids-charted").Text.Set(charted.Body))));
 }
 <p>Charted: <span id="fluids-charted"></span></p>
