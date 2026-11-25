@@ -1,20 +1,20 @@
 # Handoff
 
-Written at `date`: Wed Nov 25 17:07:45 EST 2026
+Written at `date`: Wed Nov 25 17:13:57 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 29, each in the notes block below
-unit: landed (51): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
+unit: landed (52): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
 unit: building (2): FormDataBoundary, MoveInOwners
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: waiting (2): RowContainers, ValidationForms
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at 49dd77295 on feature/rewrite
+lane: pushing at bfe8076c8 on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at 49dd77295
+ci: unread at bfe8076c8
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,22 +27,20 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 49dd77295 requests (ContainerOnly): the request container is the one door, and it sends the hidden inputs inside it in a form body
-- Full check: .work/logs/spec-check-49dd77295.log: spec check at 49dd77295: 40 of 40 checks pass
+- HEAD: bfe8076c8 spec (MoveInDoorMap): the move-in door map names 141 doors, Form gone with ContainerOnly; a worker lands once its turn ends
+- Full check: .work/logs/spec-check-bfe8076c8.log: spec check at bfe8076c8: 40 of 40 checks pass
 - .work/last-run.txt: 20261125-164038-7773 49dd77295
 
 ## Landed since the commit before the last spec: STATE commit
-49dd77295 requests (ContainerOnly): the request container is the one door, and it sends the hidden inputs inside it in a form body
-48839f502 spec: STATE and handoff at 2f84ee35b
+bfe8076c8 spec (MoveInDoorMap): the move-in door map names 141 doors, Form gone with ContainerOnly; a worker lands once its turn ends
+2dcfabb3e spec: STATE and handoff at 49dd77295
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 465 to 469
-- A rule or a tool's list not applied before the change: 459 to 473
-- A shell command or a script wrong in its own terms: 665 to 673
+- A rule or a tool's list not applied before the change: 473 to 474
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): one concept on the developer's surface, the request container.
@@ -118,8 +116,8 @@ Its units, in order:
    - ContainerOnly landed at 49dd77295, "839 selected, 839 ran, 839 passed", spec check 40 of 40: one request container,
      its hidden inputs sent in a form body (the owner, 2026-11-25). A unit whose paths hold scripts/land-unit.sh lands from
      a copy, `cp ../<worktree>/scripts/land-unit.sh .work/land-unit-run.sh`, since cp rewrites the script bash is reading.
-   - FormDataBoundary, ../form-data-boundary, After ContainerOnly; ValidationForms, ../validation-forms, After
-     FormDataBoundary; RowContainers, ../row-containers, After ValidationForms.
+   - FormDataBoundary, ../form-data-boundary, next: ContainerOnly is landed, so it moves first by its move.sh to the
+     lane's head; ValidationForms, ../validation-forms, After it; RowContainers, ../row-containers, After ValidationForms.
    A waiting unit moves once the unit before it is landed and pushed, in its worktree by one command,
    `bash .landing/<Name>/move.sh <the lane's head>`: spec/MISTAKES.md from HEAD, the head checked out, npm ci, the
    lead's counts re-applied by counts.py beside it. Then its brief's "At the base:" commands, a `builder` on Opus at
