@@ -1468,49 +1468,9 @@
       "pass": true
     },
     "fluent": {
-      "counts": {
-        "F1": "pass",
-        "F1_names": 142,
-        "F1_rows": 142,
-        "F1_synonym_groups": 26,
-        "F2": "pass",
-        "F2_cells": 255,
-        "F2_compiling": 151,
-        "F2_failing": 0,
-        "F2_forms": 33,
-        "F2_forms_as_named": 33,
-        "F2_gap_doors": 8,
-        "F2_gaps": 99,
-        "F2_position_gaps": 3,
-        "F2_positions": 15,
-        "F2_refused": 5,
-        "F2_source_gaps": 4,
-        "F2_sources": 17,
-        "F3": "pass",
-        "F3_differ": 22,
-        "F3_kept": 6,
-        "F3_names": 36,
-        "F3_same_under_rules": 16,
-        "F3_stale_kept": 0,
-        "F4": "pass",
-        "F4_data": 143,
-        "F4_hides": 0,
-        "F4_no_row": 0,
-        "F4_other_name": 0,
-        "F4_parameters": 455,
-        "F4_rows": 11,
-        "F4_rows_unused": 1,
-        "F4_slots": 92,
-        "F5": "pass",
-        "F5_parameters": 110,
-        "F5_rows": 47,
-        "F5_stale_rows": 0,
-        "F5_untyped": 0,
-        "lambda_parameters": 463,
-        "members": 545
-      },
-      "detail": "one concept per name, every Q7 cell compiles, is refused as named or waits on a door the spec marks new, one shape per name, callbacks named as the locked table names them, every string parameter of a closed kind",
-      "pass": true
+      "counts": {},
+      "detail": "spec/api/CshtmlStages does not build: cal/share/dotnet/sdk]\n8.0.100-rc.2.23502.2 [/usr/local/share/dotnet/sdk]\n8.0.100 [/usr/local/share/dotnet/sdk]\n9.0.101 [/usr/local/share/dotnet/sdk]\n10.0.100-preview.7.25380.108 [/usr/local/share/dotnet/sdk]\n10.0.101 [/usr/local/share/dotnet/sdk]\n11.0.100-rc.1.26425.128 [/usr/local/share/dotnet/sdk]",
+      "pass": false
     },
     "gate1": {
       "counts": {},
@@ -1667,7 +1627,7 @@
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "248 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
+      "detail": "248 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways; check.py and its plants unchanged since that run",
       "digest": "6308b098534c1c140efecb3ad7236ac951e0576076d3cc14ab9ef37944b27bc0",
       "pass": true
     },
@@ -1679,8 +1639,8 @@
         "net48": 87,
         "node": 62
       },
-      "detail": "every fact printed by its probe or found at its source line, every browser fact with the proof the rewrite ships",
-      "pass": true
+      "detail": "AspNetCoreBinding exited 155: Learn about SDK resolution: https://aka.ms/dotnet/sdk-not-found",
+      "pass": false
     },
     "promises": {
       "counts": {
@@ -4356,14 +4316,16 @@
       "pass": true
     }
   },
-  "passed": 40,
-  "read_at_head": "e02fafe666a4897571ad876c02a1d71964a2e6d3",
+  "passed": 38,
+  "read_at_head": "d13a4ce7fc8a0d4ce8f4fb04f20053f068571b2a",
   "step": {
-    "failing": [],
-    "name": "End of session",
-    "next": "Write the report and copy the handoff with pbcopy.",
-    "number": 13,
-    "phase": "E"
+    "failing": [
+      "probes"
+    ],
+    "name": "Q1 to Q18, TLA+ specs, probes, history",
+    "next": "Answer Q1 to Q18 in spec/Core/DESIGN.md with their TLA+ specs and probes; write spec/history.tsv.",
+    "number": 4,
+    "phase": "C"
   },
   "total": 40
 }
