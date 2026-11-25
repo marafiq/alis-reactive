@@ -20,7 +20,6 @@ for landing in "$@"; do
 done
 mkdir -p "$W" || exit 1
 [ -z "$(git diff --name-only -- . ':!HANDOFF.md')" ] || { echo "[$batch] unstaged changes before the batch"; exit 1; }
-mistakes=0
 for d in "${folders[@]}"; do
   slice="$(basename "$d")"
   [ -f "$d/paths.txt" ] && [ -f "$d/message.txt" ] || { echo "[$batch] $slice: no paths.txt or message.txt"; exit 1; }
@@ -28,7 +27,7 @@ for d in "${folders[@]}"; do
   python3 -I -B scripts/state.py --unit "$P" "$slice" || { echo "[$batch] $slice: not ready, as scripts/state.py reads it"; exit 1; }
   while IFS= read -r path; do
     [ -n "$path" ] || continue
-    if [ "$path" = "spec/MISTAKES.md" ]; then mistakes=1; continue; fi
+    if [ "$path" = "spec/MISTAKES.md" ]; then continue; fi
     case "$path" in tests/Alis.Reactive.Conformance.World/Promises.g.cs|tests/Alis.Reactive.Conformance.World/Gates.g.cs) continue;; esac
     if [ ! -e "$P/$path" ]; then git rm -q -- "$path" || exit 1; continue; fi
     atbase="$(git rev-parse -q --verify "$BASE:$path" 2>/dev/null)"; athead="$(git rev-parse -q --verify "HEAD:$path" 2>/dev/null)"
@@ -45,8 +44,7 @@ for d in "${folders[@]}"; do
     git add -- "$path"
   done < "$d/paths.txt"
 done
-if [ "$mistakes" = 1 ]; then
-  python3 -I -B - "$P" "$BASE" <<'PY' || exit 1
+python3 -I -B - "$P" "$BASE" <<'PY' || exit 1
 import re, sys, subprocess
 from pathlib import Path
 def counts(text):
@@ -63,8 +61,7 @@ for kind in built:
     print("counted", kind[:40], "+", n)
 p.write_text(t)
 PY
-  git add -- spec/MISTAKES.md
-fi
+git add -- spec/MISTAKES.md
 for d in "${folders[@]}"; do
   slice="$(basename "$d")"
   if [ -f "$d/spec.py" ]; then python3 -I -B "$d/spec.py" . > /dev/null || { echo "[$batch] $slice: spec.py refused"; exit 1; }; fi
