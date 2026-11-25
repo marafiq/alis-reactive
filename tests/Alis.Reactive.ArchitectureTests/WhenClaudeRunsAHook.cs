@@ -26,6 +26,9 @@ public class WhenClaudeRunsAHook
         "for unit in \"ci Handoff\" \"skill BuildAScreen\"; do set -- $unit; echo \"$1\"; done",
         "names=\"a b\"; for name in $names; do echo \"$name\"; done",
         "TSC=\"node tsc -b\"\n$TSC > tsc.log 2>&1",
+        "c=$(git rev-list -1 HEAD); git show $c:spec/MISTAKES.md",
+        "echo \"$dir:t\"",
+        "set -- a/b; echo $1:h",
     ];
 
     private static readonly string[] OneFactFromACommandThisMachineGetsWrong =
@@ -41,6 +44,9 @@ public class WhenClaudeRunsAHook
         "cat > run.sh <<'EOF'\nfor unit in $units; do set -- $unit; $TOOL \"$1\"; done\nEOF\nbash run.sh",
         "S=/tmp/work; \"$S/tool\" --version; $S/tool --version; echo $S done",
         "bash -c 'for name in $names; do echo \"$name\"; done'",
+        "c=$(git rev-list -1 HEAD); git show \"${c}:spec/MISTAKES.md\"",
+        "echo \"$PATH:/usr/local/bin\" \"$host:8080\"",
+        "awk -F: '{ print $1:h }' file",
     ];
 
     [Test]

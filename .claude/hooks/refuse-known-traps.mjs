@@ -10,6 +10,7 @@ process.stdin.on("end", () => {
     searchesWithGrepInclude,
     startsCodexWithItsInputOpen,
     splitsAVariableIntoWordsAsBashDoes,
+    readsAModifierAfterABareName,
   ]
     .map((trap) => trap(command))
     .find((reason) => reason !== undefined);
@@ -94,5 +95,11 @@ function splitsAVariableIntoWordsAsBashDoes(command) {
     /(^|[;&|]\s*|\n\s*)\$\{?[A-Za-z_][A-Za-z0-9_]*\}?[ \t]+[^=\s]/.test(shell);
   return splits
     ? "zsh does not split a variable into words as bash does: `set -- $name`, `for x in $name` and a command held in a variable each run as one word here. Write the words out, or run it as a bash script (CLAUDE.md, How you work)."
+    : undefined;
+}
+
+function readsAModifierAfterABareName(command) {
+  return /\$(?:[A-Za-z_][A-Za-z0-9_]*|[0-9]):(?:[aAehlPrstu&]|g[s&])/.test(outsideHeredocsAndSingleQuotes(command))
+    ? "zsh reads a letter after a bare $name and a colon as a modifier: $c:spec is a substitution and $c:h the head. Write ${name}: (CLAUDE.md, How you work)."
     : undefined;
 }

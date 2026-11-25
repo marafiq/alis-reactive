@@ -29,7 +29,7 @@ python3 scripts/state.py
 python3 scripts/open.py
 ```
 Builds run one at a time, with a read-only consult beside the build (the owner, 2026-11-17).
-Commands on this Mac: git grep's extended expressions take no \b and no \s; zsh ties the variable path to PATH, expands $var:A, stops a command whose glob matches no file and runs a command held in a variable as one word, so a script is bash and writes ${var}; BSD sed's in-place edit takes ''; a tool that reads its input is started with < /dev/null.
+Commands on this Mac: git grep's extended expressions take no \b and no \s; zsh ties the variable path to PATH, reads a letter after a bare $var and a colon as a modifier, stops a command whose glob matches no file and runs a command held in a variable as one word, so a script is bash and writes ${var}; BSD sed's in-place edit takes ''; a tool that reads its input is started with < /dev/null.
 The browser runner takes --test or --all here and no --filter. A script bash is running is never edited; a planted file is restored by cp and touch, since mv keeps the old time.
 
 ## Vision: typed access to JavaScript objects
@@ -123,7 +123,7 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | A comment in any language; an XML doc off a shipped package's public surface | `WhenCodeIsWritten` |
 | A rule file that names code the repo does not hold | `tests/Alis.Reactive.ArchitectureTests/WhenARuleNamesTheCode.cs` |
 | A hand edit of the generated contract | `.claude/hooks/protect-generated.mjs`, held by `WhenClaudeRunsAHook` |
-| A command in a shape this machine gets wrong: a `git grep` extended expression with a class it lacks, the browser runner by a filter, `grep --include`, Codex started with its input open, a variable split into words as bash splits it | `.claude/hooks/refuse-known-traps.mjs`, held by `WhenClaudeRunsAHook` |
+| A command in a shape this machine gets wrong: a `git grep` extended expression with a class it lacks, the browser runner by a filter, `grep --include`, Codex started with its input open, a variable split into words as bash splits it, a letter after a bare variable and a colon, which zsh reads as a modifier | `.claude/hooks/refuse-known-traps.mjs`, held by `WhenClaudeRunsAHook` |
 | A commit the landing script did not make, where `scripts/land.sh` stands | the pre-commit hook `scripts/install-git-hooks.sh` installs |
 | An untyped public door; a door handed `dynamic` as a type argument, a plan opened over `object`, or a call bound at run time by a `dynamic` argument; a slice that uses a later row; a namespace off its folder; an open public class; a table off its project | `ALIS009`, `ALIS044`, `ALIS010`, `ALIS011`, `ALIS012`, `ALIS013` |
 | A project that holds folders, or a shipped package, built without its slice table; a friend assembly, an internal opened to a test or to a consumer | `WhenAProjectHoldsFolders`, `WhenAPackageShips`, `WhenAnInternalIsExposed` |
