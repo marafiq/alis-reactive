@@ -40,7 +40,8 @@ read. Read these whole, before anything else:
 - Read no secret and no file that holds a credential, a machine's NuGet or npm configuration among them. When a
   restore fails for the machine's sources, say so and stop that probe.
 - Write only under the scratch folder your brief names, and enter it only in a subshell, `( cd <folder> && … )`.
-- Run no git command that writes, and no command your brief does not name.
+- Run no git command that writes, and no command your brief does not name beyond the reads every design takes: `git show`,
+  `git grep`, `git log`, `git ls-tree` and `git status`, and `ls` and `mkdir` under your landing folder.
 - Decide only what your brief asks. A form the spec does not state you decide by quality, from the TLA+ specs, the
   principles and the owner's decisions, and name it decided; only a principle, a closed rule or a scope goes back,
   as one line for the owner.
