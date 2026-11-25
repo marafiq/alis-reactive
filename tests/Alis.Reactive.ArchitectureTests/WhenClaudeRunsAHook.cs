@@ -29,6 +29,11 @@ public class WhenClaudeRunsAHook
         "c=$(git rev-list -1 HEAD); git show $c:spec/MISTAKES.md",
         "echo \"$dir:t\"",
         "set -- a/b; echo $1:h",
+        "git checkout -- spec/NOTES.md spec/STATE.json",
+        "cd ../core-leads && git checkout -- spec/NOTES.md",
+        "git -C ../core-leads checkout -- spec/NOTES.md",
+        "git restore spec/NOTES.md",
+        "grep -c -F \"`WhenAJsonSaveLeavesOutTheLeadsName`\" use-cases.md",
     ];
 
     private static readonly string[] OneFactFromACommandThisMachineGetsWrong =
@@ -47,6 +52,14 @@ public class WhenClaudeRunsAHook
         "c=$(git rev-list -1 HEAD); git show \"${c}:spec/MISTAKES.md\"",
         "echo \"$PATH:/usr/local/bin\" \"$host:8080\"",
         "awk -F: '{ print $1:h }' file",
+        "git checkout HEAD -- spec/NOTES.md spec/STATE.json",
+        "git -C ../core-leads checkout 830817f4b -- spec/NOTES.md",
+        "git restore --source=HEAD spec/NOTES.md",
+        "git restore --staged spec/NOTES.md",
+        "git checkout -b feature/x origin/main",
+        "grep -c -F '`WhenAJsonSaveLeavesOutTheLeadsName`' use-cases.md",
+        "echo \"a \\`literal\\` backtick\"",
+        "cat > note.md <<'EOF'\nthe `door`\nEOF",
     ];
 
     [Test]

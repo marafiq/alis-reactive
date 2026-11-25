@@ -11,6 +11,8 @@ process.stdin.on("end", () => {
     startsCodexWithItsInputOpen,
     splitsAVariableIntoWordsAsBashDoes,
     readsAModifierAfterABareName,
+    restoresAFileFromTheIndex,
+    substitutesABacktickedText,
   ]
     .map((trap) => trap(command))
     .find((reason) => reason !== undefined);
@@ -95,6 +97,23 @@ function splitsAVariableIntoWordsAsBashDoes(command) {
     /(^|[;&|]\s*|\n\s*)\$\{?[A-Za-z_][A-Za-z0-9_]*\}?[ \t]+[^=\s]/.test(shell);
   return splits
     ? "zsh does not split a variable into words as bash does: `set -- $name`, `for x in $name` and a command held in a variable each run as one word here. Write the words out, or run it as a bash script (CLAUDE.md, How you work)."
+    : undefined;
+}
+
+function restoresAFileFromTheIndex(command) {
+  const fromTheIndex = invocationsOf(outsideHeredocsAndSingleQuotes(command), "git ").some(
+    (invocation) =>
+      /^git(\s+-C\s+\S+)?\s+checkout(\s+-[A-Za-z-]+)*\s+--(\s|$)/.test(invocation) ||
+      (/^git(\s+-C\s+\S+)?\s+restore(\s|$)/.test(invocation) && !/\s(--source|-s|--staged|-S)(\s|=|$)/.test(invocation)),
+  );
+  return fromTheIndex
+    ? "git checkout -- <path> and git restore <path> take the file from the index, not from HEAD, so a file staged since keeps its staged text. Name the commit: git checkout HEAD -- <path> (CLAUDE.md, What is forbidden)."
+    : undefined;
+}
+
+function substitutesABacktickedText(command) {
+  return outsideHeredocsAndSingleQuotes(command).replace(/\\`/g, "").includes("`")
+    ? "A backtick outside single quotes runs the text it holds as a command. Write $(...) for a substitution, and put Markdown with backticks in single quotes or a file (CLAUDE.md, What is forbidden)."
     : undefined;
 }
 
