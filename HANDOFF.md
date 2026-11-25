@@ -1,20 +1,19 @@
 # Handoff
 
-Written at `date`: Tue Nov 24 22:42:06 EST 2026
+Written at `date`: Tue Nov 24 23:48:57 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
-unit: landed (43): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, ZshModifier
+unit: landed (44): BodilessCheck, SpecCiCold, MacTlc, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputSent, ListPosition, MarkdownLand, MistakesCarried, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
+unit: returned (8): FormDataBoundary, FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
-unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, InputForm, InputSentForms
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 45b14dc30 on feature/rewrite: equal to the remote
-  leaves by: the landing of a unit that is ready
-  read first: the queue of `HANDOFF.md`
-  exit line: "landed"
-  goes to: lane: landed
-ci: unread at 45b14dc30
+lane: pushing at c3aeae654 on feature/rewrite
+  leaves by: the last line `scripts/push.sh` prints
+  exit line: "remote equals HEAD"
+  goes to: lane: pushed
+ci: unread at c3aeae654
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,22 +26,21 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 45b14dc30 land: every unit's mistake counts are carried from its worktree, and a spec.py that edits one is refused
-- Full check: .work/logs/spec-check-45b14dc30.log: spec check at 45b14dc30: 40 of 40 checks pass
-- .work/last-run.txt: 20261124-223246-3320 45b14dc30
+- HEAD: c3aeae654 X3.7 written for the net48 twin: the resident card, its JsonResult address and its fixture, its run left to CI's Windows job
+- Full check: .work/logs/spec-check-c3aeae654.log: spec check at c3aeae654: 40 of 40 checks pass
+- .work/last-run.txt: 20261124-233944-29250 c3aeae654
 
 ## Landed since the commit before the last spec: STATE commit
-45b14dc30 land: every unit's mistake counts are carried from its worktree, and a spec.py that edits one is refused
-4e65460bb spec: STATE and handoff at 5d9328da2
+c3aeae654 X3.7 written for the net48 twin: the resident card, its JsonResult address and its fixture, its run left to CI's Windows job
+31c256b0f spec: STATE and handoff at 45b14dc30
 
 ## Open
-open: 19 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
+open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 453 to 461
-- A rule or a tool's list not applied before the change: 448 to 452
-- A shell command or a script wrong in its own terms: 649 to 655
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 461 to 463
+- A shell command or a script wrong in its own terms: 655 to 658
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
@@ -117,8 +115,10 @@ Its units, in order:
    at 6da8232ec (X16.46). On MVC 5 an action's model binds route values and the query beside the body
    (probe mvc5-value-provider-order), so a rule over a member a request sends in its path or query is checked at its
    start in the browser and bound on that endpoint; the meaning by host is designed whole and put to the owner
-   before the core freeze (D16.5, D16.6).
-3. X3.7 written on the net48 host; CI's Windows job proves it.
+   before the core freeze (D16.5, D16.6). In design since 2026-11-24 in ../form-data-boundary (FormDataBoundary), a
+   designer on Fable at xhigh, read-only, from 31c256b0f; its design.md is read at the source before it goes to the owner.
+3. X3.7 written on the net48 host; CI's Windows job proves it. In build since 2026-11-24 in ../x37-net48 (X37Net48), a
+   page-writer from 31c256b0f, its environment proven there: npm ci, the packs, the twin's and the tests' builds green.
 4. Eight parked core leads, each one verdict by the owner's test of 2026-11-20 (a reproduced defect, a reachable
    incomplete contract or an unproved promise is in; otherwise a row of the after-1.0 table), the raw text and
    single-file body check having landed at 6da8232ec as X16.46: the named enum in a pushed message, typed list construction from separate

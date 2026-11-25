@@ -4476,7 +4476,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "45b14dc3016d393317cb0a488ea6b4a8805ec19d",
+  "read_at_head": "c3aeae654ccfdc720bda031bf8415ad54ab8d85f",
   "step": {
     "failing": [],
     "name": "End of session",
