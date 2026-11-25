@@ -117,13 +117,13 @@ HANDOFF.md                            the generated state, landed work, open wor
 .github/                              the toolchain action, Dependabot, the release notes and section 2.8's workflows
 scripts/                              section 2.7's scripts
 scripts/toolchain-env.sh              the sourced toolchain environment from ALIS_TOOLCHAIN or the home folder
-scripts/gate.sh                       the staged unit's checks, refusing main
-scripts/land.sh                       pause TLC, gate, run every browser test, compare regressions, stamp and commit, resume TLC
+scripts/gate.sh                       the staged unit's checks, refusing main; for a unit of Markdown alone, the tests and checks that read Markdown and the state script
+scripts/land.sh                       pause TLC, gate, run every browser test, compare regressions, stamp and commit, resume TLC; a unit of Markdown alone takes the gate's Markdown path and no browser run
 scripts/land-unit.sh                  merge a worktree's landing folders, apply their spec edits, refuse a kind of mistake grown while its holder stood, and land one commit
 scripts/full-check.sh                 the full spec check at HEAD, its log under .work/logs/
 scripts/push.sh                       push the checked branch, then its STATE and generated handoff together
 scripts/regressions.py                compare a browser run with the last landed run
-scripts/stamp.py                      stamp a commit message with the browser run and regression result
+scripts/stamp.py                      stamp a commit message with what the land ran: the browser run and regression result, or the Markdown path's checks
 scripts/tlc.sh                        pause or resume TLC processes
 scripts/open.py                       list unwritten promises, runtime cases not built and doors not implemented
 scripts/handoff.py                    generate HANDOFF.md from facts, preserving the lead's next queue

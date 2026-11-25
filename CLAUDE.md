@@ -29,7 +29,7 @@ python3 scripts/state.py
 python3 scripts/open.py
 ```
 Builds run one at a time, with a read-only consult beside the build (the owner, 2026-11-17).
-Commands on this Mac: git grep's extended expressions take no \b and no \s; zsh ties the variable path to PATH, expands $var:A and runs a command held in a variable as one word, so a script is bash and writes ${var}; BSD sed's in-place edit takes ''; a tool that reads its input is started with < /dev/null.
+Commands on this Mac: git grep's extended expressions take no \b and no \s; zsh ties the variable path to PATH, expands $var:A, stops a command whose glob matches no file and runs a command held in a variable as one word, so a script is bash and writes ${var}; BSD sed's in-place edit takes ''; a tool that reads its input is started with < /dev/null.
 The browser runner takes --test or --all here and no --filter. A script bash is running is never edited; a planted file is restored by cp and touch, since mv keeps the old time.
 
 ## Vision: typed access to JavaScript objects
@@ -96,7 +96,7 @@ keeps (section 10); the modules and the owner's decisions are `spec/CLAUDE.md`'s
   5. Prove it on the rung that holds it, once: behavior by a `scripts/playwright.sh` result line, the test first failing
      on its planted defect (`scripts/plant-defect.sh`); a rule by a refused case it reports by name and an accepted case
      one fact away, both kept; a pin by a restore and a run. A failure goes back to 4 twice at most, then research.
-  6. Land through the lane of `.claude/rules/process.md`, behind the gate's `"[check] every check passed."`.
+  6. Land through the lane of `.claude/rules/process.md`, behind the gate's `"[check] every check passed."`, or for Markdown alone its `"[gate] the Markdown path: every check passed."`.
   7. The commit says what changed, its proof lines and what did not run; a unit's last commit rewrites where the
      rewrite stands (`spec/REWRITE.md`, section 4).
 - `spec/tools/check.py` and `spec/plants` change in two cases: a check reports wrongly on correct content, or it passes
@@ -110,8 +110,8 @@ scripts/playwright.sh --unit U2
 
 Behavior is done when a Playwright test proves it in a real browser, and not before: a real gesture and a visible
 outcome, on a page a developer would write, found as a user finds it, with no `page.evaluate()` and no read of a
-component's object (`.claude/rules/tests.md`); a build, a typecheck and a module's pure tests are no proof of it. Every commit waits on every written test at its tree, and a test that passed at the run before and
-fails stops it (the owner, 2026-11-15). A non-browser project runs when it is named first, as `dotnet test tests/Alis.Reactive.ArchitectureTests`.
+component's object (`.claude/rules/tests.md`); a build, a typecheck and a module's pure tests are no proof of it. Every commit of more than Markdown waits on every written test at its tree, and a test that passed at the run before and
+fails stops it (the owner, 2026-11-15; for Markdown, 2026-11-24). A non-browser project runs when it is named first, as `dotnet test tests/Alis.Reactive.ArchitectureTests`.
 
 ## What is forbidden, and what refuses it
 

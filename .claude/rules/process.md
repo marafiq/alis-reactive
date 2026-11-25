@@ -29,7 +29,7 @@ what it says is open only what a read or a run at the source showed (the lead's 
 | unit: waiting | after-unlanded | nothing | the unit it names lands; then it moves to the new head and each command of its "Done" runs there | each line of the brief's "Done" | unit: ready | unit: building |
 | unit: building | not built and tree-changed | the rule file of each kind of file, as it is opened | the builder's work: the test red, the code, the test green, `scripts/plant-defect.sh` | each line of the brief's "Done" | unit: ready, or unit: returned for an agent | unit: building, twice at most, then research |
 | unit: briefed | not built | the brief; each file its "Rules" names; the kinds of `spec/MISTAKES.md` | its builder starts: the lead, or the agent handed the brief | none | unit: building | none |
-| unit: ready | always | nothing | `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed | "landed", with the browser run's result line | unit: landed | unit: building |
+| unit: ready | always | nothing | `scripts/land-unit.sh {worktree} {base} "{title}" ".landing/{name}"`, while the lane is pushed; a unit whose every staged path ends in .md takes the Markdown path of `scripts/land.sh`, the checks that read Markdown and no browser run (the owner, 2026-11-24: "for md file changes u do not need whole flow to run") | "landed", with the browser run's result line, or for Markdown alone the gate's `"[gate] the Markdown path: every check passed."` | unit: landed | unit: building |
 
 ## Track: the lane
 

@@ -9,11 +9,21 @@ R=tests/Alis.Reactive.Conformance.PlaywrightTests/TestResults
 test "$(git branch --show-current)" != main || { echo "[land] main is refused"; exit 1; }
 test -f "$msg" || { echo "[land] no message at $msg"; exit 1; }
 test -n "$(git diff --cached --name-only)" || { echo "[land] nothing staged"; exit 1; }
-test -f .work/last-run.txt || {
-  echo "[land] .work/last-run.txt is missing. At the commit before, run scripts/playwright.sh --all once."
-  echo "[land] Then write the line '<run folder> <sha>' to .work/last-run.txt; the run folder is its name under $R."
-  exit 1
-}
+other="$(git diff --cached --name-only --no-renames | grep -v -E '\.md$' | head -1)"
+if [ -z "$other" ]; then
+  path=markdown
+  passed='\[gate\] the Markdown path: every check passed\.'
+  echo "[land] the Markdown path: every staged path ends in .md"
+else
+  path=full
+  passed='\[check\] every check passed\.'
+  echo "[land] the full path: $other is no Markdown"
+  test -f .work/last-run.txt || {
+    echo "[land] .work/last-run.txt is missing. At the commit before, run scripts/playwright.sh --all once."
+    echo "[land] Then write the line '<run folder> <sha>' to .work/last-run.txt; the run folder is its name under $R."
+    exit 1
+  }
+fi
 paused="$(pgrep -f 'tlc2.TL[C]' | tr '\n' ' ')"
 resume() {
   test -n "$paused" && kill -CONT $paused 2>/dev/null
@@ -22,22 +32,28 @@ resume() {
 trap resume EXIT
 test -n "$paused" && kill -STOP $paused
 echo "[quiet] paused TLC: ${paused:-none}"
-bash "$T/gate.sh" "$n"
-grep -q -x '\[check\] every check passed\.' "$W/gate-$n.log" || { echo "[land] the gate did not pass"; exit 1; }
+bash "$T/gate.sh" "$n" "$path"
+grep -q -x "$passed" "$W/gate-$n.log" || { echo "[land] the gate did not pass"; exit 1; }
 test -z "$(git diff --name-only -- . ':!HANDOFF.md')" || { echo "[land] the gate left unstaged changes:"; git diff --name-only -- . ':!HANDOFF.md'; exit 1; }
-read -r last_run last_sha < .work/last-run.txt
-caffeinate -i scripts/playwright.sh --all > "$W/pw-all-$n.log" 2>&1
-grep -E '^\[playwright:result\] all ' "$W/pw-all-$n.log" | tail -1
-run="$(command ls -1dt "$R"/[0-9]*/ | head -1)"
-run="${run%/}"
-test "$(basename "$run")" != "$last_run" || { echo "[land] the browser run wrote no new folder"; exit 1; }
-grep -q -E '"label": "all"' "$run/selection.json" || { echo "[land] the newest run is not --all: $run"; exit 1; }
-python3 -I "$T/regressions.py" "$R/$last_run" "$run" "$last_sha" > "$W/regress-$n.txt"
-cat "$W/regress-$n.txt"
-grep -q -x "no test that passed at $last_sha fails or is gone" "$W/regress-$n.txt" || { echo "[land] a test that passed before fails; not committed"; exit 1; }
-test -z "$(git diff --name-only -- . ':!HANDOFF.md')" || { echo "[land] the browser run left unstaged changes:"; git diff --name-only -- . ':!HANDOFF.md'; exit 1; }
-python3 -I "$T/stamp.py" "$msg" "$W/pw-all-$n.log" "$W/regress-$n.txt" "$W/stamped-$n.txt" || { echo "[land] the message could not be stamped"; exit 1; }
+if [ "$path" = markdown ]; then
+  python3 -I "$T/stamp.py" "$msg" "$W/stamped-$n.txt" markdown "$W/gate-$n.log" || { echo "[land] the message could not be stamped"; exit 1; }
+else
+  read -r last_run last_sha < .work/last-run.txt
+  caffeinate -i scripts/playwright.sh --all > "$W/pw-all-$n.log" 2>&1
+  grep -E '^\[playwright:result\] all ' "$W/pw-all-$n.log" | tail -1
+  run="$(command ls -1dt "$R"/[0-9]*/ | head -1)"
+  run="${run%/}"
+  test "$(basename "$run")" != "$last_run" || { echo "[land] the browser run wrote no new folder"; exit 1; }
+  grep -q -E '"label": "all"' "$run/selection.json" || { echo "[land] the newest run is not --all: $run"; exit 1; }
+  python3 -I "$T/regressions.py" "$R/$last_run" "$run" "$last_sha" > "$W/regress-$n.txt"
+  cat "$W/regress-$n.txt"
+  grep -q -x "no test that passed at $last_sha fails or is gone" "$W/regress-$n.txt" || { echo "[land] a test that passed before fails; not committed"; exit 1; }
+  test -z "$(git diff --name-only -- . ':!HANDOFF.md')" || { echo "[land] the browser run left unstaged changes:"; git diff --name-only -- . ':!HANDOFF.md'; exit 1; }
+  python3 -I "$T/stamp.py" "$msg" "$W/stamped-$n.txt" full "$W/pw-all-$n.log" "$W/regress-$n.txt" || { echo "[land] the message could not be stamped"; exit 1; }
+fi
 ALIS_LANDING=1 git commit -q -F "$W/stamped-$n.txt" || { echo "[land] the commit failed"; exit 1; }
-printf '%s %s\n' "$(basename "$run")" "$(git rev-parse --short=9 HEAD)" > .work/last-run.txt
+if [ "$path" = full ]; then
+  printf '%s %s\n' "$(basename "$run")" "$(git rev-parse --short=9 HEAD)" > .work/last-run.txt
+fi
 git log --oneline -1
 lsof -nP -iTCP -sTCP:LISTEN | grep -E 'Alis|dotnet' || true

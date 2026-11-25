@@ -107,15 +107,14 @@ for folder in map(Path, folders):
     body = re.sub(r"\n*^Here: .*?\{compared\}\"\.$", "", body, flags=re.S | re.M)
     parts += ["", body]
 parts += ["",
-          "Here: scripts/check.sh --no-spec, \"[check] every check passed.\"; scripts/playwright.sh --all, \"{run}\", compared test by",
-          "test with the run before, \"{compared}\".",
+          "Here: {here}",
           "",
           *attribution.read_text().splitlines()]
 Path(out).write_text("\n".join(parts) + "\n")
 PYMESSAGE
 caffeinate -i bash scripts/land.sh "$batch" "$W/msg-$batch.txt" > "$W/land-$batch.log" 2>&1
 if [ -z "$(git status --porcelain --untracked-files=no -- . ':!HANDOFF.md')" ] && [ "$(git log -1 --format=%s)" = "$title" ]; then
-  echo "[$batch] landed $(git rev-parse --short=9 HEAD): $(grep -E 'selected, .* ran' "$W/land-$batch.log" | tail -1)"
+  echo "[$batch] landed $(git rev-parse --short=9 HEAD): $(grep -E 'selected, .* ran|^\[gate\] the Markdown path: every check passed\.$' "$W/land-$batch.log" | tail -1)"
 else
   echo "[$batch] did not land; read $W/land-$batch.log"; grep -E "\[land\]|\[check\]|no test that passed|fails" "$W/land-$batch.log" | tail -4; exit 1
 fi
