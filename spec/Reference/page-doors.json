@@ -1135,6 +1135,20 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M2.F1 X7.21 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/CarerHandover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M2.F1 X7.22 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/CarerHandover.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M2.F1 X7.5 0": {
     "modules": [],
     "views": [

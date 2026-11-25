@@ -172,6 +172,14 @@
         {
           "id": "X7.20",
           "rung": "behavior"
+        },
+        {
+          "id": "X7.21",
+          "rung": "behavior"
+        },
+        {
+          "id": "X7.22",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -366,6 +374,22 @@
           "outcome": "Day planned reads sat, the name the app's JSON writes.",
           "opposite": "The same read set into the panel's Days arrives as the live form holds it: Send care then sends Care=Sat and Care sent reads Sat.",
           "defect": "The element's text is written through the mapping a live member takes, so Day planned reads 32."
+        },
+        {
+          "for": "X7.21",
+          "page": "A shift handover on the resident record, rendered with the day carer Ada in a NativeTextBox. Send handover GETs the night roster, whose reply names Ben on call, and in that route POSTs a JSON body whose Carers, an IReadOnlyList<string?>, is pipeline.List<string?>([the day carer's Value, the reply's OnCall]); the endpoint records the handover and answers the carers it bound, in order, which the page writes into handover.",
+          "gesture": "Click Send handover.",
+          "outcome": "handover reads Handover recorded: Ada, Ben.",
+          "opposite": "Send day handover, whose list holds the one source, reads Handover recorded: Ada.",
+          "defect": "The door writes its first item alone, so handover reads Handover recorded: Ada; for the opposite, a list of one is written as its item, so the endpoint binds no list and records no handover."
+        },
+        {
+          "for": "X7.22",
+          "page": "The shift handover of X7.21, rendered with the day carer Ada, in a world whose night roster names nobody on call, so the roster answers null and the reply's OnCall reads nothing. Send handover POSTs Carers, an IReadOnlyList<string?>, as pipeline.List<string?>([the day carer's Value, the reply's OnCall]); the endpoint binds the list as System.Text.Json binds it, records the handover and answers each carer it bound in order, a null one written as no carer on call, which the page writes into handover.",
+          "gesture": "Click Send handover.",
+          "outcome": "handover reads Handover recorded: Ada, no carer on call.",
+          "opposite": "With Ben seeded on the night roster, Send handover reads Handover recorded: Ada, Ben.",
+          "defect": "The door drops an item that reads nothing, so handover reads Handover recorded: Ada, and a door that stops on it sends nothing, so handover reads No handover sent.; for the opposite, a door that holds the reply's item as null reads Handover recorded: Ada, no carer on call."
         }
       ],
       "verdicts": [

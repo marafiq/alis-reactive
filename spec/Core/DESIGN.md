@@ -1319,7 +1319,8 @@ Terms used throughout:
   take any object; no type refuses them. ALIS043 refuses each at build (N18.17), and `pipeline.Concat` joins a text
   from sources (N7.7). The render receives a text like any other and refuses nothing.
 - D7.4 One builder makes an object from sources, member by typed member, and the dispatch payload, a method
-  or plugin argument and a property write all use it. One door makes a list from sources.
+  or plugin argument and a property write all use it. One door makes a list from sources. An item that reads nothing
+  is held as null, as an object's member is.
 - D7.5 Every condition operator takes a source for each operand: the text tests, `MinLength`, `Between`,
   membership and the comparisons. `Matches` takes a literal pattern only, because the pattern is checked
   where the view renders for the constructs JavaScript reads differently from .NET; a pattern read in the
@@ -1522,6 +1523,14 @@ Terms used throughout:
   that converter writes it, and a stage no value of its enum names reading nothing; days set from another
   panel's days arrive as held; and a planned day set as an element's text reads the name the app's JSON writes,
   `sat`, where the same read set into the panel's days arrives as its number.
+- `X7.21` behavior (D7.4, N7.2): a shift handover's carers, a list built from the day carer's text box and the night
+  roster's on-call carer, reach the endpoint as both, in order, where a door that wrote its first item alone sends the
+  day carer alone; a list built from the day carer alone reaches it as a list of one, where a list of one written as
+  its item binds no list.
+- `X7.22` behavior (D7.4): the same handover, its night roster naming nobody on call, reaches the endpoint as the day
+  carer and null, where a door that dropped an item that reads nothing sends the day carer alone and one that stopped
+  on it sends nothing; with a carer on call the list reaches it as both, where a door that held that item as null sends
+  the day carer and null.
 
 ## Q8. Conditions: three kinds
 

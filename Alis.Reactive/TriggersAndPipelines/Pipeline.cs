@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text.Json;
 using Alis.Reactive.Declarations;
@@ -238,6 +239,21 @@ public sealed partial class Pipeline<TModel>
         var building = new ObjectMembers<T>(form);
         members(building);
         return new Computed<T>(building.Written(), form);
+    }
+
+    /// <summary>Builds a list from sources when the step runs, an item for each source in the order the view writes them.</summary>
+    /// <remarks>
+    /// The list is a source wherever one of its type goes: a request member, an argument, a property. A source that
+    /// reads nothing gives its item null. A read that stops the pipeline stops it here.
+    /// </remarks>
+    /// <param name="items">The sources of the list's items, in order.</param>
+    /// <typeparam name="T">The type of the list's items.</typeparam>
+    /// <returns>A source of the list.</returns>
+    public TypedSource<IReadOnlyList<T>> List<T>(params ITypedSource<T>[] items)
+    {
+        if (items is null) throw new ArgumentNullException(nameof(items));
+        var written = Array.ConvertAll(items, item => Sources.FormOf(item).IntoLive<T>(Sources.Of(item)));
+        return new Computed<IReadOnlyList<T>>(new ListExpression(written), HeldForm.Live(_writer.Content.Json, _writer.Content.RendersUnder));
     }
 
     /// <summary>Joins a text from its parts when the step runs, in their order: texts the view holds and sources of any type.</summary>

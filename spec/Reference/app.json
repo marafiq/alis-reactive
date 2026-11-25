@@ -857,13 +857,13 @@
         {
           "id": "noteInputs",
           "kind": "nativeSlice",
-          "role": "the record's NativeTextBox, NativeTextArea and NativeCheckBox inputs: the note box, the pain, balance, intake, target and name fields, the Starts and Allergies fields, and the room-free and include-note boxes, and the night checks' Witness code box",
+          "role": "the record's NativeTextBox, NativeTextArea and NativeCheckBox inputs: the note box, the pain, balance, intake, target and name fields, the Starts and Allergies fields, and the room-free and include-note boxes, the night checks' Witness code box and the shift handover's Day carer box",
           "module": "NativeComponents"
         },
         {
           "id": "recordEndpoint",
           "kind": "endpoint",
-          "role": "the resident endpoint: tabs, notes, care plan and its failures"
+          "role": "the resident endpoint: tabs, notes, care plan and its failures, the night roster and the handovers it records"
         },
         {
           "id": "carePanel",
@@ -10110,6 +10110,40 @@
         "notes",
         "recordEndpoint",
         "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.21",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "noteInputs",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.22",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "noteInputs",
+        "recordEndpoint"
       ],
       "harness": [
         "seed"
