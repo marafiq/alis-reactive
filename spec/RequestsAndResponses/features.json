@@ -1591,6 +1591,10 @@
         {
           "id": "X10.29",
           "rung": "behavior"
+        },
+        {
+          "id": "X10.30",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -1771,6 +1775,14 @@
           "outcome": "After the 409 the error text reads Bed taken and the outcome reads status; after the dropped connection the error text is empty and the outcome reads network.",
           "opposite": "With a route written for 409, that route runs and the error text stays empty.",
           "defect": "The catch-all reads no body, so the error text stays empty after the 409, or its Body keeps the last body read, so the error text still reads Bed taken after the dropped connection."
+        },
+        {
+          "for": "X10.30",
+          "page": "A care plan review page that shows the reviews on record, which the world's care plan record keeps, and whose two buttons each send a PUT to one endpoint that records a review and answers 204 No Content: Mark reviewed and show the reviewer has a success route that reads JSON and writes the reviewer's name into the reviewer text, and a catch-all that writes the failure's outcome there; Mark reviewed has a success route of kind none that writes Reviewed into the review status, and a catch-all that writes the failure's outcome there.",
+          "gesture": "Click Mark reviewed and show the reviewer and reload the page, then click Mark reviewed and reload the page.",
+          "outcome": "The reviewer text reads content, from the catch-all, since the 204 names no JSON type, and after the reload the reviews on record read 1.",
+          "opposite": "Mark reviewed's route of kind none reads no body, so its OnSuccess runs and the review status reads Reviewed, and after the reload the reviews on record read 2.",
+          "defect": "An answer that names no type read as JSON, so the JSON route's OnSuccess runs with a body that reads nothing and the reviewer text is empty; or the route of kind none reading its body, so the 204 runs its catch-all and the review status reads content."
         }
       ],
       "verdicts": [

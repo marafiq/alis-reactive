@@ -3414,6 +3414,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F2 X10.30 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/CarePlanReview.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F2 X10.4 0": {
     "modules": [],
     "views": [

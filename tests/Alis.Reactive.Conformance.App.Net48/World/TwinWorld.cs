@@ -13,6 +13,8 @@ internal sealed class TwinWorld
 
     internal ShiftRosterBook ShiftRoster { get; } = ShiftRosterBook.Open();
 
+    internal CarePlanReviewBook CarePlanReview { get; } = CarePlanReviewBook.Open();
+
     internal DateTime? DateOfBirth { get; private set; }
 
     internal void Take(Seed seed, string noticeFolder)

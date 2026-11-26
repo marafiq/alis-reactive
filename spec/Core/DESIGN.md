@@ -2293,6 +2293,10 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   - a file, any media type, saved by the browser (D10.20);
   - none, a route with no data, whose body is not read.
 
+  A JSON, text or HTML route reads the answer's `Content-Type` before its body: a 2xx answer whose type is none its
+  kind takes, a 204 with no `Content-Type` among them, is a body not of the declared kind, so the catch-all runs with
+  `Failure.Outcome` content (D10.5, X10.30); a route of kind none reads no body, so a 204 runs its `OnSuccess`.
+
   Text and HTML are decoded by the `charset` their `Content-Type` names, else as UTF-8, through `TextDecoder`, since
   fetch's `text()` decodes UTF-8 whatever the header says (`probe:fetch-text-ignores-charset`). A HEAD answer has no
   body, so a HEAD request's routes are of kind none. C# writes `Accept` from the success route's kind alone, with no
@@ -2835,6 +2839,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `X10.29` behavior (N10.7): a typed catch-all, `OnError<TError>((failed, pipeline) => ..)`, reads the JSON body of a
   status no route names through `failed.Body`, and `Body` reads nothing after a network failure, while `Outcome` reads
   `network`.
+- `X10.30` behavior (D10.5, D10.6): a request whose success route reads JSON, answered 204, runs its catch-all with
+  `Failure.Outcome` content, since the answer names no JSON type; the same request whose success route is of kind none
+  runs its `OnSuccess`, since that route reads no body.
 
 ## Q11. Lanes and time
 

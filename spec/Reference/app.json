@@ -8678,6 +8678,21 @@
       ]
     },
     {
+      "feature": "M6.F2",
+      "for": "X10.30",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10",
+        "net48"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": []
+    },
+    {
       "feature": "M14.F1",
       "for": "X19.3",
       "index": 0,
