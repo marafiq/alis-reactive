@@ -1,21 +1,21 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 18:23:58 EST 2026
+Written at `date`: Thu Nov 26 18:45:17 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 26, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (72): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (73): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 7ab93ef58 on feature/rewrite: equal to the remote
+lane: pushed at d10c22a60 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 7ab93ef58
+ci: unread at d10c22a60
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -23,10 +23,9 @@ file: over spec/CLAUDE.md: holds 2155 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over HANDOFF.md: holds 154 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 17 units have landed since .claude/rules/process.md last changed
+machine: review due : 18 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -34,13 +33,13 @@ machine: review due : 17 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 7ab93ef58 delivery (FreshAppSlice): README teaches a component's slice from the fresh apps' own AppButton, M19.X7 holding its click on each host
-- Full check: .work/logs/spec-check-7ab93ef58.log: spec check at 7ab93ef58: 40 of 40 checks pass
+- HEAD: d10c22a60 spec (CoreStatus): U13 and U18 are closed, U7 is held by the owner, and the core stands at 1.0 but for U7
+- Full check: .work/logs/spec-check-d10c22a60.log: spec check at d10c22a60: 40 of 40 checks pass
 - .work/last-run.txt: 20261126-180829-5562 7ab93ef58
 
 ## Landed since the commit before the last spec: STATE commit
-7ab93ef58 delivery (FreshAppSlice): README teaches a component's slice from the fresh apps' own AppButton, M19.X7 holding its click on each host
-7aedb17a9 spec: STATE and handoff at 0a6cb3203
+d10c22a60 spec (CoreStatus): U13 and U18 are closed, U7 is held by the owner, and the core stands at 1.0 but for U7
+39de1909b spec: STATE and handoff at 7ab93ef58
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
@@ -85,70 +84,49 @@ spec/CLAUDE.md:24: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mi
 
 ## Next
 <!-- next -->
-### Next session: the framework package to 1.0
+### Next session: Codex takes over (the owner, 2026-11-26)
 
-The owner's order, 2026-11-23: the team process (landed), then the framework core to 1.0, then everything else. Every
-unit lands on `feature/rewrite`; its one pull request, #247, ships 1.0; landed units' worktrees stay (the owner,
-2026-11-23). Builds stay serial on this Mac; source `scripts/toolchain-env.sh` first. A unit of Markdown alone lands
-by `scripts/land.sh`'s Markdown path (the owner, 2026-11-24). 1.0's definition of done (the owner, 2026-11-23): "1.0
-DoD is when all components of fusion, and selective native, and core framework are done where fusion will be onboarded
-one component with its full powers using skill. right now focus is on getting framework package to 1.0".
+The owner, 2026-11-26: "lets hold on tracing, finish every other framework, and then leave handoff codex will take
+over". Every unit lands on `feature/rewrite`; its one pull request, #247, ships 1.0; landed units' worktrees stay.
+Builds stay serial on this Mac; source `scripts/toolchain-env.sh` first. A unit of Markdown alone lands by
+`scripts/land.sh`'s Markdown path. 1.0 is done when the core, every Fusion component and selected Native components
+are done (the owner, 2026-11-23).
 
-**1. Start inside the lane,** `cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite && claude`,
-spelled Code as on disk: from Documents/code, bash's pwd -P and Python's getcwd differ in case and state.py finds no
-landing folder, so land-unit.sh runs from a shell cd'd to the Code spelling (2026-11-26).
+**1. Start.** Read `AGENTS.md` (root CLAUDE.md) and `.claude/rules/process.md`, run `scripts/doctor.sh` and
+`python3 scripts/state.py`, then read this file whole. Work from the lane,
+`/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite`, spelled Code
+as on disk, since state.py finds no landing folder from the lowercase spelling.
 
-**2. The framework core to 1.0 (U1 to U22).** Done when `scripts/open.py` prints no core runtime case (met at
-b824783d3); X3.7 passes on CI's Windows job (met at f2986ea66); `spec/REWRITE.md` section 4 states each of U1 to U22
-closed with its result line (U3, U4, U5, U8 to U13 closed, U1, U2, U14 to U16 landed, U6, U7, U17 to U22 not stated);
-the core's surface text is read as the 1.0 surface and README's examples come from tested pages. Its units, in order:
-1. The plan narrowed to what C# writes: landed, the last at 5d9328da2 (ListPosition). Its gap: an empty list or a files
-   input with no file sends no part, so an item whose only field is one of these still ends the list.
-2. The forms, one unit at a time, each its spec lines, TLA+, tests and code in one commit; every design question is
-   answered, so nothing goes to the owner unless a run prints other than its brief states.
-   - Landed: ContainerOnly at 49dd77295 (one request container, its hidden inputs in a form body); FormDataBoundary at
-     15b480e1e, "842 selected, 842 ran, 842 passed, 0 failed, 0 over budget", spec check 40 of 40 (choice C of D16.5,
-     the quirk in the Query doors' XML doc, X16.46 4, 7 and 8 net48 alone, the twin's DELETE through IIS Express).
-   - Landed: ValidationForms at 96955defa, "845 selected, 845 ran, 845 passed, 0 failed, 0 over budget", spec check
-     40 of 40 (pipeline.Validate(container, ruleSet); a set no rule runs under refused; X16.48 to X16.50).
-   - Landed on 2026-11-26: MistakesShort f3e2c7d9d, OneDoor ca7055154 (Iterables' forwarders gone), FormDataBoundaryNet48
-     4f1a073cb, RowContainers 7b4d6c306, JsonNoContent ddf83d814 (X10.30), Mvc5Roster 9ccf7a367 (a container under no
-     prefix reads no JSON options; the twin logs a page's exception to run-hosts/iis.err.log), EmptyTextItem 3710785c9
-     (BoundList.emptyField, X16.57), Mvc5Razor 6feddb6e3 (no "@for" inside a code block), Section4Close 720499148
-     (U6, U7, U19 to U21 closed). The last land: "853 selected, 853 ran, 853 passed"; CI at 57b8d0fd3 verify-net48
-     "33 selected, 33 ran, 32 passed, 1 failed", least-dose alone.
-   - Open, the owner's decision put on 2026-11-26: least-dose's MVC 5 navigation outlasts the 704 ms wait while IIS
-     Express compiles its view at first render (its GET the run's last logged line, no exception); the lead recommends
-     scripts/playwright-windows.ps1 precompiling the twin in place with aspnet_compiler before IIS Express starts.
-   - Open: U18, a whole object a JSON body sends on MVC 5 is named by its JSON names where the endpoint binds C# names
-     (the requests module), and X10.2's and X10.29's endpoints answer constants against the app's CLAUDE.md:19; U22,
-     README read at the freeze; the 1.0 surface read with the six G13 forms.
-   A waiting unit moves once the one before it is landed and pushed: `bash .landing/<Name>/move.sh <the lane's head>`
-   in its worktree, then its brief's "At the base:" line rewritten at that head, a low-effort probe, and its builder: a
-   general-purpose agent with no name and no isolation, its first read .claude/agents/builder.md, on Opus at xhigh
-   (.claude/skills/delegate/SKILL.md). Then read.md, the unit staged and `scripts/check.sh --no-spec` in its
-   worktree, `scripts/land-unit.sh`, `scripts/full-check.sh`, `scripts/push.sh`. A unit whose paths hold
-   scripts/land-unit.sh lands from a copy, `cp ../<worktree>/scripts/land-unit.sh .work/land-unit-run.sh`.
-   Each unlanded worktree is backed up
-   before a session ends: `bash .work/tools/backup-worktree.sh ../<worktree> <worktree>`.
-3. Eight parked core leads, judged at cad8e3581 (CoreLeads): typed list construction landed at a00125348; N16.3, a
-   named rule set for a check with no request, is ValidationForms' F5; five after 1.0, as rows of spec/NOTES.md's table.
-4. A divergence read at the source (2026-11-26), decided before the freeze: MVC 5 binds an empty item of a list of
-   texts as an empty text (spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:50-52), while forms.ts:220 reads it
-   as null in form data and DESIGN.md:1827's table, citing mvc5-empty-list-item-null, says null for text; the fact
-   holds for nullable values alone (:156, :57). The JSON arm on MVC 5 meets it for a list query member whose item reads
-   nothing. What net10 binds for an empty text item no probe has read: probe:core-query-nullable-enum-items reads enums.
-5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked. Decided first: a 204 to a JSON route
-   is a content failure, since response.ts reads no Content-Type as no JSON before it reads the body, and no D line
-   states a 204 under `OnSuccess<T>` (a search of spec/Core/DESIGN.md for "204" and "No Content" printed nothing).
+**2. The core stands at 1.0 but for U7.** `spec/REWRITE.md` section 4 states U1 to U6 and U8 to U22 closed, each with
+its result line; CI at 39de1909b passed 10 of 10 jobs (net48 "34 selected, 34 ran, 34 passed", consumerNet10 and
+consumerNet48 "2 selected, 2 ran, 2 passed"); the last land, "853 selected, 853 ran, 853 passed, 0 failed, 0 over
+budget". No door of `Alis.Reactive` throws `NotImplementedException`.
 
-**3. After the framework package:** the selected Native components (date entry first), then every Fusion component,
-one at a time with its full powers through `.claude/skills/onboard-component/SKILL.md`, then PR #247 out of draft.
-The six packages pack at one version, so the tag comes once, at the end.
+**3. U7, held by the owner.** Its code and 8 browser tests stand. Not built, each in section 2.1 and 2.2 of
+`.worktrees/fresh-app-docs/.landing/FreshAppDocs/design.md` (a designer's answer, every fact cited at 3a8ec7120 and
+unrun; backed up as the branch `backup/rewrite/fresh-app-docs` on origin):
+   1. The fresh net10 app's tracing: two OpenTelemetry packages at their pins, the tracer provider and
+      `AddReactiveTracing` with `Console` from the development setting in `Program.cs`.
+   2. README's section on reading a page's spans, copied from that file.
+   3. M19.X6, its browser test reading a person's console lines, a harness member the harness lacks.
+   4. D20.8's net48 fact: the fresh MVC 5 app wires ASP.NET's instrumentation module, and
+      `scripts/playwright-windows.ps1` sends one GET with a known `traceparent` and reads the plan's; CI's verify-net48
+      alone runs it.
+Start it only on the owner's word.
 
-**Parked, each where it lives:** browser validation's shared key (`spec/Validation/browser-validation-proposal.md`,
-the owner's condition stands); TanStack Table (`../tanstack-table`, uncommitted) and Charts (`../tanstack-charts`, a
-brief); Form Builder and Query Builder (their pushed branches); the Fusion Grid API worktree (`../fusion-grid-api`,
-uncommitted); five ComboBox units whose replies wait for a read. Older history is the previous STATE commit's HANDOFF.md.
+**4. After the core: Fusion and Native (U23 to U27).** Read at 39de1909b, by `spec/tools/landings.py` against the tests'
+FailsFor constants: U23 307 of 307 placed tests written, U24 57 of 57, U25 38 of 38, U26 93 of 108, U27 0 of 3; every
+written test passes. What is not built:
+   1. The Fusion shell: `FusionConfirmDialog` (two overloads), `FusionToast`, `FusionBreadcrumb`, `FusionMenu`,
+      `FusionSidebar` and `FusionToolbar` throw on both hosts, and `OpenTelemetryExporter` on net48; the fusionShell
+      host's layout is not written; seven tests wait on it (U27's M23.X1 to X3, U26's M21.X406, X1002, X1024, X1032).
+   2. FusionGrid: M21.X201's three exports wait on a harness verb that holds an export; M21.X203's three and X205's two
+      wait on a core door that hands a validator's browser rules to a grid column, a core door to put to the owner with
+      its use and a recommendation.
+   3. Smart Paste: M21.X803's two and X804 wait on the harness's clipboard permission and the antiforgery startup call.
+   Onboard each Fusion component through `.claude/skills/onboard-component/SKILL.md`, one at a time.
 
+**5. Gaps named, not built:** an object held as a dictionary's value in a JSON body on MVC 5 (no probe of MVC 5's
+dictionary binding); `Console` false has no browser promise; the fresh MVC 5 app's net48 consumer fixture fails on this
+Mac for "-tl:off" (CI's Windows job runs it).
 <!-- /next -->
