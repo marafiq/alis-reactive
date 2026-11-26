@@ -40,6 +40,7 @@
     <Compile Include="$(ConformanceApp)Care/Admission/RoomIntake.cs" Link="ConformanceApp/Care/Admission/RoomIntake.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/SavedIntake.cs" Link="ConformanceApp/Care/Admission/SavedIntake.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/ContactMoveIn.cs" Link="ConformanceApp/Care/Admission/ContactMoveIn.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/BedNotes.cs" Link="ConformanceApp/Care/Admission/BedNotes.cs" />
     <TwinView Include="$(ConformanceApp)**/*.Net48.cshtml" Exclude="$(ConformanceApp)bin/**;$(ConformanceApp)obj/**" />
     <TwinView Include="$(ConformanceApp)World/Ready.cshtml" />
     <TwinView Include="$(ConformanceApp)Refusals/RequestsAndResponses/RoundsBoard.cshtml" />
@@ -51,6 +52,7 @@
     <TwinView Include="$(ConformanceApp)Care/Admission/RoomIntake.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/SavedIntake.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/ContactMoveInKinCard.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/BedNotes.cshtml" />
   </ItemGroup>
 
   <Target Name="LayOutTheSite" AfterTargets="Build" DependsOnTargets="CopyAlisReactiveBrowserFiles">

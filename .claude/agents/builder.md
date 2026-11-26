@@ -42,7 +42,8 @@ names. Read these whole, before anything else:
 - Write only inside your worktree. Run no git command but `git status`, `git diff`, `git show`, `git grep` and
   `git add -N` into a private index, a file in your worktree's obj folder that git's index variable names, for the
   rules test; never commit, stash, push or reset, and never touch another worktree.
-- In zsh, git grep takes its options before the pattern, since one after it is read as a revision, and reads no \b;
+- In zsh, git grep takes its options before the pattern, since one after it is read as a revision, which the traps
+  hook refuses (the builder's mistakes, 2026-11-25), and reads no \b;
   a separator line is quoted, echo "----", since zsh expands an unquoted word that starts with =. git apply takes no
   rename option: a patch git diff wrote with its renames carries them, and git apply applies them as written (the
   lead's mistake, 2026-11-24).
@@ -53,6 +54,11 @@ names. Read these whole, before anything else:
   spec check, is started that way with its log under the landing folder's scratch, and a later script reads the log; a
   log is never given a bare name, which writes it at the worktree's root. A git grep pattern that holds a backtick is
   handed to the shell helper as a value, never inside quote marks of its own (the builder's mistakes, 2026-11-25).
+- The private index of `git add -N` goes to the rules test alone: `scripts/check.sh` and `spec/tools/check.py` write the
+  index they run on, so a private index handed to them comes back holding HEAD's entries, and the traps hook refuses
+  it. Each command of the brief runs from the worktree's root as the brief writes it; a listing is /bin/ls and a search
+  git grep, since the tools' shell aliases ls and grep; a file is copied by cp, which keeps its bytes and its BOM; a
+  file of lines is written whole, never trimmed (the builder's mistakes, 2026-11-25).
 - Read no secret and no file that holds a credential, a machine's NuGet or npm configuration among them; list no user
   secrets.
 - Run no command your brief does not name, and no `scripts/check.sh`, TLC, package install or restore unless it

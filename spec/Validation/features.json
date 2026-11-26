@@ -2153,7 +2153,7 @@
         "Ownership.tla:FailureReachesSummary",
         "Ownership.tla:InlineOnlyAtTheSentInput",
         "Validation.tla:OnlyTheNamedValidator",
-        "Validation.tla:UnboundBodyChecksTheStarts"
+        "Validation.tla:SentOutsideAgrees"
       ],
       "defects": [
         {
@@ -2345,27 +2345,75 @@
         },
         {
           "for": "X16.46",
-          "page": "A bed notes page whose Send note button posts the note Bed by the window as the whole text body to the ward's notes address, its Ward set to North in the path, checked by the validator of its model, RuleFor(n => n.Ward).NotEmpty().WithMessage(\"Ward is required.\"); the model's Ward starts null, the endpoint binds the model [FromForm] and answers \"{ward}: {note}\", which the page writes into noted, and the page's layout renders the notice.",
-          "gesture": "Click Send note.",
-          "outcome": "The notices status reads \"Notices: error: Ward is required.\" and no request reaches the notes address.",
-          "opposite": "On the bed notes page whose model's Ward starts as Admissions, Send note is sent and noted reads Admissions: Bed by the window.",
-          "defect": "The check reads a text body as form data and takes North from the path, so the note is sent; or it reads no member at all, not even its start, so the note whose Ward starts as Admissions is refused."
+          "page": "A bed notes page whose model starts with Ward and Shift null, under the validator of its requests' model, RuleFor(n => n.Ward).MaximumLength(5).WithMessage(\"A ward's name holds 5 letters at most.\") and RuleFor(n => n.Shift).MaximumLength(5).WithMessage(\"A shift's name holds 5 letters at most.\"); the notes and photos endpoints bind a plain model, the saved notes endpoints bind their model [FromForm] on net10 and a plain model on MVC 5, and each endpoint answers what it bound, which the page writes into noted; the page's layout renders the notice. Send the note to North and Send the note to Northeast post the note Bed by the window as the whole text body to the ward's notes address, its Ward set in the path, and the endpoint answers \"{ward}: {note}\".",
+          "gesture": "Click Send the note to Northeast.",
+          "outcome": "The notices status reads \"Notices: error: A ward's name holds 5 letters at most.\" and no request reaches Northeast's notes address.",
+          "opposite": "Send the note to North is sent, and noted reads North: Bed by the window.",
+          "defect": "The check of a text body reads Ward at its start, null, which the rule passes, so the note to Northeast is sent; or it reads the path's field with its key, Ward=North, so the note to North is refused."
         },
         {
           "for": "X16.46",
-          "page": "The same bed notes page, whose Send photo button posts the photo chosen in Bed photo as the whole body to the ward's photos address, its Ward set to North in the path, under the same validator; the endpoint binds the model [FromForm] and answers \"{ward}: {media type}, {length} bytes\", which the page writes into noted.",
-          "gesture": "Choose the photo bed.png of 4 bytes in Bed photo and click Send photo.",
-          "outcome": "The notices status reads \"Notices: error: Ward is required.\" and no request reaches the photos address.",
-          "opposite": "On the bed notes page whose model's Ward starts as Admissions, Send photo is sent and noted reads Admissions: image/png, 4 bytes.",
-          "defect": "The check reads a file body as form data and takes North from the path, so the photo is sent; or it reads no member at all, not even its start, so the photo whose Ward starts as Admissions is refused."
+          "page": "The same bed notes page, whose Send the photo to North and Send the photo to Northeast post the photo chosen in Bed photo as the whole body to the ward's photos address, its Ward set in the path, and the endpoint answers \"{ward}: {media type}, {length} bytes\".",
+          "gesture": "Choose the photo bed.png of 4 bytes in Bed photo and click Send the photo to Northeast.",
+          "outcome": "The notices status reads \"Notices: error: A ward's name holds 5 letters at most.\" and no request reaches Northeast's photos address.",
+          "opposite": "Choosing the photo and clicking Send the photo to North sends it, and noted reads North: image/png, 4 bytes.",
+          "defect": "The check of a file body reads Ward at its start, null, so the photo to Northeast is sent; or it reads the path's field with its key, Ward=North, so the photo to North is refused."
         },
         {
           "for": "X16.46",
-          "page": "The same bed notes page, whose Clear notes button sends a DELETE with no body to the ward's notes address, its Ward set to North in the path, under the same validator; the endpoint binds the model [FromForm] and answers \"{ward}: notes cleared\", which the page writes into noted.",
-          "gesture": "Click Clear notes.",
-          "outcome": "The notices status reads \"Notices: error: Ward is required.\" and no request reaches the notes address.",
-          "opposite": "On the bed notes page whose model's Ward starts as Admissions, Clear notes is sent and noted reads Admissions: notes cleared.",
-          "defect": "The check of a request with no body reads the path's North as form data, so the DELETE is sent; or it reads no member at all, not even its start, so the one whose Ward starts as Admissions is refused."
+          "page": "The same bed notes page, whose Clear the notes of North and Clear the notes of Northeast send a DELETE with no body to the ward's notes address, its Ward set in the path, and the endpoint answers \"{ward}: notes cleared\".",
+          "gesture": "Click Clear the notes of Northeast.",
+          "outcome": "The notices status reads \"Notices: error: A ward's name holds 5 letters at most.\" and no request reaches Northeast's notes address.",
+          "opposite": "Clear the notes of North is sent, and noted reads North: notes cleared.",
+          "defect": "The check of a request with no body reads Ward at its start, null, so the DELETE to Northeast is sent; or it reads the path's field with its key, Ward=North, so the DELETE to North is refused."
+        },
+        {
+          "for": "X16.46",
+          "page": "The same bed notes page, whose Clear the Night notes and Clear the Evening notes send a DELETE with no body to North's notes address, Shift set to Night or Evening in the query, and the endpoint answers \"{ward}, {shift}: notes cleared\".",
+          "gesture": "Click Clear the Evening notes.",
+          "outcome": "The notices status reads \"Notices: error: A shift's name holds 5 letters at most.\" and no request reaches North's notes address.",
+          "opposite": "Clear the Night notes is sent, and noted reads North, Night: notes cleared.",
+          "defect": "The check of a request with no body reads Shift at its start, null, so the Evening DELETE is sent; or it reads the query's field with its key, Shift=Night, so the Night DELETE is refused."
+        },
+        {
+          "for": "X16.46",
+          "page": "The same bed notes page under MVC 5, whose Save the Night note and Save the Evening note post a multipart body that sets Text to Bed by the window to North's saved notes address, Shift set to Night or Evening in the query beside it; the endpoint binds a plain model, as every MVC 5 model binds the query, and answers \"{ward}, {shift}: {text}\".",
+          "gesture": "Click Save the Evening note.",
+          "outcome": "The notices status reads \"Notices: error: A shift's name holds 5 letters at most.\" and no request reaches North's saved notes address.",
+          "opposite": "Save the Night note is sent, and noted reads North, Night: Bed by the window.",
+          "defect": "On MVC 5 the check leaves the query beside a body that binds members unread and reads Shift at its start, null, so the Evening note is sent; or it reads the query's field with its key, Shift=Night, so the Night note is refused."
+        },
+        {
+          "for": "X16.46",
+          "page": "The same bed notes page on net10, whose Save the Night note and Save the Evening note post the same multipart body and query to an endpoint that binds its model [FromForm] and answers \"{ward}: {text}\" where it bound no shift; the bed notes page whose model starts Shift as Evening posts them to its own saved notes address, under the same rules.",
+          "gesture": "Click Save the Evening note.",
+          "outcome": "The note is sent, and noted reads North: Bed by the window, with no shift, as the endpoint bound it.",
+          "opposite": "On the bed notes page whose model starts Shift as Evening, Save the Night note shows \"Notices: error: A shift's name holds 5 letters at most.\" and no request reaches its saved notes address.",
+          "defect": "On net10 the check reads the query beside a body that binds members, so the Evening note is refused; or it reads no member at all, not even its start, so the Night note whose Shift starts as Evening is sent."
+        },
+        {
+          "for": "X16.46",
+          "page": "The same bed notes page, whose Read the notes of North and Read the notes of Northeast send a GET to the ward's notes address, its Ward set in the path, and the endpoint answers \"{ward}: notes read\".",
+          "gesture": "Click Read the notes of Northeast.",
+          "outcome": "The notices status reads \"Notices: error: A ward's name holds 5 letters at most.\" and no request reaches Northeast's notes address.",
+          "opposite": "Read the notes of North is sent, and noted reads North: notes read.",
+          "defect": "The check of a GET reads Ward at its start, null, so the read of Northeast's notes is sent; or it reads the path's field with its key, Ward=North, so the read of North's notes is refused."
+        },
+        {
+          "for": "X16.46",
+          "page": "The same bed notes page under MVC 5, whose Hand over the note posts a JSON body that sets Text to Bed by the window to North's handovers address, its Ward set in the path, beside Shift in the query, read from the Shift text box, under the validator of its own model, RuleFor(handover => handover.Shift).NotNull().WithMessage(\"Name the shift.\"); the model starts Shift null, and the endpoint binds a plain model on MVC 5, [FromBody] on net10, and answers \"{ward}, {shift}: {text}\", or \"{ward}: {text}\" where it bound no shift.",
+          "gesture": "Leave Shift empty and click Hand over the note.",
+          "outcome": "The notices status reads \"Notices: error: Name the shift.\" and no request reaches North's handovers address.",
+          "opposite": "Typing Night in Shift and clicking Hand over the note sends it, and noted reads North, Night: Bed by the window.",
+          "defect": "On MVC 5 the check reads the query's empty text beside a JSON body as text, which the rule passes, where MVC 5 binds it null, so the note is sent; or it reads every query text there as null, so the Night note is refused."
+        },
+        {
+          "for": "X16.46",
+          "page": "The same bed notes page under MVC 5, whose Hand over to the shift on duty posts the same JSON body to North's handovers address, Shift in the query held from the page's model as the shift on duty, an empty text on the bed notes page and Evening on the bed notes page on the evening shift, under the same validator and endpoint.",
+          "gesture": "On the bed notes page, click Hand over to the shift on duty.",
+          "outcome": "The notices status reads \"Notices: error: Name the shift.\" and no request reaches North's handovers address.",
+          "opposite": "On the bed notes page on the evening shift, Hand over to the shift on duty is sent, and noted reads North, Evening: Bed by the window.",
+          "defect": "On MVC 5 the check reads a held empty query text beside a JSON body as text, so the note with no shift on duty is sent; or it reads every held query text there as null, so the evening note is refused."
         }
       ],
       "verdicts": []

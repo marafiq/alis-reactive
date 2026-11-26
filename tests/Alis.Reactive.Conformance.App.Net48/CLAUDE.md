@@ -13,7 +13,7 @@ which serves the pages `spec/Reference/app.json` places under the host net48.
   without a world.
 - `TwinApplication.cs` is its startup: `AddReactiveRequests` with the antiforgery token in a header and no other
   default, `AddReactiveJson` with camel-case enum names, `AddReactiveFluentValidation` with `RoomNumberingRules`,
-  and MVC's resolver set over the container
+  `BedNoteRules`, `EveningBedNoteRules` and `BedHandoverRules`, and MVC's resolver set over the container
   (`TwinResolver.cs`). A world seeded with `Seed.TheResolverLeftUnset` answers through MVC's own resolver alone, as
   an app that never set one does.
 - A request names its culture and its time zone as the conformance app's does, from the same closed lists and with
@@ -25,8 +25,12 @@ which serves the pages `spec/Reference/app.json` places under the host net48.
   contract names it and trims its leading "/".
 - An exception a page throws answers with its type and message as the page's heading (`ErrorPage.cs`), the
   conformance app's error page.
+- Its layout, `Shared/_Layout.cshtml`, renders `Html.ConformanceNotice()` after its body
+  (`tests/Alis.Reactive.Conformance.App/Components/ConformanceNotice/ConformanceNoticeHtml.Net48.cs`), since the check
+  of a request sent with no container shows its failures at the notice.
 - `Web.config` holds MVC 5's Razor configuration for views outside a Views folder, and no binding redirect, since
-  the build suggests none.
+  the build suggests none. It registers the extensionless handler again for every verb, since IIS Express registers it
+  for GET, HEAD, POST and DEBUG alone, so a DELETE the bed notes page sends would be answered before MVC 5 binds it.
 - It builds on the packs the command below writes, at the version its build reads from the property
   PACKAGE_VERSION, as the fresh apps' builds do, with every warning an error.
 

@@ -18,7 +18,7 @@ public class TwinApplication : HttpApplication
         var services = new ServiceCollection();
         services.AddReactiveRequests(requests => requests.Antiforgery(AntiforgeryIn.Header));
         services.AddReactiveJson(json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
-        services.AddReactiveFluentValidation(validation => validation.Add<RoomNumberingRules>());
+        services.AddReactiveFluentValidation(validation => validation.Add<RoomNumberingRules>().Add<BedNoteRules>().Add<EveningBedNoteRules>().Add<BedHandoverRules>());
         DependencyResolver.SetResolver(new TwinResolver(DependencyResolver.Current, services.BuildServiceProvider()));
         RouteTable.Routes.MapMvcAttributeRoutes();
     }

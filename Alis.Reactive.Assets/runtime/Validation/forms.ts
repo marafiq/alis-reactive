@@ -204,7 +204,6 @@ function checkedBody(registration: Registration, body: CheckedBody): unknown {
     case "none":
     case "text":
     case "file":
-      return structuredClone(registration.start);
     case "urlEncoded":
     case "multipart":
       return bound(registration, structuredClone(registration.start), body.value, [], "form");

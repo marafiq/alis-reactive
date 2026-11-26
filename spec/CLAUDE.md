@@ -6,6 +6,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), choice C of the form-data boundary: a member a request sends
+  outside its body is checked where MVC's binder reads it, on MVC 5 the body, then the path, then the query; on net10
+  a body that binds members is read alone, and a text, a file or no body binds no member, so the check reads the
+  members the path and the query send as form data and every other at its start (D16.5, X16.46). No query member is
+  carried in the body too: on net10 a query member beside a body that binds members is read at its start, the quirk
+  D16.5 and the `Query` doors' XML doc state.
 - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): one concept on the developer's surface, the request container.
   Html.BeginRequestForm, its block, RequestForm<TModel> and Form(form) leave, each carried by the container's door; a
   request sends what its plan declares and the hidden inputs inside its container (below), and nothing else, the

@@ -6,23 +6,38 @@ using static Microsoft.Playwright.Assertions;
 
 namespace Alis.Reactive.Conformance.PlaywrightTests.Validation;
 
-[TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10))]
-[Category(Hosts.Net10Name)]
+[TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10AndNet48))]
 public sealed class WhenARequestSendsNoBody(string host) : ConformanceFixture(host)
 {
     [Test]
     [FailsFor(Promises.M8_F4.X16_46_2)]
-    public async Task its_check_reads_every_member_at_its_start()
+    public async Task its_check_reads_the_ward_its_path_sends()
     {
-        var unwarded = await NewWorld();
-        await unwarded.Page.GotoAsync(CarePages.BedNotes);
-        await unwarded.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Clear notes", Exact = true }).ClickAsync();
-        await Expect(unwarded.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Notices", Exact = true })).ToHaveTextAsync("Notices: error: Ward is required.");
-        Assert.That(unwarded.SentTo(CareEndpoints.BedNotesOfNorth), Is.EqualTo(0));
+        var northeast = await NewWorld();
+        await northeast.Page.GotoAsync(CarePages.BedNotes);
+        await northeast.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Clear the notes of Northeast", Exact = true }).ClickAsync();
+        await Expect(northeast.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Notices", Exact = true })).ToHaveTextAsync("Notices: error: A ward's name holds 5 letters at most.");
+        Assert.That(northeast.SentTo(CareEndpoints.BedNotesOfNortheast), Is.EqualTo(0));
 
-        var admitted = await NewWorld();
-        await admitted.Page.GotoAsync(CarePages.BedNotesStartingInAdmissions);
-        await admitted.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Clear notes", Exact = true }).ClickAsync();
-        await Expect(admitted.Page.Locator("#noted")).ToHaveTextAsync("Admissions: notes cleared");
+        var north = await NewWorld();
+        await north.Page.GotoAsync(CarePages.BedNotes);
+        await north.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Clear the notes of North", Exact = true }).ClickAsync();
+        await Expect(north.Page.Locator("#noted")).ToHaveTextAsync("North: notes cleared");
+    }
+
+    [Test]
+    [FailsFor(Promises.M8_F4.X16_46_3)]
+    public async Task its_check_reads_the_shift_its_query_sends()
+    {
+        var evening = await NewWorld();
+        await evening.Page.GotoAsync(CarePages.BedNotes);
+        await evening.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Clear the Evening notes", Exact = true }).ClickAsync();
+        await Expect(evening.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Notices", Exact = true })).ToHaveTextAsync("Notices: error: A shift's name holds 5 letters at most.");
+        Assert.That(evening.SentTo(CareEndpoints.BedNotesOfNorth), Is.EqualTo(0));
+
+        var night = await NewWorld();
+        await night.Page.GotoAsync(CarePages.BedNotes);
+        await night.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Clear the Night notes", Exact = true }).ClickAsync();
+        await Expect(night.Page.Locator("#noted")).ToHaveTextAsync("North, Night: notes cleared");
     }
 }

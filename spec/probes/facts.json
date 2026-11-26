@@ -1954,6 +1954,15 @@
       "source": "spec/probes/aspnetwebstack/ValueProviderFactories.cs.txt:13"
     },
     {
+      "id": "mvc5-first-provider-wins",
+      "statement": "MVC 5 reads a key from its value providers in their order and takes the first result one of them holds.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ValueProviderCollection.cs.txt",
+      "expect": "ValueProviderResult result = GetValueFromProvider(this[i], key, skipValidation);",
+      "source": "spec/probes/aspnetwebstack/ValueProviderCollection.cs.txt:48"
+    },
+    {
       "id": "mvc5-form-filled-any-method",
       "statement": "System.Web fills Request.Form from a URL-encoded or multipart body whatever the method, so a PUT's or a DELETE's form field reaches the antiforgery check.",
       "host": "net48",
@@ -1969,6 +1978,42 @@
       "oracle": "ASP.NET Core 10 MVC on Kestrel",
       "probe": "AspNetCoreBinding",
       "expect": "core-query-key-case: ward=North&SHIFT=Night binds Ward=North Shift=Night",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-plain-model-outside-a-body",
+      "statement": "On net10 a model bound with no attribute binds a route value and a query value when the request sends no body, a text body or a file body, as it does on a GET.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-plain-model-outside-a-body: a model bound with no attribute at /h/n/North/plain?Shift=Night binds 200 Ward=North Shift=Night with no body, 200 Ward=North Shift=Night with a text body, 200 Ward=North Shift=Night with a file body and 200 Ward=North Shift=Night on a GET",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-fromform-model-outside-a-body",
+      "statement": "On net10 a [FromForm] model binds no route value and no query value when the request sends no body or a text body, and no query value beside a multipart body.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-fromform-model-outside-a-body: a [FromForm] model at /h/n/North/form?Shift=Night binds 200 Ward=null Shift=null with no body and 200 Ward=null Shift=null with a text body; at /h/n/North/form?Shift=Evening beside a multipart body Text=x it binds 200 Ward=null Shift=null",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-plain-model-query-beside-a-form",
+      "statement": "On net10 a model bound with no attribute binds a query value beside a multipart body that lacks its key, and the body's value wins over the query's.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-plain-model-query-beside-a-form: a model bound with no attribute at /h/n/North/plain?Shift=Evening binds 200 Ward=North Shift=Evening beside a multipart body Text=x and 200 Ward=North Shift=Night beside a multipart body Shift=Night",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-empty-query-text",
+      "statement": "On net10 an empty query text binds a text member null, and a member no key names keeps its start.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-empty-query-text: /h/n/North/plain?Shift= binds 200 Ward=North Shift=null; a model whose Shift starts as Evening binds 200 Ward=North Shift=Evening with no Shift and 200 Ward=North Shift=null with ?Shift=",
       "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
     },
     {

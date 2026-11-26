@@ -6,6 +6,8 @@ process.stdin.on("end", () => {
   const command = input.tool_input?.command ?? "";
   const refusal = [
     gitGrepsWithAClassTheMachineLacks,
+    gitGrepsWithAnOptionAfterItsPattern,
+    handsAPrivateIndexToTheCheck,
     runsTheBrowserTestsByAFilter,
     searchesWithGrepInclude,
     startsCodexWithItsInputOpen,
@@ -51,6 +53,65 @@ function gitGrepsWithAClassTheMachineLacks(command) {
     .some((invocation) => /\s-[A-Za-z]*E/.test(invocation) && /\\[bsdw]/.test(invocation));
   return lacksTheClass
     ? "git grep's extended expressions take no \\b, \\s, \\d or \\w on this machine: write a bracket, [[:space:]], [0-9] or ([^A-Za-z]|$) (CLAUDE.md, How you work)."
+    : undefined;
+}
+
+function wordsOf(invocation) {
+  const words = [];
+  let word = null;
+  let quote = "";
+  for (const character of invocation) {
+    if (quote !== "") {
+      if (character === quote) quote = "";
+      else word += character;
+      continue;
+    }
+    if (character === "'" || character === '"') {
+      quote = character;
+      word ??= "";
+    } else if (/\s/.test(character)) {
+      if (word !== null) words.push(word);
+      word = null;
+    } else word = (word ?? "") + character;
+  }
+  if (word !== null) words.push(word);
+  return words;
+}
+
+const gitGrepOptionsWithAnArgument = new Set(["-A", "-B", "-C", "-m", "-e", "-f", "-O", "--max-depth", "--threads", "--max-count", "--after-context", "--before-context", "--context", "--open-files-in-pager"]);
+
+function grepWordsOf(words) {
+  let at = 1;
+  while (at < words.length && words[at].startsWith("-")) at += words[at] === "-C" || words[at] === "-c" ? 2 : 1;
+  return words[at] === "grep" ? words.slice(at + 1) : undefined;
+}
+
+function hasAnOptionAfterItsPattern(arguments_) {
+  let positional = false;
+  for (let at = 0; at < arguments_.length; at += 1) {
+    const word = arguments_[at];
+    if (word === "--") return false;
+    if (word.startsWith("-") && word.length > 1) {
+      if (positional) return true;
+      if (gitGrepOptionsWithAnArgument.has(word)) at += 1;
+    } else positional = true;
+  }
+  return false;
+}
+
+function gitGrepsWithAnOptionAfterItsPattern(command) {
+  const optionAfter = invocationsOf(outsideHeredocsAndSingleQuotes(command), "git ")
+    .map((invocation) => grepWordsOf(wordsOf(invocation)))
+    .some((arguments_) => arguments_ !== undefined && hasAnOptionAfterItsPattern(arguments_));
+  return optionAfter
+    ? "git grep reads its options before its pattern: an option after the pattern is read as a revision. Write every option before the pattern (CLAUDE.md, What is forbidden)."
+    : undefined;
+}
+
+function handsAPrivateIndexToTheCheck(command) {
+  const shell = outsideHeredocsAndSingleQuotes(command);
+  return /(^|[\s;&|(])(export\s+)?GIT_INDEX_FILE=/.test(shell) && /(scripts\/check\.sh|spec\/tools\/check\.py)/.test(shell)
+    ? "scripts/check.sh and spec/tools/check.py write the index they run on, so a private index handed to them comes back holding HEAD's entries. Run them on the worktree's own index, and the private index on git add -N and the rules test alone (.claude/agents/builder.md, Limits)."
     : undefined;
 }
 

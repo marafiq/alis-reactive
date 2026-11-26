@@ -5,7 +5,9 @@ CONSTANT Mutant
 
 Mutants == {"none", "ConditionReadsNothing", "ObjectStartFromModel", "NullHolderReadsNothing", "ChildRulesOverNull",
             "PopulateIgnored", "EmptyTextStaysText", "ReadsUnsentInputs", "RunsEveryRegistration", "TypedTextLeftOut",
-            "FailureUnderAnotherName", "PeerReadFromTheItem", "UnboundBodyReadsBeside"}
+            "FailureUnderAnotherName", "PeerReadFromTheItem", "OutsideReadAtItsStart", "QueryBesideUnreadOnNet48",
+            "QueryBesideReadOnNet10", "OutsideReadOnNet48Alone", "OutsideEmptyStaysText", "ConfinedEndpointLeavesWhatWasSent",
+            "ModelTakesTheQueryBesideItsBody"}
 
 ASSUME Mutant \in Mutants
 
@@ -15,14 +17,29 @@ Checks == {"item"}
 
 ItemValues == {"none", "low", "high"}
 
-VARIABLES host, format, handling, sendsForm, nInput, nBeside, nStart,
+VARIABLES host, format, handling, sendsForm, nInput, nBeside, nPlace, nPlaceText, binding, nStart,
           leadStart, leadStartName, leadTypeName, leadPhoneInput, leadNameInput,
           itemsStart, itemTypeName, row, rowName, countText, otherRegistered,
           plane, check, typed, start, peer
 
-vars == <<host, format, handling, sendsForm, nInput, nBeside, nStart, leadStart, leadStartName, leadTypeName,
+vars == <<host, format, handling, sendsForm, nInput, nBeside, nPlace, nPlaceText, binding, nStart, leadStart, leadStartName, leadTypeName,
           leadPhoneInput, leadNameInput, itemsStart, itemTypeName, row, rowName, countText, otherRegistered,
           plane, check, typed, start, peer>>
+
+BindingsOf(h, f) == IF h = "net48" THEN {"everyPlace"}
+                    ELSE IF f = "json" THEN {"bodyAlone", "copied"}
+                    ELSE {"everyPlace", "bodyAlone", "copied"}
+
+InTheBody == format # "none" /\ ((sendsForm /\ nInput # "absent") \/ nBeside)
+
+Carried == nPlace = "path" /\ format # "none"
+
+SentOutsideAlone == nPlace # "none" /\ ~InTheBody /\ ~Carried
+
+Served ==
+    \/ ~SentOutsideAlone
+    \/ format = "none" /\ (binding # "bodyAlone" \/ Mutant = "ConfinedEndpointLeavesWhatWasSent")
+    \/ format # "none" /\ (host = "net48" \/ binding = "bodyAlone" \/ Mutant = "ModelTakesTheQueryBesideItsBody")
 
 Init ==
     /\ format \in {"form", "json", "none"}
@@ -32,6 +49,10 @@ Init ==
           /\ handling \in {"replace", "populate"}
           /\ nInput \in Inputs
           /\ nBeside \in BOOLEAN
+          /\ nPlace \in IF nBeside THEN {"none"} ELSE {"none", "path", "query"}
+          /\ nPlaceText \in IF nPlace = "query" THEN {"x", "empty"} ELSE {"x"}
+          /\ binding \in BindingsOf(host, format)
+          /\ Served
           /\ nStart \in {"x", "none"}
           /\ leadStart \in {"object", "null"}
           /\ leadStartName \in {"x", "none"}
@@ -53,6 +74,9 @@ Init ==
           /\ handling = "replace"
           /\ nInput = "x"
           /\ nBeside = FALSE
+          /\ nPlace = "none"
+          /\ nPlaceText = "x"
+          /\ binding = "bodyAlone"
           /\ nStart = "x"
           /\ leadStart = "object"
           /\ leadStartName = "x"
@@ -80,6 +104,10 @@ BindsMembers == format # "none"
 
 NSent == BindsMembers /\ ((sendsForm /\ nInput # "absent") \/ nBeside)
 NSentText == IF nBeside THEN "x" ELSE nInput
+
+OutsideBound == IF nPlaceText = "empty" THEN "none" ELSE nPlaceText
+
+HoldsWhatWasSent == binding \in {"everyPlace", "copied"}
 LeadNameSent == BindsMembers /\ sendsForm /\ leadNameInput # "absent"
 LeadSent == BindsMembers /\ sendsForm /\ (leadPhoneInput \/ leadNameInput # "absent")
 ItemsSent == BindsMembers /\ sendsForm /\ row
@@ -91,7 +119,11 @@ AppendsList == format = "json" /\ host = "net10" /\ handling = "populate"
 
 StartItems == IF itemsStart = "seeded" THEN <<"x">> ELSE <<>>
 
-ServerN == IF NSent THEN Bound(NSentText) ELSE nStart
+ServerN ==
+    IF NSent THEN Bound(NSentText)
+    ELSE IF Carried THEN Bound(nPlaceText)
+    ELSE IF nPlace # "none" /\ HoldsWhatWasSent THEN OutsideBound
+    ELSE nStart
 
 ServerLeadPresent == LeadSent \/ leadStart = "object"
 
@@ -117,10 +149,21 @@ ServerFails ==
     \cup (IF HasNone(ServerItems) THEN {"items.name"} ELSE {})
     \cup (IF ServerCountRefused THEN {"count"} ELSE {})
 
+ReadsBesideABodyThatBindsMembers ==
+    \/ host = "net48" /\ Mutant # "QueryBesideUnreadOnNet48"
+    \/ host = "net10" /\ Mutant = "QueryBesideReadOnNet10"
+
+ReadsWhereTheBodyBindsNone ==
+    /\ Mutant # "OutsideReadAtItsStart"
+    /\ Mutant = "OutsideReadOnNet48Alone" => host = "net48"
+
+ReadsOutside == nPlace # "none" /\ IF BindsMembers THEN ReadsBesideABodyThatBindsMembers ELSE ReadsWhereTheBodyBindsNone
+
 BrowserN ==
     IF NSent THEN (IF Mutant = "EmptyTextStaysText" THEN NSentText ELSE Bound(NSentText))
     ELSE IF Mutant = "ReadsUnsentInputs" /\ nInput # "absent" THEN Bound(nInput)
-    ELSE IF Mutant = "UnboundBodyReadsBeside" /\ nBeside THEN NSentText
+    ELSE IF Carried THEN Bound(nPlaceText)
+    ELSE IF ReadsOutside THEN (IF Mutant = "OutsideEmptyStaysText" THEN nPlaceText ELSE OutsideBound)
     ELSE nStart
 
 BrowserLeadPresent ==
@@ -181,7 +224,7 @@ EmptyTextAgrees == NSent => BrowserN = ServerN
 
 UnsentInputsUnread == ~NSent => BrowserN = ServerN
 
-UnboundBodyChecksTheStarts == ~BindsMembers => BrowserN = nStart /\ ServerN = nStart
+SentOutsideAgrees == nPlace # "none" => BrowserN = ServerN
 
 OnlyTheNamedValidator == ~BrowserRunsOther
 
@@ -197,6 +240,16 @@ ReachAnItemBelowItsPeer == ~(plane = "check" /\ check = "item" /\ Held = "low" /
 
 ReachConditionOnStart == ~(~LeadSent /\ leadStart = "object" /\ ~NSent /\ nStart = "none" /\ "n" \notin BrowserFails /\ Agreement)
 
-ReachUnboundBodyOnTheStarts == ~(~BindsMembers /\ nBeside /\ leadStart = "null" /\ nStart = "none" /\ "n" \in BrowserFails /\ Agreement)
+OnTheRuleOverN == ~LeadSent /\ leadStart = "null" /\ nStart = "none"
+
+ReachAPathMemberCheckedAsSent == ~(~BindsMembers /\ nPlace = "path" /\ OnTheRuleOverN /\ "n" \notin BrowserFails /\ Agreement)
+
+ReachAQueryMemberCheckedBesideItsBodyOnNet48 == ~(host = "net48" /\ BindsMembers /\ ~NSent /\ nPlace = "query" /\ nPlaceText = "x" /\ OnTheRuleOverN /\ "n" \notin BrowserFails /\ Agreement)
+
+ReachAQueryMemberLeftToItsBodyOnNet10 == ~(host = "net10" /\ binding = "bodyAlone" /\ BindsMembers /\ ~NSent /\ nPlace = "query" /\ OnTheRuleOverN /\ "n" \in BrowserFails /\ Agreement)
+
+ReachAnInputOverWhatIsSentOutside == ~(NSent /\ nPlace = "query" /\ nPlaceText = "x" /\ NSentText = "empty" /\ format = "form" /\ OnTheRuleOverN /\ "n" \in BrowserFails /\ Agreement)
+
+ReachAnUnsentMemberOnItsStart == ~(~BindsMembers /\ nPlace = "none" /\ OnTheRuleOverN /\ "n" \in BrowserFails /\ Agreement)
 
 ====

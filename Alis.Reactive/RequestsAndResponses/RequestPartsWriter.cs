@@ -13,7 +13,7 @@ using Expression = Alis.Reactive.Schema.Expression;
 
 namespace Alis.Reactive.RequestsAndResponses;
 
-internal sealed class RequestPartsWriter
+internal sealed partial class RequestPartsWriter
 {
     private const string TokenHeader = "RequestVerificationToken";
     private const string TokenField = "__RequestVerificationToken";
@@ -229,7 +229,7 @@ internal sealed class RequestPartsWriter
         var sendsABody = _body != Body.None;
         var inputs = new GetExpression([new MemberStep(sendsABody ? "body" : "query"), new MemberStep("inputs")], PathMembers.Required, argument);
         var sentValue = _body == Body.Json ? new GetExpression([new MemberStep("body"), new MemberStep("value")], PathMembers.Required, argument) : (Expression)Literals.Text(null);
-        var sentFields = new List<Expression>([.. _pathFields, .. sendsABody ? _fields : _query]);
+        var sentFields = CheckedFields();
         var entries = new ListExpression(sentFields.Where(_checkedEntries.ContainsKey).Select(field => _checkedEntries[field]()).ToArray());
         return new RequestCheckParts("'" + method.Text + " " + _url.Url + "'", CheckedFormat(method), inputs, sentValue, entries, ContainerId, names);
     }
@@ -302,11 +302,24 @@ internal sealed class RequestPartsWriter
         _ => method == RequestMethod.Post || method == RequestMethod.Put || method == RequestMethod.Delete ? BodyFormat.None : BodyFormat.UrlEncoded,
     };
 
-    private void Checks(Expression field, RequestMember member, Expression value)
+    private void Checks(Expression field, RequestMember member, Expression value) => Checks(field, member, () => value);
+
+    private void Checks(Expression field, RequestMember member, Func<Expression> value)
         => _checkedEntries[field] = () => new RecordExpression([
             new RecordField("path", new ListExpression(BodySteps(member).Select(step => (Expression)ContractRecord<SentField>.Literal(step.Step)).ToArray())),
-            new RecordField("value", value),
+            new RecordField("value", value()),
         ]);
+
+    private List<Expression> CheckedFields()
+    {
+        if (_body is not (Body.Json or Body.UrlEncoded or Body.Multipart)) return [.. _pathFields, .. _query];
+        return ReadsTheQueryBesideABodyThatBindsMembers() ? [.. _pathFields, .. _fields, .. _query] : [.. _pathFields, .. _fields];
+    }
+
+    private static partial bool ReadsTheQueryBesideABodyThatBindsMembers();
+
+    private static OpExpression EmptyTextReadsNull(Expression captured)
+        => new(Operator.Cond, [new OpExpression(Operator.Eq, [captured, Literals.Text(string.Empty)]), ContractRecord<ValueRead>.Literal<string?>(null), captured]);
 
     private Expression Guarded(Expression read) => _guards.Count == 0 ? read : new OpExpression(Operator.Cond, [_guards.Peek(), read, Nothing]);
 
@@ -317,7 +330,8 @@ internal sealed class RequestPartsWriter
         if (SentByAnInput(member)) return Skipped(stage);
         Open(stage);
         var (held, form) = RequestValues.LiteralHeld(value, _writer, member.Lambda.ToString());
-        Add(member, (RequestValues.Held(held), form), path, held, value is null);
+        var emptyAsNull = value is string { Length: 0 } ? RequestValues.Held(ContractRecord<ValueRead>.Literal<string?>(null)) : RequestValues.Held(held);
+        Add(member, (RequestValues.Held(held), form), path, held, value is null, emptyAsNull);
         if (path) _pathJson.Add(() => (BodySteps(member), JsonBodyValues.Literal(value, _writer, member.Lambda)));
         return _stage;
     }
@@ -327,7 +341,7 @@ internal sealed class RequestPartsWriter
         if (SentByAnInput(member)) return Skipped(stage);
         Open(stage);
         var sent = RequestValues.Source(value, _writer, member.Lambda.ToString(), path ? _captures.Add : Capture);
-        Add(member, (sent.Value, sent.Form), path, Sources.Of(value), true);
+        Add(member, (sent.Value, sent.Form), path, Sources.Of(value), true, RequestValues.Read(sent.Captured, EmptyTextReadsNull(sent.Captured)));
         if (path) _pathJson.Add(() => (BodySteps(member), JsonBodyValues.Captured<TValue>(sent.Captured, Sources.FormOf(value), _writer, member)));
         return _stage;
     }
@@ -464,7 +478,7 @@ internal sealed class RequestPartsWriter
         return _stage;
     }
 
-    private void Add(RequestMember named, (Expression Value, WireForm Form) sent, bool path, Expression read, bool canReadNothing)
+    private void Add(RequestMember named, (Expression Value, WireForm Form) sent, bool path, Expression read, bool canReadNothing, Expression emptyAsNull)
     {
         Named(named);
         var member = named.Lambda;
@@ -499,7 +513,9 @@ internal sealed class RequestPartsWriter
         var queried = FieldRecord(named, sent, When);
         _query.Add(queried);
         Positioned(queried, named, canReadNothing);
-        Checks(queried, named, Guarded(sent.Value));
+        var checkedAsSent = Guarded(sent.Value);
+        var checkedInJson = Guarded(emptyAsNull);
+        Checks(queried, named, () => _body == Body.Json ? checkedInJson : checkedAsSent);
         _sent.Add(sentMember);
         _setMembers[named.Name] = () =>
         {

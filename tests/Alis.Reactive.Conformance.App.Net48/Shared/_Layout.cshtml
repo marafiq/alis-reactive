@@ -1,3 +1,4 @@
+@using Alis.Reactive.Conformance.App.Components
 @using Alis.Reactive.RenderingAndDelivery
 <!doctype html>
 <html lang="en">
@@ -10,6 +11,7 @@
     <main>
         @RenderBody()
     </main>
+    @Html.ConformanceNotice()
     <script src="@Url.AppendVersion("~/js/alis-reactive-conformance.js")"></script>
     <script src="@Url.AppendVersion("~/Content/AlisReactive.Native/js/alis-reactive-native.js")"></script>
     <script src="@Url.AppendVersion("~/Content/AlisReactive/js/alis-reactive.js")"></script>

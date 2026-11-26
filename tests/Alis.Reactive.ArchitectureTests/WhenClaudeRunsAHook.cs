@@ -34,6 +34,10 @@ public class WhenClaudeRunsAHook
         "git -C ../core-leads checkout -- spec/NOTES.md",
         "git restore spec/NOTES.md",
         "grep -c -F \"`WhenAJsonSaveLeavesOutTheLeadsName`\" use-cases.md",
+        "git grep \"D16.5\" -n -- spec/Core/DESIGN.md",
+        "git -C ../core-leads grep foo -n -- spec",
+        "GIT_INDEX_FILE=obj/rules.index scripts/check.sh --no-spec",
+        "export GIT_INDEX_FILE=\"$PWD/obj/rules.index\"; python3 spec/tools/check.py",
     ];
 
     private static readonly string[] OneFactFromACommandThisMachineGetsWrong =
@@ -60,6 +64,10 @@ public class WhenClaudeRunsAHook
         "grep -c -F '`WhenAJsonSaveLeavesOutTheLeadsName`' use-cases.md",
         "echo \"a \\`literal\\` backtick\"",
         "cat > note.md <<'EOF'\nthe `door`\nEOF",
+        "git grep -C 3 -n foo -- spec",
+        "git grep -n \"a -b\" -- spec",
+        "GIT_INDEX_FILE=obj/rules.index git add -N tests/X.cs",
+        "scripts/check.sh --no-spec",
     ];
 
     [Test]

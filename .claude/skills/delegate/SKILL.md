@@ -20,7 +20,12 @@ has read it at the source.
   `scripts/state.py` reads the unit from `git worktree list`. With agent teams on, a named call without isolation
   starts an in-process teammate, which shares the lead's working folder (the probe, 2026-11-23), so a teammate only
   reads and advises. A builder started anew gets a fresh worktree from HEAD, so a unit sent back is reworked by the
-  builder that built it, messaged by name, or by the lead, in the unit's own worktree.
+  builder that built it, messaged by name, or by the lead, in the unit's own worktree. A unit whose worktree the lead
+  made and moved, a waiting unit's "move.sh", is built where it stands, since the harness refuses an isolated agent's
+  git in another worktree (the probe, 2026-11-25): its builder is a general-purpose agent with no name and no
+  isolation, its first read `.claude/agents/builder.md`, started on the model and effort that file names, each command
+  and path in the unit's worktree, messaged by its agent id; a low-effort probe of that same call, which prints the
+  head, reads the design and writes and removes a scratch file, runs first (the lead's mistakes, 2026-11-25).
 - Six workers at most, three of Codex and three agents at xhigh, each with one bounded task: its spec lines, a landed
   exemplar and the command that proves it, a fork's build taking what is left of a unit's half and a consult running
   only where no line decides (the owner, 2026-11-15). None words a rule. A brief names its base and carries the full

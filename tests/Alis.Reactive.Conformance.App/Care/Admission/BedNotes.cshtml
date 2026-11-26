@@ -1,4 +1,5 @@
 @using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
 @using Alis.Reactive.Native.NativeComponents
 @using Alis.Reactive.RequestsAndResponses
 @using Alis.Reactive.RenderingAndDelivery
@@ -11,38 +12,87 @@
 }
 <h1>Bed notes</h1>
 <label for="bed-photo">Bed photo</label>
-@plan.AdmissionFiles("bed-photo", false)
-@if (Model.StartsInAdmissions)
+@(plan.Render<IntakeDocumentFile>("bed-photo", Html.Raw("<input type=\"file\" id=\"bed-photo\">")))
+@(Html.NativeButton("send-note-north", "Send the note to North").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Post<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "North").Text("Bed by the window"))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("send-note-northeast", "Send the note to Northeast").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Post<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "Northeast").Text("Bed by the window"))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("send-photo-north", "Send the photo to North").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Post<BedNote>(BedNoteEndpoints.Photos, request => request.Path(note => note.Ward, "North")
+        .File(pipeline.Component<IntakeDocumentFile>("bed-photo").Files.Items.At(0)))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("send-photo-northeast", "Send the photo to Northeast").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Post<BedNote>(BedNoteEndpoints.Photos, request => request.Path(note => note.Ward, "Northeast")
+        .File(pipeline.Component<IntakeDocumentFile>("bed-photo").Files.Items.At(0)))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("clear-north", "Clear the notes of North").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Delete<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "North"))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("clear-northeast", "Clear the notes of Northeast").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Delete<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "Northeast"))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("clear-night", "Clear the Night notes").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Delete<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "North").Query(note => note.Shift, "Night"))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("clear-evening", "Clear the Evening notes").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Delete<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "North").Query(note => note.Shift, "Evening"))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("read-north", "Read the notes of North").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Get<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "North"))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("read-northeast", "Read the notes of Northeast").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Get<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "Northeast"))
+    .Validate<BedNoteRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@if (Model.OnTheEveningShift)
 {
-    @(Html.NativeButton("send-note", "Send note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<AdmissionsBedNote>(BedNoteEndpoints.AdmissionsNotes, request => request.Path(note => note.Ward, "North").Text("Bed by the window"))
-        .Validate<AdmissionsBedNoteRules>()
+    @(Html.NativeButton("save-night", "Save the Night note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<EveningBedNote>(BedNoteEndpoints.EveningSavedNotes, request => request.Path(note => note.Ward, "North").Query(note => note.Shift, "Night")
+            .Multipart(body => body.Set(note => note.Text, "Bed by the window")))
+        .Validate<EveningBedNoteRules>()
         .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
-    @(Html.NativeButton("send-photo", "Send photo").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<AdmissionsBedNote>(BedNoteEndpoints.AdmissionsPhotos, request => request.Path(note => note.Ward, "North")
-            .File(pipeline.Component<AdmissionFileInput>("bed-photo").Files.Items.At(0)))
-        .Validate<AdmissionsBedNoteRules>()
+    @(Html.NativeButton("save-evening", "Save the Evening note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<EveningBedNote>(BedNoteEndpoints.EveningSavedNotes, request => request.Path(note => note.Ward, "North").Query(note => note.Shift, "Evening")
+            .Multipart(body => body.Set(note => note.Text, "Bed by the window")))
+        .Validate<EveningBedNoteRules>()
         .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
-    @(Html.NativeButton("clear-notes", "Clear notes").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Delete<AdmissionsBedNote>(BedNoteEndpoints.AdmissionsNotes, request => request.Path(note => note.Ward, "North"))
-        .Validate<AdmissionsBedNoteRules>()
-        .OnSuccess(Content.Text, (cleared, pipeline) => pipeline.Element("noted").Text.Set(cleared.Body))))
 }
 else
 {
-    @(Html.NativeButton("send-note", "Send note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "North").Text("Bed by the window"))
+    @(Html.NativeButton("save-night", "Save the Night note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<BedNote>(BedNoteEndpoints.SavedNotes, request => request.Path(note => note.Ward, "North").Query(note => note.Shift, "Night")
+            .Multipart(body => body.Set(note => note.Text, "Bed by the window")))
         .Validate<BedNoteRules>()
         .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
-    @(Html.NativeButton("send-photo", "Send photo").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Post<BedNote>(BedNoteEndpoints.Photos, request => request.Path(note => note.Ward, "North")
-            .File(pipeline.Component<AdmissionFileInput>("bed-photo").Files.Items.At(0)))
+    @(Html.NativeButton("save-evening", "Save the Evening note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<BedNote>(BedNoteEndpoints.SavedNotes, request => request.Path(note => note.Ward, "North").Query(note => note.Shift, "Evening")
+            .Multipart(body => body.Set(note => note.Text, "Bed by the window")))
         .Validate<BedNoteRules>()
         .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
-    @(Html.NativeButton("clear-notes", "Clear notes").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
-        .Delete<BedNote>(BedNoteEndpoints.Notes, request => request.Path(note => note.Ward, "North"))
-        .Validate<BedNoteRules>()
-        .OnSuccess(Content.Text, (cleared, pipeline) => pipeline.Element("noted").Text.Set(cleared.Body))))
 }
+@(Html.InputField(plan, m => m.Shift, options => options.Label("Shift")).NativeTextBox())
+@(Html.NativeButton("hand-over", "Hand over the note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Post<BedHandover>(BedNoteEndpoints.Handovers, request => request.Path(handover => handover.Ward, "North")
+        .Query(handover => handover.Shift, pipeline.Input(m => m.Shift).Component<NativeTextBox>().Value)
+        .Json(body => body.Set(handover => handover.Text, "Bed by the window")))
+    .Validate<BedHandoverRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
+@(Html.NativeButton("hand-over-on-duty", "Hand over to the shift on duty").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Post<BedHandover>(BedNoteEndpoints.Handovers, request => request.Path(handover => handover.Ward, "North").Query(handover => handover.Shift, Model.ShiftOnDuty)
+        .Json(body => body.Set(handover => handover.Text, "Bed by the window")))
+    .Validate<BedHandoverRules>()
+    .OnSuccess(Content.Text, (noted, pipeline) => pipeline.Element("noted").Text.Set(noted.Body))))
 <p>Noted: <span id="noted"></span></p>
+<p><a href="@CareEndpoints.BedNotesOfNorth">North's notes</a></p>
 @Html.RenderPlan(plan)

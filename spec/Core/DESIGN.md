@@ -3957,15 +3957,28 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - The checked body is the endpoint's binding of the sent body. A sent member reads as the endpoint binds it:
     in form data an empty text binds null on both hosts (`probe:core-form-implicit-required`,
     `probe:mvc5-empty-text-null`). A member the body lacks reads its starting value (D16.6).
-  - A text or a file sent as the whole body binds no member, as no body does, so its check reads every member at its
-    start: a member sent in the path or the query is not read, as an endpoint that binds its model `[FromForm]`
-    leaves it. An endpoint that binds a plain model binds that member from the path or the query, and does not bind
-    from that body (X16.46).
+  - A member the request sends outside its body is read where MVC's binder reads it. On MVC 5 one binder reads the
+    form, a JSON body, the route and the query (`probe:mvc5-value-provider-order`), and a key takes its value from the
+    first of them that holds it (`probe:mvc5-first-provider-wins`), so the check reads the body, then the path, then
+    the query, and a member's empty text in the query as the null MVC 5 binds (`probe:mvc5-empty-text-null`). On
+    net10 a body that binds members is read alone, as an endpoint that binds its model `[FromForm]` or
+    `[FromBody]` binds it (`probe:core-route-value-binds-member`, `probe:core-fromform-model-outside-a-body`). A
+    text or a file sent as the whole body binds no member, as no body on a POST, PUT or DELETE does
+    (`probe:mvc5-form-filled-any-method`), so the check reads the members the path and the query send, as form data,
+    and every other at its start, as a GET's check does and as an endpoint that binds a plain model binds them
+    (`probe:core-plain-model-outside-a-body`, `probe:core-empty-query-text`); an endpoint that binds `[FromForm]`
+    there binds nothing the request sends (X16.46). A member the request sends nowhere reads its start.
   - Decision C: a request is checked on what it sends and on the starting values of the rest. A request that sends
     no container is checked on its `Set` members and its `Input`s, and no container's inputs are read. This replaces
     65fdf118d, which read the validated form's inputs for such a request.
   - The check with no request, `Validate(container)` (N16.3), and live validation read their container's inputs, as
     the container sends them.
+  - On .NET 10, a query member sent beside a body that binds members is not read by the browser's check, which reads
+    it at its start: an endpoint that binds its model `[FromForm]` or `[FromBody]` binds it the same way, while one
+    that binds a plain model binds the query's value (`probe:core-plain-model-query-beside-a-form`), so there the
+    endpoint's own check decides it and its message shows after the request. A model whose starting value breaks its
+    own rule is refused in the browser even where the query sends a value the rule passes (X16.46). No query member is
+    carried in the body too: the owner chose the endpoint's own check for that case (2026-11-25, `spec/NOTES.md`).
   - A hidden input a container's form body sends beside its framework inputs (D9.15) is no input of the check: the
     check reads no member from it, so a member such an input alone sends reads as one the body lacks (D16.6), where
     the endpoint binds the input's value. It is a value sent outside the plan's inputs, which the browser's check
@@ -4183,8 +4196,11 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   - `Validation.tla:UnsentInputsUnread`
   - `Validation.tla:OnlyTheNamedValidator`
   - `Validation.tla:NoTypedValueLost`
-- `Validation.tla:UnboundBodyChecksTheStarts`: a body that binds no member, the plan's none, text or file, is checked
-  with every member at its start, broken by a mutant that reads a member sent beside it (X16.46).
+- `Validation.tla:SentOutsideAgrees`: a member the request sends in its path or its query is checked as the endpoint
+  binds it, over each host, body format and binding, broken by seven mutants: every such member read at its start, the
+  query beside a body that binds members left unread on MVC 5 or read on net10, the read on MVC 5 alone, an empty
+  query text read as text, and the two endpoints the read does not serve, a `[FromForm]` model where no body binds a
+  member and a model that takes the query beside its body on net10 (X16.46).
 - The four gaps the code had at bff9eb6c0 are ValidationToday's invariants, each a counterexample TLC prints from
   its own cfg: AnUnrenderedMemberRendersItsView, AListNotSentReadsItsStart, AConditionReadsTheObjectsStart and
   AnItemsListNotSentReadsTheItemsStart.
@@ -4401,9 +4417,15 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `X16.45` analyzer (D16.9): a synchronous check of a validator whose rule waits, reached: "A rule that waits
   (MustAsync, CustomAsync or WhenAsync) runs only in ValidateAsync." At build by ALIS006, and where the endpoint
   checks on code it does not follow (D18.6): new:N18.11.
-- `X16.46` behavior (D16.5): a request that sends no body, or a text or a file as its whole body, its Ward sent in
-  the path, is checked with every member at its start: over a model whose Ward starts null it shows "Ward is required." in the notice and
-  sends nothing, and over a model whose Ward starts as Admissions it is sent.
+- `X16.46` behavior (D16.5): a member the request sends outside its body is checked where MVC's binder reads it. A
+  request that sends no body, or a text or a file as its whole body, and a GET are checked on the members their path
+  and their query send, as form data, on both hosts; a query member beside a body that binds members is checked on
+  MVC 5 and read at its start on net10. Under RuleFor(n => n.Ward).MaximumLength(5).WithMessage("A ward's name holds 5
+  letters at most."), a note sent to Northeast shows the message in the notice and sends nothing, and one sent to
+  North is sent. On MVC 5 a query's empty text beside a JSON body is checked as the null MVC 5 binds
+  (`probe:mvc5-empty-text-null`): under RuleFor(handover => handover.Shift).NotNull().WithMessage("Name the shift."), a
+  handover whose Shift the text box leaves empty, or the page's model holds empty, shows the message in the notice and
+  sends nothing, and one whose Shift is Night or Evening is sent.
 - `X16.47` behavior (D16.7, D9.13): an enum input whose text no row lists fails its check with the binder's message,
   "The value 'agency' is not valid for Cover.", beside the input and in the summary, and nothing is sent.
 

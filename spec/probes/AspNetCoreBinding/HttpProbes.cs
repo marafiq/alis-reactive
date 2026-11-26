@@ -63,6 +63,10 @@ static class HttpProbes
         var later = await client.GetStringAsync("/h/token");
         Console.WriteLine("core-antiforgery-later-token: a token issued by a later GET, as a slot's partial gets one, " + (later == token ? "is the same token" : "is a new token") + " and answers " + await Status(client, HttpMethod.Post, "/h/protected", JsonBody("{}"), later) + "; the first token still answers " + await Status(client, HttpMethod.Post, "/h/protected", JsonBody("{}"), token));
         Console.WriteLine("core-query-key-case: ward=North&SHIFT=Night binds " + await client.GetStringAsync("/h/page?ward=North&SHIFT=Night"));
+        Console.WriteLine("core-plain-model-outside-a-body: a model bound with no attribute at /h/n/North/plain?Shift=Night binds " + await Answer(client, HttpMethod.Delete, "/h/n/North/plain?Shift=Night", null) + " with no body, " + await Answer(client, HttpMethod.Post, "/h/n/North/plain?Shift=Night", TextBody("Bed by the window")) + " with a text body, " + await Answer(client, HttpMethod.Post, "/h/n/North/plain?Shift=Night", Pdf(4)) + " with a file body and " + await Answer(client, HttpMethod.Get, "/h/n/North/plain?Shift=Night", null) + " on a GET");
+        Console.WriteLine("core-fromform-model-outside-a-body: a [FromForm] model at /h/n/North/form?Shift=Night binds " + await Answer(client, HttpMethod.Delete, "/h/n/North/form?Shift=Night", null) + " with no body and " + await Answer(client, HttpMethod.Post, "/h/n/North/form?Shift=Night", TextBody("Bed by the window")) + " with a text body; at /h/n/North/form?Shift=Evening beside a multipart body Text=x it binds " + await Answer(client, HttpMethod.Post, "/h/n/North/form?Shift=Evening", Multipart(("Text", "x"))));
+        Console.WriteLine("core-plain-model-query-beside-a-form: a model bound with no attribute at /h/n/North/plain?Shift=Evening binds " + await Answer(client, HttpMethod.Post, "/h/n/North/plain?Shift=Evening", Multipart(("Text", "x"))) + " beside a multipart body Text=x and " + await Answer(client, HttpMethod.Post, "/h/n/North/plain?Shift=Evening", Multipart(("Shift", "Night"))) + " beside a multipart body Shift=Night");
+        Console.WriteLine("core-empty-query-text: /h/n/North/plain?Shift= binds " + await Answer(client, HttpMethod.Delete, "/h/n/North/plain?Shift=", null) + "; a model whose Shift starts as Evening binds " + await Answer(client, HttpMethod.Delete, "/h/n/North/started", null) + " with no Shift and " + await Answer(client, HttpMethod.Delete, "/h/n/North/started?Shift=", null) + " with ?Shift=");
         Console.WriteLine("core-consumes-urlencoded: [Consumes(\"application/x-www-form-urlencoded\")] answers a URL-encoded body " + await Status(client, HttpMethod.Post, "/h/urlencoded", FormBody("Ward=North"), null) + " and a multipart body " + await Status(client, HttpMethod.Post, "/h/urlencoded", Multipart(("Ward", "North")), null));
         using (var large = new MultipartFormDataContent())
         {
@@ -84,6 +88,8 @@ static class HttpProbes
     static StringContent JsonBody(string json) => new(json, Encoding.UTF8, "application/json");
 
     static StringContent FormBody(string form) => new(form, Encoding.UTF8, "application/x-www-form-urlencoded");
+
+    static StringContent TextBody(string text) => new(text, Encoding.UTF8, "text/plain");
 
     static MultipartFormDataContent Multipart(params (string Name, string Value)[] fields)
     {
@@ -120,6 +126,12 @@ static class HttpProbes
     static async Task<string> PostBody(HttpClient client, string path, HttpContent content)
     {
         using var response = await client.PostAsync(path, content);
+        return (int)response.StatusCode + " " + await response.Content.ReadAsStringAsync();
+    }
+
+    static async Task<string> Answer(HttpClient client, HttpMethod method, string path, HttpContent? content)
+    {
+        using var response = await Send(client, method, path, content, null, null, false);
         return (int)response.StatusCode + " " + await response.Content.ReadAsStringAsync();
     }
 
@@ -203,6 +215,15 @@ public sealed class HttpProbeController(IAntiforgery antiforgery) : Controller
     [HttpGet("page")]
     public string Page(ProbePage page) => "Ward=" + page.Ward + " Shift=" + page.Shift;
 
+    [AcceptVerbs("GET", "POST", "DELETE", Route = "n/{ward}/plain")]
+    public string PlainNote(ProbeNote note) => note.Shown;
+
+    [AcceptVerbs("POST", "DELETE", Route = "n/{ward}/form")]
+    public string FormNote([FromForm] ProbeNote note) => note.Shown;
+
+    [HttpDelete("n/{ward}/started")]
+    public string StartedNote(ProbeStartedNote note) => note.Shown;
+
     [HttpPost("urlencoded"), Consumes("application/x-www-form-urlencoded")]
     public string UrlEncoded(ProbeIntake intake) => "Ward " + intake.Ward;
 
@@ -227,4 +248,21 @@ public sealed class ProbePage
 {
     public string? Ward { get; set; }
     public string? Shift { get; set; }
+}
+
+public sealed class ProbeNote
+{
+    public string? Ward { get; set; }
+    public string? Shift { get; set; }
+    public string? Text { get; set; }
+
+    public string Shown => "Ward=" + (Ward ?? "null") + " Shift=" + (Shift ?? "null");
+}
+
+public sealed class ProbeStartedNote
+{
+    public string? Ward { get; set; }
+    public string? Shift { get; set; } = "Evening";
+
+    public string Shown => "Ward=" + (Ward ?? "null") + " Shift=" + (Shift ?? "null");
 }

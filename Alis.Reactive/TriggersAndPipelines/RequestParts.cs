@@ -231,18 +231,21 @@ public sealed class BodyParts<TRequest>
         => new(_parts, _parts.Source(_stage, member, value, true));
 
     /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a source reads it when the request is sent.</summary>
+    /// <remarks>On .NET 10, a member sent in the query beside a body that binds members, a JSON, URL-encoded or multipart body, is not read by the browser's check, which reads it at its start: an endpoint that binds its model <c>[FromForm]</c> or <c>[FromBody]</c> binds it the same way, while one that binds a plain model binds the query's value, so there the endpoint's own check decides it and its message shows after the request. A model whose starting value breaks its own rule is refused in the browser even where the query sends a value the rule passes.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public BodyParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, false));
 
     /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a literal.</summary>
+    /// <remarks>On .NET 10, a member sent in the query beside a body that binds members, a JSON, URL-encoded or multipart body, is not read by the browser's check, which reads it at its start: an endpoint that binds its model <c>[FromForm]</c> or <c>[FromBody]</c> binds it the same way, while one that binds a plain model binds the query's value, so there the endpoint's own check decides it and its message shows after the request. A model whose starting value breaks its own rule is refused in the browser even where the query sends a value the rule passes.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public BodyParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, false));
 
     /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a source reads it when the request is sent.</summary>
+    /// <remarks>On .NET 10, a member sent in the query beside a body that binds members, a JSON, URL-encoded or multipart body, is not read by the browser's check, which reads it at its start: an endpoint that binds its model <c>[FromForm]</c> or <c>[FromBody]</c> binds it the same way, while one that binds a plain model binds the query's value, so there the endpoint's own check decides it and its message shows after the request. A model whose starting value breaks its own rule is refused in the browser even where the query sends a value the rule passes.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
@@ -368,18 +371,21 @@ public sealed class BodiedParts<TRequest>
         => new(_parts, _parts.Source(_stage, member, value, true));
 
     /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a source reads it when the request is sent.</summary>
+    /// <remarks>On .NET 10, a member sent in the query beside a body that binds members, a JSON, URL-encoded or multipart body, is not read by the browser's check, which reads it at its start: an endpoint that binds its model <c>[FromForm]</c> or <c>[FromBody]</c> binds it the same way, while one that binds a plain model binds the query's value, so there the endpoint's own check decides it and its message shows after the request. A model whose starting value breaks its own rule is refused in the browser even where the query sends a value the rule passes.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public BodiedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, false));
 
     /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a literal.</summary>
+    /// <remarks>On .NET 10, a member sent in the query beside a body that binds members, a JSON, URL-encoded or multipart body, is not read by the browser's check, which reads it at its start: an endpoint that binds its model <c>[FromForm]</c> or <c>[FromBody]</c> binds it the same way, while one that binds a plain model binds the query's value, so there the endpoint's own check decides it and its message shows after the request. A model whose starting value breaks its own rule is refused in the browser even where the query sends a value the rule passes.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public BodiedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, false));
 
     /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a source reads it when the request is sent.</summary>
+    /// <remarks>On .NET 10, a member sent in the query beside a body that binds members, a JSON, URL-encoded or multipart body, is not read by the browser's check, which reads it at its start: an endpoint that binds its model <c>[FromForm]</c> or <c>[FromBody]</c> binds it the same way, while one that binds a plain model binds the query's value, so there the endpoint's own check decides it and its message shows after the request. A model whose starting value breaks its own rule is refused in the browser even where the query sends a value the rule passes.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>

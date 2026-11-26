@@ -113,6 +113,15 @@ const intakeCard = (lists: "append" | "replace"): Registration => ({
   ]),
 });
 
+const bedNote: Registration = {
+  validator: "BedNote", ruleSet: "default", start: { ward: null, shift: "Night" },
+  scalars: [], objects: [], lists: [],
+  rules: group([
+    field(["ward"], "A ward's name holds 5 letters at most.", fn(value => value === null || (typeof value === "string" && value.length <= 5))),
+    field(["shift"], "Name the shift.", notNull),
+  ]),
+};
+
 const home = (objects: "fill" | "replace"): Registration => ({
   validator: "Home", ruleSet: "default", start: { lead: { name: "Ruth", phone: null } },
   scalars: [], objects: [{ path: ["lead"], start: { name: "", phone: null }, json: objects }], lists: [],
@@ -259,7 +268,21 @@ describe("when alis.form checks the body a container sends", () => {
   });
 
   test("A body with no members is checked on the model's start", () => {
-    expect(forms([supplies]).validate(check("Supplies", null, [], "none"))).toStrictEqual([{ name: "", message: "'Count' must be greater than '0'." }]);
+    expect(forms([supplies]).validate(check("Supplies", {}, [], "none"))).toStrictEqual([{ name: "", message: "'Count' must be greater than '0'." }]);
+  });
+
+  test("SentOutsideAgrees: a body that binds no member is checked on the members its path and its query send", () => {
+    for (const format of ["none", "text", "file"] as const) {
+      const page = forms([bedNote]);
+      expect(page.validate(check("BedNote", { ward: "Northeast" }, [], format))).toStrictEqual([{ name: "", message: "A ward's name holds 5 letters at most." }]);
+      expect(page.validate(check("BedNote", { ward: "North" }, [], format))).toStrictEqual([]);
+    }
+  });
+
+  test("OutsideEmptyStaysText: an empty text the query sends where the body binds no member reads null, and a member it sends nowhere reads its start", () => {
+    const page = forms([bedNote]);
+    expect(page.validate(check("BedNote", { shift: "" }, [], "none"))).toStrictEqual([{ name: "", message: "Name the shift." }]);
+    expect(page.validate(check("BedNote", {}, [], "none"))).toStrictEqual([]);
   });
 });
 

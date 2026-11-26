@@ -338,7 +338,7 @@
         {
           "id": "bedNotes",
           "kind": "nativeSlice",
-          "role": "the bed notes page's NativeButton actions, Send note, Send photo and Clear notes, beside the native browser file picker Bed photo",
+          "role": "the bed notes page's NativeButton actions, which send a note, a photo, a clear and a read to North and to Northeast, clear the notes of a shift, save a shift's note and hand a note over to a shift, beside the native browser file picker Bed photo and the NativeTextBox Shift",
           "module": "NativeComponents"
         },
         {
@@ -9685,7 +9685,8 @@
       "index": 0,
       "screen": "admission",
       "hosts": [
-        "net10"
+        "net10",
+        "net48"
       ],
       "parts": [
         "intakeEndpoint",
@@ -9702,7 +9703,8 @@
       "index": 1,
       "screen": "admission",
       "hosts": [
-        "net10"
+        "net10",
+        "net48"
       ],
       "parts": [
         "intakeEndpoint",
@@ -9719,7 +9721,112 @@
       "index": 2,
       "screen": "admission",
       "hosts": [
+        "net10",
+        "net48"
+      ],
+      "parts": [
+        "intakeEndpoint",
+        "notice",
+        "bedNotes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.46",
+      "index": 3,
+      "screen": "admission",
+      "hosts": [
+        "net10",
+        "net48"
+      ],
+      "parts": [
+        "intakeEndpoint",
+        "notice",
+        "bedNotes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.46",
+      "index": 4,
+      "screen": "admission",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "intakeEndpoint",
+        "notice",
+        "bedNotes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.46",
+      "index": 5,
+      "screen": "admission",
+      "hosts": [
         "net10"
+      ],
+      "parts": [
+        "intakeEndpoint",
+        "notice",
+        "bedNotes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.46",
+      "index": 6,
+      "screen": "admission",
+      "hosts": [
+        "net10",
+        "net48"
+      ],
+      "parts": [
+        "intakeEndpoint",
+        "notice",
+        "bedNotes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.46",
+      "index": 7,
+      "screen": "admission",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "intakeEndpoint",
+        "notice",
+        "bedNotes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.46",
+      "index": 8,
+      "screen": "admission",
+      "hosts": [
+        "net48"
       ],
       "parts": [
         "intakeEndpoint",

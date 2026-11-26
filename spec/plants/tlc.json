@@ -144,5 +144,82 @@
    }
   ],
   "expect": "ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenSentOutsideAFormBody.cfg: expected AHiddenInputReachesAFormBodyAlone violated, saw Model checking completed"
+ },
+ {
+  "name": "a member sent outside the body read at its start, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.cfg",
+    "old": "CONSTANT Mutant = \"OutsideReadAtItsStart\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "MVC 5's query beside a body left unread, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.QueryBesideUnreadOnNet48.cfg",
+    "old": "CONSTANT Mutant = \"QueryBesideUnreadOnNet48\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.QueryBesideUnreadOnNet48.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "net10's query beside a body read, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.QueryBesideReadOnNet10.cfg",
+    "old": "CONSTANT Mutant = \"QueryBesideReadOnNet10\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.QueryBesideReadOnNet10.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "the outside read on MVC 5 alone, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.OutsideReadOnNet48Alone.cfg",
+    "old": "CONSTANT Mutant = \"OutsideReadOnNet48Alone\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.OutsideReadOnNet48Alone.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "an empty query text read as text, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.OutsideEmptyStaysText.cfg",
+    "old": "CONSTANT Mutant = \"OutsideEmptyStaysText\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.OutsideEmptyStaysText.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "a [FromForm] endpoint with no body to bind, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.ConfinedEndpointLeavesWhatWasSent.cfg",
+    "old": "CONSTANT Mutant = \"ConfinedEndpointLeavesWhatWasSent\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.ConfinedEndpointLeavesWhatWasSent.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "a model that takes the query beside its body on net10, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.ModelTakesTheQueryBesideItsBody.cfg",
+    "old": "CONSTANT Mutant = \"ModelTakesTheQueryBesideItsBody\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.ModelTakesTheQueryBesideItsBody.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
  }
 ]

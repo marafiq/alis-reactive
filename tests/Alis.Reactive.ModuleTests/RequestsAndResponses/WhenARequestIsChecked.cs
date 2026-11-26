@@ -15,6 +15,7 @@ public sealed class WhenARequestIsChecked
     private const string Rules = "Alis.Reactive.ModuleTests.RequestsAndResponses.TransferRules";
     private const string DoseRules = "Alis.Reactive.ModuleTests.RequestsAndResponses.DoseOrderRules";
     private const string WardNorth = """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"lit","value":"North"}}]}""";
+    private const string RoomFour = """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"lit","value":"4"}}]}""";
 
     [Test]
     public void a_request_whose_model_has_a_registered_validator_is_checked_under_the_default_rule_set_on_what_it_sends()
@@ -31,6 +32,16 @@ public sealed class WhenARequestIsChecked
         Assert.That(Check(pipeline => pipeline.Get<Transfer>("/transfers", request => request.Set(r => r.Ward, "North"))), Does.Contain(
             """{"name":"format","value":{"kind":"lit","value":"urlEncoded"}}"""));
     }
+
+    [Test]
+    public void a_text_sent_as_the_whole_body_is_checked_on_the_members_its_path_and_its_query_send()
+        => Assert.That(Check(pipeline => pipeline.Post<Transfer>("/wards/{ward}/transfers", request => request.Path(r => r.Ward, "North").Query(r => r.Room, "4").Text("Moved by the window"))), Does.StartWith(
+            $$$$"""[{"kind":"let","name":"checked1","await":false,"binds":"line","expr":{"kind":"call","path":["checked"],"members":"required","target":{"kind":"obj","id":"$model"},"args":[{"kind":"get","path":["body","inputs"],"members":"required","target":{"kind":"ref","name":"argument1"}},{"kind":"lit","value":null},{"kind":"list","items":[{"kind":"record","fields":[{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"ward"}]}},{"name":"value","value":{{{{WardNorth}}}}}]},{"kind":"record","fields":[{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"room"}]}},{"name":"value","value":{{{{RoomFour}}}}}]}]}]}}"""));
+
+    [Test]
+    public void a_query_member_beside_a_body_that_binds_members_is_left_to_that_body_on_net10()
+        => Assert.That(Check(pipeline => pipeline.Post<Transfer>("/transfers", request => request.Query(r => r.Ward, "North").Multipart(body => body.Set(r => r.Room, "4")))), Does.StartWith(
+            $$$$"""[{"kind":"let","name":"checked1","await":false,"binds":"line","expr":{"kind":"call","path":["checked"],"members":"required","target":{"kind":"obj","id":"$model"},"args":[{"kind":"get","path":["body","inputs"],"members":"required","target":{"kind":"ref","name":"argument1"}},{"kind":"lit","value":null},{"kind":"list","items":[{"kind":"record","fields":[{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"room"}]}},{"name":"value","value":{{{{RoomFour}}}}}]}]}]}}"""));
 
     [Test]
     public void a_request_that_sends_a_container_shows_its_failures_in_that_containers_summary()
