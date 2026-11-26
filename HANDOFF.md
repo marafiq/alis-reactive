@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 15:43:23 EST 2026
+Written at `date`: Thu Nov 26 16:01:30 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
@@ -8,15 +8,15 @@ note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "
 unit: landed (65): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, UnitsClosed, ValidationForms, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
-unit: ready (3): G13Forms, Section4Close, StateSpecUnits
+unit: ready (4): G13Forms, Section4Close, StateSpecUnits, UnitsReread
 unit: building (3): MoveInOwners, Mvc5JsonNames, WorldRecords
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at dfdac650e on feature/rewrite: equal to the remote
+lane: pushed at 8960a308c on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at dfdac650e
+ci: unread at 8960a308c
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,7 +27,7 @@ file: over spec/CLAUDE.md: holds 2155 lines, its limit 150
 file: over HANDOFF.md: holds 154 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 12 units have landed since .claude/rules/process.md last changed
+machine: review due : 13 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -35,13 +35,13 @@ machine: review due : 12 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: dfdac650e spec (UnitsClosed): U1, U2, U14, U15, U16 and U17 are closed, and what holds U18 and U22 open
-- Full check: .work/logs/spec-check-dfdac650e.log: spec check at dfdac650e: 40 of 40 checks pass
+- HEAD: 8960a308c spec (UnitsReread): U7 and U13 are open again on their sections' README lines; U1, U2 and U22 are closed by their sections
+- Full check: .work/logs/spec-check-8960a308c.log: spec check at 8960a308c: 40 of 40 checks pass
 - .work/last-run.txt: 20261126-150503-94155 2536f54de
 
 ## Landed since the commit before the last spec: STATE commit
-dfdac650e spec (UnitsClosed): U1, U2, U14, U15, U16 and U17 are closed, and what holds U18 and U22 open
-47380692f spec: STATE and handoff at 2536f54de
+8960a308c spec (UnitsReread): U7 and U13 are open again on their sections' README lines; U1, U2 and U22 are closed by their sections
+d825e6859 spec: STATE and handoff at dfdac650e
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
