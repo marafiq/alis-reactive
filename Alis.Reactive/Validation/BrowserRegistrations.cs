@@ -37,6 +37,8 @@ internal static partial class BrowserRegistrations
 
     private static partial BoundListJson ListJson(JsonPropertyInfo property, JsonTypeInfo holder);
 
+    private static partial BoundListEmptyField EmptyField(JsonTypeInfo item);
+
     private static void Holders(JsonSerializerOptions starts, JsonTypeInfo holder, IReadOnlyList<RegistrationStep> path, IReadOnlyList<Type> around, List<BoundObject> objects, List<BoundList> lists)
     {
         foreach (var property in holder.Properties)
@@ -54,7 +56,7 @@ internal static partial class BrowserRegistrations
 
             if (!member.IsList(out var item)) continue;
             var itemCreated = Creates(item, around);
-            lists.Add(new BoundList(at, itemCreated ? starts.GetTypeInfo(item.Type).StartOf() : JsonSerializer.SerializeToElement<object?>(null), ListJson(property, holder)));
+            lists.Add(new BoundList(at, itemCreated ? starts.GetTypeInfo(item.Type).StartOf() : JsonSerializer.SerializeToElement<object?>(null), ListJson(property, holder), EmptyField(item)));
             if (itemCreated) Holders(starts, item, [.. at, EachRegistrationStep.Instance], [.. around, item.Type], objects, lists);
         }
     }

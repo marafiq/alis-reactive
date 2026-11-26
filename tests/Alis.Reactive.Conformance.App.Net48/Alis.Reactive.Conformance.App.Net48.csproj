@@ -35,6 +35,7 @@
     <Compile Include="$(ConformanceApp)Care/Record/VisitBoard.cs" Link="ConformanceApp/Care/Record/VisitBoard.cs" />
     <Compile Include="$(ConformanceApp)Care/Record/ShiftRoster.cs" Link="ConformanceApp/Care/Record/ShiftRoster.cs" />
     <Compile Include="$(ConformanceApp)Care/Record/CarePlanReview.cs" Link="ConformanceApp/Care/Record/CarePlanReview.cs" />
+    <Compile Include="$(ConformanceApp)Care/Record/HandoverNotes.cs" Link="ConformanceApp/Care/Record/HandoverNotes.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/AdmitResident.cs" Link="ConformanceApp/Care/Admission/AdmitResident.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/IntakeDocuments.cs" Link="ConformanceApp/Care/Admission/IntakeDocuments.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/IntakeDocumentFile.cs" Link="ConformanceApp/Care/Admission/IntakeDocumentFile.cs" />
@@ -55,6 +56,7 @@
     <TwinView Include="$(ConformanceApp)Care/Record/ShiftRosterNote.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Record/ShiftSheet.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Record/CarePlanReview.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Record/HandoverNotes.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/AdmitResident.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/IntakeDocuments.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/RoomNumbering.cshtml" />

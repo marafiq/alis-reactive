@@ -122,6 +122,8 @@ try
     var named = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
     Console.WriteLine("core-query-enum-member-name: under a string converter System.Text.Json writes Night as " + System.Text.Json.JsonSerializer.Serialize(ProbeShift.Night, named) + "; Shift=Night binds " + await client.GetStringAsync("/q/shift?Shift=Night") + "; Shift=night-shift binds " + await client.GetStringAsync("/q/shift?Shift=night-shift") + "; Shift=night binds " + await client.GetStringAsync("/q/shift?Shift=night") + "; Shift=1 binds " + await client.GetStringAsync("/q/shift?Shift=1") + "; Shift=5 binds " + await client.GetStringAsync("/q/shift?Shift=5"));
     Console.WriteLine("core-query-nullable-enum-items: Shifts=Day&Shifts=&Shifts=Night binds " + await client.GetStringAsync("/q/shift?Shifts=Day&Shifts=&Shifts=Night") + "; Shifts=Day&Shifts=night-shift binds " + await client.GetStringAsync("/q/shift?Shifts=Day&Shifts=night-shift"));
+    Console.WriteLine("core-query-text-items: Notes=a&Notes=&Notes=b binds " + await client.GetStringAsync("/q/notes?Notes=a&Notes=&Notes=b") + "; Notes[0]=a&Notes[1]=&Notes[2]=b binds " + await client.GetStringAsync("/q/notes?Notes%5B0%5D=a&Notes%5B1%5D=&Notes%5B2%5D=b"));
+    Console.WriteLine("core-form-text-items: Notes=a&Notes=&Notes=b binds " + await (await client.PostAsync("/q/notes-form", new FormUrlEncodedContent([new("Notes", "a"), new("Notes", ""), new("Notes", "b")]))).Content.ReadAsStringAsync() + "; Notes[0]=a&Notes[1]=&Notes[2]=b binds " + await (await client.PostAsync("/q/notes-form", new FormUrlEncodedContent([new("Notes[0]", "a"), new("Notes[1]", ""), new("Notes[2]", "b")]))).Content.ReadAsStringAsync() + "; Note= binds " + await (await client.PostAsync("/q/notes-form", new FormUrlEncodedContent([new("Note", "")]))).Content.ReadAsStringAsync());
     Console.WriteLine("core-query-flags-enum: System.Text.Json writes Mon|Tue as " + System.Text.Json.JsonSerializer.Serialize(ProbeDays.Mon | ProbeDays.Tue, named) + " under a string converter and " + System.Text.Json.JsonSerializer.Serialize(ProbeDays.Mon | ProbeDays.Tue) + " without; Days=Mon%2C%20Tue binds " + await client.GetStringAsync("/q/days?Days=Mon%2C%20Tue") + "; Days=Mon&Days=Tue binds " + await client.GetStringAsync("/q/days?Days=Mon&Days=Tue") + "; Days=3 binds " + await client.GetStringAsync("/q/days?Days=3"));
     Console.WriteLine("core-query-member-names: Ward=W&Bed=B&Room=R&Never=N binds " + await client.GetStringAsync("/q/renamed?Ward=W&Bed=B&Room=R&Never=N") + " | w=W&b=B&r=R binds " + await client.GetStringAsync("/q/renamed?w=W&b=B&r=R"));
     Console.WriteLine("core-query-bind-prefix: [Bind(Prefix = \"q\")] with Count=3 binds " + await client.GetStringAsync("/q/bind-prefix?Count=3") + "; with q.Count=3 binds " + await client.GetStringAsync("/q/bind-prefix?q.Count=3"));
@@ -882,6 +884,14 @@ public sealed class QueryProbeController : ControllerBase
     [HttpPost("/q/enum-json")]
     public string EnumJson([FromBody] ProbeEnumBody? body) => (body is null ? "nothing" : "Shift=" + body.Shift + " Watch=" + body.Watch) + Errors();
 
+    [HttpGet("/q/notes")]
+    public string Notes(ProbeNotes probe) => NotesText(probe);
+
+    [HttpPost("/q/notes-form")]
+    public string NotesForm([FromForm] ProbeNotes probe) => NotesText(probe);
+
+    private string NotesText(ProbeNotes notes) => "Notes=[" + string.Join(",", notes.Notes.Select(note => note is null ? "null" : "'" + note + "'")) + "] Note=" + (notes.Note is null ? "null" : "'" + notes.Note + "'") + Errors();
+
     [HttpGet("/q/shift")]
     public string Shift(HandoverQuery query) => "Shift=" + query.Shift + " Shifts=[" + string.Join(",", query.Shifts.Select(shift => shift?.ToString() ?? "null")) + "]" + Errors();
 
@@ -1009,4 +1019,11 @@ public sealed class ProbeController : ControllerBase
         => counts == null ? "refused, no instance" : (ModelState.IsValid ? "valid" : "refused") + " Count=" + counts.Count.ToString(CultureInfo.InvariantCulture) + " Maybe=" + (counts.Maybe?.ToString(CultureInfo.InvariantCulture) ?? "null");
 
     private string Bound(decimal value) => ModelState.IsValid ? value.ToString(CultureInfo.InvariantCulture) : "refused";
+}
+
+public sealed class ProbeNotes
+{
+    public List<string?> Notes { get; set; } = [];
+
+    public string? Note { get; set; }
 }

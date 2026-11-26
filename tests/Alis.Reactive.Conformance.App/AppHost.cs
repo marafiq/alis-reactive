@@ -260,6 +260,7 @@ internal static class AppHost
             .Add<Care.ResidentDetailsRules>()
             .Add<Care.RosterRules>()
             .Add<Care.ShiftRules>()
+            .Add<Care.HandoverNotesRules>()
             .Add<Refusals.VisitValidator>()
             .Add<Refusals.RosterRules>()));
 

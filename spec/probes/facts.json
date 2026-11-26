@@ -1324,6 +1324,24 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-query-text-items",
+      "statement": "A query binds an empty field of a list of texts as a null item, its keys repeated or indexed.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-text-items: Notes=a&Notes=&Notes=b binds Notes=['a',null,'b'] Note=null; Notes[0]=a&Notes[1]=&Notes[2]=b binds Notes=['a',null,'b'] Note=null",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-text-items",
+      "statement": "Form data an endpoint binds [FromForm] binds an empty field of a list of texts as a null item, its keys repeated or indexed, and an empty text member as null.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-text-items: Notes=a&Notes=&Notes=b binds Notes=['a',null,'b'] Note=null; Notes[0]=a&Notes[1]=&Notes[2]=b binds Notes=['a',null,'b'] Note=null; Note= binds Notes=[] Note=null",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
       "id": "core-frombody-enum-forms",
       "statement": "A [FromBody] member binds an enum in the form its own contract reads: under the app's default options a number, not the C# name; a member with its own string converter its JsonStringEnumMemberName, not the C# name.",
       "host": "net10",
@@ -1613,12 +1631,21 @@
     },
     {
       "id": "mvc5-empty-list-item-null",
-      "statement": "MVC 5 converts each repeated value of a list of scalars on its own, so an empty one is a null item.",
+      "statement": "MVC 5 converts each repeated value of a list of nullable value types on its own, so an empty one is a null item.",
       "host": "net48",
       "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
       "probe": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt",
       "expect": "converted[i] = ConvertSimpleType(culture, valueAsArray.GetValue(i), destinationElementType);",
       "source": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:156"
+    },
+    {
+      "id": "mvc5-empty-text-item",
+      "statement": "MVC 5 converts a list's item, repeated or indexed, through ConvertSimpleType, which returns a text before its blank check, and turns only a member's empty text into null, so an empty item of a list of texts binds an empty text.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt",
+      "expect": "if (value == null || destinationType.IsInstanceOfType(value))",
+      "source": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:50"
     },
     {
       "id": "mvc5-enum-name-ignores-case",

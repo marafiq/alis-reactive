@@ -8,7 +8,7 @@ Mutants == {"none", "PlaceholderUnchecked", "DateInPath", "FileInJson", "NullFor
             "ChainedAfterError", "StepsAfterStop", "RetryAnyPost", "RetryPastAttempts", "LoadingEachAttempt",
             "FailedConditionSendsNothing", "ChainedIgnoresCondition", "CatchAllRunsOnSuccess",
             "EmptyFieldForObject", "EmptyFieldForObjectItem", "OneFlagForBothLayers", "HoldBeforeLoading",
-            "HoldOnAFailedGuard", "ContainerSubmitsNatively"}
+            "HoldOnAFailedGuard", "ContainerSubmitsNatively", "TextItemNullOnEveryHost"}
 
 ASSUME Mutant \in Mutants
 
@@ -27,7 +27,7 @@ FileBodies == {"form", "file"}
 Kinds == {"valueType", "list", "nullable"}
 Bodies == {"json", "form"}
 Hosts == {"net10", "net48"}
-Items == {"nullableItem", "valueItem", "objectItem"}
+Items == {"nullableItem", "textItem", "valueItem", "objectItem"}
 
 VARIABLES part, config,
           checkPasses, loadingStops, guardOk, method, policy, outcomes, successRoute, reqRoutes, defRoutes,
@@ -136,18 +136,23 @@ ObjectBound(sent, host) ==
 ObjectExpected(body) == IF body = "json" THEN "null" ELSE "start"
 
 ItemSent(item) ==
-    CASE item = "nullableItem" -> "emptyField"
+    CASE item \in {"nullableItem", "textItem"} -> "emptyField"
       [] item = "objectItem" /\ Mutant = "EmptyFieldForObjectItem" -> "emptyField"
       [] OTHER -> "stop"
 
 ItemBound(item, sent, host) ==
     CASE sent = "stop" -> "noRequest"
       [] item = "nullableItem" -> "nullItem"
+      [] item = "textItem" /\ host = "net48" -> "emptyText"
+      [] item = "textItem" -> "nullItem"
       [] item = "objectItem" /\ host = "net10" -> "listEnds"
       [] item = "objectItem" -> "nullItem"
       [] OTHER -> "modelError"
 
-ItemExpected(item) == IF item = "nullableItem" THEN "nullItem" ELSE "noRequest"
+ItemExpected(item, host) ==
+    CASE item = "textItem" /\ host = "net48" /\ Mutant # "TextItemNullOnEveryHost" -> "emptyText"
+      [] item \in {"nullableItem", "textItem"} -> "nullItem"
+      [] OTHER -> "noRequest"
 
 CatchAll ==
     IF "catchAll" \in reqRoutes THEN <<"request", "catchAll">>
@@ -284,7 +289,7 @@ ObjectNothingBindsAsDeclared ==
     Placement => \A body \in Bodies, host \in Hosts : ObjectBound(ObjectSent(body), host) = ObjectExpected(body)
 
 ItemNothingBindsAsDeclared ==
-    Placement => \A item \in Items, host \in Hosts : ItemBound(item, ItemSent(item), host) = ItemExpected(item)
+    Placement => \A item \in Items, host \in Hosts : ItemBound(item, ItemSent(item), host) = ItemExpected(item, host)
 
 FailedConditionLeavesThePartOut ==
     Placement => \A kind \in Kinds, body \in Bodies : Bound(kind, body, SentWhenItsConditionFails(kind, body)) = "start"

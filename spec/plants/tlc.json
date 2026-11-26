@@ -124,6 +124,17 @@
   "expect": "Request.violates.FailedCheckSendsNothing.ContainerSubmitsNatively.cfg: expected FailedCheckSendsNothing violated, saw Model checking completed"
  },
  {
+  "name": "a text item's null-on-every-host mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/RequestsAndResponses/Request.violates.ItemNothingBindsAsDeclared.TextItemNullOnEveryHost.cfg",
+    "old": "CONSTANT Mutant = \"TextItemNullOnEveryHost\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Request.violates.ItemNothingBindsAsDeclared.TextItemNullOnEveryHost.cfg: expected ItemNothingBindsAsDeclared violated, saw Model checking completed"
+ },
+ {
   "name": "a hidden input's unsent mutant disarmed",
   "edits": [
    {

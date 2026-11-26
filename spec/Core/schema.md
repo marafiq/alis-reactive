@@ -194,7 +194,9 @@ the container sends them (D16.5).
 `BoundList` carries:
 - `path`;
 - `item`: the JSON of a new item;
-- `json`: `append` or `replace` (D16.6).
+- `json`: `append` or `replace` (D16.6);
+- `emptyField`: `null` or `emptyText`, what an empty field of its items binds in form data and a query on the host the
+  view renders on: `emptyText` on MVC 5 for a list of texts, and `null` otherwise (D16.5).
 
 Form data replaces every list and fills every object on both hosts. An object that starts null is the type's
 start under every format.

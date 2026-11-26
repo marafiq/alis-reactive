@@ -372,9 +372,12 @@ export interface BoundList {
   readonly path: readonly RegistrationStep[];
   readonly item: JsonValue;
   readonly json: BoundListJson;
+  readonly emptyField: BoundListEmptyField;
 }
 
 export type BoundListJson = "append" | "replace";
+
+export type BoundListEmptyField = "null" | "emptyText";
 
 export interface RuleGroup {
   readonly path: readonly RegistrationStep[];

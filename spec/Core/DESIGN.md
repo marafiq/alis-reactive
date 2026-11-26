@@ -1823,7 +1823,8 @@ Terms used throughout:
 
   | The item's type | Query or form data |
   |-----------------|--------------------|
-  | a nullable value type or text | an empty field, which binds a null item (`probe:core-query-nullable-enum-items`, `probe:mvc5-empty-list-item-null`) |
+  | a nullable value type | an empty field, which binds a null item (`probe:core-query-nullable-enum-items`, `probe:mvc5-empty-list-item-null`) |
+  | text | an empty field, which binds a null item on .NET 10 (`probe:core-query-text-items`, `probe:core-form-text-items`) and an empty text on MVC 5 (`probe:mvc5-empty-text-item`), as the check reads it (D16.5) |
   | a non-nullable value type | the request stops, since no field binds back as nothing |
   | an object | the request stops: an empty field ends the list at that item on net10 (`probe:core-query-list-of-objects-empty-item`) and binds a null item on MVC 5, and an item left out ends the list there on both hosts (`probe:core-query-list-of-objects-gap`, `probe:mvc5-list-ends-at-missing-index`) |
   | an object that sends no field, each of its fields left out where it holds a start its form cannot write or reads nothing | the request stops, since an item left out ends the list there on both hosts; a request's member that can be left out, with no member of its item always sent, is refused where the view renders |
@@ -3979,7 +3980,12 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   endpoint binds from that body.
   - The checked body is the endpoint's binding of the sent body. A sent member reads as the endpoint binds it:
     in form data an empty text binds null on both hosts (`probe:core-form-implicit-required`,
-    `probe:mvc5-empty-text-null`). A member the body lacks reads its starting value (D16.6).
+    `probe:mvc5-empty-text-null`). A list's item the request sends as an empty field, in form data or a query, binds as
+    the plan's `BoundList.emptyField` states for the host the view renders on: a null item on .NET 10
+    (`probe:core-form-text-items`, `probe:core-query-text-items`), and on MVC 5 an empty text for an item of a list of
+    texts, since MVC 5 turns a member's empty text into null and no item's (`probe:mvc5-empty-text-item`), and a null
+    item for a nullable value type (`probe:mvc5-empty-list-item-null`); the check reads each such item as it binds
+    (X16.57). A member the body lacks reads its starting value (D16.6).
   - A member the request sends outside its body is read where MVC's binder reads it. On MVC 5 one binder reads the
     form, a JSON body, the route and the query (`probe:mvc5-value-provider-order`), and a key takes its value from the
     first of them that holds it (`probe:mvc5-first-provider-wins`), so the check reads the body, then the path, then
@@ -4507,6 +4513,14 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   shift 6's Save sends nothing and logs "Input 'Alis_Reactive_Conformance_App_Care_ShiftNote__Note' binds 'Note' inside
   container 'shift-6', whose field prefix 'Rows[1]' does not open it.", and with the slot not loaded the shift is saved
   (`ContainerRead.tla:AnInputOutsideThePrefixStopsTheSend`).
+- `X16.57` behavior (D16.5, D9.10): an empty item of a list of texts, which a request sends in form data as an empty
+  field, is checked as the endpoint binds it. A handover notes page's container holds Note 1 to Note 3 of a
+  `List<string?>` and Handed over by, under `RuleForEach(handover => handover.Notes).NotNull()` and
+  `RuleFor(handover => handover.HandedOverBy).NotNull()`. With Note 2 left empty, net10 shows "Write each note." beside
+  Note 2 and in the summary and sends nothing, since it binds a null item, while MVC 5 saves the handover with Note 2 an
+  empty text, since it binds one; with every note written net10 saves it, and with Handed over by left empty MVC 5 shows
+  "Name who hands over." and sends nothing, since a text member binds null on both hosts
+  (`Request.tla:ItemNothingBindsAsDeclared`).
 
 ## Q17. Vendors and inversion
 

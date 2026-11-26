@@ -2165,7 +2165,8 @@
         "Validation.tla:ANamedSetSelectsARule",
         "ContainerRead.tla:ATypedTextReachesTheEndpoint",
         "ContainerRead.tla:AnInputOutsideThePrefixStopsTheSend",
-        "Partials.tla:KinContainerBindsItsAttachedMembers"
+        "Partials.tla:KinContainerBindsItsAttachedMembers",
+        "Request.tla:ItemNothingBindsAsDeclared"
       ],
       "defects": [
         {
@@ -2270,6 +2271,10 @@
         },
         {
           "id": "X16.56",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.57",
           "rung": "behavior"
         }
       ],
@@ -2534,6 +2539,22 @@
           "outcome": "No request reaches the shift's address, and the console names the input, the container shift-6 and the prefix \"Rows[1]\".",
           "opposite": "With the slot not loaded the shift is saved.",
           "defect": "The input is sent under its bare name and the endpoint binds it as the shift's own member."
+        },
+        {
+          "for": "X16.57",
+          "page": "A handover notes page whose container holds Note 1, Note 2 and Note 3, the items of a List<string?>, and Handed over by, a text, under RuleForEach(handover => handover.Notes).NotNull().WithMessage(\"Write each note.\") and RuleFor(handover => handover.HandedOverBy).NotNull().WithMessage(\"Name who hands over.\"); Hand over PUTs the container, and the endpoint checks it, records the handover and answers how many notes it holds and who handed them over, which the page shows, and the page shows the handover on record.",
+          "gesture": "Under net10, type into Note 1, Note 3 and Handed over by, leave Note 2 empty and click Hand over.",
+          "outcome": "\"Write each note.\" shows beside Note 2 and in the summary, the status stays empty and no request reaches the endpoint, since net10 binds the empty field as a null note.",
+          "opposite": "With every note written the handover is sent, the status reads 3 notes handed over by Ann, and after a reload the handover on record holds the three notes.",
+          "defect": "The empty field read as an empty text, as MVC 5 binds it, so the rule passes in the browser, the request is sent and the endpoint refuses it."
+        },
+        {
+          "for": "X16.57",
+          "page": "A handover notes page whose container holds Note 1, Note 2 and Note 3, the items of a List<string?>, and Handed over by, a text, under RuleForEach(handover => handover.Notes).NotNull().WithMessage(\"Write each note.\") and RuleFor(handover => handover.HandedOverBy).NotNull().WithMessage(\"Name who hands over.\"); Hand over PUTs the container, and the endpoint checks it, records the handover and answers how many notes it holds and who handed them over, which the page shows, and the page shows the handover on record.",
+          "gesture": "Under MVC 5, type into Note 1, Note 3 and Handed over by, leave Note 2 empty and click Hand over.",
+          "outcome": "The handover is sent and saved: the status reads 3 notes handed over by Ann, and after a reload the handover on record holds Note 2 as an empty text, since MVC 5 binds an empty item of a list of texts as an empty text.",
+          "opposite": "With every note written and Handed over by left empty, \"Name who hands over.\" shows beside Handed over by and in the summary and no request reaches the endpoint, since MVC 5 binds an empty text member as null.",
+          "defect": "The empty note read as null, so the browser refuses a handover the endpoint accepts and nothing is sent; or every empty field read as an empty text, so the empty Handed over by passes in the browser and the endpoint refuses it."
         }
       ],
       "verdicts": []

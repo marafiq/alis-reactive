@@ -90,11 +90,12 @@ internal sealed class BoundObjectJson : IChoice
 
 internal sealed class BoundList
 {
-    internal BoundList(IReadOnlyList<RegistrationStep> path, JsonElement item, BoundListJson json)
+    internal BoundList(IReadOnlyList<RegistrationStep> path, JsonElement item, BoundListJson json, BoundListEmptyField emptyField)
     {
         Path = path;
         Item = item;
         Json = json;
+        EmptyField = emptyField;
     }
 
     public IReadOnlyList<RegistrationStep> Path { get; }
@@ -102,6 +103,8 @@ internal sealed class BoundList
     public JsonElement Item { get; }
 
     public BoundListJson Json { get; }
+
+    public BoundListEmptyField EmptyField { get; }
 }
 
 [JsonConverter(typeof(ChoiceConverter<BoundListJson>))]
@@ -111,6 +114,20 @@ internal sealed class BoundListJson : IChoice
     internal static readonly BoundListJson Replace = new("replace");
 
     private BoundListJson(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
+}
+
+[JsonConverter(typeof(ChoiceConverter<BoundListEmptyField>))]
+internal sealed class BoundListEmptyField : IChoice
+{
+    internal static readonly BoundListEmptyField Null = new("null");
+    internal static readonly BoundListEmptyField EmptyText = new("emptyText");
+
+    private BoundListEmptyField(string text)
     {
         Text = text;
     }

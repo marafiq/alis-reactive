@@ -15,6 +15,8 @@ internal sealed class TwinWorld
 
     internal CarePlanReviewBook CarePlanReview { get; } = CarePlanReviewBook.Open();
 
+    internal HandoverNotesBook HandoverNotes { get; } = HandoverNotesBook.Open();
+
     internal DateTime? DateOfBirth { get; private set; }
 
     internal void Take(Seed seed, string noticeFolder)

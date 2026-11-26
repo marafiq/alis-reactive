@@ -13,6 +13,8 @@ internal static partial class BrowserRegistrations
     private static partial BoundListJson ListJson(JsonPropertyInfo property, JsonTypeInfo holder)
         => Populates(property, holder) ? BoundListJson.Append : BoundListJson.Replace;
 
+    private static partial BoundListEmptyField EmptyField(JsonTypeInfo item) => BoundListEmptyField.Null;
+
     private static bool Populates(JsonPropertyInfo property, JsonTypeInfo holder)
         => (property.ObjectCreationHandling ?? holder.PreferredPropertyObjectCreationHandling ?? holder.Options.PreferredObjectCreationHandling) == JsonObjectCreationHandling.Populate;
 }

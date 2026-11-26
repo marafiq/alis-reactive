@@ -63,6 +63,16 @@ public sealed class IntakeCardRules : ReactiveValidator<IntakeCard>
     }
 }
 
+public sealed class NotesCard
+{
+    public List<string?> Notes { get; set; } = [];
+}
+
+public sealed class NotesCardRules : ReactiveValidator<NotesCard>
+{
+    public NotesCardRules() => RuleForEach(card => card.Notes).NotNull().WithMessage("Write each note.");
+}
+
 public sealed class HomeCard
 {
     public Lead Lead { get; set; } = new() { Name = "Ruth" };

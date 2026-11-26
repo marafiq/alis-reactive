@@ -105,13 +105,21 @@ const deputyCard = (deputyStart: string): Registration => ({
 
 const intakeCard = (lists: "append" | "replace"): Registration => ({
   validator: "IntakeCard", ruleSet: "default", start: { name: "Unnamed", status: null, urgent: false, carers: [{ name: "Ruth" }] },
-  scalars: [], objects: [], lists: [{ path: ["carers"], item: { name: null }, json: lists }],
+  scalars: [], objects: [], lists: [{ path: ["carers"], item: { name: null }, json: lists, emptyField: "null" }],
   rules: group([], [
     group([field(["status"], "'Status' must not be empty.", notBlank, fn(instance => Reflect.get(instance as object, "urgent") === true))]),
     group([field(["name"], "Name the resident.")]),
     group([], [group([field(["name"], "Name the carer.")], [], ["carers", { kind: "each" }], holdsAValue)]),
   ]),
 });
+
+const handoverNotes = (emptyField: Registration["lists"][number]["emptyField"]): Registration => ({
+  validator: "HandoverNotes", ruleSet: "default", start: { notes: [], handedOverBy: null },
+  scalars: [], objects: [], lists: [{ path: ["notes"], item: null, json: "replace", emptyField }],
+  rules: group([field(["notes", { kind: "each" }], "Write each note.", notNull), field(["handedOverBy"], "Name who hands over.", notNull)]),
+});
+
+const noteInputs = (): Sent[] => [sent("Notes[0]", ["notes", 0]), sent("Notes[1]", ["notes", 1]), sent("Notes[2]", ["notes", 2]), sent("HandedOverBy", ["handedOverBy"])];
 
 const bedNote: Registration = {
   validator: "BedNote", ruleSet: "default", start: { ward: null, shift: "Night" },
@@ -190,6 +198,29 @@ describe("when alis.form checks the body a container sends", () => {
     const page = forms([wardCard]);
     expect(page.validate(check("WardCard", { ward: "" }, [sent("Ward", ["ward"])], "json"))).toStrictEqual([]);
     expect(page.validate(check("WardCard", {}, [], "json"))).toStrictEqual([{ name: "", message: "'Ward' must not be empty." }]);
+  });
+
+  test("EmptyItemAgrees: where the plan says an empty field of a list's items binds an empty text, form data reads an item sent as one as an empty text", () => {
+    const page = forms([handoverNotes("emptyText")]);
+    expect(page.validate(check("HandoverNotes", { notes: ["Fed at noon", null, "Walked"], handedOverBy: "Ann" }, noteInputs()))).toStrictEqual([]);
+    expect(page.validate(check("HandoverNotes", { notes: ["Fed at noon", "", "Walked"], handedOverBy: "Ann" }, noteInputs(), "multipart"))).toStrictEqual([]);
+  });
+
+  test("EmptyItemAgrees: where the plan says an empty field of a list's items binds null, form data reads an item sent as one as null", () => {
+    const page = forms([handoverNotes("null")]);
+    expect(page.validate(check("HandoverNotes", { notes: ["Fed at noon", null, "Walked"], handedOverBy: "Ann" }, noteInputs()))).toStrictEqual([{ name: "Notes[1]", message: "Write each note." }]);
+    expect(page.validate(check("HandoverNotes", { notes: ["Fed at noon", "", "Walked"], handedOverBy: "Ann" }, noteInputs(), "none"))).toStrictEqual([{ name: "Notes[1]", message: "Write each note." }]);
+  });
+
+  test("EmptyItemAgrees: a member's empty text reads null in form data whatever its lists' items bind", () => {
+    const page = forms([handoverNotes("emptyText")]);
+    expect(page.validate(check("HandoverNotes", { notes: ["Fed at noon"], handedOverBy: "" }, noteInputs()))).toStrictEqual([{ name: "HandedOverBy", message: "Name who hands over." }]);
+  });
+
+  test("EmptyItemAgrees: a JSON body keeps each item as it sends it", () => {
+    expect(forms([handoverNotes("null")]).validate(check("HandoverNotes", { notes: ["Fed at noon", ""], handedOverBy: "Ann" }, noteInputs(), "json"))).toStrictEqual([]);
+    expect(forms([handoverNotes("emptyText")]).validate(check("HandoverNotes", { notes: ["Fed at noon", null], handedOverBy: "Ann" }, noteInputs(), "json")))
+      .toStrictEqual([{ name: "Notes[1]", message: "Write each note." }]);
   });
 
   test("ConditionAgrees: a rule's condition reads the checked body, the start of what the body lacks included", () => {

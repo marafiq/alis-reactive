@@ -14,14 +14,15 @@ which serves the pages `spec/Reference/app.json` places under the host net48.
 - `TwinApplication.cs` is its startup: `AddReactiveRequests` with the antiforgery token in a header and no other
   default, `AddReactiveJson` with camel-case enum names, `AddReactiveFluentValidation` with `RoomNumberingRules`,
   `BedNoteRules`, `EveningBedNoteRules`, `BedHandoverRules`, `ResidentDetailsRules`, `DeputyAppointmentRules`,
-  `DeputyNamelessAppointmentRules`, `LeastDoseRoundRules`, `RosterRules` and `ShiftRules`, and MVC's resolver set over
-  the container (`TwinResolver.cs`). A world seeded with `Seed.TheResolverLeftUnset` answers through MVC's own resolver
-  alone, as an app that never set one does.
+  `DeputyNamelessAppointmentRules`, `LeastDoseRoundRules`, `RosterRules`, `ShiftRules` and `HandoverNotesRules`, and
+  MVC's resolver set over the container (`TwinResolver.cs`). A world seeded with `Seed.TheResolverLeftUnset` answers
+  through MVC's own resolver alone, as an app that never set one does.
 - A request names its culture and its time zone as the conformance app's does, from the same closed lists and with
   the same 400 pages (`RequestCulturesAndZones.cs`). `World/` keeps each world by the cookie "world" and answers
   the seed, its end and the host orders `tests/Alis.Reactive.Conformance.App/Components/component-host.ts` waits on,
-  and holds the date of birth a seed gives the record screen's resident card, the shift roster's book and the care
-  plan review's book (`World/TwinWorld.cs`), since a care screen's endpoint reads its world's seeded domain and answers no constant.
+  and holds the date of birth a seed gives the record screen's resident card, the shift roster's book, the care plan
+  review's book and the handover notes' book (`World/TwinWorld.cs`), since a care screen's endpoint reads its world's
+  seeded domain and answers no constant.
 - An attribute route of MVC 5 starts with no "/", so `AddressAttribute.cs` takes a page's address as the world
   contract names it and trims its leading "/".
 - An exception a page throws answers with its type and message as the page's heading (`ErrorPage.cs`), the

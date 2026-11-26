@@ -1,8 +1,8 @@
 import type { LiveCheck } from "../InputsAndIds/index";
 import type { Owner } from "../OwnershipAndState/index";
 import {
-  assertNever, type CheckedBody, type FnExpression, type FormCheck, type FormPlace, type InputEntry, type PathStep, type PlanDocument, type Registration,
-  type RegistrationStep, type RuleGroup, type SentInput,
+  assertNever, type BoundListEmptyField, type CheckedBody, type FnExpression, type FormCheck, type FormPlace, type InputEntry, type PathStep, type PlanDocument,
+  type Registration, type RegistrationStep, type RuleGroup, type SentInput,
 } from "../Schema/index";
 import { called, Stop, value } from "../ValuesAndSources/index";
 
@@ -237,8 +237,24 @@ function boundObject(registration: Registration, start: unknown, sent: object, a
 function boundList(registration: Registration, start: unknown, sent: readonly unknown[], at: readonly PathStep[], fill: Fill): unknown[] {
   const declared = registration.lists.find(list => matches(list.path, at));
   const kept: readonly unknown[] = declared !== undefined && fill === "json" && declared.json === "append" && Array.isArray(start) ? start : [];
-  const items = sent.map((item, index) => bound(registration, declared === undefined ? undefined : structuredClone(declared.item), item, [...at, kept.length + index], fill));
+  const items = sent.map((item, index) => {
+    const path = [...at, kept.length + index];
+    if (declared === undefined) return bound(registration, undefined, item, path, fill);
+    const sentAsAnEmptyField = fill === "form" && (item === null || item === "");
+    return sentAsAnEmptyField ? emptyItem(declared.emptyField) : bound(registration, structuredClone(declared.item), item, path, fill);
+  });
   return [...kept, ...items];
+}
+
+function emptyItem(emptyField: BoundListEmptyField): string | null {
+  switch (emptyField) {
+    case "null":
+      return null;
+    case "emptyText":
+      return "";
+    default:
+      return assertNever(emptyField);
+  }
 }
 
 function reach(holder: Reached, path: readonly RegistrationStep[]): Reached[] {

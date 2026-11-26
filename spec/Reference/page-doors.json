@@ -3989,6 +3989,20 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M8.F4 X16.57 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/HandoverNotes.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.57 1": {
+    "modules": [],
+    "views": [
+      "/Care/Record/HandoverNotes.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M8.F4 X16.7 0": {
     "modules": [],
     "views": [

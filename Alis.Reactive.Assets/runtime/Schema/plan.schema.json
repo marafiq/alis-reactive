@@ -1457,12 +1457,16 @@
         "item": {},
         "json": {
           "$ref": "#/$defs/BoundListJson"
+        },
+        "emptyField": {
+          "$ref": "#/$defs/BoundListEmptyField"
         }
       },
       "required": [
         "path",
         "item",
-        "json"
+        "json",
+        "emptyField"
       ],
       "additionalProperties": false
     },
@@ -1470,6 +1474,12 @@
       "enum": [
         "append",
         "replace"
+      ]
+    },
+    "BoundListEmptyField": {
+      "enum": [
+        "null",
+        "emptyText"
       ]
     },
     "RuleGroup": {

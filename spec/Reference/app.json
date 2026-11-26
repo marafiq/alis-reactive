@@ -15296,6 +15296,42 @@
       ]
     },
     {
+      "feature": "M8.F4",
+      "for": "X16.57",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "noteInputs",
+        "recordButton",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.57",
+      "index": 1,
+      "screen": "record",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "tabForm",
+        "noteInputs",
+        "recordButton",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M6.F1",
       "for": "X9.37",
       "index": 0,

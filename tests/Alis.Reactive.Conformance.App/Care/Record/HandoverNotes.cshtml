@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HandoverNotes
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Handover notes";
+    var plan = Html.ReactivePlan<HandoverNotes>();
+}
+<h1>Handover notes</h1>
+@using (var handover = Html.BeginRequestContainer(plan, "handover"))
+{
+    <legend>Handover</legend>
+    @for (var position = 0; position < Model.Notes.Count; position++)
+    {
+        var at = position;
+        <fieldset>
+            <legend>Note @(at + 1)</legend>
+            @(Html.InputField(plan, m => m.Notes[at], options => options.Label("Note " + (at + 1))).NativeTextBox())
+        </fieldset>
+    }
+    <fieldset>
+        <legend>Handed over by</legend>
+        @(Html.InputField(plan, m => m.HandedOverBy, options => options.Label("Handed over by")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("hand-over", "Hand over").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Put<HandoverNotes>(CareEndpoints.NotesHandedOver, request => request.Inputs(handover.Container))
+        .OnSuccess(Content.Text, (handed, pipeline) => pipeline.Element("handover-status").Text.Set(handed.Body))))
+}
+<p id="handover-status"></p>
+<p>On record: <span id="on-record">@Model.OnRecord</span></p>
+@Html.RenderPlan(plan)

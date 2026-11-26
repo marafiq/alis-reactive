@@ -20,7 +20,7 @@ public class TwinApplication : HttpApplication
         services.AddReactiveJson(json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
         services.AddReactiveFluentValidation(validation => validation.Add<RoomNumberingRules>().Add<BedNoteRules>().Add<EveningBedNoteRules>().Add<BedHandoverRules>().Add<ResidentDetailsRules>()
             .Add<DeputyAppointmentRules>().Add<DeputyNamelessAppointmentRules>().Add<LeastDoseRoundRules>()
-            .Add<RosterRules>().Add<ShiftRules>());
+            .Add<RosterRules>().Add<ShiftRules>().Add<HandoverNotesRules>());
         DependencyResolver.SetResolver(new TwinResolver(DependencyResolver.Current, services.BuildServiceProvider()));
         RouteTable.Routes.MapMvcAttributeRoutes();
     }

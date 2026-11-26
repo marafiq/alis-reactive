@@ -9,5 +9,7 @@ internal static partial class BrowserRegistrations
     private static partial BoundObjectJson ObjectJson(JsonPropertyInfo property, JsonTypeInfo holder) => BoundObjectJson.Fill;
 
     private static partial BoundListJson ListJson(JsonPropertyInfo property, JsonTypeInfo holder) => BoundListJson.Replace;
+
+    private static partial BoundListEmptyField EmptyField(JsonTypeInfo item) => item.Type == typeof(string) ? BoundListEmptyField.EmptyText : BoundListEmptyField.Null;
 }
 #endif
