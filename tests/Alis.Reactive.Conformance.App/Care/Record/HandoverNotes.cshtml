@@ -14,7 +14,7 @@
 @using (var handover = Html.BeginRequestContainer(plan, "handover"))
 {
     <legend>Handover</legend>
-    @for (var position = 0; position < Model.Notes.Count; position++)
+    for (var position = 0; position < Model.Notes.Count; position++)
     {
         var at = position;
         <fieldset>

@@ -15,7 +15,7 @@
 @using (var roster = Html.BeginRequestContainer(plan, "roster"))
 {
     <legend>Roster</legend>
-    @for (var position = 0; position < Model.Rows.Count; position++)
+    for (var position = 0; position < Model.Rows.Count; position++)
     {
         var at = position;
         <fieldset>

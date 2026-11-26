@@ -29,6 +29,10 @@ and a script URL in any tracked view, and a layout links a script by its file.
 - A new page of the conformance app adds its placement's line to `spec/Reference/page-doors.json`, which the gate
   writes and refuses unstaged, so the unit that writes the page carries that file in its paths (the lead's mistake,
   2026-11-24).
+- A view MVC 5 serves writes a statement inside a code block with no "@", a "for" straight inside a container's
+  "@using" block among them: MVC 5's parser refuses "@for" there with HttpParseException at the page's first render,
+  which ASP.NET Core's parser accepts, and both read the bare form (the lead's mistake, 2026-11-26: the roster page
+  answered 500 on MVC 5 at 79e09ab34). An "@" stays where the statement sits inside an HTML element.
 
 Two meanings every view meets, restated from their D lines in `spec/Core/DESIGN.md`:
 - A member's name (D2.4 to D2.6, D2.9). A request body names each member as the endpoint's binder reads it: on
