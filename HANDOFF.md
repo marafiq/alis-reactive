@@ -1,23 +1,22 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 15:20:50 EST 2026
+Written at `date`: Thu Nov 26 15:43:23 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 26, each in the notes block below
+note: open: 25, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (64): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
+unit: landed (65): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, UnitsClosed, ValidationForms, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
-unit: ready (2): G13Forms, Section4Close
-unit: building (1): MoveInOwners
-unit: briefed (1): Mvc5JsonNames
+unit: ready (3): G13Forms, Section4Close, StateSpecUnits
+unit: building (3): MoveInOwners, Mvc5JsonNames, WorldRecords
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 2536f54de on feature/rewrite: equal to the remote
+lane: pushed at dfdac650e on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 2536f54de
+ci: unread at dfdac650e
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -25,10 +24,10 @@ file: over spec/CLAUDE.md: holds 2155 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over HANDOFF.md: holds 156 lines, its limit 150
+file: over HANDOFF.md: holds 154 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 11 units have landed since .claude/rules/process.md last changed
+machine: review due : 12 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -36,13 +35,13 @@ machine: review due : 11 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 2536f54de validation (FlagsAttribute): a flags enum is the one [Flags] marks, and the startup names none
-- Full check: .work/logs/spec-check-2536f54de.log: spec check at 2536f54de: 40 of 40 checks pass
+- HEAD: dfdac650e spec (UnitsClosed): U1, U2, U14, U15, U16 and U17 are closed, and what holds U18 and U22 open
+- Full check: .work/logs/spec-check-dfdac650e.log: spec check at dfdac650e: 40 of 40 checks pass
 - .work/last-run.txt: 20261126-150503-94155 2536f54de
 
 ## Landed since the commit before the last spec: STATE commit
-2536f54de validation (FlagsAttribute): a flags enum is the one [Flags] marks, and the startup names none
-de05f8b7f spec: STATE and handoff at 03c79d4aa
+dfdac650e spec (UnitsClosed): U1, U2, U14, U15, U16 and U17 are closed, and what holds U18 and U22 open
+47380692f spec: STATE and handoff at 2536f54de
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
@@ -56,7 +55,6 @@ spec/CLAUDE.md:24: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mi
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
-- 2026-11-26 | decision | spec/CLAUDE.md, the G13 forms | G13Forms | "1-will dev have to type one of those every sngle time? 2-ok 3-ok, non issue. 4-where it tell its? 6-ok, does dev experience degraded."
 - 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complexities. Get rid of this desk thinking. Keep other pages, other browser tasks, but write this complex app from ground up with full scale complexity. This framework has features to handle it."
 - 2026-11-18 | direction | the queue of this file | queue | "I want you to build a skill out of that TLA plus and schema, which will be used by every consumer as well." "This skill you are building should be a guiding principle for any developer to write any complex app by simple decisions, because it has a map, right? It has clear names, right?"
 - 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "This should not be in the skill. This is for you to use the skill to write the app, but you have to first list down every feature the app will have ... The specs of the apps are a separate thing, but you should get help from the specs and the TLA plus that how that app should be written." "Why you need to do inventory again? You have TLA+, you have schema."
