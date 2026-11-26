@@ -6,6 +6,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), on the forms gate 2's G13 left to the owner: yes to
+  `container.Read(m => m.Member)` (N13.1), the endpoint's check `EndpointChecks`' `Validate` returning its result, which
+  the action answers through `ToErrorResponse` (N16.1), `AbortSignal()` among a declaration's arguments, which only a
+  component's author writes (N17.5), and `Validate<TValidator>(ruleSet)` on a request (D16.2). A handler's policy
+  (N11.1) stands as built: a door with no policy runs overlap, so a view names `HandlerPolicy` only to replace or skip.
+  A flags enum is the flags unit's (N16.4), decided the same day.
 - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): one door for each list operation. An object JavaScript iterates
   declares its iterator under a member it names, `Items`, by `LiveIterator<TItem>()` or `DataIterator<TItem>()`, and the
   list operations run on that member (`Children.Items.Count()`). the Iterables class's 27 forwarders and the
@@ -1176,7 +1182,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   signature: `AbortSignal()`, an `Arg` among a declaration's argument kinds beside `Answer`, `Fixed` and `Pass`,
   named for lib.dom's type the method receives. A declaration lists it among its method's arguments where the
   method takes the signal, and a view passes nothing for it. The cost of another form: one line in each
-  declaration that lists it. The owner decides it.
+  declaration that lists it. The owner approved it, 2026-11-26.
 - The lead, 2026-11-13, landing seventeen Fusion slices of the handover, bed-board and fusion-layout screens as
   signatures, three forks' work read at the source, and settling what they read into. Four forms are the lead's,
   each read at EJ2 33.1.47's source: the scheduler's `DataBound` is the core's `Event`, since EJ2 raises it with
@@ -1390,7 +1396,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   person types renders the field in a container block, X8.4's pain assessment the first; eight more pages wait on it,
   five of the record screen's, X7.11's two and X1.4. X7.7's first promise read none for a cleared int field, where
   D3.6 reads the member's start, so its opposite reads 0. The cost of another form: one line in each view that reads a
-  typed member. The owner decides it.
+  typed member. The owner approved it, 2026-11-26.
 - The lead, 2026-11-13, on the owner's "make the decision that give quality, and TLA+ covers it and roll with it"
   (verbatim in `spec/NOTES.md`): N13.1's read is what the endpoint binds from what its container sends, read in its
   step (D13.3). One input reads its value, a blank or unconverted one the member's start (D3.6); a member no input
@@ -1428,7 +1434,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   public as the grammar's third value, so a consumer that forwards a policy names the default; its cost is a second
   spelling of a door that names none. A consumer door that starts a handler off the core's doors adds its own overload
   and forwards the policy. X17.8's text joined from a source and a literal is N7.7's, and X11.15,
-  X11.21 and X11.22 wait on the defaultHooks host. The owner decides the form.
+  X11.21 and X11.22 wait on the defaultHooks host. The form stands (the owner, 2026-11-26): a view names no policy
+  unless it replaces or skips.
 - The lead, 2026-11-13, declaring N10.1, the endpoint's error answer, as its line writes it:
   `ValidationResult.ToErrorResponse()`, an extension of `RequestsAndResponses`, module 6's, in a file of each host,
   returning that host's MVC `ActionResult`, so an action that returns `IActionResult` or `ActionResult` returns it
@@ -1468,7 +1475,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   D16.7) and checks under the default rule set, since no request door names a rule set yet (D16.2). It returns the
   result, and the action answers a failed one through N10.1, so one door writes D10.8's body. X16.16's endpoint checks
   through it in place of its hand copy of the rule, and X8.3's visitor sign-in stands on it, its test red. Three
-  things wait for the owner: the form, which checks and leaves the answer to N10.1 where N16.1's line says the door
+  things waited for the owner: the form, approved on 2026-11-26, which checks and leaves the answer to N10.1 where N16.1's line says the door
   answers, so an action that ignores the result saves an unchecked model; how MVC 5's own validation stays out of the
   model state on net48, which no line states, read by an MVC 5 probe before U17 builds that half; and net48's hosts
   for X8.3 or X16.16, since no placed promise runs the net48 half. The bench's validation endpoints answer what they
