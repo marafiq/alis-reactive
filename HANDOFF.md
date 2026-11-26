@@ -1,58 +1,55 @@
 # Handoff
 
-Written at `date`: Wed Nov 25 21:16:20 EST 2026
+Written at `date`: Wed Nov 25 23:19:43 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 27, each in the notes block below
-note: closed 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "C (Recommended)", to : its follow-up FormDataBoundary landed
-note: closed 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "if a input is part of: its follow-up FormDataBoundary landed
-unit: landed (53): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
+note: open: 26, each in the notes block below
+unit: landed (54): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
+unit: briefed (2): FormDataBoundaryNet48, RowContainers
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
-unit: building (2): MoveInOwners, ValidationForms
-unit: waiting (1): RowContainers
+unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at 15b480e1e on feature/rewrite
+lane: pushing at 96955defa on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at 15b480e1e
+ci: unread at 96955defa
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2121 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2131 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over HANDOFF.md: holds 166 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 15b480e1e validation (FormDataBoundary): a member a request sends outside its body is checked where MVC's binder reads it, choice C, with the .NET 10 quirk written down
-- Full check: .work/logs/spec-check-15b480e1e.log: spec check at 15b480e1e: 40 of 40 checks pass
-- .work/last-run.txt: 20261125-205729-8000 15b480e1e
+- HEAD: 96955defa validation (ValidationForms): a check with no request names its rule set, and a set its validator runs no rule under is refused
+- Full check: .work/logs/spec-check-96955defa.log: spec check at 96955defa: 40 of 40 checks pass
+- .work/last-run.txt: 20261125-225932-13405 96955defa
 
 ## Landed since the commit before the last spec: STATE commit
-15b480e1e validation (FormDataBoundary): a member a request sends outside its body is checked where MVC's binder reads it, choice C, with the .NET 10 quirk written down
-1fd564b6e spec: STATE and handoff at bfe8076c8
+96955defa validation (ValidationForms): a check with no request names its rule set, and a set its validator runs no rule under is refused
+982a6f7e3 spec: STATE and handoff at 15b480e1e
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 469 to 474
-- A rule or a tool's list not applied before the change: 474 to 483
-- A number, a proof line or an absence not read from the run that proves it: 74 to 76
-- A shell command or a script wrong in its own terms: 673 to 692
-- A costly agent run started before its environment was proven to run the brief's commands: 9 to 10
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 474 to 481
+- A rule or a tool's list not applied before the change: 483 to 488
+- A number, a proof line or an absence not read from the run that proves it: 76 to 79
+- A shell command or a script wrong in its own terms: 692 to 698
 
 ## The owner's latest decisions
 spec/CLAUDE.md:9: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), choice C of the form-data boundary: a member a request sends
 spec/CLAUDE.md:15: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): one concept on the developer's surface, the request container.
 spec/CLAUDE.md:19: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): the container takes care of hidden fields in the browser, since
+spec/CLAUDE.md:24: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), yes to lines 2 to 5 of ValidationForms' section 10, each in a
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -81,10 +78,7 @@ spec/CLAUDE.md:19: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): the co
 - 2026-11-23 | direction | the queue of this file | queue | "keep worktree around"
 - 2026-11-23 | direction | the queue of this file | queue | "nah splitting inputbinidng now is such a huge change, explain in more detail, that could set us back to zero", then "yes, on input i will not approve that change in isolation, must have thought through design so prepare that, adhoc recommondations are forbidden"
 - 2026-11-24 | direction | the queue of this file | queue | "never lower the quality - just reminder"
-- 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "C (Recommended)", to D16.5's question of a member sent outside the body (form-data-boundary-design.md, section 6)
-- 2026-11-25 | direction | the queue of this file | ValidationForms | "1 seems more aligned, but make sure that all use cases are satified, including where bulk edit say row gets validated. I would like to see each use case form here before you action it." "Its very critical to get this right with high quality code and keep grammer and dev experience." "Bulk Edit is not about checking one row alone, it has two use cases, if action is in row, then row validate, if its applying to all rows then all validate." "write these use cases a md document, take this to fable xhigh designer, ask it to deliver on correctness, grammer consistency, quality, typed and your document must contain small but complete use examples. so design from fable is expected to be complete, then it gets tla+ and then it lands without loosing quality"
-- 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | ValidationForms | "i approve it", to the five lines of .worktrees/validation-forms/.landing/ValidationForms/design.md, section 10
-- 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "if a input is part of body and validator on server already works great. and if dev also sent in query, it dev business logic how it will be validated. There is no solution around this problem is there. so i lean toward no"; then "yes lets go with no. and note down the quirk", to the design's section 8 (a query member carried in the body too): not built, and the quirk written where D16.5 and the Query door's XML doc state it
+- 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that all use cases are satified, including where bulk edit say row gets validated. I would like to see each use case form here before you action it." "Its very critical to get this right with high quality code and keep grammer and dev experience." "Bulk Edit is not about checking one row alone, it has two use cases, if action is in row, then row validate, if its applying to all rows then all validate." "write these use cases a md document, take this to fable xhigh designer, ask it to deliver on correctness, grammer consistency, quality, typed and your document must contain small but complete use examples. so design from fable is expected to be complete, then it gets tla+ and then it lands without loosing quality"
 <!-- /notes -->
 
 ## Next
@@ -92,75 +86,59 @@ spec/CLAUDE.md:19: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): the co
 ### Next session: the framework package to 1.0
 
 The owner's order, 2026-11-23: the team process (landed), then the framework core to 1.0, then everything else. Every
-unit lands on `feature/rewrite`; its one pull request, #247, ships 1.0 (the owner, 2026-11-23). The worktrees of
-landed units stay (the owner, 2026-11-23: "keep worktree around"). Builds stay serial on this Mac; source
-`scripts/toolchain-env.sh` first. A unit of Markdown alone lands by `scripts/land.sh`'s Markdown path since 1bce0ab2e
-(the owner, 2026-11-24: "for md file changes u do not need whole flow to run").
+unit lands on `feature/rewrite`; its one pull request, #247, ships 1.0; landed units' worktrees stay (the owner,
+2026-11-23). Builds stay serial on this Mac; source `scripts/toolchain-env.sh` first. A unit of Markdown alone lands
+by `scripts/land.sh`'s Markdown path (the owner, 2026-11-24). 1.0's definition of done (the owner, 2026-11-23): "1.0
+DoD is when all components of fusion, and selective native, and core framework are done where fusion will be onboarded
+one component with its full powers using skill. right now focus is on getting framework package to 1.0".
 
-1.0's definition of done is the owner's (2026-11-23): "1.0 DoD is when all components of fusion, and selective native,
-and core framework are done where fusion will be onboarded one component with its full powers using skill. right now
-focus is on getting framework package to 1.0". So the focus now is the framework package, the core (U1 to U22).
+**1. Start inside the lane,** `cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite && claude`,
+spelled Code as on disk: from Documents/code, bash's pwd -P and Python's getcwd differ in case and state.py finds no
+landing folder, so land-unit.sh runs from a shell cd'd to the Code spelling (2026-11-26).
 
-**1. Start inside the lane.** `cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite && claude`:
-the lane's agents, hooks and rules load only there (the 2026-11-25 session started at the root, a mistake). First spawn
-`builder` with a two-line brief: print `git rev-parse HEAD`, change nothing; any commit but the lane's head means
-`worktree.baseRef` is not applied.
-
-**2. The framework core to 1.0 (U1 to U22).** Done when:
-- `scripts/open.py` prints no core runtime case: met at b824783d3, "0 runtime cases not built";
-- X3.7, a date in a JSON response on MVC 5, passes on CI's Windows job;
-- `spec/REWRITE.md` section 4 states each of U1 to U22 closed with its result line (today it states U3, U4, U5,
-  U8 to U13 closed and U1, U2, U14 to U16 landed; U6, U7, U17 to U22 are not stated);
-- the core's public surface text is read as the 1.0 surface, and README's examples come from tested pages.
-Its units, in order:
-1. The plan narrowed to what C# writes: landed in six units, the last at 5d9328da2 (ListPosition, choice A of
-   2026-11-24, X9.43 to X9.46). Its gap: an empty list or a files input with no file sends no part, so an item whose
-   only field is one of these still ends the list.
-2. The forms, four units, one at a time, each its spec lines, TLA+, tests and code in one commit, as ListPosition
-   landed at 5d9328da2. Every design question is answered and every probe ran before its build (2026-11-25), each
-   brief naming what it rests on, so no question goes to the owner unless a run prints other than its brief states.
-   Each worktree and its .landing is backed up as backup/rewrite/<worktree> on GitHub, rerun before a session ends:
-   `bash .work/tools/backup-worktree.sh ../<worktree> <worktree>`.
-   - ContainerOnly landed at 49dd77295, "839 selected, 839 ran, 839 passed", spec check 40 of 40: one request container,
-     its hidden inputs sent in a form body (the owner, 2026-11-25). A unit whose paths hold scripts/land-unit.sh lands from
-     a copy, `cp ../<worktree>/scripts/land-unit.sh .work/land-unit-run.sh`, since cp rewrites the script bash is reading.
-   - FormDataBoundary landed at 15b480e1e, "842 selected, 842 ran, 842 passed, 0 failed, 0 over budget", spec check 40
-     of 40: choice C of D16.5, the quirk in the Query doors' XML doc, X16.46's nine promises (4, 7 and 8 net48 alone,
-     CI's), the twin's Web.config letting a DELETE through IIS Express, two traps in the hook.
-   - ValidationForms, ../validation-forms, next: it moves by its move.sh to the lane's head; RowContainers,
-     ../row-containers, After it. A unit in a worktree the lead moved is built by an unnamed general-purpose agent with
-     no isolation, its first read .claude/agents/builder.md, after a low-effort probe (.claude/skills/delegate/SKILL.md).
-     land-unit.sh runs from a shell whose cwd is spelled as on disk, Documents/Code: from Documents/code, pwd -P and
-     Python's getcwd differ in case, and state.py finds no landing folder (2026-11-26).
-   A waiting unit moves once the unit before it is landed and pushed, in its worktree by one command,
-   `bash .landing/<Name>/move.sh <the lane's head>`: spec/MISTAKES.md from HEAD, the head checked out, npm ci, the
-   lead's counts re-applied by counts.py beside it. Then its brief's "At the base:" commands, a `builder` on Opus at
-   xhigh with the brief, read.md, `scripts/land-unit.sh`, `scripts/full-check.sh`, `scripts/push.sh`, `scripts/ci.py`.
-3. X3.7 on the net48 host: landed at c3aeae654, proven by CI's Windows job at f2986ea66 ("ci at f2986ea66: 10 of 10
-   jobs passed"; verify-net48 "Passed the_date_of_birth_shows_its_own_day_in_a_browser_whose_clock_is_behind_the_servers").
-4. Eight parked core leads: judged at cad8e3581 (CoreLeads), two in, one closed, five after 1.0. In: typed list
-   construction from separate sources, landed at a00125348 (ListFromSources, X7.21 and X7.22); a named rule set for a
-   check with no request, N16.3, which ValidationForms builds as F5's door. Closed: plan shape alignment. After 1.0, as
-   rows of the table in spec/NOTES.md: the named enum in a pushed message; activated-row replacement, a row's
-   "removing" state and handler cleanup; the attached-partial validation summary.
-5. A divergence FormDataBoundary's builder read at the source (2026-11-26), decided before the freeze: MVC 5 binds an
-   empty item of a list of texts as an empty text (spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:50-52),
-   while forms.ts:220 reads it as null in form data and DESIGN.md:1827's table, citing mvc5-empty-list-item-null,
-   says null for text; the fact holds for nullable values alone (:156, :57). The JSON arm on MVC 5 meets it for a list
-   query member whose item reads nothing. What net10 binds for an empty text item no probe has read yet:
-   probe:core-query-nullable-enum-items reads enums.
-6. Core freeze: section 4 rewritten unit by unit, the surface read, README checked. One gap is decided first: a 204 to
-   a JSON route is a content failure, since response.ts reads no Content-Type as no JSON before it reads the body, while
-   an empty JSON body reads as none, and no D line states a 204 under `OnSuccess<T>` (a search of spec/Core/DESIGN.md
-   for "204" and "No Content" printed nothing; raised by ListFromSources' builder, read at the source in its read.md).
+**2. The framework core to 1.0 (U1 to U22).** Done when `scripts/open.py` prints no core runtime case (met at
+b824783d3); X3.7 passes on CI's Windows job (met at f2986ea66); `spec/REWRITE.md` section 4 states each of U1 to U22
+closed with its result line (U3, U4, U5, U8 to U13 closed, U1, U2, U14 to U16 landed, U6, U7, U17 to U22 not stated);
+the core's surface text is read as the 1.0 surface and README's examples come from tested pages. Its units, in order:
+1. The plan narrowed to what C# writes: landed, the last at 5d9328da2 (ListPosition). Its gap: an empty list or a files
+   input with no file sends no part, so an item whose only field is one of these still ends the list.
+2. The forms, one unit at a time, each its spec lines, TLA+, tests and code in one commit; every design question is
+   answered, so nothing goes to the owner unless a run prints other than its brief states.
+   - Landed: ContainerOnly at 49dd77295 (one request container, its hidden inputs in a form body); FormDataBoundary at
+     15b480e1e, "842 selected, 842 ran, 842 passed, 0 failed, 0 over budget", spec check 40 of 40 (choice C of D16.5,
+     the quirk in the Query doors' XML doc, X16.46 4, 7 and 8 net48 alone, the twin's DELETE through IIS Express).
+   - Landed: ValidationForms at 96955defa, "845 selected, 845 ran, 845 passed, 0 failed, 0 over budget", spec check
+     40 of 40 (pipeline.Validate(container, ruleSet); a set no rule runs under refused; X16.48 to X16.50).
+   - FormDataBoundaryNet48, ../fdb-net48, briefed at 96955defa: CI's verify-net48 at 982a6f7e3 failed X16.46 0, 1, 2
+     and 6, since on MVC 5 a registration's start is named in camel case while the body and the rules name C# names
+     (.landing/FormDataBoundaryNet48/answer.md); X16.48's net48 half meets it too. Then RowContainers, ../row-containers.
+   A waiting unit moves once the one before it is landed and pushed: `bash .landing/<Name>/move.sh <the lane's head>`
+   in its worktree, then its brief's "At the base:" line rewritten at that head, a low-effort probe, and its builder: a
+   general-purpose agent with no name and no isolation, its first read .claude/agents/builder.md, on Opus at xhigh
+   (.claude/skills/delegate/SKILL.md). Then read.md, the unit staged and `scripts/check.sh --no-spec` in its
+   worktree, `scripts/land-unit.sh`, `scripts/full-check.sh`, `scripts/push.sh`. A unit whose paths hold
+   scripts/land-unit.sh lands from a copy, `cp ../<worktree>/scripts/land-unit.sh .work/land-unit-run.sh`. land-unit.sh
+   stops a kind of mistake that grew while its row and every file it names stood: the lead moves its holder in the
+   unit, a row's text through spec.py, since only the count cells are carried. Each unlanded worktree is backed up
+   before a session ends: `bash .work/tools/backup-worktree.sh ../<worktree> <worktree>`.
+3. Eight parked core leads, judged at cad8e3581 (CoreLeads): typed list construction landed at a00125348; N16.3, a
+   named rule set for a check with no request, is ValidationForms' F5; five after 1.0, as rows of spec/NOTES.md's table.
+4. A divergence read at the source (2026-11-26), decided before the freeze: MVC 5 binds an empty item of a list of
+   texts as an empty text (spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:50-52), while forms.ts:220 reads it
+   as null in form data and DESIGN.md:1827's table, citing mvc5-empty-list-item-null, says null for text; the fact
+   holds for nullable values alone (:156, :57). The JSON arm on MVC 5 meets it for a list query member whose item reads
+   nothing. What net10 binds for an empty text item no probe has read: probe:core-query-nullable-enum-items reads enums.
+5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked. Decided first: a 204 to a JSON route
+   is a content failure, since response.ts reads no Content-Type as no JSON before it reads the body, and no D line
+   states a 204 under `OnSuccess<T>` (a search of spec/Core/DESIGN.md for "204" and "No Content" printed nothing).
 
 **3. After the framework package:** the selected Native components (date entry first), then every Fusion component,
-one at a time with its full powers through `.claude/skills/onboard-component/SKILL.md`, then PR #247 out of draft. The six packages pack at one version, so the tag comes once, at the end.
+one at a time with its full powers through `.claude/skills/onboard-component/SKILL.md`, then PR #247 out of draft.
+The six packages pack at one version, so the tag comes once, at the end.
 
-**Parked, each where it lives:** browser validation's shared key
-(`spec/Validation/browser-validation-proposal.md`, the owner's condition stands); TanStack Table
-(`../tanstack-table`, uncommitted) and Charts (`../tanstack-charts`, a brief); Form Builder and Query Builder
-(their pushed branches); the Fusion Grid API worktree (`../fusion-grid-api`, uncommitted); five ComboBox
-units whose replies wait for a read. The history this block held is the HANDOFF.md of the previous STATE commit.
+**Parked, each where it lives:** browser validation's shared key (`spec/Validation/browser-validation-proposal.md`,
+the owner's condition stands); TanStack Table (`../tanstack-table`, uncommitted) and Charts (`../tanstack-charts`, a
+brief); Form Builder and Query Builder (their pushed branches); the Fusion Grid API worktree (`../fusion-grid-api`,
+uncommitted); five ComboBox units whose replies wait for a read. Older history is the previous STATE commit's HANDOFF.md.
 
 <!-- /next -->
