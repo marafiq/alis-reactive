@@ -120,13 +120,13 @@ or the connection before it opens (D21.11).
 
 `alis.model`'s `sent`, called with a request container's id and the key of its model, returns the body that container
 sends, built when it is called: each framework input of the page's input table whose element is inside the container's
-element, under its `InputBinding.path`, its value its `InputBinding.converted` evaluated in the plan that contributed it,
-or its `InputBinding.blank` where that holds null or reads nothing.
-The page lacking the container's element, no live plan rendering that container for that model (D14.8), two
-inputs inside it under one scalar binding name (D13.4), a list input whose item reads nothing where its `sent`
-admits none, and an input its `whenBlank` `leaveUnlessAlone` leaves out where no other input writes a field of its item
-(D9.10) each stop the pipeline. A container read is a `data` read over
-it (N13.1, D13.3), and `Live.body`'s `value` is that call.
+element, under its `InputBinding.path` past the container's `prefix` (D14.8), its value its `InputBinding.converted`
+evaluated in the plan that contributed it, or its `InputBinding.blank` where that holds null or reads nothing. The page
+lacking the container's element, no live plan rendering that container for that model, or two rendering it under two
+prefixes (D14.8), two inputs inside it under one scalar binding name (D13.4), a list input whose item reads nothing
+where its `sent` admits none, an input its `whenBlank` `leaveUnlessAlone` leaves out where no other input writes a field
+of its item (D9.10), and an input inside it whose path its `prefix` does not open (D14.8) each stop the pipeline. A
+container read is a `data` read over it (N13.1, D13.3), and `Live.body`'s `value` is that call.
 
 `alis.document`'s `query`, called with a member's binding name (D2.5), returns the first value of the page's query
 whose key matches it ignoring case, as both hosts bind the query, and null where no key does. Its `segment`, called
@@ -160,6 +160,8 @@ Its shape and list flag of 65fdf118d leave into `converted`.
 
 `Container` carries:
 - `model`: the key of the model its block was rendered for (D14.8);
+- `prefix`: the field prefix its view was rendered under, its `name` and its `path`, each empty for a view with none
+  (D14.8);
 - `summary`: its summary element's id (D13.6);
 - `live`: none, or the `Live` its inputs are checked by (D16.15).
 
@@ -462,8 +464,9 @@ no argument type of its own (D9.1).
   refused where the view renders. A literal enum is written in the endpoint's form where the view renders.
 - `HttpResponse`, the reply a `request` binds in its routes and `chained` block (N10.2, N10.7, D10.23): `status`,
   `outcome`, `headers`, the headers of the answer the browser hands the page, lib.dom's `Headers`, whose `get` a `call`
-  reads (N10.7), `request`, the members as the request sent them, `inputs`, the inputs it sent, each its binding name
-  and the entry the inputs table held (D10.18), and `body`, absent for kind none and every HEAD route.
+  reads (N10.7), `request`, the members as the request sent them, `inputs`, the inputs it sent, each the binding name
+  and the path it was sent under and the entry the inputs table held (D10.18), and `body`, absent for kind none and
+  every HEAD route.
 - `FormCheck`, the argument of `alis.form`'s `validate`: the registration's key, the body the request sends with its
   format and the inputs it read (D10.18), and the request's `FormPlace` (D16.5, N16.2). A check with no request reads
   its container's inputs as the body (N16.3).
@@ -494,9 +497,10 @@ each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `H
   evaluated value that holds what its inputs write and the hidden inputs inside its element (D9.15), and its
   `inputs`) and `individual`, a list of `missing` (with its `id` and `name`), `captured` (with its `input`) or
   `leftOut`, a named input whose condition failed, which C# writes as the `cond` of its binding over the lookup, so
-  it is never looked up and is in neither the check's inputs nor the reply's. A `SentInput` is its binding `name`,
-  its `entry`, the inputs table's `InputEntry`, its `id` and `binding`, and its `sent`, the `InputSent` its binding's
-  `sent` evaluates to where its plan joined the page.
+  it is never looked up and is in neither the check's inputs nor the reply's. A `SentInput` is the `name` and the `path`
+  it is sent under, past its container's `prefix` for an input of a container and the request member's for an `Input`
+  (D14.8), its `entry`, the inputs table's `InputEntry`, its `id` and `binding`, and its `sent`, the `InputSent` its
+  binding's `sent` evaluates to where its plan joined the page.
 - `InputSent`, the form a request sends an input's value in (D9.10, D9.13): `field` with its `form`, a wire form with no
   `enum` or `flags` in it, `whenNothing` (`leave` or `empty`) and `whenBlank` (`send`, `leave` or `leaveUnlessAlone`); `enum` with its
   `form`, `enum`, `flags` or a `list` of one, `json`, its `JsonForm`, `whenNothing` and `whenBlank`; or `files`. The

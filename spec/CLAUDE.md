@@ -37,8 +37,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   message differs by rule set; its form then is a closed choice the block door takes, LiveCheck.Under with the rule
   set or LiveCheck.None, written into the container's live field, with no PublicAPI line before that view. The core
   adds no door for a grid: the grid's own unit decides between M21.F23's adapter and the owner's words of 2026-11-20
-  ("adapter is not default choice"), and the one thing it can ask of the core, a check over a value a source hands,
-  is named in section 8 of that design. Line 1, a container under a field prefix, is RowContainers' unit.
+  ("adapter is not default choice"), and the one thing it can ask of the core, a check over a value a source hands, is
+  named in section 8 of that design. Line 1: a container under a field prefix is its view's model, which sends, reads
+  and checks the inputs inside it under the names past the prefix, and an input inside it that the prefix does not open
+  stops it (D14.8, X16.51 to X16.56).
 - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
   left out under a list index that leaves its item with no field stops the request, or is refused where the view
   renders. `WhenBlank` gains "leaveUnlessAlone", which C# writes where an input's path holds a list index and it would

@@ -6,7 +6,7 @@ CONSTANT Mutant
 Mutants == {"none", "DuplicatesSent", "TwoInputsReadTheLast", "BlankReadsNothing", "UnsentReadsNothing",
             "CachedInputs", "PageWideRead", "UnlistedStopsTheSend", "UnlistedReadsItsText", "UnnamedStartSentAsHeld",
             "JsonSentAsHeld", "ItemNothingStopsTheSendAlone", "BlankAloneStopsTheSendAlone", "HandWrittenControlSent",
-            "HiddenLeftUnsent", "HiddenSentOutsideAFormBody"}
+            "HiddenLeftUnsent", "HiddenSentOutsideAFormBody", "PrefixKept", "OutsideThePrefixSent"}
 
 ASSUME Mutant \in Mutants
 
@@ -24,9 +24,9 @@ DomOrder == <<"own", "slot">>
 
 ContainerOf(i) == IF i = "other" THEN "elsewhere" ELSE "container"
 
-VARIABLES containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused, handWritten, hidden, read, readFrom, hiddenSent, cached, cache
+VARIABLES containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused, handWritten, hidden, prefixed, slotOutside, read, readFrom, hiddenSent, cached, cache
 
-page == <<containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused, handWritten, hidden>>
+page == <<containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused, handWritten, hidden, prefixed, slotOutside>>
 vars == <<page, read, readFrom, hiddenSent, cached, cache>>
 
 Range(s) == {s[i] : i \in DOMAIN s}
@@ -41,8 +41,13 @@ Body == SelectSeq(DomOrder, LAMBDA i : OnPage(i))
 
 Unlisted(i) == text[i] = "unlisted" \/ (text[i] = "blank" /\ ~startNamed)
 
+Outside(i) == prefixed /\ slotOutside /\ i = "slot"
+
+KeepsThePrefix == prefixed /\ Mutant = "PrefixKept"
+
 SendStops == ~containerOnPage \/ Len(Body) >= 2 \/ (\E i \in Range(Body) : text[i] \in {"itemNothing", "blankAlone"})
              \/ (Mutant = "UnlistedStopsTheSend" /\ \E i \in Range(Body) : Unlisted(i))
+             \/ (Mutant # "OutsideThePrefixSent" /\ \E i \in Range(Body) : Outside(i))
 
 BodyLeaves == IF Mutant = "DuplicatesSent" THEN containerOnPage ELSE ~SendStops
 
@@ -60,6 +65,7 @@ HandWrittenBinds == Mutant = "HandWrittenControlSent" /\ containerOnPage /\ hand
 
 Bind(h, s) == CASE Body = <<>> /\ HandWrittenBinds -> "handWritten"
                 [] Body = <<>> -> "start"
+                [] KeepsThePrefix -> "start"
                 [] h = "form" -> Bound(Body[1], h, s)
                 [] h = "json" -> Bound(Body[Len(Body)], h, s)
 
@@ -73,7 +79,8 @@ Hits == IF Mutant = "PageWideRead" THEN Table ELSE {i \in Table : ContainerOf(i)
 
 Found == IF Mutant = "CachedInputs" /\ cached THEN cache ELSE Hits
 
-ValueRead(i) == CASE text[i] = "blank" /\ Mutant = "BlankReadsNothing" -> "nothing"
+ValueRead(i) == CASE KeepsThePrefix -> "start"
+                  [] text[i] = "blank" /\ Mutant = "BlankReadsNothing" -> "nothing"
                   [] text[i] = "unlisted" /\ Mutant = "UnlistedReadsItsText" -> "unlisted"
                   [] OTHER -> Value(i)
 
@@ -85,12 +92,15 @@ BlankAloneFound == Mutant # "BlankAloneStopsTheSendAlone" /\ \E i \in Found : te
 
 TakesTheLast == TwoFound /\ Mutant = "TwoInputsReadTheLast"
 
+OutsideFound == Mutant # "OutsideThePrefixSent" /\ \E i \in Found : Outside(i)
+
 ReadValue ==
     CASE ~containerOnPage -> "stop"
+      [] TakesTheLast -> ValueRead("slot")
       [] ItemNothingFound -> "stop"
       [] BlankAloneFound -> "stop"
+      [] OutsideFound -> "stop"
       [] Found = {} -> IF Mutant = "UnsentReadsNothing" THEN "nothing" ELSE "start"
-      [] TakesTheLast -> ValueRead("slot")
       [] TwoFound -> "stop"
       [] OTHER -> ValueRead(CHOOSE i \in Found : TRUE)
 
@@ -114,6 +124,8 @@ Init ==
     /\ heldRefused \in BOOLEAN
     /\ handWritten \in {"none", "typed"}
     /\ hidden \in BOOLEAN
+    /\ prefixed \in BOOLEAN
+    /\ slotOutside \in IF prefixed THEN BOOLEAN ELSE {FALSE}
     /\ read = "unread"
     /\ readFrom = {}
     /\ hiddenSent = [w \in Wires |-> FALSE]
@@ -134,7 +146,7 @@ Type(i, t) ==
     /\ text[i] # t
     /\ text' = [text EXCEPT ![i] = t]
     /\ Unread
-    /\ UNCHANGED <<containerOnPage, ownRendered, slotLoaded, slotLeft, startNamed, heldRefused, handWritten, hidden, cached, cache>>
+    /\ UNCHANGED <<containerOnPage, ownRendered, slotLoaded, slotLeft, startNamed, heldRefused, handWritten, hidden, prefixed, slotOutside, cached, cache>>
 
 LoadSlot ==
     /\ containerOnPage
@@ -142,7 +154,7 @@ LoadSlot ==
     /\ slotLoaded' = TRUE
     /\ \E t \in Texts : text' = [text EXCEPT !["slot"] = t]
     /\ Unread
-    /\ UNCHANGED <<containerOnPage, ownRendered, slotLeft, startNamed, heldRefused, handWritten, hidden, cached, cache>>
+    /\ UNCHANGED <<containerOnPage, ownRendered, slotLeft, startNamed, heldRefused, handWritten, hidden, prefixed, slotOutside, cached, cache>>
 
 UnloadSlot ==
     /\ slotLoaded
@@ -150,20 +162,20 @@ UnloadSlot ==
     /\ slotLeft' = TRUE
     /\ text' = [text EXCEPT !["slot"] = "blank"]
     /\ Unread
-    /\ UNCHANGED <<containerOnPage, ownRendered, startNamed, heldRefused, handWritten, hidden, cached, cache>>
+    /\ UNCHANGED <<containerOnPage, ownRendered, startNamed, heldRefused, handWritten, hidden, prefixed, slotOutside, cached, cache>>
 
 HoldHidden ==
     /\ containerOnPage
     /\ ~hidden
     /\ hidden' = TRUE
     /\ Unread
-    /\ UNCHANGED <<containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused, handWritten, cached, cache>>
+    /\ UNCHANGED <<containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused, handWritten, prefixed, slotOutside, cached, cache>>
 
 DropHidden ==
     /\ hidden
     /\ hidden' = FALSE
     /\ Unread
-    /\ UNCHANGED <<containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused, handWritten, cached, cache>>
+    /\ UNCHANGED <<containerOnPage, ownRendered, slotLoaded, slotLeft, text, startNamed, heldRefused, handWritten, prefixed, slotOutside, cached, cache>>
 
 Next == Read \/ LoadSlot \/ UnloadSlot \/ HoldHidden \/ DropHidden \/ \E i \in Inputs, t \in Texts : Type(i, t)
 
@@ -184,6 +196,11 @@ ReadSeesTheSlotThatJoinedOrLeftBeforeIt == (Done /\ containerOnPage) => (("slot"
 ReadFindsWhatItsContainerSends == (Done /\ containerOnPage) => readFrom = Range(Body)
 
 AHiddenInputReachesAFormBodyAlone == Done => \A w \in Wires : hiddenSent[w] = (w = "form" /\ hidden /\ containerOnPage /\ ~SendStops)
+
+ATypedTextReachesTheEndpoint ==
+    (BodyLeaves /\ Len(Body) = 1 /\ text[Body[1]] \in {"n1", "n2"}) => \A h \in Hosts, s \in Servers : Bind(h, s) = text[Body[1]]
+
+AnInputOutsideThePrefixStopsTheSend == (containerOnPage /\ \E i \in Range(Body) : Outside(i)) => ~BodyLeaves
 
 ReachStopOnceASlotsInputJoins == ~(read = "stop" /\ containerOnPage /\ ownRendered /\ slotLoaded)
 
@@ -206,5 +223,9 @@ ReachBlankAloneStopsTheRead == ~(read = "stop" /\ containerOnPage /\ Len(Body) =
 ReachAHandWrittenControlLeftUnsent == ~(read = "start" /\ containerOnPage /\ Body = <<>> /\ handWritten = "typed")
 
 ReachAHiddenInputInAFormBody == ~(Done /\ hiddenSent["form"] /\ ~hiddenSent["json"] /\ ~hiddenSent["query"])
+
+ReachATextBoundUnderAPrefix == ~(prefixed /\ read = "n1" /\ BodyLeaves /\ Len(Body) = 1 /\ text[Body[1]] = "n1")
+
+ReachStopOnAnInputOutsideThePrefix == ~(prefixed /\ read = "stop" /\ containerOnPage /\ ~ownRendered /\ slotLoaded /\ slotOutside /\ text["slot"] = "n1")
 
 ====

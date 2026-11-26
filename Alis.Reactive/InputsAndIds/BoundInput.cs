@@ -148,7 +148,7 @@ internal sealed partial class BoundInput
 
     private static partial string PrefixMemberName(string clrName, JsonSerializerOptions app);
 
-    private static IEnumerable<PathStep> PrefixSteps(string prefix, JsonSerializerOptions app)
+    internal static IEnumerable<PathStep> PrefixSteps(string prefix, JsonSerializerOptions app)
     {
         foreach (var (text, isPosition) in MemberLambda.Named(prefix))
         {

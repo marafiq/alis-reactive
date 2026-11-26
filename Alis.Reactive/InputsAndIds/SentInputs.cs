@@ -21,14 +21,17 @@ internal sealed class SentInputs
 
 internal sealed class SentInput
 {
-    internal SentInput(string name, InputEntry entry, InputSent sent)
+    internal SentInput(string name, IReadOnlyList<PathStep> path, InputEntry entry, InputSent sent)
     {
         Name = name;
+        Path = path;
         Entry = entry;
         Sent = sent;
     }
 
     public string Name { get; }
+
+    public IReadOnlyList<PathStep> Path { get; }
 
     public InputEntry Entry { get; }
 

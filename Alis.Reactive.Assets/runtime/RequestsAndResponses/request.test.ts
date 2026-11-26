@@ -345,6 +345,7 @@ type InputSent = Captured["inputs"][number]["sent"];
 const asField = (form: Extract<InputSent, { kind: "field" }>["form"]): InputSent => ({ kind: "field", form, whenNothing: "empty", whenBlank: "send" });
 const bound = (name: string, path: Binding["path"], shape: Binding["converted"]["shape"], sent: InputSent): Captured["inputs"][number] => ({
   name,
+  path,
   entry: {
     id: "Intake__" + name,
     binding: {

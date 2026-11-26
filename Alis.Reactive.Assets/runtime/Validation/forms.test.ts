@@ -145,7 +145,7 @@ function sent(name: string, path: Entry["binding"]["path"], message = ""): Sent 
   const converted: Entry["binding"]["converted"] = { kind: "as", expr: { kind: "lit", value: null }, shape: { kind: "nullable", inner: { kind: "any" } } };
   const blank: Entry["binding"]["blank"] = { kind: "lit", value: null };
   const textField = { kind: "field", form: { kind: "text" }, whenNothing: "empty", whenBlank: "send" } as const;
-  return { name, entry: { id: "input_" + name, binding: { name, path, converted, blank, sent: { kind: "lit", value: textField }, committed: "change", invalidClass: "invalid", message } }, sent: textField };
+  return { name, path, entry: { id: "input_" + name, binding: { name, path, converted, blank, sent: { kind: "lit", value: textField }, committed: "change", invalidClass: "invalid", message } }, sent: textField };
 }
 
 function shown(name: string, path: Entry["binding"]["path"]): Sent {

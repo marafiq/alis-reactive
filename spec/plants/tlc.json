@@ -276,5 +276,82 @@
    }
   ],
   "expect": "expected ReachTheDefaultSetLeavesANamedRuleOut violated, saw violated: ReachANamedSetRunsARuleTheDefaultLeavesOut"
+ },
+ {
+  "name": "a prefix kept in the names a container sends, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ATypedTextReachesTheEndpoint.cfg",
+    "old": "CONSTANT Mutant = \"PrefixKept\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.ATypedTextReachesTheEndpoint.cfg: expected ATypedTextReachesTheEndpoint violated, saw Model checking completed"
+ },
+ {
+  "name": "an input outside the prefix sent, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.AnInputOutsideThePrefixStopsTheSend.cfg",
+    "old": "CONSTANT Mutant = \"OutsideThePrefixSent\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.AnInputOutsideThePrefixStopsTheSend.cfg: expected AnInputOutsideThePrefixStopsTheSend violated, saw Model checking completed"
+ },
+ {
+  "name": "the witness of a text bound under a prefix reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ReachATextBoundUnderAPrefix.cfg",
+    "old": "INVARIANT ReachATextBoundUnderAPrefix",
+    "new": "INVARIANT ReachStopOnAnInputOutsideThePrefix"
+   }
+  ],
+  "expect": "expected ReachATextBoundUnderAPrefix violated, saw violated: ReachStopOnAnInputOutsideThePrefix"
+ },
+ {
+  "name": "the witness of a stop on an input outside the prefix reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ReachStopOnAnInputOutsideThePrefix.cfg",
+    "old": "INVARIANT ReachStopOnAnInputOutsideThePrefix",
+    "new": "INVARIANT ReachATextBoundUnderAPrefix"
+   }
+  ],
+  "expect": "expected ReachStopOnAnInputOutsideThePrefix violated, saw violated: ReachATextBoundUnderAPrefix"
+ },
+ {
+  "name": "a kin's prefix kept in the names its container sends, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.violates.KinContainerBindsItsAttachedMembers.cfg",
+    "old": "CONSTANT Mutant = \"KinPrefixKept\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Partials.violates.KinContainerBindsItsAttachedMembers.cfg: expected KinContainerBindsItsAttachedMembers violated, saw Model checking completed"
+ },
+ {
+  "name": "the witness of a kin bound under its prefix reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.violates.ReachKinBoundUnderItsPrefix.cfg",
+    "old": "INVARIANT ReachKinBoundUnderItsPrefix",
+    "new": "INVARIANT ReachKinSendStopsOnNet48"
+   }
+  ],
+  "expect": "expected ReachKinBoundUnderItsPrefix violated, saw violated: ReachKinSendStopsOnNet48"
+ },
+ {
+  "name": "the witness of a kin's send stopping on net48 reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.violates.ReachKinSendStopsOnNet48.cfg",
+    "old": "INVARIANT ReachKinSendStopsOnNet48",
+    "new": "INVARIANT ReachKinBoundUnderItsPrefix"
+   }
+  ],
+  "expect": "expected ReachKinSendStopsOnNet48 violated, saw violated: ReachKinBoundUnderItsPrefix"
  }
 ]

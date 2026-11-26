@@ -86,7 +86,8 @@ internal sealed partial class RequestPartsWriter
 
     internal int Input<TRequest, TMember>(int stage, Expression<Func<TRequest, TMember>> member, string inputId, Func<int, int> placed)
     {
-        var name = Member(member).Name;
+        var sent = Member(member);
+        var name = sent.Name;
         if (_inputMembers.Contains(name))
             throw new InvalidOperationException($"Request member '{name}' overlaps a member already supplied; send each member once, and send either an object or its members.");
         if (_setMembers.TryGetValue(name, out var dropped))
@@ -98,7 +99,8 @@ internal sealed partial class RequestPartsWriter
 
         var stageAfter = placed(stage);
         _inputMembers.Add(name);
-        var captured = ModelPlugin.Input(_writer.Content, inputId, name);
+        var path = new ListExpression(BodySteps(sent).Select(step => (Expression)ContractRecord<SentInput>.Literal(step.Step)).ToArray());
+        var captured = ModelPlugin.Input(_writer.Content, inputId, name, path);
         _individual.Add(_guards.Count == 0 ? captured : new OpExpression(Operator.Cond, [_guards.Peek(), captured, LeftOutInput]));
         return stageAfter;
     }

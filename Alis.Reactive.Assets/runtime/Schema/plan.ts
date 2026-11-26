@@ -316,8 +316,14 @@ export interface InputBinding {
 
 export interface Container {
   readonly model: string;
+  readonly prefix: FieldPrefix;
   readonly summary: string;
   readonly live: readonly Live[];
+}
+
+export interface FieldPrefix {
+  readonly name: string;
+  readonly path: readonly PathStep[];
 }
 
 export interface Live {
@@ -535,6 +541,7 @@ export type EvaluatedValue = unknown;
 
 export interface SentInput {
   readonly name: string;
+  readonly path: readonly PathStep[];
   readonly entry: InputEntry;
   readonly sent: InputSent;
 }

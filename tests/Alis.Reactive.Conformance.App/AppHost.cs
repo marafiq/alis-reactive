@@ -259,6 +259,7 @@ internal static class AppHost
             .Add<Care.WardPharmacyAdmissionInItsContractRules>()
             .Add<Care.ResidentDetailsRules>()
             .Add<Care.RosterRules>()
+            .Add<Care.ShiftRules>()
             .Add<Refusals.VisitValidator>()
             .Add<Refusals.RosterRules>()));
 

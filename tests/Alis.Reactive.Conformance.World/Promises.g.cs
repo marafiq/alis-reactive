@@ -340,6 +340,12 @@ public static class Promises
         public const string X16_48_0 = "M8.F4 X16.48 0";
         public const string X16_49_0 = "M8.F4 X16.49 0";
         public const string X16_50_0 = "M8.F4 X16.50 0";
+        public const string X16_51_0 = "M8.F4 X16.51 0";
+        public const string X16_52_0 = "M8.F4 X16.52 0";
+        public const string X16_53_0 = "M8.F4 X16.53 0";
+        public const string X16_54_0 = "M8.F4 X16.54 0";
+        public const string X16_55_0 = "M8.F4 X16.55 0";
+        public const string X16_56_0 = "M8.F4 X16.56 0";
     }
 
     public static class M9_F2

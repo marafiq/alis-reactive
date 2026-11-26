@@ -1,6 +1,6 @@
 import type { Owner } from "../OwnershipAndState/index";
 import {
-  assertNever, type CheckedBody as CheckedForm, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type InputEntry, type InputSent,
+  assertNever, type CheckedBody as CheckedForm, type Container, type ContainerCapture, type Expression, type FieldPrefix, type InputBinding, type InputCapture, type InputEntry, type InputSent,
   type ItemWhenNothing, type ModelPluginData, type PathStep, type PlanDocument, type SentInput, type SentInputs, type ValueRead, type WhenBlank,
 } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
@@ -105,30 +105,32 @@ export class PageInputs {
   captured(containerId: string, modelKey: string): CapturedContainer {
     const inside = this.#inside(containerId);
     if (inside === null) throw new Stop("No element has the id '" + containerId + "'.");
-    const renderings = this.#containers.get(containerId);
-    if (renderings === undefined) throw new Stop("No live plan renders container '" + containerId + "' for model '" + modelKey + "'.");
-    const models = [...new Set([...renderings.values()].map(container => container.model))];
-    if (!models.includes(modelKey)) throw new Stop("Container '" + containerId + "' is rendered for model '" + models.join("', '") + "', not '" + modelKey + "'.");
+    const prefix = this.#prefixOf(containerId, modelKey);
     const inputs = [...this.#inputs].filter(([id]) => inside(id));
     const names = new Map<string, string>();
     for (const [id, input] of inputs) {
+      if (!opens(prefix, input.binding)) {
+        throw new Stop("Input '" + id + "' binds '" + input.binding.name + "' inside container '" + containerId + "', whose field prefix '" + prefix.name +
+          "' does not open it.");
+      }
       const first = names.get(input.binding.name);
       if (first !== undefined) throw new Stop("Inputs '" + first + "' and '" + id + "' both bind '" + input.binding.name + "' inside container '" + containerId + "'.");
       names.set(input.binding.name, id);
     }
-    const [first] = inputs;
-    const body = first !== undefined && typeof first[1].binding.path[0] === "number" ? [] : {};
-    const leftUnlessAlone: InputBinding[] = [];
-    for (const [, input] of inputs) {
+    const held = inputs.map(([id, input]) => ({ input, sent: sentInput(id, input, prefix) }));
+    const [first] = held;
+    const body = first !== undefined && typeof first.sent.path[0] === "number" ? [] : {};
+    const leftUnlessAlone: SentInput[] = [];
+    for (const { input, sent } of held) {
       const bound = boundOf(input);
       const whenBlank = bound.blank ? whenBlankOf(input.sent) : "send";
-      if (whenBlank === "leaveUnlessAlone") leftUnlessAlone.push(input.binding);
+      if (whenBlank === "leaveUnlessAlone") leftUnlessAlone.push(sent);
       if (whenBlank !== "send") continue;
       refuseAnItemThatReadsNothing(input, bound.value);
-      write(body, input.binding.path, bound.value);
+      write(body, sent.path, bound.value);
     }
-    for (const binding of leftUnlessAlone) refuseAnItemLeftWithNoField(body, binding, containerId);
-    return { kind: "captured", id: containerId, body, inputs: inputs.map(sentInput) };
+    for (const sent of leftUnlessAlone) refuseAnItemLeftWithNoField(body, sent, containerId);
+    return { kind: "captured", id: containerId, body, inputs: held.map(({ sent }) => sent) };
   }
 
   liveChecksOf(inputId: string): readonly LiveCheck[] {
@@ -136,9 +138,11 @@ export class PageInputs {
       const inside = this.#inside(containerId);
       if (inside === null) return [];
       if (!inside(inputId)) return [];
-      const inputs = [...this.#inputs].filter(([id]) => inside(id)).map(sentInput);
-      return [...renderings].flatMap(([contribution, container]) => container.live.map(live =>
-        ({ registration: live.validator + ":" + live.ruleSet, body: contribution.read(live.body) as CheckedForm, inputs })));
+      return [...renderings].flatMap(([contribution, container]) => {
+        if (container.live.length === 0) return [];
+        const { inputs } = this.captured(containerId, container.model);
+        return container.live.map(live => ({ registration: live.validator + ":" + live.ruleSet, body: contribution.read(live.body) as CheckedForm, inputs }));
+      });
     });
   }
 
@@ -150,14 +154,15 @@ export class PageInputs {
     const hidden = this.#hiddenOf(containerId);
     if (hidden === null) return { kind: "missing", id: containerId };
     const captured = this.captured(containerId, modelKey);
-    const body: ContainerBody = { members: captured.body, hidden };
+    const framework = new Set(captured.inputs.map(input => input.entry.binding.name));
+    const body: ContainerBody = { members: captured.body, hidden: hidden.filter(input => !framework.has(input.name)) };
     return { ...captured, body };
   }
 
-  input(inputId: string, name: string): InputCapture {
+  input(inputId: string, name: string, path: readonly PathStep[]): InputCapture {
     const input = this.#inputs.get(inputId);
     if (input === undefined) return { kind: "missing", id: inputId, name };
-    return { kind: "captured", input: { name, entry: { id: inputId, binding: input.binding }, sent: input.sent } };
+    return { kind: "captured", input: { name, path, entry: { id: inputId, binding: input.binding }, sent: input.sent } };
   }
 
   valueOf(inputId: string): unknown {
@@ -216,6 +221,23 @@ export class PageInputs {
     return input.contribution.read(converted) === null ? typed : null;
   }
 
+  #prefixOf(containerId: string, modelKey: string): FieldPrefix {
+    const renderings = this.#containers.get(containerId);
+    if (renderings === undefined) throw new Stop("No live plan renders container '" + containerId + "' for model '" + modelKey + "'.");
+    const rendered = [...renderings.values()];
+    const own = rendered.filter(container => container.model === modelKey);
+    const [first] = own;
+    if (first === undefined) {
+      throw new Stop("Container '" + containerId + "' is rendered for model '" + [...new Set(rendered.map(container => container.model))].join("', '") + "', not '" +
+        modelKey + "'.");
+    }
+    const other = own.find(container => container.prefix.name !== first.prefix.name);
+    if (other !== undefined) {
+      throw new Stop("Container '" + containerId + "' is rendered under the field prefixes '" + first.prefix.name + "' and '" + other.prefix.name + "'.");
+    }
+    return first.prefix;
+  }
+
   #drop(contribution: Contribution): void {
     for (const id of Object.keys(contribution.data.inputs)) this.#inputs.delete(id);
     for (const id of Object.keys(contribution.data.containers)) {
@@ -226,8 +248,15 @@ export class PageInputs {
   }
 }
 
-function sentInput([id, input]: readonly [string, Input]): SentInput {
-  return { name: input.binding.name, entry: { id, binding: input.binding }, sent: input.sent };
+function sentInput(id: string, input: Input, prefix: FieldPrefix): SentInput {
+  const rest = input.binding.name.slice(prefix.name.length);
+  const name = rest.startsWith(".") ? rest.slice(1) : rest;
+  return { name, path: input.binding.path.slice(prefix.path.length), entry: { id, binding: input.binding }, sent: input.sent };
+}
+
+function opens(prefix: FieldPrefix, binding: InputBinding): boolean {
+  if (prefix.path.length === 0) return true;
+  return binding.path.length > prefix.path.length && prefix.path.every((step, at) => step === binding.path[at]) && binding.name.startsWith(prefix.name);
 }
 
 function boundOf(input: Input): Bound {
@@ -247,9 +276,9 @@ function whenBlankOf(sent: InputSent): WhenBlank {
   }
 }
 
-function refuseAnItemLeftWithNoField(body: object, binding: InputBinding, containerId: string): void {
-  if (holds(body, itemOf(binding.path))) return;
-  throw new Stop("Input '" + binding.name + "' is left out while it holds its blank, and no other input of container '" + containerId +
+function refuseAnItemLeftWithNoField(body: object, input: SentInput, containerId: string): void {
+  if (holds(body, itemOf(input.path))) return;
+  throw new Stop("Input '" + input.entry.binding.name + "' is left out while it holds its blank, and no other input of container '" + containerId +
     "' writes a field of its item, so the endpoint's list would end before it on both hosts.");
 }
 

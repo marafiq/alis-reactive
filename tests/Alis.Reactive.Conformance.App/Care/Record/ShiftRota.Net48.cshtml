@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model ShiftRota
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Shift rota";
+    var plan = Html.ReactivePlan<ShiftRota>();
+}
+<h1>Shift rota</h1>
+@for (var position = 0; position < Model.Rows.Count; position++)
+{
+    var at = position;
+    <fieldset>
+        <legend>Shift @Model.Rows[at].Id</legend>
+        @Html.PartialFor(m => m.Rows[at], "/Care/Record/ShiftRosterRow.cshtml")
+    </fieldset>
+}
+<p id="roster-status"></p>
+@Html.RenderPlan(plan)

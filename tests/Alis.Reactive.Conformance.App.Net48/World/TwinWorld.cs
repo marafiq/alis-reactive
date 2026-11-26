@@ -1,3 +1,4 @@
+using Alis.Reactive.Conformance.App.Care;
 using Alis.Reactive.Conformance.World;
 
 namespace Alis.Reactive.Conformance.App.World;
@@ -9,6 +10,8 @@ internal sealed class TwinWorld
     internal bool ResolverLeftUnset { get; private set; }
 
     internal TwinHostOrders HostOrders { get; } = new();
+
+    internal ShiftRosterBook ShiftRoster { get; } = ShiftRosterBook.Open();
 
     internal DateTime? DateOfBirth { get; private set; }
 

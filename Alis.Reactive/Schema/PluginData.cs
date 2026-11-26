@@ -107,18 +107,34 @@ internal sealed class InputBinding
 
 internal sealed class Container
 {
-    internal Container(string model, string summary, IReadOnlyList<Live> live)
+    internal Container(string model, FieldPrefix prefix, string summary, IReadOnlyList<Live> live)
     {
         Model = model;
+        Prefix = prefix;
         Summary = summary;
         Live = live;
     }
 
     public string Model { get; }
 
+    public FieldPrefix Prefix { get; }
+
     public string Summary { get; }
 
     public IReadOnlyList<Live> Live { get; }
+}
+
+internal sealed class FieldPrefix
+{
+    internal FieldPrefix(string name, IReadOnlyList<PathStep> path)
+    {
+        Name = name;
+        Path = path;
+    }
+
+    public string Name { get; }
+
+    public IReadOnlyList<PathStep> Path { get; }
 }
 
 internal sealed class Live

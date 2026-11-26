@@ -23,7 +23,7 @@ public sealed class WhenABlockChecksItsInputsLive
         var json = JsonOf(html.RenderPlan(plan));
         using var written = JsonDocument.Parse(json);
         var objects = written.RootElement.GetProperty("objects");
-        Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","summary":"intake_summary","live":[""" + SentByIntake + "]}}"));
+        Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","prefix":{"name":"","path":[]},"summary":"intake_summary","live":[""" + SentByIntake + "]}}"));
         Assert.That(objects.GetProperty("$form:Alis.Reactive.ModuleTests.Validation.SuppliesRules:default").GetRawText(), Is.EqualTo(Registered));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
@@ -40,7 +40,7 @@ public sealed class WhenABlockChecksItsInputsLive
         var json = JsonOf(html.RenderPlan(plan));
         using var written = JsonDocument.Parse(json);
         var objects = written.RootElement.GetProperty("objects");
-        Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","summary":"intake_summary","live":[]},"kin":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","summary":"kin_summary","live":[]}}"""));
+        Assert.That(objects.GetProperty("$model").GetProperty("data").GetProperty("containers").GetRawText(), Is.EqualTo("""{"intake":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","prefix":{"name":"","path":[]},"summary":"intake_summary","live":[]},"kin":{"model":"Alis.Reactive.ModuleTests.Validation.Supplies","prefix":{"name":"","path":[]},"summary":"kin_summary","live":[]}}"""));
         Assert.That(objects.EnumerateObject().Select(member => member.Name), Is.EqualTo(new[] { "$model" }));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }

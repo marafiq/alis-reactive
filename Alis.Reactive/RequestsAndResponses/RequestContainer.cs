@@ -28,8 +28,10 @@ public sealed class RequestContainer<TModel>
     /// whose text does not convert to the member's type, reads the member's declared start. A member a present holder
     /// lacks reads its start; a null holder, or a list position or dictionary key the sent body lacks, reads nothing.
     /// A holder missing a required member, or an absent member whose start the JSON contract cannot obtain, stops the pipeline.
-    /// The read takes the inputs inside the container when its step runs. Two inputs that bind one name, a missing
-    /// container element, or no live view rendering the container for this model stops the pipeline.
+    /// The read takes the inputs inside the container when its step runs, each under its name past the field prefix the
+    /// container's view was rendered under. Two inputs that bind one name, an input inside the container that the prefix
+    /// does not open, a missing container element, or no live view rendering the container for this model stops the
+    /// pipeline.
     /// </remarks>
     /// <param name="member">The member to read, as a member path.</param>
     /// <typeparam name="TValue">The type of the member.</typeparam>

@@ -6,8 +6,7 @@ using static Microsoft.Playwright.Assertions;
 
 namespace Alis.Reactive.Conformance.PlaywrightTests.Validation;
 
-[TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10))]
-[Category(Hosts.Net10Name)]
+[TestFixtureSource(typeof(Hosts), nameof(Hosts.Net10AndNet48))]
 public sealed class WhenARosterIsApprovedUnderARuleSet(string host) : ConformanceFixture(host)
 {
     [Test]

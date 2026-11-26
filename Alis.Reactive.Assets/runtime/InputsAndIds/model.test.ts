@@ -18,7 +18,7 @@ class Visit implements Owner {
   release(): void { for (const drop of this.drops.splice(0)) drop(); }
 }
 
-const intake: Containers = { intake: { model: "Admission", summary: "intake_summary", live: [] } };
+const intake: Containers = { intake: { model: "Admission", prefix: { name: "", path: [] }, summary: "intake_summary", live: [] } };
 type Converted = Inputs[string]["converted"];
 type Blank = Inputs[string]["blank"];
 const convertedFrom = (read: Source): Converted => ({ kind: "as", expr: read, shape: { kind: "nullable", inner: { kind: "any" } } });
@@ -246,16 +246,16 @@ describe("when an input is checked live", () => {
   const nights = field("Nights", ["nights"], convertedFrom(literal(5)));
   const room = field("Room", ["room"], convertedFrom(literal("B-12")));
   const held: Inputs = { own: nights, second: room };
-  const sentOwn = { name: "Nights", entry: { id: "own", binding: nights }, sent: textSentValue };
-  const sentSecond = { name: "Room", entry: { id: "second", binding: room }, sent: textSentValue };
+  const sentOwn = { name: "Nights", path: ["nights"], entry: { id: "own", binding: nights }, sent: textSentValue };
+  const sentSecond = { name: "Room", path: ["room"], entry: { id: "second", binding: room }, sent: textSentValue };
 
   test("each container that holds the input gives its live check over its own inputs, and a container that does not hold it gives none", () => {
     const inputs = page(new Map([["intake", new Set(["own", "second"])], ["kin", new Set(["own"])], ["ward", new Set(["second"])], ["bare", new Set(["own"])]]));
     inputs.join(plan(held, {
-      intake: { model: "Admission", summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
-      kin: { model: "Admission", summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
-      ward: { model: "Admission", summary: "ward_summary", live: [live("WardRules", "the ward's body")] },
-      bare: { model: "Admission", summary: "bare_summary", live: [] },
+      intake: { model: "Admission", prefix: { name: "", path: [] }, summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
+      kin: { model: "Admission", prefix: { name: "", path: [] }, summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
+      ward: { model: "Admission", prefix: { name: "", path: [] }, summary: "ward_summary", live: [live("WardRules", "the ward's body")] },
+      bare: { model: "Admission", prefix: { name: "", path: [] }, summary: "bare_summary", live: [] },
     }), new Visit(), "on the page", literalValue);
     expect(inputs.liveChecksOf("own")).toStrictEqual([
       { registration: "AdmissionRules:default", body: "the intake's body", inputs: [sentOwn, sentSecond] },
@@ -267,8 +267,8 @@ describe("when an input is checked live", () => {
     const inputs = page(new Map([["kin", new Set(["own"])]]));
     const owner = new Visit();
     inputs.join(plan(held, {
-      intake: { model: "Admission", summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
-      kin: { model: "Admission", summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
+      intake: { model: "Admission", prefix: { name: "", path: [] }, summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
+      kin: { model: "Admission", prefix: { name: "", path: [] }, summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
     }), owner, "on the page", literalValue);
     expect(inputs.liveChecksOf("own")).toStrictEqual([{ registration: "KinRules:default", body: "the kin's body", inputs: [sentOwn] }]);
     owner.release();
@@ -328,9 +328,9 @@ describe("when a request captures what it sends", () => {
   test("RecordsAMissingInput: an input the page lacks is recorded missing and its value reads nothing", () => {
     const inputs = page();
     inputs.join(plan(), new Visit(), "on the page", literalValue);
-    expect(inputs.input("gone", "Ward")).toStrictEqual({ kind: "missing", id: "gone", name: "Ward" });
+    expect(inputs.input("gone", "Ward", ["ward"])).toStrictEqual({ kind: "missing", id: "gone", name: "Ward" });
     expect(inputs.valueOf("gone")).toBeUndefined();
-    expect(inputs.input("own", "Stay")).toStrictEqual({ kind: "captured", input: { name: "Stay", entry: { id: "own", binding: field("Nights", ["nights"], convertedFrom(literal(5))) }, sent: textSentValue } });
+    expect(inputs.input("own", "Stay", ["stay"])).toStrictEqual({ kind: "captured", input: { name: "Stay", path: ["stay"], entry: { id: "own", binding: field("Nights", ["nights"], convertedFrom(literal(5))) }, sent: textSentValue } });
     expect(inputs.valueOf("own")).toBe(5);
   });
 
@@ -390,5 +390,51 @@ describe("when an input is sent by its binding's sent", () => {
     const held = page();
     held.join(plan({ own: field("VisitDays", ["visitDays"], convertedFrom(visitDays), { kind: "lit", value: [] }, days("empty")) }), new Visit(), "on the page", literalValue);
     expect(held.sent("intake", "Admission")).toStrictEqual({ visitDays: [0, null] });
+  });
+});
+
+describe("when a container is rendered under a field prefix", () => {
+  const shiftSix = { model: "ShiftRow", prefix: { name: "Rows[1]", path: ["rows", 1] }, summary: "shift-6_summary", live: [] };
+  const rows: Containers = { "shift-6": shiftSix };
+  const row: Inputs = {
+    carer: field("Rows[1].Carer", ["rows", 1, "carer"], convertedFrom(literal("Ben"))),
+    hours: field("Rows[1].Hours", ["rows", 1, "hours"], convertedFrom(literal(6))),
+  };
+  const shift = (hidden: readonly HiddenInput[] = []): PageInputs => page(new Map([["shift-6", new Set(["carer", "hours", "id", "note"])]]), hidden);
+
+  test("ATypedTextReachesTheEndpoint: each input is sent under its name and its path past the prefix", () => {
+    const inputs = shift();
+    inputs.join(plan(row, rows, "ShiftRow"), new Visit(), "in the row's partial", literalValue);
+    const captured = inputs.captured("shift-6", "ShiftRow");
+    expect(captured.body).toStrictEqual({ carer: "Ben", hours: 6 });
+    expect(captured.inputs.map(input => [input.name, input.path])).toStrictEqual([["Carer", ["carer"]], ["Hours", ["hours"]]]);
+  });
+
+  test("AnInputOutsideThePrefixStopsTheSend: an input whose path the prefix does not open stops the capture, naming the input, the container and the prefix", () => {
+    const inputs = shift();
+    const owner = new Visit();
+    inputs.join(plan(row, rows, "ShiftRow"), owner, "in the row's partial", literalValue);
+    inputs.join(plan({ note: field("Note", ["note"], convertedFrom(literal("Late"))) }, {}, "ShiftNote"), owner, "in slot 'shift-note-6'", literalValue);
+    expect(() => inputs.captured("shift-6", "ShiftRow")).toThrow(/^Input 'note' binds 'Note' inside container 'shift-6', whose field prefix 'Rows\[1\]' does not open it\.$/);
+  });
+
+  test("two renderings of one container under two prefixes stop, as two models stop", () => {
+    const inputs = shift();
+    inputs.join(plan(row, rows, "ShiftRow"), new Visit(), "in the row's partial", literalValue);
+    inputs.join(plan({}, { "shift-6": { ...shiftSix, prefix: { name: "Rows[2]", path: ["rows", 2] } } }, "AnotherRow"), new Visit(), "in another partial", literalValue);
+    expect(() => inputs.captured("shift-6", "ShiftRow")).toThrow(/^Container 'shift-6' is rendered under the field prefixes 'Rows\[1\]' and 'Rows\[2\]'\.$/);
+  });
+
+  test("a live check takes its inputs as its container sends them", () => {
+    const inputs = shift();
+    const checked: Containers = { "shift-6": { ...shiftSix, live: [{ validator: "ShiftRules", ruleSet: "default", body: literal("the row's body") }] } };
+    inputs.join(plan(row, checked, "ShiftRow"), new Visit(), "in the row's partial", literalValue);
+    expect(inputs.liveChecksOf("carer").map(check => check.inputs.map(input => input.name))).toStrictEqual([["Carer", "Hours"]]);
+  });
+
+  test("AHiddenInputReachesAFormBodyAlone: a framework input rendered as a hidden input is sent once, under its name past the prefix", () => {
+    const inputs = shift([{ name: "Rows[1].Id", value: "6" }, { name: "Shift", value: "Night" }]);
+    inputs.join(plan({ id: field("Rows[1].Id", ["rows", 1, "id"], convertedFrom(literal(6))) }, rows, "ShiftRow"), new Visit(), "in the row's partial", literalValue);
+    expect(inputs.sends("shift-6", "ShiftRow")).toMatchObject({ kind: "captured", body: { members: { id: 6 }, hidden: [{ name: "Shift", value: "Night" }] } });
   });
 });

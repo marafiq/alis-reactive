@@ -3906,6 +3906,7 @@
     "modules": [],
     "views": [
       "/Care/Record/ShiftRoster.cshtml",
+      "/Care/Record/ShiftRosterNote.cshtml",
       "/Care/Record/ShiftRosterRow.cshtml",
       "/Refusals/Validation/ShiftRoster.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3924,6 +3925,59 @@
     "modules": [],
     "views": [
       "/Care/Record/ShiftRoster.cshtml",
+      "/Care/Record/ShiftRosterNote.cshtml",
+      "/Care/Record/ShiftRosterRow.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.51 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/ShiftRoster.cshtml",
+      "/Care/Record/ShiftRosterNote.cshtml",
+      "/Care/Record/ShiftRosterRow.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.52 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/ShiftRoster.cshtml",
+      "/Care/Record/ShiftRosterNote.cshtml",
+      "/Care/Record/ShiftRosterRow.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.53 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/ShiftRoster.cshtml",
+      "/Care/Record/ShiftRosterNote.cshtml",
+      "/Care/Record/ShiftRosterRow.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.54 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/ShiftRosterNote.cshtml",
+      "/Care/Record/ShiftRosterRow.cshtml",
+      "/Care/Record/ShiftRota.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.55 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/ShiftSheet.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.56 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/ShiftRoster.cshtml",
+      "/Care/Record/ShiftRosterNote.cshtml",
       "/Care/Record/ShiftRosterRow.cshtml",
       "/Shared/_Layout.cshtml"
     ]

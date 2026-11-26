@@ -1,11 +1,38 @@
 @using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
 @using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
 @using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
 @model ShiftRow
 @{
     var plan = Html.ReactivePlan<ShiftRow>();
 }
-@(Html.NativeHiddenField(plan, m => m.Id))
-@(Html.InputField(plan, m => m.Carer, options => options.Label("Carer")).NativeTextBox())
-@(Html.InputField(plan, m => m.Hours, options => options.Label("Hours")).NativeTextBox())
+@using (var shift = Html.BeginRequestContainer(plan, "shift-" + Model.Id))
+{
+    @(Html.NativeHiddenField(plan, m => m.Id))
+    <fieldset>
+        <legend>Carer</legend>
+        @(Html.InputField(plan, m => m.Carer, options => options.Label("Carer")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>Hours</legend>
+        @(Html.InputField(plan, m => m.Hours, options => options.Label("Hours")).NativeTextBox())
+    </fieldset>
+    <div id="@("shift-note-" + Model.Id)"></div>
+    @(Html.NativeButton("save-shift-" + Model.Id, "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Put<ShiftRow>(CareEndpoints.ShiftRosterShifts, request => request.Inputs(shift.Container).Set(sent => sent.Id, Model.Id))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("roster-status").Text.Set(saved.Body))))
+    @(Html.NativeButton("approve-shift-" + Model.Id, "Approve").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Put<ShiftRow>(CareEndpoints.ShiftRosterShiftApprovals, request => request.Inputs(shift.Container).Set(sent => sent.Id, Model.Id))
+        .Validate<ShiftRules>(ShiftRules.Approval)
+        .OnSuccess(Content.Text, (approved, pipeline) => pipeline.Element("roster-status").Text.Set(approved.Body))))
+    @(Html.NativeButton("check-shift-" + Model.Id, "Check").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        pipeline.Validate(shift.Container);
+        pipeline.Element("roster-status").Text.Set("Shift " + Model.Id + " is ready");
+    }))
+    @(Html.NativeButton("add-note-" + Model.Id, "Add a note").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Get(CareEndpoints.ShiftRosterNote).Into("shift-note-" + Model.Id)))
+}
 @Html.RenderPlan(plan)

@@ -1918,14 +1918,15 @@ Terms used throughout:
   2026-11-25):
   - `Set(r => r.Member, value)`: a member from any source (Q7), a response's body included.
   - `Inputs(container)`: the framework inputs inside one request container, the element its block renders (D14.8),
-    rendered by any plan, containers nested inside it included, each under its binding name, in any body and in a GET's
-    query. A control of the view's own markup inside the container, hand-written or rendered by MVC's own helper, is no
-    framework input, and no request sends it but a hidden one: the view declares it an input
-    (`InputField<TModel, TValue>.Render<TComponent>`), or names its value by `Set` and its file by `File`. A hidden
-    input inside the container's element, an `input` of type "hidden" with a name and not disabled, MVC's `HiddenFor`
-    and its antiforgery field among them, is sent under its own name with its value in a URL-encoded or a multipart
-    body, read when the container is captured. A member the request sends under that name, by `Set`, by an input or
-    as its antiforgery field, replaces it, and so does one it leaves out where it reads nothing or holds its blank; a
+    rendered by any plan, containers nested inside it included, each under its binding name past the prefix the
+    container's view was rendered under (D14.8), in any body and in a GET's query. A control of the view's own markup
+    inside the container, hand-written or rendered by MVC's own helper, is no framework input, and no request sends it
+    but a hidden one: the view declares it an input (`InputField<TModel, TValue>.Render<TComponent>`), or names its
+    value by `Set` and its file by `File`. A hidden input inside the container's element, an `input` of type "hidden"
+    with a name and not disabled, MVC's `HiddenFor` and its antiforgery field among them, is sent under its own name
+    with its value in a URL-encoded or a multipart body, read when the container is captured; a framework input that
+    renders one is sent once, as that framework input. A member the request sends under that name, by `Set`, by an input
+    or as its antiforgery field, replaces it, and so does one it leaves out where it reads nothing or holds its blank; a
     part whose condition failed was never gathered (D10.16) and replaces nothing. A JSON body and a GET's query carry
     none: a JSON member is named by the endpoint's contract and a hidden text has no declared type, and an antiforgery
     token never rides in a URL (the lead, within the owner's decision of 2026-11-25). A form the view writes around a
@@ -1943,7 +1944,7 @@ Terms used throughout:
   - When an input and a set member send the same binding name, the input's value is sent, as the body the check reads
     (Q16); two inputs that send one scalar binding name are D13.4's.
   - A container whose element the page lacks stops the request, and so does an `Input` whose input the page lacks.
-  - The run records each input it sent, under the binding name it sent it by (D10.18).
+  - The run records each input it sent, under the binding name and the path it sent it by (D10.18).
 - D9.16 A file is the shape `file`, sent only in form data or as the whole body. A set member of file shape in a
   request with no body, a JSON, URL-encoded or text body
   is refused by an analyzer; a file input a request sends in a GET or a JSON body stops the request when it is sent
@@ -2410,12 +2411,12 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
     it read-only, so the runtime's own code cannot write into it either. A step that hands it, or any data value, to a
     vendor or to a plugin an app registers (a `set` or a call argument) hands a structured copy
     (`probe:js-structured-clone-separate`). The runtime's own plugins, `alis.document`, `alis.model`, `alis.form` and
-    `alis.slot`, read what the run holds, so the run's record of each input it sent reaches the check with the table's
-    own entries.
-  - The run records, as it sends, each input it sent: the binding name it sent it under and the entry the inputs
-    table held for it (D13.1). An answer shows a message inline only at an entry the table still holds, so an input
-    that left with its slot, or one a reload of its slot mounted again under the same id, shows nothing inline, and
-    the summary place shows every message (`Ownership.tla:FailureReachesSummary`,
+    `alis.slot`, read what the run holds, so the run's record of each input it sent, with the name and the path it sent
+    it by, reaches the check with the table's own entries.
+  - The run records, as it sends, each input it sent: the binding name and the path it sent it under and the entry the
+    inputs table held for it (D13.1). An answer shows a message inline only at an entry the table still holds, so an
+    input that left with its slot, or one a reload of its slot mounted again under the same id, shows nothing inline,
+    and the summary place shows every message (`Ownership.tla:FailureReachesSummary`,
     `Ownership.tla:InlineOnlyAtTheSentInput`).
     What a component does with what it is given is its own: one that edits it edits its copy, and the later steps
     of its route and the request `Chained` sends read the response as the server sent it. Evidence
@@ -3470,7 +3471,7 @@ plans name.
   | a validator's registration under a rule set, its fields by binding name, item fields by `[*]` | the plan that renders the request or the container that checks by it, keyed by validator and rule set |
   | the table of containers by element id, each with its model, its summary and its live check | the page, each entry under its owner |
   | the inputs a container sends or checks: those inside its element at that moment | the container |
-  | the inputs a request sent, by binding name, each as the inputs table held it | the request, until it settles |
+  | the inputs a request sent, each by the binding name and the path it sent it by, as the inputs table held it | the request, until it settles |
   | a request's failures: every one in its summary place, each also at the input it sent under that key | the request's container's summary, else the notice |
   | the summary, one per container, rendered by the container's block | the container |
   | listeners, holds, registrations and runs | the owner (Q12) |
@@ -3478,18 +3479,19 @@ plans name.
   | the argument, the attempts, the response and the route of one request | the request, until it settles |
 
 - D13.2 A plan's id keys nothing: it names the plan in traces only, and many plans of a page share one id freely.
-- D13.3 A read of a member by its binding name belongs to a container. It reads the input inside the container's
-  element that binds the name, as the container sends it (`container.Read(m => m.Member)`, N13.1): what the endpoint
-  binds from what the container sends. It runs in its step and reads the inputs inside the element then, so an input a
-  slot loads into the container counts from its load, and one whose slot unloads counts no more. One input reads its
-  value (N3.3), so a blank or unconverted one reads the member's start (D3.6); a member no input inside the container
-  binds reads its start (D4.2); two inputs under the name stop it (D13.4), and so do a container whose element the
-  page lacks, a list input whose item reads nothing where the item admits none and an input left out under a list
-  index that leaves its item no field, as each stops the container's request (D9.15, D9.10) (`ContainerRead.tla`). A page-wide read by binding name is
-  refused: two views can bind one name, so on a page a name names no single input. That ends the chain of guesses that
-  read the last contributed input, then the plan's own. C# writes the read as a `data` read of the member's steps
-  over `alis.model`'s `sent` of the container (schema.md), in the live form (D7.7), a list position between its steps
-  a `get` of the item with `optional`. A read of a member's input outside a container is
+- D13.3 A read of a member by its binding name belongs to a container. It reads the input inside the container's element
+  that binds the name, as the container sends it, under a prefix the member past it (D14.8)
+  (`container.Read(m => m.Member)`, N13.1): what the endpoint binds from what the container sends. It runs in its step
+  and reads the inputs inside the element then, so an input a slot loads into the container counts from its load, and
+  one whose slot unloads counts no more. One input reads its value (N3.3), so a blank or unconverted one reads the
+  member's start (D3.6); a member no input inside the container binds reads its start (D4.2); two inputs under the name
+  stop it (D13.4), and so do a container whose element the page lacks, a list input whose item reads nothing where the
+  item admits none, an input left out under a list index that leaves its item no field and an input inside the container
+  that its prefix does not open, as each stops the container's request (D9.15, D9.10, D14.8) (`ContainerRead.tla`). A
+  page-wide read by binding name is refused: two views can bind one name, so on a page a name names no single input.
+  That ends the chain of guesses that read the last contributed input, then the plan's own. C# writes the read as a
+  `data` read of the member's steps over `alis.model`'s `sent` of the container (schema.md), in the live form (D7.7), a
+  list position between its steps a `get` of the item with `optional`. A read of a member's input outside a container is
   `pipeline.Input(m => m.Member)` (N14.4), by the element id Q14 derives the same way in every view that renders the
   member.
 - D13.4 Two inputs a request or a check sends under one scalar binding name (two inside its container, or an
@@ -3700,6 +3702,14 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   view reaches a container by `pipeline.Container<TModel>(containerId)`, which `Inputs` sends. A request that sends a
   container no live plan renders under that id and model stops before it sends, with one error naming the id and both
   models, as a plan composition defect (D14.6).
+  A container's block in a view rendered under a field prefix, a partial for a member among them (D14.4), is its view's
+  model: it sends, reads and checks the inputs inside its element under the names past that prefix, each input's path
+  the steps after the prefix's and its name the text after the prefix's, less the dot that joins them
+  (`probe:core-template-prefix-name`, `probe:mvc5-sub-index-name`), so an endpoint that binds the container's model
+  binds what it sends. An input inside it that the prefix does not open stops the container's send, read and check, with
+  one error naming the input, the container and the prefix. C# writes the prefix into the container's entry, its name
+  and its path, each empty for a view with none. A container under no prefix sends the same inputs under their full
+  names (X9.16).
 
 **Schema nodes.** None new: the plan's object locators by element id, the plugin data `model` (inputs by id) and
 `slot` (container ids).
@@ -3722,6 +3732,9 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `Partials.tla:AttachedInputBindsItsMember`
 - `Partials.tla:ReadNeverFindsAnotherMember`
 - `Partials.tla:EverySentValueIsTheOneBound`
+- `Partials.tla:KinContainerBindsItsAttachedMembers`
+- `ContainerRead.tla:ATypedTextReachesTheEndpoint`
+- `ContainerRead.tla:AnInputOutsideThePrefixStopsTheSend`
 
 **Doors.**
 - kept: `Html.ReactivePlan`, `Html.InputField` (M7.N2), `IdGenerator.For<TModel, TProp>` (M7.N1), and MVC's own
@@ -4121,14 +4134,14 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 
   A registration carries the starts of D16.6 once. `$model.sentValueOf` and `$model.sends` leave, since every
   read is a `get` over one checked body (B3), and the form plugin's argument is a typed contract (D9.1).
-- D16.15 Live validation is D12.7's, per container. A container's block carries its live check: its model's
-  registered validator under the default rule set, the rule set the block names, or none (the form goes to gate 2);
-  a bare block carries the first, and the door that names a rule set or none is declared with the first view that
-  names one. Typing clears an input's message, and blur and the input's commit check the input's member under the
-  live check of each container that holds it, each over its own container's inputs, a checked body C# writes as form
-  data, as a check with no request sends it (D16.6); a message two of them give shows once. A live check shows at
-  the input's message element alone, its member's first failure as a request's check shows it there (D16.13), and
-  changes no summary and no notice.
+- D16.15 Live validation is D12.7's, per container. A container's block carries its live check: its model's registered
+  validator under the default rule set, the rule set the block names, or none (the form goes to gate 2); a bare block
+  carries the first, and the door that names a rule set or none is declared with the first view that names one. Typing
+  clears an input's message, and blur and the input's commit check the input's member under the live check of each
+  container that holds it, each over its own container's inputs, under the names that container sends them by (D14.8), a
+  checked body C# writes as form data, as a check with no request sends it (D16.6); a message two of them give shows
+  once. A live check shows at the input's message element alone, its member's first failure as a request's check shows
+  it there (D16.13), and changes no summary and no notice.
 - D16.16 A check that compares a member with a fixed value or another member (`Equal`, `NotEqual`, `GreaterThan`,
   `GreaterThanOrEqualTo`, `LessThan`, `LessThanOrEqualTo`, `InclusiveBetween`, `ExclusiveBetween`) compares a date or a
   time (`DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly`, `TimeSpan`, each nullable too) as .NET does, to the tick,
@@ -4460,6 +4473,33 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   RuleSet("Approval", ..) and its other rules in no set. Approve all checks every row under Approval: a shift of 10
   hours shows the message beside its Hours and in the roster's summary and sends nothing, and the rows' rules of no
   set do not run, so a shift with no carer is approved.
+- `X16.51` behavior (D14.8, D9.15): a row's container under its view's field prefix sends its inputs under the names
+  past that prefix. The roster's rows are views of `ShiftRow`, each rendered by `Html.PartialFor(m => m.Rows[at], ..)`
+  with its own container, whose Save sends `request.Inputs(shift.Container).Set(sent => sent.Id, Model.Id)` to an
+  endpoint that binds a `ShiftRow`: Ben typed into shift 6's Carer is saved as shift 6's, its body holds Id, Carer and
+  Hours and no field named Rows, and the check reads shift 6's inputs alone, so shift 7's empty carer refuses nothing;
+  with shift 6's Carer cleared, "Choose a carer." shows beside it and in shift 6's summary and nothing is sent
+  (`ContainerRead.tla:ATypedTextReachesTheEndpoint`, `Partials.tla:KinContainerBindsItsAttachedMembers`).
+- `X16.52` behavior (D16.2, D14.8): a row's request under a rule set checks its own container's inputs under that set:
+  shift 6's Approve, `.Validate<ShiftRules>(ShiftRules.Approval)`, with 10 hours shows "An approved shift is 8 hours at
+  most." beside shift 6's Hours and in shift 6's summary and sends nothing, and with 8 hours and its carer cleared the
+  approval is sent and stored.
+- `X16.53` behavior (N16.3, D14.8): a check with no request of a row's container reads the row's inputs under the names
+  past its prefix: shift 6's Check, `pipeline.Validate(shift.Container)`, with its carer cleared shows "Choose a carer."
+  beside shift 6's Carer and in shift 6's summary and stops its pipeline, and with Ann it writes "Shift 6 is ready".
+- `X16.54` behavior (D16.15, D14.8): a row's live check names a failure as its container sends the input. On a rota page
+  whose model has no registered validator and whose rows are views of `ShiftRow`, each with its own container inside no
+  other container, shift 6's Carer cleared and left shows "Choose a carer." once beside it, and shift 6's summary stays
+  hidden.
+- `X16.55` behavior (D16.13, D16.7): an `Input` sent under a request member whose path differs from its own is checked
+  as that member. Shift 6's Save sends `Input(sent => sent.Hours, pipeline.Input(m => m.Rows[1].Hours))` and its carer
+  the same way, as a `ShiftRow`: 12a shows "The value '12a' is not valid for Hours." beside shift 6's Hours and in the
+  notice and sends nothing, 20 shows "A shift is 1 to 12 hours." there, and 8 is saved.
+- `X16.56` behavior (D14.8): an input inside a row's container that its prefix does not open stops the container's send.
+  Shift 6's container holds a slot that loads a partial rendered with no prefix, whose input binds Note; once it loads,
+  shift 6's Save sends nothing and logs "Input 'Alis_Reactive_Conformance_App_Care_ShiftNote__Note' binds 'Note' inside
+  container 'shift-6', whose field prefix 'Rows[1]' does not open it.", and with the slot not loaded the shift is saved
+  (`ContainerRead.tla:AnInputOutsideThePrefixStopsTheSend`).
 
 ## Q17. Vendors and inversion
 

@@ -79,7 +79,10 @@ export class PageForms {
     if (entry.binding.message === "") return;
     const checks = this.#table.liveChecksOf(entry.id);
     if (checks.length === 0) return;
-    const [first] = checks.flatMap(check => this.#liveFailures(check)).filter(failure => failure.name === entry.binding.name);
+    const [first] = checks.flatMap(check => {
+      const sent = check.inputs.find(input => input.entry.id === entry.id);
+      return sent === undefined ? [] : this.#liveFailures(check).filter(failure => failure.name === sent.name);
+    });
     this.#places.clearMessage(entry);
     if (first !== undefined) this.#places.showMessage(entry, first.message);
   }
@@ -149,7 +152,7 @@ class Run {
   }
 
   #typed(input: SentInput): void {
-    const path = input.entry.binding.path;
+    const path = input.path;
     const scalar = this.#registration.scalars.find(bound => matches(bound.path, path));
     if (scalar === undefined) return;
     const text = this.#typedText(input);
@@ -184,7 +187,7 @@ class Run {
   }
 
   #nameOf(path: readonly PathStep[]): string {
-    return this.#inputs.find(input => same(input.entry.binding.path, path))?.name ?? "";
+    return this.#inputs.find(input => same(input.path, path))?.name ?? "";
   }
 }
 

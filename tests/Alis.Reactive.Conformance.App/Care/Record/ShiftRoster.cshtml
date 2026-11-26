@@ -29,4 +29,5 @@
         .OnSuccess(Content.Text, (approved, pipeline) => pipeline.Element("roster-status").Text.Set(approved.Body))))
 }
 <p id="roster-status"></p>
+<p>Saved: <span id="saved-shifts">@string.Join("; ", Model.Saved)</span></p>
 @Html.RenderPlan(plan)

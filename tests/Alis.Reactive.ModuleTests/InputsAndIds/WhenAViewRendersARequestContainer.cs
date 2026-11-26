@@ -24,7 +24,7 @@ public sealed class WhenAViewRendersARequestContainer
         block.Dispose();
         Assert.That(html.ViewContext.Writer.ToString(), Is.EqualTo("""<fieldset id="kin"><div id="kin_summary" class="validation-summary-valid" hidden><ul></ul></div></fieldset>"""));
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
-        Assert.That(json, Is.EqualTo(Head + "\"" + """kin":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.Family","summary":"kin_summary","live":[]}""" + Tail));
+        Assert.That(json, Is.EqualTo(Head + "\"" + """kin":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.Family","prefix":{"name":"","path":[]},"summary":"kin_summary","live":[]}""" + Tail));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 
@@ -35,7 +35,7 @@ public sealed class WhenAViewRendersARequestContainer
         var ownerPlan = owner.ReactivePlan<Family>();
         using (owner.BeginRequestContainer(ownerPlan, "kin")) { }
         var ownerJson = MoveInPlans.JsonOf(owner.RenderPlan(ownerPlan));
-        Assert.That(ownerJson, Is.EqualTo(Head + "\"" + """kin":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.Family","summary":"kin_summary","live":[]}""" + Tail));
+        Assert.That(ownerJson, Is.EqualTo(Head + "\"" + """kin":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.Family","prefix":{"name":"","path":[]},"summary":"kin_summary","live":[]}""" + Tail));
         Assert.That(PlanSchema.ProblemsOf(ownerJson), Is.Empty);
         Assert.That(owner.ViewContext.Writer.ToString(), Is.EqualTo("""<fieldset id="kin"><div id="kin_summary" class="validation-summary-valid" hidden><ul></ul></div></fieldset>"""));
 
@@ -62,7 +62,7 @@ public sealed class WhenAViewRendersARequestContainer
                 MoveInPlans.Box(html, plan, m => m.Nights);
         }
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
-        Assert.That(json, Is.EqualTo(MoveInPlans.Head + "\"" + """Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights":{"name":"Nights","path":["nights"],"converted":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}},"blank":{"kind":"lit","value":5},"sent":""" + MoveInPlans.NumberSent + ""","committed":"change","invalidClass":"alis-has-error","message":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights_message"},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"name":"Room","path":["room"],"converted":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room"}},"shape":{"kind":"nullable","inner":{"kind":"string","date":"none","negativeZero":"0"}}},"blank":{"kind":"lit","value":""},"sent":""" + MoveInPlans.TextSent + ""","committed":"change","invalidClass":"alis-has-error","message":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message"}},"containers":{"intake":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.MoveIn","summary":"intake_summary","live":[]},"kin":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.MoveIn","summary":"kin_summary","live":[]}}}},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights","vendor":"native"},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room","vendor":"native"}""" + MoveInPlans.Tail));
+        Assert.That(json, Is.EqualTo(MoveInPlans.Head + "\"" + """Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights":{"name":"Nights","path":["nights"],"converted":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}},"blank":{"kind":"lit","value":5},"sent":""" + MoveInPlans.NumberSent + ""","committed":"change","invalidClass":"alis-has-error","message":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights_message"},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"name":"Room","path":["room"],"converted":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room"}},"shape":{"kind":"nullable","inner":{"kind":"string","date":"none","negativeZero":"0"}}},"blank":{"kind":"lit","value":""},"sent":""" + MoveInPlans.TextSent + ""","committed":"change","invalidClass":"alis-has-error","message":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message"}},"containers":{"intake":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.MoveIn","prefix":{"name":"","path":[]},"summary":"intake_summary","live":[]},"kin":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.MoveIn","prefix":{"name":"","path":[]},"summary":"kin_summary","live":[]}}}},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Nights","vendor":"native"},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room","vendor":"native"}""" + MoveInPlans.Tail));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 
@@ -122,7 +122,7 @@ public sealed class WhenAViewRendersARequestContainer
         Assert.That(Views.TextOf(rendered), Is.EqualTo("<input>"));
         Assert.That(html.ViewContext.Writer.ToString(), Is.EqualTo("""<fieldset id="Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message"><div id="Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message_summary" class="validation-summary-valid" hidden><ul></ul></div></fieldset>"""));
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
-        Assert.That(json, Is.EqualTo(MoveInPlans.Head + "\"" + """Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"name":"Room","path":["room"],"converted":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room"}},"shape":{"kind":"nullable","inner":{"kind":"string","date":"none","negativeZero":"0"}}},"blank":{"kind":"lit","value":""},"sent":""" + MoveInPlans.TextSent + ""","committed":"change","invalidClass":"alis-has-error","message":""}},"containers":{"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.MoveIn","summary":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message_summary","live":[]}}}},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room","vendor":"native"}""" + MoveInPlans.Tail));
+        Assert.That(json, Is.EqualTo(MoveInPlans.Head + "\"" + """Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"name":"Room","path":["room"],"converted":{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room"}},"shape":{"kind":"nullable","inner":{"kind":"string","date":"none","negativeZero":"0"}}},"blank":{"kind":"lit","value":""},"sent":""" + MoveInPlans.TextSent + ""","committed":"change","invalidClass":"alis-has-error","message":""}},"containers":{"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.MoveIn","prefix":{"name":"","path":[]},"summary":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room_message_summary","live":[]}}}},"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room":{"kind":"element","id":"Alis_Reactive_ModuleTests_InputsAndIds_MoveIn__Room","vendor":"native"}""" + MoveInPlans.Tail));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 
@@ -160,7 +160,7 @@ public sealed class WhenAViewRendersARequestContainer
         using (html.BeginRequestContainer(plan, "kin&care")) { }
         Assert.That(html.ViewContext.Writer.ToString(), Is.EqualTo("""<fieldset id="kin&amp;care"><div id="kin&amp;care_summary" class="validation-summary-valid" hidden><ul></ul></div></fieldset>"""));
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
-        Assert.That(json, Is.EqualTo(Head + "\"" + """kin\u0026care":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.Family","summary":"kin\u0026care_summary","live":[]}""" + Tail));
+        Assert.That(json, Is.EqualTo(Head + "\"" + """kin\u0026care":{"model":"Alis.Reactive.ModuleTests.InputsAndIds.Family","prefix":{"name":"Family","path":["family"]},"summary":"kin\u0026care_summary","live":[]}""" + Tail));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 }

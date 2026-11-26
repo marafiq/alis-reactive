@@ -202,7 +202,7 @@ public sealed class WhenAPartsConditionIsWritten
         var plan = Views.TextOf(html.RenderPlan(reactive))["<script type=\"application/json\" data-reactive-plan>".Length..^"</script>".Length];
         Assert.That(RequestPage.Field(RequestPage.Field(RequestPage.Send(plan, "body"), "inputs"), "individual").GetRawText(), Is.EqualTo(
             """{"kind":"list","items":[{"kind":"op","op":"cond","args":[""" + Guard +
-            """,{"kind":"call","path":["input"],"members":"required","target":{"kind":"obj","id":"$model"},"args":[{"kind":"lit","value":"Alis_Reactive_ModuleTests_RequestsAndResponses_IntakeDesk__Ward"},{"kind":"lit","value":"Ward"}]},""" +
+            """,{"kind":"call","path":["input"],"members":"required","target":{"kind":"obj","id":"$model"},"args":[{"kind":"lit","value":"Alis_Reactive_ModuleTests_RequestsAndResponses_IntakeDesk__Ward"},{"kind":"lit","value":"Ward"},{"kind":"list","items":[{"kind":"lit","value":"ward"}]}]},""" +
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"leftOut"}}]}]}]}"""));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }

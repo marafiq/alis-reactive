@@ -193,7 +193,7 @@ function containerBody(container: CapturedContainerCapture): ContainerBody {
 }
 
 function setInput(form: URLSearchParams | FormData, input: SentInput, members: unknown, zone: TimeZone, place: TextPlace, request: object): void {
-  const path = input.entry.binding.path;
+  const path = input.path;
   form.delete(input.name);
   if (!holds(members, path)) return;
   const value = readAt(members, path);
@@ -230,7 +230,7 @@ function withContainer(value: unknown, inputs: SentInputs, zone: TimeZone): unkn
   const members: unknown = containerBody(container).members;
   const json = Array.isArray(members) ? [] : {};
   for (const input of container.inputs) {
-    const path = input.entry.binding.path;
+    const path = input.path;
     if (!holds(members, path)) continue;
     const member = jsonMember(readAt(members, path), input.sent, input.name, zone);
     if (member !== undefined) write(json, path, member);

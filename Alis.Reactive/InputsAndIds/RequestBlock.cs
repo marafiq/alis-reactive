@@ -13,12 +13,12 @@ internal sealed class RequestBlock
     private readonly Action _checkPrefix;
     private bool _closed;
 
-    internal RequestBlock(TextWriter writer, PlanContent plan, string id, IReadOnlyList<Live> live, Action checkPrefix)
+    internal RequestBlock(TextWriter writer, PlanContent plan, string id, string prefix, IReadOnlyList<Live> live, Action checkPrefix)
     {
         _writer = writer;
         _checkPrefix = checkPrefix;
         var summary = id + "_summary";
-        ModelPlugin.Contains(plan, id, summary, live);
+        ModelPlugin.Contains(plan, id, new FieldPrefix(prefix, [.. BoundInput.PrefixSteps(prefix, plan.Json.App)]), summary, live);
         writer.Write($"<fieldset id=\"{WebUtility.HtmlEncode(id)}\">");
         writer.Write($"<div id=\"{WebUtility.HtmlEncode(summary)}\" class=\"validation-summary-valid\" hidden><ul></ul></div>");
     }

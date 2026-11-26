@@ -4,7 +4,7 @@ EXTENDS Naturals, Sequences, FiniteSets
 CONSTANTS Mutant, Candidate
 
 Mutants == {"none", "NoLatePrefixRefusal", "IdWithoutPrefix", "NameWithoutPrefix", "NoCompositionRefusal",
-            "NoDuplicateStop"}
+            "NoDuplicateStop", "KinPrefixKept"}
 
 Candidates == {"none", "OwnPlanStops"}
 
@@ -199,5 +199,35 @@ ReachOwnPlansValueLandsInAnotherMember ==
 
 ReachInheritedPrefixMisnames ==
     ~(Sent /\ \E p \in Carried : ~Attached(p) /\ ~OwnPlanOfAnotherModel(p) /\ LandsIn(p) # {Member(p)})
+
+KinElement(k) == {p \in Carried : p \in {KinPlan(k), AddressPlan(k)}}
+
+KinOpens(k, p) ==
+    Len(KinPrefix(k)) <= Len(InputName(p)) /\ SubSeq(InputName(p), 1, Len(KinPrefix(k))) = KinPrefix(k)
+
+PastKin(k, p) ==
+    IF Mutant = "KinPrefixKept" THEN InputName(p) ELSE SubSeq(InputName(p), Len(KinPrefix(k)) + 1, Len(InputName(p)))
+
+KinSendStops(k) == \E p \in KinElement(k) : ~KinOpens(k, p)
+
+KinSent(k) == phase = "rendered" /\ KinPlan(k) \in Carried /\ ~KinSendStops(k)
+
+KinPaths == {<<"Name">>, <<"Address", "Street">>}
+
+KinLandsIn(k, p) == IF PastKin(k, p) \in KinPaths THEN {PastKin(k, p)} ELSE {}
+
+KinMember(p) == Tail(Member(p))
+
+AttachedUnderKin(p) == p[1] = "kin" \/ nested # "PartialWithModel"
+
+KinContainerBindsItsAttachedMembers ==
+    \A k \in Members : KinSent(k) => \A p \in KinElement(k) : AttachedUnderKin(p) => KinLandsIn(k, p) = {KinMember(p)}
+
+ReachKinBoundUnderItsPrefix ==
+    ~(\E k \in Members : KinSent(k) /\ KinPrefix(k) # <<>> /\ AddressPlan(k) \in KinElement(k)
+        /\ nested # "PartialWithModel" /\ KinLandsIn(k, AddressPlan(k)) = {<<"Address", "Street">>})
+
+ReachKinSendStopsOnNet48 ==
+    ~(phase = "rendered" /\ host = "net48" /\ \E k \in Members : KinPlan(k) \in Carried /\ KinSendStops(k))
 
 ====

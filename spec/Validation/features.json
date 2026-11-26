@@ -2162,7 +2162,10 @@
         "Validation.tla:OnlyTheNamedValidator",
         "Validation.tla:SentOutsideAgrees",
         "Validation.tla:TheNamedSetIsTheOneRun",
-        "Validation.tla:ANamedSetSelectsARule"
+        "Validation.tla:ANamedSetSelectsARule",
+        "ContainerRead.tla:ATypedTextReachesTheEndpoint",
+        "ContainerRead.tla:AnInputOutsideThePrefixStopsTheSend",
+        "Partials.tla:KinContainerBindsItsAttachedMembers"
       ],
       "defects": [
         {
@@ -2243,6 +2246,30 @@
         },
         {
           "id": "X16.50",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.51",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.52",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.53",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.54",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.55",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.56",
           "rung": "behavior"
         }
       ],
@@ -2459,6 +2486,54 @@
           "outcome": "\"An approved shift is 8 hours at most.\" shows beside shift 6's Hours and in the roster's summary, and no request reaches the approvals address.",
           "opposite": "With 8 hours, and shift 7's carer still empty, the roster is approved and its next open reads it approved.",
           "defect": "The row's validator is not reached under the set, so 10 hours is approved; or the default set runs, so shift 7's empty carer refuses the approval."
+        },
+        {
+          "for": "X16.51",
+          "page": "The roster page, each row a view of `ShiftRow` with its own container and a Save that PUTs the container's inputs to the shift's address.",
+          "gesture": "In shift 6 type Ben into Carer and click its Save.",
+          "outcome": "roster-status reads \"Shift 6 saved\"; the request's body holds the fields Id, Carer and Hours and no field named Rows; the roster's next open reads Ben for shift 6; shift 7 shows no message.",
+          "opposite": "With shift 6's Carer cleared, \"Choose a carer.\" shows beside shift 6's Carer and in shift 6's summary, no request reaches the shift's address, and shift 7 shows no message.",
+          "defect": "The container sends \"Rows[1].Carer\", so the endpoint binds no member and Ben's save is refused with \"Choose a carer.\"; or the check reads every input of the roster's container, so shift 7's empty carer refuses shift 6's save."
+        },
+        {
+          "for": "X16.52",
+          "page": "The roster page, each row with an Approve that PUTs its container under `ShiftRules.Approval`.",
+          "gesture": "Type 10 into shift 6's Hours and click its Approve.",
+          "outcome": "\"An approved shift is 8 hours at most.\" shows beside shift 6's Hours and in shift 6's summary, and no request reaches the approval's address.",
+          "opposite": "With 8 hours and shift 6's Carer cleared, the approval is sent and stored.",
+          "defect": "The row's request runs the default set, so the cleared carer refuses it and 10 hours passes."
+        },
+        {
+          "for": "X16.53",
+          "page": "The roster page, each row with a Check that checks its container, then writes \"Shift 6 is ready\" into roster-status.",
+          "gesture": "Clear shift 6's Carer and click its Check.",
+          "outcome": "\"Choose a carer.\" shows beside shift 6's Carer and in shift 6's summary, roster-status stays empty, and no request leaves the page.",
+          "opposite": "With Ann in shift 6's Carer, roster-status reads \"Shift 6 is ready\".",
+          "defect": "The check stops with its summary empty (move-in.md:1428's observation); or it reads the container under its full names, so Ann's row fails with \"Choose a carer.\"."
+        },
+        {
+          "for": "X16.54",
+          "page": "A rota page whose model has no registered validator and whose rows are views of `ShiftRow`, each with its own container, inside no other container.",
+          "gesture": "Click into shift 6's Carer, clear it and press Tab.",
+          "outcome": "\"Choose a carer.\" shows once beside shift 6's Carer, and shift 6's summary stays hidden.",
+          "opposite": "With Ann typed, no message shows beside it.",
+          "defect": "The live check names its failure \"Carer\" and the browser looks for \"Rows[1].Carer\", so nothing shows."
+        },
+        {
+          "for": "X16.55",
+          "page": "A roster page whose shift 6 Save sends `Input(sent => sent.Hours, pipeline.Input(m => m.Rows[1].Hours))` and the carer the same way, as a `ShiftRow`.",
+          "gesture": "Type 12a into shift 6's Hours and click its Save.",
+          "outcome": "\"The value '12a' is not valid for Hours.\" shows beside shift 6's Hours and in the notice, and no request reaches the shift's address.",
+          "opposite": "With 20 typed, \"A shift is 1 to 12 hours.\" shows beside shift 6's Hours and in the notice; with 8 the shift is saved.",
+          "defect": "The check keys the input by its own path, so 12a is not refused and the start is sent, and the range's message shows in the notice alone."
+        },
+        {
+          "for": "X16.56",
+          "page": "The roster page, whose shift 6 holds a slot that loads a partial rendered with no prefix, with an input of its own.",
+          "gesture": "Load the slot, then click shift 6's Save.",
+          "outcome": "No request reaches the shift's address, and the console names the input, the container shift-6 and the prefix \"Rows[1]\".",
+          "opposite": "With the slot not loaded the shift is saved.",
+          "defect": "The input is sent under its bare name and the endpoint binds it as the shift's own member."
         }
       ],
       "verdicts": []

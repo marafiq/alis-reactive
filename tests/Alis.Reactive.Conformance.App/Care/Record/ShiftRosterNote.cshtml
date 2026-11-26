@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ShiftNote
+@{
+    var plan = Html.ReactivePlan<ShiftNote>();
+}
+@(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+@Html.RenderPlan(plan)

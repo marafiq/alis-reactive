@@ -1250,6 +1250,9 @@
         "model": {
           "type": "string"
         },
+        "prefix": {
+          "$ref": "#/$defs/FieldPrefix"
+        },
         "summary": {
           "type": "string"
         },
@@ -1262,8 +1265,28 @@
       },
       "required": [
         "model",
+        "prefix",
         "summary",
         "live"
+      ],
+      "additionalProperties": false
+    },
+    "FieldPrefix": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "path"
       ],
       "additionalProperties": false
     },
@@ -2115,6 +2138,12 @@
         "name": {
           "type": "string"
         },
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        },
         "entry": {
           "$ref": "#/$defs/InputEntry"
         },
@@ -2124,6 +2153,7 @@
       },
       "required": [
         "name",
+        "path",
         "entry",
         "sent"
       ],
