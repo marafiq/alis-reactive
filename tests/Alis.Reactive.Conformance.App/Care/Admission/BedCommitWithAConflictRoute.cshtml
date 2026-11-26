@@ -15,7 +15,7 @@
     @(Html.InputField(plan, m => m.Bed, options => options.Label("Bed")).NativeTextBox())
     <button type="button" @Html.Raises(plan, BedCommits.Save)>Save</button>
     Html.On(plan, trigger => trigger.CustomEvent(BedCommits.Save, pipeline => pipeline
-        .Post<BedAssignment>(BedCommitEndpoints.Beds, request => request.Inputs(bed.Container))
+        .Post<BedAssignment>(BedCommitEndpoints.Beds, request => request.Inputs(bed.Container).Set(assignment => assignment.Resident, Model.Resident))
         .OnError<CommitError>(409, (taken, pipeline) => pipeline.Element("bed-outcome").Text.Set("Choose another bed"))
         .OnError<CommitError>((failed, pipeline) =>
         {
