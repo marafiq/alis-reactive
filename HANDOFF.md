@@ -1,21 +1,22 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 05:01:33 EST 2026
+Written at `date`: Thu Nov 26 06:33:09 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (59): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
+unit: landed (60): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5Roster, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
+unit: ready (1): EmptyTextItem
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at ddf83d814 on feature/rewrite: equal to the remote
+lane: pushed at 9ccf7a367 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at ddf83d814
+ci: unread at 9ccf7a367
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -28,13 +29,13 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: ddf83d814 requests (JsonNoContent): a 204 to a route that reads JSON runs the catch-all as a content failure, and a route of kind none runs its success
-- Full check: .work/logs/spec-check-ddf83d814.log: spec check at ddf83d814: 40 of 40 checks pass
-- .work/last-run.txt: 20261126-044606-59784 ddf83d814
+- HEAD: 9ccf7a367 requests (Mvc5Roster): a container under no prefix reads no JSON options, and the twin logs a page's exception
+- Full check: .work/logs/spec-check-9ccf7a367.log: spec check at 9ccf7a367: 40 of 40 checks pass
+- .work/last-run.txt: 20261126-062337-61213 9ccf7a367
 
 ## Landed since the commit before the last spec: STATE commit
-ddf83d814 requests (JsonNoContent): a 204 to a route that reads JSON runs the catch-all as a content failure, and a route of kind none runs its success
-1da9b32a4 spec: STATE and handoff at 7b4d6c306
+9ccf7a367 requests (Mvc5Roster): a container under no prefix reads no JSON options, and the twin logs a page's exception
+79e09ab34 spec: STATE and handoff at ddf83d814
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
