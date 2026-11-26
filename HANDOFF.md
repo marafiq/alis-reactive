@@ -1,23 +1,22 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 13:17:29 EST 2026
+Written at `date`: Thu Nov 26 14:58:48 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 26, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (62): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5Razor, Mvc5Roster, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
-unit: briefed (1): FlagsAttribute
+unit: landed (63): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
+unit: ready (3): FlagsAttribute, G13Forms, Section4Close
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
-unit: ready (2): G13Forms, Section4Close
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 9f1f3a2b2 on feature/rewrite: equal to the remote
+lane: pushed at 03c79d4aa on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 9f1f3a2b2
+ci: unread at 03c79d4aa
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -25,18 +24,24 @@ file: over spec/CLAUDE.md: holds 2148 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
+file: over HANDOFF.md: holds 153 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
+machine: review due : 10 units have landed since .claude/rules/process.md last changed
+  leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
+  read first: the units sent back, the kinds of mistake that grew, the states no unit met
+  exit line: "landed"
+  goes to: gone
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 9f1f3a2b2 spec (G13Forms): the owner approves four of G13's forms, keeps the handler policy as built, and drops Flags<TEnum>()
-- Full check: .work/logs/spec-check-9f1f3a2b2.log: spec check at 9f1f3a2b2: 40 of 40 checks pass
-- .work/last-run.txt: 20261126-071443-21665 6feddb6e3
+- HEAD: 03c79d4aa harness (Mvc5ViewsCompiled): MVC 5 compiles every view of the twin before the browser tests start
+- Full check: .work/logs/spec-check-03c79d4aa.log: spec check at 03c79d4aa: 40 of 40 checks pass
+- .work/last-run.txt: 20261126-143305-40967 03c79d4aa
 
 ## Landed since the commit before the last spec: STATE commit
-9f1f3a2b2 spec (G13Forms): the owner approves four of G13's forms, keeps the handler policy as built, and drops Flags<TEnum>()
-563bde7fb spec: STATE and handoff at 720499148
+03c79d4aa harness (Mvc5ViewsCompiled): MVC 5 compiles every view of the twin before the browser tests start
+99a67ded1 spec: STATE and handoff at 9f1f3a2b2
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
