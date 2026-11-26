@@ -8,8 +8,10 @@ which serves the pages `spec/Reference/app.json` places under the host net48.
   (`Alis.Reactive.Conformance.App.Net48.csproj`). Its build lays the site out under the folder
   `tests/Alis.Reactive.Conformance.World/TwinSite.cs` names on Windows, the one the harness serves from IIS, and under
   "obj/site" elsewhere, with the required conformance script `build.mjs` bundles before the twin builds.
-  On Windows, `scripts/playwright-windows.ps1` opens the readiness page and the contact move-in page before the
-  browser tests start. It checks for the partial's "NextOfKin.Name" input on the contact page. Both requests run
+  On Windows, `scripts/playwright-windows.ps1` opens the readiness page, then the page that compiles every view of
+  the site (`World/ViewsController.cs`), then the contact move-in page, before the browser tests start, so no test
+  meets MVC 5's compile of a view at its first render and a view MVC 5's parser refuses stops the run there, named in
+  the run's server log (the lead's mistake, 2026-11-26: least-dose's first render outlasted its test's wait). It checks for the partial's "NextOfKin.Name" input on the contact page. Both requests run
   without a world.
 - `TwinApplication.cs` is its startup: `AddReactiveRequests` with the antiforgery token in a header and no other
   default, `AddReactiveJson` with camel-case enum names, `AddReactiveFluentValidation` with `RoomNumberingRules`,

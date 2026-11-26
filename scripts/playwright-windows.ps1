@@ -8,10 +8,10 @@ $test.Environment['ALIS_SERVER_RECORDS'] = $records
 $test.Environment.Remove('ALIS_IIS_HOST') | Out-Null
 $test.Environment.Remove('ALIS_IIS_ADDRESS') | Out-Null
 
-function Wait-ForMvc($server, $url, $marker) {
+function Wait-ForMvc($server, $url, $marker, $minutes = 2) {
     $client = [Net.Http.HttpClient]::new()
     $client.Timeout = [Threading.Timeout]::InfiniteTimeSpan
-    $deadline = [Threading.CancellationTokenSource]::new([TimeSpan]::FromMinutes(2))
+    $deadline = [Threading.CancellationTokenSource]::new([TimeSpan]::FromMinutes($minutes))
     $lastError = 'no connection'
     try {
         while (!$deadline.IsCancellationRequested) {
@@ -86,6 +86,7 @@ try {
         Write-Host "[playwright:runner] $hostName IIS Express PID $($iis.Id) serves $site at $address with CLR v4.0"
         Wait-ForMvc $iis "$address$ready" $marker
         if ($hostName -eq 'net48') {
+            Wait-ForMvc $iis "$address/world/views-compiled" '<h1>Views compiled</h1>' 10
             Wait-ForMvc $iis "$address/care/admission/contact-move-in" 'name="NextOfKin.Name"'
         }
         $test.Environment['ALIS_IIS_HOST'] = $hostName
