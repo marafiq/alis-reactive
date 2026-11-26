@@ -68,14 +68,15 @@ holds no JavaScript.
 
 ```cshtml
 @using Alis.Reactive.Consumer.Net10.Models
+@using Alis.Reactive.Consumer.Net10.Components
 @using Alis.Reactive.RenderingAndDelivery
 @using Alis.Reactive.TriggersAndPipelines
 ```
 
-The first `@using` is the app's own, where the view's model lives. Each of the others names the namespace of the
-fluent builders a view calls: `Alis.Reactive.RenderingAndDelivery` for the
-plan, `Alis.Reactive.TriggersAndPipelines` for its triggers and what a pipeline does. Write them at the top of the
-view, or once in `Views/_ViewImports.cshtml` for every view.
+The first two `@using` lines are the app's own: where the view's model lives, and where the app's own components live
+("How do you bring a component of your own?" below). Each of the others names the namespace of the fluent builders a
+view calls: `Alis.Reactive.RenderingAndDelivery` for the plan, `Alis.Reactive.TriggersAndPipelines` for its triggers
+and what a pipeline does. Write them at the top of the view, or once in `Views/_ViewImports.cshtml` for every view.
 
 ### How does the browser get the framework's script?
 
@@ -112,6 +113,70 @@ app.Run();
 ```
 
 A page that only reacts in the browser needs no startup call of the framework's.
+
+### How do you bring a component of your own?
+
+A component is a JavaScript object an element holds, and your app brings one as the framework brings its own: a class
+that declares the object's members by their JavaScript names, and a render helper that writes its element. The home
+page's button is the app's own. The browser's `button` element is the object, so it needs no script:
+
+```csharp
+using Alis.Reactive.Declarations;
+using Alis.Reactive.Vendors;
+
+namespace Alis.Reactive.Consumer.Net10.Components;
+
+public sealed class AppButton : Component
+{
+    public override ComponentVendor Vendor => ComponentVendor.Native;
+
+    public Property<string> TextContent => Property<string>();
+
+    public Event<Clicked> Click => Event<Clicked>();
+
+    public sealed class Clicked : JsObject
+    {
+    }
+}
+```
+
+`ComponentVendor.Native` says the element itself is the object and raises the DOM's events. `TextContent` is the
+button's `textContent`, which a pipeline reads and sets, and `Click` is its `click` event, whose payload is a class
+nested in the declaration, so no other event shares it.
+
+The render helper builds the element under the id the view gives it, and `plan.Render` declares the component on it:
+
+```csharp
+using Alis.Reactive.RenderingAndDelivery;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace Alis.Reactive.Consumer.Net10.Components;
+
+public static class AppButtonHtml
+{
+    public static Rendered<AppButton, TModel> AppButton<TModel>(this ReactivePlan<TModel> plan, string id, string text)
+    {
+        var button = new TagBuilder("button");
+        button.MergeAttribute("id", id);
+        button.MergeAttribute("type", "button");
+        button.InnerHtml.Append(text);
+        return plan.Render<AppButton>(id, button);
+    }
+}
+```
+
+The view renders the button and says what its click does:
+
+```cshtml
+@(plan.AppButton("acknowledge", "Acknowledge").Reactive(button => button.Click, (clicked, pipeline) => pipeline.Component<AppButton>("acknowledge").TextContent.Set("Acknowledged")))
+```
+
+`Reactive` runs its pipeline each time the button raises `Click`. `pipeline.Component<AppButton>(id)` reaches the
+component by the id you gave it, typed by its declaration, so a member the declaration does not hold does not compile.
+
+Your app's slices are vertical, as the framework's are. A component is one folder, `Components/AppButton/`, holding
+its declaration and its render helper, shared with no other component, as an action that needs a model has a model of
+its own, shared with no other view. Your app shares a base class only for the abstract members it enforces.
 
 ## ASP.NET MVC 5 on .NET Framework 4.8
 
@@ -200,7 +265,8 @@ namespace Alis.Reactive.Consumer.Net48
         <add namespace="Alis.Reactive.TriggersAndPipelines" />
 ```
 
-The home page above then needs no `@using`: its plan, its trigger and `Html.RenderPlan(plan)` are written the same way.
+The home page above then needs no `@using`: its plan, its trigger, its button and `Html.RenderPlan(plan)` are written
+the same way.
 
 ### How does the browser get the framework's script?
 
@@ -214,6 +280,46 @@ page:
 
 `Url.AppendVersion` adds the hash of the file's content to its address, as `asp-append-version` does on .NET 10, so a
 new release's file gets a new address.
+
+### How do you bring a component of your own?
+
+The button's declaration is the class above, written in a namespace block, in `Components/AppButton/AppButton.cs`. Its
+render helper hands MVC 5's markup to `plan.Render` as an `MvcHtmlString`:
+
+```csharp
+using System.Web.Mvc;
+using Alis.Reactive.RenderingAndDelivery;
+
+namespace Alis.Reactive.Consumer.Net48.Components
+{
+    public static class AppButtonHtml
+    {
+        public static Rendered<AppButton, TModel> AppButton<TModel>(this ReactivePlan<TModel> plan, string id, string text)
+        {
+            var button = new TagBuilder("button");
+            button.MergeAttribute("id", id);
+            button.MergeAttribute("type", "button");
+            button.SetInnerText(text);
+            return plan.Render<AppButton>(id, new MvcHtmlString(button.ToString(TagRenderMode.Normal)));
+        }
+    }
+}
+```
+
+A classic project compiles the files its `Compile` items list, so both files join them:
+
+```xml
+    <Compile Include="Components\AppButton\AppButton.cs" />
+    <Compile Include="Components\AppButton\AppButtonHtml.cs" />
+```
+
+and `Views/Web.config` names their namespace for every view, beside the framework's:
+
+```xml
+        <add namespace="Alis.Reactive.Consumer.Net48.Components" />
+```
+
+The view renders the button with the same line as on .NET 10.
 
 ### When does a mistake in a view show?
 

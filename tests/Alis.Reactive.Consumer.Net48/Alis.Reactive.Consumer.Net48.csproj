@@ -63,6 +63,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Models\Welcome.cs" />
+    <Compile Include="Components\AppButton\AppButton.cs" />
+    <Compile Include="Components\AppButton\AppButtonHtml.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

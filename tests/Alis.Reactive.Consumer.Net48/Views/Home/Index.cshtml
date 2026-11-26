@@ -7,4 +7,5 @@
 @{
     Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("consumer-status").Text.Set(Model.Message)));
 }
+@(plan.AppButton("acknowledge", "Acknowledge").Reactive(button => button.Click, (clicked, pipeline) => pipeline.Component<AppButton>("acknowledge").TextContent.Set("Acknowledged")))
 @Html.RenderPlan(plan)

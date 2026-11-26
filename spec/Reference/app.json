@@ -1379,6 +1379,12 @@
             "M5.N5",
             "M5.N1"
           ]
+        },
+        {
+          "id": "consumerButton",
+          "kind": "native",
+          "role": "acknowledge, AppButton: the app's own button slice in Components/AppButton/, a declaration on Component whose vendor is ComponentVendor.Native and a render helper on the plan that hands its button to plan.Render, whose Click handler sets its TextContent through pipeline.Component (M12.N1, M12.N2, M12.N3)",
+          "module": "Vendors"
         }
       ]
     }
@@ -7797,6 +7803,38 @@
         "consumerPlan",
         "consumerLoad",
         "consumerStatus"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M19.F1",
+      "for": "M19.X7",
+      "index": 0,
+      "screen": "fresh",
+      "hosts": [
+        "consumerNet10"
+      ],
+      "parts": [
+        "consumerPlan",
+        "consumerLoad",
+        "consumerStatus",
+        "consumerButton"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M19.F1",
+      "for": "M19.X7",
+      "index": 1,
+      "screen": "fresh",
+      "hosts": [
+        "consumerNet48"
+      ],
+      "parts": [
+        "consumerPlan",
+        "consumerLoad",
+        "consumerStatus",
+        "consumerButton"
       ],
       "harness": []
     },

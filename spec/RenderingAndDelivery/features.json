@@ -220,6 +220,11 @@
           "id": "M19.X5",
           "rung": "behavior",
           "defect": "A fresh app on the packed packages, wired by README.md's steps alone, renders its page and never boots its plan: on net10 AlisReactive's package carries its runtime as no static web asset, so ~/_content/AlisReactive/js/alis-reactive.js answers 404, a path the conformance app, which takes the shipped projects, never reads; on net48 the classic MVC 5 project imports no build target from its PackageReference, or README.md's steps leave out one it needs (the runtime's link, Views/Web.config's namespaces, the binding redirects System.Text.Json 10.0.15 needs), which the twin's own startup supplies."
+        },
+        {
+          "id": "M19.X7",
+          "rung": "behavior",
+          "defect": "A component an app declares and renders by README.md's steps alone, a declaration on Component and a render helper on the plan in a folder of its own, does not build in a fresh app on the packed packages, or renders there and never hears its event, so the app's own button keeps the text the server rendered after a click: a door the slice needs is off the packed surface, or the packed runtime does not listen on the element a render helper hands plan.Render. The conformance app declares its components on the shipped projects under a slice table and a contract table, and the twin compiles at C# 14, so neither builds a slice as a fresh app's project builds it, with no table and at its own language version."
         }
       ],
       "promises": [
@@ -278,6 +283,22 @@
           "outcome": "consumer-status shows Booted.",
           "opposite": "In a browser context with JavaScript off, consumer-status shows Not booted.",
           "defect": "The package the fresh app restores serves no runtime at the path its layout links, or README.md's steps leave out one the page needs, so the plan never boots and consumer-status shows Not booted."
+        },
+        {
+          "for": "M19.X7",
+          "page": "The fresh net10 app's home page: its view renders AppButton, the app's own button in Components/AppButton/, a declaration on Component whose vendor is ComponentVendor.Native with the members TextContent and Click, through its render helper on the plan as acknowledge, which the server renders as Acknowledge, and handles its Click by setting its TextContent to Acknowledged; its plan's load step writes Booted into consumer-status.",
+          "gesture": "Open the home page and click Acknowledge.",
+          "outcome": "acknowledge shows Acknowledged.",
+          "opposite": "A person who opens the home page and clicks nothing reads Booted in consumer-status, and acknowledge shows Acknowledge.",
+          "defect": "The slice README.md teaches does not build on the packed packages, or its Click handler runs nothing on the page, so acknowledge keeps Acknowledge after the click; or the handler runs with no click, so acknowledge shows Acknowledged before anyone clicks."
+        },
+        {
+          "for": "M19.X7",
+          "page": "The fresh MVC 5 app's home page: its view renders AppButton, the app's own button in Components/AppButton/, a declaration on Component whose vendor is ComponentVendor.Native with the members TextContent and Click, its two files in the project's Compile items and its namespace in Views/Web.config, through its render helper on the plan as acknowledge, which the server renders as Acknowledge, and handles its Click by setting its TextContent to Acknowledged; its plan's load step writes Booted into consumer-status.",
+          "gesture": "Open the home page and click Acknowledge.",
+          "outcome": "acknowledge shows Acknowledged.",
+          "opposite": "A person who opens the home page and clicks nothing reads Booted in consumer-status, and acknowledge shows Acknowledge.",
+          "defect": "The slice README.md teaches does not build on the packed packages, or its Click handler runs nothing on the page, so acknowledge keeps Acknowledge after the click; or the handler runs with no click, so acknowledge shows Acknowledged before anyone clicks."
         }
       ],
       "verdicts": []

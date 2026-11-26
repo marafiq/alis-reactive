@@ -801,6 +801,8 @@ public static class Promises
         public const string M19_X1_1 = "M19.F1 M19.X1 1";
         public const string M19_X5_0 = "M19.F1 M19.X5 0";
         public const string M19_X5_1 = "M19.F1 M19.X5 1";
+        public const string M19_X7_0 = "M19.F1 M19.X7 0";
+        public const string M19_X7_1 = "M19.F1 M19.X7 1";
         public const string M19_X2_0 = "M19.F1 M19.X2 0";
         public const string M19_X3_0 = "M19.F1 M19.X3 0";
         public const string M19_X4_0 = "M19.F1 M19.X4 0";
