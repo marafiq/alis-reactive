@@ -1,25 +1,25 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 01:08:38 EST 2026
+Written at `date`: Thu Nov 26 03:25:50 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 26, each in the notes block below
-unit: landed (57): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
+note: open: 25, each in the notes block below
+note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
+unit: landed (58): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
-unit: briefed (1): RowContainers
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 4f1a073cb on feature/rewrite: equal to the remote
+lane: pushed at 7b4d6c306 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 4f1a073cb
+ci: unread at 7b4d6c306
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2139 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2141 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
@@ -28,15 +28,13 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 4f1a073cb validation (FormDataBoundaryNet48): on MVC 5 the browser's check names each member as the body sends it
-- Full check: .work/logs/spec-check-4f1a073cb.log: spec check at 4f1a073cb: 40 of 40 checks pass
-- .work/last-run.txt: 20261126-005258-36727 4f1a073cb
+- HEAD: 7b4d6c306 validation (RowContainers): a container under a field prefix sends, reads and checks its inputs under the names past the prefix
+- Full check: .work/logs/spec-check-7b4d6c306.log: spec check at 7b4d6c306: 40 of 40 checks pass
+- .work/last-run.txt: 20261126-030931-4240 7b4d6c306
 
 ## Landed since the commit before the last spec: STATE commit
-4f1a073cb validation (FormDataBoundaryNet48): on MVC 5 the browser's check names each member as the body sends it
-ca7055154 declarations (OneDoor): the list operations have one door, an iterable's Items
-f3e2c7d9d process (MistakesShort): the mistakes log keeps each kind and what stops it, and no count
-8f12a2fb3 spec: STATE and handoff at 96955defa
+7b4d6c306 validation (RowContainers): a container under a field prefix sends, reads and checks its inputs under the names past the prefix
+a45d98273 spec: STATE and handoff at 4f1a073cb
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
