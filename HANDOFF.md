@@ -1,33 +1,34 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 14:58:48 EST 2026
+Written at `date`: Thu Nov 26 15:20:50 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 26, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (63): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
-unit: ready (3): FlagsAttribute, G13Forms, Section4Close
+unit: landed (64): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
+unit: ready (2): G13Forms, Section4Close
 unit: building (1): MoveInOwners
+unit: briefed (1): Mvc5JsonNames
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 03c79d4aa on feature/rewrite: equal to the remote
+lane: pushed at 2536f54de on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 03c79d4aa
+ci: unread at 2536f54de
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2148 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2155 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
-file: over HANDOFF.md: holds 153 lines, its limit 150
+file: over HANDOFF.md: holds 156 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 10 units have landed since .claude/rules/process.md last changed
+machine: review due : 11 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -35,22 +36,23 @@ machine: review due : 10 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 03c79d4aa harness (Mvc5ViewsCompiled): MVC 5 compiles every view of the twin before the browser tests start
-- Full check: .work/logs/spec-check-03c79d4aa.log: spec check at 03c79d4aa: 40 of 40 checks pass
-- .work/last-run.txt: 20261126-143305-40967 03c79d4aa
+- HEAD: 2536f54de validation (FlagsAttribute): a flags enum is the one [Flags] marks, and the startup names none
+- Full check: .work/logs/spec-check-2536f54de.log: spec check at 2536f54de: 40 of 40 checks pass
+- .work/last-run.txt: 20261126-150503-94155 2536f54de
 
 ## Landed since the commit before the last spec: STATE commit
-03c79d4aa harness (Mvc5ViewsCompiled): MVC 5 compiles every view of the twin before the browser tests start
-99a67ded1 spec: STATE and handoff at 9f1f3a2b2
+2536f54de validation (FlagsAttribute): a flags enum is the one [Flags] marks, and the startup names none
+de05f8b7f spec: STATE and handoff at 03c79d4aa
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## The owner's latest decisions
-spec/CLAUDE.md:9: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), on the forms gate 2's G13 left to the owner: yes to
-spec/CLAUDE.md:15: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): one door for each list operation. An object JavaScript iterates
-spec/CLAUDE.md:19: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mistakes log stays short enough to stay in context, each kind
+spec/CLAUDE.md:9: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), closing the flags enum: an enum is flags to the framework when
+spec/CLAUDE.md:14: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), on the forms gate 2's G13 left to the owner: yes to
+spec/CLAUDE.md:20: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): one door for each list operation. An object JavaScript iterates
+spec/CLAUDE.md:24: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mistakes log stays short enough to stay in context, each kind
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
