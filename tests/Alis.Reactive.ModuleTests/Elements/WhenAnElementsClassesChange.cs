@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.ArrayLambdas;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.TriggersAndPipelines;
@@ -72,7 +73,7 @@ public sealed class WhenAnElementsClassesChange
         var html = Views.Of(new Seating("4"));
         var plan = html.ReactivePlan<Seating>();
         html.On(plan, trigger => trigger.DomReady(pipeline =>
-            pipeline.Element("table-4-risks").Text.Set(pipeline.Element("table-4").Classes.Count(flag => flag.StartsWith("risk-", StringComparison.Ordinal)))));
+            pipeline.Element("table-4-risks").Text.Set(pipeline.Element("table-4").Classes.Items.Count(flag => flag.StartsWith("risk-", StringComparison.Ordinal)))));
         var classes = """{"kind":"op","op":"toArray","args":[{"kind":"get","path":["classList"],"members":"required","target":""" + Obj("table-4") + "}]}";
         var risks = """{"kind":"get","path":["length"],"members":"requiredIfHeld","target":{"kind":"call","path":["filter"],"members":"requiredIfHeld","target":""" + classes +
             ""","args":[{"kind":"fn","params":["item1"],"body":{"kind":"op","op":"startsWith","args":[""" + Ref("item1") + "," + Text("risk-") + "]}}]}}";

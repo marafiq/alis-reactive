@@ -66,7 +66,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Element(\"table-4-seated\").Text.Set(pipeline.Element(\"table-4-seats\").Children.Count());",
+          "text": "pipeline.Element(\"table-4-seated\").Text.Set(pipeline.Element(\"table-4-seats\").Children.Items.Count());",
           "doors": [
             "M5.N5",
             "M5.N1",
@@ -76,7 +76,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Element(\"table-4-close-supervision\").Text.Set(pipeline.Element(\"table-4-seats\").Children.Count(seat => seat.GetAttribute(\"data-supervision\").Eq(\"close\")));",
+          "text": "pipeline.Element(\"table-4-close-supervision\").Text.Set(pipeline.Element(\"table-4-seats\").Children.Items.Count(seat => seat.GetAttribute(\"data-supervision\").Eq(\"close\")));",
           "doors": [
             "M5.N3",
             "M5.N4",
@@ -85,7 +85,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Element(\"table-4-risk-count\").Text.Set(pipeline.Element(\"table-4\").Classes.Count(flag => flag.StartsWith(\"risk-\", StringComparison.Ordinal)));",
+          "text": "pipeline.Element(\"table-4-risk-count\").Text.Set(pipeline.Element(\"table-4\").Classes.Items.Count(flag => flag.StartsWith(\"risk-\", StringComparison.Ordinal)));",
           "doors": [
             "M5.N1",
             "M5.N2",

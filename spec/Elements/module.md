@@ -40,7 +40,7 @@ Each name is gate 2's; each door is the capability it carries.
   iterator, which yields `string` (N5.7).
   It replaces main's `AddClass`, `RemoveClass` and `ToggleClass`, which take a literal only, and the redesign's
   `ElementClassList` with its `Items`.
-- `M5.N3` new: `ElementChildren`, mirroring lib.dom's `HTMLCollection`, whose iterator yields `ChildElement` (N5.7). It
+- `M5.N3` new: `ElementChildren`, mirroring lib.dom's `HTMLCollection`, whose `Items` yields `ChildElement` (N5.7). It
   replaces the redesign's `HtmlElement.Children` and main's `FromDom<TElement>(elementId, "children")`.
 - `M5.N4` new: `ChildElement`, mirroring lib.dom's `Element`: `GetAttribute`, a `Method<string?>`, and `HasAttribute`,
   a `Method<bool>`, each taking the attribute's name. The redesign's `ChildElement` has the same two members, read

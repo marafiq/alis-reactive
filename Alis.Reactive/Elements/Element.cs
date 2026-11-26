@@ -144,11 +144,13 @@ public sealed partial class ElementContent : ReadOnly<string?>
 }
 
 /// <summary>
-/// An element's classes: a step adds, removes or toggles one by its name.
+/// An element's classes: a step adds, removes or toggles one by its name, and the list operations read its
+/// <see cref="Items"/>.
 /// </summary>
-public sealed class ClassList : JsObject, IDataIterable<string>
+public sealed class ClassList : JsObject
 {
-    TypedSource<IReadOnlyList<string>> IDataIterable<string>.Items => DataIterator<string>();
+    /// <summary>Gets a source of the element's class names, read when a list operation runs.</summary>
+    public TypedSource<IReadOnlyList<string>> Items => DataIterator<string>();
 
     /// <summary>Adds a class to the element.</summary>
     /// <param name="name">The class's name; null changes no class.</param>
@@ -187,12 +189,13 @@ public sealed class ClassList : JsObject, IDataIterable<string>
 }
 
 /// <summary>
-/// An element's child elements, which the list operations read as the elements it holds when they run.
+/// An element's child elements, whose <see cref="Items"/> the list operations read.
 /// </summary>
 [Mirrors("lib.dom", "HTMLCollection")]
-public sealed class ElementChildren : JsObject, ILiveIterable<ChildElement>
+public sealed class ElementChildren : JsObject
 {
-    LiveObjects<ChildElement> ILiveIterable<ChildElement>.Items => LiveIterator<ChildElement>();
+    /// <summary>Gets the child elements the element holds when a list operation runs.</summary>
+    public LiveObjects<ChildElement> Items => LiveIterator<ChildElement>();
 }
 
 /// <summary>

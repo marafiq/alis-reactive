@@ -1,3 +1,4 @@
+@using Alis.Reactive.ArrayLambdas
 @using Alis.Reactive.Conditions
 @using Alis.Reactive.Conformance.App.Care
 @using Alis.Reactive.Declarations
@@ -52,21 +53,21 @@
             trigger
                 .DomReady(pipeline =>
                 {
-                    pipeline.Element($"{card}-seated").Text.Set(pipeline.Element($"{card}-seats").Children.Count());
-                    pipeline.Element($"{card}-close-supervision").Text.Set(pipeline.Element($"{card}-seats").Children.Count(seat => seat.GetAttribute("data-supervision").Eq("close")));
-                    pipeline.Element($"{card}-risk-count").Text.Set(pipeline.Element(card).Classes.Count(flag => flag.StartsWith("risk-", StringComparison.Ordinal)));
+                    pipeline.Element($"{card}-seated").Text.Set(pipeline.Element($"{card}-seats").Children.Items.Count());
+                    pipeline.Element($"{card}-close-supervision").Text.Set(pipeline.Element($"{card}-seats").Children.Items.Count(seat => seat.GetAttribute("data-supervision").Eq("close")));
+                    pipeline.Element($"{card}-risk-count").Text.Set(pipeline.Element(card).Classes.Items.Count(flag => flag.StartsWith("risk-", StringComparison.Ordinal)));
                 })
                 .CustomEvent(table.FallRisk, pipeline =>
                 {
                     pipeline.Element(card).Classes.Add("risk-fall");
-                    pipeline.Element($"{card}-risk-count").Text.Set(pipeline.Element(card).Classes.Count(flag => flag.StartsWith("risk-", StringComparison.Ordinal)));
+                    pipeline.Element($"{card}-risk-count").Text.Set(pipeline.Element(card).Classes.Items.Count(flag => flag.StartsWith("risk-", StringComparison.Ordinal)));
                 });
         }
 
         trigger.CustomEvent(LunchSeatings.CountThePlates, pipeline =>
         {
             pipeline.Element("plates-on-order").Text.Set(pipeline.Plugin<ServingStation>().Plates.Total);
-            pipeline.Element("plates-ready").Text.Set(pipeline.Plugin<ServingStation>().Plates.Count());
+            pipeline.Element("plates-ready").Text.Set(pipeline.Plugin<ServingStation>().Plates.Items.Count());
             pipeline.Element("station-status").Text.Set("Counted");
         });
     });

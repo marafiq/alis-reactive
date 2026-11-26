@@ -18,7 +18,7 @@ public sealed class WhenAnElementsChildrenAreCounted
     {
         var html = Views.Of(new Seating("4"));
         var plan = html.ReactivePlan<Seating>();
-        html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("seated").Text.Set(pipeline.Element("table-seats").Children.Count())));
+        html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("seated").Text.Set(pipeline.Element("table-seats").Children.Items.Count())));
         var expected = Loaded(
             Element("seated") + "," + Element("table-seats"),
             SetTo("seated", """{"kind":"get","path":["length"],"members":"requiredIfHeld","target":""" + Seats + "}"));
@@ -34,10 +34,10 @@ public sealed class WhenAnElementsChildrenAreCounted
         var plan = html.ReactivePlan<Seating>();
         html.On(plan, trigger => trigger.DomReady(pipeline =>
         {
-            pipeline.Element("close-supervision").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.GetAttribute("data-supervision").Eq("close")));
-            pipeline.Element("not-close").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.GetAttribute("data-supervision").NotEq("close")));
-            pipeline.Element("wheelchair-seats").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.HasAttribute("data-wheelchair")));
-            pipeline.Element("hoist-seats").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.HasAttribute("data-hoist")));
+            pipeline.Element("close-supervision").Text.Set(pipeline.Element("table-seats").Children.Items.Count(seat => seat.GetAttribute("data-supervision").Eq("close")));
+            pipeline.Element("not-close").Text.Set(pipeline.Element("table-seats").Children.Items.Count(seat => seat.GetAttribute("data-supervision").NotEq("close")));
+            pipeline.Element("wheelchair-seats").Text.Set(pipeline.Element("table-seats").Children.Items.Count(seat => seat.HasAttribute("data-wheelchair")));
+            pipeline.Element("hoist-seats").Text.Set(pipeline.Element("table-seats").Children.Items.Count(seat => seat.HasAttribute("data-hoist")));
         }));
         var expected = Loaded(
             Element("close-supervision") + "," + Element("hoist-seats") + "," + Element("not-close") + "," + Element("table-seats") + "," + Element("wheelchair-seats"),

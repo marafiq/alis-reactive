@@ -6,6 +6,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): one door for each list operation. An object JavaScript iterates
+  declares its iterator under a member it names, `Items`, by `LiveIterator<TItem>()` or `DataIterator<TItem>()`, and the
+  list operations run on that member (`Children.Items.Count()`). the Iterables class's 27 forwarders and the
+  interfaces ILiveIterable and IDataIterable leave, replacing the lead's form of 2026-11-13 (D5.13, N5.7).
 - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mistakes log stays short enough to stay in context, each kind
   of mistake with what stops it and no count. A mistake is fixed where it is found, a kind no row names gets a row, and
   no rule line is written for each mistake. It replaces the counts and the holder's rung of 2026-11-12, 2026-11-14 and
@@ -1489,9 +1493,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   D5.13, N5.7 and M5.F1's proposed sentences write the view's half, the object taking the list operations beside its
   own members (`Children.Count()`), so by G13 that is the form. No line wrote the declaration's half, and U3 declares
   the lead's proposal as signatures: `LiveIterator<TItem>()` and `DataIterator<TItem>()`, protected on `JsObject` and
-  taking no name, since the member is always the iterator; `ILiveIterable<TItem>` and `IDataIterable<TItem>`, which an
+  taking no name, since the member is always the iterator; ILiveIterable and IDataIterable, which an
   iterable implements with the door as its body; and the nine operations of `LiveObjects<TItem>` and the eighteen of
-  `DataLists` as extensions of them in `Iterables`, each the operation over the items, so the build binds each to the
+  `DataLists` as extensions of them in the Iterables class, each the operation over the items, so the build binds each to the
   one it forwards and its docs are that one's. A live object that iterates and is no collection declares the door
   under a member it names. M5.F1's class count is reworded to the ordinal `StartsWith`, the overload the translated
   members' table takes. Two things wait for the owner: the form, against the smaller one the agent names,

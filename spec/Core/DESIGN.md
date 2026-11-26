@@ -633,9 +633,10 @@ Terms used throughout:
   type. lib.dom's `HTMLCollection`, which an element's `children` holds, yields `Element`, and the `DOMTokenList` its
   `classList` holds yields `string`; neither is an array, and neither has `filter`, `map`, `some` or `find`
   (`probe:dom-children-iterable`, `probe:dom-classlist-iterable`), so `LiveObjects<T>`, the array a property holds
-  (D5.8), mirrors neither. Such an object takes the list operations of D6.2 over the items its iterator yields when the
-  operation runs (D6.17), beside its own members (`DOMTokenList`'s `add`, `HTMLCollection`'s `length`), and its items are
-  live objects or data as its iterator declares them (D6.8). The vendor contract writes the type each iterator yields
+  (D5.8), mirrors neither. Such an object declares its iterator under a member it names, `Items`, which takes the list
+  operations of D6.2 over the items the iterator yields when the operation runs (D6.17); the object keeps its own members
+  beside it (`DOMTokenList`'s `add`, `HTMLCollection`'s `length`), no list operation is declared on the object itself,
+  and its items are live objects or data as its iterator declares them (D6.8). The vendor contract writes the type each iterator yields
   (D17.5), and the build refuses an iterator declared on a type that has none, items the iterator does not yield, and
   `LiveObjects<T>` on a member whose type is no array.
 
@@ -680,11 +681,9 @@ Terms used throughout:
 - kept on a new holder: the whole declaration vocabulary on an event's payload, at any depth (D5.6), where the
   redesign's payload is already a `JsObject` (`Alis.Reactive/Components/Event.cs:14`).
 - `N5.7` new, its form gate 2's: a `JsObject`'s iterator, declared with the declaration of its items, live or data
-  (D5.13); the list operations of N6.1 and D6.10 take an object that declares one. The lines write the view's half,
-  the object taking the operations beside its own members; no line wrote the declaration's half, so U3 declares the
-  lead's proposal as a signature (G13): `LiveIterator<TItem>()` and `DataIterator<TItem>()` on `JsObject`, and the
-  operations as extensions of `ILiveIterable<TItem>` and `IDataIterable<TItem>`, which the object implements (the
-  lead, 2026-11-13, `spec/CLAUDE.md`). It replaces the redesign's `HtmlElement.Children` and `ElementClassList.Items`,
+  (D5.13), under a member the declaration names, `Items`, by `LiveIterator<TItem>()` or `DataIterator<TItem>()`, both
+  protected on `JsObject`; the list operations of N6.1 and D6.10 run on that member, `Children.Items.Count()`, and none
+  is declared a second time (the owner, 2026-11-26, `spec/CLAUDE.md`). It replaces the redesign's `HtmlElement.Children` and `ElementClassList.Items`,
   each a `ReactiveArray` over a member read with no declaration
  
   (`Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:52-53`, `Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:120-121`).

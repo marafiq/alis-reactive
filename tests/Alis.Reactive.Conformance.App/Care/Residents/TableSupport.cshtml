@@ -37,10 +37,10 @@
 @{
     Html.On(plan, trigger => trigger.DomReady(pipeline =>
     {
-        pipeline.Element("close-supervision").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.GetAttribute("data-supervision").Eq("close")));
-        pipeline.Element("not-close").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.GetAttribute("data-supervision").NotEq("close")));
-        pipeline.Element("wheelchair-seats").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.HasAttribute("data-wheelchair")));
-        pipeline.Element("hoist-seats").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.HasAttribute("data-hoist")));
+        pipeline.Element("close-supervision").Text.Set(pipeline.Element("table-seats").Children.Items.Count(seat => seat.GetAttribute("data-supervision").Eq("close")));
+        pipeline.Element("not-close").Text.Set(pipeline.Element("table-seats").Children.Items.Count(seat => seat.GetAttribute("data-supervision").NotEq("close")));
+        pipeline.Element("wheelchair-seats").Text.Set(pipeline.Element("table-seats").Children.Items.Count(seat => seat.HasAttribute("data-wheelchair")));
+        pipeline.Element("hoist-seats").Text.Set(pipeline.Element("table-seats").Children.Items.Count(seat => seat.HasAttribute("data-hoist")));
     }));
 }
 @Html.RenderPlan(plan)

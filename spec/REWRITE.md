@@ -1092,8 +1092,8 @@ A flags enum named at startup (N16.4) and a rule set a request names (D16.2) are
 the owner, `Flags<TEnum>()` on the validation builder and `Validate<TValidator>(ruleSet)` beside each request's
 `Validate<TValidator>()` and the endpoint's check; X16.22's care rota stands on them on the record screen, its test
 red.
-N5.7's iterator is declared as the lead's proposal for the owner, `LiveIterator<TItem>()` and `DataIterator<TItem>()`
-on `JsObject` and the list operations on `ILiveIterable<TItem>` and `IDataIterable<TItem>`, with M5.N3's
+N5.7's iterator is declared under a member the declaration names, `Items`, by `LiveIterator<TItem>()` and
+`DataIterator<TItem>()` on `JsObject`, the list operations running on that member (the owner, 2026-11-26), with M5.N3's
 `ElementChildren`, M5.N4's `ChildElement` and the iterator of `ClassList`; X6.56's lunch seating and M5.X2's table
 support stand on them on the residents screen, each test red, the lunch seating's opposite case a page's own plugin
 whose list member holds a paged result, its script U13's.

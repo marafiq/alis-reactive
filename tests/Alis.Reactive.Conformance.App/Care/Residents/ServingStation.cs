@@ -15,9 +15,9 @@ public sealed class ServingStation : Plugin
     public StationPlates Plates => LiveObject<StationPlates>();
 }
 
-public sealed class StationPlates : JsObject, IDataIterable<string>
+public sealed class StationPlates : JsObject
 {
-    TypedSource<IReadOnlyList<string>> IDataIterable<string>.Items => DataIterator<string>();
+    public TypedSource<IReadOnlyList<string>> Items => DataIterator<string>();
 
     public ReadOnly<int> Total => ReadOnly<int>(name: "count");
 }
