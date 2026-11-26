@@ -70,6 +70,8 @@ internal sealed partial class MemberPath
 
     internal static partial string BodyName(WrittenMember written, string clrName);
 
+    internal static partial JsonSerializerOptions NamedAsTheBody(JsonSerializerOptions options);
+
     internal static partial string? BoundUnderAnotherName(JsonTypeInfo holder, JsonPropertyInfo member);
 
     private static InvalidOperationException NoItemsMember(LambdaExpression member)

@@ -9282,7 +9282,8 @@
       "index": 0,
       "screen": "round",
       "hosts": [
-        "net10"
+        "net10",
+        "net48"
       ],
       "parts": [
         "doses",
@@ -9367,7 +9368,8 @@
       "index": 0,
       "screen": "admission",
       "hosts": [
-        "net10"
+        "net10",
+        "net48"
       ],
       "parts": [
         "intakeForm",

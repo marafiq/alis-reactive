@@ -124,6 +124,10 @@ internal sealed class WrittenMember
             ? declared.Name
             : throw new InvalidOperationException($"'{ClassNames.AsCSharpWritesIt(holder.Type)}' holds '{member.Name}', a member the app's JSON contract adds and no C# member declares, so the core cannot name it as C# declares it.");
 
+    [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's list names this file's read of a member's C# name (D18.1): MVC 5 binds a request body by it, so the browser's check names each member it reads by it, and a member no C# member declares keeps the contract's name (D2.4, D16.6).")]
+    internal static string AsCSharpDeclaresItElseAsWritten(JsonPropertyInfo member)
+        => member.AttributeProvider is MemberInfo declared ? declared.Name : member.Name;
+
     private static InvalidOperationException NotWritten(LambdaExpression read, JsonTypeInfo holder)
         => new($"'{read}' reads a member of '{ClassNames.AsCSharpWritesIt(holder.Type)}' that the app's JSON options do not write, so the browser never holds it.");
 }

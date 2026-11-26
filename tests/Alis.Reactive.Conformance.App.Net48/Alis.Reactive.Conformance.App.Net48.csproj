@@ -42,6 +42,8 @@
     <Compile Include="$(ConformanceApp)Care/Admission/ContactMoveIn.cs" Link="ConformanceApp/Care/Admission/ContactMoveIn.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/BedNotes.cs" Link="ConformanceApp/Care/Admission/BedNotes.cs" />
     <Compile Include="$(ConformanceApp)Care/Admission/ResidentDetails.cs" Link="ConformanceApp/Care/Admission/ResidentDetails.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/DeputyAppointment.cs" Link="ConformanceApp/Care/Admission/DeputyAppointment.cs" />
+    <Compile Include="$(ConformanceApp)Care/Round/LeastDoseRound.cs" Link="ConformanceApp/Care/Round/LeastDoseRound.cs" />
     <TwinView Include="$(ConformanceApp)**/*.Net48.cshtml" Exclude="$(ConformanceApp)bin/**;$(ConformanceApp)obj/**" />
     <TwinView Include="$(ConformanceApp)World/Ready.cshtml" />
     <TwinView Include="$(ConformanceApp)Refusals/RequestsAndResponses/RoundsBoard.cshtml" />
@@ -55,6 +57,9 @@
     <TwinView Include="$(ConformanceApp)Care/Admission/ContactMoveInKinCard.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/BedNotes.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Admission/ResidentDetails.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/DeputyAppointment.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/DeputyNamelessAppointment.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Round/LeastDoseRound.cshtml" />
   </ItemGroup>
 
   <Target Name="LayOutTheSite" AfterTargets="Build" DependsOnTargets="CopyAlisReactiveBrowserFiles">

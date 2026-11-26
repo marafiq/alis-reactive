@@ -4012,10 +4012,12 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     `probe:mvc5-nested-fills-start`, `probe:mvc5-list-item-new`, `probe:mvc5-list-replaced`, and MVC 5 binds JSON
     through the same binder (`probe:mvc5-json-binds-through-binder`).
   - A new object's start is the JSON System.Text.Json writes, under the app's options (D2.9), for the object it
-    reads from `{}` (`probe:core-stj-empty-object-start`). C# writes the start of each member a check reads, where the
-    view renders, from the binding of the path down to it, as D4.2 reads data: a populated member's start hangs on
-    its holder's, so one start per type cannot hold it (`spec/NOTES.md`, the second start probe). The model's path
-    starts at the validator's `T`, an item's at `RuleForEach`'s `TElement`. The plan carries each in the registration.
+    reads from `{}` (`probe:core-stj-empty-object-start`). The start's members, each holder's and each read of the
+    check are named as the body names them (D2.4): the contract's name on .NET 10, the C# name on MVC 5. C# writes the
+    start of each member a check reads, where the view renders, from the binding of the path down to it, as D4.2 reads
+    data: a populated member's start hangs on its holder's, so one start per type cannot hold it (`spec/NOTES.md`, the
+    second start probe). The model's path starts at the validator's `T`, an item's at `RuleForEach`'s `TElement`. The
+    plan carries each in the registration.
   - No hand reflection builds a start: the `Activator`, `GetConstructors` and `GetValue` reads of
     `ModelDefaults` leave (B11).
   - A type the endpoint's binder cannot create is refused where the view renders: on net48, a type with no

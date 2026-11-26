@@ -170,7 +170,8 @@ the container sends them (D16.5).
 `Registration` is one validator's rules under one rule set, for every check by them in its plan (D16.2). It carries:
 - `validator`: the validator's key;
 - `ruleSet`: the rule set's name;
-- `start`: the JSON of the model's start (D16.6);
+- `start`: the JSON of the model's start (D16.6), its members, each holder's and each read of the check named as the
+  body names them (D2.4): the contract's name on .NET 10, the C# name on MVC 5;
 - `scalars`: a list of `BoundScalar`;
 - `objects`: a list of `BoundObject`;
 - `lists`: a list of `BoundList`;
