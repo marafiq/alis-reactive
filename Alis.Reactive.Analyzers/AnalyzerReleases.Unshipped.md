@@ -20,7 +20,7 @@ ALIS024 | Alis.Reactive.Analyzers | Error | A declaration door's arguments are c
 ALIS025 | Alis.Reactive.Analyzers | Error | An override keeps the JSON name and the ignore of the member it overrides
 ALIS032 | Alis.Reactive.Analyzers | Error | A callback answers its vendor with one value at once
 ALIS034 | Alis.Reactive.Analyzers | Error | A vendor declaration names one valid vendor and reads arguments only in a listener or callback
-ALIS038 | Alis.Reactive.Analyzers | Error | Flags enums are named at startup and have disjoint or nested exact nonnegative values
+ALIS038 | Alis.Reactive.Analyzers | Error | A flags enum that IsInEnum reads or a request sends has disjoint or nested exact nonnegative values
 ALIS041 | Alis.Reactive.Analyzers | Error | A view renders the plan it opens once, after every door that takes it
 ALIS042 | Alis.Reactive.Analyzers | Error | A list's operation runs over a list
 ALIS043 | Alis.Reactive.Analyzers | Error | A text is joined with a source by pipeline.Concat

@@ -52,11 +52,10 @@ public sealed class WhenASourcesEnumIsWrittenIntoALiveObject
     }
 
     [Test]
-    public void a_flags_enum_the_app_names_carries_each_values_number_the_largest_first()
+    public void a_flags_enum_carries_each_values_number_the_largest_first()
     {
         var plan = Rendered(NamesInCamelCase, pipeline => pipeline.Get("/turnover").OnSuccess<TurnoverReply>((reply, pipeline) =>
-            pipeline.Component<TurnoverPanel>("panel").Days.Set(reply.Body.Read(b => b.Days))),
-            services => services.AddReactiveFluentValidation(validation => validation.Flags<TurnoverDays>()));
+            pipeline.Component<TurnoverPanel>("panel").Days.Set(reply.Body.Read(b => b.Days))));
 
         Assert.That(SetOf(plan, "days").GetProperty("shape").GetRawText(), Is.EqualTo(
             """{"kind":"enum","flags":true,"values":[{"held":"weekend","live":96,"number":96},{"held":"sun","live":64,"number":64},{"held":"sat","live":32,"number":32},{"held":"mon","live":1,"number":1},{"held":"none","live":0,"number":0}]}"""));
@@ -64,12 +63,12 @@ public sealed class WhenASourcesEnumIsWrittenIntoALiveObject
     }
 
     [Test]
-    public void a_flags_enum_the_app_does_not_name_is_mapped_value_by_value()
+    public void an_enum_of_the_same_values_flags_does_not_mark_is_mapped_value_by_value()
     {
         var plan = Rendered(NamesInCamelCase, pipeline => pipeline.Get("/turnover").OnSuccess<TurnoverReply>((reply, pipeline) =>
-            pipeline.Component<TurnoverPanel>("panel").Days.Set(reply.Body.Read(b => b.Days))));
+            pipeline.Component<TurnoverPanel>("panel").Week.Set(reply.Body.Read(b => b.Week))));
 
-        Assert.That(SetOf(plan, "days").GetProperty("shape").GetRawText(), Is.EqualTo(
+        Assert.That(SetOf(plan, "week").GetProperty("shape").GetRawText(), Is.EqualTo(
             """{"kind":"enum","flags":false,"values":[{"held":"none","live":0,"number":0},{"held":"mon","live":1,"number":0},{"held":"sat","live":32,"number":0},{"held":"sun","live":64,"number":0},{"held":"weekend","live":96,"number":0}]}"""));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
@@ -78,8 +77,7 @@ public sealed class WhenASourcesEnumIsWrittenIntoALiveObject
     public void a_flags_enum_its_type_writes_by_name_is_mapped_to_the_names_a_live_object_holds()
     {
         var plan = Rendered(NamesInCamelCase, pipeline => pipeline.Get("/turnover").OnSuccess<TurnoverReply>((reply, pipeline) =>
-            pipeline.Component<TurnoverPanel>("panel").Rounds.Set(reply.Body.Read(b => b.Rounds))),
-            services => services.AddReactiveFluentValidation(validation => validation.Flags<NamedRounds>()));
+            pipeline.Component<TurnoverPanel>("panel").Rounds.Set(reply.Body.Read(b => b.Rounds))));
 
         Assert.That(SetOf(plan, "rounds").GetProperty("shape").GetRawText(), Is.EqualTo(
             """{"kind":"enum","flags":true,"values":[{"held":"night","live":"Night","number":2},{"held":"day","live":"Day","number":1}]}"""));
@@ -191,6 +189,24 @@ public sealed class WhenASourcesEnumIsWrittenIntoALiveObject
             Throws.InvalidOperationException.With.Message.EqualTo(
                 "'b.Wing' holds North and South in one form, \"wing\", under the app's options, so the browser cannot tell which one it holds; give one of them a JsonStringEnumMemberName of its own."));
 
+    [Test]
+    public void a_flags_enum_two_of_whose_values_share_a_bit_with_neither_holding_the_other_is_refused_naming_the_read_and_the_values()
+        => Assert.That(() => Rendered(NamesInCamelCase, pipeline => pipeline.Get("/turnover").OnSuccess<TurnoverReply>((reply, pipeline) =>
+                pipeline.Component<TurnoverPanel>("panel").Shifts.Set(reply.Body.Read(b => b.Shifts)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'b.Shifts' holds TurnoverShifts, whose values Early (5) and Late (6) share a bit and neither holds the other; the framework splits a combination only over values that are disjoint or one inside the other, where its split, FluentValidation's IsInEnum and net10's binding agree on every value; give each value bits no other value shares, or make one hold the other."));
+
+    [Test]
+    public void a_flags_enum_whose_one_value_holds_the_other_carries_each_values_number_the_largest_first()
+    {
+        var plan = Rendered(NamesInCamelCase, pipeline => pipeline.Get("/turnover").OnSuccess<TurnoverReply>((reply, pipeline) =>
+            pipeline.Component<TurnoverPanel>("panel").Cover.Set(reply.Body.Read(b => b.Cover))));
+
+        Assert.That(SetOf(plan, "cover").GetProperty("shape").GetRawText(), Is.EqualTo(
+            """{"kind":"enum","flags":true,"values":[{"held":"late","live":6,"number":6},{"held":"early","live":4,"number":4}]}"""));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
     private static void NamesInCamelCase(JsonSerializerOptions json) => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 
     private static void DatesDayFirst(JsonSerializerOptions json) => json.Converters.Add(new DayFirstDate());
@@ -255,6 +271,29 @@ public enum TurnoverDays
     Weekend = Sat | Sun,
 }
 
+public enum TurnoverWeek
+{
+    None = 0,
+    Mon = 1,
+    Sat = 32,
+    Sun = 64,
+    Weekend = Sat | Sun,
+}
+
+[Flags]
+public enum TurnoverShifts
+{
+    Early = 5,
+    Late = 6,
+}
+
+[Flags]
+public enum TurnoverCover
+{
+    Early = 4,
+    Late = 6,
+}
+
 [Flags]
 [JsonConverter(typeof(JsonStringEnumConverter<NamedRounds>))]
 public enum NamedRounds
@@ -309,6 +348,12 @@ public sealed class TurnoverReply
 
     public TurnoverDays Days { get; init; }
 
+    public TurnoverWeek Week { get; init; }
+
+    public TurnoverShifts Shifts { get; init; }
+
+    public TurnoverCover Cover { get; init; }
+
     public NamedRounds Rounds { get; init; }
 
     public TurnoverWing Wing { get; init; }
@@ -335,6 +380,12 @@ public sealed class TurnoverPanel : Component
     public Property<TurnoverStage?> Next => Property<TurnoverStage?>();
 
     public Property<TurnoverDays> Days => Property<TurnoverDays>();
+
+    public Property<TurnoverWeek> Week => Property<TurnoverWeek>();
+
+    public Property<TurnoverShifts> Shifts => Property<TurnoverShifts>();
+
+    public Property<TurnoverCover> Cover => Property<TurnoverCover>();
 
     public Property<NamedRounds> Rounds => Property<NamedRounds>();
 

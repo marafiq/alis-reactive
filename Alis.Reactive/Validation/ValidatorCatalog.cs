@@ -12,23 +12,16 @@ internal sealed class ValidatorRegistration(Type validatorType, Func<IServicePro
     internal ReactiveValidator Resolve(IServiceProvider services) => resolve(services);
 }
 
-internal sealed class FlagsRegistration(Type enumType)
-{
-    internal Type EnumType { get; } = enumType;
-}
-
 internal sealed class ValidatorCatalog
 {
     private readonly Lazy<IReadOnlyDictionary<Type, ValidatorRegistration>> _models;
 
-    internal ValidatorCatalog(IServiceScopeFactory scopes, IEnumerable<ValidatorRegistration> registrations, IEnumerable<FlagsRegistration> flags)
+    internal ValidatorCatalog(IServiceScopeFactory scopes, IEnumerable<ValidatorRegistration> registrations)
     {
         var declared = registrations.ToArray();
-        Flags = flags.Select(flag => flag.EnumType).Distinct().ToArray();
         _models = new Lazy<IReadOnlyDictionary<Type, ValidatorRegistration>>(() => Discover(scopes, declared));
     }
 
-    internal IReadOnlyCollection<Type> Flags { get; }
     internal bool Checks(Type model) => Find(model) is not null;
 
     internal ValidatorRegistration? Find(Type model)

@@ -6,6 +6,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), closing the flags enum: an enum is flags to the framework when
+  its own `[Flags]` marks it, on both hosts, and the startup names none. The core reads the mark once, in TypeKnowledge,
+  a read on D18.1's list (N16.4); the startup door that named a flags enum leaves both hosts' surface, with its
+  registry; ALIS038 keeps its two value rules where the build sees such an enum used, an `IsInEnum` over it and a
+  request member that sends it (N16.5, X16.23 to X16.26). It reverses gate 1's P2 of 2026-11-09.
 - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), on the forms gate 2's G13 left to the owner: yes to
   `container.Read(m => m.Member)` (N13.1), the endpoint's check `EndpointChecks`' `Validate` returning its result, which
   the action answers through `ToErrorResponse` (N16.1), `AbortSignal()` among a declaration's arguments, which only a
@@ -458,12 +463,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - Chosen within the owner's yes, 2026-11-09, by precedent ("well solve 17c like you solve similar problems, it do not
   need me to give you decision"): D9.13's rows are written through HeldForm from the enum's values, never from a
   generated table, and the reads that list the values are D18.1's, granted at gate 1 (C37); a source's combination of
-  an enum the app does not name as flags stops; a JSON body's enum is the form its endpoint binds. The owner can
-  overrule each. Chosen within the owner's yes, 2026-11-09, gate 1's P2: an enum is flags to the framework only when
-  the startup names it, `Flags<TEnum>()` (N16.4), never by a `FlagsAttribute` read; a source's value of it is split as
+  an enum `[Flags]` does not mark stops; a JSON body's enum is the form its endpoint binds. The owner can
+  overrule each. Chosen within the owner's yes, 2026-11-09, gate 1's P2, and reversed by the owner, 2026-11-26 (verbatim
+  in `spec/NOTES.md`), which the standing decision above holds: an enum is flags to the framework when its own `[Flags]`
+  marks it, which the core reads once (N16.4), and no startup call names it; a source's value of it is split as
   `Enum.ToString` splits it and sent as that text, and `IsInEnum` over it is FluentValidation's flags meaning on both
-  sides; ALIS038 admits the door only over a `[Flags]` enum whose values are from 0 to 2^53 - 1 and disjoint or nested
-  (D9.13, D16.10, N16.5). The form is gate 2's. The owner can overrule it.
+  sides; ALIS038 holds such an enum, where an `IsInEnum` reads it or a request member sends it, to values from 0 to
+  2^53 - 1 that are disjoint or nested (D9.13, D16.10, N16.5).
 - The owner, 2026-11-07: a request is the HTTP message, and the core holds its parts: the method, the path, the query,
   the headers and a body with its media type, JSON and multipart form data (a form that uploads files among them);
   the response's status and its body as JSON, text or HTML. The methods are GET, HEAD, OPTIONS, POST, PUT and DELETE (OPTIONS by the owner's "OPTIONS support is
@@ -1483,7 +1489,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The lead, 2026-11-13, declaring N16.4's flags enum named at startup and D16.2's rule set a request names, designed
   by a Fable agent at xhigh (N16.4-FABLE.md of the handoff folder) and decided from its answer read at the source. No
   line wrote either form, so by G13 each is the owner's, and U3 declares the lead's proposals as signatures:
-  `Flags<TEnum>()` on `ReactiveFluentValidationBuilder`, the builder `AddReactiveFluentValidation` hands its callback,
+  the door `Flags` on `ReactiveFluentValidationBuilder`, the builder `AddReactiveFluentValidation` hands its callback,
   since the registration names each validator and each flags enum once (spec/Validation/module.md); and
   `Validate<TValidator>(ruleSet)` beside each of the twelve request doors' `Validate<TValidator>()`, with N16.1's
   endpoint check taking the same name, a text as the validator's own `RuleSet` takes it. The callback keeps its
@@ -1496,7 +1502,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   project's file reads a check that sends nothing from the answer line: a check on the server would answer the
   browser's message with a 400 of the same words, and the test analyzers leave a page's requests to the harness, which
   reports none, so no page calls the endpoint check's rule-set overload yet. The startup call that names the two enums
-  waits for U17, since `Flags<TEnum>()` throws until then and would stop the app.
+  waits for U17, since that door threw until then and would stop the app. The owner's reversal of 2026-11-26 took the
+  door out: `[Flags]` marks a flags enum, and the core reads it (N16.4).
 - The lead, 2026-11-13, declaring N5.7's iterator with M5.N3's `ElementChildren` and M5.N4's `ChildElement`, designed
   by a Fable agent at xhigh (N5.7-FABLE.md of the handoff folder) and decided from its answer read at the source.
   D5.13, N5.7 and M5.F1's proposed sentences write the view's half, the object taking the list operations beside its

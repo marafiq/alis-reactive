@@ -274,13 +274,12 @@ internal sealed class EnumCheck<T, TValue, TEnum>(Func<TValue, TEnum?> read) : C
     internal override Task<bool> Passes(T model, TValue value, MessageArguments arguments, ValidationRun run)
     {
         if (read(value) is not { } enumeration) return Task.FromResult(true);
-        if (!run.Flags.Contains(typeof(TEnum))) return Task.FromResult(Enum.IsDefined(typeof(TEnum), enumeration));
-        return Task.FromResult(EnumNames.NamesFlags(enumeration));
+        return Task.FromResult(EnumNames.Names(enumeration));
     }
 
     internal override BrowserTest Browser(BrowserMember<T, TValue> member)
     {
-        if (member.Flags.Contains(typeof(TEnum))) return member.InFlags(Enum.GetValues(typeof(TEnum)).Cast<Enum>());
+        if (EnumNames.NamesFlags(typeof(TEnum))) return member.InFlags(Enum.GetValues(typeof(TEnum)).Cast<Enum>());
         return member.InEnum(Enum.GetValues(typeof(TEnum)).Cast<object>());
     }
 }

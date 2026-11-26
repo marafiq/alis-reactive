@@ -60,7 +60,7 @@ evidence), so no inventory row is this module's, and its doors are the core's th
 - `N20.3` new: the `ActivitySource` "Alis.Reactive" with its activities for rendering a plan, the validation door and
   the error door (D20.8), and the app's tracing options, `console` among them, on both hosts. Their form is gate 2's.
   The default: the source's name as a public constant, `ReactiveTracing.SourceName`, so an app's tracer provider
-  names it with no text of its own; `console` a boolean of the framework's one startup call (N16.4's), false unless
+  names it with no text of its own; `console` a boolean of the framework's one startup call, false unless
   the app sets it, which README.md's startup example sets from the host's development setting.
 
 A second gate 2 item is the span and activity names, the vocabulary an operator reads in a trace. The default: each

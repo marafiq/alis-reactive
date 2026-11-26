@@ -36,9 +36,9 @@ its views.
   token in a form field where net10's send it in a header, noShowValidationErrors's are net10's without
   ShowValidationErrors(), so a 400 takes the catch-all, classNames's fields render AddReactiveClassNames's choice of
   Bootstrap's invalid-feedback and is-invalid beside net10's defaults, and no host's defaults send X-Requested-With (the owner, 2026-11-15). The app's cookie authentication answers a challenge as net10 does, 401 at
-  an API endpoint and a redirect to the record's sign-in page elsewhere (`Care/Record/SessionNotesController.cs`). Every host's
-  startup names the flags enums its pages read, as net10's definition names them, in `AppHost.cs`: the conformance
-  library's `CareDays` and the care rota's `CareDays` and `RotaDays`. An app started under no host, or under one it does not serve, stops and names the hosts it serves.
+  an API endpoint and a redirect to the record's sign-in page elsewhere (`Care/Record/SessionNotesController.cs`). No host's
+  startup names a flags enum: the conformance library's `CareDays`, the care rota's `CareDays` and `RotaDays` and the
+  move-in's `DietaryNeeds` are flags by the `FlagsAttribute` each declares (the owner, 2026-11-26). An app started under no host, or under one it does not serve, stops and names the hosts it serves.
   The harness passes the host a fixture runs under, `scripts/run.sh` passes net10, and the page sweep sets it. What
   else a host's definition names lands with the door or the page that needs it.
 - A request names the culture the app binds and renders it under in its query "culture": "en-US", "de-DE",

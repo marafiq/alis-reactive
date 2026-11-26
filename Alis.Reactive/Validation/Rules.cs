@@ -9,12 +9,11 @@ using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.Validation;
 
-internal sealed class ValidationRun(bool synchronous, CancellationToken cancellation, string selection, IReadOnlyList<ValidationFailure> binding, IReadOnlyCollection<Type> flags)
+internal sealed class ValidationRun(bool synchronous, CancellationToken cancellation, string selection, IReadOnlyList<ValidationFailure> binding)
 {
     internal bool Synchronous { get; } = synchronous;
     internal CancellationToken Cancellation { get; } = cancellation;
     internal string Selection { get; } = selection;
-    internal IReadOnlyCollection<Type> Flags { get; } = flags;
     internal List<ValidationFailure> Failures { get; } = [.. binding];
 
     internal bool Refused(string path) => binding.Any(failure => string.Equals(failure.PropertyName, path, StringComparison.OrdinalIgnoreCase));

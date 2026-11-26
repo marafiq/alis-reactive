@@ -172,12 +172,12 @@ public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
     public ValidationResult Validate(T instance) => Validate(instance, "default");
 
     /// <inheritdoc />
-    public ValidationResult Validate(T instance, string ruleSet) => CheckBound(instance, ruleSet, [], []);
+    public ValidationResult Validate(T instance, string ruleSet) => CheckBound(instance, ruleSet, []);
 
-    internal ValidationResult CheckBound(T instance, string ruleSet, IReadOnlyList<ValidationFailure> binding, IReadOnlyCollection<Type> flags)
+    internal ValidationResult CheckBound(T instance, string ruleSet, IReadOnlyList<ValidationFailure> binding)
     {
         if (instance is null) throw new ArgumentNullException(nameof(instance));
-        var run = new ValidationRun(true, CancellationToken.None, ruleSet, binding, flags);
+        var run = new ValidationRun(true, CancellationToken.None, ruleSet, binding);
         RunRules(new ValidationContext<T>(instance, "", run)).GetAwaiter().GetResult();
         return new ValidationResult(run.Failures.ToArray());
     }
@@ -187,12 +187,12 @@ public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
 
     /// <inheritdoc />
     public Task<ValidationResult> ValidateAsync(T instance, string ruleSet, CancellationToken cancellation = default)
-        => CheckBoundAsync(instance, ruleSet, [], [], cancellation);
+        => CheckBoundAsync(instance, ruleSet, [], cancellation);
 
-    internal async Task<ValidationResult> CheckBoundAsync(T instance, string ruleSet, IReadOnlyList<ValidationFailure> binding, IReadOnlyCollection<Type> flags, CancellationToken cancellation)
+    internal async Task<ValidationResult> CheckBoundAsync(T instance, string ruleSet, IReadOnlyList<ValidationFailure> binding, CancellationToken cancellation)
     {
         if (instance is null) throw new ArgumentNullException(nameof(instance));
-        var run = new ValidationRun(false, cancellation, ruleSet, binding, flags);
+        var run = new ValidationRun(false, cancellation, ruleSet, binding);
         await RunRules(new ValidationContext<T>(instance, "", run)).ConfigureAwait(false);
         return new ValidationResult(run.Failures.ToArray());
     }

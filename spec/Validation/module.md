@@ -20,8 +20,8 @@ renders, so the two give one verdict on the body each request sends; and where e
   page's save (D16.3, X12.4).
 - Q13: each container keeps its own summary, which outlives a slot that joined it (D13.6, X13.5); a rule for each
   item checks every row its container sends (D13.5, X13.3).
-- Q18: the registration names each validator and each flags enum once, by a type argument, with no assembly scan and
-  no reflection (D18.1, N16.4, N16.5).
+- Q18: the registration names each validator once, by a type argument, with no assembly scan, and a flags enum is the
+  one `[Flags]` marks, which the core reads once, a read on D18.1's list (D18.1, N16.4, N16.5).
 - Q19: the browser's rules are the plan's `form` and `model` data, keyed by validator and rule set (N16.2).
 
 ## Boundaries

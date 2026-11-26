@@ -619,7 +619,7 @@
         },
         {
           "for": "X9.24",
-          "page": "A care plan whose Load button GETs the resident's plan, whose body's Care, a CareDays, the app's string enum converter writes as Weekend, Mon, and whose Send care button sets r => r.Care of a GET from that Care, a flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
+          "page": "A care plan whose Load button GETs the resident's plan, whose body's Care, a CareDays, the app's string enum converter writes as Weekend, Mon, and whose Send care button sets r => r.Care of a GET from that Care, a flags enum [Flags] marks; the GET's endpoint echoes the Care it bound.",
           "gesture": "Click Load, then Send care.",
           "outcome": "The URL holds Care=Mon%2C+Weekend and the echo reads Mon, Weekend.",
           "opposite": "With Mon alone in the body, the URL holds Care=Mon.",
@@ -627,7 +627,7 @@
         },
         {
           "for": "X9.24",
-          "page": "The same care plan in an app whose JSON options write enums as numbers, its body holding 97 for the same Care, sets r => r.Care, the flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
+          "page": "The same care plan in an app whose JSON options write enums as numbers, its body holding 97 for the same Care, sets r => r.Care, the flags enum [Flags] marks; the GET's endpoint echoes the Care it bound.",
           "gesture": "Click Load, then Send care.",
           "outcome": "The URL holds Care=Mon%2C+Weekend and the echo reads Mon, Weekend.",
           "opposite": "With 1 in the body, the URL holds Care=Mon.",

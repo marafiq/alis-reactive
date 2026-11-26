@@ -17,10 +17,10 @@ internal static partial class BrowserRegistrations
 {
     internal const string DefaultRuleSet = "default";
 
-    internal static Registration Of<T>(ReactiveValidator<T> validator, string key, string ruleSet, AppJson json, CultureInfo rendersUnder, IReadOnlyCollection<Type> flags)
+    internal static Registration Of<T>(ReactiveValidator<T> validator, string key, string ruleSet, AppJson json, CultureInfo rendersUnder)
     {
         var scalars = new BrowserScalars(json);
-        var selection = new ValidationRun(true, CancellationToken.None, ruleSet, [], flags);
+        var selection = new ValidationRun(true, CancellationToken.None, ruleSet, []);
         var binding = Contracts.Binding(json.App);
         var named = MemberPath.NamedAsTheBody(json.App);
         var carried = new CarriedMembers(named);

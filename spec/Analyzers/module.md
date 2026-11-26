@@ -99,7 +99,7 @@ One id, one rule. Each analyzer id of both lines and the rewrite:
 | ALIS026, ALIS027, ALIS036 | the suppressors | new (N6.3, N9.5) |
 | ALIS028, ALIS029 | a typed source; a file member | new (N6.4, N9.4) |
 | ALIS030 to ALIS035 | the request, `ShowValidationErrors`, blocks, lambdas, declarations, a row's link | new (N18.7 to N18.13) |
-| ALIS038, ALIS039 | the flags door; two app events of one name | new (N16.5, M1.N6) |
+| ALIS038, ALIS039 | a flags enum's values; two app events of one name | new (N16.5, M1.N6) |
 | ALIS040 | a source whose nullability differs from its argument's or operand's | new (N18.14) |
 | ALIS041 | a plan a view opens and does not render once, last | new (N18.15) |
 | ALIS042 | a list's operation over a source of text | new (N18.16) |

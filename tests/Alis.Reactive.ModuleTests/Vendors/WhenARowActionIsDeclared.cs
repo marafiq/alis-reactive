@@ -271,7 +271,7 @@ public sealed class WhenARowActionIsDeclared
     [Test]
     public void each_row_action_the_view_cannot_render_is_refused_with_what_is_wrong_and_its_cure()
     {
-        var html = Views.Of(new Ward("North"), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()).AddReactiveFluentValidation(validation => validation.Flags<CareNeeds>()));
+        var html = Views.Of(new Ward("North"), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
         var plan = html.ReactivePlan<Ward>();
         var rows = plan.Rows<ResidentRow>("residents");
         var again = plan.Rows<ResidentRow>("residents").WardButton(HandlerPolicy.Overlap, (chosen, pipeline) => chosen.Element.Text.Set("Discharged"));

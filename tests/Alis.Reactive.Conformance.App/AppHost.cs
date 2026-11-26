@@ -203,10 +203,6 @@ internal static class AppHost
 
     internal static void AddValidation(IServiceCollection services)
         => services.AddReactiveFluentValidation(validators => Care.MoveInValidators.AddTo(validators
-            .Flags<Components.CareDays>()
-            .Flags<Care.CareDays>()
-            .Flags<Care.RotaDays>()
-            .Flags<Care.DietaryNeeds>()
             .Add<Bench.CodeRules>()
             .Add<Bench.StrictCodeRules>()
             .Add<Bench.EntriesRules>()

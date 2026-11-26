@@ -30,7 +30,7 @@ internal static class FormChecks
         var validatorKey = ClassNames.ModelKey(registered.ValidatorType);
         var key = validatorKey + ":" + ruleSet;
         var form = ObjectOf + key;
-        var registration = BrowserRegistrations.Of(validator, validatorKey, ruleSet, plan.Json, plan.RendersUnder, catalog.Flags);
+        var registration = BrowserRegistrations.Of(validator, validatorKey, ruleSet, plan.Json, plan.RendersUnder);
         plan.Declares(form, new PluginLocator(Plugin, key, VendorListening.OfAnEventTarget, new FormPluginData(registration)));
         var captured = writer.NextBinding("captured");
         writer.Write(new LetStatement(captured.Name, false, LetBinds.Line, ModelPlugin.Captured(plan, containerId, ClassNames.ModelKey(typeof(TContainer)))));

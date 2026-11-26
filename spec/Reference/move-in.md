@@ -87,7 +87,7 @@ The domain enums are:
 | `DocumentScan` | `Accepted`, `Quarantined` |
 | `PaymentStatus` | `Authorised`, `Declined`, `Voided` |
 | `ReviewKind` | `Allocation`, `Payer`, `Pharmacy`, `Services`, `Room`, `Mobility` |
-| `DietaryNeeds` | `None=0`, `Vegetarian=1`, `LowSodium=2`, `Pureed=4`; registered with `Flags<DietaryNeeds>()` |
+| `DietaryNeeds` | `None=0`, `Vegetarian=1`, `LowSodium=2`, `Pureed=4`; `[Flags]` marks it |
 
 **Seed**
 
@@ -631,7 +631,7 @@ The coordinator authorises a fake deposit and receives a persistent receipt.
 
 The kitchen receives a valid flags combination and the current meal count.
 
-1. Diet changes read the main container’s typed `DietaryNeeds`, validate `IsInEnum` under its flags registration, and choose `"Kitchen review required"` or `"Meal plan ready"` with `Choose`.
+1. Diet changes read the main container’s typed `DietaryNeeds`, validate `IsInEnum` over its `[Flags]` mark, and choose `"Kitchen review required"` or `"Meal plan ready"` with `Choose`.
 2. Save PUTs E40 with JSON enum translation, Kinds and OptionalLabels; the service uses `None`, Vegetarian and LowSodium as declared enum values rather than treating a combined flag as an unknown scalar.
 3. Preview GETs E41 with the same flags as form/query text, repeated list fields and a nullable list item, showing `"Vegetarian, low sodium: 3 meals"`; forbidden kitchen combinations receive the server’s 422.
 
@@ -692,7 +692,7 @@ The admissions desk has one deliberate request policy.
 
 **5. THE VALIDATORS**
 
-Every request model is registered explicitly with `Add<TValidator>()`. DietaryNeeds is registered with `Flags<DietaryNeeds>()`. The browser checks the sent body, including binder starts for unsent members; it does not inspect every input on the page.
+Every request model is registered explicitly with `Add<TValidator>()`. DietaryNeeds is a flags enum by its own `[Flags]`, which no startup names. The browser checks the sent body, including binder starts for unsent members; it does not inspect every input on the page.
 
 The grammar and server-only boundary come from [Validation/module.md](spec/Validation/module.md:8) and [the rule API](Alis.Reactive/PublicAPI/net10.0/PublicAPI.Unshipped.txt:606).
 
@@ -756,7 +756,7 @@ The grammar and server-only boundary come from [Validation/module.md](spec/Valid
 | Deposit.CardNumber | `NotEmpty`, `CreditCard` | Shared checksum; authority decision server-only |
 | Deposit.Amount | `GreaterThan(0)`, `Equal(500.00)`, `PrecisionScale(7,2,true)` | Shared; current deposit amount rechecked server-side |
 | Deposit consent | `Equal(true)` | Shared |
-| Diet.Needs | `IsInEnum` with registered flags | Shared; combination3 accepted, undefined bit8 refused |
+| Diet.Needs | `IsInEnum` over `[Flags]` | Shared; combination3 accepted, undefined bit8 refused |
 | Diet.MealCount | `InclusiveBetween(1,6)` | Shared |
 | Kitchen capacity | `Must`; model-built `WithMessage(model => …)` | Entire model-message rule stays server-side; `"Pureed meals are unavailable at Harbor House."` |
 | Documents.Caption | `NotEmpty`, `MaximumLength(120)` | Shared |
@@ -1046,7 +1046,7 @@ The additional condition doors identified in the brief also have explicit uses:
 | `EndpointChecks.Validate` | MI.16.1 |
 | `EndpointChecks.ValidateAsync` | MI.11.1 |
 | `Add<TValidator>` | MI.31.1 |
-| `Flags<TEnum>` | MI.26.1 |
+| `[Flags]`, read by the core | MI.26.1 |
 | `IsValid` | MI.17.1 |
 | `Errors` | MI.12.2 |
 | `ErrorsByField` | MI.12.2 |
@@ -1523,7 +1523,7 @@ Nothing of MI.5, MI.6 or MI.7 is blocked by it. Four places meet it:
 1. M9.X165–169. The independent deposit form uses the operation ID of the open draft. E38 checks the coordinator, the draft and operation, the accepted quote revision, its expiry and the amount under the same world lock as receipt creation. Its editable amount is compared with the rendered required amount in the shared validator and with the current quote before payment. Receipts contain the last four digits, amount, currency, time and operation. The two currency display headers preserve two decimal places under the page's culture. A replay returns the existing receipt and the outstanding balance. Connection loss after the write leaves PAY100 recoverable. A changed required deposit revises the offer and clears acceptance. Accepting that new revision cannot authorise an earlier in-flight amount.
 2. E39 reads the draft and operation as typed query members at the concrete MVC GET `/care/move-ins/deposit-receipt`. E41 reads its draft and working meal plan at `/care/move-ins/meal-plan`. The page sweep opens a parameterised GET through a document link. These two reads are reactive actions and have no document link.
 3. M9.X170–174. D100's kitchen starts with Consent and MedicationList. Its two service label positions start with Window table and an unassigned seat. The native checklist and label inputs belong to the main container. E40 sends the working document kinds and label positions and the kitchen plan. Its typed path supplies the draft ID once. The JSON builder refuses to repeat the same member in its path and explicit body. The last unassigned label's native textbox supplies empty text. The kitchen stores that position as null. E41 repeats each collection member in the query and MVC binds its empty label position as null. E41 returns the kitchen's plan and service instructions together. Harbor House's kitchen cannot prepare pureed meals.
-4. The native dietary dropdown sends MVC enum names, including the combined value. Its model declares the JSON string enum converter and the app registers DietaryNeeds as flags. An imported referral can carry a numeric bit with no declared name. Before presenting the referral, the server applies the registered DietRules to its actual bits. The typed read of an unknown native option has no named flags combination. The selection keeps its original raw option text so the page can show the validator's refusal without replacing the confirmed diet or sending E40. The working note, meal count, confirmed state and valid flag combinations take the ordinary shared validation path. The main request container owns the draft version after either edit.
+4. The native dietary dropdown sends MVC enum names, including the combined value. Its model declares the JSON string enum converter and `[Flags]` marks DietaryNeeds as flags. An imported referral can carry a numeric bit with no declared name. Before presenting the referral, the server applies the registered DietRules to its actual bits. The typed read of an unknown native option has no named flags combination. The selection keeps its original raw option text so the page can show the validator's refusal without replacing the confirmed diet or sending E40. The working note, meal count, confirmed state and valid flag combinations take the ordinary shared validation path. The main request container owns the draft version after either edit.
 5. The kitchen preview and the confirmed change of care dispatch to one replacing handler. Its superseded request runs no success or error route after the held kitchen answer is released (Lanes.tla, ReplacedRunRunsNoRoute). The coordinator can retain the dietary choices while completing the questions for the new care level. A failed preview leaves the confirmed kitchen plan intact.
 
 ### MI.10, MI.11 and MI.12 — medication orders and pharmacy clearance

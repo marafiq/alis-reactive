@@ -66,7 +66,7 @@ public static class EndpointChecks
         var validator = catalog.Resolve<TRequest, TValidator>(services);
         RuleSetChecks.RunsARuleUnder(validator, typeof(TValidator), ruleSet);
         using var check = ServerActivities.Check(ClassNames.AsCSharpWritesIt(typeof(TValidator)), ruleSet);
-        var result = validator.CheckBound(request, ruleSet, BindingFailures(controller), catalog.Flags);
+        var result = validator.CheckBound(request, ruleSet, BindingFailures(controller));
         ServerActivities.Checked(check, result.Errors.Count);
         return result;
     }
@@ -91,7 +91,7 @@ public static class EndpointChecks
         var validator = catalog.Resolve<TRequest, TValidator>(services);
         RuleSetChecks.RunsARuleUnder(validator, typeof(TValidator), ruleSet);
         using var check = ServerActivities.Check(ClassNames.AsCSharpWritesIt(typeof(TValidator)), ruleSet);
-        var result = await validator.CheckBoundAsync(request, ruleSet, BindingFailures(controller), catalog.Flags, cancellation).ConfigureAwait(false);
+        var result = await validator.CheckBoundAsync(request, ruleSet, BindingFailures(controller), cancellation).ConfigureAwait(false);
         ServerActivities.Checked(check, result.Errors.Count);
         return result;
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Alis.Reactive.TypeKnowledge;
 
 namespace Alis.Reactive.ValuesAndSources;
 
@@ -40,7 +41,23 @@ internal static class EnumRows
             rows.Add(new HeldRow(value, name, written, isFlags ? FlagNumber(value, name, member) : 0));
         }
 
+        if (isFlags) RefuseSharedBits(rows, type, member);
         return rows;
+    }
+
+    private static void RefuseSharedBits(List<HeldRow> rows, Type type, string member)
+    {
+        for (var first = 0; first < rows.Count; first++)
+        {
+            for (var second = first + 1; second < rows.Count; second++)
+            {
+                var left = rows[first];
+                var right = rows[second];
+                var shared = left.Number & right.Number;
+                if (shared == 0 || shared == left.Number || shared == right.Number) continue;
+                throw new InvalidOperationException($"'{member}' holds {ClassNames.AsCSharpWritesIt(EnumOf(type))}, whose values {left.Name} ({left.Number.ToString(CultureInfo.InvariantCulture)}) and {right.Name} ({right.Number.ToString(CultureInfo.InvariantCulture)}) share a bit and neither holds the other; the framework splits a combination only over values that are disjoint or one inside the other, where its split, FluentValidation's IsInEnum and net10's binding agree on every value; give each value bits no other value shares, or make one hold the other.");
+            }
+        }
     }
 
     private static string KeyOf(JsonElement written)

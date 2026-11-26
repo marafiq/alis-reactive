@@ -631,7 +631,6 @@ Alis.Reactive.Validation.InlineValidator<T>
 Alis.Reactive.Validation.InlineValidator<T>.InlineValidator() -> void
 Alis.Reactive.Validation.ReactiveFluentValidationBuilder
 Alis.Reactive.Validation.ReactiveFluentValidationBuilder.Add<TValidator>() -> Alis.Reactive.Validation.ReactiveFluentValidationBuilder!
-Alis.Reactive.Validation.ReactiveFluentValidationBuilder.Flags<TEnum>() -> Alis.Reactive.Validation.ReactiveFluentValidationBuilder!
 Alis.Reactive.Validation.ReactiveValidator
 Alis.Reactive.Validation.ReactiveValidator<T>
 Alis.Reactive.Validation.ReactiveValidator<T>.Include(Alis.Reactive.Validation.IValidator<T>! rules) -> void

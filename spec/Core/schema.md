@@ -438,7 +438,7 @@ no argument type of its own (D9.1).
   renders, so every `held` is a `lit` of a scalar. A value that holds nothing, or null, reads nothing, and the member is
   sent by D9.10's `whenNothing`: `leave` or `empty`. `FlagValue` carries `held` and `name` as `EnumValue` does, and
   `number`, the value's number, an integer from 0 to 9,007,199,254,740,991 (N16.5); `flags` is written only for an
-  enum the app names as flags (N16.4), and `inFlags` carries the same rows in its `lit` (D16.10).
+  enum `[Flags]` marks (N16.4), and `inFlags` carries the same rows in its `lit` (D16.10).
 
   Each part `HttpSend` sends, a field, a header, a file part and a JSON member, carries `when`, a boolean: `true` on
   a part with no condition, and on a part a `When` guards the binding C# wrote before the request, `cond` of the

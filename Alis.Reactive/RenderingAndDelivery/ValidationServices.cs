@@ -21,7 +21,7 @@ public static partial class ValidationServices
     public static IServiceCollection AddReactiveFluentValidation(this IServiceCollection services, Action<ReactiveFluentValidationBuilder> validators)
     {
         validators(new ReactiveFluentValidationBuilder(services));
-        services.TryAddSingleton(provider => new ValidatorCatalog(provider.GetRequiredService<IServiceScopeFactory>(), provider.GetServices<ValidatorRegistration>(), provider.GetServices<FlagsRegistration>()));
+        services.TryAddSingleton(provider => new ValidatorCatalog(provider.GetRequiredService<IServiceScopeFactory>(), provider.GetServices<ValidatorRegistration>()));
         ConfigureHost(services);
         return services;
     }

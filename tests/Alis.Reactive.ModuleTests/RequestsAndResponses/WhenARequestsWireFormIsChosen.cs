@@ -14,10 +14,9 @@ namespace Alis.Reactive.ModuleTests.RequestsAndResponses;
 public sealed class WhenARequestsWireFormIsChosen
 {
     [Test]
-    public void registered_flags_carry_their_numbers_largest_first()
+    public void flags_carry_their_numbers_largest_first()
     {
-        var plan = RequestPage.Rendered(pipeline => pipeline.Get<FlagQuery>("/staff", request => request.Query(r => r.Shifts, pipeline.Component<WirePanel>("wire").Flags)),
-            services: services => services.AddReactiveFluentValidation(validation => validation.Flags<NamedShifts>()));
+        var plan = RequestPage.Rendered(pipeline => pipeline.Get<FlagQuery>("/staff", request => request.Query(r => r.Shifts, pipeline.Component<WirePanel>("wire").Flags)));
         Assert.That(Form(plan).GetRawText(), Is.EqualTo(
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"flags"}},{"name":"values","value":{"kind":"list","items":[{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":2}},{"name":"name","value":{"kind":"lit","value":"Night"}},{"name":"number","value":{"kind":"lit","value":2}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":1}},{"name":"name","value":{"kind":"lit","value":"Day"}},{"name":"number","value":{"kind":"lit","value":1}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":0}},{"name":"name","value":{"kind":"lit","value":"None"}},{"name":"number","value":{"kind":"lit","value":0}}]}]}}]}"""));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);

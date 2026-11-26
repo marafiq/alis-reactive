@@ -25,8 +25,7 @@ public static class PlanHtml
     /// </remarks>
     /// <returns>The plan.</returns>
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
-        => ViewPlans.Open<TModel>(RequestTimeZone.Of(html.ViewContext.HttpContext), new AppJson(() => html.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions,
-                type => html.ViewContext.HttpContext.RequestServices.GetService<ValidatorCatalog>()?.Flags.Contains(type) == true),
+        => ViewPlans.Open<TModel>(RequestTimeZone.Of(html.ViewContext.HttpContext), new AppJson(() => html.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions),
             () => html.ViewData.TemplateInfo.HtmlFieldPrefix,
             text => html.ViewData.TemplateInfo.GetFullHtmlFieldName(text),
             html.GenerateIdFromName,

@@ -320,30 +320,30 @@ public sealed class WhenAnEndpointChecksAdmission
     }
 
     [Test]
-    public void flags_are_per_app_and_repeating_the_declaration_changes_nothing()
+    public void a_combination_passes_over_an_enum_flags_marks_and_is_one_value_over_one_it_does_not()
     {
         var request = new Visiting { Days = VisitingDays.Morning | VisitingDays.Evening, OptionalDays = VisitingDays.Morning | VisitingDays.Evening };
-        using var flags = ControllerFor(request, services => services.AddReactiveFluentValidation(validation => validation.Add<VisitingRules>().Flags<VisitingDays>().Flags<VisitingDays>()));
-        using var single = ControllerFor(request, services => services.AddReactiveFluentValidation(validation => validation.Add<VisitingRules>()));
+        var hours = new VisitingHours { Hours = VisitingHour.Morning | VisitingHour.Evening };
+        using var flags = ControllerFor(request, services => services.AddReactiveFluentValidation(validation => validation.Add<VisitingRules>()));
+        using var single = ControllerFor(hours, services => services.AddReactiveFluentValidation(validation => validation.Add<VisitingHoursRules>()));
         Assert.That(flags.Validate<Visiting, VisitingRules>(request).IsValid, Is.True);
-        Assert.That(single.Validate<Visiting, VisitingRules>(request).Errors.Select(error => (error.PropertyName, error.ErrorMessage)), Is.EqualTo(new[] { ("Days", "'Days' has a range of values which does not include 'Morning, Evening'."), ("OptionalDays", "'Optional Days' has a range of values which does not include 'Morning, Evening'.") }));
-        Assert.That(flags.Validate<Visiting, VisitingRules>(request).IsValid, Is.True);
+        Assert.That(single.Validate<VisitingHours, VisitingHoursRules>(hours).Errors.Select(error => (error.PropertyName, error.ErrorMessage)), Is.EqualTo(new[] { ("Hours", "'Hours' has a range of values which does not include '7'.") }));
     }
 
     [Test]
     public void flags_require_whole_declared_values_and_a_declared_zero()
     {
-        using var controller = ControllerFor(new Visiting(), services => services.AddReactiveFluentValidation(validation => validation.Add<VisitingRules>().Flags<VisitingDays>()));
+        using var controller = ControllerFor(new Visiting(), services => services.AddReactiveFluentValidation(validation => validation.Add<VisitingRules>()));
         Assert.That(controller.Validate<Visiting, VisitingRules>(new Visiting { Days = (VisitingDays)1 }).Errors.Select(error => (error.PropertyName, error.ErrorMessage)), Is.EqualTo(new[] { ("Days", "'Days' has a range of values which does not include '1'.") }));
         Assert.That(controller.Validate<Visiting, VisitingRules>(new Visiting { Days = 0 }).Errors.Select(error => (error.PropertyName, error.ErrorMessage)), Is.EqualTo(new[] { ("Days", "'Days' has a range of values which does not include '0'.") }));
         Assert.That(controller.Validate<Visiting, VisitingRules>(new Visiting { Days = VisitingDays.All }).IsValid, Is.True);
     }
 
     [Test]
-    public void a_declared_zero_and_a_childs_flags_use_the_same_registration()
+    public void a_declared_zero_and_a_childs_flags_are_each_read_by_their_mark()
     {
         var request = new VisitingHousehold { Visit = new Visiting { Days = VisitingDays.Morning | VisitingDays.Evening } };
-        using var controller = ControllerFor(request, services => services.AddReactiveFluentValidation(validation => validation.Add<VisitingHouseholdRules>().Flags<VisitingDays>().Flags<VisitOptions>()));
+        using var controller = ControllerFor(request, services => services.AddReactiveFluentValidation(validation => validation.Add<VisitingHouseholdRules>()));
         Assert.That(controller.Validate<VisitingHousehold, VisitingHouseholdRules>(request).IsValid, Is.True);
     }
 
@@ -521,6 +521,23 @@ public sealed class WhenAnEndpointChecksAdmission
             RuleFor(request => request.Days).IsInEnum();
             RuleFor(request => request.OptionalDays).IsInEnum();
         }
+    }
+
+    public enum VisitingHour
+    {
+        Morning = 3,
+        Evening = 4,
+        All = 15,
+    }
+
+    public sealed class VisitingHours
+    {
+        public VisitingHour Hours { get; set; }
+    }
+
+    public sealed class VisitingHoursRules : ReactiveValidator<VisitingHours>
+    {
+        public VisitingHoursRules() => RuleFor(request => request.Hours).IsInEnum();
     }
 }
 

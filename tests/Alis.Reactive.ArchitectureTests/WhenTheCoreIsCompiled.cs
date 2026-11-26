@@ -36,6 +36,7 @@ public class WhenTheCoreIsCompiled
         "TypeKnowledge/ClassNames.cs System.Type.GetGenericArguments",
         "TypeKnowledge/ClassNames.cs System.Type.IsArray",
         "TypeKnowledge/ClassNames.cs System.Type.IsInterface",
+        "TypeKnowledge/EnumNames.cs System.Reflection.MemberInfo.IsDefined",
         "TypeKnowledge/WrittenMember.cs System.Reflection.MemberInfo",
         "TypeKnowledge/WrittenMember.cs System.Reflection.MemberInfo.DeclaringType",
         "TypeKnowledge/WrittenMember.cs System.Reflection.MemberInfo.Name",

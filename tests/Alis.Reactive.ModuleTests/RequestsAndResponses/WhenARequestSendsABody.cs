@@ -283,11 +283,10 @@ public sealed class WhenARequestSendsABody
     }
 
     [Test]
-    public void a_flags_enum_the_startup_names_is_sent_in_a_json_body_by_rows_that_carry_each_values_number()
+    public void a_flags_enum_is_sent_in_a_json_body_by_rows_that_carry_each_values_number()
     {
         var plan = RequestPage.Rendered(pipeline => pipeline.Post<FlagQuery>("/notes", request => request.Json(body => body.Set(r => r.Shifts, pipeline.Component<WirePanel>("wire").Flags))),
-            json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)),
-            services => services.AddReactiveFluentValidation(validation => validation.Flags<NamedShifts>()));
+            json => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
         Assert.That(RequestPage.Field(RequestPage.Send(plan, "body"), "enums").GetRawText(), Is.EqualTo(
             """{"kind":"list","items":[{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"Shifts"}},{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"shifts"}]}},{"name":"form","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"flags"}},{"name":"values","value":{"kind":"list","items":[{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":2}},{"name":"number","value":{"kind":"lit","value":2}},{"name":"sent","value":{"kind":"lit","value":"night"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":1}},{"name":"number","value":{"kind":"lit","value":1}},{"name":"sent","value":{"kind":"lit","value":"day"}}]},{"kind":"record","fields":[{"name":"held","value":{"kind":"lit","value":0}},{"name":"number","value":{"kind":"lit","value":0}},{"name":"sent","value":{"kind":"lit","value":"none"}}]}]}}]}}]}]}"""));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
@@ -296,8 +295,7 @@ public sealed class WhenARequestSendsABody
     [Test]
     public void a_flags_enum_its_endpoint_writes_as_texts_and_numbers_apart_is_refused_in_a_json_body()
         => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<FlagQuery>("/notes", request => request.Json(body => body.Set(r => r.Shifts, pipeline.Component<WirePanel>("wire").Flags))),
-                json => json.Converters.Add(new ShiftsWrittenAsANumberForNone()),
-                services => services.AddReactiveFluentValidation(validation => validation.Flags<NamedShifts>())),
+                json => json.Converters.Add(new ShiftsWrittenAsANumberForNone())),
             Throws.InvalidOperationException.With.Message.EqualTo(
                 "'r => r.Shifts' is a flags enum its endpoint's JSON options write as texts and numbers apart, and a JSON body joins a combination's texts or sends its number; write each value of it as text, or each as its number."));
 

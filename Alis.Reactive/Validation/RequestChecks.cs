@@ -42,7 +42,7 @@ internal static class RequestChecks
         var registered = catalog?.Find(typeof(TRequest));
         if (catalog is null || registered is null) return [];
         var validator = (ReactiveValidator<TRequest>)registered.Resolve(plan.Services);
-        return Checked(writer, parts(), validator, registered.ValidatorType, BrowserRegistrations.DefaultRuleSet, catalog);
+        return Checked(writer, parts(), validator, registered.ValidatorType, BrowserRegistrations.DefaultRuleSet);
     }
 
     internal static IReadOnlyList<Statement> Named<TRequest, TValidator>(BlockWriter writer, Func<RequestCheckParts> parts, string ruleSet)
@@ -52,17 +52,16 @@ internal static class RequestChecks
         var catalog = plan.Services.GetService<ValidatorCatalog>() ?? throw ValidatorCatalog.Missing<TRequest, TValidator>();
         var validator = catalog.Resolve<TRequest, TValidator>(plan.Services);
         RuleSetChecks.RunsARuleUnder(validator, typeof(TValidator), ruleSet);
-        return Checked(writer, parts(), validator, typeof(TValidator), ruleSet, catalog);
+        return Checked(writer, parts(), validator, typeof(TValidator), ruleSet);
     }
 
-    private static IReadOnlyList<Statement> Checked<TRequest>(BlockWriter writer, RequestCheckParts parts, ReactiveValidator<TRequest> validator, Type validatorType, string ruleSet,
-        ValidatorCatalog catalog)
+    private static IReadOnlyList<Statement> Checked<TRequest>(BlockWriter writer, RequestCheckParts parts, ReactiveValidator<TRequest> validator, Type validatorType, string ruleSet)
     {
         var plan = writer.Content;
         var validatorKey = ClassNames.ModelKey(validatorType);
         var key = validatorKey + ":" + ruleSet;
         var form = ObjectOf + key;
-        var registration = BrowserRegistrations.Of(validator, validatorKey, ruleSet, plan.Json, plan.RendersUnder, catalog.Flags);
+        var registration = BrowserRegistrations.Of(validator, validatorKey, ruleSet, plan.Json, plan.RendersUnder);
         plan.Declares(form, new PluginLocator(Plugin, key, VendorListening.OfAnEventTarget, new FormPluginData(registration)));
         var body = parts.Body;
         var failures = parts.Failures;

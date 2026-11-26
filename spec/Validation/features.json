@@ -239,7 +239,7 @@
         },
         {
           "for": "X16.22",
-          "page": "A care plan page whose app names CareDays and RotaDays as flags enums at startup; RotaDays has no value for zero; the model starts Care at Mon | Tue and Rota at 0; Save care is checked by a rule set holding RuleFor(p => p.Care).IsInEnum() and Save rota by one holding RuleFor(p => p.Rota).IsInEnum(), each sending only the Name input; the page writes the endpoint's answer, the name and then each day of the saved enum, comma separated, into saved, and renders the container's summary above the buttons.",
+          "page": "A care plan page whose CareDays and RotaDays are flags enums, each marked [Flags]; RotaDays has no value for zero; the model starts Care at Mon | Tue and Rota at 0; Save care is checked by a rule set holding RuleFor(p => p.Care).IsInEnum() and Save rota by one holding RuleFor(p => p.Rota).IsInEnum(), each sending only the Name input; the page writes the endpoint's answer, the name and then each day of the saved enum, comma separated, into saved, and renders the container's summary above the buttons.",
           "gesture": "Type Ada in Name and click Save care, then click Save rota.",
           "outcome": "After Save care, saved reads Ada, Mon, Tue; after Save rota, \"'Rota' has a range of values which does not include '0'.\" shows in the summary, saved still reads Ada, Mon, Tue, and no request is sent.",
           "opposite": "With the model starting Rota at Early, Save rota shows Ada, Early in saved and no message.",
@@ -1111,7 +1111,7 @@
     },
     {
       "id": "M8.F2",
-      "summary": "Registration through dependency injection: AddReactiveFluentValidation registers each validator once with Add<TValidator>(), no assembly scan; the registration marks each validated type as one MVC does not validate on net10; the flags enums are named once at startup. Main's registration of client-only rules leaves.",
+      "summary": "Registration through dependency injection: AddReactiveFluentValidation registers each validator once with Add<TValidator>(), no assembly scan; the registration marks each validated type as one MVC does not validate on net10; a flags enum is the one [Flags] marks, named at no startup. Main's registration of client-only rules leaves.",
       "status": "both",
       "types": [
         "Alis.Reactive:ReactiveFluentValidationBuilder",
@@ -1156,7 +1156,7 @@
         },
         {
           "line": "proposed",
-          "text": "services.AddReactiveFluentValidation(validators => validators.Add<CareRotaRules>().Flags<CareDays>().Flags<RotaDays>())",
+          "text": "services.AddReactiveFluentValidation(validators => validators.Add<CareRotaRules>())",
           "doors": [
             "N16.4"
           ]

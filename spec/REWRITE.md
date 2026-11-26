@@ -1088,10 +1088,10 @@ screen, and X17.36's resident directory on the residents screen; X11.24 waits on
 The endpoint's check (N16.1) is declared as the lead's proposal for the owner, `this.Validate<TRequest,
 TValidator>(request)` and `ValidateAsync` on each host's controller, whose failed result the action answers through
 `ToErrorResponse()`; X16.16's endpoint checks through it, and X8.3's visitor sign-in stands on it, its test red.
-A flags enum named at startup (N16.4) and a rule set a request names (D16.2) are declared as the lead's proposals for
-the owner, `Flags<TEnum>()` on the validation builder and `Validate<TValidator>(ruleSet)` beside each request's
-`Validate<TValidator>()` and the endpoint's check; X16.22's care rota stands on them on the record screen, its test
-red.
+A rule set a request names (D16.2) is declared as the lead's proposal for the owner, `Validate<TValidator>(ruleSet)`
+beside each request's `Validate<TValidator>()` and the endpoint's check, and a flags enum is the one `[Flags]` marks,
+which the core reads (N16.4; the owner, 2026-11-26, in place of the startup door U3 declared); X16.22's care rota
+stands on them on the record screen, its test red.
 N5.7's iterator is declared under a member the declaration names, `Items`, by `LiveIterator<TItem>()` and
 `DataIterator<TItem>()` on `JsObject`, the list operations running on that member (the owner, 2026-11-26), with M5.N3's
 `ElementChildren`, M5.N4's `ChildElement` and the iterator of `ClassList`; X6.56's lunch seating and M5.X2's table

@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Alis.Reactive.TypeKnowledge;
 
 namespace Alis.Reactive.PathsAndWire;
 
@@ -10,12 +11,10 @@ internal sealed class AppJson
     private static readonly ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions> LiveForms = new();
     private static readonly ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions> BodyForms = new();
     private readonly Lazy<JsonSerializerOptions> _options;
-    private readonly Func<Type, bool> _namesFlags;
 
-    internal AppJson(Func<JsonSerializerOptions> read, Func<Type, bool> namesFlags)
+    internal AppJson(Func<JsonSerializerOptions> read)
     {
         _options = new Lazy<JsonSerializerOptions>(read);
-        _namesFlags = namesFlags;
     }
 
     internal JsonSerializerOptions App => _options.Value;
@@ -24,7 +23,7 @@ internal sealed class AppJson
 
     internal JsonSerializerOptions BodyForm => BodyForms.GetValue(_options.Value, BodyFormOf);
 
-    internal bool NamesFlags(Type enumeration) => _namesFlags(enumeration);
+    internal bool NamesFlags(Type enumeration) => EnumNames.NamesFlags(enumeration);
 
     private static JsonSerializerOptions LiveFormOf(JsonSerializerOptions app) => new()
     {

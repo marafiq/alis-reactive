@@ -19,9 +19,9 @@ public class WhenAConsumerAppIsBuilt
     private const string TraceSink = "AlisReactive.OpenTelemetry";
     private const string Net10 = "net10.0";
     private const string Net48 = "net48";
-    private const string AnUnmarkedShift = "public enum Shift { Early = 1, Late = 2 }";
-    private const string AMarkedShift = "[Flags] public enum Shift { Early = 1, Late = 2 }";
-    private const string ShiftIsNoFlagsEnum = "Startup.cs(12,30): error ALIS038: Flags<Shift>() names Shift as a flags enum, and Shift has no [Flags], so FluentValidation and System.Text.Json read it as one value; mark Shift [Flags], or take the call out";
+    private const string AShiftWhoseValuesShareABit = "[Flags] public enum Shift { Early = 5, Late = 6 }";
+    private const string AShiftOfDisjointValues = "[Flags] public enum Shift { Early = 1, Late = 2 }";
+    private const string ShiftsValuesShareABit = "RotaRules.cs(17,41): error ALIS038: IsInEnum reads Shift, whose values Early (5) and Late (6) share a bit and neither holds the other; the framework splits a combination only over values that are disjoint or one inside the other, where its split, FluentValidation's IsInEnum and net10's binding agree on every value; give each value bits no other value shares, or make one hold the other";
     private const string NoTargetOfItsOwn = "";
     private const string AProgramThatMapsTheStaticAssets = "using Microsoft.AspNetCore.Builder;\n\nvar app = WebApplication.CreateBuilder(args).Build();\napp.MapStaticAssets();\napp.Run();\n";
 
@@ -83,7 +83,7 @@ public class WhenAConsumerAppIsBuilt
     public async Task a_net10_app_that_maps_no_static_assets_is_refused_for_each_packages_browser_file_it_does_not_serve()
     {
         using var written = new WrittenFolder();
-        var app = WriteApp(written, Net10, Core, AMarkedShift, NoTargetOfItsOwn);
+        var app = WriteApp(written, Net10, Core, AShiftOfDisjointValues, NoTargetOfItsOwn);
 
         Assert.That(
             await WhatTheBuiltAppDoesNotServe(app),
@@ -98,7 +98,7 @@ public class WhenAConsumerAppIsBuilt
     public async Task the_same_net10_app_mapping_its_static_assets_serves_each_packages_browser_file_as_its_pack_holds_it()
     {
         using var written = new WrittenFolder();
-        var app = WriteApp(written, Net10, Core, AMarkedShift, NoTargetOfItsOwn);
+        var app = WriteApp(written, Net10, Core, AShiftOfDisjointValues, NoTargetOfItsOwn);
         written.Write("App/Program.cs", AProgramThatMapsTheStaticAssets);
 
         Assert.That(await WhatTheBuiltAppDoesNotServe(app), Is.Empty);
@@ -108,16 +108,16 @@ public class WhenAConsumerAppIsBuilt
     public void a_file_an_alis_analyzer_refuses_fails_the_build_of_a_net10_app_that_names_a_consumer_package_alone_with_its_id()
     {
         using var written = new WrittenFolder();
-        var app = WriteApp(written, Net10, Components, AnUnmarkedShift, NoTargetOfItsOwn);
+        var app = WriteApp(written, Net10, Components, AShiftWhoseValuesShareABit, NoTargetOfItsOwn);
 
-        Assert.That(WhatTheBuildRefuses(app), Is.EqualTo(new[] { ShiftIsNoFlagsEnum }));
+        Assert.That(WhatTheBuildRefuses(app), Is.EqualTo(new[] { ShiftsValuesShareABit }));
     }
 
     [AcceptedCase]
-    public void the_same_net10_app_with_its_enum_marked_builds()
+    public void the_same_net10_app_with_its_enums_values_disjoint_builds()
     {
         using var written = new WrittenFolder();
-        var app = WriteApp(written, Net10, Components, AMarkedShift, NoTargetOfItsOwn);
+        var app = WriteApp(written, Net10, Components, AShiftOfDisjointValues, NoTargetOfItsOwn);
 
         Assert.That(WhatTheBuildRefuses(app), Is.Empty);
     }
@@ -126,16 +126,16 @@ public class WhenAConsumerAppIsBuilt
     public void a_file_an_alis_analyzer_refuses_fails_the_build_of_a_net48_app_that_names_a_consumer_package_alone_with_its_id()
     {
         using var written = new WrittenFolder();
-        var app = WriteApp(written, Net48, Components, AnUnmarkedShift, NoTargetOfItsOwn);
+        var app = WriteApp(written, Net48, Components, AShiftWhoseValuesShareABit, NoTargetOfItsOwn);
 
-        Assert.That(WhatTheBuildRefuses(app), Is.EqualTo(new[] { ShiftIsNoFlagsEnum }));
+        Assert.That(WhatTheBuildRefuses(app), Is.EqualTo(new[] { ShiftsValuesShareABit }));
     }
 
     [AcceptedCase]
-    public void the_same_net48_app_with_its_enum_marked_builds()
+    public void the_same_net48_app_with_its_enums_values_disjoint_builds()
     {
         using var written = new WrittenFolder();
-        var app = WriteApp(written, Net48, Components, AMarkedShift, NoTargetOfItsOwn);
+        var app = WriteApp(written, Net48, Components, AShiftOfDisjointValues, NoTargetOfItsOwn);
 
         Assert.That(WhatTheBuildRefuses(app), Is.Empty);
     }
@@ -144,7 +144,7 @@ public class WhenAConsumerAppIsBuilt
     public void a_build_target_that_writes_a_file_git_lists_is_refused()
     {
         using var written = new WrittenFolder();
-        var app = WriteApp(written, Net48, TraceSink, AMarkedShift, ATargetThatWritesAFileGitLists);
+        var app = WriteApp(written, Net48, TraceSink, AShiftOfDisjointValues, ATargetThatWritesAFileGitLists);
 
         Assert.That(
             WhatTheBuildsLeave(app),
@@ -155,7 +155,7 @@ public class WhenAConsumerAppIsBuilt
     public void a_build_target_that_writes_its_file_on_every_build_is_refused()
     {
         using var written = new WrittenFolder();
-        var app = WriteApp(written, Net48, TraceSink, AMarkedShift, ATargetThatWritesItsFileOnEveryBuild);
+        var app = WriteApp(written, Net48, TraceSink, AShiftOfDisjointValues, ATargetThatWritesItsFileOnEveryBuild);
 
         Assert.That(
             WhatTheBuildsLeave(app),
@@ -166,7 +166,7 @@ public class WhenAConsumerAppIsBuilt
     public void a_net48_app_on_the_packs_is_left_with_nothing_git_lists_and_each_packages_browser_file_beside_its_ignore_file()
     {
         using var written = new WrittenFolder();
-        var app = WriteApp(written, Net48, TraceSink, AMarkedShift, NoTargetOfItsOwn);
+        var app = WriteApp(written, Net48, TraceSink, AShiftOfDisjointValues, NoTargetOfItsOwn);
 
         Assert.That(WhatTheBuildsLeave(app), Is.Empty);
         Assert.That(
@@ -188,7 +188,7 @@ public class WhenAConsumerAppIsBuilt
         written.Write("App/Directory.Build.targets", "<Project />\n");
         written.Write("App/Directory.Packages.props", "<Project>\n  <PropertyGroup>\n    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>\n  </PropertyGroup>\n</Project>\n");
         written.Write("App/.gitignore", "bin/\nobj/\n");
-        written.Write("App/Rounds/Startup.cs", Startup(shift));
+        written.Write("App/Rounds/RotaRules.cs", RotaRules(shift));
         if (framework == Net10) written.Write("App/Program.cs", "Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args).Build().Run();\n");
         return app;
     }
@@ -209,7 +209,7 @@ public class WhenAConsumerAppIsBuilt
             """;
     }
 
-    private static string Startup(string shift) => $$"""
+    private static string RotaRules(string shift) => $$"""
         using System;
         using Alis.Reactive.Validation;
 
@@ -217,11 +217,16 @@ public class WhenAConsumerAppIsBuilt
         {
             {{shift}}
 
-            public static class Startup
+            public sealed class Rota
             {
-                public static void Register(ReactiveFluentValidationBuilder validation)
+                public Shift Shift { get; set; }
+            }
+
+            public sealed class RotaRules : ReactiveValidator<Rota>
+            {
+                public RotaRules()
                 {
-                    validation.Flags<Shift>();
+                    RuleFor(rota => rota.Shift).IsInEnum();
                 }
             }
         }

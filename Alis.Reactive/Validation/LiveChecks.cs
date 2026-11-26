@@ -23,7 +23,7 @@ internal static class LiveChecks
         var validatorKey = ClassNames.ModelKey(registered.ValidatorType);
         var ruleSet = BrowserRegistrations.DefaultRuleSet;
         var key = validatorKey + ":" + ruleSet;
-        var registration = BrowserRegistrations.Of(validator, validatorKey, ruleSet, plan.Json, plan.RendersUnder, catalog.Flags);
+        var registration = BrowserRegistrations.Of(validator, validatorKey, ruleSet, plan.Json, plan.RendersUnder);
         plan.Declares(ObjectOf + key, new PluginLocator(Plugin, key, VendorListening.OfAnEventTarget, new FormPluginData(registration)));
         return [new Live(validatorKey, ruleSet, new RecordExpression([
             new RecordField("format", Literals.Text(BodyFormat.UrlEncoded.Text)),

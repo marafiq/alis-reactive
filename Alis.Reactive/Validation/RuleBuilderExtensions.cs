@@ -357,8 +357,8 @@ public static class RuleBuilderExtensions
 
     /// <summary>Requires a value the enum declares.</summary>
     /// <remarks>
-    /// A value is in the enum as <c>Enum.IsDefined</c> reads it. Over an enum the app names as flags at startup, a
-    /// combination of the enum's values is in it too.
+    /// A value is in the enum as <c>Enum.IsDefined</c> reads it. Over an enum <c>[Flags]</c> marks, a combination of
+    /// the enum's values is in it too.
     /// </remarks>
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TEnum> IsInEnum<T, TEnum>(this IRuleBuilder<T, TEnum> rule)
@@ -367,8 +367,8 @@ public static class RuleBuilderExtensions
 
     /// <summary>Requires a value the enum declares.</summary>
     /// <remarks>
-    /// A value is in the enum as <c>Enum.IsDefined</c> reads it. Over an enum the app names as flags at startup, a
-    /// combination of the enum's values is in it too.
+    /// A value is in the enum as <c>Enum.IsDefined</c> reads it. Over an enum <c>[Flags]</c> marks, a combination of
+    /// the enum's values is in it too.
     /// </remarks>
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TEnum?> IsInEnum<T, TEnum>(this IRuleBuilder<T, TEnum?> rule)

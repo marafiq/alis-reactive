@@ -84,7 +84,6 @@ internal sealed class BrowserScope<T>
     internal string Prefix { get; }
     internal bool Each { get; }
     internal Func<T> Start { get; }
-    internal IReadOnlyCollection<Type> Flags => _selection.Flags;
 
     internal bool Selects(IReadOnlyList<string> sets, bool include) => _selection.Selects(sets, include);
 
@@ -164,8 +163,6 @@ internal sealed class BrowserMember<T, TValue>
         _start = start;
         _carriedPath = new(() => scope.Carried.PathOf(member));
     }
-
-    internal IReadOnlyCollection<Type> Flags => _scope.Flags;
 
     internal string Path => _path;
 

@@ -329,7 +329,7 @@
         },
         {
           "for": "X7.20",
-          "page": "A panel week page with a care panel, a ConformanceComponent, whose Load button GETs a week's plan, whose Care holds Mon | Sat | Sun of CareDays, an enum the app names as flags and its JSON writes by name, sets the panel's Days from it and shows the plan's resident, and whose Send care button GETs the care endpoint with r => r.Care set from the panel's Days and shows the endpoint's answer, the days it bound.",
+          "page": "A panel week page with a care panel, a ConformanceComponent, whose Load button GETs a week's plan, whose Care holds Mon | Sat | Sun of CareDays, an enum [Flags] marks and its JSON writes by name, sets the panel's Days from it and shows the plan's resident, and whose Send care button GETs the care endpoint with r => r.Care set from the panel's Days and shows the endpoint's answer, the days it bound.",
           "gesture": "Click Load, and once the plan's resident shows, click Send care.",
           "outcome": "The URL holds Care=Mon%2C+Weekend and Care sent reads Mon, Weekend.",
           "opposite": "At the address whose plan holds Mon alone, the URL holds Care=Mon and Care sent reads Mon.",
@@ -369,7 +369,7 @@
         },
         {
           "for": "X7.20",
-          "page": "A planned care page with a care panel, a ConformanceComponent, whose Load button GETs a plan whose Care holds Sat of CareDays, an enum the app names as flags and its JSON writes by name, sets the text of the Day planned line from it and the panel's Days from the same read, and whose Send care button GETs the care endpoint with r => r.Care set from the panel's Days and shows the endpoint's answer.",
+          "page": "A planned care page with a care panel, a ConformanceComponent, whose Load button GETs a plan whose Care holds Sat of CareDays, an enum [Flags] marks and its JSON writes by name, sets the text of the Day planned line from it and the panel's Days from the same read, and whose Send care button GETs the care endpoint with r => r.Care set from the panel's Days and shows the endpoint's answer.",
           "gesture": "Click Load.",
           "outcome": "Day planned reads sat, the name the app's JSON writes.",
           "opposite": "The same read set into the panel's Days arrives as the live form holds it: Send care then sends Care=Sat and Care sent reads Sat.",

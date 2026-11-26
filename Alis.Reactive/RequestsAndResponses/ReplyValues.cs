@@ -44,7 +44,7 @@ internal sealed class ReplyBody<TValue> : ReadOnly<TValue>
             return _kind == SuccessBody.Json
                 ? HeldForm.App(writer.Content.Json, writer.Content.RendersUnder)
                 : _kind == SuccessBody.File
-                    ? HeldForm.App(new AppJson(() => PlanJson.Options, writer.Content.NamesFlags), writer.Content.RendersUnder)
+                    ? HeldForm.App(new AppJson(() => PlanJson.Options), writer.Content.RendersUnder)
                     : HeldForm.Live(writer.Content.Json, writer.Content.RendersUnder);
         }
     }
