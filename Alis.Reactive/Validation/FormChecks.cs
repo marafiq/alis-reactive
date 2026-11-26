@@ -13,7 +13,7 @@ internal static class FormChecks
     private const string Plugin = "alis.form";
     private const string ObjectOf = "$form:";
 
-    internal static void WithNoRequest<TContainer>(BlockWriter writer, string containerId)
+    internal static void WithNoRequest<TContainer>(BlockWriter writer, string containerId, string ruleSet)
     {
         var plan = writer.Content;
         var model = ClassNames.AsCSharpWritesIt(typeof(TContainer));
@@ -26,8 +26,8 @@ internal static class FormChecks
         }
 
         var validator = (ReactiveValidator<TContainer>)registered.Resolve(plan.Services);
+        RuleSetChecks.RunsARuleUnder(validator, registered.ValidatorType, ruleSet);
         var validatorKey = ClassNames.ModelKey(registered.ValidatorType);
-        var ruleSet = BrowserRegistrations.DefaultRuleSet;
         var key = validatorKey + ":" + ruleSet;
         var form = ObjectOf + key;
         var registration = BrowserRegistrations.Of(validator, validatorKey, ruleSet, plan.Json, plan.RendersUnder, catalog.Flags);

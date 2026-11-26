@@ -1,0 +1,11 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ShiftRow
+@{
+    var plan = Html.ReactivePlan<ShiftRow>();
+}
+@(Html.NativeHiddenField(plan, m => m.Id))
+@(Html.InputField(plan, m => m.Carer, options => options.Label("Carer")).NativeTextBox())
+@(Html.InputField(plan, m => m.Hours, options => options.Label("Hours")).NativeTextBox())
+@Html.RenderPlan(plan)

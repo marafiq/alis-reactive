@@ -15,4 +15,6 @@ public static partial class CarePages
     public const string PanelDaysOfMonday = Record + "panel-days/monday";
 
     public const string PanelDaysHold = Record + "panel-days/hold";
+
+    public const string ShiftRoster = Record + "shift-roster";
 }

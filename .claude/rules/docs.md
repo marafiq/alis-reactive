@@ -78,7 +78,10 @@ design called a defect before the app's actions were read, and stated a search's
 cause no run had shown). The meaning it gives a case is quoted from the D line that states it, read before the case is
 written; a search over the app names every door a request can be written with, the files it read and those it did not,
 and each count is the line the command printed (the lead's mistakes, 2026-11-24: a check's meaning set before D16.5 was
-read, and "no page reaches it" from a search that missed the condensed doors and every lambda not named "request").
+read, and "no page reaches it" from a search that missed the condensed doors and every lambda not named "request"). A
+use-case document handed to a designer states each test, page and count it names from a read at HEAD, its file and line
+beside it (the lead's mistakes, 2026-11-25: a use case's test that proves another case, a case's message placed where
+the page does not show it and the grid's views miscounted).
 
 ## Workflow
 

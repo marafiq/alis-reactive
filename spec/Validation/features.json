@@ -2083,7 +2083,7 @@
     },
     {
       "id": "M8.F4",
-      "summary": "A check and where its failures show: a request is checked by its model's registered validator over the body it sends, and Validate(container) checks with no request; every failure shows in the summary of the container the request sends, else the notice, and at the message element of the framework input it sent under the failure's binding name; a slot's own registration leaves with its slot.",
+      "summary": "A check and where its failures show: a request is checked by its model's registered validator over the body it sends, and Validate(container) checks with no request, under the default rule set or the one it names; a check under a rule set its validator runs no rule under is refused; every failure shows in the summary of the container the request sends, else the notice, and at the message element of the framework input it sent under the failure's binding name; a slot's own registration leaves with its slot.",
       "status": "redesign-only",
       "types": [],
       "claims": [
@@ -2109,6 +2109,13 @@
         {
           "line": "proposed",
           "text": "pipeline.Validate(admission)",
+          "doors": [
+            "N16.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Validate(identity.Container, ResidentDetailsRules.Identity)",
           "doors": [
             "N16.3"
           ]
@@ -2153,7 +2160,9 @@
         "Ownership.tla:FailureReachesSummary",
         "Ownership.tla:InlineOnlyAtTheSentInput",
         "Validation.tla:OnlyTheNamedValidator",
-        "Validation.tla:SentOutsideAgrees"
+        "Validation.tla:SentOutsideAgrees",
+        "Validation.tla:TheNamedSetIsTheOneRun",
+        "Validation.tla:ANamedSetSelectsARule"
       ],
       "defects": [
         {
@@ -2222,6 +2231,18 @@
         },
         {
           "id": "X16.46",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.48",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.49",
+          "rung": "refusal"
+        },
+        {
+          "id": "X16.50",
           "rung": "behavior"
         }
       ],
@@ -2414,6 +2435,30 @@
           "outcome": "The notices status reads \"Notices: error: Name the shift.\" and no request reaches North's handovers address.",
           "opposite": "On the bed notes page on the evening shift, Hand over to the shift on duty is sent, and noted reads North, Evening: Bed by the window.",
           "defect": "On MVC 5 the check reads a held empty query text beside a JSON body as text, so the note with no shift on duty is sent; or it reads every held query text there as null, so the evening note is refused."
+        },
+        {
+          "for": "X16.48",
+          "page": "A resident details page whose container resident holds a container identity with Name, Email and Confirm email, and Bed outside it; Next checks identity under the rule set Identity, then writes \"Step 2: the bed\" into step; Review checks identity under the default set, then writes \"Details ready\" into saved.",
+          "gesture": "With Ada typed in Name and ada@example.org in both emails, Bed empty, click Next.",
+          "outcome": "step reads \"Step 2: the bed\" and identity's summary shows no message.",
+          "opposite": "With Confirm email changed to ada@example.com, \"The email addresses must match.\" shows beside Confirm email and alone in identity's summary, and step stays empty.",
+          "defect": "The check runs the default set, so \"Choose a bed.\" fills identity's summary and Next stops; or it runs no rule, so emails that differ pass."
+        },
+        {
+          "for": "X16.49",
+          "page": "The roster page whose Approve all names `.Validate<RosterRules>(ShiftRules.Approval)`, over a `RosterRules` that declares its rule for each row in no set.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"RosterRules runs no rule under the rule set 'Approval': declare the rules it checks there inside RuleSet(\"Approval\", ..), a rule that holds a child validator among them.\"",
+          "opposite": "With the rule declared in \"default, Approval\" the page renders, and X16.50 holds.",
+          "defect": "The page renders and Approve all sends a 10-hour shift."
+        },
+        {
+          "for": "X16.50",
+          "page": "The roster page, `RosterRules` declaring its rule for each row in \"default, Approval\".",
+          "gesture": "Type 10 into shift 6's Hours and click Approve all.",
+          "outcome": "\"An approved shift is 8 hours at most.\" shows beside shift 6's Hours and in the roster's summary, and no request reaches the approvals address.",
+          "opposite": "With 8 hours, and shift 7's carer still empty, the roster is approved and its next open reads it approved.",
+          "defect": "The row's validator is not reached under the set, so 10 hours is approved; or the default set runs, so shift 7's empty carer refuses the approval."
         }
       ],
       "verdicts": []

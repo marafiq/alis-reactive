@@ -14,4 +14,5 @@ public static partial class CarePages
     public const string BedNotes = Admission + "bed-notes";
     public const string BedNotesOnTheEveningShift = Admission + "bed-notes/on-the-evening-shift";
     public const string WardAssignment = Admission + "ward-assignment";
+    public const string ResidentDetails = Admission + "resident-details";
 }

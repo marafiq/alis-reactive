@@ -206,6 +206,8 @@ public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
 
     internal IReadOnlyList<RuleGroup> BrowserGroups(BrowserScope<T> scope) => [.. _rules.SelectMany(rule => rule.BrowserGroups(scope))];
 
+    internal bool RunsARule(ValidationRun run) => _rules.Any(rule => rule.RunsARule(run));
+
     internal List<ValidationRule<T>> Capture(Action rules, IReadOnlyList<string> sets)
     {
         var outer = _rules;

@@ -49,8 +49,8 @@ public static class EndpointChecks
 
     /// <summary>Checks the model the action bound by the validator and the rule set named, and adds each value the binder refused under the name it was sent under.</summary>
     /// <remarks>
-    /// The check runs the rules the validator declares inside that rule set and no other. Return the result's
-    /// <c>ToErrorResponse()</c> when it is not valid.
+    /// The check runs the rules the validator declares inside that rule set and no other, and a rule set it runs no
+    /// rule under is refused. Return the result's <c>ToErrorResponse()</c> when it is not valid.
     /// </remarks>
     /// <param name="controller">The action's controller.</param>
     /// <param name="request">The model the action bound.</param>
@@ -64,6 +64,7 @@ public static class EndpointChecks
         var services = controller.HttpContext.RequestServices;
         var catalog = services.GetService<ValidatorCatalog>() ?? throw ValidatorCatalog.Missing<TRequest, TValidator>();
         var validator = catalog.Resolve<TRequest, TValidator>(services);
+        RuleSetChecks.RunsARuleUnder(validator, typeof(TValidator), ruleSet);
         using var check = ServerActivities.Check(ClassNames.AsCSharpWritesIt(typeof(TValidator)), ruleSet);
         var result = validator.CheckBound(request, ruleSet, BindingFailures(controller), catalog.Flags);
         ServerActivities.Checked(check, result.Errors.Count);
@@ -72,8 +73,8 @@ public static class EndpointChecks
 
     /// <summary>Checks the model the action bound by the validator and the rule set named, with its asynchronous rules, and adds each value the binder refused under the name it was sent under.</summary>
     /// <remarks>
-    /// The check runs the rules the validator declares inside that rule set and no other. Return the result's
-    /// <c>ToErrorResponse()</c> when it is not valid.
+    /// The check runs the rules the validator declares inside that rule set and no other, and a rule set it runs no
+    /// rule under is refused. Return the result's <c>ToErrorResponse()</c> when it is not valid.
     /// </remarks>
     /// <param name="controller">The action's controller.</param>
     /// <param name="request">The model the action bound.</param>
@@ -88,6 +89,7 @@ public static class EndpointChecks
         var services = controller.HttpContext.RequestServices;
         var catalog = services.GetService<ValidatorCatalog>() ?? throw ValidatorCatalog.Missing<TRequest, TValidator>();
         var validator = catalog.Resolve<TRequest, TValidator>(services);
+        RuleSetChecks.RunsARuleUnder(validator, typeof(TValidator), ruleSet);
         using var check = ServerActivities.Check(ClassNames.AsCSharpWritesIt(typeof(TValidator)), ruleSet);
         var result = await validator.CheckBoundAsync(request, ruleSet, BindingFailures(controller), catalog.Flags, cancellation).ConfigureAwait(false);
         ServerActivities.Checked(check, result.Errors.Count);

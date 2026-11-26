@@ -257,7 +257,10 @@ internal static class AppHost
             .Add<Care.AddressAdmissionRules>()
             .Add<Care.WardPharmacyAdmissionRules>()
             .Add<Care.WardPharmacyAdmissionInItsContractRules>()
-            .Add<Refusals.VisitValidator>()));
+            .Add<Care.ResidentDetailsRules>()
+            .Add<Care.RosterRules>()
+            .Add<Refusals.VisitValidator>()
+            .Add<Refusals.RosterRules>()));
 
     private static void WriteEnumNames(JsonSerializerOptions json) => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 

@@ -221,5 +221,60 @@
    }
   ],
   "expect": "Validation.violates.SentOutsideAgrees.ModelTakesTheQueryBesideItsBody.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "a named set's check run under the default set, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.TheNamedSetIsTheOneRun.cfg",
+    "old": "CONSTANT Mutant = \"CheckRunsTheDefaultSet\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.TheNamedSetIsTheOneRun.cfg: expected TheNamedSetIsTheOneRun violated, saw Model checking completed"
+ },
+ {
+  "name": "the browser's verdict under the default set where the check names one, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.Agreement.CheckRunsTheDefaultSet.cfg",
+    "old": "CONSTANT Mutant = \"CheckRunsTheDefaultSet\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.Agreement.CheckRunsTheDefaultSet.cfg: expected Agreement violated, saw Model checking completed"
+ },
+ {
+  "name": "a named set no rule declares that renders, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.ANamedSetSelectsARule.cfg",
+    "old": "CONSTANT Mutant = \"ANamedSetNoRuleDeclaresRenders\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.ANamedSetSelectsARule.cfg: expected ANamedSetSelectsARule violated, saw Model checking completed"
+ },
+ {
+  "name": "the witness of a named set's rule the default leaves out reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.ReachANamedSetRunsARuleTheDefaultLeavesOut.cfg",
+    "old": "INVARIANT ReachANamedSetRunsARuleTheDefaultLeavesOut",
+    "new": "INVARIANT ReachTheDefaultSetLeavesANamedRuleOut"
+   }
+  ],
+  "expect": "expected ReachANamedSetRunsARuleTheDefaultLeavesOut violated, saw violated: ReachTheDefaultSetLeavesANamedRuleOut"
+ },
+ {
+  "name": "the witness of the default set leaving a named rule out reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.ReachTheDefaultSetLeavesANamedRuleOut.cfg",
+    "old": "INVARIANT ReachTheDefaultSetLeavesANamedRuleOut",
+    "new": "INVARIANT ReachANamedSetRunsARuleTheDefaultLeavesOut"
+   }
+  ],
+  "expect": "expected ReachTheDefaultSetLeavesANamedRuleOut violated, saw violated: ReachANamedSetRunsARuleTheDefaultLeavesOut"
  }
 ]

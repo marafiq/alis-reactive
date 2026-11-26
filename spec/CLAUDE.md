@@ -21,6 +21,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   under its name in a URL-encoded or a multipart body, `FormData` building that payload in TypeScript and never
   replacing the container. The lead's reading within it: a JSON body and a GET's query carry none, since a hidden text
   has no declared type and an antiforgery token never rides in a URL (D9.15, D14.8, D16.5). The owner can overrule it.
+- The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), yes to lines 2 to 5 of ValidationForms' section 10, each in a
+  container's terms. `pipeline.Validate(container, ruleSet)` checks a container with no request under the rule set it
+  names (N16.3, X16.48). A check under a rule set its validator runs no rule under, a child validator's rules among
+  them, is refused where the view renders and where the endpoint checks, and a check under the default set never is
+  (D16.2, X16.49, X16.50). F7, a live check that names its rule set, builds nothing until a view shows a blur whose
+  message differs by rule set; its form then is a closed choice the block door takes, LiveCheck.Under with the rule
+  set or LiveCheck.None, written into the container's live field, with no PublicAPI line before that view. The core
+  adds no door for a grid: the grid's own unit decides between M21.F23's adapter and the owner's words of 2026-11-20
+  ("adapter is not default choice"), and the one thing it can ask of the core, a check over a value a source hands,
+  is named in section 8 of that design. Line 1, a container under a field prefix, is RowContainers' unit.
 - The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
   left out under a list index that leaves its item with no field stops the request, or is refused where the view
   renders. `WhenBlank` gains "leaveUnlessAlone", which C# writes where an input's path holds a list index and it would

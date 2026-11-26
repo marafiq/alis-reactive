@@ -846,7 +846,7 @@
         {
           "id": "tabForm",
           "kind": "form",
-          "role": "a tab's form, a request container with its summary"
+          "role": "a tab's form, a request container with its summary, and the shift roster's container"
         },
         {
           "id": "notes",
@@ -857,13 +857,13 @@
         {
           "id": "noteInputs",
           "kind": "nativeSlice",
-          "role": "the record's NativeTextBox, NativeTextArea and NativeCheckBox inputs: the note box, the pain, balance, intake, target and name fields, the Starts and Allergies fields, and the room-free and include-note boxes, the night checks' Witness code box and the shift handover's Day carer box",
+          "role": "the record's NativeTextBox, NativeTextArea and NativeCheckBox inputs: the note box, the pain, balance, intake, target and name fields, the Starts and Allergies fields, and the room-free and include-note boxes, the night checks' Witness code box, the shift handover's Day carer box and the shift roster's Carer and Hours boxes",
           "module": "NativeComponents"
         },
         {
           "id": "recordEndpoint",
           "kind": "endpoint",
-          "role": "the resident endpoint: tabs, notes, care plan and its failures, the night roster and the handovers it records"
+          "role": "the resident endpoint: tabs, notes, care plan and its failures, the night roster, the handovers it records and the shift roster's approvals"
         },
         {
           "id": "carePanel",
@@ -885,7 +885,7 @@
         {
           "id": "recordButton",
           "kind": "nativeSlice",
-          "role": "the record's NativeButton buttons: Call the nurse, and the night checks' Sign off",
+          "role": "the record's NativeButton buttons: Call the nurse, the night checks' Sign off, and the shift roster's Approve all",
           "module": "NativeComponents"
         },
         {
@@ -15107,6 +15107,57 @@
         "inputs",
         "intakeEndpoint",
         "intakeValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.48",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10",
+        "net48"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.49",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "refusalValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.50",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "noteInputs",
+        "recordButton",
+        "recordEndpoint"
       ],
       "harness": [
         "seed"

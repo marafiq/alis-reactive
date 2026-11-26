@@ -51,6 +51,7 @@ internal static class RequestChecks
         var plan = writer.Content;
         var catalog = plan.Services.GetService<ValidatorCatalog>() ?? throw ValidatorCatalog.Missing<TRequest, TValidator>();
         var validator = catalog.Resolve<TRequest, TValidator>(plan.Services);
+        RuleSetChecks.RunsARuleUnder(validator, typeof(TValidator), ruleSet);
         return Checked(writer, parts(), validator, typeof(TValidator), ruleSet, catalog);
     }
 

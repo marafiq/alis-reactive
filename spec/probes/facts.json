@@ -1540,6 +1540,15 @@
       "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:216"
     },
     {
+      "id": "mvc5-unsent-member-keeps-start",
+      "statement": "MVC 5 binds no member whose key no value provider holds, so a text member no key names keeps its start.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "if (!bindingContext.ValueProvider.ContainsPrefix(fullPropertyKey))",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:217"
+    },
+    {
       "id": "mvc5-value-at-member-key-simple",
       "statement": "MVC 5 binds a member as a single value whenever the request holds a value at its exact key, an object member included.",
       "host": "net48",

@@ -7,7 +7,7 @@ Mutants == {"none", "ConditionReadsNothing", "ObjectStartFromModel", "NullHolder
             "PopulateIgnored", "EmptyTextStaysText", "ReadsUnsentInputs", "RunsEveryRegistration", "TypedTextLeftOut",
             "FailureUnderAnotherName", "PeerReadFromTheItem", "OutsideReadAtItsStart", "QueryBesideUnreadOnNet48",
             "QueryBesideReadOnNet10", "OutsideReadOnNet48Alone", "OutsideEmptyStaysText", "ConfinedEndpointLeavesWhatWasSent",
-            "ModelTakesTheQueryBesideItsBody"}
+            "ModelTakesTheQueryBesideItsBody", "CheckRunsTheDefaultSet", "ANamedSetNoRuleDeclaresRenders"}
 
 ASSUME Mutant \in Mutants
 
@@ -20,11 +20,11 @@ ItemValues == {"none", "low", "high"}
 VARIABLES host, format, handling, sendsForm, nInput, nBeside, nPlace, nPlaceText, binding, nStart,
           leadStart, leadStartName, leadTypeName, leadPhoneInput, leadNameInput,
           itemsStart, itemTypeName, row, rowName, countText, otherRegistered,
-          plane, check, typed, start, peer
+          plane, check, typed, start, peer, asked, inDefault, inNamed
 
 vars == <<host, format, handling, sendsForm, nInput, nBeside, nPlace, nPlaceText, binding, nStart, leadStart, leadStartName, leadTypeName,
           leadPhoneInput, leadNameInput, itemsStart, itemTypeName, row, rowName, countText, otherRegistered,
-          plane, check, typed, start, peer>>
+          plane, check, typed, start, peer, asked, inDefault, inNamed>>
 
 BindingsOf(h, f) == IF h = "net48" THEN {"everyPlace"}
                     ELSE IF f = "json" THEN {"bodyAlone", "copied"}
@@ -69,6 +69,9 @@ Init ==
           /\ typed = "none"
           /\ start = "none"
           /\ peer = "none"
+          /\ asked = "default"
+          /\ inDefault = TRUE
+          /\ inNamed = FALSE
        \/ /\ plane = "check"
           /\ host = "net10"
           /\ handling = "replace"
@@ -93,6 +96,10 @@ Init ==
           /\ typed \in ItemValues
           /\ start \in ItemValues
           /\ peer \in {"none", "mid"}
+          /\ asked \in {"default", "named"}
+          /\ inDefault \in BOOLEAN
+          /\ inNamed \in BOOLEAN
+          /\ (asked = "named" /\ ~inNamed) => Mutant = "ANamedSetNoRuleDeclaresRenders"
 
 Next == UNCHANGED vars
 
@@ -204,11 +211,15 @@ Held == IF BindsMembers /\ sendsForm THEN Bound(typed) ELSE start
 
 AtLeast(value, least) == value = "none" \/ (least = "mid" /\ value = "high")
 
-ServerPasses == CASE check = "item" -> AtLeast(Held, peer)
+RuleRuns(set) == IF set = "named" THEN inNamed ELSE inDefault
+
+BrowserAsked == IF Mutant = "CheckRunsTheDefaultSet" THEN "default" ELSE asked
+
+ServerPasses == CASE check = "item" -> ~RuleRuns(asked) \/ AtLeast(Held, peer)
 
 BrowserPeer == IF Mutant = "PeerReadFromTheItem" THEN "none" ELSE peer
 
-BrowserPasses == CASE check = "item" -> AtLeast(Held, BrowserPeer)
+BrowserPasses == CASE check = "item" -> ~RuleRuns(BrowserAsked) \/ AtLeast(Held, BrowserPeer)
 
 ConditionAgrees == BrowserLeadPresent = ServerLeadPresent
 
@@ -234,9 +245,17 @@ ItemPeerAgrees == (plane = "check" /\ check = "item") => BrowserPasses = ServerP
 
 Agreement == BrowserFails = ServerFails /\ (plane = "check" => BrowserPasses = ServerPasses)
 
+TheNamedSetIsTheOneRun == plane = "check" => RuleRuns(BrowserAsked) = RuleRuns(asked)
+
+ANamedSetSelectsARule == (plane = "check" /\ asked = "named") => inNamed
+
 ReachPopulatedList == ~(AppendsList /\ itemsStart = "seeded" /\ ItemsSent /\ Len(BrowserItems) = 2 /\ Agreement)
 
 ReachAnItemBelowItsPeer == ~(plane = "check" /\ check = "item" /\ Held = "low" /\ peer = "mid" /\ ~ServerPasses /\ Agreement)
+
+ReachANamedSetRunsARuleTheDefaultLeavesOut == ~(plane = "check" /\ asked = "named" /\ inNamed /\ ~inDefault /\ ~ServerPasses /\ Agreement)
+
+ReachTheDefaultSetLeavesANamedRuleOut == ~(plane = "check" /\ asked = "default" /\ inNamed /\ ~inDefault /\ Held = "low" /\ peer = "mid" /\ ServerPasses /\ Agreement)
 
 ReachConditionOnStart == ~(~LeadSent /\ leadStart = "object" /\ ~NSent /\ nStart = "none" /\ "n" \notin BrowserFails /\ Agreement)
 

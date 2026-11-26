@@ -114,6 +114,8 @@ internal abstract class ValidationRule<T>(IReadOnlyList<string> sets)
         await Check(context).ConfigureAwait(false);
     }
 
+    internal bool RunsARule(ValidationRun run) => run.Selects(Sets, this is IncludeRule<T>) && HoldsARule(run);
+
     internal IReadOnlyList<RuleGroup> BrowserGroups(BrowserScope<T> scope)
     {
         NameScalars(scope);
@@ -126,6 +128,7 @@ internal abstract class ValidationRule<T>(IReadOnlyList<string> sets)
 
     protected virtual bool Refused(ValidationContext<T> context) => false;
     protected abstract Task Check(ValidationContext<T> context);
+    private protected abstract bool HoldsARule(ValidationRun run);
 
     private protected virtual void NameScalars(BrowserScope<T> scope)
     {
@@ -137,6 +140,8 @@ internal abstract class ValidationRule<T>(IReadOnlyList<string> sets)
 internal sealed class IncludeRule<T>(IValidator<T> validator, IReadOnlyList<string> sets) : ValidationRule<T>(sets)
 {
     protected override Task Check(ValidationContext<T> context) => context.Run.Child(validator, context.Model, context.Prefix);
+
+    private protected override bool HoldsARule(ValidationRun run) => validator is not ReactiveValidator<T> reactive || reactive.RunsARule(run);
 
     private protected override IReadOnlyList<RuleGroup> BrowserRules(BrowserScope<T> scope)
         => validator is ReactiveValidator<T> reactive ? reactive.BrowserGroups(scope) : [];
@@ -229,6 +234,8 @@ internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOpt
     }
 
     protected override bool Refused(ValidationContext<T> context) => context.Run.Refused(context.Prefix + _path);
+
+    private protected override bool HoldsARule(ValidationRun run) => _parts.Any(part => part.RunsARule(run)) || _dependents.Any(dependent => dependent.RunsARule(run));
 
     private protected override void NameScalars(BrowserScope<T> scope)
     {
@@ -343,6 +350,8 @@ internal abstract class RulePart<T, TValue>
 
     internal virtual RuleGroup? Group(BrowserMember<T, TValue> member) => null;
 
+    internal virtual bool RunsARule(ValidationRun run) => true;
+
     internal async Task<bool> Applies(ValidationContext<T> context)
     {
         foreach (var guard in Guards)
@@ -378,6 +387,8 @@ internal sealed class CheckPart<T, TValue> : RulePart<T, TValue>
 
 internal sealed class ChildPart<T, TValue>(IValidator<TValue> validator) : RulePart<T, TValue>
 {
+    internal override bool RunsARule(ValidationRun run) => validator is not ReactiveValidator<TValue> reactive || reactive.RunsARule(run);
+
     internal override RuleGroup? Group(BrowserMember<T, TValue> member)
         => validator is ReactiveValidator<TValue> reactive ? member.Child(reactive) : null;
 

@@ -58,7 +58,9 @@ names. Read these whole, before anything else:
   index they run on, so a private index handed to them comes back holding HEAD's entries, and the traps hook refuses
   it. Each command of the brief runs from the worktree's root as the brief writes it; a listing is /bin/ls and a search
   git grep, since the tools' shell aliases ls and grep; a file is copied by cp, which keeps its bytes and its BOM; a
-  file of lines is written whole, never trimmed (the builder's mistakes, 2026-11-25).
+  file of lines is written whole, never trimmed (the builder's mistakes, 2026-11-25). The ArchitectureTests read the
+  packs, so scripts/pack.sh runs before them; a search over files git does not track yet takes git grep's --untracked
+  option, since git grep reads tracked files alone (the builder's mistakes, 2026-11-26).
 - Read no secret and no file that holds a credential, a machine's NuGet or npm configuration among them; list no user
   secrets.
 - Run no command your brief does not name, and no `scripts/check.sh`, TLC, package install or restore unless it

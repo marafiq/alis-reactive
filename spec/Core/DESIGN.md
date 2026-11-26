@@ -3925,6 +3925,10 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     proposal as a signature (G13): `Validate<TValidator>(ruleSet)` beside each request's `Validate<TValidator>()`, and
     the endpoint's check of N16.1 taking the same name (the lead, 2026-11-13, `spec/CLAUDE.md`)
     (`Validation.tla:OnlyTheNamedValidator`).
+  - A rule set a check names, by a request, by `Validate(container, ruleSet)` or at the endpoint's door, under which
+    the validator runs no rule, a child validator's rules among them, is refused where the view renders and where the
+    endpoint checks (X16.49, `Validation.tla:ANamedSetSelectsARule`). A rule that holds a child validator runs only
+    under a set it is declared in, and hands the set's name to the child (X16.50).
 - D16.3 A partial is attached or independent, and both nest (the owner, 2026-11-06).
   - Attached: a partial rendered for a member under MVC's prefix, by any of MVC's own doors (`EditorFor` by the
     member's type, by a template it names or the model's `[UIHint]` names, and for each item of a list; `<partial
@@ -3971,8 +3975,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - Decision C: a request is checked on what it sends and on the starting values of the rest. A request that sends
     no container is checked on its `Set` members and its `Input`s, and no container's inputs are read. This replaces
     65fdf118d, which read the validated form's inputs for such a request.
-  - The check with no request, `Validate(container)` (N16.3), and live validation read their container's inputs, as
-    the container sends them.
+  - The check with no request, `Validate(container)` and `Validate(container, ruleSet)` (N16.3), and live validation
+    read their container's inputs, as the container sends them.
   - On .NET 10, a query member sent beside a body that binds members is not read by the browser's check, which reads
     it at its start: an endpoint that binds its model `[FromForm]` or `[FromBody]` binds it the same way, while one
     that binds a plain model binds the query's value (`probe:core-plain-model-query-beside-a-form`), so there the
@@ -4196,6 +4200,11 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   - `Validation.tla:UnsentInputsUnread`
   - `Validation.tla:OnlyTheNamedValidator`
   - `Validation.tla:NoTypedValueLost`
+- `Validation.tla:TheNamedSetIsTheOneRun`: the browser's check runs the rule set its check names, a rule of that set
+  and no rule of another, broken by a mutant that runs the default set, which breaks `Validation.tla:Agreement` too
+  (X16.48).
+- `Validation.tla:ANamedSetSelectsARule`: a check that names a rule set its validator runs no rule under does not
+  render, broken by a mutant that renders it (X16.49).
 - `Validation.tla:SentOutsideAgrees`: a member the request sends in its path or its query is checked as the endpoint
   binds it, over each host, body format and binding, broken by seven mutants: every such member read at its start, the
   query beside a body that binds members left unread on MVC 5 or read on net10, the read on MVC 5 alone, an empty
@@ -4233,8 +4242,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   the starts of D16.6, and the containers table of `model`'s data, each with its summary and live check.
 - `N16.3` new: `pipeline.Validate(container)`, the check with no request: the container model's registered validator
   under the default rule set, over the container's inputs as it sends them; a failure shows as D16.13 places it and
-  stops its pipeline. It carries `Validate<TValidator>(formId)` of both lines; the form of naming a rule set goes to
-  gate 2.
+  stops its pipeline. `pipeline.Validate(container, ruleSet)` runs that validator under the rule set it names, a text
+  as the validator's own `RuleSet` takes it, as a request's `Validate<TValidator>(ruleSet)` does (D16.2). It carries
+  `Validate<TValidator>(formId)` of both lines.
 - `N16.4` new: `Flags<TEnum>()`, `where TEnum : struct, Enum`, which names a flags enum once at startup, on both hosts.
   The framework knows an enum is flags by it alone, through the door's type argument (D18.1's generics), and reads no
   `FlagsAttribute` (D18.3). An enum it does not name is one value to the framework: `IsInEnum` reads it as
@@ -4428,6 +4438,27 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   sends nothing, and one whose Shift is Night or Evening is sent.
 - `X16.47` behavior (D16.7, D9.13): an enum input whose text no row lists fails its check with the binder's message,
   "The value 'agency' is not valid for Cover.", beside the input and in the summary, and nothing is sent.
+- `X16.48` behavior (N16.3, D16.2): a check with no request under a rule set it names runs that set's rules over the
+  container's inputs and no rule of another set (`Validation.tla:TheNamedSetIsTheOneRun`). ResidentDetailsRules
+  declares Name's "Enter the name." and Confirm email's "The email addresses must match." inside
+  RuleSet("default, Identity", ..), and Bed's "Choose a bed." in no set. Next checks the identity container under
+  Identity: with the two emails equal and no bed chosen it passes, and with two emails that differ it shows "The
+  email addresses must match." beside Confirm email and in the container's summary and stops its pipeline. A member
+  the container does not send reads its start, as the endpoint's binder leaves it on net10
+  (`probe:core-form-implicit-required`) and on MVC 5 (`probe:mvc5-unsent-member-keeps-start`).
+- `X16.49` refusal (D16.2): a check under a rule set its validator runs no rule under: "{Validator} runs no rule
+  under the rule set '{ruleSet}': declare the rules it checks there inside RuleSet("{ruleSet}", ..), a rule that
+  holds a child validator among them." The default rule set, which a check takes when it names none, is not refused:
+  D16.2 gives that check to every request of a registered model, whatever sets its validator declares. It is refused
+  where the view renders, for a request's `Validate<TValidator>(ruleSet)` and for `Validate(container, ruleSet)`, and
+  where the endpoint checks, for `Validate<TRequest, TValidator>(request, ruleSet)` and its `ValidateAsync`
+  (`Validation.tla:ANamedSetSelectsARule`).
+- `X16.50` behavior (D16.2): a rule that holds a child validator, declared in a rule set, runs the child's rules of
+  that set under it. RosterRules declares its rule for each row, SetValidator(new ShiftRules()), inside
+  RuleSet("default, Approval", ..), and ShiftRules declares Hours' "An approved shift is 8 hours at most." inside
+  RuleSet("Approval", ..) and its other rules in no set. Approve all checks every row under Approval: a shift of 10
+  hours shows the message beside its Hours and in the roster's summary and sends nothing, and the rows' rules of no
+  set do not run, so a shift with no carer is approved.
 
 ## Q17. Vendors and inversion
 

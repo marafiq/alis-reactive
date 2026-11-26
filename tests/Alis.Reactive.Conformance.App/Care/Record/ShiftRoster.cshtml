@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Roster
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Shift roster";
+    var plan = Html.ReactivePlan<Roster>();
+}
+<h1>Shift roster</h1>
+<p>Approval: <span id="approval">@(Model.Approved ? "Approved" : "Awaiting approval")</span></p>
+@using (var roster = Html.BeginRequestContainer(plan, "roster"))
+{
+    <legend>Roster</legend>
+    @for (var position = 0; position < Model.Rows.Count; position++)
+    {
+        var at = position;
+        <fieldset>
+            <legend>Shift @Model.Rows[at].Id</legend>
+            @await Html.PartialFor(m => m.Rows[at], "/Care/Record/ShiftRosterRow.cshtml")
+        </fieldset>
+    }
+    @(Html.NativeButton("approve-all", "Approve all").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Put<Roster>(CareEndpoints.ShiftRosterApprovals, request => request.Inputs(roster.Container))
+        .Validate<RosterRules>(ShiftRules.Approval)
+        .OnSuccess(Content.Text, (approved, pipeline) => pipeline.Element("roster-status").Text.Set(approved.Body))))
+}
+<p id="roster-status"></p>
+@Html.RenderPlan(plan)

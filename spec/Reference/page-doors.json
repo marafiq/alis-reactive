@@ -3895,12 +3895,36 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M8.F4 X16.48 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/ResidentDetails.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.49 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/ShiftRoster.cshtml",
+      "/Care/Record/ShiftRosterRow.cshtml",
+      "/Refusals/Validation/ShiftRoster.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M8.F4 X16.5 0": {
     "modules": [],
     "views": [
       "/Care/Admission/StateMoveIn.cshtml",
       "/Care/Admission/StateMoveInMassachusetts.cshtml",
       "/Care/Admission/StateMoveInTexas.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M8.F4 X16.50 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/ShiftRoster.cshtml",
+      "/Care/Record/ShiftRosterRow.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

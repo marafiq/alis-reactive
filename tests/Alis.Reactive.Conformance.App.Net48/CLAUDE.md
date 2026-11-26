@@ -13,9 +13,9 @@ which serves the pages `spec/Reference/app.json` places under the host net48.
   without a world.
 - `TwinApplication.cs` is its startup: `AddReactiveRequests` with the antiforgery token in a header and no other
   default, `AddReactiveJson` with camel-case enum names, `AddReactiveFluentValidation` with `RoomNumberingRules`,
-  `BedNoteRules`, `EveningBedNoteRules` and `BedHandoverRules`, and MVC's resolver set over the container
-  (`TwinResolver.cs`). A world seeded with `Seed.TheResolverLeftUnset` answers through MVC's own resolver alone, as
-  an app that never set one does.
+  `BedNoteRules`, `EveningBedNoteRules`, `BedHandoverRules` and `ResidentDetailsRules`, and MVC's resolver set over
+  the container (`TwinResolver.cs`). A world seeded with `Seed.TheResolverLeftUnset` answers through MVC's own
+  resolver alone, as an app that never set one does.
 - A request names its culture and its time zone as the conformance app's does, from the same closed lists and with
   the same 400 pages (`RequestCulturesAndZones.cs`). `World/` keeps each world by the cookie "world" and answers
   the seed, its end and the host orders `tests/Alis.Reactive.Conformance.App/Components/component-host.ts` waits on,

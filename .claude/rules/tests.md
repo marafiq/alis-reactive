@@ -49,7 +49,8 @@ The rules govern every Playwright test. A compiler rule or a named check holds e
    the other steps the same code decides (a write or a call through that path) are promises too, each with its
    own test. Each side fails on a defect of its own, its plant run on it: an opposite outside the behavior's own case
    passes the defect that breaks that side, as a form body's opposite passed a text body's check that read an empty
-   holder in place of the start (the lead's mistake, 2026-11-24).
+   holder in place of the start (the lead's mistake, 2026-11-24). A side held back reads its endpoint's sent count
+   beside its message, since a server's refusal shows the same message (the builder's mistake, 2026-11-26: X16.50).
 7. **No tautology.** Expected values are literals read from the promise, never computed by the code under
    test, copied from its output, or accepted as a recorded snapshot. A test never asserts what it typed or
    set itself, or what the compiler already guarantees. `ToHaveTextAsync` when the text is known, not

@@ -34,7 +34,20 @@ public static class RequestSteps
     /// <param name="pipeline">The pipeline the step is written in.</param>
     /// <param name="container">The container whose inputs are checked.</param>
     public static void Validate<TModel, TContainer>(this Pipeline<TModel> pipeline, RequestContainer<TContainer> container)
-        => FormChecks.WithNoRequest<TContainer>(pipeline.Writer, container.ElementId);
+        => FormChecks.WithNoRequest<TContainer>(pipeline.Writer, container.ElementId, BrowserRegistrations.DefaultRuleSet);
+
+    /// <summary>Checks a container's inputs, as it sends them, by the validator registered for its model under the rule set named, with no request.</summary>
+    /// <remarks>
+    /// The check runs the rules the validator declares inside that rule set and no other, in the browser, over the model
+    /// the endpoint would bind from the container's inputs, as a request's <c>Validate&lt;TValidator&gt;(ruleSet)</c> does.
+    /// A check that fails stops the pipeline. A model with no registered validator, and a rule set its validator runs
+    /// no rule under, are refused where the view renders.
+    /// </remarks>
+    /// <param name="pipeline">The pipeline the step is written in.</param>
+    /// <param name="container">The container whose inputs are checked.</param>
+    /// <param name="ruleSet">The rule set's name, as the validator's <c>RuleSet</c> declares it.</param>
+    public static void Validate<TModel, TContainer>(this Pipeline<TModel> pipeline, RequestContainer<TContainer> container, string ruleSet)
+        => FormChecks.WithNoRequest<TContainer>(pipeline.Writer, container.ElementId, ruleSet);
 
     /// <summary>Shows a server's validation errors as the request's failures: every message in its summary, and each at the input the request sent under its key.</summary>
     /// <remarks>The request is the one whose route the step is written in. A step in no route of a request is refused where the view renders.</remarks>
