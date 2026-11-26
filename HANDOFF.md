@@ -1,24 +1,25 @@
 # Handoff
 
-Written at `date`: Wed Nov 25 23:19:43 EST 2026
+Written at `date`: Thu Nov 26 01:08:38 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 26, each in the notes block below
-unit: landed (54): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
-unit: briefed (2): FormDataBoundaryNet48, RowContainers
+unit: landed (57): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
+unit: briefed (1): RowContainers
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at 96955defa on feature/rewrite
-  leaves by: the last line `scripts/push.sh` prints
-  exit line: "remote equals HEAD"
-  goes to: lane: pushed
-ci: unread at 96955defa
+lane: pushed at 4f1a073cb on feature/rewrite: equal to the remote
+  leaves by: the landing of a unit that is ready
+  read first: the queue of `HANDOFF.md`
+  exit line: "landed"
+  goes to: lane: landed
+ci: unread at 4f1a073cb
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2131 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2139 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
@@ -27,29 +28,23 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 96955defa validation (ValidationForms): a check with no request names its rule set, and a set its validator runs no rule under is refused
-- Full check: .work/logs/spec-check-96955defa.log: spec check at 96955defa: 40 of 40 checks pass
-- .work/last-run.txt: 20261125-225932-13405 96955defa
+- HEAD: 4f1a073cb validation (FormDataBoundaryNet48): on MVC 5 the browser's check names each member as the body sends it
+- Full check: .work/logs/spec-check-4f1a073cb.log: spec check at 4f1a073cb: 40 of 40 checks pass
+- .work/last-run.txt: 20261126-005258-36727 4f1a073cb
 
 ## Landed since the commit before the last spec: STATE commit
-96955defa validation (ValidationForms): a check with no request names its rule set, and a set its validator runs no rule under is refused
-982a6f7e3 spec: STATE and handoff at 15b480e1e
+4f1a073cb validation (FormDataBoundaryNet48): on MVC 5 the browser's check names each member as the body sends it
+ca7055154 declarations (OneDoor): the list operations have one door, an iterable's Items
+f3e2c7d9d process (MistakesShort): the mistakes log keeps each kind and what stops it, and no count
+8f12a2fb3 spec: STATE and handoff at 96955defa
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
-## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 474 to 481
-- A rule or a tool's list not applied before the change: 483 to 488
-- A number, a proof line or an absence not read from the run that proves it: 76 to 79
-- A shell command or a script wrong in its own terms: 692 to 698
-
 ## The owner's latest decisions
-spec/CLAUDE.md:9: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), choice C of the form-data boundary: a member a request sends
-spec/CLAUDE.md:15: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): one concept on the developer's surface, the request container.
-spec/CLAUDE.md:19: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): the container takes care of hidden fields in the browser, since
-spec/CLAUDE.md:24: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), yes to lines 2 to 5 of ValidationForms' section 10, each in a
+spec/CLAUDE.md:9: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): one door for each list operation. An object JavaScript iterates
+spec/CLAUDE.md:13: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mistakes log stays short enough to stay in context, each kind
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -109,9 +104,11 @@ the core's surface text is read as the 1.0 surface and README's examples come fr
      the quirk in the Query doors' XML doc, X16.46 4, 7 and 8 net48 alone, the twin's DELETE through IIS Express).
    - Landed: ValidationForms at 96955defa, "845 selected, 845 ran, 845 passed, 0 failed, 0 over budget", spec check
      40 of 40 (pipeline.Validate(container, ruleSet); a set no rule runs under refused; X16.48 to X16.50).
-   - FormDataBoundaryNet48, ../fdb-net48, briefed at 96955defa: CI's verify-net48 at 982a6f7e3 failed X16.46 0, 1, 2
-     and 6, since on MVC 5 a registration's start is named in camel case while the body and the rules name C# names
-     (.landing/FormDataBoundaryNet48/answer.md); X16.48's net48 half meets it too. Then RowContainers, ../row-containers.
+   - FormDataBoundaryNet48 (MVC 5's check names members as the body does), OneDoor (Iterables' 27 forwarders gone,
+     Children.Items.Count()) and MistakesShort (the log without counts) land in that chain on 2026-11-26; then
+     RowContainers, ../row-containers, its move.sh at the new head. Open: on MVC 5 a whole object in a JSON body is
+     sent under its JSON names while BodyName names C# names (the requests module; no twin page reaches it).
+     Parked: the traps hook rewriting a backtick inside double quotes by updatedInput, proven live first.
    A waiting unit moves once the one before it is landed and pushed: `bash .landing/<Name>/move.sh <the lane's head>`
    in its worktree, then its brief's "At the base:" line rewritten at that head, a low-effort probe, and its builder: a
    general-purpose agent with no name and no isolation, its first read .claude/agents/builder.md, on Opus at xhigh
@@ -119,7 +116,7 @@ the core's surface text is read as the 1.0 surface and README's examples come fr
    worktree, `scripts/land-unit.sh`, `scripts/full-check.sh`, `scripts/push.sh`. A unit whose paths hold
    scripts/land-unit.sh lands from a copy, `cp ../<worktree>/scripts/land-unit.sh .work/land-unit-run.sh`. land-unit.sh
    stops a kind of mistake that grew while its row and every file it names stood: the lead moves its holder in the
-   unit, a row's text through spec.py, since only the count cells are carried. Each unlanded worktree is backed up
+   Each unlanded worktree is backed up
    before a session ends: `bash .work/tools/backup-worktree.sh ../<worktree> <worktree>`.
 3. Eight parked core leads, judged at cad8e3581 (CoreLeads): typed list construction landed at a00125348; N16.3, a
    named rule set for a check with no request, is ValidationForms' F5; five after 1.0, as rows of spec/NOTES.md's table.
