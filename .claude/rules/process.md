@@ -104,9 +104,9 @@ A unit is one piece of work in a worktree of its own, whoever builds it. Its lan
 | File | Written by | In state | What it holds |
 |---|---|---|---|
 | "brief.md" | the lead | unit: unbriefed | six parts. Scope: the note or queue item it answers, the base commit, the worktree, who builds it, what it changes and leaves alone, and a line "After:" with a unit its proof needs. Rules: by path, the rule file of each kind of file it touches, the decisions of its module and the TLA+ spec of each ordering it meets. Outcome: what stands when it is done. Done: each exit line a command prints, and the line "At the base:". Commands: every command it runs. Reply: its size and what it opens with |
-| "paths.txt", "message.txt", "spec.py", "retired.txt" | the builder | unit: building | the paths outside `spec/`, the commit's message with each proof line, the spec's edits with each match counted; a count of `spec/MISTAKES.md` is the worktree file's, which `scripts/land-unit.sh` carries as its change from the base, and spec.py never edits one (the lead's mistake, 2026-11-24); a test the owner's reversal retires, a line each of its test, its promise constant and the test that carries the promise now, parted by bars, which `scripts/regressions.py` lands only where the carrier passes and is new |
+| "paths.txt", "message.txt", "spec.py", "retired.txt" | the builder | unit: building | the paths outside `spec/`, the commit's message with each proof line, the spec's edits with each match counted; a test the owner's reversal retires, a line each of its test, its promise constant and the test that carries the promise now, parted by bars, which `scripts/regressions.py` lands only where the carrier passes and is new |
 | "reply.md" | an agent | unit: building | the rule lines it applied, by file and line; each line of "Done" as its command printed it; what did not run |
-| "read.md" | the lead | unit: returned | what it read, in order: the reply's rule lines at their source; the change against its base, never the reply's account; each line of "Done" against the line the reply quotes; each mistake counted by its instance, what was done and the line it broke, so a rule can be aimed at it, held against the brief first, the lead's where the brief gave no instruction; then one line, "verdict: land", "verdict: back: " or "verdict: drop: ", a round's line rewritten in words once the next round's verdict is written, since the script reads the first line that opens one (the lead's mistake, 2026-11-26) |
+| "read.md" | the lead | unit: returned | what it read, in order: the reply's rule lines at their source; the change against its base, never the reply's account; each line of "Done" against the line the reply quotes; each fault held against the brief first, the lead's where the brief gave no instruction; then one line, "verdict: land", "verdict: back: " or "verdict: drop: ", a round's line rewritten in words once the next round's verdict is written, since the script reads the first line that opens one (the lead's mistake, 2026-11-26) |
 
 A consult reads and changes nothing: its brief and answer are files of the landing folder of the unit that asked.
 
@@ -120,14 +120,14 @@ An entry is one line of the notes block: its date, kind, home, follow-up and the
 | process rule | a row of this file | a unit |
 | decision | the decisions of its module, in `spec/CLAUDE.md` until they are split by module | a unit |
 | direction | the queue of `HANDOFF.md` | queue |
-| correction | the fix where it is found, and one count in `spec/MISTAKES.md` | a unit, or answered |
+| correction | the fix where it is found, and a row of `spec/MISTAKES.md` for a kind no row names | a unit, or answered |
 | question | the reply | answered |
 
 ## Who reads what
 
 | Reader | Reaches it without asking | Is named to read | What shows it was read |
 |---|---|---|---|
-| the lead | what the hook `.claude/settings.json` tracks prints at a start and after a compaction: what the script prints, the owner's latest decisions, each kind of mistake with its count, and `HANDOFF.md`; a rule file when a file of its kind is opened with the file tools | the "Rules" of the unit's brief | its "brief.md" before a unit, its "read.md" after an agent's |
+| the lead | what the hook `.claude/settings.json` tracks prints at a start and after a compaction: what the script prints, the owner's latest decisions, each kind of mistake with what stops it, and `HANDOFF.md`; a rule file when a file of its kind is opened with the file tools | the "Rules" of the unit's brief | its "brief.md" before a unit, its "read.md" after an agent's |
 | a Claude agent | the same files, the same way, in its worktree | its definition under `.claude/agents/`, then the brief | "reply.md" opens with the rule lines it applied |
 | Codex | nothing the lead relies on | the brief, whose first line names `AGENTS.md` and this file | its reply cites file and line |
 
@@ -143,7 +143,7 @@ An entry is one line of the notes block: its date, kind, home, follow-up and the
 | `.claude/rules/docs.md` | how a doc and a rule file are written | 120 |
 | `.claude/rules/analyzers.md` | how an analyzer is written | 120 |
 | `spec/CLAUDE.md` | the modules and where each one's decisions are kept | 150 |
-| `spec/MISTAKES.md` | the kinds of mistake, ten at most, each with its count and what stops it | 24 |
+| `spec/MISTAKES.md` | the kinds of mistake, ten at most, each with what stops it | 24 |
 | `HANDOFF.md` | the state at the last push, the owner's open notes, the queue and what is open | 150 |
 | `tests/Alis.Reactive.Conformance.App/CLAUDE.md` | the conformance app's standard | 150 |
 | `tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md` | the browser tests' standard | 150 |

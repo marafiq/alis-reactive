@@ -3536,9 +3536,10 @@ def orient():
         f"{state.get('total', 0)} pass, failing {', '.join(failing) or 'none'}, step {step.get('number', '?')} {step.get('name', '')}",
         f"owner decisions dated {latest}: spec/CLAUDE.md lines {', '.join(str(number) for number, date in dated if date == latest)}",
         subprocess.run([sys.executable, str(REPO / "scripts" / "state.py")], capture_output=True, text=True, check=True).stdout.rstrip("\n"),
-        "mistakes, by kind, with its count and what stops it (spec/MISTAKES.md):",
-        *[f"- {row.group(2)} {row.group(1).strip()}: {row.group(3).strip()}" for row in
-          re.finditer(r"^\| ([^|]+?) \| (\d+) \| (.+?) \|$", (SPEC / "MISTAKES.md").read_text(), re.MULTILINE)],
+        "mistakes, by kind, with what stops it (spec/MISTAKES.md):",
+        *[f"- {row.group(1).strip()}: {row.group(2).strip()}" for row in
+          re.finditer(r"^\| ([^|-][^|]*?) \| (.+?) \|$", (SPEC / "MISTAKES.md").read_text(), re.MULTILINE)
+          if row.group(1).strip() != "Kind"],
         f"handoff, {HANDOFF.relative_to(REPO)}:",
         HANDOFF.read_text() if HANDOFF.is_file() else "MISSING: write the handoff before any other work",
         "Before acting: read the handoff whole, the owner lines above and every file the next queue item touches; "

@@ -6,6 +6,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mistakes log stays short enough to stay in context, each kind
+  of mistake with what stops it and no count. A mistake is fixed where it is found, a kind no row names gets a row, and
+  no rule line is written for each mistake. It replaces the counts and the holder's rung of 2026-11-12, 2026-11-14 and
+  2026-11-23, and `scripts/land-unit.sh` carries and checks no count.
 - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), choice C of the form-data boundary: a member a request sends
   outside its body is checked where MVC's binder reads it, on MVC 5 the body, then the path, then the query; on net10
   a body that binds members is read alone, and a text, a file or no body binds no member, so the check reads the
@@ -2112,7 +2116,7 @@ Alis.Reactive.Assets.
 |------|---------------|------------|
 | `spec/BRIEF.md` | the session brief, with the owner's corrections | the owner's words |
 | `spec/NOTES.md` | one entry per decision, fact or owner answer, two lines at most, with its evidence | appended by hand |
-| `spec/MISTAKES.md` | the log of mistakes: how it is kept and read, the classes with their counts and what holds each, what waits for the owner, and one entry a mistake | appended by hand, the turn a mistake is found |
+| `spec/MISTAKES.md` | the kinds of mistake, ten at most, each with what stops it | a row by hand, the turn a new kind is met |
 | `spec/tools/check.py` | every check the brief's section 1 names, and a brief mode for the compact hook | hand |
 | `spec/STATE.json` | the phase, the step, each check's result and counts, the next action | `spec/tools/check.py` only |
 | `spec/Elements/module.md`, one per module folder, named as the module table names it in PascalCase, hyphens dropped | the core questions the module uses; its doors, "M5.N1" for module 5's first, each with what it replaces, and each core door it keeps, so every core door is named by a module; the improvements it proposes, each with its evidence; every cite at the SHA it names ("at 623dd4a27"), or at HEAD, the redesign or main when it names none | hand |

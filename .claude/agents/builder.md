@@ -68,7 +68,7 @@ names. Read these whole, before anything else:
 - Before treating a spec check as read-only, read the check it runs. The fluent check in `spec/tools/check.py`
   starts nested .NET builds and uses the same serial build lock as a direct build (the lead's repeated mistake,
   2026-11-19).
-- Change no file of `spec/` but `spec/MISTAKES.md`, and add or remove no public symbol unless your brief says so.
+- Change no file of `spec/`, and add or remove no public symbol unless your brief says so.
 - A form the spec does not state you decide by quality, from the TLA+ specs, the principles and the owner's decisions,
   and name it decided. A gap no line decides is left as it stands and named with its use; never invent a member, a
   syntax or a runtime behavior.
@@ -77,7 +77,7 @@ names. Read these whole, before anything else:
 
 Every command your brief names, run on your finished files, read when it printed. Each meaning proven by a planted
 defect that keeps the build clean: change one value, run the tests, see the named test fail, restore by `cp` and
-`touch`. No comment in any language. Each mistake you meet counted in its kind in `spec/MISTAKES.md`.
+`touch`. No comment in any language.
 
 ## What you return
 

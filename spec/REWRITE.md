@@ -86,7 +86,7 @@ how a unit collects those lines.
 | The standard of one kind of file | its file under `.claude/rules` |
 | The standard, the command and the refusals of one project | that project's own CLAUDE.md |
 | The owner's decisions, in the owner's words | `spec/CLAUDE.md`; verbatim in `spec/NOTES.md` |
-| Each mistake, its class, what it cost and what holds the class | `spec/MISTAKES.md` |
+| Each kind of mistake and what stops it | `spec/MISTAKES.md` |
 | A module's doors, features, defects and tests | `spec/<Module>/module.md` and `features.json` |
 
 ## 2. The repository

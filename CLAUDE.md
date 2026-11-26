@@ -158,11 +158,10 @@ not; MVC 5 on net48 is CI's Windows job (the owner, 2026-11-20).
 A correction has one home: an owner's correction, and a reversal of the lead's with no new fact, become that turn a
 plain line, dated and attributed, of the rule file that owns the subject (`.claude/rules/`, a project's `CLAUDE.md`,
 `spec/CLAUDE.md` for the owner's decisions, this file for the plan, the loop, a session and the team). A mistake, the
-lead's or an agent's, is fixed where it is found and wherever its cause is shared, then counted in its kind in
-`spec/MISTAKES.md` that turn, one count or one new row (the owner, 2026-11-14). A kind that grows while its holder
-stands moves the holder up a rung that turn: a line of the rule file that loads with that kind of file, then a tool that
-refuses it, as Claude Code's guidance moves a line Claude keeps missing into a hook (the owner, 2026-11-23: "its not log
-and forgotten, its to enforce progressive learning"). A mistake is called a mistake, never a softer word (the owner,
+lead's or an agent's, is fixed where it is found and wherever its cause is shared; a kind no row of `spec/MISTAKES.md`
+names gets a row there, and no count and no rule line is written for each mistake (the owner, 2026-11-26: "drop the
+count nonsense, it has not helped"). A kind that recurs is stopped by a tool that refuses it before it runs, as the
+traps hook and the deny rules do. A mistake is called a mistake, never a softer word (the owner,
 2026-11-13).
 
 ## Sessions

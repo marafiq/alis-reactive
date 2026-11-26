@@ -81,13 +81,6 @@ def build():
     landed = git(*landed_args)
     opened = (command(sys.executable, "scripts/open.py").splitlines() or ["open: nothing"])[0] + "\nEach, by file and line: `python3 scripts/open.py`."
     machine = condensed(command(sys.executable, "scripts/state.py").rstrip("\n"))
-    def kinds(text):
-        return {row.group(1).strip(): int(row.group(2)) for row in re.finditer(r"^\| ([^|]+?) \| (\d+) \|", text, re.M)}
-
-
-    counted = kinds(Path("spec/MISTAKES.md").read_text())
-    pushed = kinds(git("show", f"{state}:spec/MISTAKES.md")) if state else counted
-    grew = [f"- {kind}: {pushed.get(kind, 0)} to {count}" for kind, count in counted.items() if count > pushed.get(kind, 0)]
     decisions = []
     for number, line in enumerate(Path("spec/CLAUDE.md").read_text().splitlines(), 1):
         dated = re.match(r"^- The owner, (\d{4}-\d{2}-\d{2})", line)
@@ -114,9 +107,6 @@ def build():
         "",
         "## Open",
         opened,
-        "",
-        "## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file",
-        "\n".join(grew) if grew else "None.",
         "",
         "## The owner's latest decisions",
         "\n".join(owners) if owners else "No dated owner decision is recorded.",
