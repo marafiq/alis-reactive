@@ -1203,12 +1203,14 @@ defects. An MVC action reaches the answer gate by its filter, with its own addre
 held, and the harness's test of it is green and fails on each of its two planted defects. U3 is closed: the
 tests that wait, the views and doors they meet, the harness verbs they use and the Playwright project's switch,
 which waits for the last test, land with their units (the owner, 2026-11-14).
-U7 is closed: `AddReactiveTracing` and the server's activities, a view's render and an endpoint's check, each handler
+U7's pieces are landed: `AddReactiveTracing` and the server's activities, a view's render and an endpoint's check, each handler
 a door writes carrying its caller's file and line (D20.7); the plan's trace context and the runtime's Tracing slice, a
 boot span per plan with its error or its stop and traceparent sent to the page's origin alone (D20.4, D20.5); each
 request's attempt recorded through the trace port by the runtime's requests module; and
 `Alis.Reactive.OpenTelemetry` with its layout helper (N20.2). Its 8 browser tests pass in one run, the land of
-6feddb6e3.
+6feddb6e3. It stays open until README.md shows its startup example setting `console` from the host's development
+setting (N20.3) and D20.8's net48 fact, joining an inbound `traceparent`, is probed on verify-net48, as its section
+states (the lead's mistake, 2026-11-26: Section4Close closed it on its tests alone).
 U4, U5 and U10 are closed: their modules build every door they declare, the browser tests the spec places in them
 pass in one run (1, 1 and 5), their analyzers wait until after 1.0 (the owner, 2026-11-15), and each promise of
 theirs whose page calls a later unit's door is proven in that unit. U8 is closed: Execution builds every part it
@@ -1239,7 +1241,8 @@ the contract's table written before the compiler reads it, the conformance libra
 beside their declarations, boot's plugin queue and `alis:mount`, the plugin script of every page that links one, and
 the contract's reader with ALIS014 and ALIS015, the core and the conformance app opting in to the table; the contract's
 rules ALIS016 to ALIS022 and ALIS037 wait until after 1.0 with the analyzers that repeat a refusal where the view
-renders (the owner, 2026-11-15), and the 98 browser tests the spec lands in U13 pass in one run. U13 is closed.
+renders (the owner, 2026-11-15), and the 98 browser tests the spec lands in U13 pass in one run. U13 stays open until README.md teaches a component's
+slice as the app's standard, as its section states (the lead's mistake, 2026-11-26: it was closed on its tests alone).
 U14 is landed: `Plugin` and its name's check, `pipeline.Plugin<TPlugin>()` with one locator a name,
 `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`, with their module tests. A host is ready once MVC has
 rendered a view with a plan (section 2.5).
@@ -1262,7 +1265,7 @@ bound file list under its binding name (D9.8, D9.15, D14.3), proved by X9.27's r
 U20's app events are landed: `AppEvent.Declare`, the
 document's load and custom-event triggers under a handler's policy, a payload member read at the event's detail, and a
 raise from markup; most of the browser tests U20 lands wait on U18's other methods. A date shown as an element's text is
-its declared type's, C# writing on the `string` shape whether it holds a `DateTime` or a `DateTimeOffset`. U6, U19, U20 and U21 are closed (2026-11-26): the core holds no door that throws `NotImplementedException`, and each browser test the spec places in them, 3, 23, 13 and 184, is written and passes in one run, the land of 6feddb6e3, "853 selected, 853 ran, 853 passed, 0 failed, 0 over budget", U6's MVC 5 half in CI's verify-net48 at 7ef43d8b8. U1, U2, U14, U15, U16 and U17 are closed (2026-11-26) by the same reading: each browser test the spec places in them, 0, 3, 4, 15, 26 and 63, is written and passes, the net10 ones in the land of 2536f54de, "853 selected, 853 ran, 853 passed, 0 failed, 0 over budget", and the MVC 5 ones in CI's verify-net48 at 47380692f, "33 selected, 33 ran, 33 passed, 0 failed, 0 over budget". U18 stays open until a whole object a JSON body sends on MVC 5 is refused where a member's JSON name differs from its C# name past case (D9.7) and X10.2's and X10.29's endpoints read a world's record, and U22 until the freeze reads README. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
+its declared type's, C# writing on the `string` shape whether it holds a `DateTime` or a `DateTimeOffset`. U6, U19, U20 and U21 are closed (2026-11-26): the core holds no door that throws `NotImplementedException`, and each browser test the spec places in them, 3, 23, 13 and 184, is written and passes in one run, the land of 6feddb6e3, "853 selected, 853 ran, 853 passed, 0 failed, 0 over budget", U6's MVC 5 half in CI's verify-net48 at 7ef43d8b8. U14, U15, U16 and U17 are closed (2026-11-26), their sections naming nothing past their features: each browser test the spec places in them, 4, 15, 26 and 63, is written and passes, the net10 ones in the land of 2536f54de, "853 selected, 853 ran, 853 passed, 0 failed, 0 over budget", and the MVC 5 ones in CI's verify-net48 at 47380692f, "33 selected, 33 ran, 33 passed, 0 failed, 0 over budget". U1 is closed by its tools' lines in that land, `scripts/check.sh` "[check] every check passed.", and CI's spec job at 47380692f, which runs `check.py --ci`. U2 is closed: its three harness tests pass in that land, and of section 2.8's four workflows CI, the nightly browser gate and the Syncfusion upgrade have run, the publish workflow running at the first release tag. U22 is closed: the core holds no door that throws `NotImplementedException`, CI's pack job at 47380692f packs the six packages, the delivery tests pass on both fresh apps, consumerNet10 in that land and consumerNet48 in verify-net48 ("1 selected, 1 ran, 1 passed, 0 failed, 0 over budget"), the twin builds there, and README.md holds what each fresh app does on its host, WhenADocShowsAnExample holding its examples. U18 stays open until a whole object a JSON body sends on MVC 5 is refused where a member's JSON name differs from its C# name past case (D9.7) and X10.2's and X10.29's endpoints read a world's record. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
 pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). A unit's last commit
 rewrites this paragraph, as root `CLAUDE.md` states.
 
