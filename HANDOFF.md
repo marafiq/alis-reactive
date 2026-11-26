@@ -1,21 +1,21 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 17:34:56 EST 2026
+Written at `date`: Thu Nov 26 18:23:58 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 25, each in the notes block below
+note: open: 26, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (71): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (72): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
-unit: building (2): FreshAppSlice, MoveInOwners
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
+unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 0a6cb3203 on feature/rewrite: equal to the remote
+lane: pushed at 7ab93ef58 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 0a6cb3203
+ci: unread at 7ab93ef58
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -26,7 +26,7 @@ file: over spec/CLAUDE.md: holds 2155 lines, its limit 150
 file: over HANDOFF.md: holds 154 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 16 units have landed since .claude/rules/process.md last changed
+machine: review due : 17 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -34,14 +34,13 @@ machine: review due : 16 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 0a6cb3203 process (StateSpecUnits): a unit whose every change is under spec/ reads as landed once a commit holds its title
-- Full check: .work/logs/spec-check-0a6cb3203.log: spec check at 0a6cb3203: 40 of 40 checks pass
-- .work/last-run.txt: 20261126-172506-44246 0a6cb3203
+- HEAD: 7ab93ef58 delivery (FreshAppSlice): README teaches a component's slice from the fresh apps' own AppButton, M19.X7 holding its click on each host
+- Full check: .work/logs/spec-check-7ab93ef58.log: spec check at 7ab93ef58: 40 of 40 checks pass
+- .work/last-run.txt: 20261126-180829-5562 7ab93ef58
 
 ## Landed since the commit before the last spec: STATE commit
-0a6cb3203 process (StateSpecUnits): a unit whose every change is under spec/ reads as landed once a commit holds its title
-be6eae4aa conformance (WorldRecords): X10.2's and X10.29's endpoints read a world's seeded records
-3239130ed spec: STATE and handoff at ea200d9c3
+7ab93ef58 delivery (FreshAppSlice): README teaches a component's slice from the fresh apps' own AppButton, M19.X7 holding its click on each host
+7aedb17a9 spec: STATE and handoff at 0a6cb3203
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
@@ -55,6 +54,7 @@ spec/CLAUDE.md:24: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mi
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
+- 2026-11-26 | direction | the queue of this file | queue | "lets hold on tracing, finish every other framework, and then leave handoff codex will take over"
 - 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complexities. Get rid of this desk thinking. Keep other pages, other browser tasks, but write this complex app from ground up with full scale complexity. This framework has features to handle it."
 - 2026-11-18 | direction | the queue of this file | queue | "I want you to build a skill out of that TLA plus and schema, which will be used by every consumer as well." "This skill you are building should be a guiding principle for any developer to write any complex app by simple decisions, because it has a map, right? It has clear names, right?"
 - 2026-11-18 | decision | spec/CLAUDE.md, the conformance app's decisions | MoveInSpec | "This should not be in the skill. This is for you to use the skill to write the app, but you have to first list down every feature the app will have ... The specs of the apps are a separate thing, but you should get help from the specs and the TLA plus that how that app should be written." "Why you need to do inventory again? You have TLA+, you have schema."
