@@ -228,7 +228,7 @@ def units():
             paths = [line for line in (folder / "paths.txt").read_text().splitlines() if line] if files["paths.txt"] else []
             equal = bool(paths) and files["message.txt"] and all(((tree / path).read_bytes() if (tree / path).is_file() else None) == blob(path) for path in paths)
             first = (folder / "message.txt").read_text().splitlines()[:1] if files["message.txt"] else []
-            equal = equal or bool(paths and first and first[0].strip() and held_by_a_commit(tree, first[0]))
+            equal = equal or bool(first and first[0].strip() and held_by_a_commit(tree, first[0]))
             verdict = ""
             if files["read.md"]:
                 verdict = next((line for line in (folder / "read.md").read_text().splitlines() if line.startswith("verdict: ")), "")
