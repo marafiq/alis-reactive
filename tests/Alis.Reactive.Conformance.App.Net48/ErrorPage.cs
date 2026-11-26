@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using System.Web;
 
@@ -12,6 +13,7 @@ internal static class ErrorPage
         if (context.Server.GetLastError() is not { } thrown) return;
 
         var shown = thrown is HttpUnhandledException { InnerException: { } inner } ? inner : thrown;
+        Console.Error.WriteLine(context.Request.HttpMethod + " " + context.Request.RawUrl + " threw " + shown);
         context.Server.ClearError();
         var response = context.Response;
         response.Clear();

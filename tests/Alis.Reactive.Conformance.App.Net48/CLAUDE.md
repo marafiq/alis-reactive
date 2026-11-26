@@ -25,7 +25,8 @@ which serves the pages `spec/Reference/app.json` places under the host net48.
 - An attribute route of MVC 5 starts with no "/", so `AddressAttribute.cs` takes a page's address as the world
   contract names it and trims its leading "/".
 - An exception a page throws answers with its type and message as the page's heading (`ErrorPage.cs`), the
-  conformance app's error page.
+  conformance app's error page, and is written whole, with the request that threw it, to the server's error stream,
+  which the Windows run keeps as run-hosts/iis.err.log beside the request log.
 - Its layout, `Shared/_Layout.cshtml`, renders `Html.ConformanceNotice()` after its body
   (`tests/Alis.Reactive.Conformance.App/Components/ConformanceNotice/ConformanceNoticeHtml.Net48.cs`), since the check
   of a request sent with no container shows its failures at the notice.

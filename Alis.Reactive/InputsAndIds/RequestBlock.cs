@@ -18,7 +18,9 @@ internal sealed class RequestBlock
         _writer = writer;
         _checkPrefix = checkPrefix;
         var summary = id + "_summary";
-        ModelPlugin.Contains(plan, id, new FieldPrefix(prefix, [.. BoundInput.PrefixSteps(prefix, plan.Json.App)]), summary, live);
+        var underNoPrefix = prefix.Length == 0;
+        PathStep[] steps = underNoPrefix ? [] : [.. BoundInput.PrefixSteps(prefix, plan.Json.App)];
+        ModelPlugin.Contains(plan, id, new FieldPrefix(prefix, steps), summary, live);
         writer.Write($"<fieldset id=\"{WebUtility.HtmlEncode(id)}\">");
         writer.Write($"<div id=\"{WebUtility.HtmlEncode(summary)}\" class=\"validation-summary-valid\" hidden><ul></ul></div>");
     }
