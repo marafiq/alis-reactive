@@ -1,21 +1,21 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 03:25:50 EST 2026
+Written at `date`: Thu Nov 26 05:01:33 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (58): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
+unit: landed (59): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundaryNet48, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, RowContainers, SentPosition, SplitValue, TextBodyCheck, ValidationForms, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 7b4d6c306 on feature/rewrite: equal to the remote
+lane: pushed at ddf83d814 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 7b4d6c306
+ci: unread at ddf83d814
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -28,13 +28,13 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 7b4d6c306 validation (RowContainers): a container under a field prefix sends, reads and checks its inputs under the names past the prefix
-- Full check: .work/logs/spec-check-7b4d6c306.log: spec check at 7b4d6c306: 40 of 40 checks pass
-- .work/last-run.txt: 20261126-030931-4240 7b4d6c306
+- HEAD: ddf83d814 requests (JsonNoContent): a 204 to a route that reads JSON runs the catch-all as a content failure, and a route of kind none runs its success
+- Full check: .work/logs/spec-check-ddf83d814.log: spec check at ddf83d814: 40 of 40 checks pass
+- .work/last-run.txt: 20261126-044606-59784 ddf83d814
 
 ## Landed since the commit before the last spec: STATE commit
-7b4d6c306 validation (RowContainers): a container under a field prefix sends, reads and checks its inputs under the names past the prefix
-a45d98273 spec: STATE and handoff at 4f1a073cb
+ddf83d814 requests (JsonNoContent): a 204 to a route that reads JSON runs the catch-all as a content failure, and a route of kind none runs its success
+1da9b32a4 spec: STATE and handoff at 7b4d6c306
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
@@ -102,18 +102,26 @@ the core's surface text is read as the 1.0 surface and README's examples come fr
      the quirk in the Query doors' XML doc, X16.46 4, 7 and 8 net48 alone, the twin's DELETE through IIS Express).
    - Landed: ValidationForms at 96955defa, "845 selected, 845 ran, 845 passed, 0 failed, 0 over budget", spec check
      40 of 40 (pipeline.Validate(container, ruleSet); a set no rule runs under refused; X16.48 to X16.50).
-   - FormDataBoundaryNet48 (MVC 5's check names members as the body does), OneDoor (Iterables' 27 forwarders gone,
-     Children.Items.Count()) and MistakesShort (the log without counts) land in that chain on 2026-11-26; then
-     RowContainers, ../row-containers, its move.sh at the new head. Open: on MVC 5 a whole object in a JSON body is
-     sent under its JSON names while BodyName names C# names (the requests module; no twin page reaches it).
+   - Landed on 2026-11-26, each "845 selected, 845 ran, 845 passed": MistakesShort at f3e2c7d9d (the log without
+     counts), OneDoor at ca7055154 (Iterables' 27 forwarders gone, Children.Items.Count()), FormDataBoundaryNet48 at
+     4f1a073cb (MVC 5's check names members as the body does; CI at a45d98273 10 of 10, verify-net48 24 of 24);
+     RowContainers at 7b4d6c306, "851 selected, 851 ran, 851 passed", spec check 40 of 40 (a container under a field
+     prefix; X16.50 to X16.56 on both hosts, the MVC 5 half first on CI). Open: on MVC 5 a whole object in a JSON body
+     is sent under its JSON names while BodyName names C# names (the requests module; no twin page reaches it).
+   - Building: JsonNoContent, ../json-no-content at 1da9b32a4 (item 5's 204, X10.30). Then item 4.
+   - Open, read at the source on 2026-11-26: X10.2's SessionNotes endpoints and X10.29's /Beds answer constants, against
+     tests/Alis.Reactive.Conformance.App/CLAUDE.md:19 (the owner, 2026-11-18); each becomes a world's seeded record.
+   - Item 4, read at the source on 2026-11-26: MVC 5 returns an empty text item as "" before its blank check
+     (spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:50-52), so DESIGN.md:1826's text row and forms.ts:223,
+     which reads every empty form field as null, hold for nullable values alone; net10's binding of an empty text item
+     is the next probe (spec/probes/AspNetCoreBinding, a List<string> query and form body), run once the build slot frees.
      Parked: the traps hook rewriting a backtick inside double quotes by updatedInput, proven live first.
    A waiting unit moves once the one before it is landed and pushed: `bash .landing/<Name>/move.sh <the lane's head>`
    in its worktree, then its brief's "At the base:" line rewritten at that head, a low-effort probe, and its builder: a
    general-purpose agent with no name and no isolation, its first read .claude/agents/builder.md, on Opus at xhigh
    (.claude/skills/delegate/SKILL.md). Then read.md, the unit staged and `scripts/check.sh --no-spec` in its
    worktree, `scripts/land-unit.sh`, `scripts/full-check.sh`, `scripts/push.sh`. A unit whose paths hold
-   scripts/land-unit.sh lands from a copy, `cp ../<worktree>/scripts/land-unit.sh .work/land-unit-run.sh`. land-unit.sh
-   stops a kind of mistake that grew while its row and every file it names stood: the lead moves its holder in the
+   scripts/land-unit.sh lands from a copy, `cp ../<worktree>/scripts/land-unit.sh .work/land-unit-run.sh`.
    Each unlanded worktree is backed up
    before a session ends: `bash .work/tools/backup-worktree.sh ../<worktree> <worktree>`.
 3. Eight parked core leads, judged at cad8e3581 (CoreLeads): typed list construction landed at a00125348; N16.3, a
