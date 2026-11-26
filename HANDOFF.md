@@ -1,6 +1,6 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 07:24:27 EST 2026
+Written at `date`: Thu Nov 26 07:36:45 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 25, each in the notes block below
@@ -9,13 +9,14 @@ unit: landed (62): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnl
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
+unit: ready (1): Section4Close
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 6feddb6e3 on feature/rewrite: equal to the remote
+lane: pushed at 720499148 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 6feddb6e3
+ci: unread at 720499148
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -28,13 +29,13 @@ file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 6feddb6e3 views (Mvc5Razor): a "for" inside a container's code block takes no "@", which MVC 5's parser refuses
-- Full check: .work/logs/spec-check-6feddb6e3.log: spec check at 6feddb6e3: 40 of 40 checks pass
+- HEAD: 720499148 spec (Section4Close): U6, U7, U19, U20 and U21 are closed, and what holds U17, U18 and U22 open
+- Full check: .work/logs/spec-check-720499148.log: spec check at 720499148: 40 of 40 checks pass
 - .work/last-run.txt: 20261126-071443-21665 6feddb6e3
 
 ## Landed since the commit before the last spec: STATE commit
-6feddb6e3 views (Mvc5Razor): a "for" inside a container's code block takes no "@", which MVC 5's parser refuses
-d47c475aa spec: STATE and handoff at 3710785c9
+720499148 spec (Section4Close): U6, U7, U19, U20 and U21 are closed, and what holds U17, U18 and U22 open
+57b8d0fd3 spec: STATE and handoff at 6feddb6e3
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
@@ -102,20 +103,18 @@ the core's surface text is read as the 1.0 surface and README's examples come fr
      the quirk in the Query doors' XML doc, X16.46 4, 7 and 8 net48 alone, the twin's DELETE through IIS Express).
    - Landed: ValidationForms at 96955defa, "845 selected, 845 ran, 845 passed, 0 failed, 0 over budget", spec check
      40 of 40 (pipeline.Validate(container, ruleSet); a set no rule runs under refused; X16.48 to X16.50).
-   - Landed on 2026-11-26, each "845 selected, 845 ran, 845 passed": MistakesShort at f3e2c7d9d (the log without
-     counts), OneDoor at ca7055154 (Iterables' 27 forwarders gone, Children.Items.Count()), FormDataBoundaryNet48 at
-     4f1a073cb (MVC 5's check names members as the body does; CI at a45d98273 10 of 10, verify-net48 24 of 24);
-     RowContainers at 7b4d6c306, "851 selected, 851 ran, 851 passed", spec check 40 of 40 (a container under a field
-     prefix; X16.50 to X16.56 on both hosts, the MVC 5 half first on CI). Open: on MVC 5 a whole object in a JSON body
-     is sent under its JSON names while BodyName names C# names (the requests module; no twin page reaches it).
-   - Building: JsonNoContent, ../json-no-content at 1da9b32a4 (item 5's 204, X10.30). Then item 4.
-   - Open, read at the source on 2026-11-26: X10.2's SessionNotes endpoints and X10.29's /Beds answer constants, against
-     tests/Alis.Reactive.Conformance.App/CLAUDE.md:19 (the owner, 2026-11-18); each becomes a world's seeded record.
-   - Item 4, read at the source on 2026-11-26: MVC 5 returns an empty text item as "" before its blank check
-     (spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:50-52), so DESIGN.md:1826's text row and forms.ts:223,
-     which reads every empty form field as null, hold for nullable values alone; net10's binding of an empty text item
-     is the next probe (spec/probes/AspNetCoreBinding, a List<string> query and form body), run once the build slot frees.
-     Parked: the traps hook rewriting a backtick inside double quotes by updatedInput, proven live first.
+   - Landed on 2026-11-26: MistakesShort f3e2c7d9d, OneDoor ca7055154 (Iterables' forwarders gone), FormDataBoundaryNet48
+     4f1a073cb, RowContainers 7b4d6c306, JsonNoContent ddf83d814 (X10.30), Mvc5Roster 9ccf7a367 (a container under no
+     prefix reads no JSON options; the twin logs a page's exception to run-hosts/iis.err.log), EmptyTextItem 3710785c9
+     (BoundList.emptyField, X16.57), Mvc5Razor 6feddb6e3 (no "@for" inside a code block), Section4Close 720499148
+     (U6, U7, U19 to U21 closed). The last land: "853 selected, 853 ran, 853 passed"; CI at 57b8d0fd3 verify-net48
+     "33 selected, 33 ran, 32 passed, 1 failed", least-dose alone.
+   - Open, the owner's decision put on 2026-11-26: least-dose's MVC 5 navigation outlasts the 704 ms wait while IIS
+     Express compiles its view at first render (its GET the run's last logged line, no exception); the lead recommends
+     scripts/playwright-windows.ps1 precompiling the twin in place with aspnet_compiler before IIS Express starts.
+   - Open: U18, a whole object a JSON body sends on MVC 5 is named by its JSON names where the endpoint binds C# names
+     (the requests module), and X10.2's and X10.29's endpoints answer constants against the app's CLAUDE.md:19; U22,
+     README read at the freeze; the 1.0 surface read with the six G13 forms.
    A waiting unit moves once the one before it is landed and pushed: `bash .landing/<Name>/move.sh <the lane's head>`
    in its worktree, then its brief's "At the base:" line rewritten at that head, a low-effort probe, and its builder: a
    general-purpose agent with no name and no isolation, its first read .claude/agents/builder.md, on Opus at xhigh
