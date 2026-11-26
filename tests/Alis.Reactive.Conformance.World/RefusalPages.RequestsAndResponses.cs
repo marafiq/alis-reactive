@@ -10,4 +10,6 @@ public static partial class RefusalPages
     public const string RoundsBoard = Area + "requests-and-responses/rounds-board";
     public const string FollowUpBookingByItsDate = Area + "requests-and-responses/follow-up-booking/by-its-date";
     public const string FollowUpBookingWithItsNote = Area + "requests-and-responses/follow-up-booking/with-its-note";
+    public const string KinContactsNamedPastTheirCase = Area + "requests-and-responses/kin-contacts/named-past-their-case";
+    public const string KinContactsNamedByTheirCase = Area + "requests-and-responses/kin-contacts/named-by-their-case";
 }

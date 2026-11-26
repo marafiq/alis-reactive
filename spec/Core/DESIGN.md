@@ -1777,7 +1777,7 @@ Terms used throughout:
   that reads that form or by the rows from JSON the server writes. On net48 a member of an object a JSON body sends
   whole, whoever wrote it, whose JSON name differs from its C# name past case is refused where the view renders, since
   MVC 5 binds a JSON body by C# names ignoring case (`probe:mvc5-json-binds-through-binder`,
-  `probe:mvc5-json-value-provider-case`); its cure, a JSON name that differs from the C# name by case alone.
+  `probe:mvc5-json-value-provider-case`); its cure, a JSON name that differs from the C# name by case alone (X9.48).
 - D9.8 Form data is multipart, written by the browser: an ordered list of parts, each a name and either text or a file
   with its name and media type. A field is named by its binding name, a list sends one part per item, a number
   carries the decimal separator of the view's culture (D3.7) and a file is sent as the file. Fields and files go in
@@ -2251,6 +2251,12 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `X9.47` behavior (D9.15): a hidden input inside a container's element, MVC's `HiddenFor` and one the view wrote, is
   sent under its name in the container's URL-encoded body beside its framework inputs, and a disabled one and one
   outside the element are not; the same container's GET query carries none of them.
+- `X9.48` refusal (D9.7): on net48 an object a JSON body sends whole, whoever wrote it, a reply, a live object or the
+  view's literal, a member of which, at any depth of its objects and lists, has a JSON name that differs from its C#
+  name past case, is refused where the view renders with "'{member}' holds '{name}', which MVC 5 binds by its
+  C# name {declared}, and a JSON body sends an object's members by their JSON names; give it a JSON name that differs from
+  {declared} by case alone."; beside a JSON name that differs by case alone the page renders and the endpoint binds the
+  member, and on net10 the same view renders.
 
 ## Q10. The request's flow and its response
 

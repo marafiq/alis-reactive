@@ -501,6 +501,10 @@
         {
           "id": "X9.47",
           "rung": "behavior"
+        },
+        {
+          "id": "X9.48",
+          "rung": "refusal"
         }
       ],
       "promises": [
@@ -872,6 +876,14 @@
           "outcome": "After Hand over the echo reads Desk Front; Name Ada; Shift Night; Ward North.",
           "opposite": "After Look up the echo reads Name Ada: the query carries no hidden input.",
           "defect": "The hidden inputs left out of the form body, so the echo reads Desk Front; Name Ada; the disabled one or the one outside the element sent, so Bed or Unit shows; or the hidden inputs carried into the query, so Look up's echo reads Name Ada; Shift Night; Ward North."
+        },
+        {
+          "for": "X9.48",
+          "page": "An MVC 5 page served by the verify-net48 run, a next of kin page whose Save the next of kin posts a JSON body that sets Daughter, the resident's daughter, from a literal contact whose GivenName, Ada, carries the JSON name given; the endpoint binds the daughter and answers her given name, which the page writes into saved.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where it renders with \"'r => r.Daughter' holds 'given', which MVC 5 binds by its C# name GivenName, and a JSON body sends an object's members by their JSON names; give it a JSON name that differs from GivenName by case alone.\"",
+          "opposite": "The page whose daughter carries the JSON name givenName renders, and Save the next of kin posts the daughter, which the endpoint binds, and saved reads Ada.",
+          "defect": "The page renders, and the body sends the daughter's given name under given, which MVC 5 binds to no member of the contact, so the endpoint binds the daughter with no given name and saved reads no given name."
         }
       ],
       "verdicts": [

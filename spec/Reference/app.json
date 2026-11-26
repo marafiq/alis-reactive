@@ -15554,6 +15554,21 @@
       "harness": [
         "seed"
       ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.48",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "refusalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
     }
   ],
   "cells": [

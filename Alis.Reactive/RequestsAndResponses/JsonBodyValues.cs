@@ -57,6 +57,7 @@ internal static class JsonBodyValues
     internal static JsonLeaf Literal<TValue>(TValue value, BlockWriter writer, LambdaExpression member)
     {
         Literals.RefuseAtAnyDepth(value, writer.Content.Json.BodyForm, member.ToString());
+        RefuseNamesItsEndpointBindsOtherwise(writer.Content.Json.BodyForm.GetTypeInfo(typeof(TValue)), member.ToString(), []);
         var written = new LitExpression(EnumEndpoints.Literal(value, writer.Content.Json));
         return value is null ? Leaf<TValue>(written, writer, member) : JsonLeaf.NullWhenNothing(written);
     }
@@ -176,12 +177,14 @@ internal static class JsonBodyValues
     private static Expression InTheBodysForm<TValue>(Expression captured, HeldForm form, JsonTypeInfo held, CultureInfo culture, string member)
     {
         var live = form.NumbersAndDatesIntoLive<TValue>(captured);
+        RefuseNamesItsEndpointBindsOtherwise(held, member, []);
         return DatesAsText(held, culture, member, [], (_, _, _) => { }) is { } texts ? new AsExpression(live, texts) : live;
     }
 
     private static Expression AsALiveObjectHoldsIt<TValue>(Expression captured, HeldForm form, BlockWriter writer, string member)
     {
         var endpoint = writer.Content.Json.App.GetTypeInfo(typeof(TValue));
+        RefuseNamesItsEndpointBindsOtherwise(endpoint, member, []);
         var texts = DatesAsText(endpoint, writer.Content.RendersUnder, member, [], (holder, property, held) => RefuseWhatALiveObjectHoldsApart(holder, property, held, form, writer.Content.Json, member));
         return texts is null ? captured : new AsExpression(captured, texts);
     }
@@ -199,7 +202,6 @@ internal static class JsonBodyValues
             {
                 var held = type.Options.GetTypeInfo(property.PropertyType);
                 RefuseAWritingTheLiveFormMisreads(type, property, held, member);
-                RefuseANameItsEndpointBindsOtherwise(type, property, member);
                 refuse(type, property, held);
                 if (DatesAsText(held, culture, member, path, refuse) is not { } texts) continue;
                 fields[property.Name] = new FieldConversion(texts, ConversionShapes.NothingOf(held));
@@ -225,6 +227,25 @@ internal static class JsonBodyValues
         if (writesIt is null) return;
         throw new InvalidOperationException(
             $"'{member}' holds '{property.Name}', which {writesIt} writes, and a JSON body sends it in the form its endpoint binds, which the browser cannot read from that writing; set it from a literal, or set its other members.");
+    }
+
+    private static void RefuseNamesItsEndpointBindsOtherwise(JsonTypeInfo type, string member, HashSet<JsonTypeInfo> path)
+    {
+        if (!path.Add(type)) return;
+        try
+        {
+            if (type.IsList(out var item)) RefuseNamesItsEndpointBindsOtherwise(item, member, path);
+            if (type.Kind != JsonTypeInfoKind.Object) return;
+            foreach (var property in type.Properties.Where(property => property.Get is not null))
+            {
+                RefuseANameItsEndpointBindsOtherwise(type, property, member);
+                if (property.CustomConverter is null) RefuseNamesItsEndpointBindsOtherwise(type.Options.GetTypeInfo(property.PropertyType), member, path);
+            }
+        }
+        finally
+        {
+            path.Remove(type);
+        }
     }
 
     private static void RefuseANameItsEndpointBindsOtherwise(JsonTypeInfo holder, JsonPropertyInfo property, string member)
