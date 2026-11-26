@@ -14,22 +14,22 @@
       "counts": {
         "cells": 117,
         "hosts": 26,
-        "placed": 740,
+        "placed": 746,
         "problems": 0,
         "rewrite": 0,
         "screens": 15
       },
-      "detail": "740 feature tests and 117 cell tests on 15 screens under 26 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
+      "detail": "746 feature tests and 117 cell tests on 15 screens under 26 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "bindings": {
       "counts": {
-        "constants": 867,
+        "constants": 873,
         "gates": 74,
         "marks": 131,
         "problems": 0
       },
-      "detail": "Gates.g.cs holds 74 gates and Promises.g.cs 867 constants, 131 of a held gate marked on them, each as the spec writes it",
+      "detail": "Gates.g.cs holds 74 gates and Promises.g.cs 873 constants, 131 of a held gate marked on them, each as the spec writes it",
       "pass": true
     },
     "carriers": {
@@ -1669,7 +1669,7 @@
     },
     "plants": {
       "counts": {
-        "caught": 256,
+        "caught": 263,
         "checks": 39,
         "failed": 0,
         "kept": 89,
@@ -1677,16 +1677,16 @@
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "256 refused plants caught and 89 accepted plants kept green; 39 of 39 checks proven both ways; check.py and its plants unchanged since that run",
-      "digest": "63d260a027b0f2653b78c5a290c004a25daa89a5ed8d722cc85850c53e281b29",
+      "detail": "263 refused plants caught and 89 accepted plants kept green; 39 of 39 checks proven both ways",
+      "digest": "3245c5acf6515949d3f83e21f6c2b6458391e7161826b037058c3303c2bda72e",
       "pass": true
     },
     "probes": {
       "counts": {
         "browser": 126,
-        "facts": 405,
-        "net10": 130,
-        "net48": 87,
+        "facts": 410,
+        "net10": 134,
+        "net48": 88,
         "node": 62
       },
       "detail": "every fact printed by its probe or found at its source line, every browser fact with the proof the rewrite ships",
@@ -1699,7 +1699,7 @@
         "mapped": 8909,
         "matrix_promised": 117,
         "matrix_runs": 117,
-        "promises": 740,
+        "promises": 746,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1727,10 +1727,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 857,
+        "tests": 863,
         "units": 27
       },
-      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 3, U10 5, U11 16, U12 0, U13 98, U14 6, U15 29, U16 0, U17 0, U18 98, U19 18, U20 8, U21 86, U22 7, U23 272, U24 57, U25 38, U26 108, U27 3",
+      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 3, U10 5, U11 16, U12 0, U13 98, U14 6, U15 29, U16 0, U17 0, U18 98, U19 18, U20 8, U21 86, U22 7, U23 278, U24 57, U25 38, U26 108, U27 3",
       "pass": true
     },
     "slice_tests": {
@@ -4325,14 +4325,14 @@
         "Validation": {
           "Validation.cfg": {
             "green": true,
-            "hash": "153fc5ed2734621ebf7a523833b0f41aad0f2b50d764c8bd2f1e537bc222ef67",
+            "hash": "a563ac2796b35946bc28a31fbd8c66b6dd526ae53f1ba4fce1055ca2513e9e51",
             "line": "Model checking completed. No error has been found.",
-            "states": "2654424 states generated, 1327212 distinct states found, 0 states left on queue.",
+            "states": "12902616 states generated, 5308524 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Validation.violates.Agreement.cfg": {
             "green": false,
-            "hash": "69bca4c6f75283024cf11754d157b1ab323b87ec0e256d8223610166c248738c",
+            "hash": "d3de21a095caf028c60d8229d694120710f6d4891a62f755f6bff1cbc1c67d20",
             "line": "violated: Agreement",
             "states": "",
             "violated": [
@@ -4341,7 +4341,7 @@
           },
           "Validation.violates.ChildSkipAgrees.cfg": {
             "green": false,
-            "hash": "a51502db0a8eacdf95a3e2db52e4121fd6b6fab92480d3a6c73995ecd9fc5e5f",
+            "hash": "04acecca92fa7068e88d59ffbdb56ccd93f8b0312a75216302e7646ce0a488fd",
             "line": "violated: ChildSkipAgrees",
             "states": "",
             "violated": [
@@ -4350,7 +4350,7 @@
           },
           "Validation.violates.ConditionAgrees.cfg": {
             "green": false,
-            "hash": "763f609f94444c4cc2e8e2ae75bf0ddab83069da2160ef7b7c604106fdce4313",
+            "hash": "1f8c265a149544ea1c73f619484411b8dc617e3431cb72133b7730457a6042f1",
             "line": "violated: ConditionAgrees",
             "states": "",
             "violated": [
@@ -4359,7 +4359,7 @@
           },
           "Validation.violates.EmptyTextAgrees.cfg": {
             "green": false,
-            "hash": "a81ef83909d137c7772048972aec3543630d1c0ed6a601f3be592e02c109e02b",
+            "hash": "ef40897b618b4dfc134f01dbf466c1da98d24ea06a34ac2aa0f5cdda5e8ad590",
             "line": "violated: EmptyTextAgrees",
             "states": "",
             "violated": [
@@ -4368,7 +4368,7 @@
           },
           "Validation.violates.ItemPeerAgrees.cfg": {
             "green": false,
-            "hash": "fbb822f03a4d65a3f856b7484337df6ab6ba7c5332bc36face0e440dba7c67bc",
+            "hash": "8794ba119e737eb0ca263e7bf53f03bcaebe35403b402e994514df2497f31479",
             "line": "violated: ItemPeerAgrees",
             "states": "",
             "violated": [
@@ -4377,7 +4377,7 @@
           },
           "Validation.violates.ListStartAgrees.cfg": {
             "green": false,
-            "hash": "d9848ef5f406b2bbc3c66b7f8ef0fca397bec9b8a8c459aff87d407dd1f8d694",
+            "hash": "622038101b4e3cc186239a98d2a2ee746fb3feddf5acd0f5308a5faf5ac750ae",
             "line": "violated: ListStartAgrees",
             "states": "",
             "violated": [
@@ -4386,7 +4386,7 @@
           },
           "Validation.violates.NewHolderAgrees.cfg": {
             "green": false,
-            "hash": "ae8dc74c91630592a0e0f6d95f4d529882ffd667a23ff5281937d40b46b9e954",
+            "hash": "4df2906e3bcb1206d75f4557133470bc6145582ddf810ef709ce8501c96cb36f",
             "line": "violated: NewHolderAgrees",
             "states": "",
             "violated": [
@@ -4395,7 +4395,7 @@
           },
           "Validation.violates.NoTypedValueLost.cfg": {
             "green": false,
-            "hash": "21041204192336581dc88f3ab8b5d4842e78466a451d0f7c6e485204eadfa591",
+            "hash": "43d00c025b5b26b8e2b28c3722bb386927c54a5b85da2fab7f311aa7192b2400",
             "line": "violated: NoTypedValueLost",
             "states": "",
             "violated": [
@@ -4404,7 +4404,7 @@
           },
           "Validation.violates.ObjectStartAgrees.cfg": {
             "green": false,
-            "hash": "19fe72143a2a3aff9cbdf2a1c2c672318d640dc7db3e803b728103ed9d161cf3",
+            "hash": "90041cbefae833eda9de01dc4e086d3918431e18632bc77597d1dba021c90142",
             "line": "violated: ObjectStartAgrees",
             "states": "",
             "violated": [
@@ -4413,25 +4413,70 @@
           },
           "Validation.violates.OnlyTheNamedValidator.cfg": {
             "green": false,
-            "hash": "d3fb97944b3dd68f4c0bf3458dac3e76727dd8fb4279ef5e3ef89d9e349fa589",
+            "hash": "2f120013ff0226409ed513a954a2d67769bd60579da0fc17b1d946db576eb2bf",
             "line": "violated: OnlyTheNamedValidator",
             "states": "",
             "violated": [
               "OnlyTheNamedValidator"
             ]
           },
+          "Validation.violates.ReachAPathMemberCheckedAsSent.cfg": {
+            "green": false,
+            "hash": "89bdb6acefcf01471e63f604fc2161a6a5d17aa35db1bf990ea61495094195e7",
+            "line": "violated: ReachAPathMemberCheckedAsSent",
+            "states": "",
+            "violated": [
+              "ReachAPathMemberCheckedAsSent"
+            ]
+          },
+          "Validation.violates.ReachAQueryMemberCheckedBesideItsBodyOnNet48.cfg": {
+            "green": false,
+            "hash": "92b4775629acdd5f741dd0781f07e382c0c8c416c58e5421d9c341e20701f7ae",
+            "line": "violated: ReachAQueryMemberCheckedBesideItsBodyOnNet48",
+            "states": "",
+            "violated": [
+              "ReachAQueryMemberCheckedBesideItsBodyOnNet48"
+            ]
+          },
+          "Validation.violates.ReachAQueryMemberLeftToItsBodyOnNet10.cfg": {
+            "green": false,
+            "hash": "87ce0953d17ff47fdb6b14314b834092c9e4deaea6b1190bc0844ad1d5499556",
+            "line": "violated: ReachAQueryMemberLeftToItsBodyOnNet10",
+            "states": "",
+            "violated": [
+              "ReachAQueryMemberLeftToItsBodyOnNet10"
+            ]
+          },
+          "Validation.violates.ReachAnInputOverWhatIsSentOutside.cfg": {
+            "green": false,
+            "hash": "23a3b1ae612f478388d66e67f8ce4367e13c0acc7d6083f1e2da7cceec8d894b",
+            "line": "violated: ReachAnInputOverWhatIsSentOutside",
+            "states": "",
+            "violated": [
+              "ReachAnInputOverWhatIsSentOutside"
+            ]
+          },
           "Validation.violates.ReachAnItemBelowItsPeer.cfg": {
             "green": false,
-            "hash": "4a8cc134a8c9fde8fa9f4c56997589882d32ad61b11c60c7d098a8e59d7e3da5",
+            "hash": "35a07e057b72196c653cbcb80ae4c1923c172c4723e257ebad180fae081611b1",
             "line": "violated: ReachAnItemBelowItsPeer",
             "states": "",
             "violated": [
               "ReachAnItemBelowItsPeer"
             ]
           },
+          "Validation.violates.ReachAnUnsentMemberOnItsStart.cfg": {
+            "green": false,
+            "hash": "f375c09f28675659565f89a929296b9d76d1d93e54d291af280a31ef73d1dd58",
+            "line": "violated: ReachAnUnsentMemberOnItsStart",
+            "states": "",
+            "violated": [
+              "ReachAnUnsentMemberOnItsStart"
+            ]
+          },
           "Validation.violates.ReachConditionOnStart.cfg": {
             "green": false,
-            "hash": "8fc8d16ccb41282bda9ea58bd2a18b035d1b0d510b06072b45d198f4ed1159f1",
+            "hash": "caf4f948bd10a11764b81e0c041af17c64ea631d7c433d09f965a98fb8adc020",
             "line": "violated: ReachConditionOnStart",
             "states": "",
             "violated": [
@@ -4440,34 +4485,79 @@
           },
           "Validation.violates.ReachPopulatedList.cfg": {
             "green": false,
-            "hash": "3fac5ec14622d67872685c5a10e412f38ee3def35bb9d2cfa5c1684c07e9ba93",
+            "hash": "c49350be52372995d2d96f205617256005b68967fdfaa60412b26e0ac97d5c0d",
             "line": "violated: ReachPopulatedList",
             "states": "",
             "violated": [
               "ReachPopulatedList"
             ]
           },
-          "Validation.violates.ReachUnboundBodyOnTheStarts.cfg": {
+          "Validation.violates.SentOutsideAgrees.ConfinedEndpointLeavesWhatWasSent.cfg": {
             "green": false,
-            "hash": "3295161e9ce1a75874547c71edee4e70dd67a7593443a399cfe4c802efa4f9d8",
-            "line": "violated: ReachUnboundBodyOnTheStarts",
+            "hash": "fc4641556154613c0b2c67170c47ac5e1b8f2facdcf3240b8e92dffdf2665ac6",
+            "line": "violated: SentOutsideAgrees",
             "states": "",
             "violated": [
-              "ReachUnboundBodyOnTheStarts"
+              "SentOutsideAgrees"
             ]
           },
-          "Validation.violates.UnboundBodyChecksTheStarts.cfg": {
+          "Validation.violates.SentOutsideAgrees.ModelTakesTheQueryBesideItsBody.cfg": {
             "green": false,
-            "hash": "a28269d24cb507ce75a9b842690d454684d84bf9daa68c1cf023736cda9d61f4",
-            "line": "violated: UnboundBodyChecksTheStarts",
+            "hash": "9fc4b1933792c1bc1bd85ed113abb952b4b121b578dbaa10e145defd186c1f2f",
+            "line": "violated: SentOutsideAgrees",
             "states": "",
             "violated": [
-              "UnboundBodyChecksTheStarts"
+              "SentOutsideAgrees"
+            ]
+          },
+          "Validation.violates.SentOutsideAgrees.OutsideEmptyStaysText.cfg": {
+            "green": false,
+            "hash": "73016d78a0986af35f3f43a5ce5351976421e123378bd46d3afbdf560eb9a9c9",
+            "line": "violated: SentOutsideAgrees",
+            "states": "",
+            "violated": [
+              "SentOutsideAgrees"
+            ]
+          },
+          "Validation.violates.SentOutsideAgrees.OutsideReadOnNet48Alone.cfg": {
+            "green": false,
+            "hash": "4ba8529d3e35894d414416832c12a415fc03fdb91b9fc5ea708a69ea2e1845e7",
+            "line": "violated: SentOutsideAgrees",
+            "states": "",
+            "violated": [
+              "SentOutsideAgrees"
+            ]
+          },
+          "Validation.violates.SentOutsideAgrees.QueryBesideReadOnNet10.cfg": {
+            "green": false,
+            "hash": "7ebb7be4ee733a0b05470c3efbef583bb17e03367570eb7648446484cd4fbc7e",
+            "line": "violated: SentOutsideAgrees",
+            "states": "",
+            "violated": [
+              "SentOutsideAgrees"
+            ]
+          },
+          "Validation.violates.SentOutsideAgrees.QueryBesideUnreadOnNet48.cfg": {
+            "green": false,
+            "hash": "e64a622464db7fd3dc5f4d87d14d74ce1699d3227fedf78fb6764cffcd630077",
+            "line": "violated: SentOutsideAgrees",
+            "states": "",
+            "violated": [
+              "SentOutsideAgrees"
+            ]
+          },
+          "Validation.violates.SentOutsideAgrees.cfg": {
+            "green": false,
+            "hash": "3b51282ede94a832b45c73b7d8daf696caddea5c8a0365cf9f3b465f479276fa",
+            "line": "violated: SentOutsideAgrees",
+            "states": "",
+            "violated": [
+              "SentOutsideAgrees"
             ]
           },
           "Validation.violates.UnsentInputsUnread.cfg": {
             "green": false,
-            "hash": "af374a9c42002f04e7584b14cbce6851c13de8ae2fb3e7fbf84684b8bdf70e2f",
+            "hash": "317c73c3a77c2aa87a628292c5ca8e1c77f6ef56970f6acdbe52dfa5871a4ea4",
             "line": "violated: UnsentInputsUnread",
             "states": "",
             "violated": [
@@ -4521,7 +4611,7 @@
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 53m 3h, U4 1b 18m 3a, U5 1b 21m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 3b 17m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 21m 21a, U18 98b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 86b 14m 1a 1h, U22 7b 4m, U23 272b, U24 57b 1a, U25 38b 1a, U26 108b 35a, U27 3b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 53m 3h, U4 1b 18m 3a, U5 1b 21m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 3b 17m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 21m 21a, U18 98b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 86b 14m 1a 1h, U22 7b 4m, U23 278b, U24 57b 1a, U25 38b 1a, U26 108b 35a, U27 3b",
       "pass": true
     },
     "verdicts": {
@@ -4539,7 +4629,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "bfe8076c83580ef2d5993fbfdb4cdcfcc8a3a011",
+  "read_at_head": "15b480e1eadf8870492650124a227aebd0d6965f",
   "step": {
     "failing": [],
     "name": "End of session",

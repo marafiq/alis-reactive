@@ -1,50 +1,58 @@
 # Handoff
 
-Written at `date`: Wed Nov 25 17:13:57 EST 2026
+Written at `date`: Wed Nov 25 21:16:20 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 29, each in the notes block below
-unit: landed (52): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
-unit: building (2): FormDataBoundary, MoveInOwners
+note: open: 27, each in the notes block below
+note: closed 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "C (Recommended)", to : its follow-up FormDataBoundary landed
+note: closed 2026-11-25 | decision | spec/CLAUDE.md, the validation decisions | FormDataBoundary | "if a input is part of: its follow-up FormDataBoundary landed
+unit: landed (53): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, FormDataBoundary, MultipartFileList, NativeDateValue, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, InputForm, InputSent, InputSentForms, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Net48BrowserHost, Net48TwinFollowThrough, Operators, QueueReach, RetirePicomatchException, SentPosition, SplitValue, TextBodyCheck, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (19): NativeDateInput, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
-unit: waiting (2): RowContainers, ValidationForms
+unit: building (2): MoveInOwners, ValidationForms
+unit: waiting (1): RowContainers
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at bfe8076c8 on feature/rewrite
+lane: pushing at 15b480e1e on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at bfe8076c8
+ci: unread at 15b480e1e
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2115 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2121 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
+file: over HANDOFF.md: holds 166 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: bfe8076c8 spec (MoveInDoorMap): the move-in door map names 141 doors, Form gone with ContainerOnly; a worker lands once its turn ends
-- Full check: .work/logs/spec-check-bfe8076c8.log: spec check at bfe8076c8: 40 of 40 checks pass
-- .work/last-run.txt: 20261125-164038-7773 49dd77295
+- HEAD: 15b480e1e validation (FormDataBoundary): a member a request sends outside its body is checked where MVC's binder reads it, choice C, with the .NET 10 quirk written down
+- Full check: .work/logs/spec-check-15b480e1e.log: spec check at 15b480e1e: 40 of 40 checks pass
+- .work/last-run.txt: 20261125-205729-8000 15b480e1e
 
 ## Landed since the commit before the last spec: STATE commit
-bfe8076c8 spec (MoveInDoorMap): the move-in door map names 141 doors, Form gone with ContainerOnly; a worker lands once its turn ends
-2dcfabb3e spec: STATE and handoff at 49dd77295
+15b480e1e validation (FormDataBoundary): a member a request sends outside its body is checked where MVC's binder reads it, choice C, with the .NET 10 quirk written down
+1fd564b6e spec: STATE and handoff at bfe8076c8
 
 ## Open
 open: 18 promises with no browser test, 0 runtime cases not built, 14 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## Mistakes counted since the last push, by kind: a kind that grew names a fix to its tool or its rule file
-- A rule or a tool's list not applied before the change: 473 to 474
+- Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering: 469 to 474
+- A rule or a tool's list not applied before the change: 474 to 483
+- A number, a proof line or an absence not read from the run that proves it: 74 to 76
+- A shell command or a script wrong in its own terms: 673 to 692
+- A costly agent run started before its environment was proven to run the brief's commands: 9 to 10
 
 ## The owner's latest decisions
-spec/CLAUDE.md:9: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): one concept on the developer's surface, the request container.
-spec/CLAUDE.md:13: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): the container takes care of hidden fields in the browser, since
+spec/CLAUDE.md:9: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), choice C of the form-data boundary: a member a request sends
+spec/CLAUDE.md:15: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): one concept on the developer's surface, the request container.
+spec/CLAUDE.md:19: - The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): the container takes care of hidden fields in the browser, since
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -116,8 +124,14 @@ Its units, in order:
    - ContainerOnly landed at 49dd77295, "839 selected, 839 ran, 839 passed", spec check 40 of 40: one request container,
      its hidden inputs sent in a form body (the owner, 2026-11-25). A unit whose paths hold scripts/land-unit.sh lands from
      a copy, `cp ../<worktree>/scripts/land-unit.sh .work/land-unit-run.sh`, since cp rewrites the script bash is reading.
-   - FormDataBoundary, ../form-data-boundary, next: ContainerOnly is landed, so it moves first by its move.sh to the
-     lane's head; ValidationForms, ../validation-forms, After it; RowContainers, ../row-containers, After ValidationForms.
+   - FormDataBoundary landed at 15b480e1e, "842 selected, 842 ran, 842 passed, 0 failed, 0 over budget", spec check 40
+     of 40: choice C of D16.5, the quirk in the Query doors' XML doc, X16.46's nine promises (4, 7 and 8 net48 alone,
+     CI's), the twin's Web.config letting a DELETE through IIS Express, two traps in the hook.
+   - ValidationForms, ../validation-forms, next: it moves by its move.sh to the lane's head; RowContainers,
+     ../row-containers, After it. A unit in a worktree the lead moved is built by an unnamed general-purpose agent with
+     no isolation, its first read .claude/agents/builder.md, after a low-effort probe (.claude/skills/delegate/SKILL.md).
+     land-unit.sh runs from a shell whose cwd is spelled as on disk, Documents/Code: from Documents/code, pwd -P and
+     Python's getcwd differ in case, and state.py finds no landing folder (2026-11-26).
    A waiting unit moves once the unit before it is landed and pushed, in its worktree by one command,
    `bash .landing/<Name>/move.sh <the lane's head>`: spec/MISTAKES.md from HEAD, the head checked out, npm ci, the
    lead's counts re-applied by counts.py beside it. Then its brief's "At the base:" commands, a `builder` on Opus at
@@ -129,7 +143,13 @@ Its units, in order:
    check with no request, N16.3, which ValidationForms builds as F5's door. Closed: plan shape alignment. After 1.0, as
    rows of the table in spec/NOTES.md: the named enum in a pushed message; activated-row replacement, a row's
    "removing" state and handler cleanup; the attached-partial validation summary.
-5. Core freeze: section 4 rewritten unit by unit, the surface read, README checked. One gap is decided first: a 204 to
+5. A divergence FormDataBoundary's builder read at the source (2026-11-26), decided before the freeze: MVC 5 binds an
+   empty item of a list of texts as an empty text (spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:50-52),
+   while forms.ts:220 reads it as null in form data and DESIGN.md:1827's table, citing mvc5-empty-list-item-null,
+   says null for text; the fact holds for nullable values alone (:156, :57). The JSON arm on MVC 5 meets it for a list
+   query member whose item reads nothing. What net10 binds for an empty text item no probe has read yet:
+   probe:core-query-nullable-enum-items reads enums.
+6. Core freeze: section 4 rewritten unit by unit, the surface read, README checked. One gap is decided first: a 204 to
    a JSON route is a content failure, since response.ts reads no Content-Type as no JSON before it reads the body, while
    an empty JSON body reads as none, and no D line states a 204 under `OnSuccess<T>` (a search of spec/Core/DESIGN.md
    for "204" and "No Content" printed nothing; raised by ListFromSources' builder, read at the source in its read.md).
