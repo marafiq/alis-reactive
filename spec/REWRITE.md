@@ -1203,11 +1203,12 @@ defects. An MVC action reaches the answer gate by its filter, with its own addre
 held, and the harness's test of it is green and fails on each of its two planted defects. U3 is closed: the
 tests that wait, the views and doors they meet, the harness verbs they use and the Playwright project's switch,
 which waits for the last test, land with their units (the owner, 2026-11-14).
-U7's pieces are landed: `AddReactiveTracing` and the server's activities, a view's render and an endpoint's check,
-each handler a door writes carrying its caller's file and line (D20.7); the plan's trace context and the runtime's
-Tracing slice, a boot span per plan with its error or its stop and traceparent sent to the page's origin alone (D20.4,
-D20.5); and `Alis.Reactive.OpenTelemetry` with its layout helper (N20.2). A request records no span until U18 calls
-the trace port's send, and U7's browser tests are not run yet.
+U7 is closed: `AddReactiveTracing` and the server's activities, a view's render and an endpoint's check, each handler
+a door writes carrying its caller's file and line (D20.7); the plan's trace context and the runtime's Tracing slice, a
+boot span per plan with its error or its stop and traceparent sent to the page's origin alone (D20.4, D20.5); each
+request's attempt recorded through the trace port by the runtime's requests module; and
+`Alis.Reactive.OpenTelemetry` with its layout helper (N20.2). Its 8 browser tests pass in one run, the land of
+6feddb6e3.
 U4, U5 and U10 are closed: their modules build every door they declare, the browser tests the spec places in them
 pass in one run (1, 1 and 5), their analyzers wait until after 1.0 (the owner, 2026-11-15), and each promise of
 theirs whose page calls a later unit's door is proven in that unit. U8 is closed: Execution builds every part it
@@ -1261,7 +1262,7 @@ bound file list under its binding name (D9.8, D9.15, D14.3), proved by X9.27's r
 U20's app events are landed: `AppEvent.Declare`, the
 document's load and custom-event triggers under a handler's policy, a payload member read at the event's detail, and a
 raise from markup; most of the browser tests U20 lands wait on U18's other methods. A date shown as an element's text is
-its declared type's, C# writing on the `string` shape whether it holds a `DateTime` or a `DateTimeOffset`. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
+its declared type's, C# writing on the `string` shape whether it holds a `DateTime` or a `DateTimeOffset`. U6, U19, U20 and U21 are closed (2026-11-26): the core holds no door that throws `NotImplementedException`, and each browser test the spec places in them, 3, 23, 13 and 184, is written and passes in one run, the land of 6feddb6e3, "853 selected, 853 ran, 853 passed, 0 failed, 0 over budget", U6's MVC 5 half in CI's verify-net48 at 7ef43d8b8. U17 stays open until CI's verify-net48 passes the roster's and least-dose's MVC 5 halves, U18 until a whole object a JSON body sends on MVC 5 is named as the endpoint binds it and X10.2's and X10.29's endpoints read a world's record, and U22 until the freeze reads README. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
 pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). A unit's last commit
 rewrites this paragraph, as root `CLAUDE.md` states.
 
