@@ -1,21 +1,21 @@
 # Handoff
 
-Written at `date`: Fri Nov 27 03:04:55 EST 2026
+Written at `date`: Fri Nov 27 13:55:51 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 29, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (86): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionNumericStep, FusionOnboardingPilotFollowup, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, FusionSwitchContinuation, FusionSwitchFull, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (90): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionCheckBoxWave, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionInputsWave, FusionNumericStep, FusionOnboardingPilotFollowup, FusionRadioButtonWave, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, FusionSwitchContinuation, FusionSwitchFull, FusionTextBoxWave, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, FusionNumericDecrement
-unit: building (1): MoveInOwners
+unit: building (2): MoveInOwners, FusionSwitchLunaExperiment
 unit: ready (1): FusionNumericDecrementApi
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at 08d3566cb on feature/rewrite
+lane: pushing at e899e3db0 on feature/rewrite
   leaves by: the last line `scripts/push.sh` prints
   exit line: "remote equals HEAD"
   goes to: lane: pushed
-ci: unread at 08d3566cb
+ci: unread at e899e3db0
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -25,7 +25,7 @@ file: over spec/CLAUDE.md: holds 2157 lines, its limit 150
   goes to: gone
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 31 units have landed since .claude/rules/process.md last changed
+machine: review due : 32 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -33,13 +33,13 @@ machine: review due : 31 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 08d3566cb FusionSwitch: complete supported resident alert operations
-- Full check: .work/logs/spec-check-08d3566cb.log: spec check at 08d3566cb: 40 of 40 checks pass
-- .work/last-run.txt: 20261127-024623-42365 08d3566cb
+- HEAD: e899e3db0 Fusion: onboard CheckBox, RadioButton and TextBox on care pages
+- Full check: .work/logs/spec-check-e899e3db0.log: spec check at e899e3db0: 40 of 40 checks pass
+- .work/last-run.txt: 20261127-133803-34746 e899e3db0
 
 ## Landed since the commit before the last spec: STATE commit
-08d3566cb FusionSwitch: complete supported resident alert operations
-313bb54a9 spec: STATE and handoff at 28bcca9c8
+e899e3db0 Fusion: onboard CheckBox, RadioButton and TextBox on care pages
+a0b69dfaf spec: STATE and handoff at 08d3566cb
 
 ## Open
 open: 9 promises with no browser test, 0 runtime cases not built, 0 doors not implemented
@@ -105,11 +105,9 @@ traceparent proof are in `.worktrees/fresh-app-docs/.landing/FreshAppDocs/design
 The design is unrun at 3a8ec7120 and backed up on origin at `backup/rewrite/fresh-app-docs`. Await the owner.
 
 **4. After the core: Fusion and Native (U23 to U27).** U23 has 307 of 307 placed tests, U24 57 of 57, U25 38 of 38,
-U26 132 of 141, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
+U26 194 of 203, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
 and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and localized layout.
-   1. Fusion shell proofs include the selected command (X1032), Residents visibility (X1024), ward trail
-      item (X1002) and menu focus on opening and Escape (X406).
-      M21.X1110 proves the NumericTextBox's explicit and configured steps on net10. Both defects were caught.
+   1. The shell proves X1032, X1024, X1002 and X406. M21.X1110 proves explicit and configured NumericTextBox steps.
    2. FusionGrid has eight open cases. The retained Evening Handoff page at `724901000` matched all three
       filenames, then all three M21.X201 diagnostics saw Exported where they expected Exporting. EJ2 33.1.47
       resolves XLSX before the async save starts the download. CSV and PDF
@@ -124,20 +122,25 @@ and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and locali
 
 ### Full Fusion onboarding
 
-FusionSwitch's supported surface is complete at the pinned vendor versions. The continuation adds 18 net10
-cases. All 32 Switch cases and 40 continuation plants passed their expected verdicts. Both shipped Release
-targets build. The landed suite passed 896 of 896. The [Switch coverage](spec/FusionComponents/audit/switch-coverage.md)
-names the live attribute map and the vendor's native veto and persistence-disable limits. The owner excluded
-the known unsupported forms and Fusion's `created` event.
+The [Switch coverage](spec/FusionComponents/audit/switch-coverage.md) records 32 net10 cases, 40 continuation plants,
+the attribute-map, native-veto and persistence limits. Both Release targets built. The suite passed 896/896.
+The owner excluded EJ2 `created` across Fusion.
 
-**Next.** The owner asks for a Luna at xhigh experiment after the Switch push. Replay the same starting
-handoff and pinned evidence at 313bb54a9 in a separate worktree. Compare preparation time, time in checks,
-and supported-operation proof. Keep the replay evidence separate from the feature/rewrite lane.
+The first three-input wave landed at e899e3db0. [CheckBox](spec/FusionComponents/audit/checkbox-coverage.md),
+[RadioButton](spec/FusionComponents/audit/radiobutton-coverage.md) and [TextBox](spec/FusionComponents/audit/textbox-coverage.md)
+proved photo consent, room choices, wristband names and family contact cards in 62 new net10 cases.
+Their restored selections passed 18/18, 18/18 and 29/29. All 147 planted defects were caught and restored.
+Both Release targets built. The local landing suite passed 958/958 and the spec passed 40/40.
+The Switch replay finished. Base CI at a0b69dfaf passed 8/10 jobs. Its hosts pool failed on defaultHooks ordering
+and the dateConverter budget. The aggregate proof job followed the hosts failure.
 
-**Queued.** The next component wave prioritizes inputs and then editable-grid controls. Assign three
-components to three builders in separate worktrees. Overlap source and case preparation. Serialize builds
-and consolidate the reviewed work into one landing. Use net10 for browser behavior and build both shipped
-targets. The lead owns spec placement, generated files and reconciliation of both host manifests.
+**Timing.** From brief to completed full check, this wave took 138m18s, with 117m57s in recorded
+browser runs, builds and gates for 62 new cases. The 13-case Switch pilot took 61m27s to the same point
+and 61m40s to publication, including 37m13s in checks. The three builders shared one build slot.
+
+**Queued.** Continue with NumericTextBox, DatePicker and DropDownList. Reuse the linen, arrival-day and ward-choice
+proofs, the pinned vendor sources and the typed framework. Numeric and date controls also serve editable charge rows.
+Keep the eight Grid promises, the Windows Smart Paste case and the U7 tracing hold visible.
 
 **5. Gaps named, not built:** an object held as a dictionary's value in a JSON body on MVC 5 (no probe of MVC 5's
 dictionary binding); `Console` false has no browser promise; the fresh MVC 5 app's net48 consumer fixture fails on this
