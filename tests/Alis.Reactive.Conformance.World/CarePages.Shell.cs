@@ -30,6 +30,8 @@ public static partial class CarePages
 
     public const string FusionResidentSidebarCollapsed = FusionResidentSidebar + "/collapsed";
 
+    public const string FusionCareToolbar = Shell + "fusion-care-toolbar";
+
     public const string DrawerDischarge = Shell + "drawer-discharge";
 
     public const string FamilyNotice = Shell + "family-notice";

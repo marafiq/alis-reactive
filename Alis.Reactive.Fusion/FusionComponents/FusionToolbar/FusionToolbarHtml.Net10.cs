@@ -2,6 +2,7 @@
 using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -18,6 +19,13 @@ public static class FusionToolbarHtml
     /// <param name="build">What the view sets on the toolbar.</param>
     /// <returns>The rendered toolbar, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionToolbar, TModel> FusionToolbar<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<ToolbarBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var toolbar = html.EJS().Toolbar(elementId);
+        build(toolbar);
+        return plan.Render<FusionToolbar>(elementId, toolbar.Render());
+    }
 }
 #endif

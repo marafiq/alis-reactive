@@ -1880,6 +1880,14 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F51 M21.X1032 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/FusionCareToolbar.cshtml",
+      "/Care/Shell/_FusionShellLayout.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F52 M21.X1033 0": {
     "modules": [],
     "views": [

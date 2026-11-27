@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Navigations
+@model FusionCareToolbar
+@{
+    Layout = "/Care/Shell/_FusionShellLayout.cshtml";
+    ViewData["Title"] = "Ward workflows";
+    var plan = Html.ReactivePlan<FusionCareToolbar>();
+}
+<section class="p-3">
+    <h1>Ward workflows</h1>
+    @(Html.FusionToolbar(plan, "care-toolbar", build => build.Items(new List<ToolbarItem>
+        {
+            new() { Text = Model.AdmitLabel },
+            new() { Text = Model.DischargeLabel },
+        }))
+        .Reactive(toolbar => toolbar.Clicked, (command, pipeline) => pipeline
+            .Element("toolbar-clicked").Text.Set(command.Item.Read(item => item.Text))))
+    <p>Selected workflow: <output id="toolbar-clicked" aria-label="Selected workflow">Nothing clicked</output></p>
+</section>
+@Html.RenderPlan(plan)
