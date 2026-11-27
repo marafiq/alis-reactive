@@ -10,6 +10,10 @@ public static class Hosts
 
     public static readonly string[] Net10 = [Net10Name];
 
+    public const string FusionShellName = HostNames.FusionShell;
+
+    public static readonly string[] FusionShell = [FusionShellName];
+
     public const string NumbersAsTextName = HostNames.NumbersAsText;
 
     public static readonly string[] NumbersAsText = [NumbersAsTextName];

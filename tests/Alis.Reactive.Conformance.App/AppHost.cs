@@ -39,6 +39,7 @@ internal static class AppHost
             case HostNames.Admissions:
             case HostNames.PublicInformation:
             case HostNames.Net10:
+            case HostNames.FusionShell:
             case HostNames.NoRequests:
             case HostNames.NoAntiforgeryChoice:
             case HostNames.SiteHeader:
@@ -81,7 +82,7 @@ internal static class AppHost
                 json.TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { LeaveOutTheAdmissionsPharmacy } };
                 return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.EnumNamesAlone}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks}, {HostNames.Tracing}, {HostNames.TracingSinkThrows}, {HostNames.RealtimeNoOffer}, {HostNames.NoReconnectComponent} and {HostNames.NoReconnectOffer}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.FusionShell}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.EnumNamesAlone}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks}, {HostNames.Tracing}, {HostNames.TracingSinkThrows}, {HostNames.RealtimeNoOffer}, {HostNames.NoReconnectComponent} and {HostNames.NoReconnectOffer}.");
         }
     }
 

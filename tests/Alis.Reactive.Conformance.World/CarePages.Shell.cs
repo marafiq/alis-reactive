@@ -16,6 +16,10 @@ public static partial class CarePages
 
     public const string WardDischarge = Shell + "ward-discharge";
 
+    public const string FusionDischarge = Shell + "fusion-discharge";
+
+    public const string FusionDischargeInSpanish = Shell + "fusion-discharge/es";
+
     public const string DrawerDischarge = Shell + "drawer-discharge";
 
     public const string FamilyNotice = Shell + "family-notice";

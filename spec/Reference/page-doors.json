@@ -2016,6 +2016,24 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M23.F2 M23.X2 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/FusionDischarge.cshtml",
+      "/Care/Shell/_FusionShellLayout.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M23.F2 M23.X3 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/FusionDischarge.cshtml",
+      "/Care/Shell/FusionDischargeInSpanish.cshtml",
+      "/Care/Shell/_FusionShellLayout.cshtml",
+      "/Care/Shell/_FusionShellSpanishLayout.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M24.F2 M24.X6 0": {
     "modules": [],
     "views": [

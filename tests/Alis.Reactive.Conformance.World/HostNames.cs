@@ -3,6 +3,7 @@ namespace Alis.Reactive.Conformance.World;
 public static class HostNames
 {
     public const string Net10 = "net10";
+    public const string FusionShell = "fusionShell";
     public const string NumbersAsText = "numbersAsText";
     public const string DateConverter = "dateConverter";
     public const string SnakeCase = "snakeCase";

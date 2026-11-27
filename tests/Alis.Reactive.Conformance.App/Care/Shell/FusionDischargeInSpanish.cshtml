@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FusionDischargeInSpanish
+@{
+    Layout = "/Care/Shell/_FusionShellSpanishLayout.cshtml";
+    ViewData["Title"] = "Alta de residente";
+    var plan = Html.ReactivePlan<FusionDischargeInSpanish>();
+}
+<h1>Alta de @Model.Resident</h1>
+<p>Estado: <output id="discharge-decision">Ingresada</output></p>
+<button type="button" @Html.Raises(plan, FusionDischargeButtons.Discharge)>Dar de alta</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(FusionDischargeButtons.Discharge, pipeline =>
+        pipeline.When(pipeline.Component<FusionConfirm>().Ask($"¿Dar de alta a {Model.Resident}?"))
+            .Then(pipeline => pipeline.Element("discharge-decision").Text.Set("Alta"))
+            .Else(pipeline => pipeline.Element("discharge-decision").Text.Set("Sigue"))));
+}
+@Html.RenderPlan(plan)

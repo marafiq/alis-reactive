@@ -13,7 +13,7 @@ public static class FusionConfirmHtml
     /// <summary>Renders the element the page's FusionConfirm is made on, once in the layout, with the heading Confirm and the buttons OK and Cancel.</summary>
     /// <remarks>A view reaches the confirm with <c>pipeline.Component&lt;FusionConfirm&gt;()</c> and branches on its <c>Ask</c>.</remarks>
     /// <returns>The confirm's host element.</returns>
-    public static IHtmlContent FusionConfirmDialog(this IHtmlHelper html) => throw new NotImplementedException();
+    public static IHtmlContent FusionConfirmDialog(this IHtmlHelper html) => html.FusionConfirmDialog("Confirm", "OK", "Cancel");
 
     /// <summary>Renders the element the page's FusionConfirm is made on, once in the layout, with the app's heading and button texts.</summary>
     /// <remarks>A view reaches the confirm with <c>pipeline.Component&lt;FusionConfirm&gt;()</c> and branches on its <c>Ask</c>.</remarks>
@@ -22,6 +22,17 @@ public static class FusionConfirmHtml
     /// <param name="ok">The text of the button that answers yes.</param>
     /// <param name="cancel">The text of the button that answers no.</param>
     /// <returns>The confirm's host element.</returns>
-    public static IHtmlContent FusionConfirmDialog(this IHtmlHelper html, string title, string ok, string cancel) => throw new NotImplementedException();
+    public static IHtmlContent FusionConfirmDialog(this IHtmlHelper html, string title, string ok, string cancel)
+    {
+        ArgumentNullException.ThrowIfNull(title);
+        ArgumentNullException.ThrowIfNull(ok);
+        ArgumentNullException.ThrowIfNull(cancel);
+        var host = new TagBuilder("div");
+        host.MergeAttribute("id", FusionConfirm.ElementId);
+        host.MergeAttribute("data-alis-title", title);
+        host.MergeAttribute("data-alis-ok", ok);
+        host.MergeAttribute("data-alis-cancel", cancel);
+        return host;
+    }
 }
 #endif
