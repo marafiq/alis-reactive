@@ -13,6 +13,7 @@ pinned at one version for NuGet and npm together (`scripts/pin-syncfusion.mjs`);
   concrete type, or a browser probe under `spec/probes/` pins what the browser hands or takes. A member the vendor
   marks private is a gap to name, never a door. One exception, the owner's of 2026-11-17 (spec/CLAUDE.md):
   FusionUploader's code raises FilesChanged through EJ2's private trigger, open for the owner's revisit.
+- Exclude EJ2's `created` event from onboarding for every Fusion component (the owner, 2026-11-27).
 - A slice's tests prove only what its declaration adds, and no test of a core module runs through a Fusion slice.
 - A slice's browser code is held to the runtime's strict compiler options and typed lint. It reaches the page
   through `fusion.ts`, the bundle's entry, which calls each slice's mount, and reaches the core only as an app's code

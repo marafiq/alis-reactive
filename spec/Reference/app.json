@@ -983,6 +983,16 @@
           "id": "allergyTip",
           "kind": "fusion",
           "role": "the allergy tip, FusionTooltip"
+        },
+        {
+          "id": "alertSwitch",
+          "kind": "fusion",
+          "role": "the resident alert settings and preview use FusionSwitch"
+        },
+        {
+          "id": "alertSwitchEndpoint",
+          "kind": "endpoint",
+          "role": "posts the selected alert desk from the switch's native form value"
         }
       ]
     },
@@ -11954,6 +11964,202 @@
       ],
       "parts": [
         "profile"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1120",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1121",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1122",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1123",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1124",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1125",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1126",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1127",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1128",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1129",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1130",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1131",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1132",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch",
+        "alertSwitchEndpoint"
       ],
       "harness": [
         "seed"

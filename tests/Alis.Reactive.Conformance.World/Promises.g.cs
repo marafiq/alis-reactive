@@ -1102,6 +1102,19 @@ public static class Promises
     public static class M21_F46
     {
         public const string M21_X1027_0 = "M21.F46 M21.X1027 0";
+        public const string M21_X1120_0 = "M21.F46 M21.X1120 0";
+        public const string M21_X1121_0 = "M21.F46 M21.X1121 0";
+        public const string M21_X1122_0 = "M21.F46 M21.X1122 0";
+        public const string M21_X1123_0 = "M21.F46 M21.X1123 0";
+        public const string M21_X1124_0 = "M21.F46 M21.X1124 0";
+        public const string M21_X1125_0 = "M21.F46 M21.X1125 0";
+        public const string M21_X1126_0 = "M21.F46 M21.X1126 0";
+        public const string M21_X1127_0 = "M21.F46 M21.X1127 0";
+        public const string M21_X1128_0 = "M21.F46 M21.X1128 0";
+        public const string M21_X1129_0 = "M21.F46 M21.X1129 0";
+        public const string M21_X1130_0 = "M21.F46 M21.X1130 0";
+        public const string M21_X1131_0 = "M21.F46 M21.X1131 0";
+        public const string M21_X1132_0 = "M21.F46 M21.X1132 0";
     }
 
     public static class M21_F47

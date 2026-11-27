@@ -21495,7 +21495,7 @@
   },
   {
    "id": "M21.F46",
-   "summary": "FusionSwitch: one declaration of the Syncfusion Switch by its JavaScript names, checked and change, each EJ2 33.1.47's public member; the payload of change, read as the browser hands it, with no member the browser lacks; the input it is, its state committed by change; and the render helpers that render it bound to a member of bool. Main spreads the slice over six files whose events, writes and reads name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name and stripped of the IsInteracted no switch hands.",
+   "summary": "FusionSwitch exposes the pinned public Switch state, activation, focus, terminal destroy and live settings. BeforeChange carries the synchronous veto and prior state. Change carries the committed state and optional original browser event. The render helpers bind a bool and Change commits the input. Main spreads the slice over six files whose events, writes and reads name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name and stripped of the IsInteracted no switch hands.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionSwitch",
@@ -21664,6 +21664,71 @@
      "id": "M21.X1027",
      "rung": "behavior",
      "defect": "Both lines start the Switch at the bound member through EJ2's own builder, EJS().SwitchFor(expr) (Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:60 at 65fdf118d); a helper that drops the start shows the switch off, EJ2's false (@syncfusion/ej2-buttons/src/switch/switch.d.ts:49-51) whatever the member holds, against D17.13. The rewrite's render helper starts the Switch at the member's value, written by M21.D1."
+    },
+    {
+     "id": "M21.X1120",
+     "rung": "behavior",
+     "defect": "The declared write reaches a different vendor property and the switch stays unchecked."
+    },
+    {
+     "id": "M21.X1121",
+     "rung": "behavior",
+     "defect": "The typed handler reads the wrong payload member and the enabled receipt is missing."
+    },
+    {
+     "id": "M21.X1122",
+     "rung": "behavior",
+     "defect": "The declared Toggle calls Click and the route reports Panel activated control."
+    },
+    {
+     "id": "M21.X1123",
+     "rung": "behavior",
+     "defect": "The declared Click calls Toggle and the route reports Panel adjustment."
+    },
+    {
+     "id": "M21.X1124",
+     "rung": "behavior",
+     "defect": "The cancellation write is dropped and the managed switch becomes checked."
+    },
+    {
+     "id": "M21.X1125",
+     "rung": "behavior",
+     "defect": "The prior-state write is omitted and the vendor turns the switch off."
+    },
+    {
+     "id": "M21.X1126",
+     "rung": "behavior",
+     "defect": "Replacing immediate DataBind with a benign call lets the native click flip the switch before the lock takes effect."
+    },
+    {
+     "id": "M21.X1127",
+     "rung": "behavior",
+     "defect": "Swapping the typed label members exposes the wrong text for the checked state."
+    },
+    {
+     "id": "M21.X1128",
+     "rung": "behavior",
+     "defect": "The class writes to a different property and the default switch styling remains."
+    },
+    {
+     "id": "M21.X1129",
+     "rung": "behavior",
+     "defect": "The live RTL change reaches a different member and the switch stays left to right."
+    },
+    {
+     "id": "M21.X1130",
+     "rung": "behavior",
+     "defect": "The typed focus command calls DataBind and the switch never receives focus."
+    },
+    {
+     "id": "M21.X1131",
+     "rung": "behavior",
+     "defect": "The typed Destroy call focuses the component instead, leaving the enhanced track."
+    },
+    {
+     "id": "M21.X1132",
+     "rung": "behavior",
+     "defect": "The typed native value write is dropped and MVC receives the original day value."
     }
    ],
    "promises": [
@@ -21674,6 +21739,110 @@
      "outcome": "The bed rails switch shows on.",
      "opposite": "A model whose BedRailsUp is false shows the switch off.",
      "defect": "The switch is rendered with no starting value, so it shows off though the model holds true."
+    },
+    {
+     "for": "M21.X1120",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using Checked and DataBind.",
+     "gesture": "Click Enable night alerts on a resident preference that starts paused.",
+     "outcome": "The Night alerts switch becomes checked and the routing status reads Send to night desk.",
+     "opposite": "On the enabled start, clicking Pause night alerts clears the check and reads Do not send alerts.",
+     "defect": "The declared write reaches a different vendor property and the switch stays unchecked."
+    },
+    {
+     "for": "M21.X1121",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using Change.Checked.",
+     "gesture": "Click the Night alerts switch on the paused start.",
+     "outcome": "The change receipt reads Night alerts enabled.",
+     "opposite": "Click the switch on the enabled start and the receipt reads Night alerts paused.",
+     "defect": "The typed handler reads the wrong payload member and the enabled receipt is missing."
+    },
+    {
+     "for": "M21.X1122",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using Toggle and Change.Event.",
+     "gesture": "Click Apply panel choice on the paused start.",
+     "outcome": "The switch is checked and the change receipt reads Panel adjustment.",
+     "opposite": "Activating the control through the native Click call records Panel activated control.",
+     "defect": "The declared Toggle calls Click and the route reports Panel activated control."
+    },
+    {
+     "for": "M21.X1123",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using Click and Change.Event.IsTrusted.",
+     "gesture": "Click Activate alert control on the paused start.",
+     "outcome": "The switch is checked and the change receipt reads Panel activated control.",
+     "opposite": "Clicking the switch directly on a fresh page records Resident activation.",
+     "defect": "The declared Click calls Toggle and the route reports Panel adjustment."
+    },
+    {
+     "for": "M21.X1124",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using BeforeChange.Cancel.",
+     "gesture": "Click Apply panel choice on a ward-managed preference.",
+     "outcome": "The switch stays unchecked and the policy status reads Managed by the ward.",
+     "opposite": "The resident-owned preference accepts the same action and the switch is checked.",
+     "defect": "The cancellation write is dropped and the managed switch becomes checked."
+    },
+    {
+     "for": "M21.X1125",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using BeforeChange.Checked.",
+     "gesture": "Click Keep alerts enabled on the enabled start.",
+     "outcome": "The policy status reads Replacing enabled setting and the switch is still checked.",
+     "opposite": "An ordinary Toggle on the enabled start clears the check.",
+     "defect": "The prior-state write is omitted and the vendor turns the switch off."
+    },
+    {
+     "for": "M21.X1126",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using Disabled and DataBind.",
+     "gesture": "Click Lock and apply on the paused start.",
+     "outcome": "The same pipeline's native click leaves the switch paused and the review reads Locked and paused.",
+     "opposite": "Unlock and apply on a locked paused start makes the switch editable and checked.",
+     "defect": "Replacing immediate DataBind with a benign call lets the native click flip the switch before the lock takes effect."
+    },
+    {
+     "for": "M21.X1127",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using OnLabel and OffLabel.",
+     "gesture": "Click Use night display on the enabled start.",
+     "outcome": "The switch displays Night dispatch on.",
+     "opposite": "Use night display on the paused start displays Night dispatch paused.",
+     "defect": "Swapping the typed label members exposes the wrong text for the checked state."
+    },
+    {
+     "for": "M21.X1128",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using CssClass.",
+     "gesture": "Click Use compact display on the default preference.",
+     "outcome": "The switch uses the compact-alert class and the display review reads Compact display.",
+     "opposite": "Use wide display replaces the compact styling with wide-alert.",
+     "defect": "The class writes to a different property and the default switch styling remains."
+    },
+    {
+     "for": "M21.X1129",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using EnableRtl.",
+     "gesture": "Click Use right-to-left layout.",
+     "outcome": "The switch has the e-rtl class and the settings review reads Right to left.",
+     "opposite": "Use left-to-right layout removes the class on the right-to-left start.",
+     "defect": "The live RTL change reaches a different member and the switch stays left to right."
+    },
+    {
+     "for": "M21.X1130",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using FocusIn.",
+     "gesture": "Click Focus alert control.",
+     "outcome": "The Night alerts switch receives focus.",
+     "opposite": "Click Review only, which leaves focus on the review button.",
+     "defect": "The typed focus command calls DataBind and the switch never receives focus."
+    },
+    {
+     "for": "M21.X1131",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using Destroy.",
+     "gesture": "Click Close switch preview on the enabled preview.",
+     "outcome": "The enhanced switch track disappears and the original checkbox is unchecked.",
+     "opposite": "The original open preview shows a checked switch with its enhanced track.",
+     "defect": "The typed Destroy call focuses the component instead, leaving the enhanced track."
+    },
+    {
+     "for": "M21.X1132",
+     "page": "A resident alert preferences or preview page with a FusionSwitch using Value.",
+     "gesture": "Click Use night destination on a checked switch and submit the native form.",
+     "outcome": "The server receipt reads Night desk selected.",
+     "opposite": "Submitting the freshly opened default checked switch reads Day desk selected.",
+     "defect": "The typed native value write is dropped and MVC receives the original day value."
     }
    ],
    "verdicts": [

@@ -1315,12 +1315,32 @@ Alis.Reactive.Fusion.FusionComponents.FusionStepper.StepperClickEventArgs.Previo
 Alis.Reactive.Fusion.FusionComponents.FusionStepper.StepperClickEventArgs.StepperClickEventArgs() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionStepperHtml
 Alis.Reactive.Fusion.FusionComponents.FusionSwitch
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.ActivationEvent
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.ActivationEvent.ActivationEvent() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.ActivationEvent.IsTrusted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.BeforeChange.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSwitch.BeforeChangeEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.BeforeChangeEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.BeforeChangeEventArgs.BeforeChangeEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.BeforeChangeEventArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.BeforeChangeEventArgs.Checked.get -> Alis.Reactive.Declarations.Property<bool>!
 Alis.Reactive.Fusion.FusionComponents.FusionSwitch.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSwitch.ChangeEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionSwitch.ChangeEventArgs
 Alis.Reactive.Fusion.FusionComponents.FusionSwitch.ChangeEventArgs.ChangeEventArgs() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionSwitch.ChangeEventArgs.Checked.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.ChangeEventArgs.OriginalEvent.get -> Alis.Reactive.Fusion.FusionComponents.FusionSwitch.ActivationEvent!
 Alis.Reactive.Fusion.FusionComponents.FusionSwitch.Checked.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.Click() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.CssClass.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.DataBind() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.Destroy() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.Disabled.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.EnableRtl.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.FocusIn() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionSwitch.FusionSwitch() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.OffLabel.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.OnLabel.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.Toggle() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSwitch.Value.get -> Alis.Reactive.Declarations.Property<string!>!
 Alis.Reactive.Fusion.FusionComponents.FusionSwitchHtml
 Alis.Reactive.Fusion.FusionComponents.FusionTab
 Alis.Reactive.Fusion.FusionComponents.FusionTab.FusionTab() -> void

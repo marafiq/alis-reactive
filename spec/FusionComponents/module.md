@@ -540,13 +540,19 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionStepper/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/stepper/stepper.d.ts:158`, `:340`, `:346`, `:352`, `:358`, `:238`, `:244`, `:250`).
-- `M21.N46` kept: `FusionSwitch`: `Checked` as `Property<bool>` and `Change`, with `IInputComponent.Input` committed by
-  `Change` (M7.N3); the payload `FusionSwitch.ChangeEventArgs` (`Checked`), with no `IsInteracted`, which the browser
-  does not hand (M21.X711, `probe:ej2-payload-switch-change`); and the render helpers `field.FusionSwitch()` and
-  `field.FusionSwitch(build => ..)` over a member of `bool`. It replaces main's six files
-  (`Alis.Reactive.Fusion/Components/FusionSwitch/` at 623dd4a27), whose doors carry their verdicts in
-  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
-  (`@syncfusion/ej2-buttons/src/switch/switch.d.ts:51`, `:38`, `@syncfusion/ej2-buttons/src/common/common.d.ts:93`).
+- `M21.N46` kept: `FusionSwitch` binds `Checked` and commits the typed input by `Change` (M7.N3).
+  Its live settings are `Disabled`, `CssClass`, `OnLabel`, `OffLabel`, `EnableRtl` and the native form
+  `Value`. `DataBind` applies settings in the same pipeline. `Toggle` calls the vendor's switch handler,
+  while `Click` activates its native input. `FocusIn` focuses the input and `Destroy` removes its switch
+  presentation. The synchronous `BeforeChange` payload carries the prior `Checked` and `Cancel`.
+  `Change` carries the committed `Checked` and the optional `OriginalEvent`; its `IsTrusted` distinguishes
+  direct activation from the panel's native click. The payload has no `IsInteracted`
+  (M21.X711, `probe:ej2-payload-switch-change`). M21.X1120 to M21.X1132 prove the live operations.
+  `field.FusionSwitch()` and `field.FusionSwitch(build => ..)` render the bound boolean for both hosts.
+  It replaces main's six files (`Alis.Reactive.Fusion/Components/FusionSwitch/` at 623dd4a27).
+  Both NuGet hosts and the umbrella pin 33.1.47, whose installed Buttons package is 33.1.44
+  (`@syncfusion/ej2-buttons/src/switch/switch.d.ts:32`, `:38`, `:51`, `:57`, `:64`, `:77`, `:83`,
+  `:90`, `:117`, `:174`, `:184`, `:191`; `@syncfusion/ej2-buttons/src/common/common.d.ts:86-122`).
 - `M21.N47` kept: `FusionTab`: `SelectedItem` as `Property<int>`, `Select(index)`, `HideTab(index, value)` and
   `Selected`; the payload `FusionTab.SelectEventArgs` (`SelectedIndex`, `PreviousIndex`, `IsSwiped`); and the render
   helper `Html.FusionTab(plan, elementId, build => ..)`, which returns the rendered component in place of main's
