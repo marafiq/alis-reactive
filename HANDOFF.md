@@ -1,20 +1,21 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 21:45:40 EST 2026
+Written at `date`: Thu Nov 26 22:17:22 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
-note: open: 26, each in the notes block below
+note: open: 29, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (77): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionToast, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (78): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: checking at 898cd86ea on feature/rewrite
-  leaves by: the last line `scripts/full-check.sh` prints
-  exit line: "spec check at" its commit
-  goes to: lane: checked
-ci: unread at 898cd86ea
+lane: pushed at efd6ddaa5 on feature/rewrite: equal to the remote
+  leaves by: the landing of a unit that is ready
+  read first: the queue of `HANDOFF.md`
+  exit line: "landed"
+  goes to: lane: landed
+ci: unread at efd6ddaa5
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -24,7 +25,7 @@ file: over spec/CLAUDE.md: holds 2157 lines, its limit 150
   goes to: gone
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 22 units have landed since .claude/rules/process.md last changed
+machine: review due : 23 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -32,16 +33,16 @@ machine: review due : 22 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 898cd86ea Fusion (FusionMenu): render the ward navigation
-- Full check: .work/logs/spec-check-898cd86ea.log: spec check at 898cd86ea: 40 of 40 checks pass
-- .work/last-run.txt: 20261126-212927-80839 898cd86ea
+- HEAD: efd6ddaa5 Fusion (FusionSidebar): render the resident sidebar
+- Full check: .work/logs/spec-check-efd6ddaa5.log: spec check at efd6ddaa5: 40 of 40 checks pass
+- .work/last-run.txt: 20261126-220114-36031 efd6ddaa5
 
 ## Landed since the commit before the last spec: STATE commit
-898cd86ea Fusion (FusionMenu): render the ward navigation
-a190c141d spec: STATE and handoff at 401f6fe24
+efd6ddaa5 Fusion (FusionSidebar): render the resident sidebar
+a456255d4 spec: STATE and handoff at 898cd86ea
 
 ## Open
-open: 13 promises with no browser test, 0 runtime cases not built, 4 doors not implemented
+open: 12 promises with no browser test, 0 runtime cases not built, 2 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## The owner's latest decisions
@@ -53,6 +54,9 @@ spec/CLAUDE.md:26: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mi
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
+- 2026-11-26 | direction | the queue of this file | queue | "please note down you can not change framework code now. let me  know if that ever become a case."
+- 2026-11-26 | direction | the queue of this file | queue | "yes, you should use the skill for onboarding with, with explicit scope and outcome, continusoly improve skill if it do not pass the quality bar."
+- 2026-11-26 | direction | the queue of this file | queue | "why bring that to me, framework is complete for now, skip it if you can not onboard sir. Either previous sessions were wasted but agents spent 2 days covering that"
 - 2026-11-26 | direction | the queue of this file | queue | "lets hold on tracing, finish every other framework, and then leave handoff codex will take over"
 - 2026-11-18 | direction | the queue of this file | queue | "Think of real domain, which has all these complexities. Get rid of this desk thinking. Keep other pages, other browser tasks, but write this complex app from ground up with full scale complexity. This framework has features to handle it."
 - 2026-11-18 | direction | the queue of this file | queue | "I want you to build a skill out of that TLA plus and schema, which will be used by every consumer as well." "This skill you are building should be a guiding principle for any developer to write any complex app by simple decisions, because it has a map, right? It has clear names, right?"
@@ -88,6 +92,7 @@ spec/CLAUDE.md:26: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mi
 
 The owner, 2026-11-26: "lets hold on tracing, finish every other framework, and then leave handoff codex will take
 over". Every unit lands on `feature/rewrite`; its one pull request, #247, ships 1.0; landed units' worktrees stay.
+The shared framework is complete for now. Use its existing typed surface and skip any case that requires a shared framework change.
 Builds stay serial on this Mac; source `scripts/toolchain-env.sh` first. A unit of Markdown alone lands by
 `scripts/land.sh`'s Markdown path. 1.0 is done when the core, every Fusion component and selected Native components
 are done (the owner, 2026-11-23).
@@ -115,16 +120,17 @@ unrun; backed up as the branch `backup/rewrite/fresh-app-docs` on origin):
 Start it only on the owner's word.
 
 **4. After the core: Fusion and Native (U23 to U27).** U23 has 307 of 307 placed tests, U24 57 of 57, U25 38 of 38,
-U26 95 of 108, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
+U26 96 of 108, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
 and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and localized layout.
-   1. Finish the Fusion shell with `FusionSidebar` and `FusionToolbar`. Their render helpers and browser
-      promises remain open (M21.X1024 and X1032). M21.X1002 proves the ward trail reads its configured
-      active item. M21.X406 proves the menu's focus feedback on opening and on Escape.
-   2. FusionGrid: M21.X201's three exports wait on a harness verb that holds an export; M21.X203's three and X205's two
-      wait on a core door that hands a validator's browser rules to a grid column, a core door to put to the owner with
-      its use and a recommendation.
+   1. Finish the Fusion shell with `FusionToolbar` (M21.X1032). M21.X1024 proves that Residents
+      starts open or closed as configured and hides on request. M21.X1002 proves the ward trail reads
+      its configured active item. M21.X406 proves the menu's focus feedback on opening and on Escape.
+   2. FusionGrid: M21.X201's three exports wait on a harness verb that holds an export. Review the existing work for
+      M21.X203's three and X205's two validation cases. Use a landed typed door if it covers the promise. Skip cases
+      that require a new core door to hand a validator's browser rules to a grid column.
    3. Smart Paste: M21.X803's two and X804 wait on the harness's clipboard permission and the antiforgery startup call.
    Onboard each Fusion component through `.claude/skills/onboard-component/SKILL.md`, one at a time.
+   Brief the scope and outcome explicitly. Improve the skill when a slice exposes a gap in its guidance.
 
 **5. Gaps named, not built:** an object held as a dictionary's value in a JSON body on MVC 5 (no probe of MVC 5's
 dictionary binding); `Console` false has no browser promise; the fresh MVC 5 app's net48 consumer fixture fails on this
