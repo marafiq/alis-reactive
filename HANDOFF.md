@@ -1,30 +1,30 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 19:28:30 EST 2026
+Written at `date`: Thu Nov 26 20:32:07 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 26, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (74): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionConfirm, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (75): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionConfirm, FusionToast, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: checking at 8b7e7e5a5 on feature/rewrite
+lane: checking at e57e1f9bd on feature/rewrite
   leaves by: the last line `scripts/full-check.sh` prints
   exit line: "spec check at" its commit
   goes to: lane: checked
-ci: unread at 8b7e7e5a5
+ci: unread at e57e1f9bd
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2155 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2157 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 19 units have landed since .claude/rules/process.md last changed
+machine: review due : 20 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -32,23 +32,24 @@ machine: review due : 19 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 8b7e7e5a5 Fusion (FusionConfirm): ask in a Syncfusion dialog
-- Full check: .work/logs/spec-check-8b7e7e5a5.log: spec check at 8b7e7e5a5: 40 of 40 checks pass
-- .work/last-run.txt: 20261126-191147-13934 8b7e7e5a5
+- HEAD: e57e1f9bd Fusion (FusionToast): show notes as text and dismiss the oldest
+- Full check: .work/logs/spec-check-e57e1f9bd.log: spec check at e57e1f9bd: 40 of 40 checks pass
+- .work/last-run.txt: 20261126-201512-72442 e57e1f9bd
 
 ## Landed since the commit before the last spec: STATE commit
-8b7e7e5a5 Fusion (FusionConfirm): ask in a Syncfusion dialog
-ae9f5d714 spec: STATE and handoff at d10c22a60
+e57e1f9bd Fusion (FusionToast): show notes as text and dismiss the oldest
+fd9f4d73a spec: STATE and handoff at 8b7e7e5a5
 
 ## Open
-open: 16 promises with no browser test, 0 runtime cases not built, 10 doors not implemented
+open: 15 promises with no browser test, 0 runtime cases not built, 8 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## The owner's latest decisions
-spec/CLAUDE.md:9: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), closing the flags enum: an enum is flags to the framework when
-spec/CLAUDE.md:14: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), on the forms gate 2's G13 left to the owner: yes to
-spec/CLAUDE.md:20: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): one door for each list operation. An object JavaScript iterates
-spec/CLAUDE.md:24: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mistakes log stays short enough to stay in context, each kind
+spec/CLAUDE.md:9: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): FusionToast.Hide keeps EJ2's zero-argument call and
+spec/CLAUDE.md:11: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), closing the flags enum: an enum is flags to the framework when
+spec/CLAUDE.md:16: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), on the forms gate 2's G13 left to the owner: yes to
+spec/CLAUDE.md:22: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): one door for each list operation. An object JavaScript iterates
+spec/CLAUDE.md:26: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mistakes log stays short enough to stay in context, each kind
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -114,10 +115,10 @@ unrun; backed up as the branch `backup/rewrite/fresh-app-docs` on origin):
 Start it only on the owner's word.
 
 **4. After the core: Fusion and Native (U23 to U27).** U23 has 307 of 307 placed tests, U24 57 of 57, U25 38 of 38,
-U26 93 of 108, and U27 2 of 3. FusionConfirm's two layout overloads and the fusionShell discharge pages landed in
-8b7e7e5a5 with M23.X2 and X3. The gate reported 855 selected, 855 ran, 855 passed, 0 failed, 0 over budget.
-   1. Finish the Fusion shell with `FusionToast`, `FusionBreadcrumb`, `FusionMenu`, `FusionSidebar` and `FusionToolbar`.
-      Their render helpers and browser promises remain open (U27's M23.X1 and U26's M21.X406, X1002, X1024 and X1032).
+U26 93 of 108, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
+and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and localized layout.
+   1. Finish the Fusion shell with `FusionBreadcrumb`, `FusionMenu`, `FusionSidebar` and `FusionToolbar`.
+      Their render helpers and browser promises remain open (M21.X406, X1002, X1024 and X1032).
    2. FusionGrid: M21.X201's three exports wait on a harness verb that holds an export; M21.X203's three and X205's two
       wait on a core door that hands a validator's browser rules to a grid column, a core door to put to the owner with
       its use and a recommendation.
