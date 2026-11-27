@@ -1,21 +1,22 @@
 # Handoff
 
-Written at `date`: Fri Nov 27 13:55:51 EST 2026
+Written at `date`: Fri Nov 27 18:31:46 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 29, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (90): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionCheckBoxWave, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionInputsWave, FusionNumericStep, FusionOnboardingPilotFollowup, FusionRadioButtonWave, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, FusionSwitchContinuation, FusionSwitchFull, FusionTextBoxWave, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (91): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionCheckBoxWave, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionInputsWave, FusionNumericStep, FusionOnboardingConfidence, FusionOnboardingPilotFollowup, FusionRadioButtonWave, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, FusionSwitchContinuation, FusionSwitchFull, FusionTextBoxWave, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
-unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, FusionNumericDecrement
-unit: building (2): MoveInOwners, FusionSwitchLunaExperiment
-unit: ready (1): FusionNumericDecrementApi
+unit: returned (7): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, FusionDropDownListWave, FusionNumericDecrement
+unit: building (3): MoveInOwners, FusionEditorsWave, FusionSwitchLunaExperiment
+unit: ready (3): FusionDatePickerWave, FusionNumericDecrementApi, FusionNumericTextBoxWave
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at e899e3db0 on feature/rewrite
-  leaves by: the last line `scripts/push.sh` prints
-  exit line: "remote equals HEAD"
-  goes to: lane: pushed
-ci: unread at e899e3db0
+lane: pushed at 7ff7a2663 on feature/rewrite: equal to the remote
+  leaves by: the landing of a unit that is ready
+  read first: the queue of `HANDOFF.md`
+  exit line: "landed"
+  goes to: lane: landed
+ci: unread at 7ff7a2663
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -25,7 +26,7 @@ file: over spec/CLAUDE.md: holds 2157 lines, its limit 150
   goes to: gone
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 32 units have landed since .claude/rules/process.md last changed
+machine: review due : 33 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -33,13 +34,13 @@ machine: review due : 32 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: e899e3db0 Fusion: onboard CheckBox, RadioButton and TextBox on care pages
-- Full check: .work/logs/spec-check-e899e3db0.log: spec check at e899e3db0: 40 of 40 checks pass
+- HEAD: 7ff7a2663 Fusion: focus onboarding on high-confidence public members
+- Full check: .work/logs/spec-check-7ff7a2663.log: spec check at 7ff7a2663: 40 of 40 checks pass
 - .work/last-run.txt: 20261127-133803-34746 e899e3db0
 
 ## Landed since the commit before the last spec: STATE commit
-e899e3db0 Fusion: onboard CheckBox, RadioButton and TextBox on care pages
-a0b69dfaf spec: STATE and handoff at 08d3566cb
+7ff7a2663 Fusion: focus onboarding on high-confidence public members
+41d01e88e spec: STATE and handoff at e899e3db0
 
 ## Open
 open: 9 promises with no browser test, 0 runtime cases not built, 0 doors not implemented
