@@ -1,21 +1,21 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 23:17:56 EST 2026
+Written at `date`: Thu Nov 26 23:53:59 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 29, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (80): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (81): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionGridDownloadEvidence, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 6e668a0b2 on feature/rewrite: equal to the remote
+lane: pushed at 62652a24e on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 6e668a0b2
+ci: unread at 62652a24e
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -25,7 +25,7 @@ file: over spec/CLAUDE.md: holds 2157 lines, its limit 150
   goes to: gone
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 25 units have landed since .claude/rules/process.md last changed
+machine: review due : 26 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -33,13 +33,13 @@ machine: review due : 25 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 6e668a0b2 Fusion (FusionSmartPasteButton): paste into a protected intake
-- Full check: .work/logs/spec-check-6e668a0b2.log: spec check at 6e668a0b2: 40 of 40 checks pass
+- HEAD: 62652a24e Fusion: record the Grid export proof boundary
+- Full check: .work/logs/spec-check-62652a24e.log: spec check at 62652a24e: 40 of 40 checks pass
 - .work/last-run.txt: 20261126-230211-39274 6e668a0b2
 
 ## Landed since the commit before the last spec: STATE commit
-6e668a0b2 Fusion (FusionSmartPasteButton): paste into a protected intake
-f9785e5c8 spec: STATE and handoff at 70f283e1d
+62652a24e Fusion: record the Grid export proof boundary
+724901000 spec: STATE and handoff at 6e668a0b2
 
 ## Open
 open: 9 promises with no browser test, 0 runtime cases not built, 0 doors not implemented
@@ -125,15 +125,23 @@ and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and locali
    1. The Fusion shell is proven. M21.X1032 reads the selected Admit or Discharge command. M21.X1024 proves
       Residents starts open or closed as configured and hides on request. M21.X1002 reads the configured
       ward trail item. M21.X406 reads the menu's focus feedback on opening and on Escape.
-   2. FusionGrid remains open. The retained export work proved the three filenames. M21.X201 requires download/start
-      ordering. EJ2 resolves the XLSX export before its asynchronous save starts the download. The CSV and PDF
-      download notifications did not establish the status at initiation. M21.X203 and X205 remain open because
-      the typed surface has no validator-rule projection for the EJ2 column editor. The owner directed these cases
-      to be skipped while the shared framework is complete for now.
-   3. Smart Paste: M21.X803's net10 case proves the antiforgery POST, and X804 proves the same form works
-      after a late slot mount. M21.X803's MVC 5 case remains open and needs browser proof under Windows IIS Express.
-   Onboard each Fusion component through `.claude/skills/onboard-component/SKILL.md`, one at a time.
-   Brief the scope and outcome explicitly. Improve the skill when a slice exposes a gap in its guidance.
+   2. FusionGrid has eight open cases. The retained Evening Handoff page at `724901000` matched all three
+      filenames. The M21.X201 replay then read Exported where it expected Exporting (3 selected, 3 ran, 0 passed,
+      3 failed, 0 over budget). EJ2 33.1.47 resolves XLSX before the async save starts the download. CSV and PDF
+      dispatch their links before settlement. Blob mode only returns data. The later Playwright read misses
+      initiation. A sync declaration stops the pipeline under D11.3 and leaves Exporting. All three stay open.
+      The three M21.X203 refusals and two M21.X205 inline edits need the validator's rules at
+      `GridColumn.ValidationRules`. N16.2 registers them internally, N16.3 checks a request container, and the
+      public validator returns check results. The typed projection is absent. X203_0's opposite and X203_1
+      also disagree on whether the same unconditional GreaterThan(0) renders or is refused.
+   3. Smart Paste net10 proves the protected POST and late slot mount. M21.X803_1 needs Fusion and its assets in
+      the MVC 5 twin, a protected intake page and a fixture. Run its browser and missing-header proofs in Windows IIS Express.
+
+Prioritize inputs, then editable grid-like controls. Brief one component at a time and use both onboarding skills.
+Assign pinned vendor evidence, typed declarations and their manifests, and the app and browser proof to separate
+agents. Keep builds serial. The lead owns spec placements, generated files and landing. Require a pinned public
+contract, typed use on the landed API, the exact browser outcome and the caught defect. Keep gaps open. Land on
+`feature/rewrite` with `scripts/land-unit.sh`, `scripts/full-check.sh` and `scripts/push.sh`.
 
 **5. Gaps named, not built:** an object held as a dictionary's value in a JSON body on MVC 5 (no probe of MVC 5's
 dictionary binding); `Console` false has no browser promise; the fresh MVC 5 app's net48 consumer fixture fails on this
