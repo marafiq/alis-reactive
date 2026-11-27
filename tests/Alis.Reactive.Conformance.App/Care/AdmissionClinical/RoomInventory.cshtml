@@ -1,0 +1,46 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomInventory
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed request";
+    var plan = Html.ReactivePlan<RoomInventory>();
+    void ShowInventory(FusionRadioButton.ChangeArgs changed, Pipeline<RoomInventory> pipeline)
+    {
+        pipeline.When(changed.Value.Eq(string.Empty))
+            .Then(pipeline => pipeline.Element("bed-code").Text.Set("Awaiting an inventory code"))
+            .Else(pipeline => pipeline.Element("bed-code").Text.Set(changed.Value));
+    }
+}
+<h1>Bed request for @Model.Resident</h1>
+<fieldset>
+    <legend>Available placements</legend>
+    @(Html.FusionRadioButton(plan, "provisional-bed", build => build.Label("Next available bed").Name("inventory"))
+        .Reactive(room => room.Change, ShowInventory))
+    @(Html.FusionRadioButton(plan, "garden-bed", build => build.Label("Garden room").Name("inventory").Value("G-14"))
+        .Reactive(room => room.Change, ShowInventory))
+</fieldset>
+<p><output id="bed-code" aria-label="Inventory code">Choose a placement</output></p>
+@(Html.NativeButton("prepare-request", "Prepare bed request")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var provisional = pipeline.Component<FusionRadioButton>("provisional-bed");
+        var garden = pipeline.Component<FusionRadioButton>("garden-bed");
+        var selected = provisional.GetSelectedValue();
+        pipeline.When(selected.Eq("on").And(provisional.Value.Eq(string.Empty)))
+            .Then(pipeline => pipeline.Element("bed-request").Text.Set("Request the next available bed"))
+            .ElseIf(selected.Eq(garden.Value))
+            .Then(pipeline =>
+            {
+                var request = pipeline.Element("bed-request");
+                request.Text.Set("Prepare reservation for ");
+                request.Text.Append(garden.Value);
+            })
+            .Else(pipeline => pipeline.Element("bed-request").Text.Set("Choose a placement before booking"));
+    }))
+<p><output id="bed-request" aria-label="Bed request">Request awaiting review</output></p>
+@Html.RenderPlan(plan)

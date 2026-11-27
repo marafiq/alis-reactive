@@ -3549,7 +3549,7 @@
   },
   {
    "id": "M21.F10",
-   "summary": "FusionCheckBox: one declaration of the Syncfusion CheckBox by its JavaScript names, checked, indeterminate, disabled, dataBind, click, focusIn and change, each EJ2 33.1.47's public member; the payload of change, read as the browser hands it; the input it is, its checked state committed by change; and the render helpers that render it bound to a member of bool. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with a setter and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name.",
+   "summary": "FusionCheckBox binds the model’s bool and exposes EJ2’s checked, mixed and disabled states. A signed decision can update the admission record or submit a separate native filing code. A change identifies the activation, and the print and worksheet cases exercise caption settings, keyboard focus, persistence, refresh, destroy and the native input. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with a setter and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionCheckBox",
@@ -3660,7 +3660,9 @@
     "call",
     "lit",
     "on",
-    "method"
+    "method",
+    "if",
+    "request"
    ],
    "writes": [
     {
@@ -3723,6 +3725,91 @@
      "id": "M21.X1006",
      "rung": "behavior",
      "defect": "Both lines render the CheckBox by EJ2's CheckBoxFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs:78 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the CheckBox at the member's value, written by M21.D1; a helper that drops it shows the box unticked, EJ2's checked false (@syncfusion/ej2-buttons/src/check-box/check-box.d.ts:50-52), though the member holds true, against D17.13."
+    },
+    {
+     "id": "M21.X1300",
+     "rung": "behavior",
+     "defect": "Write a resolved state when deferring, or retain the pending state when resolving."
+    },
+    {
+     "id": "M21.X1301",
+     "rung": "behavior",
+     "defect": "Write false when applying the permission, or write true when applying the refusal."
+    },
+    {
+     "id": "M21.X1302",
+     "rung": "behavior",
+     "defect": "Route the resident event as a staff action, or replace the delegated click with an assignment that emits no change."
+    },
+    {
+     "id": "M21.X1303",
+     "rung": "behavior",
+     "defect": "Skip the synchronous bind before either attempted correction, leaving the native control in its preceding enabled or disabled state."
+    },
+    {
+     "id": "M21.X1304",
+     "rung": "behavior",
+     "defect": "Route the decision action to the signature field, or the signature action back to the decision."
+    },
+    {
+     "id": "M21.X1305",
+     "rung": "behavior",
+     "defect": "Keep the formal wording for the plain sheet, or keep plain wording on the formal sheet."
+    },
+    {
+     "id": "M21.X1306",
+     "rung": "behavior",
+     "defect": "Keep the ordinary styling for the large-print order, or retain large print when standard is chosen."
+    },
+    {
+     "id": "M21.X1307",
+     "rung": "behavior",
+     "defect": "Use the wrong caption position in the Arabic layout, or keep the Arabic direction in the English layout."
+    },
+    {
+     "id": "M21.X1308",
+     "rung": "behavior",
+     "defect": "Enable stripping on the fixed house caption, or retain the embedded house style when preparing the plain caption."
+    },
+    {
+     "id": "M21.X1309",
+     "rung": "behavior",
+     "defect": "Retain the directory code for clinical filing, or retain the clinical code for the directory."
+    },
+    {
+     "id": "M21.X1310",
+     "rung": "behavior",
+     "defect": "Read an unrelated input attribute for the custom notice, or use the local notice for the standard form."
+    },
+    {
+     "id": "M21.X1311",
+     "rung": "behavior",
+     "defect": "Read the wrong attribute from the returned input, or assign the custom instruction to the unlabelled root."
+    },
+    {
+     "id": "M21.X1312",
+     "rung": "behavior",
+     "defect": "Refresh the preview instead of destroying it, or close the enhanced preview while keeping it open."
+    },
+    {
+     "id": "M21.X1313",
+     "rung": "behavior",
+     "defect": "Skip the refresh that attaches persistence, or enable remembering on the visit-only path."
+    },
+    {
+     "id": "M21.X1314",
+     "rung": "behavior",
+     "defect": "Keep a named filing code when clearing the destination, or submit the unchecked form as a filed release."
+    },
+    {
+     "id": "M21.X1315",
+     "rung": "behavior",
+     "defect": "Drop the prior checked choice from the marked pending render, or start an unmarked pending decision checked."
+    },
+    {
+     "id": "M21.X1316",
+     "rung": "behavior",
+     "defect": "Keep the previous caption instead of clearing it, or fail to restore the formal caption."
     }
    ],
    "promises": [
@@ -3733,6 +3820,142 @@
      "opposite": "A model whose PhotoConsent is false shows the box unticked.",
      "defect": "The CheckBox is rendered with no starting value, so the box shows unticked though the model holds true.",
      "for": "M21.X1006"
+    },
+    {
+     "for": "M21.X1300",
+     "page": "Photo decision review",
+     "gesture": "Defer the photo decision, then preview the admitted resident’s badge.",
+     "outcome": "The issue desk reads “Contact the resident before issuing a badge”.",
+     "opposite": "Resolve the pending decision without consent and the same preview reads “Issue a badge without a photo”.",
+     "defect": "Write a resolved state when deferring, or retain the pending state when resolving."
+    },
+    {
+     "for": "M21.X1301",
+     "page": "Photo decision review",
+     "gesture": "Apply the signed permission and save the photo decision.",
+     "outcome": "The admission desk receives the checked choice and shows “Photo permission recorded”.",
+     "opposite": "Apply the signed refusal and save the same field to receive “Photo refusal recorded”.",
+     "defect": "Write false when applying the permission, or write true when applying the refusal."
+    },
+    {
+     "for": "M21.X1302",
+     "page": "Photo decision review",
+     "gesture": "Select the photo option on the resident form.",
+     "outcome": "The consent history reads “Resident granted photo permission”.",
+     "opposite": "Starting from permission, activate the delegated correction and the history reads “Staff recorded photo refusal”.",
+     "defect": "Route the resident event as a staff action, or replace the delegated click with an assignment that emits no change."
+    },
+    {
+     "for": "M21.X1303",
+     "page": "Photo decision review",
+     "gesture": "Lock a signed decision before applying a pending correction.",
+     "outcome": "The control stays unchecked and the correction review reads “Signed decision locked”.",
+     "opposite": "Reopen a locked decision before applying the same correction; the box becomes checked and the review reads “Correction applied”.",
+     "defect": "Skip the synchronous bind before either attempted correction, leaving the native control in its preceding enabled or disabled state."
+    },
+    {
+     "for": "M21.X1304",
+     "page": "Photo decision review",
+     "gesture": "Choose to edit the photo decision from the signature review.",
+     "outcome": "The photo option receives keyboard focus.",
+     "opposite": "Choose to return to the signature instead; the signature field receives keyboard focus.",
+     "defect": "Route the decision action to the signature field, or the signature action back to the decision."
+    },
+    {
+     "for": "M21.X1305",
+     "page": "Photo consent sheet",
+     "gesture": "Choose plain wording and prepare the signature line.",
+     "outcome": "The option and signature line say `May we use your photo?`.",
+     "opposite": "Choose the formal statement and both show “I consent to a photo ID”.",
+     "defect": "Keep the formal wording for the plain sheet, or keep plain wording on the formal sheet."
+    },
+    {
+     "for": "M21.X1306",
+     "page": "Photo consent sheet",
+     "gesture": "Choose large print and prepare the resident’s packet.",
+     "outcome": "The actual photo control uses its large-print style and the order reads “Large-print consent packet”.",
+     "opposite": "Restore standard print; the same control sheds that style and the order reads “Standard consent packet”.",
+     "defect": "Keep the ordinary styling for the large-print order, or retain large print when standard is chosen."
+    },
+    {
+     "for": "M21.X1307",
+     "page": "Photo consent sheet",
+     "gesture": "Choose the Arabic reading layout and prepare the print order.",
+     "outcome": "The checkbox displays the Arabic photo consent in right-to-left layout and the print order reads “Arabic layout ready” for a caption before the mark.",
+     "opposite": "The English sheet displays “I consent to a photo ID” left-to-right and reads “English layout ready” for a caption after the mark.",
+     "defect": "Use the wrong caption position in the Arabic layout, or keep the Arabic direction in the English layout."
+    },
+    {
+     "for": "M21.X1308",
+     "page": "Photo consent sheet",
+     "gesture": "Apply the house-designed caption to the consent sheet.",
+     "outcome": "The house caption displays “Signature required” in its own format and the sheet identifies “House-designed caption”.",
+     "opposite": "Apply the plain caption; it shows “Photo release” and the sheet identifies “Standard caption”.",
+     "defect": "Enable stripping on the fixed house caption, or retain the embedded house style when preparing the plain caption."
+    },
+    {
+     "for": "M21.X1309",
+     "page": "Photo release filing",
+     "gesture": "Select clinical filing and file the signed release.",
+     "outcome": "The selected destination reads “Clinical record” and the server files the checked release in the clinical record.",
+     "opposite": "Select directory filing; the selected destination and the server receipt both identify the resident directory.",
+     "defect": "Retain the directory code for clinical filing, or retain the clinical code for the directory."
+    },
+    {
+     "for": "M21.X1310",
+     "page": "Photo release filing",
+     "gesture": "Review the signed release’s accessible notice on a form with a local notice.",
+     "outcome": "The signed copy shows “Permission for a directory photo”.",
+     "opposite": "Review a form using the standard notice; the signed copy shows “Photo permission”.",
+     "defect": "Read an unrelated input attribute for the custom notice, or use the local notice for the standard form."
+    },
+    {
+     "for": "M21.X1311",
+     "page": "Photo release filing",
+     "gesture": "Check the spoken filing instruction for a custom-labelled release.",
+     "outcome": "The accessibility review shows “Permission for a directory photo”.",
+     "opposite": "Review the standard release; the spoken filing instruction shows “Photo permission”.",
+     "defect": "Read the wrong attribute from the returned input, or assign the custom instruction to the unlabelled root."
+    },
+    {
+     "for": "M21.X1312",
+     "page": "Photo consent worksheet",
+     "gesture": "Close the signed worksheet preview.",
+     "outcome": "The enhanced caption is gone and the original checkbox is unchecked.",
+     "opposite": "Keep the preview open; the signed option stays checked and its caption remains visible.",
+     "defect": "Refresh the preview instead of destroying it, or close the enhanced preview while keeping it open."
+    },
+    {
+     "for": "M21.X1313",
+     "page": "Photo consent worksheet",
+     "gesture": "Remember the marked, pending worksheet on this workstation and reopen it.",
+     "outcome": "The storage selection reads “Remember on this workstation” and the reopened worksheet reads “Marked release awaiting confirmation”.",
+     "opposite": "Keep a marked, pending worksheet for one visit and reopen it; the selection reads “This visit only” and the worksheet reads “Unmarked release”.",
+     "defect": "Skip the refresh that attaches persistence, or enable remembering on the visit-only path."
+    },
+    {
+     "for": "M21.X1314",
+     "page": "Photo release filing",
+     "gesture": "Leave the checked release uncategorized and submit it.",
+     "outcome": "The server receives the empty code under the bound field and shows “Release filed under general consent”.",
+     "opposite": "Clear the same uncategorized release before filing; the server reports “No photo release filed”.",
+     "defect": "Keep a named filing code when clearing the destination, or submit the unchecked form as a filed release."
+    },
+    {
+     "for": "M21.X1315",
+     "page": "Photo decision review",
+     "gesture": "Resolve the pending, marked photo decision with the keyboard.",
+     "outcome": "The resident history reports “Resident granted photo permission” and the badge desk reads “Issue a badge with a photo”.",
+     "opposite": "Resolve the pending, unmarked decision with the same key; the history reports refusal and the badge desk reads “Issue a badge without a photo”.",
+     "defect": "Drop the prior checked choice from the marked pending render, or start an unmarked pending decision checked."
+    },
+    {
+     "for": "M21.X1316",
+     "page": "Photo consent sheet",
+     "gesture": "Use the field label alone when a separate caption was present.",
+     "outcome": "The former caption disappears and the signature line reads “Use the standard photo permission form”.",
+     "opposite": "Reinstate the formal caption and the signature line shows “I consent to a photo ID”.",
+     "defect": "Keep the previous caption instead of clearing it, or fail to restore the formal caption."
     }
    ],
    "verdicts": [
@@ -16945,7 +17168,7 @@
   },
   {
    "id": "M21.F36",
-   "summary": "FusionRadioButton: one declaration of the Syncfusion RadioButton by its JavaScript names, checked, disabled, dataBind, getSelectedValue, click, focusIn and change, each EJ2 33.1.47's public member; the payload of change, read as the browser hands it; and the render helper that renders one button under the developer's id. Main spreads the slice over seven files whose events, writes and calls name members by strings over ComponentRef, a payload class with a setter, and a builder class of its own whose Reactive extension wires the change; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component and its payload nested under EJ2's interface name.",
+   "summary": "FusionRadioButton exposes the selected native group value and the live option value. The admission page can update, group, select and focus room choices, review the original change event, submit the booked room, and configure or retire a resident’s room card. Main spreads the slice over seven files whose events, writes and calls name members by strings over ComponentRef, a payload class with a setter, and a builder class of its own whose Reactive extension wires the change; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component and its payload nested under EJ2's interface name.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionRadioButton",
@@ -17040,7 +17263,8 @@
     "call",
     "lit",
     "on",
-    "method"
+    "method",
+    "if"
    ],
    "writes": [
     {
@@ -17107,6 +17331,91 @@
      "id": "M21.X1022",
      "rung": "behavior",
      "defect": "Both lines render the RadioButton by EJ2's builder under the view's id with the view's options, EJS().RadioButton(elementId) (Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonHtmlExtensions.cs:31 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:77 at 65fdf118d): a helper that drops the view's options starts it at EJ2's empty value (@syncfusion/ej2-buttons/src/radio-button/radio-button.d.ts:90-92), and one that renders an id the plan does not name leaves the plan's GetSelectedValue (Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:33 at 65fdf118d; @syncfusion/ej2-buttons/src/radio-button/radio-button.d.ts:134) nothing to reach, against D17.13. The rewrite's render helper renders the RadioButton under the plan's id with the options the view sets."
+    },
+    {
+     "id": "M21.X1400",
+     "rung": "behavior",
+     "defect": "Treat a booked referral as released, or retain the prior assignment on release."
+    },
+    {
+     "id": "M21.X1401",
+     "rung": "behavior",
+     "defect": "Leave the room unlocked while cleaning, retain the lock after release, or defer the bind until after the native click."
+    },
+    {
+     "id": "M21.X1402",
+     "rung": "behavior",
+     "defect": "Classify the single or companion value as the other room, or drop the actual vendor or original event category."
+    },
+    {
+     "id": "M21.X1403",
+     "rung": "behavior",
+     "defect": "Send the single recommendation to the companion control, or send the companion recommendation to the single control."
+    },
+    {
+     "id": "M21.X1404",
+     "rung": "behavior",
+     "defect": "Copy the independent group name on inclusion, or retain the primary group name on separation."
+    },
+    {
+     "id": "M21.X1405",
+     "rung": "behavior",
+     "defect": "Keep the original live room code on ordinary bookings, or drop the contract value attribute that preserves the submitted code."
+    },
+    {
+     "id": "M21.X1406",
+     "rung": "behavior",
+     "defect": "Use the English layout for the Arabic card, or retain Arabic ordering on the English card."
+    },
+    {
+     "id": "M21.X1407",
+     "rung": "behavior",
+     "defect": "Disregard the native hold when issuing the slip, or read the wrong native attribute for the released room."
+    },
+    {
+     "id": "M21.X1408",
+     "rung": "behavior",
+     "defect": "Approve transfer from a held root, or print the wrong attribute of the released root."
+    },
+    {
+     "id": "M21.X1409",
+     "rung": "behavior",
+     "defect": "Skip attaching browser persistence for a remembered room, or enable it when the referral default was selected."
+    },
+    {
+     "id": "M21.X1410",
+     "rung": "behavior",
+     "defect": "Keep the enhanced preview on close, or destroy it while continuing."
+    },
+    {
+     "id": "M21.X1411",
+     "rung": "behavior",
+     "defect": "Allow the imported card style through, or filter the house template when creating its caption."
+    },
+    {
+     "id": "M21.X1412",
+     "rung": "behavior",
+     "defect": "Retain the old caption when clearing, or clear it again when an alias is restored."
+    },
+    {
+     "id": "M21.X1413",
+     "rung": "behavior",
+     "defect": "Leave the handler unattached when enabling persistence or attach it initially on every workstation."
+    },
+    {
+     "id": "M21.X1414",
+     "rung": "behavior",
+     "defect": "Assign the checked property instead of activating the native option, or activate it when applying the referral."
+    },
+    {
+     "id": "M21.X1415",
+     "rung": "behavior",
+     "defect": "Configure the Arabic caption on the wrong side, or allow the imported card to keep the first-party print-stock style."
+    },
+    {
+     "id": "M21.X1416",
+     "rung": "behavior",
+     "defect": "Read an empty native group result for the selected provisional bed, or give the identified Garden room the wrong inventory code."
     }
    ],
    "promises": [
@@ -17117,6 +17426,142 @@
      "outcome": "room-choice reads companion.",
      "opposite": "Clicking Single room, then Show room, room-choice reads single.",
      "defect": "The helper drops the view's options, so the radio carries no value and room-choice reads nothing; or it renders the radio at an id the plan does not name, so the read stops and room-choice keeps No room."
+    },
+    {
+     "for": "M21.X1400",
+     "page": "The admission desk applies a referral to a single-room radio, then reviews the checked state and selected group value.",
+     "gesture": "Apply the booked referral and review the placement.",
+     "outcome": "Single room is checked and the admission summary reads Single room assigned.",
+     "opposite": "Applying the released referral clears the formerly checked single room and the summary reads Awaiting room assignment.",
+     "defect": "Treat a booked referral as released, or retain the prior assignment on release."
+    },
+    {
+     "for": "M21.X1401",
+     "page": "The admission desk reconciles a single room with its cleaning status, binds the editing lock and attempts the reservation in the same action.",
+     "gesture": "Apply the cleaning hold and try to reserve the room.",
+     "outcome": "The radio is disabled and the reservation receipt reads Held for cleaning.",
+     "opposite": "Applying a release to an initially locked room enables its radio and records Single room reserved.",
+     "defect": "Leave the room unlocked while cleaning, retain the lock after release, or defer the bind until after the native click."
+    },
+    {
+     "for": "M21.X1402",
+     "page": "Admission staff record a room choice from the actual radio change notification, its native change event and the selected value.",
+     "gesture": "Choose Single room.",
+     "outcome": "The placement activity reads Single room requested.",
+     "opposite": "Choosing Companion suite records Companion suite requested.",
+     "defect": "Classify the single or companion value as the other room, or drop the actual vendor or original event category."
+    },
+    {
+     "for": "M21.X1403",
+     "page": "Admission staff can move keyboard focus to either room choice from its referral.",
+     "gesture": "Review the recommendation for a single room.",
+     "outcome": "Keyboard focus is on the Single room radio.",
+     "opposite": "Reviewing the companion referral focuses Companion suite.",
+     "defect": "Send the single recommendation to the companion control, or send the companion recommendation to the single control."
+    },
+    {
+     "for": "M21.X1404",
+     "page": "The admission desk can count a respite room as a placement alternative or consider it separately by reassigning its live group from another radio.",
+     "gesture": "Include respite in the primary group, select Single room and then Short stay, and review the placement.",
+     "outcome": "The primary room review reads Short stay replaces the single room.",
+     "opposite": "Separating respite first preserves the primary choice and the review reads Single room with independent respite.",
+     "defect": "Copy the independent group name on inclusion, or retain the primary group name on separation."
+    },
+    {
+     "for": "M21.X1405",
+     "page": "The booking desk applies the garden code to the selected room and submits its native form; a contract booking retains its original native value.",
+     "gesture": "Allocate the garden wing and confirm the ordinary booking.",
+     "outcome": "The proposed booking reads Garden wing and the server confirms Garden wing reserved.",
+     "opposite": "The same live property changes for a contracted bed, while the server confirms Contract bed reserved.",
+     "defect": "Keep the original live room code on ordinary bookings, or drop the contract value attribute that preserves the submitted code."
+    },
+    {
+     "for": "M21.X1406",
+     "page": "A resident-facing room card applies the requested caption, class, text direction and caption position, then reviews the live settings.",
+     "gesture": "Apply the Arabic room card, open the print review and select its localized caption.",
+     "outcome": "The Arabic radio labeled غرفة مفردة becomes checked and the print review reads Print right to left with the room name first.",
+     "opposite": "Applying English after Arabic gives a selectable Single room and the print review reads Print left to right with the room name last.",
+     "defect": "Use the English layout for the Arabic card, or retain Arabic ordering on the English card."
+    },
+    {
+     "for": "M21.X1407",
+     "page": "The bed desk reads the native radio input to issue an availability slip from its disabled and value attributes.",
+     "gesture": "Read the slip for a room held for cleaning.",
+     "outcome": "The availability slip reads Hold for housekeeping.",
+     "opposite": "The released room has no disabled attribute and its slip reads Garden suite.",
+     "defect": "Disregard the native hold when issuing the slip, or read the wrong native attribute for the released room."
+    },
+    {
+     "for": "M21.X1408",
+     "page": "The transport desk reads the mounted root returned by the room radio to check the destination before transfer.",
+     "gesture": "Check a room still held for cleaning.",
+     "outcome": "The transfer destination reads Transfer on hold.",
+     "opposite": "Checking the released room reads its native value and gives Garden suite.",
+     "defect": "Approve transfer from a held root, or print the wrong attribute of the released root."
+    },
+    {
+     "for": "M21.X1409",
+     "page": "The admissions workstation optionally remembers the provisional room for its next visit by enabling browser storage and refreshing the radio.",
+     "gesture": "Remember the provisional choice, select Single room and open the next visit.",
+     "outcome": "Storage policy reads Remember this room and the next visit restores the checked Single room.",
+     "opposite": "Using the admission default reports Use referral default and opens the next visit with the radio unchecked.",
+     "defect": "Skip attaching browser persistence for a remembered room, or enable it when the referral default was selected."
+    },
+    {
+     "for": "M21.X1410",
+     "page": "Admission staff close or continue a preview of the selected room before entering a final booking.",
+     "gesture": "Close the room preview.",
+     "outcome": "The original radio is unchecked and the preview caption no longer appears.",
+     "opposite": "Continuing the preview retains the checked radio and its Garden suite caption.",
+     "defect": "Keep the enhanced preview on close, or destroy it while continuing."
+    },
+    {
+     "for": "M21.X1411",
+     "page": "The room-card editor filters imported house-card styling or keeps a locally authored print legend on first caption creation.",
+     "gesture": "Apply the imported card.",
+     "outcome": "The review reads Imported styling filtered and the first-party print legend is hidden.",
+     "opposite": "Applying the house card reports House styling enabled and shows the print legend.",
+     "defect": "Allow the imported card style through, or filter the house template when creating its caption."
+    },
+    {
+     "for": "M21.X1412",
+     "page": "The admission desk removes or restores a resident-facing room alias on a mounted radio.",
+     "gesture": "Clear the current room alias.",
+     "outcome": "The option caption becomes empty and the review reads Room alias cleared.",
+     "opposite": "Restoring the alias displays Garden suite and the live review reads Garden suite.",
+     "defect": "Retain the old caption when clearing, or clear it again when an alias is restored."
+    },
+    {
+     "for": "M21.X1413",
+     "page": "The workstation changes its live storage flag back to the referral default after it has attached its room-saving handler.",
+     "gesture": "Remember the provisional choice, switch to the referral default, review the policy, choose Single room and open the next visit.",
+     "outcome": "The policy reads Use referral default, and the next visit still restores this tab’s checked Single room.",
+     "opposite": "A new workstation that never enabled storage reports Use referral default and the next visit opens with Single room unchecked.",
+     "defect": "Leave the handler unattached when enabling persistence or attach it initially on every workstation."
+    },
+    {
+     "for": "M21.X1414",
+     "page": "The desk can activate a released room through the native radio click or apply the same choice directly from a written referral.",
+     "gesture": "Apply availability and reserve the released single room.",
+     "outcome": "The room is checked and its actual native change records Single room requested.",
+     "opposite": "Applying the booked referral also checks Single room, while placement activity remains No request recorded.",
+     "defect": "Assign the checked property instead of activating the native option, or activate it when applying the referral."
+    },
+    {
+     "for": "M21.X1415",
+     "page": "Staff open a saved resident room card whose MVC radio builder configures the caption, display class, RTL setting, caption position and first-caption styling policy.",
+     "gesture": "Open the saved Arabic house card and preview its print layout.",
+     "outcome": "The displayed caption is غرفة مفردة, the editable print preview reads Print right to left with the room name first and the house print-stock instruction is visible.",
+     "opposite": "Opening the saved English imported card displays Single room and Print left to right with the room name last. Its inert house print-stock instruction is filtered.",
+     "defect": "Configure the Arabic caption on the wrong side, or allow the imported card to keep the first-party print-stock style."
+    },
+    {
+     "for": "M21.X1416",
+     "page": "The bed request offers the next available bed before inventory assigns it a code and a separately coded Garden room.",
+     "gesture": "Select Next available bed and prepare the bed request.",
+     "outcome": "Inventory reads Awaiting an inventory code and the request reads Request the next available bed.",
+     "opposite": "Selecting Garden room shows its received inventory code G-14 and preparing the request reads Prepare reservation for G-14.",
+     "defect": "Read an empty native group result for the selected provisional bed, or give the identified Garden room the wrong inventory code."
     }
    ],
    "verdicts": [
@@ -22963,7 +23408,7 @@
   },
   {
    "id": "M21.F49",
-   "summary": "FusionTextBox: one declaration of the Syncfusion TextBox by its JavaScript names, value, dataBind, focusIn, focusOut, addIcon, input, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its four events; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over nine files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters, an append-only icon door and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it, an icon's place typed, and its payloads nested under EJ2's interface names.",
+   "summary": "FusionTextBox binds the preferred name and supplies the input, change, focus and blur payloads to the wristband editor. The family contact card uses the real editable field, its access settings, presentation, templates and typed attribute removal. The editor can save a draft, read the persisted data and release the preview. Main spreads the slice over nine files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters, an append-only icon door and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it, an icon's place typed, and its payloads nested under EJ2's interface names.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionTextBox",
@@ -23084,7 +23529,9 @@
     "call",
     "lit",
     "on",
-    "method"
+    "method",
+    "if",
+    "request"
    ],
    "writes": [
     {
@@ -23157,6 +23604,146 @@
      "id": "M21.X1030",
      "rung": "behavior",
      "defect": "Both lines start the TextBox at the bound member through EJ2's own builder, EJS().TextBoxFor(expr) (Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:116 at 65fdf118d); a helper that drops the start shows the box empty, EJ2's null (@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:79-81) whatever the member holds, against D17.13. The rewrite's render helper starts the TextBox at the member's value, written by M21.D1."
+    },
+    {
+     "id": "M21.X1500",
+     "rung": "behavior",
+     "defect": "Checking the new name as the previous name or treating the directory write as a staff edit misclassifies the change."
+    },
+    {
+     "id": "M21.X1501",
+     "rung": "behavior",
+     "defect": "Reading the current keystroke as the previous text or ignoring the preceding recorded name selects the wrong preparation."
+    },
+    {
+     "id": "M21.X1502",
+     "rung": "behavior",
+     "defect": "Substituting the wrong focus operation or treating blank focus or blur as an existing name leaves the wrong review."
+    },
+    {
+     "id": "M21.X1503",
+     "rung": "behavior",
+     "defect": "Reading the old native disabled attribute before binding, or leaving the input locked on release, gives the wrong access state."
+    },
+    {
+     "id": "M21.X1504",
+     "rung": "behavior",
+     "defect": "The wrong read-only flag or editing hint leaves the wrong access or placeholder on the field."
+    },
+    {
+     "id": "M21.X1505",
+     "rung": "behavior",
+     "defect": "Posting a different registered field or keeping a former value on removal saves the wrong profile."
+    },
+    {
+     "id": "M21.X1506",
+     "rung": "behavior",
+     "defect": "A mismatched input type or completion token leaves the wrong contact mode."
+    },
+    {
+     "id": "M21.X1507",
+     "rung": "behavior",
+     "defect": "Using the other layout's width, reading the wrong class or reversing direction misidentifies the contact card."
+    },
+    {
+     "id": "M21.X1508",
+     "rung": "behavior",
+     "defect": "Setting another float label mode or selecting the wrong live mode leaves the wrong caption."
+    },
+    {
+     "id": "M21.X1509",
+     "rung": "behavior",
+     "defect": "The wrong side gives the caption the opposite width. Omitting the second default or saved leading reminder leaves extra caption space."
+    },
+    {
+     "id": "M21.X1510",
+     "rung": "behavior",
+     "defect": "Writing the prefix into the suffix or leaving a label attached renders the wrong card."
+    },
+    {
+     "id": "M21.X1511",
+     "rung": "behavior",
+     "defect": "Selecting the wrong clear-button setting either removes the clear action or advertises it for a protected card."
+    },
+    {
+     "id": "M21.X1512",
+     "rung": "behavior",
+     "defect": "Selecting the wrong initial multiline option or recognizing the wrong live mode leaves the wrong editor or format."
+    },
+    {
+     "id": "M21.X1513",
+     "rung": "behavior",
+     "defect": "Omitting the persistence refresh or enabling storage for the server-default choice restores the wrong name."
+    },
+    {
+     "id": "M21.X1514",
+     "rung": "behavior",
+     "defect": "Refreshing in place of destroying or destroying during refresh gives the wrong terminal status."
+    },
+    {
+     "id": "M21.X1515",
+     "rung": "behavior",
+     "defect": "Sending the unchanged fallback or serializing an empty draft as a named one gives the wrong recovered value."
+    },
+    {
+     "id": "M21.X1516",
+     "rung": "behavior",
+     "defect": "Reading the placeholder as the accessible name, or the accessible name as the placeholder, shows the wrong contact instruction."
+    },
+    {
+     "id": "M21.X1517",
+     "rung": "behavior",
+     "defect": "Using the old locale or the wrong fallback gives the field an incorrect hint."
+    },
+    {
+     "id": "M21.X1518",
+     "rung": "behavior",
+     "defect": "Removing an unrelated attribute or applying the same list to both actions either retains a lock or removes a protected field setting."
+    },
+    {
+     "id": "M21.X1519",
+     "rung": "behavior",
+     "defect": "Substituting a different completion token or keeping an override after leaving kiosk mode selects the wrong policy."
+    },
+    {
+     "id": "M21.X1520",
+     "rung": "behavior",
+     "defect": "Reading an empty string as null or discarding the original interaction misclassifies the withdrawal."
+    },
+    {
+     "id": "M21.X1521",
+     "rung": "behavior",
+     "defect": "Dropping the model's number, the configured value or the leading and trailing transfer templates shows the wrong extension card."
+    },
+    {
+     "id": "M21.X1522",
+     "rung": "behavior",
+     "defect": "Retaining 176px or replacing it with 18ch leaves the wrong standard width; overwriting the custom setting loses the 40ch card."
+    },
+    {
+     "id": "M21.X1523",
+     "rung": "behavior",
+     "defect": "The wrong builder width, floating-label mode or clear setting changes the actual extension on the affected card."
+    },
+    {
+     "id": "M21.X1524",
+     "rung": "behavior",
+     "defect": "Writing an empty string in place of null, or null in place of empty, selects the other printed directions."
+    },
+    {
+     "id": "M21.X1525",
+     "rung": "behavior",
+     "defect": "Selecting the wrong stored prefix or suffix, or retaining the stored label on the visitor card, leaves the incorrect directions on the field."
+    },
+    {
+     "id": "M21.X1526",
+     "rung": "behavior",
+     "defect": "Retaining a visible input type while withholding, or restoring it as hidden, yields the wrong status and field."
+    },
+    {
+     "id": "M21.X1527",
+     "rung": "behavior",
+     "defect": "Capturing the other configured field, reading the wrong template-name argument, or installing a fixed label gives the wrong routing instructions."
     }
    ],
    "promises": [
@@ -23167,6 +23754,230 @@
      "outcome": "The preferred name box shows Nell.",
      "opposite": "A model whose PreferredName is null shows an empty box.",
      "defect": "The box is rendered with no starting value, so it shows empty though the model holds Nell."
+    },
+    {
+     "for": "M21.X1500",
+     "page": "The resident profile shows the wristband names a member of staff and the resident directory can supply.",
+     "gesture": "Edit Nell to Nelly and leave the preferred name field.",
+     "outcome": "The review identifies a staff amendment to Nell and offers to replace the wristband.",
+     "opposite": "On a blank profile Use directory name supplies Eleanor and marks the wristband as a directory entry.",
+     "defect": "Checking the new name as the previous name or treating the directory write as a staff edit misclassifies the change."
+    },
+    {
+     "for": "M21.X1501",
+     "page": "The resident profile shows the preferred name being entered for a wristband.",
+     "gesture": "Type a new name in a blank profile before leaving the field.",
+     "outcome": "The live draft offers Add a wristband name.",
+     "opposite": "Replacing the existing name Nell offers Replace wristband name while the field still has focus.",
+     "defect": "Reading the current keystroke as the previous text or ignoring the preceding recorded name selects the wrong preparation."
+    },
+    {
+     "for": "M21.X1502",
+     "page": "The resident profile shows the wristband editor and print review.",
+     "gesture": "Click Edit wristband name on the populated profile, then Finish editing.",
+     "outcome": "Focus reports Editing the recorded name, and leaving the editor reports Ready to print.",
+     "opposite": "The blank profile reports Adding a preferred name on focus, then Name still needed after Finish editing.",
+     "defect": "Substituting the wrong focus operation or treating blank focus or blur as an existing name leaves the wrong review."
+    },
+    {
+     "for": "M21.X1503",
+     "page": "The resident profile shows the preferred name editing permission for a printed wristband.",
+     "gesture": "Lock the populated profile, then use its editing control.",
+     "outcome": "The input is disabled in the same action and the access review says Locked for printing.",
+     "opposite": "Unlocking the initially locked blank profile enables and focuses its input and reports Staff can edit.",
+     "defect": "Reading the old native disabled attribute before binding, or leaving the input locked on release, gives the wrong access state."
+    },
+    {
+     "for": "M21.X1504",
+     "page": "The resident profile shows the read-only and editable wristband profile.",
+     "gesture": "Protect the recorded name and review its editing instructions.",
+     "outcome": "The native field becomes read-only, shows Check against wristband and reports Read-only profile.",
+     "opposite": "Release the protected field on the blank profile to show Enter preferred name and report Editable profile.",
+     "defect": "The wrong read-only flag or editing hint leaves the wrong access or placeholder on the field."
+    },
+    {
+     "for": "M21.X1505",
+     "page": "The resident profile shows the preferred name on the resident's profile record.",
+     "gesture": "Use the directory name and save the registered preferred name.",
+     "outcome": "The saved profile reopens showing Eleanor.",
+     "opposite": "Clearing the recorded name and saving reopens the profile with the no-name wristband instruction.",
+     "defect": "Posting a different registered field or keeping a former value on removal saves the wrong profile."
+    },
+    {
+     "for": "M21.X1506",
+     "page": "The resident profile shows the resident contact card's email and phone modes.",
+     "gesture": "Choose Email contact on a telephone contact card.",
+     "outcome": "The contact field expects email, offers email completion and identifies the email address on review.",
+     "opposite": "Choosing Telephone contact on an email card switches the field and its completion token to tel and identifies a callback number.",
+     "defect": "A mismatched input type or completion token leaves the wrong contact mode."
+    },
+    {
+     "for": "M21.X1507",
+     "page": "The resident profile shows the layout a staff member selects for a contact card.",
+     "gesture": "Choose a compact right-to-left contact card.",
+     "outcome": "The actual editor has a 176-pixel wrapper and the card layout review identifies the compact Arabic card.",
+     "opposite": "The full English card has a 40ch wrapper and reports its left-to-right layout.",
+     "defect": "Using the other layout's width, reading the wrong class or reversing direction misidentifies the contact card."
+    },
+    {
+     "for": "M21.X1508",
+     "page": "The resident profile shows the contact address caption on narrow cards.",
+     "gesture": "Choose a permanently raised caption, then a caption that follows focus.",
+     "outcome": "The actual Contact address label stays above an empty box under Always, and rises on focus under Auto.",
+     "opposite": "An inline caption remains the placeholder and the label review identifies inline wording.",
+     "defect": "Setting another float label mode or selecting the wrong live mode leaves the wrong caption."
+    },
+    {
+     "for": "M21.X1509",
+     "page": "The arrival card has a floating caption, a default reminder pair for new contacts, and saved reminder icons for existing contacts.",
+     "gesture": "Choose a compact card with a raised caption, then choose Call before arrival.",
+     "outcome": "The actual contact caption leaves room for both leading reminders from the default list and the saved comma-separated setting.",
+     "opposite": "Choosing Contact at check-in places the reminders at the trailing edge and leaves a wider caption.",
+     "defect": "The wrong side gives the caption the opposite width. Omitting the second default or saved leading reminder leaves extra caption space."
+    },
+    {
+     "for": "M21.X1510",
+     "page": "The resident profile shows the printed contact card's prefix and suffix.",
+     "gesture": "Add the visitor entrance and extension labels to the contact card.",
+     "outcome": "The actual Visitor entrance label appears before the field and the Extension label after it.",
+     "opposite": "Removing both labels leaves the rendered contact field available without either transfer instruction.",
+     "defect": "Writing the prefix into the suffix or leaving a label attached renders the wrong card."
+    },
+    {
+     "for": "M21.X1511",
+     "page": "The resident profile shows the contact desk's quick clear action.",
+     "gesture": "Enable quick clearing, focus the populated contact field and use its clear control.",
+     "outcome": "The field becomes empty and the desk is prompted to enter a replacement contact.",
+     "opposite": "Keep the quick-clear option off and the name remains on file with type-to-edit instructions.",
+     "defect": "Selecting the wrong clear-button setting either removes the clear action or advertises it for a protected card."
+    },
+    {
+     "for": "M21.X1512",
+     "page": "The resident profile shows the contact card's single-line entry and multiline directions.",
+     "gesture": "Open the visit directions editor and enter two lines before reviewing its format.",
+     "outcome": "Both lines remain in the multiline field and the format review reports Visit directions.",
+     "opposite": "Opening the callback editor instead offers a single-line contact field and its format review reports Callback entry.",
+     "defect": "Selecting the wrong initial multiline option or recognizing the wrong live mode leaves the wrong editor or format."
+    },
+    {
+     "for": "M21.X1513",
+     "page": "The resident profile shows the reception desk's remembered wristband workspace.",
+     "gesture": "Remember the wristband on this browser, take the directory name and reopen the workspace.",
+     "outcome": "Eleanor returns from the remembered browser draft.",
+     "opposite": "A fresh browser using the server default reopens with Nell and reports Use resident file.",
+     "defect": "Omitting the persistence refresh or enabling storage for the server-default choice restores the wrong name."
+    },
+    {
+     "for": "M21.X1514",
+     "page": "The resident profile shows the terminal wristband preview.",
+     "gesture": "Use the directory name in a preview and close it.",
+     "outcome": "The original field returns to Nell and the desk reports Preview closed.",
+     "opposite": "Rebuilding the active editor keeps the name Eleanor and the desk reports Preview open.",
+     "defect": "Refreshing in place of destroying or destroying during refresh gives the wrong terminal status."
+    },
+    {
+     "for": "M21.X1515",
+     "page": "The resident profile shows the recovery copy of a wristband draft.",
+     "gesture": "Use the directory name and save a recovery copy.",
+     "outcome": "The saved recovery preview identifies Eleanor.",
+     "opposite": "Archiving an unnamed profile produces No name in recovery copy.",
+     "defect": "Sending the unchanged fallback or serializing an empty draft as a named one gives the wrong recovered value."
+    },
+    {
+     "for": "M21.X1516",
+     "page": "The resident contact card supplies the callback desk's accessibility instructions on its actual contact input.",
+     "gesture": "Review the phone field and check its screen-reader instructions.",
+     "outcome": "The field and its returned root both provide Call the front desk and the callback hint.",
+     "opposite": "The email card instead supplies Write to reception and the email hint.",
+     "defect": "Reading the placeholder as the accessible name, or the accessible name as the placeholder, shows the wrong contact instruction."
+    },
+    {
+     "for": "M21.X1517",
+     "page": "The resident profile shows community wording on contact cards.",
+     "gesture": "Choose a custom contact hint, then reapply the community language.",
+     "outcome": "The editor restores the community default Contact the family and reports Community wording.",
+     "opposite": "Keeping the custom hint retains Ask for the evening contact and reports Desk wording.",
+     "defect": "Using the old locale or the wrong fallback gives the field an incorrect hint."
+    },
+    {
+     "for": "M21.X1518",
+     "page": "A protected contact field has a lock, read-only state, an entry hint and explicit accessible wording.",
+     "gesture": "Release the protected field by removing disabled, readonly and placeholder together.",
+     "outcome": "The field accepts focus, its hint is cleared, and its explicit accessible wording remains.",
+     "opposite": "Removing only its accessible name keeps the native field locked and read-only and its entry hint visible.",
+     "defect": "Removing an unrelated attribute or applying the same list to both actions either retains a lock or removes a protected field setting."
+    },
+    {
+     "for": "M21.X1519",
+     "page": "The family contact field offers different browser completion policies on an office workstation and a shared kiosk.",
+     "gesture": "Select shared kiosk and check the field's completion policy.",
+     "outcome": "The field disables browser completion and the desk reports Shared kiosk.",
+     "opposite": "Allowing saved entries removes the native override and reports Saved entries allowed. Choosing the browser default also removes the override and reports Browser default.",
+     "defect": "Substituting a different completion token or keeping an override after leaving kiosk mode selects the wrong policy."
+    },
+    {
+     "for": "M21.X1520",
+     "page": "The wristband profile distinguishes a directory withdrawal from a member of staff clearing a name on file.",
+     "gesture": "Use Remove preferred name on a recorded wristband.",
+     "outcome": "The change review reports Directory name withdrawn for the null value.",
+     "opposite": "Clearing the field and leaving it supplies an empty string from the real edit and reports Staff cleared the printed name.",
+     "defect": "Reading an empty string as null or discarding the original interaction misclassifies the withdrawal."
+    },
+    {
+     "for": "M21.X1521",
+     "page": "The printed family contact card renders the telephone extension with the directory's transfer instructions.",
+     "gesture": "Open the telephone contact card and review the number and its printed prefix and suffix.",
+     "outcome": "The numeric member renders as 214 with Dial internally before it and Main building after it.",
+     "opposite": "On the email contact card reception routes calls through the configured 408 override and the printed instructions say Via reception and Evening desk.",
+     "defect": "Dropping the model's number, the configured value or the leading and trailing transfer templates shows the wrong extension card."
+    },
+    {
+     "for": "M21.X1522",
+     "page": "The family contact card has a standard width of 100% so its input fits the available card.",
+     "gesture": "Choose the 176-pixel compact card, then restore its standard width.",
+     "outcome": "The rebuilt contact wrapper fills 100% of the card and keeps the recorded destination.",
+     "opposite": "Rebuilding the full-width custom card without clearing its width keeps its 40ch setting.",
+     "defect": "Retaining 176px or replacing it with 18ch leaves the wrong standard width; overwriting the custom setting loses the 40ch card."
+    },
+    {
+     "for": "M21.X1523",
+     "page": "Printed telephone-extension cards use their desk’s width, captions and clearing policy at first render.",
+     "gesture": "Open the reception contact card and activate the configured clear button on its extension.",
+     "outcome": "The compact extension starts with a raised Extension hint, measures 176 pixels, and clears its configured value.",
+     "opposite": "The internal card starts with an inline Extension hint, measures 40ch, and preserves 214 without offering a clear action.",
+     "defect": "The wrong builder width, floating-label mode or clear setting changes the actual extension on the affected card."
+    },
+    {
+     "for": "M21.X1524",
+     "page": "Contact instructions can follow the resident record or explicitly leave the printed hint blank.",
+     "gesture": "Choose Use resident instructions for the contact hint.",
+     "outcome": "The field loses its native hint and the printed instructions direct staff to the resident record.",
+     "opposite": "Choosing Suppress printed hint also clears the field hint but the printed instructions direct staff to the front desk.",
+     "defect": "Writing an empty string in place of null, or null in place of empty, selects the other printed directions."
+    },
+    {
+     "for": "M21.X1525",
+     "page": "Front desk, visitor and direct-call contact cards carry different directions around the contact field.",
+     "gesture": "Apply the reusable clinic labels to a mounted contact card.",
+     "outcome": "The real field appears between Clinic reception and After hours from the clinic’s stored templates.",
+     "opposite": "Applying visitor labels replaces both with Visitor entrance and Extension from the typed template.",
+     "defect": "Selecting the wrong stored prefix or suffix, or retaining the stored label on the visitor card, leaves the incorrect directions on the field."
+    },
+    {
+     "for": "M21.X1526",
+     "page": "A family contact can be withheld on a shared reception screen and reopened by staff.",
+     "gesture": "Choose Withhold contact on the shared screen.",
+     "outcome": "The real contact field leaves the accessible card and the privacy review reports that the number is withheld.",
+     "opposite": "Choosing Show staff contact restores the same filled telephone box and marks the number available to staff.",
+     "defect": "Retaining a visible input type while withholding, or restoring it as hidden, yields the wrong status and field."
+    },
+    {
+     "for": "M21.X1527",
+     "page": "The family contact and internal extension use the vendor’s named template callback and the public channel of each configured field.",
+     "gesture": "Apply the channel routing labels to an email contact and its telephone extension.",
+     "outcome": "The email field shows Email reception and Shared inbox, while the extension beside it shows Call reception and Transfer desk.",
+     "opposite": "Changing the email field to telephone and rebuilding the card asks both templates again, replacing the email directions with Call reception and Transfer desk.",
+     "defect": "Capturing the other configured field, reading the wrong template-name argument, or installing a fixed label gives the wrong routing instructions."
     }
    ],
    "verdicts": [

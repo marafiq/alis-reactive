@@ -1247,6 +1247,125 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F10 M21.X1300 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoDecision.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1301 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoDecision.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1302 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoDecision.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1303 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoDecision.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1304 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoDecision.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1305 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoConsentSheet.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1306 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoConsentSheet.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1307 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoConsentSheet.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1308 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoConsentSheet.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1309 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoReleaseFiling.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1310 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoReleaseFiling.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1311 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoReleaseFiling.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1312 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoConsentWorksheet.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1313 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoConsentWorksheet.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1314 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoReleaseFiling.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1315 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoDecision.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F10 M21.X1316 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/PhotoConsentSheet.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F11 M21.X401 0": {
     "modules": [],
     "views": [
@@ -1711,6 +1830,126 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F36 M21.X1400 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomAllocation.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1401 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomAllocation.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1402 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomAllocation.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1403 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomAllocation.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1404 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomAlternatives.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1405 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomBooking.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1406 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1407 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomAvailability.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1408 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomAvailability.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1409 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomVisit.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1410 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomPreview.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1411 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomCardPrinting.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1412 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1413 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomVisit.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1414 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomAllocation.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1415 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomCard.cshtml",
+      "/Care/AdmissionClinical/SavedRoomCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F36 M21.X1416 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/RoomInventory.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F37 M21.X613 0": {
     "modules": [],
     "views": [
@@ -2103,6 +2342,202 @@
     "modules": [],
     "views": [
       "/Care/RecordContacts/ProfileName.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1500 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1501 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1502 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1503 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1504 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1505 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1506 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1507 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1508 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1509 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1510 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1511 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1512 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1513 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1514 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1515 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1516 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1517 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1518 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1519 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1520 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/WristbandNames.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1521 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1522 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1523 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1524 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1525 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1526 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F49 M21.X1527 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/FamilyContactCard.cshtml",
       "/Shared/_FusionLayout.cshtml"
     ]
   },

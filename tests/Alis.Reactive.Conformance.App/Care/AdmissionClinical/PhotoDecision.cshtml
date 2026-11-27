@@ -1,0 +1,106 @@
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PhotoDecision
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Photo decision review";
+    var plan = Html.ReactivePlan<PhotoDecision>();
+}
+<h1>Photo decision review</h1>
+@using (Html.BeginRequestContainer(plan, "resident-photo-consent"))
+{
+    <fieldset>
+        <legend>Resident photo decision</legend>
+        @(Html.InputField(plan, m => m.PhotoConsent, options => options.Label("Photo permission"))
+            .FusionCheckBox(build => build.Indeterminate(Model.Pending).Disabled(Model.Locked))
+            .Reactive(box => box.Change, (changed, pipeline) =>
+            {
+                var history = "photo-consent-history";
+                pipeline.When(changed.Name.Eq("change"))
+                    .Then(pipeline => pipeline.When(changed.OriginalEvent.IsTrusted.Eq(true))
+                        .Then(pipeline => pipeline.When(changed.Checked)
+                            .Then(pipeline => pipeline.Element(history).Text.Set("Resident granted photo permission"))
+                            .Else(pipeline => pipeline.Element(history).Text.Set("Resident declined photo permission")))
+                        .ElseIf(changed.OriginalEvent.IsTrusted.Eq(false))
+                        .Then(pipeline => pipeline.When(changed.Checked)
+                            .Then(pipeline => pipeline.Element(history).Text.Set("Staff recorded photo permission"))
+                            .Else(pipeline => pipeline.Element(history).Text.Set("Staff recorded photo refusal"))));
+            }))
+        @(Html.InputField(plan, m => m.Signature, options => options.Label("Resident signature")).NativeTextBox())
+        <p><output id="photo-consent-history" aria-label="Consent history">Awaiting a decision</output></p>
+        @(Html.NativeButton("edit-photo-decision", "Edit photo decision")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+                pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>().FocusIn()))
+        @(Html.NativeButton("edit-photo-signature", "Edit signature")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+                pipeline.Input(m => m.Signature).Component<NativeTextBox>().Focus()))
+        @(Html.NativeButton("apply-signed-decision", Model.PhotoConsent ? "Apply signed refusal" : "Apply signed permission")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                consent.Checked.Set(!Model.PhotoConsent);
+                consent.DataBind();
+            }))
+        @(Html.NativeButton("correct-photo-consent", "Apply delegated correction")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+                pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>().Click()))
+        @(Html.NativeButton("save-photo-decision", "Save photo decision")
+            .Reactive(plan, button => button.Click, (_, pipeline) => pipeline
+                .Post<PhotoDecisionFiling>(CarePages.PhotoDecisionSave, request => request.Input(filing => filing.PhotoConsent, pipeline.Input(m => m.PhotoConsent)))
+                .OnSuccess(Content.Text, (receipt, pipeline) => pipeline.Element("photo-decision-saved").Text.Set(receipt.Body))))
+        <p><output id="photo-decision-saved" aria-label="Filing receipt">No photo decision filed</output></p>
+    </fieldset>
+}
+<fieldset>
+    <legend>Badge desk</legend>
+    @(Html.NativeButton("defer-photo-decision", "Defer the decision")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+            consent.Indeterminate.Set(true);
+            consent.DataBind();
+        }))
+    @(Html.NativeButton("resolve-photo-decision", "Resolve without permission")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+            consent.Checked.Set(false);
+            consent.Indeterminate.Set(false);
+            consent.DataBind();
+        }))
+    @(Html.NativeButton("preview-photo-badge", "Preview badge")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+            pipeline.When(consent.Indeterminate)
+                .Then(pipeline => pipeline.Element("photo-badge-instructions").Text.Set("Contact the resident before issuing a badge"))
+                .ElseIf(consent.Checked)
+                .Then(pipeline => pipeline.Element("photo-badge-instructions").Text.Set("Issue a badge with a photo"))
+                .Else(pipeline => pipeline.Element("photo-badge-instructions").Text.Set("Issue a badge without a photo"));
+        }))
+    <p><output id="photo-badge-instructions" aria-label="Badge instructions">Review the photo decision</output></p>
+</fieldset>
+<fieldset>
+    <legend>Signed decision corrections</legend>
+    @(Html.NativeButton("photo-correction-access", Model.Locked ? "Reopen and apply correction" : "Lock and apply correction")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+            consent.Disabled.Set(!Model.Locked);
+            consent.DataBind();
+            consent.Click();
+            pipeline.When(consent.Disabled.And(consent.Checked.Eq(false)))
+                .Then(pipeline => pipeline.Element("photo-correction-review").Text.Set("Signed decision locked"))
+                .ElseIf(consent.Disabled.Eq(false).And(consent.Checked))
+                .Then(pipeline => pipeline.Element("photo-correction-review").Text.Set("Correction applied"))
+                .Else(pipeline => pipeline.Element("photo-correction-review").Text.Set("Reconcile the signed decision"));
+        }))
+    <p><output id="photo-correction-review" aria-label="Correction review">No correction applied</output></p>
+</fieldset>
+@Html.RenderPlan(plan)

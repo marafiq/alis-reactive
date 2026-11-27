@@ -1,0 +1,118 @@
+@using Syncfusion.EJ2.Buttons
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PhotoConsentSheet
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Photo consent sheet";
+    var plan = Html.ReactivePlan<PhotoConsentSheet>();
+}
+<style>
+    .consent-caption .house-signature {
+        display: none;
+    }
+
+    .consent-sheet .large-print .e-label {
+        font-size: 1.75rem;
+    }
+</style>
+<h1>Photo consent sheet</h1>
+<div class="consent-sheet">
+    <fieldset>
+        <legend id="photo-permission-heading">Photo identification permission</legend>
+        @(Html.InputField(plan, m => m.PhotoConsent, options => options.Label("Photo permission"))
+            .FusionCheckBox(build => build.Label(Model.InitialCaption)
+                .LabelPosition(Model.Arabic ? LabelPosition.Before : LabelPosition.After)
+                .EnableRtl(Model.Arabic).CssClass(Model.LargePrint ? "large-print" : string.Empty)
+                .EnableHtmlSanitizer(!Model.HouseCaption)
+                .HtmlAttributes(new Dictionary<string, object>
+                {
+                    ["aria-labelledby"] = "photo-permission-heading"
+                })))
+    </fieldset>
+    <fieldset>
+        <legend>Signature wording</legend>
+        @(Html.NativeButton("photo-plain-wording", "Use plain wording")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                consent.Label.Set("May we use your photo?");
+                consent.DataBind();
+            }))
+        @(Html.NativeButton("photo-formal-wording", "Use formal wording")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                consent.Label.Set("I consent to a photo ID");
+                consent.DataBind();
+            }))
+        @(Html.NativeButton("photo-no-caption", "Use field label only")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                consent.Label.Set(string.Empty);
+                consent.DataBind();
+            }))
+        @(Html.NativeButton("prepare-photo-signature", "Prepare signature line")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var caption = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>().Label;
+                pipeline.When(caption.IsEmpty())
+                    .Then(pipeline => pipeline.Element("photo-signature-line").Text.Set("Use the standard photo permission form"))
+                    .Else(pipeline => pipeline.Element("photo-signature-line").Text.Set(caption));
+            }))
+        <p><output id="photo-signature-line" aria-label="Signature line">Select wording for the signed copy</output></p>
+    </fieldset>
+    <fieldset>
+        <legend>Print order</legend>
+        @(Html.NativeButton("photo-print-size", Model.LargePrint ? "Use standard print" : "Use large print")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                consent.CssClass.Set(Model.LargePrint ? string.Empty : "large-print");
+                consent.DataBind();
+            }))
+        @(Html.NativeButton("photo-reading-direction", Model.Arabic ? "Use English layout" : "Use Arabic layout")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                consent.Label.Set(Model.Arabic ? "I consent to a photo ID" : "أوافق على استخدام صورتي للهوية");
+                consent.LabelPosition.Set(Model.Arabic ? FusionCheckBoxLabelPosition.After : FusionCheckBoxLabelPosition.Before);
+                consent.EnableRtl.Set(!Model.Arabic);
+                consent.DataBind();
+            }))
+        @(Html.NativeButton("photo-caption-format", Model.HouseCaption ? "Use standard caption" : "Use house caption")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                consent.EnableHtmlSanitizer.Set(Model.HouseCaption);
+                consent.Label.Set(PhotoConsentSheet.PrintCaption);
+                consent.Refresh();
+            }))
+        @(Html.NativeButton("prepare-photo-print-order", "Prepare print order")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                pipeline.When(consent.CssClass.Eq("large-print"))
+                    .Then(pipeline => pipeline.Element("photo-print-size-order").Text.Set("Large-print consent packet"))
+                    .Else(pipeline => pipeline.Element("photo-print-size-order").Text.Set("Standard consent packet"));
+                pipeline.When(consent.EnableRtl.And(consent.LabelPosition.Eq(FusionCheckBoxLabelPosition.Before)))
+                    .Then(pipeline => pipeline.Element("photo-reading-layout").Text.Set("Arabic layout ready"))
+                    .ElseIf(consent.EnableRtl.Eq(false).And(consent.LabelPosition.Eq(FusionCheckBoxLabelPosition.After)))
+                    .Then(pipeline => pipeline.Element("photo-reading-layout").Text.Set("English layout ready"))
+                    .Else(pipeline => pipeline.Element("photo-reading-layout").Text.Set("Review caption placement"));
+                pipeline.When(consent.EnableHtmlSanitizer)
+                    .Then(pipeline => pipeline.Element("photo-caption-order").Text.Set("Standard caption"))
+                    .Else(pipeline => pipeline.Element("photo-caption-order").Text.Set("House-designed caption"));
+            }))
+        <p><output id="photo-print-size-order" aria-label="Print size">Select sheet size</output></p>
+        <p><output id="photo-reading-layout" aria-label="Reading layout">Select reading layout</output></p>
+        <p><output id="photo-caption-order" aria-label="Caption format">Select caption style</output></p>
+    </fieldset>
+</div>
+@Html.RenderPlan(plan)

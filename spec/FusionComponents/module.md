@@ -151,6 +151,12 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-buttons/src/check-box/check-box.d.ts:52`, `:73`, `:66`, `:198`, `:206`, `:39`,
   `@syncfusion/ej2-buttons/src/common/common.d.ts:93`, `@syncfusion/ej2-base/src/component.d.ts:129`).
+  The live photo consent box exposes its caption, caption position, CSS classes, right-to-left layout,
+  label sanitization, persistence setting and submitted value. Its native input is reached through
+  `Element` and `GetRootElement()`. `Refresh()` rebuilds the wrapper and `Destroy()` returns the native
+  input to the form. A change supplies the optional vendor event name and the original activation's
+  `IsTrusted`. The field keeps its model binding name. Buttons 33.1.44 declares the live properties
+  (`@syncfusion/ej2-buttons/src/check-box/check-box.d.ts:59`, `:79`, `:88`, `:102`, `:109`). The [operation record](audit/checkbox-coverage.md) names the supported forms and limits.
 - `M21.N11` kept: `FusionChipList`: `Add`; `Select(index)`, `Select(indexes)` and `Select(values, selectionType)` with
   `FusionChipList.SelectionType`; `Remove(index)` and `Remove(indexes)`; `Find` returning a
   `FusionChipList.ChipDataArgs`; `GetSelectedChips<TData>()` and `GetSelectedChip<TData>()` (`getSelectedChips`,
@@ -447,6 +453,11 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-buttons/src/radio-button/radio-button.d.ts:49`, `:63`, `:134`, `:187`, `:195`, `:36`, `:202`,
   `@syncfusion/ej2-base/src/component.d.ts:129`).
+  The live room choice exposes its caption and position, group name, value, CSS classes, direction,
+  label sanitization and persistence setting. `Element` and `GetRootElement()` reach the native radio.
+  `Refresh()` rebuilds its wrapper and `Destroy()` returns the native input. The change payload carries
+  the vendor notification name and the original event's type. Buttons 33.1.44 declares the radio's
+  member and payload types (`@syncfusion/ej2-buttons/src/radio-button/radio-button.d.ts:11`, `:23`, `:200`). The [operation record](audit/radiobutton-coverage.md) names the supported forms and limits.
 - `M21.N37` kept: `FusionRating`: `Value` as `Property<double>`, since EJ2's value starts at 0, `DataBind`, `Reset` and
   `ValueChanged`, with `IInputComponent.Input` committed by `ValueChanged` (M7.N3); the payload
   `FusionRating.RatingChangedEventArgs` (`Value`, `PreviousValue`, `IsInteracted`); and the render helpers
@@ -588,6 +599,16 @@ Each name is gate 2's; each door is the capability it carries.
   623dd4a27), whose doors carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2
   33.1.47's public member (`@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:81`, `:195`, `:201`, `:207`, `:213`, `:286`,
   `:314`, `:320`, `:11`, `:19`, `:23`, `:27`, `:31`, `@syncfusion/ej2-base/src/component.d.ts:129`).
+  The wristband and contact editors read the actual value, original browser event and input container
+  during editing. A change distinguishes a staff edit from a value assigned by the directory. The
+  editor exposes its enabled and read-only settings, hint, presentation, focus and storage operations.
+  The multiline variant is selected at construction and its live setting is read-only. The clear
+  button, attribute removal, icon array and label presentation reach the rendered input through EJ2.
+  Prefix and suffix templates accept HTML or a selector string. Their typed callbacks return authored
+  HTML and receive the template name at the vendor's third argument. A view can read the field it
+  configured when producing that field's instructions.
+  TextBox declares its payloads, optional initial hint and public operations
+  (`@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:5-33`, `:104`, `:131`, `:277`, `:286`, `:292`, `:308`). The [operation record](audit/textbox-coverage.md) names the supported forms and limits.
 - `M21.N50` kept: `FusionTimePicker<TValue>`, TValue the type of the member it binds, as EJ2 marks the picker's value a
   generic type (`@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts:373-376`): `Value`, a `Property<TValue>` whose
   type argument admits null (M21.X712), `FocusIn`, `FocusOut` and `Change`, with `IInputComponent.Input` committed by

@@ -1,0 +1,374 @@
+@using System.Collections.Generic
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FamilyContactCard
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Family contact card";
+    var plan = Html.ReactivePlan<FamilyContactCard>();
+    var entry = Html.InputField(plan, m => m.Contact, options => options.Label("Contact details"));
+    var startHint = Model.Community ? "Contact the family" : Model.Email ? "Contact address" : "Callback number";
+    var extension = Html.InputField(plan, m => m.Extension, options => options.Label("Internal extension"));
+    var entranceLabel = FusionTemplate.Create<FamilyContactCard>().Text("Visitor entrance ").Render(plan);
+    var extensionLabel = FusionTemplate.Create<FamilyContactCard>().Text("Extension").Render(plan);
+    var emailRoute = FusionTemplate.Create<FamilyContactCard>().Text("Email reception").Render(plan);
+    var phoneRoute = FusionTemplate.Create<FamilyContactCard>().Text("Call reception").Render(plan);
+    var mailDestination = FusionTemplate.Create<FamilyContactCard>().Text("Shared inbox").Render(plan);
+    var phoneDestination = FusionTemplate.Create<FamilyContactCard>().Text("Transfer desk").Render(plan);
+    void PrintInstructions(Pipeline<FamilyContactCard> pipeline, string? wording)
+    {
+        var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+        contact.Placeholder.Set(wording);
+        contact.DataBind();
+        var fieldHasNoHint = contact.Element.HasAttribute("placeholder").Not();
+        pipeline.When(contact.Placeholder.IsNull().And(fieldHasNoHint))
+            .Then(pipeline => pipeline.Element("printed-contact-instructions").Text.Set("Follow the instructions in the resident record"))
+            .ElseIf(contact.Placeholder.Eq(string.Empty).And(fieldHasNoHint))
+            .Then(pipeline => pipeline.Element("printed-contact-instructions").Text.Set("Ask the front desk before contacting the family"));
+    }
+    void AddReminders(FusionTextBox contact, FusionTextBox.IconPosition position)
+    {
+        if (Model.ReminderIcons is { } saved)
+            contact.AddIcon(position, saved);
+        else
+            contact.AddIcon(position, new[] { "e-icons call-reminder", "e-icons message-reminder" });
+    }
+}
+<style>
+    .compact-contact { font-size: .9rem; }
+    .full-contact { font-size: 1.1rem; }
+    .call-reminder::before { content: "☎"; }
+    .message-reminder::before { content: "✉"; }
+</style>
+<h1>Family contact card</h1>
+<div class="family-contact">
+    @using (Html.BeginRequestContainer(plan, "family-contact-card"))
+    {
+        <fieldset>
+            <legend>Contact destination</legend>
+            @(entry.FusionTextBox(build => build.Placeholder(startHint).Locale("en-US").Multiline(Model.Directions)
+                    .Type(Model.Directions ? "text" : Model.Email ? "email" : "tel").Autocomplete(Model.Email ? "email" : "tel")
+                    .Enabled(!Model.Protected).Readonly(Model.Protected).EnableRtl(Model.Email)
+                    .HtmlAttributes(new Dictionary<string, object> { ["name"] = entry.Name, ["aria-label"] = Model.Email ? "Write to reception" : "Call the front desk", ["style"] = "width: 100%;" }))
+                .Reactive(box => box.Input, (input, pipeline) =>
+                {
+                    pipeline.When(input.Value.IsEmpty().And(input.OriginalEvent.Type.Eq("mousedown")))
+                        .Then(pipeline => pipeline.Element("contact-draft").Text.Set("Enter a replacement contact"));
+                }))
+            <p><output id="contact-draft" aria-label="Contact draft">Contact on file</output></p>
+            <a href="@CarePages.FamilyContactDirections">Make room for directions</a>
+            <a href="@CarePages.FamilyContactPhone">Use single-line contact</a>
+        </fieldset>
+    }
+    <fieldset>
+        <legend>Contact method</legend>
+        @(Html.NativeButton("contact-email", "Use email contact")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.Type.Set("email");
+                contact.Autocomplete.Set("email");
+                contact.DataBind();
+                pipeline.When(contact.Type.Eq("email").And(contact.Autocomplete.Eq("email")))
+                    .Then(pipeline => pipeline.Element("contact-mode").Text.Set("Email address"));
+            }))
+        @(Html.NativeButton("contact-tel", "Use telephone contact")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.Type.Set("tel");
+                contact.Autocomplete.Set("tel");
+                contact.DataBind();
+                pipeline.When(contact.Type.Eq("tel").And(contact.Autocomplete.Eq("tel")))
+                    .Then(pipeline => pipeline.Element("contact-mode").Text.Set("Callback number"));
+            }))
+        <p><output id="contact-mode" aria-label="Contact mode">Choose a contact method</output></p>
+        @(Html.NativeButton("contact-format", "Review entry format")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                pipeline.When(contact.Multiline)
+                    .Then(pipeline => pipeline.Element("contact-format-review").Text.Set("Visit directions"))
+                    .Else(pipeline => pipeline.Element("contact-format-review").Text.Set("Callback entry"));
+            }))
+        <p><output id="contact-format-review" aria-label="Entry format">Check contact format</output></p>
+        @(Html.NativeButton("contact-instructions", "Review contact instructions")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                pipeline.Element("contact-instruction-review").Text.Set(contact.Element.GetAttribute("aria-label"));
+                pipeline.Element("contact-hint-review").Text.Set(contact.GetRootElement().GetAttribute("placeholder"));
+            }))
+        <p><output id="contact-instruction-review" aria-label="Contact instructions">Check the destination</output></p>
+        <p><output id="contact-hint-review" aria-label="Entry hint">Check the field hint</output></p>
+        @(Html.NativeButton("contact-clear", "Enable quick clearing")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.ShowClearButton.Set(true);
+                contact.DataBind();
+                pipeline.When(contact.ShowClearButton)
+                    .Then(pipeline => pipeline.Element("contact-clear-policy").Text.Set("Quick clearing available"));
+            }))
+        @(Html.NativeButton("contact-keep", "Keep existing contact")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.ShowClearButton.Set(false);
+                contact.DataBind();
+                pipeline.When(contact.ShowClearButton.Eq(false))
+                    .Then(pipeline => pipeline.Element("contact-clear-policy").Text.Set("Type to edit"));
+            }))
+        <p><output id="contact-clear-policy" aria-label="Clearing policy">Check clear settings</output></p>
+    </fieldset>
+    @if (Model.Protected)
+    {
+        <fieldset>
+            <legend>Protected contact</legend>
+            @(Html.NativeButton("release-contact-field", "Release protected contact")
+                .Reactive(plan, button => button.Click, (_, pipeline) =>
+                {
+                    var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                    contact.RemoveAttributes(new[] { FusionTextBox.RemovableAttribute.Disabled, FusionTextBox.RemovableAttribute.Readonly, FusionTextBox.RemovableAttribute.Placeholder });
+                    contact.FocusIn();
+                    pipeline.When(contact.Enabled.And(contact.Readonly.Not()).And(contact.Placeholder.IsNull()).And(contact.Element.HasAttribute("placeholder").Not()))
+                        .Then(pipeline => pipeline.Element("contact-protection").Text.Set("Released without a hint"));
+                }))
+            @(Html.NativeButton("use-field-label", "Use associated contact label")
+                .Reactive(plan, button => button.Click, (_, pipeline) =>
+                {
+                    var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                    contact.RemoveAttributes(new[] { FusionTextBox.RemovableAttribute.AccessibleName });
+                    pipeline.When(contact.Element.HasAttribute("aria-label").Not().And(contact.Readonly).And(contact.Enabled.Not()))
+                        .Then(pipeline => pipeline.Element("contact-protection").Text.Set("Protected field uses contact label"));
+                }))
+            <p><output id="contact-protection" aria-label="Contact protection">Protected by reception</output></p>
+        </fieldset>
+    }
+    <fieldset>
+        <legend>Contact card layout</legend>
+        @(Html.NativeButton("compact-contact", "Use compact Arabic card")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.CssClass.Set("compact-contact");
+                contact.EnableRtl.Set(true);
+                contact.WidthInPixels.Set(176);
+                contact.DataBind();
+                pipeline.When(contact.CssClass.Eq("compact-contact").And(contact.EnableRtl))
+                    .Then(pipeline => pipeline.Element("contact-layout").Text.Set("Compact Arabic contact card"));
+            }))
+        @(Html.NativeButton("full-contact", "Use full English card")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.CssClass.Set("full-contact");
+                contact.EnableRtl.Set(false);
+                contact.Width.Set("40ch");
+                contact.DataBind();
+                pipeline.When(contact.CssClass.Eq("full-contact").And(contact.EnableRtl.Eq(false)))
+                    .Then(pipeline => pipeline.Element("contact-layout").Text.Set("Full English contact card"));
+            }))
+        @(Html.NativeButton("standard-contact-width", "Restore standard width")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.WidthInPixels.Set((double?)null);
+                contact.Refresh();
+            }))
+        @(Html.NativeButton("rebuild-contact-width", "Rebuild printed card")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+                pipeline.Input(m => m.Contact).Component<FusionTextBox>().Refresh()))
+        <p><output id="contact-layout" aria-label="Card layout">Select a card layout</output></p>
+        @(Html.NativeButton("caption-always", "Keep caption raised")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.FloatLabelType.Set(FusionTextBox.LabelMode.Always);
+                contact.DataBind();
+                pipeline.When(contact.FloatLabelType.Eq(FusionTextBox.LabelMode.Always))
+                    .Then(pipeline => pipeline.Element("contact-caption").Text.Set("Always above"));
+            }))
+        @(Html.NativeButton("caption-auto", "Raise caption on entry")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.FloatLabelType.Set(FusionTextBox.LabelMode.Auto);
+                contact.DataBind();
+                pipeline.When(contact.FloatLabelType.Eq(FusionTextBox.LabelMode.Auto))
+                    .Then(pipeline => pipeline.Element("contact-caption").Text.Set("Follows focus"));
+            }))
+        @(Html.NativeButton("caption-inline", "Use inline caption")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.FloatLabelType.Set(FusionTextBox.LabelMode.Never);
+                contact.DataBind();
+                pipeline.When(contact.FloatLabelType.Eq(FusionTextBox.LabelMode.Never))
+                    .Then(pipeline => pipeline.Element("contact-caption").Text.Set("Inline wording"));
+            }))
+        <p><output id="contact-caption" aria-label="Caption choice">Choose how to label the field</output></p>
+    </fieldset>
+    <fieldset>
+        <legend>Arrival instructions</legend>
+        @(Html.NativeButton("remind-before-arrival", "Call before arrival")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                AddReminders(contact, FusionTextBox.IconPosition.Prepend);
+            }))
+        @(Html.NativeButton("remind-at-checkin", "Contact at check-in")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                AddReminders(contact, FusionTextBox.IconPosition.Append);
+            }))
+        @(Html.NativeButton("visitor-contact-labels", "Add visitor contact labels")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.PrependTemplate.Set(entranceLabel);
+                contact.AppendTemplate.Set(extensionLabel);
+                contact.DataBind();
+            }))
+        @(Html.NativeButton("direct-contact-card", "Use direct-call card")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.PrependTemplate.Set((string?)null);
+                contact.AppendTemplate.Set((string?)null);
+                contact.DataBind();
+            }))
+        @(Html.NativeButton("desk-label", "Use evening desk wording")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.Placeholder.Set("Ask for the evening contact");
+                contact.DataBind();
+                pipeline.When(contact.Placeholder.Eq("Ask for the evening contact").And(contact.Locale.Eq("en-US")))
+                    .Then(pipeline => pipeline.Element("card-language").Text.Set("Desk wording"));
+            }))
+        @(Html.NativeButton("community-label", "Use community language")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+                contact.Locale.Set("en-GB");
+                contact.DataBind();
+                pipeline.When(contact.Locale.Eq("en-GB").And(contact.Placeholder.Eq("Contact the family")))
+                    .Then(pipeline => pipeline.Element("card-language").Text.Set("Community wording"));
+            }))
+        <p><output id="card-language" aria-label="Wording source">Choose the language and wording</output></p>
+    </fieldset>
+</div>
+<fieldset>
+    <legend>Telephone extension</legend>
+    <template id="internal-extension-prefix"><span>Dial internally</span></template>
+    <template id="reception-extension-prefix"><span>Via reception</span></template>
+    @(extension.FusionTextBox(build =>
+    {
+        if (Model.Email)
+        {
+            build.Value("408").Width(176d).FloatLabelType(Syncfusion.EJ2.Inputs.FloatLabelType.Always)
+                .Placeholder("Extension hint").ShowClearButton();
+            build.PrependTemplate("#reception-extension-prefix").AppendTemplate(FusionTemplate.Create<FamilyContactCard>().Text("Evening desk").Render(plan));
+        }
+        else
+        {
+            build.Width("40ch").FloatLabelType(Syncfusion.EJ2.Inputs.FloatLabelType.Never)
+                .Placeholder("Extension hint").ShowClearButton(false);
+            build.PrependTemplate("#internal-extension-prefix").AppendTemplate(FusionTemplate.Create<FamilyContactCard>().Text("Main building").Render(plan));
+        }
+    }))
+</fieldset>
+<fieldset>
+    <legend>Completion policy</legend>
+    @(Html.NativeButton("kiosk-entry", "Use shared kiosk")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+            contact.Autocomplete.Set("off");
+            contact.DataBind();
+            pipeline.When(contact.Autocomplete.Eq("off").And(contact.Element.GetAttribute("autocomplete").Eq("off")))
+                .Then(pipeline => pipeline.Element("completion-policy").Text.Set("Shared kiosk"));
+        }))
+    @(Html.NativeButton("saved-entries", "Allow saved entries")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+            contact.Autocomplete.Set("on");
+            contact.DataBind();
+            pipeline.When(contact.Autocomplete.Eq("on").And(contact.Element.HasAttribute("autocomplete").Not()))
+                .Then(pipeline => pipeline.Element("completion-policy").Text.Set("Saved entries allowed"));
+        }))
+    @(Html.NativeButton("browser-completion", "Use browser default")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+            contact.Autocomplete.Set(string.Empty);
+            contact.DataBind();
+            pipeline.When(contact.Autocomplete.Eq(string.Empty).And(contact.Element.HasAttribute("autocomplete").Not()))
+                .Then(pipeline => pipeline.Element("completion-policy").Text.Set("Browser default"));
+        }))
+    <output id="completion-policy" aria-label="Completion policy">Check completion policy</output>
+</fieldset>
+<fieldset>
+    <legend>Printed contact instructions</legend>
+    @(Html.NativeButton("channel-routing-labels", "Apply channel routing labels")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+            var transfer = pipeline.Input(m => m.Extension).Component<FusionTextBox>();
+            void ApplyRoutes(FusionTextBox field)
+            {
+                field.PrependTemplateCallback.Set(request => request.TemplateName.Eq("template").And(field.Type.Eq("email")).Choose(emailRoute, phoneRoute));
+                field.AppendTemplateCallback.Set(request => request.TemplateName.Eq("template").And(field.Type.Eq("email")).Choose(mailDestination, phoneDestination));
+                field.DataBind();
+            }
+            ApplyRoutes(contact);
+            ApplyRoutes(transfer);
+        }))
+    <template id="clinic-contact-prefix"><span>Clinic reception</span></template>
+    <template id="clinic-contact-suffix"><span>After hours</span></template>
+    @(Html.NativeButton("clinic-contact-labels", "Apply clinic contact labels")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+            contact.PrependTemplate.Set("#clinic-contact-prefix");
+            contact.AppendTemplate.Set("#clinic-contact-suffix");
+            contact.DataBind();
+        }))
+    @(Html.NativeButton("resident-contact-hint", "Use resident instructions")
+        .Reactive(plan, button => button.Click, (_, pipeline) => PrintInstructions(pipeline, null)))
+    @(Html.NativeButton("suppress-contact-hint", "Suppress printed hint")
+        .Reactive(plan, button => button.Click, (_, pipeline) => PrintInstructions(pipeline, string.Empty)))
+    <output id="printed-contact-instructions" aria-label="Printed contact instructions">Review printed instructions</output>
+</fieldset>
+<fieldset>
+    <legend>Shared reception screen</legend>
+    @(Html.NativeButton("withhold-contact", "Withhold contact")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+            contact.Type.Set("hidden");
+            contact.DataBind();
+            pipeline.When(contact.Type.Eq("hidden").And(contact.Element.GetAttribute("type").Eq("hidden")))
+                .Then(pipeline => pipeline.Element("contact-privacy").Text.Set("Contact withheld on the shared screen"));
+        }))
+    @(Html.NativeButton("show-staff-contact", "Show staff contact")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var contact = pipeline.Input(m => m.Contact).Component<FusionTextBox>();
+            contact.Type.Set("tel");
+            contact.DataBind();
+            pipeline.When(contact.Type.Eq("tel").And(contact.Element.GetAttribute("type").Eq("tel")))
+                .Then(pipeline => pipeline.Element("contact-privacy").Text.Set("Staff can see the contact"));
+        }))
+    <output id="contact-privacy" aria-label="Contact privacy">Review contact privacy</output>
+</fieldset>
+@Html.RenderPlan(plan)

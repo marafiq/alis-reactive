@@ -1433,6 +1433,8 @@ M21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46, M21.F47, M21.F48, M21.F49,
 
 One commit per slice, each with its own tests, which `slice_tests` holds.
 
+The full input onboarding wave covers the [CheckBox](FusionComponents/audit/checkbox-coverage.md), [RadioButton](FusionComponents/audit/radiobutton-coverage.md) and [TextBox](FusionComponents/audit/textbox-coverage.md) at the pinned vendor versions. Their net10 pages exercise photo consent, room allocation, wristband names and family contact cards. The operation records distinguish rendered behavior from vendor-only observations and name the remaining limits.
+
 ### U27. Fusion's app-level objects
 Features: M23.F1, M23.F2
 

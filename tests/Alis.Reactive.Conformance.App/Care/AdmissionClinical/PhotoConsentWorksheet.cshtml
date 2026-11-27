@@ -1,0 +1,84 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PhotoConsentWorksheet
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Photo consent worksheet";
+    var plan = Html.ReactivePlan<PhotoConsentWorksheet>();
+}
+<h1>Photo consent worksheet</h1>
+<p>The worksheet is a draft. Signed decisions are filed at the admission desk.</p>
+<fieldset>
+    <legend>Workstation worksheet</legend>
+    @(Html.InputField(plan, m => m.PhotoConsent, options => options.Label("Photo permission"))
+        .FusionCheckBox(build => build.Label("Signed photo release").EnablePersistence(Model.Reopen)))
+    @if (Model.PhotoConsent)
+    {
+        @(Html.NativeButton("close-signed-photo-preview", "Close signed preview")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+                pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>().Destroy()))
+        @(Html.NativeButton("keep-signed-photo-preview", "Keep signed preview")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+                pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>().FocusIn()))
+    }
+    else if (!Model.Reopen)
+    {
+        @(Html.NativeButton("keep-photo-worksheet", "Remember on this workstation")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var worksheet = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                worksheet.EnablePersistence.Set(true);
+                worksheet.Refresh();
+                pipeline.Element("keep-photo-worksheet").Hide();
+                pipeline.Element("visit-photo-worksheet").Hide();
+            }))
+        @(Html.NativeButton("visit-photo-worksheet", "Use this visit only")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var worksheet = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                worksheet.EnablePersistence.Set(false);
+                worksheet.DataBind();
+            }))
+        @(Html.NativeButton("mark-photo-worksheet", "Mark for confirmation")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var worksheet = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                worksheet.Checked.Set(true);
+                worksheet.DataBind();
+                worksheet.Indeterminate.Set(true);
+                worksheet.DataBind();
+            }))
+        @(Html.NativeButton("review-photo-storage", "Review storage choice")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var worksheet = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                pipeline.When(worksheet.EnablePersistence)
+                    .Then(pipeline => pipeline.Element("photo-worksheet-storage").Text.Set("Remember on this workstation"))
+                    .Else(pipeline => pipeline.Element("photo-worksheet-storage").Text.Set("This visit only"));
+            }))
+        <p><output id="photo-worksheet-storage" aria-label="Worksheet storage">Choose where to keep this draft</output></p>
+        <a href="@CarePages.PhotoWorksheetReopened">Reopen worksheet</a>
+    }
+    else
+    {
+        @(Html.NativeButton("review-photo-worksheet", "Review worksheet")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var worksheet = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                pipeline.When(worksheet.Checked.And(worksheet.Indeterminate))
+                    .Then(pipeline => pipeline.Element("photo-worksheet-selection").Text.Set("Marked release awaiting confirmation"))
+                    .ElseIf(worksheet.Checked)
+                    .Then(pipeline => pipeline.Element("photo-worksheet-selection").Text.Set("Marked release"))
+                    .ElseIf(worksheet.Indeterminate)
+                    .Then(pipeline => pipeline.Element("photo-worksheet-selection").Text.Set("Unmarked release awaiting confirmation"))
+                    .Else(pipeline => pipeline.Element("photo-worksheet-selection").Text.Set("Unmarked release"));
+            }))
+        <p><output id="photo-worksheet-selection" aria-label="Worksheet selection">Review the reopened draft</output></p>
+    }
+</fieldset>
+@Html.RenderPlan(plan)

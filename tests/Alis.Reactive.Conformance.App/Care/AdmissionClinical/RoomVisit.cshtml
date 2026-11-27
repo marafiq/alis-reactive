@@ -1,0 +1,42 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomVisit
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Provisional room for the next visit";
+    var plan = Html.ReactivePlan<RoomVisit>();
+}
+<h1>Provisional room for the next visit</h1>
+@(Html.FusionRadioButton(plan, "visit-room", build => build.Label("Single room").Name("visit-room-choice").Value("single").EnablePersistence(Model.RestoreChoice)))
+@(Html.NativeButton("remember-room", "Remember provisional choice")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("visit-room");
+        room.EnablePersistence.Set(true);
+        room.Refresh();
+    }))
+@(Html.NativeButton("use-referral", "Use referral default")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("visit-room");
+        pipeline.When(room.EnablePersistence)
+            .Then(pipeline => pipeline.Element("storage-note").Text.Set("This visit will still save its room when you leave. A new browser profile starts with the referral."));
+        room.EnablePersistence.Set(false);
+    }))
+@(Html.NativeButton("review-storage", "Review storage policy")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("visit-room");
+        pipeline.When(room.EnablePersistence)
+            .Then(pipeline => pipeline.Element("policy").Text.Set("Remember this room"))
+            .Else(pipeline => pipeline.Element("policy").Text.Set("Use referral default"));
+    }))
+<p><output id="policy" aria-label="Storage policy">Policy awaiting review</output></p>
+<p id="storage-note">The next visit checks for a room remembered on this workstation.</p>
+<p><a href="@CarePages.RoomNextVisit">Open next visit</a></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,45 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomAlternatives
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Primary and respite placement";
+    var plan = Html.ReactivePlan<RoomAlternatives>();
+}
+<h1>Primary and respite placement</h1>
+<fieldset>
+    <legend>Primary placement choices</legend>
+    @(Html.FusionRadioButton(plan, "single-placement", build => build.Label("Single room").Name("primary-room").Value("single")))
+    @(Html.FusionRadioButton(plan, "companion-placement", build => build.Label("Companion suite").Name("primary-room").Value("companion")))
+</fieldset>
+<fieldset>
+    <legend>Respite placement choices</legend>
+    @(Html.FusionRadioButton(plan, "short-stay", build => build.Label("Short stay").Name(Model.IncludeRespite ? "respite-room" : "primary-room").Value("short")))
+    @(Html.FusionRadioButton(plan, "day-stay", build => build.Label("Day stay").Name("respite-room").Value("day")))
+</fieldset>
+@(Html.NativeButton("apply-respite", "Apply respite arrangement")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var respite = pipeline.Component<FusionRadioButton>("short-stay");
+        var group = pipeline.Component<FusionRadioButton>(Model.IncludeRespite ? "single-placement" : "day-stay");
+        respite.Name.Set(group.Name);
+        respite.DataBind();
+    }))
+@(Html.NativeButton("review-primary", "Review primary room")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var primary = pipeline.Component<FusionRadioButton>("single-placement");
+        var respite = pipeline.Component<FusionRadioButton>("short-stay");
+        var grouped = respite.Name.Eq(primary.Name);
+        pipeline.When(grouped.And(primary.GetSelectedValue().Eq("short")))
+            .Then(pipeline => pipeline.Element("primary").Text.Set("Short stay replaces the single room"))
+            .ElseIf(grouped.Not().And(primary.GetSelectedValue().Eq("single")))
+            .Then(pipeline => pipeline.Element("primary").Text.Set("Single room with independent respite"));
+    }))
+<p><output id="primary" aria-label="Primary placement">Placement awaiting review</output></p>
+@Html.RenderPlan(plan)

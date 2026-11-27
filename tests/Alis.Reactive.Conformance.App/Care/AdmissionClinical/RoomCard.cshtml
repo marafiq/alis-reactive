@@ -1,0 +1,85 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomCard
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident room card";
+    var plan = Html.ReactivePlan<RoomCard>();
+}
+<h1>Resident room card</h1>
+<style>
+    .e-radio-wrapper.arabic-card .e-label { font-size: 1.25rem; line-height: 1.8; }
+    .e-radio-wrapper.english-card .e-label { font-size: 1.125rem; line-height: 1.5; }
+</style>
+<fieldset>
+    <legend>Room card preview</legend>
+    @(Html.FusionRadioButton(plan, "card-room", build => build.Label("Referral room").Name("room-card").Value("single")))
+</fieldset>
+@(Html.NativeButton("arabic-card", "Use Arabic card")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("card-room");
+        room.Label.Set("غرفة مفردة");
+        room.CssClass.Set("arabic-card");
+        room.EnableRtl.Set(true);
+        room.LabelPosition.Set(FusionRadioButtonLabelPosition.Before);
+        room.DataBind();
+    }))
+@(Html.NativeButton("english-card", "Use English card")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("card-room");
+        room.Label.Set("Single room");
+        room.CssClass.Set("english-card");
+        room.EnableRtl.Set(false);
+        room.LabelPosition.Set(FusionRadioButtonLabelPosition.After);
+        room.DataBind();
+    }))
+@(Html.NativeButton("review-card", "Review card")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("card-room");
+        var arabic = room.Label.Eq("غرفة مفردة").And(room.CssClass.Eq("arabic-card"))
+            .And(room.EnableRtl).And(room.LabelPosition.Eq(FusionRadioButtonLabelPosition.Before));
+        var english = room.Label.Eq("Single room").And(room.CssClass.Eq("english-card"))
+            .And(room.EnableRtl.Not()).And(room.LabelPosition.Eq(FusionRadioButtonLabelPosition.After));
+        pipeline.When(arabic)
+            .Then(pipeline => pipeline.Element("card-review").Text.Set("Print right to left with the room name first"))
+            .ElseIf(english)
+            .Then(pipeline => pipeline.Element("card-review").Text.Set("Print left to right with the room name last"))
+            .Else(pipeline => pipeline.Element("card-review").Text.Set("Check the room card layout before printing"));
+    }))
+<p><output id="card-review" aria-label="Print instruction">Card awaiting review</output></p>
+@(Html.NativeButton("clear-alias", "Clear room alias")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("card-room");
+        room.Label.Set(string.Empty);
+        room.DataBind();
+    }))
+@(Html.NativeButton("restore-alias", "Restore room alias")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("card-room");
+        room.Label.Set("Garden suite");
+        room.DataBind();
+    }))
+@(Html.NativeButton("review-alias", "Review alias")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("card-room");
+        pipeline.When(room.Label.Eq(string.Empty))
+            .Then(pipeline => pipeline.Element("room-alias").Text.Set("Room alias cleared"))
+            .Else(pipeline => pipeline.Element("room-alias").Text.Set(room.Label));
+    }))
+<p><output id="room-alias" aria-label="Room alias">Alias awaiting review</output></p>
+<nav aria-label="Saved cards">
+    <a href="@CarePages.SavedArabicRoomCard">Open saved Arabic card</a>
+    <a href="@CarePages.SavedEnglishRoomCard">Open saved English card</a>
+</nav>
+@Html.RenderPlan(plan)

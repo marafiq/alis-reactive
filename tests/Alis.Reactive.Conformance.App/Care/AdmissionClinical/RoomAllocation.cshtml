@@ -1,0 +1,64 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomAllocation
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission room assignment";
+    var plan = Html.ReactivePlan<RoomAllocation>();
+    void RecordChoice(FusionRadioButton.ChangeArgs changed, Pipeline<RoomAllocation> pipeline)
+    {
+        var selection = changed.Name.Eq("change").And(changed.OriginalEvent.Type.Eq("change")).And(changed.OriginalEvent.IsTrusted);
+        pipeline.When(selection.And(changed.Value.Eq("single")))
+            .Then(pipeline => pipeline.Element("activity").Text.Set("Single room requested"))
+            .ElseIf(selection.And(changed.Value.Eq("companion")))
+            .Then(pipeline => pipeline.Element("activity").Text.Set("Companion suite requested"));
+    }
+}
+<h1>Admission room assignment</h1>
+<fieldset>
+    <legend>Room choice</legend>
+    @(Html.FusionRadioButton(plan, "single-room", build => build.Label("Single room").Name("placement").Value("single").Checked(Model.InitiallyChosen).Disabled(Model.InitiallyDisabled))
+        .Reactive(room => room.Change, RecordChoice))
+    @(Html.FusionRadioButton(plan, "companion-room", build => build.Label("Companion suite").Name("placement").Value("companion"))
+        .Reactive(room => room.Change, RecordChoice))
+</fieldset>
+@(Html.NativeButton("apply-referral", "Apply referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("single-room");
+        room.Checked.Set(Model.Assign);
+        room.DataBind();
+    }))
+@(Html.NativeButton("review-assignment", "Review assignment")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("single-room");
+        pipeline.When(room.Checked.And(room.GetSelectedValue().Eq("single")))
+            .Then(pipeline => pipeline.Element("assignment").Text.Set("Single room assigned"))
+            .ElseIf(room.Checked.Not().And(room.GetSelectedValue().Eq(string.Empty)))
+            .Then(pipeline => pipeline.Element("assignment").Text.Set("Awaiting room assignment"));
+    }))
+<p><output id="assignment" aria-label="Assignment">Referral awaiting review</output></p>
+@(Html.NativeButton("apply-availability", "Apply availability and reserve")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("single-room");
+        room.Disabled.Set(Model.Cleaning);
+        room.DataBind();
+        room.Click();
+        pipeline.When(room.Disabled.And(room.GetSelectedValue().Eq(string.Empty)))
+            .Then(pipeline => pipeline.Element("reservation").Text.Set("Held for cleaning"))
+            .ElseIf(room.Disabled.Not().And(room.GetSelectedValue().Eq("single")))
+            .Then(pipeline => pipeline.Element("reservation").Text.Set("Single room reserved"));
+    }))
+<p><output id="reservation" aria-label="Reservation">Reservation not attempted</output></p>
+@(Html.NativeButton("focus-recommendation", "Review recommended room")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+        pipeline.Component<FusionRadioButton>(Model.Assign ? "single-room" : "companion-room").FocusIn()))
+<p><output id="activity" aria-label="Placement activity">No request recorded</output></p>
+@Html.RenderPlan(plan)
