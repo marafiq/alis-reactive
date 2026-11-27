@@ -15,7 +15,8 @@
     "reopen": "lets the held next connection in, or ends a refusal",
     "restart": "the test app's host script, in the layout of every screen, destroys a component's object and puts a new one on the same element when the harness tells it through the world's own channel, as the component's host does, and reports it done; no page holds a control for it",
     "clock": "Playwright's Page.Clock, for every page timer: a plan's waits and the hub client's start and reconnection waits; a stream's reconnection runs on the browser's own timer, outside the clock, after the retry: the harness's stream endpoints write",
-    "gc": "Playwright's Page.RequestGCAsync, confirmed by the page's own weak hold"
+    "gc": "Playwright's Page.RequestGCAsync, confirmed by the page's own weak hold",
+    "clipboard": "a fresh browser context grants clipboard read permission so a page reads text the person copied"
   },
   "partKinds": {
     "native": "a plain element or a hand-written control in the view's markup: the core reaches an element by id (M5.N1) and markup raises an app event from it (M1.D3); never a framework input, which a consumer renders (M7.N2)",
@@ -4489,7 +4490,15 @@
         "smartPaste"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "clipboard"
+      ],
+      "held": [
+        {
+          "verb": "clipboard",
+          "action": null,
+          "on": "the copied referral note"
+        }
       ]
     },
     {
@@ -4521,7 +4530,15 @@
         "clinicalEndpoint"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "clipboard"
+      ],
+      "held": [
+        {
+          "verb": "clipboard",
+          "action": null,
+          "on": "the copied referral note"
+        }
       ]
     },
     {

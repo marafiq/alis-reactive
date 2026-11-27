@@ -14,6 +14,8 @@ public abstract class ConformanceFixture(string host)
 
     protected Task<TestWorld> NewWorld() => OpenWorld(host, Zones.LosAngeles);
 
+    protected Task<TestWorld> NewWorldWithClipboard() => OpenWorld(host, Zones.LosAngeles, clipboard: true);
+
     protected Task<TestWorld> NewWorldUnder(string otherHost) => OpenWorld(otherHost, Zones.LosAngeles);
 
     protected Task<TestWorld> NewWorldInZone(string zone) => OpenWorld(host, zone);
@@ -23,9 +25,9 @@ public abstract class ConformanceFixture(string host)
     [SetUp]
     public void SetTheExpectationWait() => Waits.SetOnEveryExpectation(IsAFusionFixture);
 
-    private async Task<TestWorld> OpenWorld(string under, string zone)
+    private async Task<TestWorld> OpenWorld(string under, string zone, bool clipboard = false)
     {
-        var world = await TestWorld.Open(await ConformanceHost.Of(under), zone, IsAFusionFixture);
+        var world = await TestWorld.Open(await ConformanceHost.Of(under), zone, IsAFusionFixture, clipboard);
         _worlds.GetOrAdd(TestContext.CurrentContext.Test.ID, _ => []).Add(world);
         Watch(world.Page);
         return world;

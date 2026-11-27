@@ -96,3 +96,16 @@ Use [build-a-screen](../../build-a-screen/SKILL.md) to build a realistic view an
 checks and quality gates in [Rewrite orientation](../../../../spec/REWRITE.md) and
 [the framework design](../../../../spec/Core/DESIGN.md). Run builds serially and name the host that ran each
 browser proof.
+
+## What does a clipboard proof need?
+
+Grant clipboard read permission in a fresh browser context for the case that uses it. Use the browser's copy
+gesture on visible source text. Keep that source outside any form the component scans for its target fields.
+Check the pinned implementation for the way it identifies those fields. Smart Paste reads a normal input's id
+before its name and skips a field with no description.
+
+For a protected request, check the host's antiforgery setup and make the endpoint validate the request. Have the
+endpoint answer from the copied text and named fields. Prove the visible change and plant the omitted header.
+For a button in a slot, open the page before loading the form and plant an initial-document-only mount.
+The [Smart Paste browser cases](../../../../tests/Alis.Reactive.Conformance.PlaywrightTests/FusionComponents/FusionSmartPasteButton/WhenStaffPasteAResidentReferral.cs)
+exercise both paths.

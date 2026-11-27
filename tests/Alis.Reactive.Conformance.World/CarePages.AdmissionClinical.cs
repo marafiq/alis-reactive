@@ -4,6 +4,14 @@ public static partial class CarePages
 {
     private const string AdmissionClinical = Area + "admission-clinical/";
 
+    public const string SmartPasteReferral = AdmissionClinical + "smart-paste-referral";
+
+    public const string SmartPasteReferralSlot = SmartPasteReferral + "/slot";
+
+    public const string SmartPasteReferralFields = SmartPasteReferral + "/fields";
+
+    public const string SmartPasteAssist = "/intake/smart-paste";
+
     public const string AllergyIntake = AdmissionClinical + "allergy-intake";
 
     public const string WardAllergies = AdmissionClinical + "ward-allergies";

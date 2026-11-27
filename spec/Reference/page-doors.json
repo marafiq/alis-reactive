@@ -1796,6 +1796,22 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F42 M21.X803 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/SmartPasteReferral.cshtml",
+      "/Care/AdmissionClinical/SmartPasteReferralFields.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F42 M21.X804 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/SmartPasteReferral.cshtml",
+      "/Care/AdmissionClinical/SmartPasteReferralFields.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F42 M21.X805 0": {
     "modules": [],
     "views": [
