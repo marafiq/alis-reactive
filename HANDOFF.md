@@ -90,45 +90,30 @@ spec/CLAUDE.md:26: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mi
 <!-- next -->
 ### Open Fusion promises
 
-The owner, 2026-11-26: "lets hold on tracing, finish every other framework, and then leave handoff codex will take
-over". Every unit lands on `feature/rewrite`; its one pull request, #247, ships 1.0; landed units' worktrees stay.
-The shared framework is complete for now. Use its existing typed surface and skip any case that requires a shared framework change.
-Builds stay serial on this Mac; source `scripts/toolchain-env.sh` first. A unit of Markdown alone lands by
-`scripts/land.sh`'s Markdown path. 1.0 is done when the core, every Fusion component and selected Native components
-are done (the owner, 2026-11-23).
+The owner's 2026-11-26 tracing hold stands. Units land on `feature/rewrite` and retain their worktrees.
+PR #247 ships the core, every Fusion slice and selected Native slices. Use the landed shared API.
+A Markdown-only unit uses `scripts/land.sh`'s Markdown path.
 
-**1. Start.** Read `AGENTS.md` (root CLAUDE.md) and `.claude/rules/process.md`, run `scripts/doctor.sh` and
-`python3 scripts/state.py`, then read this file whole. Work from the lane,
-`/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite`, spelled Code
-as on disk, since state.py finds no landing folder from the lowercase spelling.
+**1. Start.** Read `AGENTS.md` and `.claude/rules/process.md`, source `scripts/toolchain-env.sh`, and run
+`scripts/doctor.sh` and `python3 scripts/state.py`. Read this handoff whole. Use the physical path
+`/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite` with uppercase Code.
 
-**2. The core stands at 1.0 but for U7.** `spec/REWRITE.md` section 4 states U1 to U6 and U8 to U22 closed, each with
-its result line; CI at 39de1909b passed 10 of 10 jobs (net48 "34 selected, 34 ran, 34 passed", consumerNet10 and
-consumerNet48 "2 selected, 2 ran, 2 passed"); the last core landing, "853 selected, 853 ran, 853 passed, 0 failed, 0 over
-budget". No door of `Alis.Reactive` throws `NotImplementedException`.
+**2. Core.** U1 to U6 and U8 to U22 are closed in `spec/REWRITE.md` section 4. The last core landing passed
+853 of 853. CI at 39de1909b passed 10 of 10 jobs, including net48 and both consumer hosts.
 
-**3. U7, held by the owner.** Its code and 8 browser tests stand. Not built, each in section 2.1 and 2.2 of
-`.worktrees/fresh-app-docs/.landing/FreshAppDocs/design.md` (a designer's answer, every fact cited at 3a8ec7120 and
-unrun; backed up as the branch `backup/rewrite/fresh-app-docs` on origin):
-   1. The fresh net10 app's tracing: two OpenTelemetry packages at their pins, the tracer provider and
-      `AddReactiveTracing` with `Console` from the development setting in `Program.cs`.
-   2. README's section on reading a page's spans, copied from that file.
-   3. M19.X6, its browser test reading a person's console lines, a harness member the harness lacks.
-   4. D20.8's net48 fact: the fresh MVC 5 app wires ASP.NET's instrumentation module, and
-      `scripts/playwright-windows.ps1` sends one GET with a known `traceparent` and reads the plan's; CI's verify-net48
-      alone runs it.
-Start it only on the owner's word.
+**3. U7, held.** Eight tests and code stand. The open wiring, span docs, console harness and net48
+traceparent proof are in `.worktrees/fresh-app-docs/.landing/FreshAppDocs/design.md` sections 2.1 and 2.2.
+The design is unrun at 3a8ec7120 and backed up on origin at `backup/rewrite/fresh-app-docs`. Await the owner.
 
 **4. After the core: Fusion and Native (U23 to U27).** U23 has 307 of 307 placed tests, U24 57 of 57, U25 38 of 38,
 U26 101 of 110, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
 and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and localized layout.
-   1. The Fusion shell is proven. M21.X1032 reads the selected Admit or Discharge command. M21.X1024 proves
-      Residents starts open or closed as configured and hides on request. M21.X1002 reads the configured
-      ward trail item. M21.X406 reads the menu's focus feedback on opening and on Escape.
+   1. Fusion shell proofs include the selected command (X1032), Residents visibility (X1024), ward trail
+      item (X1002) and menu focus on opening and Escape (X406).
       M21.X1110 proves the NumericTextBox's explicit and configured steps on net10. Both defects were caught.
    2. FusionGrid has eight open cases. The retained Evening Handoff page at `724901000` matched all three
-      filenames. The M21.X201 replay then read Exported where it expected Exporting (3 selected, 3 ran, 0 passed,
-      3 failed, 0 over budget). EJ2 33.1.47 resolves XLSX before the async save starts the download. CSV and PDF
+      filenames, then all three M21.X201 diagnostics saw Exported where they expected Exporting. EJ2 33.1.47
+      resolves XLSX before the async save starts the download. CSV and PDF
       dispatch their links before settlement. Blob mode only returns data. The later Playwright read misses
       initiation. A sync declaration stops the pipeline under D11.3 and leaves Exporting. All three stay open.
       The three M21.X203 refusals and two M21.X205 inline edits need the validator's rules at
@@ -136,13 +121,26 @@ and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and locali
       public validator returns check results. The typed projection is absent. X203_0's opposite and X203_1
       also disagree on whether the same unconditional GreaterThan(0) renders or is refused.
    3. Smart Paste net10 proves the protected POST and late slot mount. M21.X803_1 needs Fusion assets, a
-      protected MVC 5 intake route and fixture, and IIS Express for its proofs. Continue net10 onboarding.
+      protected MVC 5 intake route and fixture, and IIS Express for its proofs.
 
-Prioritize inputs, then editable grid-like controls. Brief one component at a time and use both onboarding skills.
-Assign pinned vendor evidence, typed declarations and their manifests, and the app and browser proof to separate
-agents. Keep builds serial. The lead owns spec placements, generated files and landing. Require a pinned public
-contract, typed use on the landed API, the exact browser outcome and the caught defect. Keep gaps open. Land on
-`feature/rewrite` with `scripts/land-unit.sh`, `scripts/full-check.sh` and `scripts/push.sh`.
+### Full Fusion onboarding
+
+Owner, 2026-11-27: "One complete component first." Audit FusionSwitch end to end with one builder.
+NumericTextBox's increment is landed. The decrement draft stays isolated at `.worktrees/fusion-numeric-decrement`.
+
+**Read first.** Read `AGENTS.md`, `.claude/rules/process.md`, the slice's spec and project rules. Use
+`.claude/skills/onboard-component/SKILL.md` in full with its `references/full-api.md` and pinned operation
+inventory. Use `.claude/skills/prove-behavior/SKILL.md` for the browser proofs.
+
+**Definition of done.** One builder inventories and delivers a complete component. Account for its public
+instance API, inherited operations and reachable payloads at the installed pin. Every eligible operation
+needs typed C# on the landed framework, matching host manifests and exact browser and defect evidence.
+Give each exclusion a sourced reason and report unresolved eligible operations as open. A browser plant
+must compile and reach its named assertion. The increment pilot's extra discard triggered ALIS023.
+
+Prioritize inputs, then editable grids. Use net10 for the experiment and compile both shipped targets.
+The lead reviews after the builder stops and owns spec placement, generated files and landing. Keep builds
+serial. Land with `scripts/land-unit.sh`, `scripts/full-check.sh` and `scripts/push.sh`. Verify origin and a clean tree.
 
 **5. Gaps named, not built:** an object held as a dictionary's value in a JSON body on MVC 5 (no probe of MVC 5's
 dictionary binding); `Console` false has no browser promise; the fresh MVC 5 app's net48 consumer fixture fails on this
