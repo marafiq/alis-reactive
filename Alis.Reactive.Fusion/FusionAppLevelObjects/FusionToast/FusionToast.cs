@@ -41,6 +41,6 @@ public sealed class FusionToast : FusionComponent, IAppLevelComponent
     /// <summary>Shows a toast with the title, content, tone, time and buttons as last set, the newest on top.</summary>
     public void Show() => Method();
 
-    /// <summary>Hides the newest toast.</summary>
+    /// <summary>Hides the oldest visible toast.</summary>
     public void Hide() => Method();
 }

@@ -3876,6 +3876,21 @@
       }
     },
     {
+      "id": "ej2-toast-hide-oldest",
+      "statement": "EJ2 33.1.47's Toast with newestOnTop set to true dismisses the oldest toast when hide takes no argument.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-hide-oldest: Evening dose recorded | Morning dose recorded -> Evening dose recorded",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log with a note input, a Record button that shows a FusionToast with TimeOut set to 0, and a Dismiss oldest notice button that calls FusionToast.Hide().",
+        "gesture": "Record Morning dose recorded, record Evening dose recorded, then click Dismiss oldest notice.",
+        "outcome": "The evening notice is above the morning notice before dismissal. The evening notice remains after dismissal."
+      }
+    },
+    {
       "id": "ej2-dialog-ask-markup",
       "statement": "EJ2 33.1.47's Dialog, under both lines' confirm options and sequence, writes a header, content and button text given as a string as sanitized HTML, so markup in them renders.",
       "host": "browser",

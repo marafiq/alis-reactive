@@ -1436,6 +1436,7 @@ One commit per slice, each with its own tests, which `slice_tests` holds.
 ### U27. Fusion's app-level objects
 Features: M23.F1, M23.F2
 
-FusionConfirm and FusionToast, each with its own tests. This unit builds the last door, so from it on
-WhenAnAppRendersItsPages takes a page whose door is not built as a problem; until it the sweep lists such a page
-apart.
+FusionConfirm and FusionToast render on both hosts. M23.X2 and X3 passed on fusionShell with 2 selected, 2 ran,
+2 passed, 0 failed, 0 over budget. M23.X1 and X4 passed on the same host with 2 selected, 2 ran, 2 passed,
+0 failed, 0 over budget. The browser proved literal note text and oldest-first toast dismissal. The page
+sweep lists pages with unbuilt doors apart until the last remaining consumer door lands.

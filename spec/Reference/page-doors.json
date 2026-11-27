@@ -2016,6 +2016,22 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M23.F1 M23.X1 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/FusionDoseLog.cshtml",
+      "/Care/Shell/_FusionShellLayout.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M23.F1 M23.X4 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/FusionDoseLog.cshtml",
+      "/Care/Shell/_FusionShellLayout.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M23.F2 M23.X2 0": {
     "modules": [],
     "views": [

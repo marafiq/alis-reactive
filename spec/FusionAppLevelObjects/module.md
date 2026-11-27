@@ -114,3 +114,6 @@ The meanings `M23.D1` to `M23.D4` are in `spec/FusionAppLevelObjects/features.js
   properties when it shows, so a toast shown right after a write holds the written content and class
   (`probe:ej2-toast-show-without-databind`), and `Show` writes `show` alone, as the redesign does
   (`Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:54` at 65fdf118d).
+- Hide dismisses the oldest visible toast (M23.D2, M23.X4). EJ2 prepends each new toast with newestOnTop enabled
+  and its zero-argument hide dismisses the last child (probe:ej2-toast-hide-oldest). The owner chose the direct
+  vendor call on 2026-11-26.

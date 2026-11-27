@@ -3,7 +3,7 @@
   "features": [
     {
       "id": "M23.F1",
-      "summary": "The page's toast: FusionToast, declared on FusionComponent by the names EJ2's Toast uses, Title and Content as text that reads nothing when absent, TimeOut, ShowCloseButton, ShowProgressBar, CssClass typed by the closed set FusionToastTone, Show and Hide, reached by its fixed id, alisFusionToast, and rendered once by Html.FusionToast() in the layout, where the Fusion package's toast code makes the Toast at the bottom right, newest on top, with a close button. The rewrite shows every title and content as text (M23.D1): both lines hand EJ2 the string as it is, and EJ2 moves a page element a content matches as a selector into the toast, compiles one that parses as a selector and matches none as a template, and writes any other as HTML. Show shows a toast with the properties as written, and Hide hides the newest (M23.D2). Main writes each property through a setter of a C# literal and each tone through a door of its own; the redesign names cssClass Tone.",
+      "summary": "The page's toast: FusionToast, declared on FusionComponent by the names EJ2's Toast uses, Title and Content as text that reads nothing when absent, TimeOut, ShowCloseButton, ShowProgressBar, CssClass typed by the closed set FusionToastTone, Show and Hide, reached by its fixed id, alisFusionToast, and rendered once by Html.FusionToast() in the layout, where the Fusion package's toast code makes the Toast at the bottom right, newest on top, with a close button. The rewrite shows every title and content as text (M23.D1): both lines hand EJ2 the string as it is, and EJ2 moves a page element a content matches as a selector into the toast, compiles one that parses as a selector and matches none as a template, and writes any other as HTML. Show shows a toast with the properties as written, and Hide hides the oldest (M23.D2). Main writes each property through a setter of a C# literal and each tone through a door of its own; the redesign names cssClass Tone.",
       "status": "both",
       "types": [
         "Alis.Reactive.Fusion:FusionToast",
@@ -218,10 +218,10 @@
         },
         {
           "id": "M23.D2",
-          "meaning": "Show calls the Toast's show with no argument, and the toast it shows holds the title, content, class, time and buttons as last written, with no dataBind before it (probe:ej2-toast-show-without-databind); each Show adds a toast, the newest on top. Hide calls hide with no argument, which hides the newest toast (@syncfusion/ej2-notifications/src/toast/toast.js:379). TimeOut is the toast's milliseconds before it hides itself, 5000 unless written, and 0 keeps it until it is closed (@syncfusion/ej2-notifications/src/toast/toast.d.ts:359); the core waits for none of it (D11.9). CssClass writes the tone's EJ2 class, which EJ2's themes style. The toast code makes the Toast with the options both lines' render helper gives it, its target the body, at the bottom right, newest on top, with a close button, as the redesign's confirm code makes its Dialog on mount (Alis.Reactive.Assets/components/fusion/confirm.ts:73 at 65fdf118d), so the layout's order of scripts does not decide whether the Toast exists when the plan boots; a member a view reads on a host whose Toast was never made stops its pipeline (D4.1)."
+          "meaning": "Show calls the Toast's show with no argument, and the toast it shows holds the title, content, class, time and buttons as last written, with no dataBind before it (probe:ej2-toast-show-without-databind); each Show adds a toast, the newest on top. Hide calls hide with no argument, which hides the oldest visible toast. With newestOnTop true, EJ2 prepends the new toast and hides the last child (@syncfusion/ej2-notifications/src/toast/toast.js:379, :746; probe:ej2-toast-hide-oldest). TimeOut is the toast's milliseconds before it hides itself, 5000 unless written, and 0 keeps it until it is closed (@syncfusion/ej2-notifications/src/toast/toast.d.ts:359); the core waits for none of it (D11.9). CssClass writes the tone's EJ2 class, which EJ2's themes style. The toast code makes the Toast with the options both lines' render helper gives it, its target the body, at the bottom right, newest on top, with a close button, as the redesign's confirm code makes its Dialog on mount (Alis.Reactive.Assets/components/fusion/confirm.ts:73 at 65fdf118d), so the layout's order of scripts does not decide whether the Toast exists when the plan boots; a member a view reads on a host whose Toast was never made stops its pipeline (D4.1)."
         }
       ],
-      "oracle": "Syncfusion EJ2's Toast, @syncfusion/ej2 33.1.47's ej2.min.js run in Chromium by spec/probes/ej2-payloads-m23.mjs with Playwright 1.63.0, its source read in @syncfusion/ej2-notifications 33.1.44's toast.js: a content string that a page element matches as a selector moves the element into the toast, one that parses as a selector and matches none is compiled as a template, any other is written as sanitized HTML, a beforeSanitizeHtml answer whose helper writes a span of the escaped text shows each as text, and show reads the properties as written.",
+      "oracle": "Syncfusion EJ2's Toast, @syncfusion/ej2 33.1.47's ej2.min.js run in Chromium by spec/probes/ej2-payloads-m23.mjs with Playwright 1.63.0, its source read in @syncfusion/ej2-notifications 33.1.44's toast.js: a content string that a page element matches as a selector moves the element into the toast, one that parses as a selector and matches none is compiled as a template, any other is written as sanitized HTML, a beforeSanitizeHtml answer whose helper writes a span of the escaped text shows each as text, and show reads the properties as written. With newest-on-top ordering, hide with no argument dismisses the oldest toast.",
       "checker": [
         "core:Q11",
         "core:Q17",
@@ -232,6 +232,11 @@
           "id": "M23.X1",
           "rung": "behavior",
           "defect": "Both lines hand EJ2 a toast's title and content as the string they hold (Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:52 and :60 at 623dd4a27, Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:36 and :39 at 65fdf118d), and EJ2 reads a content string in three ways: a page element it matches as a selector is moved into the toast (probe:ej2-toast-content-selector), one that parses as a selector and matches none is compiled as a template, whose ${...} threw a TypeError so no toast showed (probe:ej2-toast-content-selector-template), and any other is written as sanitized HTML, as a title is (probe:ej2-toast-content-markup, probe:ej2-toast-title-markup). Main takes a C# literal only; the redesign's properties take any source."
+        },
+        {
+          "id": "M23.X4",
+          "rung": "behavior",
+          "defect": "Selecting the first displayed toast when dismissing removes the newest and leaves the older note. The zero-argument call removes the last displayed toast with newestOnTop set (probe:ej2-toast-hide-oldest)."
         }
       ],
       "promises": [
@@ -242,6 +247,14 @@
           "outcome": "Three toasts show, reading b[title='${window.location.protocol}'], <b>Ada</b> 5 mg and #ward-board as typed, none holds a bold element, and the ward board still shows under the note.",
           "opposite": "Type Ada 5 mg and click Record: one toast reads Ada 5 mg, and the ward board shows under the note.",
           "defect": "The redesign hands EJ2 the note as it is (Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:39 at 65fdf118d), so the first click moves the ward board into the toast, the second shows Ada in bold, and the third throws from show and shows no toast (probe:ej2-toast-content-selector, probe:ej2-toast-content-markup, probe:ej2-toast-content-selector-template); main's SetContent takes a C# literal only (Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:60 at 623dd4a27), so it cannot show the note, and it shows the same faults for a literal that holds such text."
+        },
+        {
+          "for": "M23.X4",
+          "page": "A dose log with a note input, a Record button that shows a FusionToast with TimeOut set to 0, and a Dismiss oldest notice button that calls FusionToast.Hide().",
+          "gesture": "Record Morning dose recorded, record Evening dose recorded, then click Dismiss oldest notice.",
+          "outcome": "The evening notice is above the morning notice before dismissal. The evening notice remains after dismissal.",
+          "opposite": "With one dose notice shown, dismissing removes it. Recording another note then shows the new notice.",
+          "defect": "Dismissing the first displayed toast leaves the morning notice alone (M23.D2)."
         }
       ],
       "verdicts": [

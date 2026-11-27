@@ -1,0 +1,33 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionAppLevelObjects
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model FusionDoseLog
+@{
+    Layout = "/Care/Shell/_FusionShellLayout.cshtml";
+    ViewData["Title"] = "Dose log";
+    var plan = Html.ReactivePlan<FusionDoseLog>();
+}
+<h1>Dose log</h1>
+@using (var log = Html.BeginRequestContainer(plan, "dose-log"))
+{
+    @(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, FusionDoseLogButtons.Record)>Record</button>
+    <button type="button" @Html.Raises(plan, FusionDoseLogButtons.DismissOldest)>Dismiss oldest notice</button>
+    Html.On(plan, trigger => trigger
+        .CustomEvent(FusionDoseLogButtons.Record, pipeline =>
+        {
+            var toast = pipeline.Component<FusionToast>(FusionToast.ElementId);
+            toast.TimeOut.Set(0);
+            toast.Content.Set(log.Container.Read(m => m.Note).OrNull());
+            toast.Show();
+        })
+        .CustomEvent(FusionDoseLogButtons.DismissOldest, pipeline => pipeline.Component<FusionToast>(FusionToast.ElementId).Hide()));
+}
+<section id="ward-board" aria-labelledby="ward-board-title">
+    <h2 id="ward-board-title">Ward board</h2>
+    <p>Evening medication round</p>
+</section>
+@Html.RenderPlan(plan)

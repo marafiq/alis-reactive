@@ -92,6 +92,31 @@ const toastAsText = async page => {
   console.log(`ej2-toast-show-without-databind: ${unbound}`);
 };
 
+const toastHide = async page => {
+  await page.evaluate(() => {
+    const toast = new ej.notifications.Toast({
+      newestOnTop: true,
+      position: { X: "Right", Y: "Bottom" },
+      timeOut: 0,
+      animation: { show: { duration: 0 }, hide: { duration: 0 } },
+    });
+    toast.appendTo("#toast-hide");
+    toast.content = "Morning dose recorded";
+    toast.show();
+    toast.content = "Evening dose recorded";
+    toast.show();
+    document.querySelector("#dismiss-oldest").addEventListener("click", () => toast.hide());
+  });
+  const notices = page.locator("#toast-hide").getByRole("alert");
+  await notices.getByText("Evening dose recorded", { exact: true }).waitFor();
+  const shown = await notices.allTextContents();
+  await withoutTrialBanner(page);
+  await page.getByRole("button", { name: "Dismiss oldest", exact: true }).click();
+  await notices.getByText("Morning dose recorded", { exact: true }).waitFor({ state: "detached" });
+  const remaining = await notices.allTextContents();
+  console.log("ej2-toast-hide-oldest: " + shown.join(" | ") + " -> " + remaining.join(" | "));
+};
+
 const confirmDialog = async page => {
   await page.evaluate(() => {
     const dialog = new ej.popups.Dialog({
@@ -138,7 +163,7 @@ const confirmDialog = async page => {
   const page = await (await browser.newContext()).newPage();
   await page.route("http://probe.test/", route => route.fulfill({
     contentType: "text/html",
-    body: '<!doctype html><main id="probe"><section id="vitals">Vitals panel</section><div id="toast-markup"></div><div id="toast-selector"></div><div id="toast-selector-template"></div><div id="toast-title"></div><section id="chart">Chart panel</section><div id="text-markup"></div><div id="text-selector"></div><div id="text-template"></div><div id="text-null"></div><div id="text-title-null"></div><div id="toast-unbound"></div><div id="confirm"></div></main>',
+    body: '<!doctype html><main id="probe"><section id="vitals">Vitals panel</section><div id="toast-markup"></div><div id="toast-selector"></div><div id="toast-selector-template"></div><div id="toast-title"></div><section id="chart">Chart panel</section><div id="text-markup"></div><div id="text-selector"></div><div id="text-template"></div><div id="text-null"></div><div id="text-title-null"></div><div id="toast-unbound"></div><div id="toast-hide"></div><button id="dismiss-oldest" style="position:fixed;left:50%;top:1rem">Dismiss oldest</button><div id="confirm"></div></main>',
   }));
   await page.goto("http://probe.test/");
   await page.addScriptTag({ path: bundle });
@@ -146,6 +171,7 @@ const confirmDialog = async page => {
   await page.evaluate(describe);
   await toast(page);
   await toastAsText(page);
+  await toastHide(page);
   await confirmDialog(page);
   await browser.close();
 })();

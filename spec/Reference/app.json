@@ -3541,6 +3541,21 @@
       ]
     },
     {
+      "feature": "M23.F1",
+      "for": "M23.X4",
+      "index": 0,
+      "screen": "fusion-layout",
+      "hosts": [
+        "fusionShell"
+      ],
+      "parts": [
+        "fusionObjects"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M23.F2",
       "for": "M23.X2",
       "index": 0,

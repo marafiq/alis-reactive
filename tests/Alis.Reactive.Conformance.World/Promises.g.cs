@@ -1163,6 +1163,7 @@ public static class Promises
     public static class M23_F1
     {
         public const string M23_X1_0 = "M23.F1 M23.X1 0";
+        public const string M23_X4_0 = "M23.F1 M23.X4 0";
     }
 
     public static class M23_F2

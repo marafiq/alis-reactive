@@ -6,6 +6,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): FusionToast.Hide keeps EJ2's zero-argument call and
+  dismisses the oldest visible toast. New notices still display first. M23.D2 and M23.X4 carry the contract.
 - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), closing the flags enum: an enum is flags to the framework when
   its own `[Flags]` marks it, on both hosts, and the startup names none. The core reads the mark once, in TypeKnowledge,
   a read on D18.1's list (N16.4); the startup door that named a flags enum leaves both hosts' surface, with its
