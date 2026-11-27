@@ -6,8 +6,8 @@ description: Inventory and expose the public API of a JavaScript component or pl
 # Onboard a component
 
 A component is a JavaScript object an element holds; a plugin is one the page provides by name, with no element.
-Onboarding either is one slice: a declaration class that mirrors the object's typed API member for member, by
-JavaScript name, a render helper for a component, and the object's own browser code beside them. Nothing else
+Onboarding either is one slice: a declaration class that mirrors its supported public members by JavaScript name,
+a render helper for a component, and the object's own browser code beside them. Nothing else
 changes: no runtime code, no registry, no edit to the core. A component that seems to need one means the
 declaration is missing information, and the C# carries it. The framework's own components onboard the way an app's
 do, on the same public surface, and the conformance library is the exemplar of every form below
@@ -15,25 +15,22 @@ do, on the same public surface, and the conformance library is the exemplar of e
 
 ## How do I start the named component?
 
-Assign one complete component to one builder. Name the base, worktree, scope, outcome and proof in the brief.
-Find its live instance and a landed slice that renders and listens the same way. For a new Fusion slice, run the
-[operation inventory](../../../spec/FusionComponents/audit/README.md#which-call-forms-and-nested-objects-does-a-slice-expose)
-on its pinned package export. For an existing slice, run it by slice name. Read the
-[full API audit and proof reference](references/full-api.md) to follow signatures, nested shapes and variants.
-For a scoped change, use that same workflow on the operations it reaches.
+Onboard high-confidence public members only. The owner’s target is ten minutes of wall time per component
+(2026-11-27). Give one builder the base, worktree, scope, outcome and proof. Record time to proof and to publication.
 
-1. Read the exact vendor declarations and implementation. Start from the component's coverage record and check
-   the landed tests before proposing any new ones. Use the same record to brief the lead on new cases, record
-   their spec placement and reconcile the final evidence. See [how to prepare the cases](references/full-api.md#how-do-i-prepare-the-cases-before-the-first-build).
-2. Map the operations through the typed C# surface. For Fusion, compare the emitted operations with the pinned
-   inventory and both host manifests.
-3. Prove each supported variant through a real rendered component. Record the named failure each browser case
-   catches. Account for every open operation and every exclusion in the component's coverage record.
+1. Start from the component’s pinned [operation inventory](../../../spec/FusionComponents/audit/README.md#which-call-forms-and-nested-objects-does-a-slice-expose),
+   existing care page and browser cases. Generate a missing inventory from the pinned component export.
+2. Check that the vendor declares the member publicly and the typed C# wrapper matches its name, argument order,
+   arity and conversions. Check both Fusion host manifests. For an uncertain member, record the exact vendor
+   contract and typed path checked, then move on.
+3. Exercise the supported forms on a real page and assert the visible result or server receipt. Reuse an existing
+   case that proves the same component behavior. The framework already proves generic reads, calls and event
+   dispatch. Plant a defect for each distinct positive and opposite user outcome. Several API entries can cite
+   that proof when the case exercises each form. An additional mutation needs a different observable failure.
 
-A matching name identifies a declaration to inspect. Full onboarding requires a reviewed signature and browser
-evidence for every eligible operation and a reason for each exclusion. If the landed public framework surface
-cannot express an operation, record the vendor signature, typed path checked and real use that remains open.
-Continue with the other eligible operations using the landed API.
+The [full API reference](references/full-api.md) covers signatures, nested shapes, exclusions and case preparation.
+For a full inventory audit, account for every public path. On installation or upgrade, keep verified rows and their
+pinned evidence with the component spec.
 
 ## Read the API before declaring
 
