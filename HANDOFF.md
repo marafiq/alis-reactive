@@ -91,12 +91,11 @@ spec/CLAUDE.md:26: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mi
 <!-- next -->
 ### Open Fusion promises
 
-The owner's 2026-11-26 tracing hold stands. Units land on `feature/rewrite` and retain their worktrees.
-PR #247 ships the core, every Fusion slice and selected Native slices. Use the landed shared API.
-A Markdown-only unit uses `scripts/land.sh`'s Markdown path.
+The 2026-11-26 tracing hold stands. PR #247 ships the core, Fusion and selected Native slices.
+Use the landed shared API. Land on `feature/rewrite` and retain worktrees.
 
-**1. Start.** Read `AGENTS.md` and `.claude/rules/process.md`, source `scripts/toolchain-env.sh`, and run
-`scripts/doctor.sh` and `python3 scripts/state.py`. Read this handoff whole. Use the physical path
+**1. Start.** Read `AGENTS.md` and `.claude/rules/process.md`, source `scripts/toolchain-env.sh`, set
+`JAVA_HOME=/opt/homebrew/opt/openjdk`, and run `scripts/doctor.sh` and `python3 scripts/state.py`. Read this handoff whole. Use
 `/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite` with uppercase Code.
 
 **2. Core.** U1 to U6 and U8 to U22 are closed in `spec/REWRITE.md` section 4. The last core landing passed
@@ -126,22 +125,22 @@ and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and locali
 
 ### Full Fusion onboarding
 
-Owner, 2026-11-27: "One complete component first." FusionSwitch has 13 new net10 cases and 29 caught
-defects. See `spec/FusionComponents/audit/switch-coverage.md` for proofs and open variants. The NumericTextBox
-increment is landed. The decrement draft stays at `.worktrees/fusion-numeric-decrement`.
+Owner, 2026-11-27: "One complete component first." FusionSwitch has 13 new net10 cases and 29 caught defects.
+NumericTextBox increment landed. The decrement draft stays at `.worktrees/fusion-numeric-decrement`.
 
-**Read first.** Read `AGENTS.md`, `.claude/rules/process.md`, the slice's spec and project rules. Use
-`.claude/skills/onboard-component/SKILL.md` in full with its `references/full-api.md` and pinned operation
-inventory. Use `.claude/skills/prove-behavior/SKILL.md` for the browser proofs.
+**Next slice.** Continue Switch from the pushed base. Start with C13 in `spec/FusionComponents/audit/switch-coverage.md`
+and verify the public DOM-value carrier against pinned source and a visible typed read. Then work through the other
+high-confidence open members. Read the slice spec and project rules, `onboard-component` and its `references/full-api.md`, and `prove-behavior`.
 
-**Definition of done.** One builder inventories and delivers a complete component. Account for its public
-instance API, inherited operations and reachable payloads at the installed pin. Every eligible operation
-needs typed C# on the landed framework, matching host manifests and exact browser and defect evidence.
-Record sourced exclusions and unresolved eligible operations. Skip EJ2's `created` for every Fusion component
-(the owner, 2026-11-27). A browser plant must compile and reach its named assertion, as ALIS023 held in the pilot.
+**Definition of done.** One builder inventories the complete pinned API, inherited operations and reachable payloads.
+Every eligible operation needs typed C#, matching host manifests and exact browser and defect evidence. Record sourced
+exclusions and open operations. Skip EJ2's `created` across Fusion. Prepare the gesture, opposite and plants before building.
 
-Prioritize inputs, then editable grids. Use net10 for the experiment and compile both shipped targets.
-The lead reviews after the builder stops and owns specs and generated files. Keep builds serial. Land with `scripts/land-unit.sh`, `scripts/full-check.sh` and `scripts/push.sh`. Verify origin and a clean tree.
+After Switch, brief three builders on separate components and worktrees. Prioritize inputs, then editable grids.
+Overlap source and case preparation. Keep builds serial with net10 browser proofs and both shipped target builds.
+The lead owns spec placement and generated files and reconciles shared manifest edits against the pushed base.
+Review each stopped builder at the source. Land with `scripts/land-unit.sh`, `scripts/full-check.sh` and `scripts/push.sh`
+in order, verify the clean lane against origin, and review and improve the handoff after each pushed wave.
 
 **5. Gaps named, not built:** an object held as a dictionary's value in a JSON body on MVC 5 (no probe of MVC 5's
 dictionary binding); `Console` false has no browser promise; the fresh MVC 5 app's net48 consumer fixture fails on this

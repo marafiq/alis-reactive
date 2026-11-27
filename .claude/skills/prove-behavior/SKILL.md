@@ -26,6 +26,10 @@ scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_th
   goes on past a missing member, a wrong code unlocks.
 - Before the run, write down which test the defect turns red and which it leaves green. A test that turns red
   without being predicted shares a cause you did not see, or the defect is wider than the promise.
+- For a typed component declaration, check the substitution against the analyzer rule for that declaration.
+  The NumericTextBox increment plant added a discard statement and ALIS023 refused it. A single `Method()`
+  call compiled and made Add a pack take the configured step. Plant the smallest valid expression that changes
+  the named behavior, then read the assertion that failed.
 - No two tests fail together on every defect. Two that do prove one promise twice: find the defect that fails
   one and leaves the other green, or make them one test.
 
@@ -42,8 +46,9 @@ scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_th
   test gets a positive control or an exact value, or the defect changes nothing anyone can observe. Then the planted
   code is not a behavior: record the finding in `spec/NOTES.md`, and the code either gains a meaning a real case
   raises or leaves.
-- A refusal or a run with no result line is no verdict. A defect the build refuses is held by the compiler and needs
-  no test; a constant that selects no test proves nothing.
+- A refusal or a run with no result line gives no browser verdict. Record a compiler-enforced defect on its own
+  rung. When a different valid implementation can still break the promise, use that substitution for the browser
+  proof. A constant that selects no test proves nothing.
 
 ## Report
 

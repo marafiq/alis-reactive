@@ -15,22 +15,25 @@ do, on the same public surface, and the conformance library is the exemplar of e
 
 ## How do I start the named component?
 
-Onboard one component per session. Find its live instance and a landed slice that renders and listens the same
-way. For a new Fusion slice, run the [operation inventory](../../../spec/FusionComponents/audit/README.md#which-call-forms-and-nested-objects-does-a-slice-expose)
+Assign one complete component to one builder. Name the base, worktree, scope, outcome and proof in the brief.
+Find its live instance and a landed slice that renders and listens the same way. For a new Fusion slice, run the
+[operation inventory](../../../spec/FusionComponents/audit/README.md#which-call-forms-and-nested-objects-does-a-slice-expose)
 on its pinned package export. For an existing slice, run it by slice name. Read the
 [full API audit and proof reference](references/full-api.md) to follow signatures, nested shapes and variants.
 For a scoped change, use that same workflow on the operations it reaches.
 
-1. Record the requested operations and variants in the component's spec. Read the exact vendor declarations and
-   the source that implements them.
+1. Read the exact vendor declarations and implementation. Start from the component's coverage record and check
+   the landed tests before proposing any new ones. Use the same record to brief the lead on new cases, record
+   their spec placement and reconcile the final evidence. See [how to prepare the cases](references/full-api.md#how-do-i-prepare-the-cases-before-the-first-build).
 2. Map the operations through the typed C# surface. For Fusion, compare the emitted operations with the pinned
    inventory and both host manifests.
 3. Prove each supported variant through a real rendered component. Record the named failure each browser case
    catches. Account for every open operation and every exclusion in the component's coverage record.
 
 A matching name identifies a declaration to inspect. Full onboarding requires a reviewed signature and browser
-evidence for every eligible operation and a reason for each exclusion. Record the exact use case if the public
-framework surface cannot express a vendor contract.
+evidence for every eligible operation and a reason for each exclusion. If the landed public framework surface
+cannot express an operation, record the vendor signature, typed path checked and real use that remains open.
+Continue with the other eligible operations using the landed API.
 
 ## Read the API before declaring
 

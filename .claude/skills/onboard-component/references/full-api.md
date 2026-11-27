@@ -62,6 +62,24 @@ every exclusion with its reason and source. Keep open rows in the handoff and re
 coverage separately. On an upgrade, replay the inventory, compare signatures and source, and rerun the proofs
 for changed contracts. Preserve existing C# callers and their behavior.
 
+## How do I prepare the cases before the first build?
+
+Carry forward landed evidence for the same pinned contract, typed path, host and named behavior after reading
+its proof and defect. For example, [Switch coverage](../../../../spec/FusionComponents/audit/switch-coverage.md)
+credits M21.X1027 for initial checked state and keeps the live variants separate. Reuse a read-only vendor
+audit at the same pin after confirming the source and any changes to the slice at the assigned base.
+
+Take the new rows to the lead together. For each row name the actual view and gesture, the exact visible result
+or server receipt, its opposite on the same path, and the compiling substitution for each defect. Find a landed
+locator and assertion form before writing the test. The Switch pilot lost a build to locator and assertion
+members refused by TEST002 and a computed accessible name refused by TEST007. Use the app's accessible names and
+literal assertions through the permitted API. The lead places the promises and owns the generated files. The
+builder then takes the new cases from expected red to green, runs their own plants and links the restored run.
+
+The Switch pilot took about 62 minutes from brief to push, about 37 of them in proof and landing checks. Compare
+the next wave's brief-to-push and check times using the existing logs. Look for duplicate discovery and time
+spent waiting for the build lane between checks.
+
 ## Which runtime details change the declaration?
 
 - Check omitted values, explicit null, false, zero and empty collections independently. For weak data, trace the
