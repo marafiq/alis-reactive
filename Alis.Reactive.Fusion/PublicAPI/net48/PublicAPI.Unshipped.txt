@@ -960,6 +960,7 @@ Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.FocusIn() -> 
 Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.FocusOut() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.FusionNumericTextBox() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Increment() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Increment(Alis.Reactive.ValuesAndSources.Arg<double>! step) -> void
 Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Min.get -> Alis.Reactive.Declarations.Property<TValue>!
 Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.NumericBlurEventArgs
 Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.NumericBlurEventArgs.NumericBlurEventArgs() -> void

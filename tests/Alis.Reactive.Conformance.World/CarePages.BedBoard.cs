@@ -14,6 +14,8 @@ public static partial class CarePages
 
     public const string RoomBeds = BedBoard + "room-beds";
 
+    public const string LinenCount = BedBoard + "linen-count";
+
     public const string ResidentNames = BedBoard + "resident-names";
 
     public const string ResidentNamesRenamed = BedBoard + "resident-names-renamed";

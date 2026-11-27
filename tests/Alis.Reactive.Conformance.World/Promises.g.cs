@@ -1015,6 +1015,8 @@ public static class Promises
     public static class M21_F32
     {
         public const string M21_X1019_0 = "M21.F32 M21.X1019 0";
+        public const string M21_X1110_0 = "M21.F32 M21.X1110 0";
+        public const string M21_X1110_1 = "M21.F32 M21.X1110 1";
     }
 
     public static class M21_F33

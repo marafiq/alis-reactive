@@ -1,5 +1,6 @@
 using Alis.Reactive.Declarations;
 using Alis.Reactive.InputsAndIds;
+using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
 
@@ -28,6 +29,10 @@ public sealed class FusionNumericTextBox<TValue> : FusionComponent, IInputCompon
 
     /// <summary>Raises the box's number by one step.</summary>
     public void Increment() => Method();
+
+    /// <summary>Raises the box's number by the supplied step.</summary>
+    /// <param name="step">The amount to add.</param>
+    public void Increment(Arg<double> step) => Method([step]);
 
     /// <summary>Lowers the box's number by one step.</summary>
     public void Decrement() => Method();

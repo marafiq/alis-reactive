@@ -1648,6 +1648,20 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F32 M21.X1110 0": {
+    "modules": [],
+    "views": [
+      "/Care/BedBoard/LinenCount.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F32 M21.X1110 1": {
+    "modules": [],
+    "views": [
+      "/Care/BedBoard/LinenCount.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F33 M21.X612 0": {
     "modules": [],
     "views": [

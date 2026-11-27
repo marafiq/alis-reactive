@@ -277,6 +277,11 @@
           "id": "billingEndpoint",
           "kind": "endpoint",
           "role": "the bed board's endpoints: the charge corrections a batch-edited grid saves"
+        },
+        {
+          "id": "linenCount",
+          "kind": "fusion",
+          "role": "the ward linen count, a FusionNumericTextBox whose toolbar adds a towel or a pack"
         }
       ]
     },
@@ -11738,6 +11743,36 @@
       ],
       "parts": [
         "doseEntry"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F32",
+      "for": "M21.X1110",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "linenCount"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F32",
+      "for": "M21.X1110",
+      "index": 1,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "linenCount"
       ],
       "harness": [
         "seed"

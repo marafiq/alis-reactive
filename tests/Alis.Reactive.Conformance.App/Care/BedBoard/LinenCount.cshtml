@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LinenCount
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward linen count";
+    var plan = Html.ReactivePlan<LinenCount>();
+}
+<h1>Ward linen count</h1>
+<fieldset>
+    <legend>Ward linen stock</legend>
+    @(Html.InputField(plan, m => m.Towels, options => options.Label("Towels"))
+        .FusionNumericTextBox(build => build.Format("n0").Min(0).Step(1)))
+    <button type="button" @Html.Raises(plan, LinenCounts.AddPack)>Add a pack</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.AddOne)>Add one</button>
+</fieldset>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.AddPack, pipeline =>
+        pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>().Increment(6d)));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.AddOne, pipeline =>
+        pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>().Increment()));
+}
+@Html.RenderPlan(plan)

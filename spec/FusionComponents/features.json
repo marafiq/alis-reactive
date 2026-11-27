@@ -15339,6 +15339,11 @@
      "id": "M21.X1019",
      "rung": "behavior",
      "defect": "Both lines start the NumericTextBox at the bound member through EJ2's own builder, EJS().NumericTextBoxFor(expr) (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:92 at 65fdf118d); a helper that drops the start shows the box empty, EJ2's null (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:67-71) whatever the member holds, against D17.13. The rewrite's render helper starts the NumericTextBox at the member's value, written by M21.D1."
+    },
+    {
+     "id": "M21.X1110",
+     "rung": "behavior",
+     "defect": "The typed increment drops the step the view supplies, so a pack adds the configured single towel. The explicit step reaches EJ2's increment(step), and a call with no step uses the box's configured step (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:369-373)."
     }
    ],
    "promises": [
@@ -15349,6 +15354,22 @@
      "outcome": "The page shows again with 12.50 in the dose box, the value the action left.",
      "opposite": "Opened for a model whose DoseMg is null, the dose box shows empty.",
      "defect": "The box shows 99.00, the attempted value, though a typed component shows what the server decided (D17.13); or it shows empty."
+    },
+    {
+     "for": "M21.X1110",
+     "page": "A ward linen count starts with 8 towels and configures the numeric box to step by one. Its Add a pack button calls Increment with a step of six.",
+     "gesture": "Click Add a pack.",
+     "outcome": "The Towels field shows 14.",
+     "opposite": "Clicking Add one on a fresh page shows 9.",
+     "defect": "The typed call drops the explicit step and the count shows 9."
+    },
+    {
+     "for": "M21.X1110",
+     "page": "The ward linen count starts with 8 towels and its Add one button calls Increment with no argument.",
+     "gesture": "Click Add one.",
+     "outcome": "The Towels field shows 9.",
+     "opposite": "Clicking Add a pack on a fresh page shows 14.",
+     "defect": "The call without an argument supplies the pack size and the count shows 14."
     }
    ],
    "verdicts": [

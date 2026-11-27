@@ -396,7 +396,8 @@ Each name is gate 2's; each door is the capability it carries.
   `:443`, `:451`, `:757`, `:898`, `:905`, `:913`, `:920`).
 - `M21.N32` kept: `FusionNumericTextBox<TValue>`, `TValue` the bound member's type as EJ2 marks the value generic:
   `Value` and `Min` as `Property<TValue>`, whose type argument admits null (M21.X607), `FocusIn`, `FocusOut`,
-  `Increment`, `Decrement`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input` committed by `Change` (M7.N3);
+  `Increment()`, `Increment(Arg<double> step)` (M21.X1110), `Decrement`, `Change`, `Focus` and `Blur`, with
+  `IInputComponent.Input` committed by `Change` (M7.N3);
   the payloads `FusionNumericTextBox<TValue>.ChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<TValue>`,
   M21.X608, and `IsInteracted`), `FusionNumericTextBox<TValue>.NumericFocusEventArgs` and
   `FusionNumericTextBox<TValue>.NumericBlurEventArgs`, of which the declaration reads no member; and the render helper
