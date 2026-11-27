@@ -1,22 +1,22 @@
 # Handoff
 
-Written at `date`: Fri Nov 27 01:40:02 EST 2026
+Written at `date`: Fri Nov 27 01:53:54 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 29, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (84): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionNumericStep, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, FusionSwitchFull, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (85): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionNumericStep, FusionOnboardingPilotFollowup, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, FusionSwitchFull, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, FusionNumericDecrement
 unit: building (1): MoveInOwners
 unit: ready (1): FusionNumericDecrementApi
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 75ce40417 on feature/rewrite: equal to the remote
+lane: pushed at 28bcca9c8 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 75ce40417
+ci: unread at 28bcca9c8
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -26,7 +26,7 @@ file: over spec/CLAUDE.md: holds 2157 lines, its limit 150
   goes to: gone
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 29 units have landed since .claude/rules/process.md last changed
+machine: review due : 30 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -34,13 +34,13 @@ machine: review due : 29 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 75ce40417 Fusion (FusionSwitch): prove live resident alert settings
-- Full check: .work/logs/spec-check-75ce40417.log: spec check at 75ce40417: 40 of 40 checks pass
+- HEAD: 28bcca9c8 Fusion: carry the onboarding pilot into the next wave
+- Full check: .work/logs/spec-check-28bcca9c8.log: spec check at 28bcca9c8: 40 of 40 checks pass
 - .work/last-run.txt: 20261127-012332-37508 75ce40417
 
 ## Landed since the commit before the last spec: STATE commit
-75ce40417 Fusion (FusionSwitch): prove live resident alert settings
-5d341cc2e spec: STATE and handoff at cc05d5de4
+28bcca9c8 Fusion: carry the onboarding pilot into the next wave
+8a0139e72 spec: STATE and handoff at 75ce40417
 
 ## Open
 open: 9 promises with no browser test, 0 runtime cases not built, 0 doors not implemented
