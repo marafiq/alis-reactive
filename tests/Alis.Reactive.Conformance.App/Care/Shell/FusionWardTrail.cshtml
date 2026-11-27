@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Navigations
+@model FusionWardTrail
+@{
+    Layout = "/Care/Shell/_FusionShellLayout.cshtml";
+    ViewData["Title"] = "Ward directory";
+    var plan = Html.ReactivePlan<FusionWardTrail>();
+}
+<header>
+    <h1>Ward directory</h1>
+    @(Html.FusionBreadcrumb(plan, "trail", build => build
+        .Items(new List<BreadcrumbItem>
+        {
+            new() { Text = "Home", Url = "/" },
+            new() { Text = "Wards", Url = CarePages.FusionWardTrail },
+            new() { Text = "North wing", Url = CarePages.FusionNorthWingTrail },
+        })
+        .ActiveItem(Model.ActiveItem)))
+    <button type="button" @Html.Raises(plan, FusionWardTrailButtons.WhereAmI)>Where am I</button>
+    <p>Current location: <output id="ward-location">—</output></p>
+</header>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(FusionWardTrailButtons.WhereAmI, pipeline => pipeline
+        .Element("ward-location").Text.Set(pipeline.Component<FusionBreadcrumb>("trail").ActiveItem)));
+}
+@Html.RenderPlan(plan)

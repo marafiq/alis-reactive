@@ -1871,6 +1871,14 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F6 M21.X1002 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/FusionWardTrail.cshtml",
+      "/Care/Shell/_FusionShellLayout.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F7 M21.X1003 0": {
     "modules": [],
     "views": [

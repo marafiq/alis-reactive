@@ -20,6 +20,10 @@ public static partial class CarePages
 
     public const string FusionDischargeInSpanish = Shell + "fusion-discharge/es";
 
+    public const string FusionWardTrail = "/wards";
+
+    public const string FusionNorthWingTrail = "/wards/north";
+
     public const string DrawerDischarge = Shell + "drawer-discharge";
 
     public const string FamilyNotice = Shell + "family-notice";

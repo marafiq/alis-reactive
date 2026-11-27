@@ -2,6 +2,7 @@
 using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -18,6 +19,13 @@ public static class FusionBreadcrumbHtml
     /// <param name="build">What the view sets on the breadcrumb.</param>
     /// <returns>The rendered breadcrumb, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionBreadcrumb, TModel> FusionBreadcrumb<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<BreadcrumbBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var breadcrumb = html.EJS().Breadcrumb(elementId);
+        build(breadcrumb);
+        return plan.Render<FusionBreadcrumb>(elementId, breadcrumb.Render());
+    }
 }
 #endif
