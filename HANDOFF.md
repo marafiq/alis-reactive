@@ -1,21 +1,21 @@
 # Handoff
 
-Written at `date`: Thu Nov 26 23:53:59 EST 2026
+Written at `date`: Fri Nov 27 00:24:27 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 29, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (81): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionGridDownloadEvidence, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (82): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionGridDownloadEvidence, FusionNumericStep, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (5): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch
 unit: building (1): MoveInOwners
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at 62652a24e on feature/rewrite: equal to the remote
+lane: pushed at f823c435d on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at 62652a24e
+ci: unread at f823c435d
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -25,7 +25,7 @@ file: over spec/CLAUDE.md: holds 2157 lines, its limit 150
   goes to: gone
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 26 units have landed since .claude/rules/process.md last changed
+machine: review due : 27 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -33,13 +33,13 @@ machine: review due : 26 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: 62652a24e Fusion: record the Grid export proof boundary
-- Full check: .work/logs/spec-check-62652a24e.log: spec check at 62652a24e: 40 of 40 checks pass
-- .work/last-run.txt: 20261126-230211-39274 6e668a0b2
+- HEAD: f823c435d Fusion (FusionNumericTextBox): increment by a supplied step
+- Full check: .work/logs/spec-check-f823c435d.log: spec check at f823c435d: 40 of 40 checks pass
+- .work/last-run.txt: 20261127-000812-32419 f823c435d
 
 ## Landed since the commit before the last spec: STATE commit
-62652a24e Fusion: record the Grid export proof boundary
-724901000 spec: STATE and handoff at 6e668a0b2
+f823c435d Fusion (FusionNumericTextBox): increment by a supplied step
+11717b77d spec: STATE and handoff at 62652a24e
 
 ## Open
 open: 9 promises with no browser test, 0 runtime cases not built, 0 doors not implemented
@@ -120,11 +120,12 @@ unrun; backed up as the branch `backup/rewrite/fresh-app-docs` on origin):
 Start it only on the owner's word.
 
 **4. After the core: Fusion and Native (U23 to U27).** U23 has 307 of 307 placed tests, U24 57 of 57, U25 38 of 38,
-U26 99 of 108, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
+U26 101 of 110, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
 and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and localized layout.
    1. The Fusion shell is proven. M21.X1032 reads the selected Admit or Discharge command. M21.X1024 proves
       Residents starts open or closed as configured and hides on request. M21.X1002 reads the configured
       ward trail item. M21.X406 reads the menu's focus feedback on opening and on Escape.
+      M21.X1110 proves the NumericTextBox's explicit and configured steps on net10. Both defects were caught.
    2. FusionGrid has eight open cases. The retained Evening Handoff page at `724901000` matched all three
       filenames. The M21.X201 replay then read Exported where it expected Exporting (3 selected, 3 ran, 0 passed,
       3 failed, 0 over budget). EJ2 33.1.47 resolves XLSX before the async save starts the download. CSV and PDF
@@ -134,8 +135,8 @@ and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and locali
       `GridColumn.ValidationRules`. N16.2 registers them internally, N16.3 checks a request container, and the
       public validator returns check results. The typed projection is absent. X203_0's opposite and X203_1
       also disagree on whether the same unconditional GreaterThan(0) renders or is refused.
-   3. Smart Paste net10 proves the protected POST and late slot mount. M21.X803_1 needs Fusion and its assets in
-      the MVC 5 twin, a protected intake page and a fixture. Run its browser and missing-header proofs in Windows IIS Express.
+   3. Smart Paste net10 proves the protected POST and late slot mount. M21.X803_1 needs Fusion assets, a
+      protected MVC 5 intake route and fixture, and IIS Express for its proofs. Continue net10 onboarding.
 
 Prioritize inputs, then editable grid-like controls. Brief one component at a time and use both onboarding skills.
 Assign pinned vendor evidence, typed declarations and their manifests, and the app and browser proof to separate
