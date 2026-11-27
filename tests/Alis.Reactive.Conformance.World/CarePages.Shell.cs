@@ -24,6 +24,8 @@ public static partial class CarePages
 
     public const string FusionNorthWingTrail = "/wards/north";
 
+    public const string FusionWardNavigation = Shell + "fusion-ward-navigation";
+
     public const string DrawerDischarge = Shell + "drawer-discharge";
 
     public const string FamilyNotice = Shell + "family-notice";

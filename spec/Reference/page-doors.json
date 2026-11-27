@@ -1612,6 +1612,14 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F30 M21.X406 0": {
+    "modules": [],
+    "views": [
+      "/Care/Shell/FusionWardNavigation.cshtml",
+      "/Care/Shell/_FusionShellLayout.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F31 M21.X1052 0": {
     "modules": [],
     "views": [
