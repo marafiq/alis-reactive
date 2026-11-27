@@ -2,6 +2,7 @@
 using System;
 using System.Web.Mvc;
 using Alis.Reactive.RenderingAndDelivery;
+using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -18,6 +19,13 @@ public static class FusionSidebarHtml
     /// <param name="build">What the view sets on the sidebar.</param>
     /// <returns>The rendered sidebar, which writes its markup where the view puts it.</returns>
     public static Rendered<FusionSidebar, TModel> FusionSidebar<TModel>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan, string elementId, Action<SidebarBuilder> build)
-        => throw new NotImplementedException();
+    {
+        if (plan is null) throw new ArgumentNullException(nameof(plan));
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (build is null) throw new ArgumentNullException(nameof(build));
+        var sidebar = html.EJS().Sidebar(elementId);
+        build(sidebar);
+        return plan.Render<FusionSidebar>(elementId, sidebar.Render());
+    }
 }
 #endif

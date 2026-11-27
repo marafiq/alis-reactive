@@ -26,6 +26,10 @@ public static partial class CarePages
 
     public const string FusionWardNavigation = Shell + "fusion-ward-navigation";
 
+    public const string FusionResidentSidebar = Shell + "fusion-resident-sidebar";
+
+    public const string FusionResidentSidebarCollapsed = FusionResidentSidebar + "/collapsed";
+
     public const string DrawerDischarge = Shell + "drawer-discharge";
 
     public const string FamilyNotice = Shell + "family-notice";
