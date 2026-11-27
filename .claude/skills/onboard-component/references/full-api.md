@@ -81,6 +81,20 @@ for changed contracts. Preserve existing C# callers and their behavior.
   Include the supported fields needed by that call. Evaluate a hidden or private method itself under the owner's
   existing boundary. Preserve typed paths and expose gaps requiring a framework decision with their real use case.
 
+## How do I prove the order of an async effect?
+
+Follow each overload from the typed call through the vendor implementation to the effect the promise names.
+Record what settles the returned Promise, what the vendor's completion event carries and when the browser takes
+the action. In EJ2 33.1.47, Grid's default XLSX export can resolve while archive work is still pending. Its
+default CSV and PDF saves dispatch a download link during the save call in Chromium. A filename and a status read after Playwright receives a
+download notification establish the file and the later status. To prove the status at initiation, find an
+observable boundary at initiation or a named action the harness can hold. Keep the ordering case open when
+that evidence is missing.
+
+Read the planted call through the current framework before using it to prove an ordering. Under D11.3, declaring
+a Promise-returning method with `Method` stops the pipeline. A failure because its final status never appears
+establishes that stop. A case about a final status appearing too early needs evidence of that order.
+
 ## How do the proofs expose different kinds of gaps?
 
 | Reference | What to replay |
