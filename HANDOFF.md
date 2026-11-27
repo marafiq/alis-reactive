@@ -1,23 +1,22 @@
 # Handoff
 
-Written at `date`: Fri Nov 27 00:41:09 EST 2026
+Written at `date`: Fri Nov 27 01:40:02 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 29, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (83): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionNumericStep, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (84): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionNumericStep, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, FusionSwitchFull, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, FusionNumericDecrement
 unit: building (1): MoveInOwners
 unit: ready (1): FusionNumericDecrementApi
-unit: briefed (1): FusionSwitchFull
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushed at cc05d5de4 on feature/rewrite: equal to the remote
+lane: pushed at 75ce40417 on feature/rewrite: equal to the remote
   leaves by: the landing of a unit that is ready
   read first: the queue of `HANDOFF.md`
   exit line: "landed"
   goes to: lane: landed
-ci: unread at cc05d5de4
+ci: unread at 75ce40417
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
@@ -27,7 +26,7 @@ file: over spec/CLAUDE.md: holds 2157 lines, its limit 150
   goes to: gone
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 28 units have landed since .claude/rules/process.md last changed
+machine: review due : 29 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -35,13 +34,13 @@ machine: review due : 28 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: cc05d5de4 Fusion: hand off one complete component
-- Full check: .work/logs/spec-check-cc05d5de4.log: spec check at cc05d5de4: 40 of 40 checks pass
-- .work/last-run.txt: 20261127-000812-32419 f823c435d
+- HEAD: 75ce40417 Fusion (FusionSwitch): prove live resident alert settings
+- Full check: .work/logs/spec-check-75ce40417.log: spec check at 75ce40417: 40 of 40 checks pass
+- .work/last-run.txt: 20261127-012332-37508 75ce40417
 
 ## Landed since the commit before the last spec: STATE commit
-cc05d5de4 Fusion: hand off one complete component
-bb9a7e613 spec: STATE and handoff at f823c435d
+75ce40417 Fusion (FusionSwitch): prove live resident alert settings
+5d341cc2e spec: STATE and handoff at cc05d5de4
 
 ## Open
 open: 9 promises with no browser test, 0 runtime cases not built, 0 doors not implemented
@@ -108,7 +107,7 @@ traceparent proof are in `.worktrees/fresh-app-docs/.landing/FreshAppDocs/design
 The design is unrun at 3a8ec7120 and backed up on origin at `backup/rewrite/fresh-app-docs`. Await the owner.
 
 **4. After the core: Fusion and Native (U23 to U27).** U23 has 307 of 307 placed tests, U24 57 of 57, U25 38 of 38,
-U26 101 of 110, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
+U26 114 of 123, and U27 is closed with all 4 placed browser cases passing. M23.X1 and X4 prove literal notes
 and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and localized layout.
    1. Fusion shell proofs include the selected command (X1032), Residents visibility (X1024), ward trail
       item (X1002) and menu focus on opening and Escape (X406).
@@ -127,8 +126,9 @@ and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and locali
 
 ### Full Fusion onboarding
 
-Owner, 2026-11-27: "One complete component first." Audit FusionSwitch end to end with one builder.
-NumericTextBox's increment is landed. The decrement draft stays isolated at `.worktrees/fusion-numeric-decrement`.
+Owner, 2026-11-27: "One complete component first." FusionSwitch has 13 new net10 cases and 29 caught
+defects. See `spec/FusionComponents/audit/switch-coverage.md` for proofs and open variants. The NumericTextBox
+increment is landed. The decrement draft stays at `.worktrees/fusion-numeric-decrement`.
 
 **Read first.** Read `AGENTS.md`, `.claude/rules/process.md`, the slice's spec and project rules. Use
 `.claude/skills/onboard-component/SKILL.md` in full with its `references/full-api.md` and pinned operation
@@ -137,12 +137,11 @@ inventory. Use `.claude/skills/prove-behavior/SKILL.md` for the browser proofs.
 **Definition of done.** One builder inventories and delivers a complete component. Account for its public
 instance API, inherited operations and reachable payloads at the installed pin. Every eligible operation
 needs typed C# on the landed framework, matching host manifests and exact browser and defect evidence.
-Give each exclusion a sourced reason and report unresolved eligible operations as open. A browser plant
-must compile and reach its named assertion. The increment pilot's extra discard triggered ALIS023.
+Record sourced exclusions and unresolved eligible operations. Skip EJ2's `created` for every Fusion component
+(the owner, 2026-11-27). A browser plant must compile and reach its named assertion, as ALIS023 held in the pilot.
 
 Prioritize inputs, then editable grids. Use net10 for the experiment and compile both shipped targets.
-The lead reviews after the builder stops and owns spec placement, generated files and landing. Keep builds
-serial. Land with `scripts/land-unit.sh`, `scripts/full-check.sh` and `scripts/push.sh`. Verify origin and a clean tree.
+The lead reviews after the builder stops and owns specs and generated files. Keep builds serial. Land with `scripts/land-unit.sh`, `scripts/full-check.sh` and `scripts/push.sh`. Verify origin and a clean tree.
 
 **5. Gaps named, not built:** an object held as a dictionary's value in a JSON body on MVC 5 (no probe of MVC 5's
 dictionary binding); `Console` false has no browser promise; the fresh MVC 5 app's net48 consumer fixture fails on this

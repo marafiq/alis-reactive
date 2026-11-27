@@ -14,22 +14,22 @@
       "counts": {
         "cells": 117,
         "hosts": 26,
-        "placed": 764,
+        "placed": 777,
         "problems": 0,
         "rewrite": 0,
         "screens": 15
       },
-      "detail": "764 feature tests and 117 cell tests on 15 screens under 26 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
+      "detail": "777 feature tests and 117 cell tests on 15 screens under 26 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "bindings": {
       "counts": {
-        "constants": 891,
+        "constants": 904,
         "gates": 74,
         "marks": 131,
         "problems": 0
       },
-      "detail": "Gates.g.cs holds 74 gates and Promises.g.cs 891 constants, 131 of a held gate marked on them, each as the spec writes it",
+      "detail": "Gates.g.cs holds 74 gates and Promises.g.cs 904 constants, 131 of a held gate marked on them, each as the spec writes it",
       "pass": true
     },
     "carriers": {
@@ -1436,7 +1436,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 902,
+        "defects": 915,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1543,7 +1543,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 115,
+        "files": 116,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1625,7 +1625,7 @@
     },
     "module_cites": {
       "counts": {
-        "cites": 1052,
+        "cites": 1062,
         "unresolved": 0
       },
       "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules",
@@ -1686,8 +1686,8 @@
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "276 refused plants caught and 89 accepted plants kept green; 39 of 39 checks proven both ways; check.py and its plants unchanged since that run",
-      "digest": "3e055f787cb4a2dd87dc37bff630c3d9a4128561f8d53797f0e1b8b370d935e4",
+      "detail": "276 refused plants caught and 89 accepted plants kept green; 39 of 39 checks proven both ways",
+      "digest": "660d19cdf6f381f7fcaeb4f23aff4665f1c028c53014f0c661f78036f15362d5",
       "pass": true
     },
     "probes": {
@@ -1708,7 +1708,7 @@
         "mapped": 8909,
         "matrix_promised": 117,
         "matrix_runs": 117,
-        "promises": 764,
+        "promises": 777,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1736,10 +1736,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 881,
+        "tests": 894,
         "units": 27
       },
-      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 3, U10 5, U11 16, U12 0, U13 98, U14 6, U15 29, U16 0, U17 1, U18 100, U19 18, U20 8, U21 86, U22 9, U23 288, U24 57, U25 38, U26 110, U27 4",
+      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 3, U10 5, U11 16, U12 0, U13 98, U14 6, U15 29, U16 0, U17 1, U18 100, U19 18, U20 8, U21 86, U22 9, U23 288, U24 57, U25 38, U26 123, U27 4",
       "pass": true
     },
     "slice_tests": {
@@ -4737,7 +4737,7 @@
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 53m 3h, U4 1b 18m 3a, U5 1b 21m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 3b 17m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 1b 21m 21a, U18 100b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 86b 14m 1a 1h, U22 9b 4m, U23 288b, U24 57b 1a, U25 38b 1a, U26 110b 35a, U27 4b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 53m 3h, U4 1b 18m 3a, U5 1b 21m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 3b 17m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 1b 21m 21a, U18 100b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 86b 14m 1a 1h, U22 9b 4m, U23 288b, U24 57b 1a, U25 38b 1a, U26 123b 35a, U27 4b",
       "pass": true
     },
     "verdicts": {
@@ -4755,7 +4755,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "cc05d5de4569c863f787da32f7188e383c66ca3c",
+  "read_at_head": "75ce40417aaa0063b64ee6af69de85bea6e7f8c2",
   "step": {
     "failing": [],
     "name": "End of session",
