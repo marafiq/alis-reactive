@@ -217,5 +217,67 @@ public sealed class WhenStaffConfigureNightAlerts(string host) : FusionFixture(h
         await Expect(day.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Saved destination", Exact = true })).ToHaveTextAsync("Day desk selected");
     }
 
+    [Test]
+    [FailsFor(Promises.M21_F46.M21_X1133_0)]
+    public async Task channel_review_reads_the_live_switch_input_label()
+    {
+        var night = await NewWorld();
+        await night.Page.GotoAsync(CarePages.AlertPreferencesNightChannelReview);
+        await night.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Review alert channel", Exact = true }).ClickAsync();
+        await Expect(night.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Channel review", Exact = true })).ToHaveTextAsync("Night alert channel");
+
+        var day = await NewWorld();
+        await day.Page.GotoAsync(CarePages.AlertPreferencesDayChannelReview);
+        await day.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Review alert channel", Exact = true }).ClickAsync();
+        await Expect(day.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Channel review", Exact = true })).ToHaveTextAsync("Day alert channel");
+    }
+
+    [Test]
+    [FailsFor(Promises.M21_F46.M21_X1134_0)]
+    public async Task control_root_review_reads_the_input_returned_by_the_switch()
+    {
+        var night = await NewWorld();
+        await night.Page.GotoAsync(CarePages.AlertPreferencesNightChannelReview);
+        await night.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Check screen-reader wording", Exact = true }).ClickAsync();
+        await Expect(night.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Screen-reader wording", Exact = true })).ToHaveTextAsync("Night alert channel");
+
+        var day = await NewWorld();
+        await day.Page.GotoAsync(CarePages.AlertPreferencesDayChannelReview);
+        await day.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Check screen-reader wording", Exact = true }).ClickAsync();
+        await Expect(day.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Screen-reader wording", Exact = true })).ToHaveTextAsync("Day alert channel");
+    }
+
+    [Test]
+    [FailsFor(Promises.M21_F46.M21_X1151_0)]
+    public async Task channel_review_reports_when_the_switch_uses_its_associated_field_label()
+    {
+        var field = await NewWorld();
+        await field.Page.GotoAsync(CarePages.AlertPreferencesFieldLabelReview);
+        await field.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Review alert channel", Exact = true }).ClickAsync();
+        await Expect(field.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Channel label source", Exact = true })).ToHaveTextAsync("Uses the field label");
+        await Expect(field.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Channel review", Exact = true })).ToHaveTextAsync("Night alerts");
+
+        var custom = await NewWorld();
+        await custom.Page.GotoAsync(CarePages.AlertPreferencesNightChannelReview);
+        await custom.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Review alert channel", Exact = true }).ClickAsync();
+        await Expect(custom.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Channel label source", Exact = true })).ToHaveTextAsync("Uses custom wording");
+    }
+
+    [Test]
+    [FailsFor(Promises.M21_F46.M21_X1152_0)]
+    public async Task screen_reader_review_reports_when_the_control_uses_its_associated_field_label()
+    {
+        var field = await NewWorld();
+        await field.Page.GotoAsync(CarePages.AlertPreferencesFieldLabelReview);
+        await field.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Check screen-reader wording", Exact = true }).ClickAsync();
+        await Expect(field.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Screen-reader label source", Exact = true })).ToHaveTextAsync("Uses the field label");
+        await Expect(field.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Screen-reader wording", Exact = true })).ToHaveTextAsync("Night alerts");
+
+        var custom = await NewWorld();
+        await custom.Page.GotoAsync(CarePages.AlertPreferencesNightChannelReview);
+        await custom.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Check screen-reader wording", Exact = true }).ClickAsync();
+        await Expect(custom.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Screen-reader label source", Exact = true })).ToHaveTextAsync("Uses custom wording");
+    }
+
     private static ILocator AlertSwitch(IPage page) => page.GetByRole(AriaRole.Switch, new PageGetByRoleOptions { Name = "Night alerts", Exact = true });
 }

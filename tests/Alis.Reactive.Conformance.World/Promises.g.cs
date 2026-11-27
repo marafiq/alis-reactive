@@ -1115,6 +1115,24 @@ public static class Promises
         public const string M21_X1130_0 = "M21.F46 M21.X1130 0";
         public const string M21_X1131_0 = "M21.F46 M21.X1131 0";
         public const string M21_X1132_0 = "M21.F46 M21.X1132 0";
+        public const string M21_X1133_0 = "M21.F46 M21.X1133 0";
+        public const string M21_X1134_0 = "M21.F46 M21.X1134 0";
+        public const string M21_X1135_0 = "M21.F46 M21.X1135 0";
+        public const string M21_X1136_0 = "M21.F46 M21.X1136 0";
+        public const string M21_X1137_0 = "M21.F46 M21.X1137 0";
+        public const string M21_X1138_0 = "M21.F46 M21.X1138 0";
+        public const string M21_X1139_0 = "M21.F46 M21.X1139 0";
+        public const string M21_X1140_0 = "M21.F46 M21.X1140 0";
+        public const string M21_X1141_0 = "M21.F46 M21.X1141 0";
+        public const string M21_X1142_0 = "M21.F46 M21.X1142 0";
+        public const string M21_X1143_0 = "M21.F46 M21.X1143 0";
+        public const string M21_X1144_0 = "M21.F46 M21.X1144 0";
+        public const string M21_X1145_0 = "M21.F46 M21.X1145 0";
+        public const string M21_X1149_0 = "M21.F46 M21.X1149 0";
+        public const string M21_X1150_0 = "M21.F46 M21.X1150 0";
+        public const string M21_X1151_0 = "M21.F46 M21.X1151 0";
+        public const string M21_X1152_0 = "M21.F46 M21.X1152 0";
+        public const string M21_X1153_0 = "M21.F46 M21.X1153 0";
     }
 
     public static class M21_F47

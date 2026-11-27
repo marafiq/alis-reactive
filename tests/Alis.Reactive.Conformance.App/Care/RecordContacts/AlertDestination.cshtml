@@ -25,6 +25,15 @@
                 .Then(chosen => chosen.Element("selected-alert-desk").Text.Set("Night desk"))
                 .Else(chosen => chosen.Element("selected-alert-desk").Text.Set("Day desk"));
         }))
+    @(Html.NativeButton("review-alert-destination", "Review alert destination")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var destination = pipeline.Input(m => m.AlertDesk).Component<FusionSwitch>();
+            pipeline.When(destination.Value.Eq("night"))
+                .Then(pipeline => pipeline.Element("alert-destination-review").Text.Set("Night desk"))
+                .Else(pipeline => pipeline.Element("alert-destination-review").Text.Set("Day desk"));
+        }))
+    <p><output id="alert-destination-review" aria-label="Destination review">Awaiting review</output></p>
     <button type="submit">Save alert destination</button>
 </form>
 @Html.RenderPlan(plan)

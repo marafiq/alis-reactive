@@ -1,4 +1,5 @@
 using Alis.Reactive.Declarations;
+using Alis.Reactive.Elements;
 using Alis.Reactive.InputsAndIds;
 
 namespace Alis.Reactive.Fusion.FusionComponents;
@@ -22,6 +23,16 @@ public sealed class FusionSwitch : FusionComponent, IInputComponent
     /// <summary>Gets whether the native control is disabled.</summary>
     public Property<bool> Disabled => Property<bool>();
 
+    /// <summary>Gets the native input the switch owns.</summary>
+    public ChildElement Element => LiveObject<ChildElement>();
+
+    /// <summary>Gets the vendor setting for remembering the switch's checked state in this browser.</summary>
+    /// <remarks>
+    /// Refresh after enabling persistence on a rendered switch to attach its page-exit handler.
+    /// Clearing the flag leaves an already attached handler in place.
+    /// </remarks>
+    public Property<bool> EnablePersistence => Property<bool>();
+
     /// <summary>Gets whether the switch uses a right-to-left layout.</summary>
     public Property<bool> EnableRtl => Property<bool>();
 
@@ -43,8 +54,14 @@ public sealed class FusionSwitch : FusionComponent, IInputComponent
     /// <summary>Activates the native input through its click method.</summary>
     public void Click() => Method();
 
+    /// <summary>Gets the root element returned by the switch.</summary>
+    public ChildElement GetRootElement() => ReturnedObject<ChildElement>();
+
     /// <summary>Moves focus to the switch's input.</summary>
     public void FocusIn() => Method();
+
+    /// <summary>Rebuilds the switch wrapper from its current settings.</summary>
+    public void Refresh() => Method();
 
     /// <summary>Removes the enhanced switch and leaves its original input unchecked.</summary>
     public void Destroy() => Method();
@@ -66,6 +83,9 @@ public sealed class FusionSwitch : FusionComponent, IInputComponent
 
         /// <summary>Gets the prior checked state. The switch takes the inverse of this value when the activation proceeds.</summary>
         public Property<bool> Checked => Property<bool>(optional: true);
+
+        /// <summary>Gets the original DOM event when the request came from native activation.</summary>
+        public ActivationEvent OriginalEvent => LiveObject<ActivationEvent>(name: "event", optional: true, nullable: true);
     }
 
     /// <summary>What a listener of <see cref="Change"/> receives.</summary>
@@ -74,6 +94,9 @@ public sealed class FusionSwitch : FusionComponent, IInputComponent
     {
         /// <summary>Gets whether the switch is on after the flip.</summary>
         public ReadOnly<bool> Checked => ReadOnly<bool>(optional: true);
+
+        /// <summary>Gets the vendor category for the notified event.</summary>
+        public ReadOnly<string> Name => ReadOnly<string>(optional: true);
 
         /// <summary>Gets the original DOM event when there was one.</summary>
         public ActivationEvent OriginalEvent => LiveObject<ActivationEvent>(name: "event", optional: true, nullable: true);

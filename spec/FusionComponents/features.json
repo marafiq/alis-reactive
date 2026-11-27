@@ -21495,7 +21495,7 @@
   },
   {
    "id": "M21.F46",
-   "summary": "FusionSwitch exposes the pinned public Switch state, activation, focus, terminal destroy and live settings. BeforeChange carries the synchronous veto and prior state. Change carries the committed state and optional original browser event. The render helpers bind a bool and Change commits the input. Main spreads the slice over six files whose events, writes and reads name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name and stripped of the IsInteracted no switch hands.",
+   "summary": "FusionSwitch exposes the pinned public Switch state, activation, focus, terminal destroy, wrapper refresh and live settings. Element and GetRootElement carry the native input's shallow DOM reads. The browser can retain the checked state when persistence is enabled and refreshed. BeforeChange carries the synchronous veto, prior state and optional original event. Change carries the committed state, optional original event and optional vendor event name. The render helpers bind a bool and Change commits the input. Main spreads the slice over six files whose events, writes and reads name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name and stripped of the IsInteracted no switch hands.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionSwitch",
@@ -21596,7 +21596,11 @@
     "call",
     "lit",
     "on",
-    "method"
+    "method",
+    "let",
+    "if",
+    "data",
+    "request"
    ],
    "writes": [
     {
@@ -21729,6 +21733,96 @@
      "id": "M21.X1132",
      "rung": "behavior",
      "defect": "The typed native value write is dropped and MVC receives the original day value."
+    },
+    {
+     "id": "M21.X1133",
+     "rung": "behavior",
+     "defect": "The channel review reads the input's role in place of its accessible label and reports switch."
+    },
+    {
+     "id": "M21.X1134",
+     "rung": "behavior",
+     "defect": "The wording review reads the input's role in place of its accessible label and reports switch."
+    },
+    {
+     "id": "M21.X1135",
+     "rung": "behavior",
+     "defect": "The decision review inverts the cancel read and reports the opposite approval."
+    },
+    {
+     "id": "M21.X1136",
+     "rung": "behavior",
+     "defect": "The review selects the enabled message for the prior unchecked state."
+    },
+    {
+     "id": "M21.X1137",
+     "rung": "behavior",
+     "defect": "The before-change review maps the dispatched event to the wrong activation source."
+    },
+    {
+     "id": "M21.X1138",
+     "rung": "behavior",
+     "defect": "The registered switch gathers a different boolean and the server saves the wrong preference."
+    },
+    {
+     "id": "M21.X1139",
+     "rung": "behavior",
+     "defect": "An assignment uses the activation method and raises Change."
+    },
+    {
+     "id": "M21.X1140",
+     "rung": "behavior",
+     "defect": "The review reads a different boolean and reports the wrong editing access."
+    },
+    {
+     "id": "M21.X1141",
+     "rung": "behavior",
+     "defect": "The review reads a different boolean and reports the wrong active layout."
+    },
+    {
+     "id": "M21.X1142",
+     "rung": "behavior",
+     "defect": "The review reads the wrong layout class and reports the other density."
+    },
+    {
+     "id": "M21.X1143",
+     "rung": "behavior",
+     "defect": "The wording review reads the label of the opposite checked state."
+    },
+    {
+     "id": "M21.X1144",
+     "rung": "behavior",
+     "defect": "Writing a nonempty default instead of clearing replaces the currently rendered wording."
+    },
+    {
+     "id": "M21.X1145",
+     "rung": "behavior",
+     "defect": "The review reads a stale routing value and displays the wrong desk."
+    },
+    {
+     "id": "M21.X1149",
+     "rung": "behavior",
+     "defect": "Binding pending changes in place of refreshing leaves the vendor's pagehide handler unattached."
+    },
+    {
+     "id": "M21.X1150",
+     "rung": "behavior",
+     "defect": "The storage review reports a different flag from the one the switch holds."
+    },
+    {
+     "id": "M21.X1151",
+     "rung": "behavior",
+     "defect": "The channel review checks for a different attribute and selects the wrong label source."
+    },
+    {
+     "id": "M21.X1152",
+     "rung": "behavior",
+     "defect": "The screen-reader review checks for a different attribute and selects the wrong label source."
+    },
+    {
+     "id": "M21.X1153",
+     "rung": "behavior",
+     "defect": "The activity review reads the wrong vendor category and reports Routing activity was not recorded."
     }
    ],
    "promises": [
@@ -21843,6 +21937,150 @@
      "outcome": "The server receipt reads Night desk selected.",
      "opposite": "Submitting the freshly opened default checked switch reads Day desk selected.",
      "defect": "The typed native value write is dropped and MVC receives the original day value."
+    },
+    {
+     "for": "M21.X1133",
+     "page": "The resident alert preferences review reads the native input reached through FusionSwitch.Element.",
+     "gesture": "Click Review alert channel on the enabled route.",
+     "outcome": "Channel review reads Night alert channel.",
+     "opposite": "The paused route reports Day alert channel through the same action.",
+     "defect": "The channel review reads the input's role in place of its accessible label and reports switch."
+    },
+    {
+     "for": "M21.X1134",
+     "page": "The resident alert preferences review reads the native input returned by FusionSwitch.GetRootElement().",
+     "gesture": "Click Check screen-reader wording on the enabled route.",
+     "outcome": "Screen-reader wording reads Night alert channel.",
+     "opposite": "The paused route reports Day alert channel through the same action.",
+     "defect": "The wording review reads the input's role in place of its accessible label and reports switch."
+    },
+    {
+     "for": "M21.X1135",
+     "page": "The resident alert preferences panel reviews FusionSwitch.BeforeChange.Cancel inside the decision handler.",
+     "gesture": "Click Apply panel choice on the ward-managed preference.",
+     "outcome": "Decision review reads Ward approval required.",
+     "opposite": "On a resident-owned preference the same action reports Resident can apply.",
+     "defect": "The decision review inverts the cancel read and reports the opposite approval."
+    },
+    {
+     "for": "M21.X1136",
+     "page": "The resident alert preferences panel reviews the previous checked state through FusionSwitch.BeforeChange.Checked.",
+     "gesture": "Click Keep alerts enabled on the paused replacement preference.",
+     "outcome": "Policy status reads Replacing paused setting.",
+     "opposite": "On an enabled replacement the same action reports Replacing enabled setting.",
+     "defect": "The review selects the enabled message for the prior unchecked state."
+    },
+    {
+     "for": "M21.X1137",
+     "page": "The resident alert preferences panel classifies the source using FusionSwitch.BeforeChange.OriginalEvent.",
+     "gesture": "Click Activate alert control on the paused start.",
+     "outcome": "The before-change review reads Control requested routing.",
+     "opposite": "Direct input activation reports Resident requested routing. Apply panel choice reports Panel requested routing.",
+     "defect": "The before-change review maps the dispatched event to the wrong activation source."
+    },
+    {
+     "for": "M21.X1138",
+     "page": "The resident alert preferences panel saves its registered FusionSwitch boolean to MVC.",
+     "gesture": "Enable the switch and click Save alert preferences.",
+     "outcome": "The server receipt reads Night alerts saved as enabled.",
+     "opposite": "After pausing the switch the server receipt reads Night alerts saved as paused.",
+     "defect": "The registered switch gathers a different boolean and the server saves the wrong preference."
+    },
+    {
+     "for": "M21.X1139",
+     "page": "The resident alert preferences panel can assign the FusionSwitch checked property and can activate the switch.",
+     "gesture": "Click Enable night alerts on an initially paused preference.",
+     "outcome": "The switch becomes checked and Change receipt reads No changes yet.",
+     "opposite": "Direct activation on a paused preference checks the switch and records Night alerts enabled.",
+     "defect": "An assignment uses the activation method and raises Change."
+    },
+    {
+     "for": "M21.X1140",
+     "page": "The resident alert preferences panel reviews the live FusionSwitch.Disabled state.",
+     "gesture": "Lock the switch and click Review only.",
+     "outcome": "Access review reads Locked for review.",
+     "opposite": "Unlock the switch and click Review only to read Editable.",
+     "defect": "The review reads a different boolean and reports the wrong editing access."
+    },
+    {
+     "for": "M21.X1141",
+     "page": "The resident alert preferences panel reviews the live FusionSwitch.EnableRtl state.",
+     "gesture": "Apply right-to-left layout and review the active layout.",
+     "outcome": "The review reads Right to left.",
+     "opposite": "Apply left-to-right layout and review Left to right.",
+     "defect": "The review reads a different boolean and reports the wrong active layout."
+    },
+    {
+     "for": "M21.X1142",
+     "page": "The resident alert preferences panel reviews the display density through FusionSwitch.CssClass.",
+     "gesture": "Apply compact display and click Review display density.",
+     "outcome": "The review reads Compact switch layout.",
+     "opposite": "Apply wide display and review Wide switch layout.",
+     "defect": "The review reads the wrong layout class and reports the other density."
+    },
+    {
+     "for": "M21.X1143",
+     "page": "The resident alert preferences panel reviews FusionSwitch.OnLabel or OffLabel according to the active state.",
+     "gesture": "Apply night display on the enabled preference and click Review active wording.",
+     "outcome": "The wording review reads Night dispatch on.",
+     "opposite": "On the paused preference the same review reads Night dispatch paused.",
+     "defect": "The wording review reads the label of the opposite checked state."
+    },
+    {
+     "for": "M21.X1144",
+     "page": "The resident alert preferences panel replaces both FusionSwitch label overrides with empty text.",
+     "gesture": "Apply night display and click Clear display wording on the enabled preference.",
+     "outcome": "The switch keeps displaying Night dispatch on and the settings review reads No wording override.",
+     "opposite": "The paused preference keeps displaying Night dispatch paused and the settings review reads No wording override.",
+     "defect": "Writing a nonempty default instead of clearing replaces the currently rendered wording."
+    },
+    {
+     "for": "M21.X1145",
+     "page": "The resident alert destination panel reviews the native destination through FusionSwitch.Value.",
+     "gesture": "Choose the night destination and click Review alert destination.",
+     "outcome": "The destination review reads Night desk.",
+     "opposite": "On the day destination the same review reads Day desk.",
+     "defect": "The review reads a stale routing value and displays the wrong desk."
+    },
+    {
+     "for": "M21.X1149",
+     "page": "The resident alert preferences panel lets staff opt in to FusionSwitch persistence in this browser.",
+     "gesture": "Choose Remember on this browser, enable night alerts, and open the saved preference.",
+     "outcome": "The reopened switch is checked although the server starts it paused.",
+     "opposite": "Using the server default and following the same link opens a paused switch.",
+     "defect": "Binding pending changes in place of refreshing leaves the vendor's pagehide handler unattached."
+    },
+    {
+     "for": "M21.X1150",
+     "page": "The resident alert preferences panel reviews the live FusionSwitch.EnablePersistence flag.",
+     "gesture": "Choose Remember on this browser and review the storage policy.",
+     "outcome": "Storage review reads Remembered here.",
+     "opposite": "Without opting in the review reads Use server default.",
+     "defect": "The storage review reports a different flag from the one the switch holds."
+    },
+    {
+     "for": "M21.X1151",
+     "page": "The resident alert preferences panel checks the label on the native input reached through FusionSwitch.Element.",
+     "gesture": "Click Review alert channel for a switch with a configured accessible label.",
+     "outcome": "The label-source review reads Uses custom wording.",
+     "opposite": "Without an explicit accessible label the same action reports Uses the field label.",
+     "defect": "The channel review checks for a different attribute and selects the wrong label source."
+    },
+    {
+     "for": "M21.X1152",
+     "page": "The resident alert preferences panel checks the label on the native input returned by FusionSwitch.GetRootElement().",
+     "gesture": "Click Check screen-reader wording for a switch with a configured accessible label.",
+     "outcome": "The wording-source review reads Uses custom wording.",
+     "opposite": "Without an explicit accessible label the same action reports Uses the field label.",
+     "defect": "The screen-reader review checks for a different attribute and selects the wrong label source."
+    },
+    {
+     "for": "M21.X1153",
+     "page": "The resident alert preferences panel recognizes the vendor category from FusionSwitch.Change.Name.",
+     "gesture": "Activate the labeled switch on the paused preference.",
+     "outcome": "The activity receipt reads Night alert activation recorded.",
+     "opposite": "Activating the labeled switch on the enabled preference reports Night alert pause recorded.",
+     "defect": "The activity review reads the wrong vendor category and reports Routing activity was not recorded."
     }
    ],
    "verdicts": [

@@ -542,17 +542,27 @@ Each name is gate 2's; each door is the capability it carries.
   (`@syncfusion/ej2-navigations/src/stepper/stepper.d.ts:158`, `:340`, `:346`, `:352`, `:358`, `:238`, `:244`, `:250`).
 - `M21.N46` kept: `FusionSwitch` binds `Checked` and commits the typed input by `Change` (M7.N3).
   Its live settings are `Disabled`, `CssClass`, `OnLabel`, `OffLabel`, `EnableRtl` and the native form
-  `Value`. `DataBind` applies settings in the same pipeline. `Toggle` calls the vendor's switch handler,
-  while `Click` activates its native input. `FocusIn` focuses the input and `Destroy` removes its switch
-  presentation. The synchronous `BeforeChange` payload carries the prior `Checked` and `Cancel`.
-  `Change` carries the committed `Checked` and the optional `OriginalEvent`; its `IsTrusted` distinguishes
-  direct activation from the panel's native click. The payload has no `IsInteracted`
-  (M21.X711, `probe:ej2-payload-switch-change`). M21.X1120 to M21.X1132 prove the live operations.
+  `Value`. `DataBind` applies settings in the same pipeline. Setting `Checked` and binding it updates the
+  switch without raising `Change`. `Toggle` calls the vendor's switch handler, while `Click` activates its
+  native input. `FocusIn` focuses the input and `Destroy` removes its switch presentation.
+  `Element` reaches the native input as a `ChildElement`, and `GetRootElement()` returns it on MVC through
+  the same DOM declaration. Both paths read an attribute's value and check whether the attribute is present.
+  `Refresh()` rebuilds the wrapper from the current settings.
+  Enabling `EnablePersistence` on a rendered switch and refreshing attaches the vendor's page-exit handler.
+  A later render with persistence enabled restores the checked state from the browser.
+  The synchronous `BeforeChange` payload carries the prior `Checked`, `Cancel` and the optional
+  `OriginalEvent`. `Change` carries the committed `Checked`, optional `OriginalEvent` and optional vendor
+  `Name`. The activity receipt reads that name from the actual notification.
+  The event's `IsTrusted` distinguishes direct activation from the panel's native click. The payload has no
+  `IsInteracted` (M21.X711, `probe:ej2-payload-switch-change`). M21.X1120–X1145 and M21.X1149–X1153 prove
+  the live operations on net10. The [coverage record](audit/switch-coverage.md) holds the exact proof and open variants.
   `field.FusionSwitch()` and `field.FusionSwitch(build => ..)` render the bound boolean for both hosts.
   It replaces main's six files (`Alis.Reactive.Fusion/Components/FusionSwitch/` at 623dd4a27).
-  Both NuGet hosts and the umbrella pin 33.1.47, whose installed Buttons package is 33.1.44
+  Both NuGet hosts and the umbrella pin 33.1.47. The installed Buttons package is 33.1.44
   (`@syncfusion/ej2-buttons/src/switch/switch.d.ts:32`, `:38`, `:51`, `:57`, `:64`, `:77`, `:83`,
   `:90`, `:117`, `:174`, `:184`, `:191`; `@syncfusion/ej2-buttons/src/common/common.d.ts:86-122`).
+  The installed Base package is 33.1.45 (`@syncfusion/ej2-base/src/component.d.ts:17`, `:26`, `:32`,
+  `:74`, `:81`, `:129`, `@syncfusion/ej2-base/src/event-handler.d.ts:69`).
 - `M21.N47` kept: `FusionTab`: `SelectedItem` as `Property<int>`, `Select(index)`, `HideTab(index, value)` and
   `Selected`; the payload `FusionTab.SelectEventArgs` (`SelectedIndex`, `PreviousIndex`, `IsSwiped`); and the render
   helper `Html.FusionTab(plan, elementId, build => ..)`, which returns the rendered component in place of main's

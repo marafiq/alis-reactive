@@ -128,12 +128,106 @@ The lead placed M21.X1120 through M21.X1132. The declaration and both manifests 
 
 The `operations-final.json` reconciles the declarations against the same six vendor shapes and retains unimplemented paths. Both public manifests were compiled with their own Release target. See `build-net10.0.log` and `build-net48.log`.
 
-### Remaining open variants
+## Phase three results
 
-- C11 persistence remains open, both the enable-and-refresh path and live disable. The vendor only attaches its pagehide listener on mount or refresh, and detaches it only while the flag remains true.
-- C13 shallow element and GetRootElement remain open. The public DOM-value carrier exists, but no placed Switch case uses it.
-- C15 whole-map HtmlAttributes remains open. Emission and the title effect need proof. Individual per-key updates have no typed member path, and arbitrary map writes can change field identity.
-- C17 Refresh remains open. A distinct wrapper rebuild effect needs proof beyond DataBind.
-- The shallow BeforeChange original event, Change payload name, Cancel read and prior Checked false receipt remain outside the placed cases. Direct native checkbox or keyboard cancellation remains open because the pinned vendor veto branch does not restore the input after native activation.
-- The live getters for Value, Disabled, CssClass, EnableRtl and both label properties lack their own named browser assertions. Empty label writes retain old rendered text in the pinned implementation and still need exact proof. The separate Reactive bool-gather path in C7 and a no-Change receipt after an assigned Checked stay open.
-- The owner excluded created for the whole Fusion family. The renderer and weak host plumbing exclusions in the inventory still apply.
+The build starts at 313bb54a9 on EJ2 umbrella and wrappers 33.1.47, Buttons 33.1.44, and
+Base 33.1.45. The complete source graph and operation-level manifest crosswalk are
+`operations.json` and `operations-final.json` in the `FusionSwitchContinuation` landing folder of the retained `.worktrees/fusion-switch-continuation` worktree. The two inventories
+carry 37 root names and 62 root operations across six reachable shapes including the root.
+The root and payload inventory above carries forward into this run. Reading the declaration, actual implementation and test at the
+same pin distinguishes presence, ability to author and ordinary browser effect.
+
+The feature paths and declarations at 75ce40417 are byte-identical at this base.
+The earlier M21.X1027 and M21.X1120–X1132 cases passed together at 313bb54a9.
+They still carry their original tests and 29 prior individual mutation results.
+
+| Promise | Checked typed operation and browser behavior |
+|---|---|
+| M21.X1133 | `FusionSwitch.Element`, declared by Component at component.d.ts:17 and found on the mounted Switch at switch.js:279–284, reads the real input's accessible wording through `ChildElement.GetAttribute`. The enabled and paused channels report exact Night and Day wording. |
+| M21.X1134 | `FusionSwitch.GetRootElement()`, component.d.ts:81 and component.js:152–159, makes the actual synchronous return and reads its input attribute through the same DOM holder. The two configured states give the same outcomes through this separate call site. |
+| M21.X1135 | `BeforeChangeEventArgs.Cancel` reads the decision written in the same event turn. The ward-confirmation and resident-owned cases show the actual veto decision. |
+| M21.X1136 | `BeforeChangeEventArgs.Checked` reads the prior false state as well as the prior true state proven earlier. Policy review distinguishes them before vendor applies the transition. |
+| M21.X1137 | `BeforeChangeEventArgs.OriginalEvent` makes the optional `event` DOM value available. Toggle has no event, browser-native `Click` has an untrusted event, and direct user activation has a trusted event. The three request-source receipts distinguish those paths. |
+| M21.X1138 | The registered `IInputComponent.Input` gathers `Checked` via the public `request.Input` mapping, submits it to MVC, and reads a world-owned saved preference. Opposite bools have distinct server receipts. |
+| M21.X1139 | A synchronous property assignment followed by `DataBind` changes the switch without a Change receipt. Direct activation reaches Change and produces one. |
+| M21.X1140 | `Disabled` reads the live editing lock after lock or unlock. The receipt is written by its own review action. |
+| M21.X1141 | `EnableRtl` reads the live direction after applying either layout. The review is separate from the CSS effect in M21.X1129. |
+| M21.X1142 | `CssClass` reads the live compact or wide class string after the corresponding action. |
+| M21.X1143 | `OnLabel` and `OffLabel` produce active wording from fresh enabled and paused switches after the live update. |
+| M21.X1144 | The setters give each label property an empty string while EJ2's truthy render guards preserve the last visible labels, switch.js:247–250 and 335–343. |
+| M21.X1145 | `Value` is the live native form string. Reviewing each current day or night destination reads it independently of the native submission in M21.X1132. |
+| M21.X1149 | `EnablePersistence.Set(true)` and `Refresh()` attach the vendor's `pagehide` handler. A real activation followed by ordinary navigation restores checked on a fresh render with persistence configured, using its registered native input ID. A separate browser context has the opposite result. |
+| M21.X1150 | `EnablePersistence` reads both true and false on the source page, before navigation. |
+| M21.X1151 | `Element.HasAttribute("aria-label")` distinguishes the actual presence of the override from ordinary field labeling. Absent override selects the same label applied to the input. |
+| M21.X1152 | The same existence decision runs on the native input returned by `GetRootElement()`. It has its own authoring path and plants. |
+| M21.X1153 | The optional `ChangeEventArgs.Name` classifies the actual vendor notification as routing activity. Activated and paused switches have distinct receipts. An absent or wrong category produces the activity refusal instead. |
+
+C13 uses `Alis.Reactive/Elements/Element.cs:205–215` for `ChildElement.GetAttribute`
+and `ChildElement.HasAttribute`. The declared Switch paths use `LiveObject<ChildElement>()`
+and `ReturnedObject<ChildElement>()`, respectively. The Vue and React host paths stay
+the vendor's own concerns described by its source.
+
+The original source inventory's exclusions still hold. EJ2 `created` is excluded by the
+owner across Fusion. The switch's MVC renderer builds and owns its input identity and its
+mount, and Fusion owns vendor subscription and release. Both shipped API manifests account
+for its declared Switch members.
+
+## Unsupported operation forms at this pin
+
+| Vendor contract and behavior | Checked typed path and open use |
+|---|---|
+| `BeforeChangeEventArgs.cancel?: boolean`, Buttons common.d.ts:114, is read by switch.js:92–96 before `changeState`. The cancelled branch leaves the native input alone. `click(): void` at switch.d.ts:184 calls the native input in switch.js:470–472. | `BeforeChange.Cancel.Set(true)` is proven for `Toggle()`. The vendor veto branch leaves the native checkbox in the state it has on entry. The present `OriginalEvent` exposes `IsTrusted`, and the underlying `Event.preventDefault(): void` would require a separately proved typed synchronous use. Native-click and keyboard veto parity remain open. |
+| Base component.d.ts:26 exposes `enablePersistence: boolean`. component.js:105–115 detaches only while the flag is true, :128–140 refreshes and attaches if true, :181–193 attaches and writes from `pagehide`, and :425–434 saves while the component lives. | `EnablePersistence.Set(false)` and `Refresh()` are expressible. Source shows that this changes the flag yet leaves the already attached callback active. A live remembered-to-server-default transition remains open. |
+| Buttons switch.d.ts:97–99 declares `htmlAttributes: { [key: string]: string }`. switch.js:344–373 applies keys to the wrapper or input. Its listed keys include `id`, `name` and `role`, which can rewrite the rendered input identity. | The candidate `Property<WrapperAttributes>` emitted only the projected title for a literal. Its source overload could accept another switch's typed property and forward the full live map. `Members.cs:82–87` calls `HeldForm.IntoLive`, which leaves the live expression intact at `HeldForm.cs:94–100`. The vendor would apply its identity-changing keys, contrary to D14.3. An indexed read such as `Read(map => map["title"])` is outside the member-expression path in `MemberPath.cs:86–99`. The owner skipped this live map surface. Render-time attributes remain under the existing host helper. |
+
+D11.3 holds synchronous calls and their returned values. D11.4 and
+`Run.tla:477 WritesAfterTheTurnAreRefused` govern the synchronous payload exchange.
+D14.3 and D17.13 govern input ID and render ownership. The save uses the landed request
+builder and a registered input. Its ordering follows the landed request lane.
+X1149 uses the vendor's pagehide contract and a real navigation in isolated browser contexts.
+
+Buttons common.d.ts:86 inherits the optional `name?: string` from Base event-handler.d.ts:65–69.
+The vendor writes the actual event name before calling listeners (Base observer.js:84–102).
+The pinned browser probe and X1153 agree on the active category `change`.
+
+The live map drafts M21.X1146–X1148 and their six mutation runs remain in the ignored build
+logs for diagnosis. The final evidence below omits them. X1149 proves the synchronous
+`Refresh()` call against `DataBind()` in the actual persistence lifecycle.
+
+
+## Proof runs
+
+Each row names the plant log and assertion line in the retained landing folder.
+
+| Promise | Source-local plants and failed assertion lines |
+|---|---|
+| M21.X1133 | `plant-primary-1133.log` at line 227, `plant-opposite-1133.log` at line 232, `plant-carrier-1133.log` at line 227 |
+| M21.X1134 | `plant-primary-1134.log` at line 242, `plant-opposite-1134.log` at line 247, `plant-carrier-1134.log` at line 242 |
+| M21.X1135 | `plant-primary-1135.log` at line 20, `plant-opposite-1135.log` at line 25 |
+| M21.X1136 | `plant-primary-1136.log` at line 35, `plant-opposite-1136.log` at line 40 |
+| M21.X1137 | `plant-primary-1137.log` at line 50, `plant-opposite-1137.log` at line 55, `plant-carrier-1137.log` at line 60 |
+| M21.X1138 | `plant-primary-1138.log` at line 71, `plant-opposite-1138.log` at line 79 |
+| M21.X1139 | `plant-primary-1139.log` at line 90, `plant-opposite-1139.log` at line 96 |
+| M21.X1140 | `plant-primary-1140.log` at line 107, `plant-opposite-1140.log` at line 113 |
+| M21.X1141 | `plant-primary-1141.log` at line 124, `plant-opposite-1141.log` at line 130 |
+| M21.X1142 | `plant-primary-1142.log` at line 141, `plant-opposite-1142.log` at line 147 |
+| M21.X1143 | `plant-primary-1143.log` at line 158, `plant-opposite-1143.log` at line 164 |
+| M21.X1144 | `plant-primary-1144.log` at line 175, `plant-opposite-1144.log` at line 176 |
+| M21.X1145 | `plant-primary-1145.log` at line 194, `plant-opposite-1145.log` at line 199 |
+| M21.X1149 | `plant-primary-1149.log` at line 22, `plant-opposite-1149.log` at line 28, `plant-carrier-1149.log` at line 22 |
+| M21.X1150 | `plant-primary-1150.log` at line 40, `plant-opposite-1150.log` at line 45 |
+| M21.X1151 | `plant-primary-1151.log` at line 257, `plant-opposite-1151.log` at line 263 |
+| M21.X1152 | `plant-primary-1152.log` at line 273, `plant-opposite-1152.log` at line 279 |
+| M21.X1153 | `plant-primary-1153.log` at line 209, `plant-opposite-1153.log` at line 214 |
+
+```text
+[playwright:result] M21.F46@net10 1/1: 16 selected, 16 ran, 14 passed, 2 failed, 0 over budget, slowest 3.66s Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenStaffConfigureNightAlerts("net10").channel_review_reads_the_live_switch_input_label
+[playwright:result] M21.F46@net10 1/1: 32 selected, 32 ran, 17 passed, 15 failed, 0 over budget, slowest 3.81s Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenStaffChooseBrowserAlertStorage("net10").an_opted_in_browser_remembers_the_switch_on_the_next_visit
+[playwright:result] WhenStaffConfigureNightAlerts@net10 1/1: 17 selected, 17 ran, 15 passed, 2 failed, 0 over budget, slowest 3.65s Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenStaffConfigureNightAlerts("net10").channel_review_reports_when_the_switch_uses_its_associated_field_label
+[playwright:result] M21_F46.M21_X1153_0@net10 1/1: 1 selected, 1 ran, 0 passed, 1 failed, 0 over budget, slowest 5.32s Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenStaffReviewNightAlertSettings("net10").the_routing_review_classifies_the_switchs_activation_and_pause
+[playwright:result] M21.F46@net10 1/1: 32 selected, 32 ran, 32 passed, 0 failed, 0 over budget, slowest 2.41s Alis.Reactive.Conformance.PlaywrightTests.FusionComponents.WhenASwitchIsRenderedForAMember("net10").the_switch_starts_on_or_off_as_the_member_holds
+```
+
+Both final Release targets succeed with zero warnings and errors.
+The final inventory reconciles 25 declared operations against both host manifests.
+MVC 5 browser behavior and TLC did not run in the builder lane.

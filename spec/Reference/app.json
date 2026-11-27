@@ -993,6 +993,11 @@
           "id": "alertSwitchEndpoint",
           "kind": "endpoint",
           "role": "posts the selected alert desk from the switch's native form value"
+        },
+        {
+          "id": "alertPreferencesSave",
+          "kind": "endpoint",
+          "role": "saves the registered night-alert preference"
         }
       ]
     },
@@ -12160,6 +12165,277 @@
       "parts": [
         "alertSwitch",
         "alertSwitchEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1133",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1134",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1135",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1136",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1137",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1138",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch",
+        "alertPreferencesSave"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1139",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1140",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1141",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1142",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1143",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1144",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1145",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1149",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1150",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1151",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1152",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1153",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "alertSwitch"
       ],
       "harness": [
         "seed"
