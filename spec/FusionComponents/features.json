@@ -6150,7 +6150,7 @@
   },
   {
    "id": "M21.F15",
-   "summary": "FusionDatePicker: one declaration of the Syncfusion DatePicker by its JavaScript names, value, focusIn, focusOut and change, each EJ2 33.1.47's public member; the payload of change; the input it is, generic over the member it binds, its value that member's own type, committed by change and sent as the core sends a DateTime or a DateTimeOffset; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value and its payload's typed by the bound member, nullable as EJ2 documents the value, and its payload nested under EJ2's interface name.",
+   "summary": "FusionDatePicker binds a nullable arrival date. Staff can choose, clear and file a date, apply entry and range rules, navigate Gregorian and Hijri calendars, and configure the live popup, keyboard shortcuts, date masks and printed format. The offset-bearing transport date reaches the booking action with the offset in force on that day. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder. The redesign uses one declaration, with its value and its payload's typed by the bound member, nullable as EJ2 documents the value, and its payload nested under EJ2's interface name.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionDatePicker",
@@ -6261,7 +6261,11 @@
     "call",
     "lit",
     "on",
-    "method"
+    "method",
+    "if",
+    "request",
+    "op",
+    "data"
    ],
    "writes": [
     {
@@ -6315,7 +6319,7 @@
     "Q3"
    ],
    "meanings": [],
-   "oracle": "Syncfusion EJ2 33.1.47's DatePicker as its TypeScript declares it (@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts, ChangedEventArgs in @syncfusion/ej2-calendars/src/calendar/calendar.d.ts), and the core's date wire form (spec/Core/DESIGN.md D3.8, D3.9), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "oracle": "Syncfusion ej2-calendars 33.1.44's DatePicker as its TypeScript declares it (@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts, ChangedEventArgs in @syncfusion/ej2-calendars/src/calendar/calendar.d.ts), and the core's date wire form (spec/Core/DESIGN.md D3.8, D3.9), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
    "checker": [
     "core:Q17",
     "core:Q5"
@@ -6335,6 +6339,356 @@
      "id": "M21.X1008",
      "rung": "behavior",
      "defect": "Both lines render the DatePicker by EJ2's DatePickerFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:74 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the DatePicker at the member's value, written by M21.D1; a helper that drops it shows an empty box, EJ2's value null (@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:83-87), though the member holds a date, against D17.13."
+    },
+    {
+     "id": "M21.X1700",
+     "rung": "behavior",
+     "defect": "Clear the confirmed date or retain it when the referral is released."
+    },
+    {
+     "id": "M21.X1701",
+     "rung": "behavior",
+     "defect": "Keep the correct month, time and offset but book July 13 or January 15 in place of the selected day."
+    },
+    {
+     "id": "M21.X1702",
+     "rung": "behavior",
+     "defect": "Classify a resident gesture as a referral assignment or classify a component write as a resident choice."
+    },
+    {
+     "id": "M21.X1703",
+     "rung": "behavior",
+     "defect": "Hide the calendar at the open action or show it at the return action."
+    },
+    {
+     "id": "M21.X1704",
+     "rung": "behavior",
+     "defect": "Allow the signed opening, or cancel the released opening."
+    },
+    {
+     "id": "M21.X1705",
+     "rung": "behavior",
+     "defect": "Permit dismissal on the held review, or cancel dismissal on the released review."
+    },
+    {
+     "id": "M21.X1706",
+     "rung": "behavior",
+     "defect": "Send focus to a different date, or keep focus when the interview finishes."
+    },
+    {
+     "id": "M21.X1707",
+     "rung": "behavior",
+     "defect": "Leave typing enabled on the calendar-only route, or disable it on the keyboard-entry route."
+    },
+    {
+     "id": "M21.X1708",
+     "rung": "behavior",
+     "defect": "Keep the editor enabled on the held intake, or disabled on the released intake."
+    },
+    {
+     "id": "M21.X1709",
+     "rung": "behavior",
+     "defect": "Leave the signed arrival writable or retain readonly on the reopened arrival."
+    },
+    {
+     "id": "M21.X1710",
+     "rung": "behavior",
+     "defect": "Disable opening on focus for assisted entry, or enable it for direct entry."
+    },
+    {
+     "id": "M21.X1711",
+     "rung": "behavior",
+     "defect": "Use the wrong earliest date, or the wrong latest date."
+    },
+    {
+     "id": "M21.X1712",
+     "rung": "behavior",
+     "defect": "Enable strict mode for review, or disable strict mode for enforcement."
+    },
+    {
+     "id": "M21.X1713",
+     "rung": "behavior",
+     "defect": "Set the forecast start or selection depth to Month, or retain Year when an exact day is required."
+    },
+    {
+     "id": "M21.X1714",
+     "rung": "behavior",
+     "defect": "Navigate to the wrong year or the wrong decade."
+    },
+    {
+     "id": "M21.X1715",
+     "rung": "behavior",
+     "defect": "Allow selection on the cleaning day or disable it after release."
+    },
+    {
+     "id": "M21.X1716",
+     "rung": "behavior",
+     "defect": "Use the letter format for the ledger, or retain the ledger format for the letter."
+    },
+    {
+     "id": "M21.X1717",
+     "rung": "behavior",
+     "defect": "Replace the full skeleton or retain it when staff restore the standard date format."
+    },
+    {
+     "id": "M21.X1718",
+     "rung": "behavior",
+     "defect": "Remove the imported pattern or keep it on an ordinary referral."
+    },
+    {
+     "id": "M21.X1719",
+     "rung": "behavior",
+     "defect": "Keep the clear control unavailable for withdrawal, or display it for the signed transfer."
+    },
+    {
+     "id": "M21.X1720",
+     "rung": "behavior",
+     "defect": "Use an explicit blank for the missing prompt, or use null for the deliberately blank prompt."
+    },
+    {
+     "id": "M21.X1721",
+     "rung": "behavior",
+     "defect": "Use automatic floating for the large card or pin the compact cue above the empty field."
+    },
+    {
+     "id": "M21.X1722",
+     "rung": "behavior",
+     "defect": "Start the nursing rota on Sunday or keep the wide Monday headings on the transport rota."
+    },
+    {
+     "id": "M21.X1723",
+     "rung": "behavior",
+     "defect": "Use FirstDay for the ISO roster or FirstFourDayWeek for the local roster."
+    },
+    {
+     "id": "M21.X1724",
+     "rung": "behavior",
+     "defect": "Remove the live-intake aids or retain them for historical transfer."
+    },
+    {
+     "id": "M21.X1725",
+     "rung": "behavior",
+     "defect": "Leave masking disabled for guided entry or enable it for the free-entry referral."
+    },
+    {
+     "id": "M21.X1726",
+     "rung": "behavior",
+     "defect": "Apply the full-sheet width to the compact anchor or the bedside direction to the full sheet."
+    },
+    {
+     "id": "M21.X1727",
+     "rung": "behavior",
+     "defect": "Skip the refresh that installs the page-exit handler or enable remembering on the clean desk."
+    },
+    {
+     "id": "M21.X1728",
+     "rung": "behavior",
+     "defect": "Archive the empty picker for the booked referral or the booked picker for the released referral."
+    },
+    {
+     "id": "M21.X1729",
+     "rung": "behavior",
+     "defect": "Keep the editor alive while closing or destroy it on the continuing route."
+    },
+    {
+     "id": "M21.X1730",
+     "rung": "behavior",
+     "defect": "Read the other field’s native attributes in the transport slip, or read the transport field in the return slip."
+    },
+    {
+     "id": "M21.X1731",
+     "rung": "behavior",
+     "defect": "Keep the default popup index on the protected transfer or assign the priority index on the ordinary desk."
+    },
+    {
+     "id": "M21.X1732",
+     "rung": "behavior",
+     "defect": "Omit the prevention call while confirmation is outstanding, or invoke it after confirmation."
+    },
+    {
+     "id": "M21.X1733",
+     "rung": "behavior",
+     "defect": "Ignore manual navigation or classify the programmatic jump as a manual move."
+    },
+    {
+     "id": "M21.X1734",
+     "rung": "behavior",
+     "defect": "Write resident settings into the ledger edition or retain ledger settings on the resident edition."
+    },
+    {
+     "id": "M21.X1735",
+     "rung": "behavior",
+     "defect": "Use the eastern offset on the west transfer or the western offset on the east transfer."
+    },
+    {
+     "id": "M21.X1736",
+     "rung": "behavior",
+     "defect": "Keep the default opening shortcut on the shared desk or retain its remapped keys on the standard desk."
+    },
+    {
+     "id": "M21.X1737",
+     "rung": "behavior",
+     "defect": "Retain Gregorian mode on the chaplaincy edition or Islamic mode on the bed desk."
+    },
+    {
+     "id": "M21.X1738",
+     "rung": "behavior",
+     "defect": "Omit the long input skeleton for correspondence or preserve it after the list is cleared."
+    },
+    {
+     "id": "M21.X1739",
+     "rung": "behavior",
+     "defect": "Use the facility hour on the transport stamp or the transport weekday on the facility stamp."
+    },
+    {
+     "id": "M21.X1740",
+     "rung": "behavior",
+     "defect": "Put the transport vocabulary into the saved nursing options or the nursing vocabulary into the transfer option builder."
+    },
+    {
+     "id": "M21.X1741",
+     "rung": "behavior",
+     "defect": "Skip installation before returning to the default, or install it on a clean workstation before selecting the day."
+    },
+    {
+     "id": "M21.X1742",
+     "rung": "behavior",
+     "defect": "Ignore the keyboard opening interaction or misclassify the command-driven closing notification."
+    },
+    {
+     "id": "M21.X1743",
+     "rung": "behavior",
+     "defect": "Open the calendar before the initial review or try to navigate on the unopened calendar."
+    },
+    {
+     "id": "M21.X1744",
+     "rung": "behavior",
+     "defect": "Keep the English locale on the French transfer or retain the French locale on the English edition."
+    },
+    {
+     "id": "M21.X1745",
+     "rung": "behavior",
+     "defect": "Give the first referral the Safar date or give the second the Muharram date."
+    },
+    {
+     "id": "M21.X1746",
+     "rung": "behavior",
+     "defect": "Give the earlier referral the next month or compare the later referral against its own month."
+    },
+    {
+     "id": "M21.X1747",
+     "rung": "behavior",
+     "defect": "Omit the Islamic requirement from the guided template or install the mask for a plain referral."
+    },
+    {
+     "id": "M21.X1748",
+     "rung": "behavior",
+     "defect": "Keep the seasonal lower limit or keep its upper limit after release."
+    },
+    {
+     "id": "M21.X1749",
+     "rung": "behavior",
+     "defect": "Use the standard helper in the transfer edition or apply the transfer format to the standard helper."
+    },
+    {
+     "id": "M21.X1750",
+     "rung": "behavior",
+     "defect": "Retain a fixed width when clearing the full-row override or clear the bedside width."
+    },
+    {
+     "id": "M21.X1751",
+     "rung": "behavior",
+     "defect": "Keep Tuesday after clearing the first weekday or replace the dispatch roster’s abbreviated headings with narrow headings."
+    },
+    {
+     "id": "M21.X1752",
+     "rung": "behavior",
+     "defect": "Put the left station at the right coordinate or give the right station the left station’s dimensions."
+    },
+    {
+     "id": "M21.X1753",
+     "rung": "behavior",
+     "defect": "Keep the quick popup on scroll or hide the retained review popup on scroll."
+    },
+    {
+     "id": "M21.X1754",
+     "rung": "behavior",
+     "defect": "Disable the saved assisted opening option or remove read-only protection from the signed transfer."
+    },
+    {
+     "id": "M21.X1755",
+     "rung": "behavior",
+     "defect": "Omit the transfer keyboard map or install imported formats for the ordinary desk."
+    },
+    {
+     "id": "M21.X1756",
+     "rung": "behavior",
+     "defect": "Apply the eastern offset in the west profile or the western offset in the east profile."
+    },
+    {
+     "id": "M21.X1757",
+     "rung": "behavior",
+     "defect": "Treat July 7 as inside the restricted range or classify the released date as outside it."
+    },
+    {
+     "id": "M21.X1758",
+     "rung": "behavior",
+     "defect": "Skip the pending review prevention call or prevent opening on the released referral."
+    },
+    {
+     "id": "M21.X1759",
+     "rung": "behavior",
+     "defect": "Replace the named horizontal alignment with a fixed left coordinate or replace the return referral’s vertical alignment with its top edge."
+    },
+    {
+     "id": "M21.X1760",
+     "rung": "behavior",
+     "defect": "Install repositioning for the fixed reference calendar or keep the following calendar pinned."
+    },
+    {
+     "id": "M21.X1761",
+     "rung": "behavior",
+     "defect": "Reverse the forward month command or use the forward command for the previous review."
+    },
+    {
+     "id": "M21.X1762",
+     "rung": "behavior",
+     "defect": "Fit the wrong horizontal axis on the paper register or keep the cross-desk calendar above its visible edge."
+    },
+    {
+     "id": "M21.X1763",
+     "rung": "behavior",
+     "defect": "Keep the bedside chooser aligned to the printed sheet or flip the print desk chooser away from its entry."
+    },
+    {
+     "id": "M21.X1764",
+     "rung": "behavior",
+     "defect": "Skip collision correction in the full review or fit the print review inside the screen."
+    },
+    {
+     "id": "M21.X1765",
+     "rung": "behavior",
+     "defect": "Leave the expanded review at its old margins or force the print review to fit inside the viewport."
+    },
+    {
+     "id": "M21.X1766",
+     "rung": "behavior",
+     "defect": "Keep the paused calendar following the register, fail to reattach the resumed calendar or open the register with tracking switched off."
+    },
+    {
+     "id": "M21.X1767",
+     "rung": "behavior",
+     "defect": "Read the document as the register or classify the ordinary booking sheet as a section."
+    },
+    {
+     "id": "M21.X1768",
+     "rung": "behavior",
+     "defect": "Open the family transport calendar without its original choice or forward that gesture to the office-arranged calendar."
+    },
+    {
+     "id": "M21.X1769",
+     "rung": "behavior",
+     "defect": "Close the family review without its original choice or pass the choice to the office review."
     }
    ],
    "promises": [
@@ -6345,6 +6699,566 @@
      "opposite": "A model whose ArrivesOn is null shows an empty box.",
      "defect": "The DatePicker is rendered with no starting value, so the box shows empty though the model holds 2026-07-14.",
      "for": "M21.X1008"
+    },
+    {
+     "for": "M21.X1700",
+     "page": "Staff record the resident’s scheduled arrival or release it to the waiting list.",
+     "gesture": "Apply the confirmed referral and file the arrival.",
+     "outcome": "The date field shows 2026-07-14 and the server files Arrival booked for 14 July 2026.",
+     "opposite": "Releasing the same referral empties the date and the server files Waiting list without an arrival day.",
+     "defect": "Clear the confirmed date or retain it when the referral is released."
+    },
+    {
+     "for": "M21.X1701",
+     "page": "The transport desk receives the booked arrival instant in the browser’s timezone.",
+     "gesture": "File the summer New York transport arrival.",
+     "outcome": "The server issues Transport booked for 14 July 2026 00:00 -04:00.",
+     "opposite": "Filing the January arrival issues Transport booked for 14 January 2026 00:00 -05:00.",
+     "defect": "Keep the correct month, time and offset but book July 13 or January 15 in place of the selected day."
+    },
+    {
+     "for": "M21.X1702",
+     "page": "The admission desk distinguishes a resident’s chosen day from an assignment made from the referral.",
+     "gesture": "Choose July 16 in the resident’s calendar.",
+     "outcome": "Placement history reads Resident chose 16 July.",
+     "opposite": "Applying the July 16 referral reads Referral assigned 16 July.",
+     "defect": "Classify a resident gesture as a referral assignment or classify a component write as a resident choice."
+    },
+    {
+     "for": "M21.X1703",
+     "page": "Staff open or close the arrival calendar from their scheduling desk.",
+     "gesture": "Open the arrival calendar from the desk.",
+     "outcome": "The date field expands and exposes July 2026.",
+     "opposite": "Opening it and returning to the admission form closes the calendar and keeps its original July 14 value.",
+     "defect": "Hide the calendar at the open action or show it at the return action."
+    },
+    {
+     "for": "M21.X1704",
+     "page": "A signed admission freezes access to its calendar until the arrival is released.",
+     "gesture": "Try opening the signed admission calendar.",
+     "outcome": "The signed admission has no visible calendar and calendar access reads Signed arrival locked.",
+     "opposite": "Opening the released admission expands the calendar and access reads Arrival calendar available.",
+     "defect": "Allow the signed opening, or cancel the released opening."
+    },
+    {
+     "for": "M21.X1705",
+     "page": "A resident reviewing the available dates keeps the calendar open while preparing a choice.",
+     "gesture": "Open the calendar and request dismissal while the review is held.",
+     "outcome": "The calendar remains expanded and the close receipt reads Continue reviewing dates.",
+     "opposite": "Dismissing the released review collapses the calendar and the receipt reads Date review finished.",
+     "defect": "Permit dismissal on the held review, or cancel dismissal on the released review."
+    },
+    {
+     "for": "M21.X1706",
+     "page": "Staff can begin an arrival interview in the date field and finish it after the review.",
+     "gesture": "Begin the arrival interview at the desk.",
+     "outcome": "The date field has keyboard focus and the interview reads Editing the arrival date.",
+     "opposite": "Beginning and finishing the interview takes focus away and the interview reads Arrival editing finished.",
+     "defect": "Send focus to a different date, or keep focus when the interview finishes."
+    },
+    {
+     "for": "M21.X1707",
+     "page": "The desk can accept typed referral dates or restrict admission staff to calendar choices.",
+     "gesture": "Apply calendar-only entry and open the choice list.",
+     "outcome": "The native input is readonly, the calendar opens and the instruction reads Choose an available day.",
+     "opposite": "Applying keyboard entry allows typing and the instruction reads Enter a referral date.",
+     "defect": "Leave typing enabled on the calendar-only route, or disable it on the keyboard-entry route."
+    },
+    {
+     "for": "M21.X1708",
+     "page": "An unavailable referral disables the date editor, while a released referral accepts an appointment.",
+     "gesture": "Apply the intake hold and try to open the date editor.",
+     "outcome": "The date editor is disabled, remains collapsed and the booking reads Intake on hold.",
+     "opposite": "Releasing the intake enables and opens the editor and the booking reads Ready to schedule.",
+     "defect": "Keep the editor enabled on the held intake, or disabled on the released intake."
+    },
+    {
+     "for": "M21.X1709",
+     "page": "A signed arrival remains readable and a reopened arrival becomes editable.",
+     "gesture": "Protect the signed arrival and try to open its calendar.",
+     "outcome": "The input is readonly, stays collapsed and the status reads Signed arrival.",
+     "opposite": "Reopening the arrival permits editing and opens its calendar, with status Arrival reopened.",
+     "defect": "Leave the signed arrival writable or retain readonly on the reopened arrival."
+    },
+    {
+     "for": "M21.X1710",
+     "page": "The admissions desk chooses whether the calendar opens as soon as the date field receives focus.",
+     "gesture": "Apply assisted entry and focus the date field.",
+     "outcome": "Focusing opens the calendar for assisted entry.",
+     "opposite": "Applying direct entry and focusing the field leaves it collapsed with the keyboard ready.",
+     "defect": "Disable opening on focus for assisted entry, or enable it for direct entry."
+    },
+    {
+     "for": "M21.X1711",
+     "page": "The arrival window can enforce the earliest and latest dates approved by the placement office.",
+     "gesture": "Apply the lower admission bound and commit a date before the window.",
+     "outcome": "Strict entry corrects the field to the approved first day, 2026-07-10.",
+     "opposite": "Committing a date after the upper bound corrects it to the approved last day, 2026-07-20.",
+     "defect": "Use the wrong earliest date, or the wrong latest date."
+    },
+    {
+     "for": "M21.X1712",
+     "page": "The scheduling desk can retain an out-of-window request for review or clamp it to the approved admission window.",
+     "gesture": "Apply review entry and commit an out-of-window July 25 request.",
+     "outcome": "The original 2026-07-25 remains visible for clinical review.",
+     "opposite": "Applying enforced entry changes the same request to 2026-07-20.",
+     "defect": "Enable strict mode for review, or disable strict mode for enforcement."
+    },
+    {
+     "for": "M21.X1713",
+     "page": "Staff book by exact date for transfers or by admission month for a planning forecast.",
+     "gesture": "Open a month-level forecast and review its calendar.",
+     "outcome": "The calendar offers July as a month, and the scope reads Choose an admission month.",
+     "opposite": "Opening the exact-day plan displays July dates and the scope reads Choose an arrival day.",
+     "defect": "Set the forecast start or selection depth to Month, or retain Year when an exact day is required."
+    },
+    {
+     "for": "M21.X1714",
+     "page": "Admission planners can jump directly to the annual or decade allocation calendar.",
+     "gesture": "Open the calendar and jump to the 2028 planning year.",
+     "outcome": "The title reads 2028 and planning scope reads Annual allocation 2028.",
+     "opposite": "Jumping to the 2030s displays 2030 - 2039 and Decade allocation 2030.",
+     "defect": "Navigate to the wrong year or the wrong decade."
+    },
+    {
+     "for": "M21.X1715",
+     "page": "The admitting unit can close an individual day for cleaning, while an available day can still be selected.",
+     "gesture": "Open July and review the cleaning day on July 16.",
+     "outcome": "Day 16 is marked unavailable and the day notice reads Closed for cleaning.",
+     "opposite": "In the released calendar, choosing day 16 commits 2026-07-16 and the day notice reads Beds released.",
+     "defect": "Allow selection on the cleaning day or disable it after release."
+    },
+    {
+     "for": "M21.X1716",
+     "page": "A date can appear on a staff transfer slip as a ledger date or a resident-facing long date.",
+     "gesture": "Apply the printed ledger format.",
+     "outcome": "The editor displays 14.07.2026.",
+     "opposite": "Applying the resident letter format displays July 14, 2026.",
+     "defect": "Use the letter format for the ledger, or retain the ledger format for the letter."
+    },
+    {
+     "for": "M21.X1717",
+     "page": "Resident correspondence can use the culture’s long date pattern or return to the local short date.",
+     "gesture": "Apply the full correspondence date.",
+     "outcome": "The editor displays Tuesday, July 14, 2026.",
+     "opposite": "Restoring the standard date displays 7/14/2026.",
+     "defect": "Replace the full skeleton or retain it when staff restore the standard date format."
+    },
+    {
+     "for": "M21.X1718",
+     "page": "Imported referrals accept their contracted date notation while ordinary referrals keep the normal intake notation.",
+     "gesture": "Apply the European referral profile and enter 23.07.2026.",
+     "outcome": "After leaving the field the editor displays 2026-07-23.",
+     "opposite": "Under the ordinary profile the same incoming notation cannot replace the previous 2026-07-14 booking.",
+     "defect": "Remove the imported pattern or keep it on an ordinary referral."
+    },
+    {
+     "for": "M21.X1719",
+     "page": "An optional arrival can be withdrawn by its clear control while a signed transfer retains its date.",
+     "gesture": "Permit withdrawal, focus the date and use its clear control.",
+     "outcome": "The field empties and the withdrawal receipt reads Arrival withdrawn by staff.",
+     "opposite": "Protecting the transfer removes its clear control and the original date remains.",
+     "defect": "Keep the clear control unavailable for withdrawal, or display it for the signed transfer."
+    },
+    {
+     "for": "M21.X1720",
+     "page": "The resident’s printed arrival instruction distinguishes a missing prompt from an explicitly blank prompt.",
+     "gesture": "Use the chart instructions on an empty arrival field.",
+     "outcome": "Its placeholder is absent and the instruction reads Follow the resident chart.",
+     "opposite": "Suppressing the printed hint leaves the native placeholder absent and the instruction reads Ask the admission nurse.",
+     "defect": "Use an explicit blank for the missing prompt, or use null for the deliberately blank prompt."
+    },
+    {
+     "for": "M21.X1721",
+     "page": "A large-print arrival card keeps the day cue above its empty field and the compact card raises it on focus.",
+     "gesture": "Apply the large-print card to the empty date field.",
+     "outcome": "The floating Arrival day cue stays at the top and the card reads Large-print date entry.",
+     "opposite": "In compact entry the cue starts below, rises when focused, and the card reads Compact date entry.",
+     "defect": "Use automatic floating for the large card or pin the compact cue above the empty field."
+    },
+    {
+     "for": "M21.X1722",
+     "page": "Nursing and transport calendars can begin the week on different days and use different weekday headings.",
+     "gesture": "Open the nursing rota with full names and Monday as its first day.",
+     "outcome": "Its first weekday header is Monday.",
+     "opposite": "The transport rota begins with Su.",
+     "defect": "Start the nursing rota on Sunday or keep the wide Monday headings on the transport rota."
+    },
+    {
+     "for": "M21.X1723",
+     "page": "An annual arrival rota can show ISO week numbers or the first-day reporting convention.",
+     "gesture": "Open the 2021 new-year roster with the four-day week rule.",
+     "outcome": "The first numbered January row is 53.",
+     "opposite": "Under the first-day reporting rule the same row is numbered 1.",
+     "defect": "Use FirstDay for the ISO roster or FirstFourDayWeek for the local roster."
+    },
+    {
+     "for": "M21.X1724",
+     "page": "Staff opening a same-day intake see Today and a numbered rota, while a historical transfer omits both aids.",
+     "gesture": "Open the same-day intake calendar.",
+     "outcome": "Today is available and the first week includes its week-number cell.",
+     "opposite": "The historical calendar has seven day cells in the first week and has no Today button.",
+     "defect": "Remove the live-intake aids or retain them for historical transfer."
+    },
+    {
+     "for": "M21.X1725",
+     "page": "Guided date entry can name the local day, month and year segments while an unmasked referral stays blank.",
+     "gesture": "Apply the guided arrival form and focus its empty date field.",
+     "outcome": "The empty field displays arrival month / arrival day / admission year.",
+     "opposite": "Opening the free-entry referral leaves the empty date field blank.",
+     "defect": "Leave masking disabled for guided entry or enable it for the free-entry referral."
+    },
+    {
+     "for": "M21.X1726",
+     "page": "The calendar’s popup follows the width and reading direction of the paper admission form.",
+     "gesture": "Apply the compact bedside paper layout and open its calendar.",
+     "outcome": "The layout slip reports Narrow bedside calendar and the popup carries the bedside style.",
+     "opposite": "The full sheet reports Full admission calendar and uses its full-sheet style.",
+     "defect": "Apply the full-sheet width to the compact anchor or the bedside direction to the full sheet."
+    },
+    {
+     "for": "M21.X1727",
+     "page": "The desk can remember an arrival date for the next visit on its own workstation.",
+     "gesture": "Save the arrival draft on a remembering desk and open the next visit.",
+     "outcome": "The next visit restores the independently selected date 2026-07-16.",
+     "opposite": "Using the fresh-visit policy on a clean workstation opens with the referral’s 2026-07-14 default.",
+     "defect": "Skip the refresh that installs the page-exit handler or enable remembering on the clean desk."
+    },
+    {
+     "for": "M21.X1728",
+     "page": "An arrival draft can be archived with its vendor recovery data, independently of whether a workstation persists it.",
+     "gesture": "Archive the date from the booked referral.",
+     "outcome": "The archive receipt identifies 14 July 2026.",
+     "opposite": "Archiving a released referral records No scheduled date in the archive.",
+     "defect": "Archive the empty picker for the booked referral or the booked picker for the released referral."
+    },
+    {
+     "for": "M21.X1729",
+     "page": "Closing the referral date editor releases the native input and records completion of its lifecycle.",
+     "gesture": "Close the arrival editor.",
+     "outcome": "The original field becomes an ordinary textbox and the record reads Arrival editor closed.",
+     "opposite": "Keeping the referral open retains its combobox and the record reads Arrival editor in service.",
+     "defect": "Keep the editor alive while closing or destroy it on the continuing route."
+    },
+    {
+     "for": "M21.X1730",
+     "page": "A booking slip can read the actual bound name and native value of the date field the desk is filing.",
+     "gesture": "Preview the transport arrival slip.",
+     "outcome": "The slip identifies the transport field and shows July 14 as the booked date.",
+     "opposite": "The referral slip identifies the separately bound return field and shows July 20.",
+     "defect": "Read the other field’s native attributes in the transport slip, or read the transport field in the return slip."
+    },
+    {
+     "for": "M21.X1731",
+     "page": "A ward can open a calendar at its standard popup layer or above a high-priority admission overlay.",
+     "gesture": "Open the protected transfer schedule over the handover overlay.",
+     "outcome": "The active calendar reports Priority overlay and accepts the July 16 selection.",
+     "opposite": "The ordinary desk uses its standard layer and reports Standard desk calendar.",
+     "defect": "Keep the default popup index on the protected transfer or assign the priority index on the ordinary desk."
+    },
+    {
+     "for": "M21.X1732",
+     "page": "A calendar review can defer dismissal through the vendor’s own prevention function before the popup acts.",
+     "gesture": "Request dismissal while a handover date still awaits confirmation.",
+     "outcome": "The calendar remains visible and review reads Handover confirmation required.",
+     "opposite": "Finishing the confirmation permits dismissal and review reads Calendar released.",
+     "defect": "Omit the prevention call while confirmation is outstanding, or invoke it after confirmation."
+    },
+    {
+     "for": "M21.X1733",
+     "page": "Navigation events distinguish paging an open July calendar by hand from jumping to the requested allocation date.",
+     "gesture": "Advance July to August using the calendar’s next-month control.",
+     "outcome": "The allocation note reads Staff opened August 2026.",
+     "opposite": "Using the scheduling shortcut records Desk opened December 2027.",
+     "defect": "Ignore manual navigation or classify the programmatic jump as a manual move."
+    },
+    {
+     "for": "M21.X1734",
+     "page": "A saved arrival form carries its initial culture, prompt, entry profile and date-display options to the resident’s sheet.",
+     "gesture": "Open the saved ledger edition of the referral.",
+     "outcome": "The existing date uses ledger formatting and the saved entry instruction is displayed.",
+     "opposite": "Opening the resident edition displays the full date with its distinct prompt and reporting convention.",
+     "defect": "Write resident settings into the ledger edition or retain ledger settings on the resident edition."
+    },
+    {
+     "for": "M21.X1735",
+     "page": "Arrival clerks can reconcile a prior evening transfer across the submitting unit’s time zone.",
+     "gesture": "Apply the western transfer offset and rebuild the intake editor in UTC.",
+     "outcome": "The corrected date shows 2026-07-13.",
+     "opposite": "Applying the eastern transfer offset leaves the handover on 2026-07-14.",
+     "defect": "Use the eastern offset on the west transfer or the western offset on the east transfer."
+    },
+    {
+     "for": "M21.X1736",
+     "page": "The booking station can publish different calendar shortcuts for its shared and dedicated keyboards.",
+     "gesture": "Install the shared-station shortcut and press F2 in the arrival field.",
+     "outcome": "The arrival calendar opens and F3 dismisses it.",
+     "opposite": "Using the standard keyboard leaves F2 inactive and Alt+Down opens the calendar.",
+     "defect": "Keep the default opening shortcut on the shared desk or retain its remapped keys on the standard desk."
+    },
+    {
+     "for": "M21.X1737",
+     "page": "Chaplaincy can review an admission in its Islamic calendar and the bed desk in its Gregorian calendar.",
+     "gesture": "Open the chaplaincy edition and review the displayed calendar.",
+     "outcome": "The date uses the Islamic year 1448 and the schedule identifies the chaplaincy calendar.",
+     "opposite": "The bed desk shows year 2026 and identifies its Gregorian calendar.",
+     "defect": "Retain Gregorian mode on the chaplaincy edition or Islamic mode on the bed desk."
+    },
+    {
+     "for": "M21.X1738",
+     "page": "Correspondence referrals can recognize a culture-resolved written date while ordinary intake retains the booked date.",
+     "gesture": "Accept written referral dates and type July 23, 2026 into the ISO editor.",
+     "outcome": "On leaving the field the canonical date is 2026-07-23.",
+     "opposite": "With the written-date list cleared, the same text keeps the existing 2026-07-14 booking.",
+     "defect": "Omit the long input skeleton for correspondence or preserve it after the list is cleared."
+    },
+    {
+     "for": "M21.X1739",
+     "page": "A transport transcription sheet can guide all parts of a timed handover stamp.",
+     "gesture": "Choose transport vocabulary and focus the empty stamp.",
+     "outcome": "The stamp names the transfer weekday, month, day, year, hour, minute and second.",
+     "opposite": "Choosing the facility vocabulary presents its own labels and the staff guide identifies the corresponding stamp.",
+     "defect": "Use the facility hour on the transport stamp or the transport weekday on the facility stamp."
+    },
+    {
+     "for": "M21.X1740",
+     "page": "A saved appointment slip can render the unit’s mask vocabulary from its saved template.",
+     "gesture": "Open the nursing template and focus its empty arrival field.",
+     "outcome": "The date prompt reads nursing month / nursing day / nursing year.",
+     "opposite": "The transport template reads transfer month / transfer day / transfer year.",
+     "defect": "Put the transport vocabulary into the saved nursing options or the nursing vocabulary into the transfer option builder."
+    },
+    {
+     "for": "M21.X1741",
+     "page": "A workstation that has already installed draft recovery keeps the selected day when the operator returns to its default preference.",
+     "gesture": "Turn on draft recovery, choose the default setting again, select July 16, then open the next visit.",
+     "outcome": "The setting reads Default requested and the next visit still restores 2026-07-16.",
+     "opposite": "On a clean workstation that has used only the default, the next visit opens with the referral’s original 2026-07-14.",
+     "defect": "Skip installation before returning to the default, or install it on a clean workstation before selecting the day."
+    },
+    {
+     "for": "M21.X1742",
+     "page": "The arrival desk can distinguish a keyboard calendar review from a scheduling command.",
+     "gesture": "Open and close the date with its keyboard shortcuts.",
+     "outcome": "The review reports Keyboard calendar opened and Keyboard review finished.",
+     "opposite": "The scheduling commands open and close the calendar and report Desk calendar opened and Desk review finished.",
+     "defect": "Ignore the keyboard opening interaction or misclassify the command-driven closing notification."
+    },
+    {
+     "for": "M21.X1743",
+     "page": "An allocation note can be prepared before the first calendar opens or from the actual period displayed.",
+     "gesture": "Prepare a period note before the date has been opened.",
+     "outcome": "The note asks the clerk to open the calendar and no popup is visible.",
+     "opposite": "Opening the planning calendar and moving to the target period displays December 2027 and the note names the monthly view.",
+     "defect": "Open the calendar before the initial review or try to navigate on the unopened calendar."
+    },
+    {
+     "for": "M21.X1744",
+     "page": "The referral dispatch slip follows the language selected on the resident’s date editor.",
+     "gesture": "Select the French receiving desk and print its dispatch slip.",
+     "outcome": "The date stays booked and the slip reads Date d’admission.",
+     "opposite": "The English receiving desk prints Admission date and preserves the same booking.",
+     "defect": "Keep the English locale on the French transfer or retain the French locale on the English edition."
+    },
+    {
+     "for": "M21.X1745",
+     "page": "A chaplaincy referral in the Hijri calendar can be converted for the bed-coordination desk.",
+     "gesture": "Book 29 Muharram 1448 from the chaplaincy referral.",
+     "outcome": "The ordinary bed slip records 14 July 2026 and the checked Hijri day is 29.",
+     "opposite": "Booking 2 Safar 1448 produces 16 July 2026 and the checked Hijri day is 2.",
+     "defect": "Give the first referral the Safar date or give the second the Muharram date."
+    },
+    {
+     "for": "M21.X1746",
+     "page": "A chaplain can classify a transfer by its actual Hijri calendar month and allocation year.",
+     "gesture": "Review the earlier July referral against the Muharram allocation.",
+     "outcome": "The scheduling note releases the referral inside the current month and allocation year.",
+     "opposite": "A subsequent Safar referral is queued for the following month while remaining in the same allocation year.",
+     "defect": "Give the earlier referral the next month or compare the later referral against its own month."
+    },
+    {
+     "for": "M21.X1747",
+     "page": "The desk prepares different entry instructions for a masked chaplaincy referral and a plain Gregorian referral.",
+     "gesture": "Configure the calendaring and masking required by the chaplaincy template and print the entry instructions.",
+     "outcome": "Instructions request the guided Hijri date.",
+     "opposite": "A plain Gregorian template gives the ordinary date-entry instructions.",
+     "defect": "Omit the Islamic requirement from the guided template or install the mask for a plain referral."
+    },
+    {
+     "for": "M21.X1748",
+     "page": "A closed admissions season can restore either of the editor’s default date limits.",
+     "gesture": "Release the lower limit and enter an archival referral from 1880.",
+     "outcome": "The strict editor corrects the date to the restored lower limit, 1900-01-01.",
+     "opposite": "Releasing the upper limit and entering a transfer in 2200 corrects it to 2099-12-31.",
+     "defect": "Keep the seasonal lower limit or keep its upper limit after release."
+    },
+    {
+     "for": "M21.X1749",
+     "page": "A standard admission slip can use the unconfigured picker, while its transfer edition carries a labelled field and a printed entry format.",
+     "gesture": "Open the printed transfer edition and file its booking.",
+     "outcome": "The labelled field shows 14.07.2026, carries its transfer instruction and the filing receipt identifies the transfer date.",
+     "opposite": "Opening the standard edition shows 7/14/2026, and filing it records the ordinary admission.",
+     "defect": "Use the standard helper in the transfer edition or apply the transfer format to the standard helper."
+    },
+    {
+     "for": "M21.X1750",
+     "page": "A saved request validates the calendar location before it prints its paper layout.",
+     "gesture": "Choose the full-row layout and clear the width override.",
+     "outcome": "The open calendar’s sheet uses the full available width and the print instruction selects a full row.",
+     "opposite": "Leaving a fixed 180-pixel width uses the bedside print instruction.",
+     "defect": "Retain a fixed width when clearing the full-row override or clear the bedside width."
+    },
+    {
+     "for": "M21.X1751",
+     "page": "A ward can restore the culture’s first weekday or choose its own reporting day and heading length.",
+     "gesture": "Open the new-year roster with the local first weekday and the first-full-week rule.",
+     "outcome": "The first narrow weekday is S and the first numbered week is 52.",
+     "opposite": "The Tuesday-start dispatch roster uses Tue and the first-day reporting week is 1.",
+     "defect": "Keep Tuesday after clearing the first weekday or replace the dispatch roster’s abbreviated headings with narrow headings."
+    },
+    {
+     "for": "M21.X1752",
+     "page": "The desk can place a large-print calendar on either side of a two-column admission board.",
+     "gesture": "Open the left-hand reading station on the board.",
+     "outcome": "Its dialog uses the left station’s designated position and dimensions, and selecting July 16 books the day.",
+     "opposite": "The right-hand station uses its own position, dimensions and reading direction and also accepts a real booking.",
+     "defect": "Put the left station at the right coordinate or give the right station the left station’s dimensions."
+    },
+    {
+     "for": "M21.X1753",
+     "page": "A scrolling admissions register can retain its active calendar or dismiss it when staff move to another record.",
+     "gesture": "Book a July day on the quick calendar, reopen it and follow the next transfer round link inside the register.",
+     "outcome": "At the end of the transfer round the return link appears, the quick calendar closes and the July 16 booking is retained.",
+     "opposite": "At the end of the retained review register the return link appears and the open calendar accepts July 16.",
+     "defect": "Keep the quick popup on scroll or hide the retained review popup on scroll."
+    },
+    {
+     "for": "M21.X1754",
+     "page": "A saved intake profile can begin in calendar-assisted entry while a signed transfer opens as a protected field.",
+     "gesture": "Open the assisted intake and focus its saved date.",
+     "outcome": "The configured year calendar opens with Jul available, and the clear control is present.",
+     "opposite": "The signed transfer presents its protected date without opening a calendar or offering the clear control.",
+     "defect": "Disable the saved assisted opening option or remove read-only protection from the signed transfer."
+    },
+    {
+     "for": "M21.X1755",
+     "page": "The transfer unit’s saved entry profile can install its keyboard and incoming date notation at construction.",
+     "gesture": "Open the saved transfer desk, use its opening shortcut and enter 23.07.2026.",
+     "outcome": "The transfer desk opens its calendar on F2 and files the canonical date 2026-07-23.",
+     "opposite": "At the ordinary desk F2 leaves the calendar closed and this notation preserves the previous booking.",
+     "defect": "Omit the transfer keyboard map or install imported formats for the ordinary desk."
+    },
+    {
+     "for": "M21.X1756",
+     "page": "A saved source timezone reconciles a transferred referral when its editor first opens.",
+     "gesture": "Open the west-unit transfer and review the arrival.",
+     "outcome": "The saved west-unit offset shows 13 July in its date editor.",
+     "opposite": "The east-unit offset keeps the date on 14 July.",
+     "defect": "Apply the eastern offset in the west profile or the western offset in the east profile."
+    },
+    {
+     "for": "M21.X1757",
+     "page": "The admitting unit can tell a family why a date is outside its available booking window.",
+     "gesture": "Open the restricted July calendar and review July 7.",
+     "outcome": "July 7 is unavailable and the family notice explains that it precedes the approved admission window.",
+     "opposite": "Under the released window July 7 can be selected and the family notice confirms it is within the window.",
+     "defect": "Treat July 7 as inside the restricted range or classify the released date as outside it."
+    },
+    {
+     "for": "M21.X1758",
+     "page": "Resident handover can stop the calendar before it opens until its privacy review has been cleared.",
+     "gesture": "Open the calendar on a referral still awaiting privacy review.",
+     "outcome": "The review tells the clerk to finish privacy clearance and the popup stays closed.",
+     "opposite": "On the released referral the calendar opens and July 16 can be booked.",
+     "defect": "Skip the pending review prevention call or prevent opening on the released referral."
+    },
+    {
+     "for": "M21.X1759",
+     "page": "A calendar can align one axis with the admission field and place the other at a designated board coordinate.",
+     "gesture": "Open the referral calendar centered on the field at the handover row.",
+     "outcome": "The chooser opens at the fixed handover row with its horizontal offset applied and July 16 can be booked.",
+     "opposite": "The return referral uses a fixed column below the field with its vertical offset applied and July 16 can be booked.",
+     "defect": "Replace the named horizontal alignment with a fixed left coordinate or replace the return referral’s vertical alignment with its top edge."
+    },
+    {
+     "for": "M21.X1760",
+     "page": "An admissions register can pin a reference calendar or let the calendar follow the booking field as the register moves.",
+     "gesture": "Follow the next arrival link inside the register with its reference calendar open.",
+     "outcome": "When the register reaches the next arrival and its return link appears, the reference chooser keeps its original position and accepts July 16.",
+     "opposite": "At that same end of the register, the following chooser moves to the relocated field and accepts July 16.",
+     "defect": "Install repositioning for the fixed reference calendar or keep the following calendar pinned."
+    },
+    {
+     "for": "M21.X1761",
+     "page": "The chaplaincy can move a Hijri review forward or backward at its displayed calendar level.",
+     "gesture": "Advance the chaplaincy calendar from Muharram at the month, annual and decade allocation levels.",
+     "outcome": "The calendar shows Safar 1448, then 1449 and the 1451–1460 planning decade in their respective reviews.",
+     "opposite": "Moving backward shows Dhuʻl-Hijjah 1447, year 1447 and the preceding 1431–1440 decade.",
+     "defect": "Reverse the forward month command or use the forward command for the previous review."
+    },
+    {
+     "for": "M21.X1762",
+     "page": "A paper admissions register can reserve either its left margin or its top margin for the open date chooser.",
+     "gesture": "Open the calendar beside the upper corner of the register.",
+     "outcome": "The calendar fits the left edge and keeps its vertical margin, and the clerk books July 16.",
+     "opposite": "The cross-desk register fits the top edge while keeping its horizontal margin and accepts the same booking.",
+     "defect": "Fit the wrong horizontal axis on the paper register or keep the cross-desk calendar above its visible edge."
+    },
+    {
+     "for": "M21.X1763",
+     "page": "A late-transfer desk can turn its date list away from the edge of the screen or align it with the matching entry on the printed sheet.",
+     "gesture": "Open the bedside calendar from the last row and column of the transfer board.",
+     "outcome": "The bedside chooser moves back into view across both edges and a keyboard date choice reaches the booking.",
+     "opposite": "The print desk keeps its position on the sheet and a keyboard date choice reaches the booking there.",
+     "defect": "Keep the bedside chooser aligned to the printed sheet or flip the print desk chooser away from its entry."
+    },
+    {
+     "for": "M21.X1764",
+     "page": "A pharmacist can keep a date review open while the booking column moves to make room for a handover.",
+     "gesture": "Move the booking on the preparation board, then transfer its held review to the fixed handover counter.",
+     "outcome": "The full-review calendar returns to its moving field and fits both screen edges, then accepts the revised day.",
+     "opposite": "The print review tracks the same field using the original margins and accepts the revised day.",
+     "defect": "Skip collision correction in the full review or fit the print review inside the screen."
+    },
+    {
+     "for": "M21.X1765",
+     "page": "A supervisor can bring a partly clipped booking calendar into view while keeping the review open.",
+     "gesture": "Request the full calendar during a held booking review.",
+     "outcome": "The open chooser moves into view at both edges and still accepts the chosen day.",
+     "opposite": "A retained print review keeps its offset and accepts the same day.",
+     "defect": "Leave the expanded review at its old margins or force the print review to fit inside the viewport."
+    },
+    {
+     "for": "M21.X1766",
+     "page": "A registration supervisor can pause or resume the open date calendar’s movement while reviewing the transfer list.",
+     "gesture": "Open the transfer calendar, follow the next arrival, retain the review and return to the current admission.",
+     "outcome": "The calendar first follows the field to the next booking. After the register returns to the current admission, the paused calendar remains beside the next booking and accepts July 16.",
+     "opposite": "The resumed calendar follows the field back to the current admission and accepts July 16.",
+     "defect": "Keep the paused calendar following the register, fail to reattach the resumed calendar or open the register with tracking switched off."
+    },
+    {
+     "for": "M21.X1767",
+     "page": "An admissions clerk can continue a calendar review inside a scrolling transfer register or on an ordinary booking sheet.",
+     "gesture": "Retain the calendar review in the transfer register.",
+     "outcome": "The review directs the clerk to the next record in the mounted register and accepts July 16.",
+     "opposite": "On the ordinary booking sheet it directs the clerk to the whole-page handover and accepts the same date.",
+     "defect": "Read the document as the register or classify the ordinary booking sheet as a section."
+    },
+    {
+     "for": "M21.X1768",
+     "page": "An arrival booking can open its transport calendar with the resident’s original choice or open it as an office-arranged follow-up.",
+     "gesture": "Choose July 16 in the arrival calendar for a family-arranged transfer.",
+     "outcome": "The opened transport calendar directs the clerk to confirm the resident’s choice and accepts July 18.",
+     "opposite": "The office-arranged transport calendar uses the referral instruction and accepts July 18.",
+     "defect": "Open the family transport calendar without its original choice or forward that gesture to the office-arranged calendar."
+    },
+    {
+     "for": "M21.X1769",
+     "page": "The date review records whether the clerk closed it for the family’s calendar choice or for the office booking.",
+     "gesture": "Choose July 16 on the family review’s active calendar.",
+     "outcome": "The calendar closes and the handover records that the family chose the arrival date.",
+     "opposite": "The office review closes on the same chosen date and records that the scheduling desk finalized it.",
+     "defect": "Close the family review without its original choice or pass the choice to the office review."
     }
    ],
    "verdicts": [
@@ -7981,7 +8895,7 @@
   },
   {
    "id": "M21.F20",
-   "summary": "FusionDropDownList: one declaration of the Syncfusion DropDownList by its JavaScript names, value, text, dataSource, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, generic over the member it binds, its value that member's own type and committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed by the bound member and its text Property<string?>, each admitting null as the vendor holds them (M21.X506), and its data named as every framework read names it (M21.D1).",
+   "summary": "FusionDropDownList binds a ward choice. The transfer desk selects and clears assignments, queries a typed local directory, filters or disables options, renders ward templates and handles selection and publication events. Its availability request shows the picker’s spinner until the reply supplies the on-call wards or the service reports a failure. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder. The redesign uses one declaration, with its value typed by the bound member and its text Property<string?>, each admitting null as the vendor holds them (M21.X506), and its data named as every framework read names it (M21.D1).",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionDropDownList",
@@ -8109,7 +9023,10 @@
     "lit",
     "on",
     "method",
-    "data"
+    "data",
+    "if",
+    "request",
+    "op"
    ],
    "writes": [
     {
@@ -8159,13 +9076,15 @@
     "Q17",
     "Q5",
     "Q2",
-    "Q7"
+    "Q7",
+    "Q10"
    ],
    "meanings": [],
    "oracle": "Syncfusion EJ2 33.1.47's DropDownList as its TypeScript declares it (@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts, dataSource in src/drop-down-base/drop-down-base.d.ts, ChangeEventArgs in both), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; its ASP.NET Core builder as the probes render it (fusion-ej2-builder-newtonsoft-defaults, fusion-ej2-builder-raw-json); and the browser, by the promises.",
    "checker": [
     "core:Q17",
-    "core:Q5"
+    "core:Q5",
+    "Request.tla:OneRouteRuns"
    ],
    "defects": [
     {
@@ -8177,6 +9096,261 @@
      "id": "M21.X507",
      "rung": "behavior",
      "defect": "A text field named by a member that carries [JsonPropertyName(\"label\")] shows no text: in the redesign Fields names label (Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownList.cs:103, Alis.Reactive/Members/JsonMemberName.cs:11 at 65fdf118d) while EJ2 writes the items handed over with the view through Newtonsoft as displayLabel (probe:fusion-ej2-builder-newtonsoft-defaults); in main Fields names displayLabel, the camel case of the C# name (Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownListHtmlExtensions.cs:27, Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9 at 623dd4a27), while an endpoint's body, written by System.Text.Json, holds label. The rewrite names the field and writes the handed items by one writer (M21.D1, probe:fusion-ej2-builder-raw-json)."
+    },
+    {
+     "id": "M21.X1800",
+     "rung": "behavior",
+     "defect": "Read the previous row for the new instruction; clear the previous ward when clearing the destination."
+    },
+    {
+     "id": "M21.X1801",
+     "rung": "behavior",
+     "defect": "Read the prior route instead of the current primitive item; use the lift team for the courtyard branch."
+    },
+    {
+     "id": "M21.X1802",
+     "rung": "behavior",
+     "defect": "Treat zero as no choice; read the prior notice for the prepared transfer."
+    },
+    {
+     "id": "M21.X1803",
+     "rung": "behavior",
+     "defect": "Conflate false with no choice; use the independent instruction for an escorted transfer."
+    },
+    {
+     "id": "M21.X1804",
+     "rung": "behavior",
+     "defect": "Read the displayed label instead of the nested contact; use the Willow team for the Cedar handover."
+    },
+    {
+     "id": "M21.X1805",
+     "rung": "behavior",
+     "defect": "Use the first row for both referrals; treat an unknown referral as a successfully looked-up ward."
+    },
+    {
+     "id": "M21.X1806",
+     "rung": "behavior",
+     "defect": "Discard the second added ward; omit the requested insertion position or append a second ward to the single release."
+    },
+    {
+     "id": "M21.X1807",
+     "rung": "behavior",
+     "defect": "Pass the original wards to updateData; use the secure-care rows for the other search."
+    },
+    {
+     "id": "M21.X1808",
+     "rung": "behavior",
+     "defect": "Omit the synchronous select cancellation; cancel the available alternative as well."
+    },
+    {
+     "id": "M21.X1809",
+     "rung": "behavior",
+     "defect": "Ignore the before-open hold; discard close cancellation while confirmation is outstanding."
+    },
+    {
+     "id": "M21.X1810",
+     "rung": "behavior",
+     "defect": "Retain the original data or label mapping; print the first row as the last row or substitute the empty roster."
+    },
+    {
+     "id": "M21.X1811",
+     "rung": "behavior",
+     "defect": "Disable a different ward by code, position, or row; clear a neighboring ward when a referral is absent."
+    },
+    {
+     "id": "M21.X1812",
+     "rung": "behavior",
+     "defect": "Return the input argument instead of the vendor result; conflate zero or false with a missing lookup."
+    },
+    {
+     "id": "M21.X1813",
+     "rung": "behavior",
+     "defect": "Drop the requested index; drop a released entry or replace false or zero with the opposite value."
+    },
+    {
+     "id": "M21.X1814",
+     "rung": "behavior",
+     "defect": "Ignore the configured comparison mode; force case-sensitive or accent-sensitive matching on the broad search."
+    },
+    {
+     "id": "M21.X1815",
+     "rung": "behavior",
+     "defect": "Omit the Query argument, pass the wrong current query, or omit the alternate field map."
+    },
+    {
+     "id": "M21.X1816",
+     "rung": "behavior",
+     "defect": "Replace the supplied local list with its original source; drop the falsy matches."
+    },
+    {
+     "id": "M21.X1817",
+     "rung": "behavior",
+     "defect": "Read the previous option for the new selection, or record an automatic assignment as a user choice."
+    },
+    {
+     "id": "M21.X1818",
+     "rung": "behavior",
+     "defect": "Use position zero for the second ward; write the label into the value slot or retain the cleared index."
+    },
+    {
+     "id": "M21.X1819",
+     "rung": "behavior",
+     "defect": "Keep the field enabled under the hold; retain the read-only lock after release."
+    },
+    {
+     "id": "M21.X1820",
+     "rung": "behavior",
+     "defect": "Focus the alternate list; leave the ward help visible after focus moves away."
+    },
+    {
+     "id": "M21.X1821",
+     "rung": "behavior",
+     "defect": "Reuse the concise template in detailed mode; render the first ward for every option or selection."
+    },
+    {
+     "id": "M21.X1822",
+     "rung": "behavior",
+     "defect": "Set the hint on a neighboring list or read the wrong input for the routine instructions."
+    },
+    {
+     "id": "M21.X1823",
+     "rung": "behavior",
+     "defect": "Refresh the preview instead of closing it; close the preview on the keep-open action."
+    },
+    {
+     "id": "M21.X1824",
+     "rung": "behavior",
+     "defect": "Omit showSpinner while the request is held or omit hideSpinner on refusal."
+    },
+    {
+     "id": "M21.X1825",
+     "rung": "behavior",
+     "defect": "Ignore the action-begin cancellation; ignore the action-complete hold or count the earlier roster."
+    },
+    {
+     "id": "M21.X1826",
+     "rung": "behavior",
+     "defect": "Omit the refresh that attaches persistence; enable storage on the shared workstation."
+    },
+    {
+     "id": "M21.X1827",
+     "rung": "behavior",
+     "defect": "Keep the compact width on the accessible card or retain the right-to-left class on the compact control."
+    },
+    {
+     "id": "M21.X1828",
+     "rung": "behavior",
+     "defect": "Ignore the open cancellation or cancel the available panel as well."
+    },
+    {
+     "id": "M21.X1829",
+     "rung": "behavior",
+     "defect": "Leave the provisional clear control unavailable or offer a clear action on the confirmed field."
+    },
+    {
+     "id": "M21.X1830",
+     "rung": "behavior",
+     "defect": "Capture the first ward for every callback, or use the detailed return in compact mode."
+    },
+    {
+     "id": "M21.X1831",
+     "rung": "behavior",
+     "defect": "Return the first row for every code or mistake the falsy row for a missing record."
+    },
+    {
+     "id": "M21.X1832",
+     "rung": "behavior",
+     "defect": "Let the short phrase run the default filter, or remove the filtering cancellation before updateData."
+    },
+    {
+     "id": "M21.X1833",
+     "rung": "behavior",
+     "defect": "Replace a chosen sort direction with another valid order."
+    },
+    {
+     "id": "M21.X1834",
+     "rung": "behavior",
+     "defect": "Leave search disabled, transfer the wrong placeholder, or enable search on the quick-pick list."
+    },
+    {
+     "id": "M21.X1835",
+     "rung": "behavior",
+     "defect": "Skip disabling the selected element, forward the wrong option, or cancel an available ward."
+    },
+    {
+     "id": "M21.X1836",
+     "rung": "behavior",
+     "defect": "Use the wrong template argument, group, footer or empty-session instruction."
+    },
+    {
+     "id": "M21.X1837",
+     "rung": "behavior",
+     "defect": "Keep the default locale on the French desk or use French on the English desk."
+    },
+    {
+     "id": "M21.X1838",
+     "rung": "behavior",
+     "defect": "Omit the returned query, mutate the reusable original or choose a different range, skip or page."
+    },
+    {
+     "id": "M21.X1839",
+     "rung": "behavior",
+     "defect": "Use another floating-label mode or leave the previous mode on the simple form."
+    },
+    {
+     "id": "M21.X1840",
+     "rung": "behavior",
+     "defect": "Disable virtual mode on the paged list, keep it enabled on the full directory, or search only the mounted rows."
+    },
+    {
+     "id": "M21.X1841",
+     "rung": "behavior",
+     "defect": "Apply the wrong closure notice, retain the isolation template on normal service, or omit the requested selector."
+    },
+    {
+     "id": "M21.X1842",
+     "rung": "behavior",
+     "defect": "Pass the wrong local array or omit the live query from a priority search."
+    },
+    {
+     "id": "M21.X1843",
+     "rung": "behavior",
+     "defect": "Drop the second released entry, ignore the priority position, or replace the Boolean release with the already offered answer."
+    },
+    {
+     "id": "M21.X1844",
+     "rung": "behavior",
+     "defect": "Pass the priority Query to a standby replacement or leave a choice out of its local source."
+    },
+    {
+     "id": "M21.X1845",
+     "rung": "behavior",
+     "defect": "Use the current choice for the previous booking, accept the held request, or reject the permitted alternative."
+    },
+    {
+     "id": "M21.X1846",
+     "rung": "behavior",
+     "defect": "Use the current choice for the previous booking, accept the held request, or reject the permitted alternative."
+    },
+    {
+     "id": "M21.X1847",
+     "rung": "behavior",
+     "defect": "Use the current choice for the previous booking, accept the held request, or reject the permitted alternative."
+    },
+    {
+     "id": "M21.X1848",
+     "rung": "behavior",
+     "defect": "Drop the start, move or stop action, keep a fixed roster adjustable, or ignore the actual popup width when preparing the selected handover."
+    },
+    {
+     "id": "M21.X1849",
+     "rung": "behavior",
+     "defect": "Drop the pixel or CSS width or height, use the configured control size for the rendered popup, or use width as a substitute for height."
+    },
+    {
+     "id": "M21.X1850",
+     "rung": "behavior",
+     "defect": "Reverse one stacking level, ignore the current priority when giving the instructions, or assign a ward from the urgent review."
     }
    ],
    "promises": [
@@ -8195,6 +9369,414 @@
      "outcome": "The list shows Maple and Cedar.",
      "opposite": "Before Load wards is clicked, the list shows no options.",
      "defect": "The field names displayLabel, the camel case of the C# name, while the body holds label, so the list shows two empty options, as main names fields."
+    },
+    {
+     "for": "M21.X1800",
+     "page": "Ward transfer",
+     "gesture": "Choose Cedar then Maple for the transfer, then remove the destination.",
+     "outcome": "Maple displays its own transfer instruction with Cedar as the previous ward.",
+     "opposite": "Clearing the transfer leaves the prior Maple instruction in the handover history and asks for a destination.",
+     "defect": "Read the previous row for the new instruction; clear the previous ward when clearing the destination."
+    },
+    {
+     "for": "M21.X1801",
+     "page": "Ward transfer",
+     "gesture": "Choose a travel route and save its transfer instruction, then choose the other route.",
+     "outcome": "Porter dispatch sends the lift team for the Lift route.",
+     "opposite": "The Courtyard route sends the outdoor escort and the form saves its distinct route.",
+     "defect": "Read the prior route instead of the current primitive item; use the lift team for the courtyard branch."
+    },
+    {
+     "for": "M21.X1802",
+     "page": "Ward transfer",
+     "gesture": "Choose zero or thirty minutes of advance notice and save the handover.",
+     "outcome": "Zero minutes sends the team to the ward immediately and records zero in the receipt.",
+     "opposite": "Thirty minutes books preparation time and records thirty in the receipt.",
+     "defect": "Treat zero as no choice; read the prior notice for the prepared transfer."
+    },
+    {
+     "for": "M21.X1803",
+     "page": "Ward transfer",
+     "gesture": "Choose whether a bedside escort is required and save the handover.",
+     "outcome": "False records independent travel and leaves the escort team available.",
+     "opposite": "True reserves the escort and the receipt records that an escort is required.",
+     "defect": "Conflate false with no choice; use the independent instruction for an escorted transfer."
+    },
+    {
+     "for": "M21.X1804",
+     "page": "Ward transfer",
+     "gesture": "Choose a receiving team by its full directory entry and review the transfer.",
+     "outcome": "Willow gives the handover to the night lead at extension 214.",
+     "opposite": "Cedar gives the handover to the day lead at extension 319.",
+     "defect": "Read the displayed label instead of the nested contact; use the Willow team for the Cedar handover."
+    },
+    {
+     "for": "M21.X1805",
+     "page": "Ward transfer",
+     "gesture": "Look up the incoming ward code on the transfer desk.",
+     "outcome": "A known referral code retrieves its catalogue row and shows the right ward contact.",
+     "opposite": "A second known code retrieves a different contact and an unknown code goes to placement review.",
+     "defect": "Use the first row for both referrals; treat an unknown referral as a successfully looked-up ward."
+    },
+    {
+     "for": "M21.X1806",
+     "page": "Ward transfer",
+     "gesture": "Release one or two overflow wards at the end of the list, or reserve their position on the round.",
+     "outcome": "The released wards follow Maple and Cedar in the order Oak then Willow.",
+     "opposite": "The priority release inserts Oak then Willow between Maple and Cedar; a single release adds only Oak.",
+     "defect": "Discard the second added ward; omit the requested insertion position or append a second ward to the single release."
+    },
+    {
+     "for": "M21.X1807",
+     "page": "Ward transfer",
+     "gesture": "Enter an area or service in the ward directory search.",
+     "outcome": "A secure-care search offers the two matched wards in directory order.",
+     "opposite": "An assisted-care search offers its different ward and an unmatched search shows the empty-directory message.",
+     "defect": "Pass the original wards to updateData; use the secure-care rows for the other search."
+    },
+    {
+     "for": "M21.X1808",
+     "page": "Ward transfer",
+     "gesture": "Choose the receiving ward and release or hold its bed assignment.",
+     "outcome": "An available ward can be selected and its assignment committed.",
+     "opposite": "The ward under isolation-review cannot replace the current assignment; its notice asks a nurse to release the hold.",
+     "defect": "Omit the synchronous select cancellation; cancel the available alternative as well."
+    },
+    {
+     "for": "M21.X1809",
+     "page": "Ward transfer",
+     "gesture": "Open the placement choices for review and return to the transfer form.",
+     "outcome": "Opening reveals the ward options and closing returns to the transfer form.",
+     "opposite": "A held placement keeps the list closed, and the open list stays available while the choice still needs confirmation.",
+     "defect": "Ignore the before-open hold; discard close cancellation while confirmation is outstanding."
+    },
+    {
+     "for": "M21.X1810",
+     "page": "Ward round catalogue",
+     "gesture": "Change between day and night ward directories and review the printed roster.",
+     "outcome": "The day directory lists Maple and Cedar with the day headings and referral keys.",
+     "opposite": "The night directory lists Oak and Willow with their alternate names and groups, and the closed overnight list prints no destinations.",
+     "defect": "Retain the original data or label mapping; print the first row as the last row or substitute the empty roster."
+    },
+    {
+     "for": "M21.X1811",
+     "page": "Ward round catalogue",
+     "gesture": "Temporarily withdraw a bed by referral code, ward record, or position in the round.",
+     "outcome": "The chosen ward becomes unavailable and its current assignment clears if selected.",
+     "opposite": "Another available ward still accepts the transfer and an unrecognized referral leaves both choices available.",
+     "defect": "Disable a different ward by code, position, or row; clear a neighboring ward when a referral is absent."
+    },
+    {
+     "for": "M21.X1812",
+     "page": "Ward round catalogue",
+     "gesture": "Check the available route, notice and escort values for a transfer referral.",
+     "outcome": "Known route, zero minutes and false escort produce the matching catalogue values.",
+     "opposite": "The alternative route, thirty minutes and true escort produce different answers; unknown values go to review.",
+     "defect": "Return the input argument instead of the vendor result; conflate zero or false with a missing lookup."
+    },
+    {
+     "for": "M21.X1813",
+     "page": "Ward round catalogue",
+     "gesture": "Release additional routes, preparation intervals, or escort choices into the local catalogue.",
+     "outcome": "Appending a new choice keeps the existing choices first for each primitive catalogue.",
+     "opposite": "A priority release places the choice first, and a pair of released entries preserves the two distinct values.",
+     "defect": "Drop the requested index; drop a released entry or replace false or zero with the opposite value."
+    },
+    {
+     "for": "M21.X1814",
+     "page": "Ward round catalogue",
+     "gesture": "Search the displayed ward names under the exact or broad matching policy.",
+     "outcome": "The exact start-of-name search distinguishes case and accents in the ward list. Staff read the exact spelling guidance before typing.",
+     "opposite": "The broader search finds middle and end matches, with end-only matching omitting names that continue after the search. The broader and ending searches each give their own spelling instructions.",
+     "defect": "Ignore the configured comparison mode; force case-sensitive or accent-sensitive matching on the broad search."
+    },
+    {
+     "for": "M21.X1815",
+     "page": "Ward round catalogue",
+     "gesture": "Select a local directory policy and search the available ward list.",
+     "outcome": "The day and night local queries return Maple and Willow. Both handover queries show Willow night using the alternate display mapping.",
+     "opposite": "The unfiltered local service lookup shows Oak and Willow, while the one-stop local query shows only Maple.",
+     "defect": "Omit the Query argument, pass the wrong current query, or omit the alternate field map."
+    },
+    {
+     "for": "M21.X1816",
+     "page": "Ward round catalogue",
+     "gesture": "Search an on-call directory whose route, time or escort entries are supplied as a local list.",
+     "outcome": "A route search displays the supplied string matches and a time search displays its numeric matches including zero.",
+     "opposite": "The escort search can offer false or true independently; an empty local reply shows the empty-directory message.",
+     "defect": "Replace the supplied local list with its original source; drop the falsy matches."
+    },
+    {
+     "for": "M21.X1817",
+     "page": "Placement review",
+     "gesture": "Review the transfer after a staff choice and after applying or clearing a referral assignment.",
+     "outcome": "A staff choice records its selected option, former option and keyboard action.",
+     "opposite": "Applying a referral records an automatic assignment, then clearing records a vacant destination and the departed option.",
+     "defect": "Read the previous option for the new selection, or record an automatic assignment as a user choice."
+    },
+    {
+     "for": "M21.X1818",
+     "page": "Placement review",
+     "gesture": "Choose the next stop by catalogue position, exact visible name, or referral value and review it.",
+     "outcome": "The day round selects its named or numbered ward and reports the active position and label.",
+     "opposite": "The alternate round selects its different ward; clearing the destination returns to an unassigned position.",
+     "defect": "Use position zero for the second ward; write the label into the value slot or retain the cleared index."
+    },
+    {
+     "for": "M21.X1819",
+     "page": "Placement review",
+     "gesture": "Hold or release input on a ward assignment before editing it.",
+     "outcome": "A disabled assignment rejects focus and a read-only assignment retains its current ward.",
+     "opposite": "Releasing the hold allows a different ward to be selected.",
+     "defect": "Keep the field enabled under the hold; retain the read-only lock after release."
+    },
+    {
+     "for": "M21.X1820",
+     "page": "Placement review",
+     "gesture": "Open the ward lookup for keyboard entry and return to the handover form.",
+     "outcome": "Keyboard help appears while the ward list has focus.",
+     "opposite": "Leaving the list removes that help and restores the handover instruction.",
+     "defect": "Focus the alternate list; leave the ward help visible after focus moves away."
+    },
+    {
+     "for": "M21.X1821",
+     "page": "Placement review",
+     "gesture": "Switch between the detailed and concise placement lists.",
+     "outcome": "The detailed list displays a ward header, floor grouping, ward-specific option details and its transfer-desk footer.",
+     "opposite": "The concise list offers the shorter options and distinct header/footer; choosing a ward displays its own selection summary.",
+     "defect": "Reuse the concise template in detailed mode; render the first ward for every option or selection."
+    },
+    {
+     "for": "M21.X1822",
+     "page": "Placement review",
+     "gesture": "Change between urgent placement and routine placement input layouts.",
+     "outcome": "The urgent input prompts “Choose an urgent destination”. Printing the instructions shows that hint and “Call the urgent placement desk.”",
+     "opposite": "The routine input prompts “Choose a routine destination”. The printed slip shows that hint and “Contact the routine placement desk.”",
+     "defect": "Set the hint on a neighboring list or read the wrong input for the routine instructions."
+    },
+    {
+     "for": "M21.X1823",
+     "page": "Placement review",
+     "gesture": "Close or retain a temporary ward placement preview.",
+     "outcome": "Closing ends the enhanced preview and the form shows the terminal closure.",
+     "opposite": "Leaving the preview open retains its searchable ward choices and allows a different selection.",
+     "defect": "Refresh the preview instead of closing it; close the preview on the keep-open action."
+    },
+    {
+     "for": "M21.X1824",
+     "page": "Ward availability bulletin",
+     "gesture": "Start a ward availability request and settle the reply or refusal.",
+     "outcome": "The ward picker shows its own loading indicator while the response is held; the reply supplies the current on-call options.",
+     "opposite": "A refused request also removes the indicator and keeps the previously published wards available.",
+     "defect": "Omit showSpinner while the request is held or omit hideSpinner on refusal."
+    },
+    {
+     "for": "M21.X1825",
+     "page": "Ward availability bulletin",
+     "gesture": "Publish or withhold a replacement ward bulletin.",
+     "outcome": "An approved bulletin publishes its own local rows and records the number of available wards after binding.",
+     "opposite": "Withholding the bulletin before processing leaves the published roster available; a review hold on the completed result also keeps the new rows off the round.",
+     "defect": "Ignore the action-begin cancellation; ignore the action-complete hold or count the earlier roster."
+    },
+    {
+     "for": "M21.X1826",
+     "page": "Ward availability bulletin",
+     "gesture": "Choose a personalized ward workstation or a shared one, leave the page, then return.",
+     "outcome": "The personal workstation restores its selected ward after actual navigation.",
+     "opposite": "The shared workstation returns to its configured starting ward and explains that its choice is temporary.",
+     "defect": "Omit the refresh that attaches persistence; enable storage on the shared workstation."
+    },
+    {
+     "for": "M21.X1827",
+     "page": "Ward availability bulletin",
+     "gesture": "Open the compact or accessible placement card.",
+     "outcome": "The accessible card displays its configured right-to-left field and wider input. Its printed handover directs the large-print card to the resident copy.",
+     "opposite": "The compact card restores left-to-right order and its shorter input while retaining the chosen ward. The compact left-to-right card prints a different filing instruction for the receiving ward.",
+     "defect": "Keep the compact width on the accessible card or retain the right-to-left class on the compact control."
+    },
+    {
+     "for": "M21.X1828",
+     "page": "Ward availability bulletin",
+     "gesture": "Open an available transfer panel or a held one.",
+     "outcome": "The available panel displays the expected ward choices.",
+     "opposite": "The open handler identifies a held placement and prevents its actual popup from displaying, while the desk explains the hold.",
+     "defect": "Ignore the open cancellation or cancel the available panel as well."
+    },
+    {
+     "for": "M21.X1829",
+     "page": "Ward availability bulletin",
+     "gesture": "Clear a provisional placement with the available clear control, or retain the confirmed placement.",
+     "outcome": "The provisional row clears its referral and the handover asks for a destination.",
+     "opposite": "A confirmed selection retains its ward and has no clear action.",
+     "defect": "Leave the provisional clear control unavailable or offer a clear action on the confirmed field."
+    },
+    {
+     "for": "M21.X1830",
+     "page": "Ward availability bulletin",
+     "gesture": "Show the detailed or compact ward badges in the transfer list.",
+     "outcome": "The badge function uses each actual item to return the corresponding app-authored ward type and selection caption.",
+     "opposite": "Choosing another ward or the compact mode produces its own distinct label.",
+     "defect": "Capture the first ward for every callback, or use the detailed return in compact mode."
+    },
+    {
+     "for": "M21.X1831",
+     "page": "Ward availability bulletin",
+     "gesture": "Check a numbered bed referral or its eligible transfer flag.",
+     "outcome": "A zero bed code and a false flag each retrieve their own full catalogue row.",
+     "opposite": "A distinct numeric or true flag retrieves a different named ward, and an unmatched key sends the referral to review.",
+     "defect": "Return the first row for every code or mistake the falsy row for a missing record."
+    },
+    {
+     "for": "M21.X1832",
+     "page": "Ward availability bulletin",
+     "gesture": "Search the bulletin directory using a short, held, or active service phrase.",
+     "outcome": "A short phrase leaves the published list in place while the active search offers the service-specific rows.",
+     "opposite": "A held request refuses even a supplied replacement list and leaves the original published choices.",
+     "defect": "Let the short phrase run the default filter, or remove the filtering cancellation before updateData."
+    },
+    {
+     "for": "M21.X1833",
+     "page": "Ward referral directory",
+     "gesture": "Choose clinical priority, alphabetical or reverse order on the on-call notice.",
+     "outcome": "Clinical priority presents Willow, Cedar and Maple in the published order. The printed call instruction retains clinical priority.",
+     "opposite": "Alphabetical lists Cedar, Maple and Willow. Reverse lists Willow, Maple and Cedar. Each alphabetical direction supplies its corresponding call instruction.",
+     "defect": "Replace a chosen sort direction with another valid order."
+    },
+    {
+     "for": "M21.X1834",
+     "page": "Ward referral directory",
+     "gesture": "Choose a search policy before opening the referral directory.",
+     "outcome": "The clinical search field shows its dedicated search hint and filters the actual directory to Cedar. Its referral instructions identify the clinical placement team.",
+     "opposite": "The handover search uses its own hint. In quick-pick mode the selectable list contains every ward and has no search field. The handover and quick-pick lists give their distinct instructions.",
+     "defect": "Leave search disabled, transfer the wrong placeholder, or enable search on the quick-pick list."
+    },
+    {
+     "for": "M21.X1835",
+     "page": "Ward referral directory",
+     "gesture": "Select an available or a held destination while reviewing the current handover.",
+     "outcome": "The selected Cedar option is withdrawn using its actual list element, the receiving selection clears, and Maple remains available.",
+     "opposite": "With the hold released the same keyboard choice commits Cedar and issues its real desk instruction.",
+     "defect": "Skip disabling the selected element, forward the wrong option, or cancel an available ward."
+    },
+    {
+     "for": "M21.X1836",
+     "page": "Ward referral directory",
+     "gesture": "Choose a routine or urgent service bulletin and open its grouped ward directory.",
+     "outcome": "The actual popup header and footer give the urgent handover instructions, and each group shows its own unit heading.",
+     "opposite": "The routine bulletin displays its own header and footer. Its closed session displays the app’s alternate empty-list message.",
+     "defect": "Use the wrong template argument, group, footer or empty-session instruction."
+    },
+    {
+     "for": "M21.X1837",
+     "page": "Ward referral directory",
+     "gesture": "Choose the language for an empty referral directory and open its available choices.",
+     "outcome": "The French desk displays its registered French no-match message. The printed admission contact instruction is also in French.",
+     "opposite": "The English desk displays its English no-match message. Its printed instructions use English.",
+     "defect": "Keep the default locale on the French desk or use French on the English desk."
+    },
+    {
+     "for": "M21.X1838",
+     "page": "Ward referral directory",
+     "gesture": "Request first, remaining, middle or second-page stops using the itinerary provider’s real local Query, then search the unrestricted directory.",
+     "outcome": "The first-stop query offers only Willow and the remaining-stop query offers Cedar, Maple and Oak.",
+     "opposite": "The middle-stop query offers Cedar and Maple, the second page offers Maple and Oak, and an unrestricted search offers all four wards.",
+     "defect": "Omit the returned query, mutate the reusable original or choose a different range, skip or page."
+    },
+    {
+     "for": "M21.X1839",
+     "page": "Ward referral directory",
+     "gesture": "Choose an always-labelled, floating or simple destination field for a printed transfer form.",
+     "outcome": "The always-labelled field shows its caption on an empty form. The floating caption moves above the field when staff choose Oak.",
+     "opposite": "The simple field uses its native placeholder and keeps the selected ward after entry.",
+     "defect": "Use another floating-label mode or leave the previous mode on the simple form."
+    },
+    {
+     "for": "M21.X1840",
+     "page": "Regional ward directory",
+     "gesture": "Choose a regional directory format and use the keyboard to commit the last ward offered on its current page.",
+     "outcome": "The paged directory offers wards 001 to 030 and End selects ward 030. A search can reach ward 150.",
+     "opposite": "The full directory offers all 150 wards and End selects ward 150 without a search.",
+     "defect": "Disable virtual mode on the paged list, keep it enabled on the full directory, or search only the mounted rows."
+    },
+    {
+     "for": "M21.X1841",
+     "page": "Regional ward directory",
+     "gesture": "Open the regional directory during a routine closure, an isolation hold or normal service.",
+     "outcome": "The routine closure gives the district transfer desk and the isolation hold displays the authored isolation contact.",
+     "opposite": "Normal service with no vacancies restores the standard empty-directory message.",
+     "defect": "Apply the wrong closure notice, retain the isolation template on normal service, or omit the requested selector."
+    },
+    {
+     "for": "M21.X1842",
+     "page": "Regional ward directory",
+     "gesture": "Search the regional transfer policies for all available travel routes, notice periods and escort choices or for their priority values.",
+     "outcome": "The unrestricted local list search offers Lift and Courtyard, 0 and 30 minutes, and independent and escorted choices.",
+     "opposite": "The priority query on the same local arrays offers only Lift, 0 minutes and independent travel.",
+     "defect": "Pass the wrong local array or omit the live query from a priority search."
+    },
+    {
+     "for": "M21.X1843",
+     "page": "Regional ward directory",
+     "gesture": "Publish the district transport release at the end of the roster or in the priority position.",
+     "outcome": "The appended release keeps the previous route, notice and escort choice first and includes all newly released entries.",
+     "opposite": "A priority release inserts the same entries before the previous route, notice or escort choice.",
+     "defect": "Drop the second released entry, ignore the priority position, or replace the Boolean release with the already offered answer."
+    },
+    {
+     "for": "M21.X1844",
+     "page": "Regional ward directory",
+     "gesture": "Request the standby travel route, notice interval and escort policy when the priority service is unavailable.",
+     "outcome": "The standby search offers only Courtyard, 30 minutes and escorted travel.",
+     "opposite": "The priority search over the same choices offers only Lift, 0 minutes and independent travel.",
+     "defect": "Pass the priority Query to a standby replacement or leave a choice out of its local source."
+    },
+    {
+     "for": "M21.X1845",
+     "page": "Transport amendment",
+     "gesture": "Request the courtyard travel route while outdoor departures are held, release the hold, and rebook the lift.",
+     "outcome": "The hold keeps Lift booked. Releasing it accepts Courtyard and instructs staff to cancel the lift booking.",
+     "opposite": "Returning to Lift releases the outdoor escort. The first booking reports that no prior travel route needs cancellation.",
+     "defect": "Use the current choice for the previous booking, accept the held request, or reject the permitted alternative."
+    },
+    {
+     "for": "M21.X1846",
+     "page": "Transport amendment",
+     "gesture": "Request immediate departure under the advance-notice requirement, release the hold, and restore thirty minutes of notice.",
+     "outcome": "The hold keeps 30 minutes booked. After release, immediate departure cancels the earlier thirty-minute notice.",
+     "opposite": "Restoring thirty minutes withdraws the prior immediate departure. The first booking has no earlier notice to withdraw.",
+     "defect": "Use the current choice for the previous booking, accept the held request, or reject the permitted alternative."
+    },
+    {
+     "for": "M21.X1847",
+     "page": "Transport amendment",
+     "gesture": "Request independent travel under an escort requirement, release the hold, and then rebook the bedside escort.",
+     "outcome": "The hold keeps the escort. Once released, independent travel cancels the previously reserved escort.",
+     "opposite": "Rebooking the escort updates the prior independent departure. The first booking has no earlier escort arrangement.",
+     "defect": "Use the current choice for the previous booking, accept the held request, or reject the permitted alternative."
+    },
+    {
+     "for": "M21.X1848",
+     "page": "Ward station workboard",
+     "gesture": "Arrange a personal ward station, expand the chooser into the receiving column, and select the terminal ward for a shift handover.",
+     "outcome": "The resized roster admits Linden and prepares its real extension 614 and east-entrance instructions. Staff can restore the transport reminder after the drag.",
+     "opposite": "A compact drag prepares the Maple extension without arrival instructions. The fixed shared station retains its reminders and prepares the chosen ward without a resize handle.",
+     "defect": "Drop the start, move or stop action, keep a fixed roster adjustable, or ignore the actual popup width when preparing the selected handover."
+    },
+    {
+     "for": "M21.X1849",
+     "page": "Ward station workboard",
+     "gesture": "Choose a full-width short roster or a pocket-width tall roster and prepare the chosen ward for the shift handover.",
+     "outcome": "The full-width short roster gives Linden’s extension and east-entrance instructions, with the after-hours pager outside the short layout.",
+     "opposite": "The pocket-width tall roster prints only Cedar’s extension and includes the after-hours admission supervisor on pager 22.",
+     "defect": "Drop the pixel or CSS width or height, use the configured control size for the rendered popup, or use width as a substitute for height."
+    },
+    {
+     "for": "M21.X1850",
+     "page": "Ward station workboard",
+     "gesture": "Set which action takes priority when an urgent arrival banner and the ward chooser overlap, then use the action at the front.",
+     "outcome": "With the ward roster in front, the click assigns Maple and shows the receiving-team assignment.",
+     "opposite": "With the urgent arrival in front, the same area opens the duty-nurse review and leaves the ward unassigned.",
+     "defect": "Reverse one stacking level, ignore the current priority when giving the instructions, or assign a ward from the urgent review."
     }
    ],
    "verdicts": [
@@ -15369,7 +16951,7 @@
   },
   {
    "id": "M21.F32",
-   "summary": "FusionNumericTextBox: one declaration of the Syncfusion NumericTextBox by its JavaScript names, value, min, focusIn, focusOut, increment, decrement, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, its value committed by change; and the render helper that renders it bound to a model member. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, generic in the value's type as EJ2 marks it, with its value, its min and its change payload's values typed by the member it binds, nullable as EJ2 documents them and the browser hands them.",
+   "summary": "FusionNumericTextBox binds a nullable stock count or laundry charge. The ward can change the bundle size, enforce bounds, inspect staff edits, validate a shortage while the counter retains focus and file a zero count. The billing desk configures the precision, currency, templates and printed scale, and can retire a counter for paper transcription. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder. The redesign uses one declaration, generic in the value's type as EJ2 marks it, with its value, its min and its change payload's values typed by the member it binds, nullable as EJ2 documents them and the browser hands them.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionNumericTextBox",
@@ -15489,7 +17071,11 @@
     "call",
     "lit",
     "on",
-    "method"
+    "method",
+    "if",
+    "request",
+    "op",
+    "data"
    ],
    "writes": [
     {
@@ -15567,6 +17153,191 @@
      "id": "M21.X1110",
      "rung": "behavior",
      "defect": "The typed increment drops the step the view supplies, so a pack adds the configured single towel. The explicit step reaches EJ2's increment(step), and a call with no step uses the box's configured step (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:369-373)."
+    },
+    {
+     "id": "M21.X1600",
+     "rung": "behavior",
+     "defect": "Drop the supplied decrement amount, or wrongly hard-code six for the omitted amount."
+    },
+    {
+     "id": "M21.X1601",
+     "rung": "behavior",
+     "defect": "Apply four for the three-towel choice or three for the four-towel choice."
+    },
+    {
+     "id": "M21.X1602",
+     "rung": "behavior",
+     "defect": "Drop the explicit zero from either step, or compare a zero delivery with the opening book count after staff have already added stock."
+    },
+    {
+     "id": "M21.X1603",
+     "rung": "behavior",
+     "defect": "Lower the reserve or enlarge the cart limit before the stock action."
+    },
+    {
+     "id": "M21.X1604",
+     "rung": "behavior",
+     "defect": "Leave discrepancies enabled for the strict cart or force strict caps on the discrepancy report."
+    },
+    {
+     "id": "M21.X1605",
+     "rung": "behavior",
+     "defect": "Write null for the empty cart or write zero for the outstanding count."
+    },
+    {
+     "id": "M21.X1606",
+     "rung": "behavior",
+     "defect": "Read the current number as the old number in the keyboard report, or require a browser event for the book correction."
+    },
+    {
+     "id": "M21.X1607",
+     "rung": "behavior",
+     "defect": "Skip entering the count for the recount or skip leaving it when opening the review."
+    },
+    {
+     "id": "M21.X1608",
+     "rung": "behavior",
+     "defect": "Use dollars for the euro invoice or use euros for the dollar invoice."
+    },
+    {
+     "id": "M21.X1609",
+     "rung": "behavior",
+     "defect": "Disable decimal validation for the hundredths scale or enable it for the untrimmed scale."
+    },
+    {
+     "id": "M21.X1610",
+     "rung": "behavior",
+     "defect": "Retain the fraction for the whole-unit run or force whole units on the precise scale."
+    },
+    {
+     "id": "M21.X1611",
+     "rung": "behavior",
+     "defect": "Leave the audited field writable or leave the fresh count read-only."
+    },
+    {
+     "id": "M21.X1612",
+     "rung": "behavior",
+     "defect": "Retain the trolley toolkit for bedside counting or leave bedside controls selected for the trolley."
+    },
+    {
+     "id": "M21.X1613",
+     "rung": "behavior",
+     "defect": "Keep the closed entry enabled or leave the reopened entry disabled."
+    },
+    {
+     "id": "M21.X1614",
+     "rung": "behavior",
+     "defect": "Read an unrelated original field attribute in either review."
+    },
+    {
+     "id": "M21.X1615",
+     "rung": "behavior",
+     "defect": "Disable persistence when keeping the worksheet or enable it for the one-visit worksheet."
+    },
+    {
+     "id": "M21.X1616",
+     "rung": "behavior",
+     "defect": "Serialize the outstanding count for the empty cart or the empty cart for the outstanding count."
+    },
+    {
+     "id": "M21.X1617",
+     "rung": "behavior",
+     "defect": "Use a refresh for the release, or end the numeric editor when reopening the electronic tally."
+    },
+    {
+     "id": "M21.X1618",
+     "rung": "behavior",
+     "defect": "Apply the standard column to the narrow selection or the narrow column to the standard selection."
+    },
+    {
+     "id": "M21.X1619",
+     "rung": "behavior",
+     "defect": "Replace a null CSS width by 100% or a null pixel width by 100."
+    },
+    {
+     "id": "M21.X1620",
+     "rung": "behavior",
+     "defect": "Substitute the focus-raised, permanent or inline mode for the selected caption mode."
+    },
+    {
+     "id": "M21.X1621",
+     "rung": "behavior",
+     "defect": "Keep the community wording on the ward slip or the ward wording on the community slip."
+    },
+    {
+     "id": "M21.X1622",
+     "rung": "behavior",
+     "defect": "Write an empty string for removed instructions or null for intentionally suppressed instructions."
+    },
+    {
+     "id": "M21.X1623",
+     "rung": "behavior",
+     "defect": "Substitute the other station or unit, reverse their printed positions, or retain either label on the plain replacement."
+    },
+    {
+     "id": "M21.X1624",
+     "rung": "behavior",
+     "defect": "Choose the other pair, read the wrong callback argument, or place the live unit before the reading and its source after it."
+    },
+    {
+     "id": "M21.X1625",
+     "rung": "behavior",
+     "defect": "Write a nonzero value for the empty cart or restore a prior count on the outstanding form."
+    },
+    {
+     "id": "M21.X1626",
+     "rung": "behavior",
+     "defect": "Skip the bound member’s amount or replace a missing amount with zero."
+    },
+    {
+     "id": "M21.X1627",
+     "rung": "behavior",
+     "defect": "Keep EUR on the community reset or reset the explicit euro contract to its default."
+    },
+    {
+     "id": "M21.X1628",
+     "rung": "behavior",
+     "defect": "Leave the lower reserve in force or retain the upper capacity limit."
+    },
+    {
+     "id": "M21.X1629",
+     "rung": "behavior",
+     "defect": "Write an empty CSS class for an unselected style or null for an intentionally unbranded copy."
+    },
+    {
+     "id": "M21.X1630",
+     "rung": "behavior",
+     "defect": "Commit against a different component event on the shortage side, or apply a threshold above nine on the sufficient-stock side."
+    },
+    {
+     "id": "M21.X1631",
+     "rung": "behavior",
+     "defect": "Treat the prior missing count as zero or treat the withdrawn count as a new zero."
+    },
+    {
+     "id": "M21.X1632",
+     "rung": "behavior",
+     "defect": "Use the whole-unit default for the received parcel or for the issued parcel."
+    },
+    {
+     "id": "M21.X1633",
+     "rung": "behavior",
+     "defect": "Read an outstanding focused or blurred value as zero, or read a confirmed zero as missing."
+    },
+    {
+     "id": "M21.X1634",
+     "rung": "behavior",
+     "defect": "Read before entering the editor for the transcription or read its editing text for the signed invoice."
+    },
+    {
+     "id": "M21.X1635",
+     "rung": "behavior",
+     "defect": "Apply an archived editing flag to the staffed station or an active flag to the read-only archive."
+    },
+    {
+     "id": "M21.X1636",
+     "rung": "behavior",
+     "defect": "Apply the domestic raw width or currency to the European rendering, or the European width or currency to the domestic rendering."
     }
    ],
    "promises": [
@@ -15593,6 +17364,302 @@
      "outcome": "The Towels field shows 9.",
      "opposite": "Clicking Add a pack on a fresh page shows 14.",
      "defect": "The call without an argument supplies the pack size and the count shows 14."
+    },
+    {
+     "for": "M21.X1600",
+     "page": "Ward linen count",
+     "gesture": "Take a six-towel pack from the ward’s eight towels.",
+     "outcome": "The stock reads 2.",
+     "opposite": "Take a single towel from the same starting stock and the count reads 7.",
+     "defect": "Drop the supplied decrement amount, or wrongly hard-code six for the omitted amount."
+    },
+    {
+     "for": "M21.X1601",
+     "page": "Ward linen replenishment",
+     "gesture": "Choose three towels per bundle, then add one bundle to eight in stock.",
+     "outcome": "Stock becomes 11 and the pick list says “Bundle of 3”.",
+     "opposite": "Choose four towels per bundle and stock becomes 12 with “Bundle of 4”.",
+     "defect": "Apply four for the three-towel choice or three for the four-towel choice."
+    },
+    {
+     "for": "M21.X1602",
+     "page": "Ward linen replenishment",
+     "gesture": "Post a delivery adjustment of zero to eight towels.",
+     "outcome": "Stock stays at 8 and the receipt says “No stock adjustment”.",
+     "opposite": "Post a return adjustment of zero to the same stock and the return receipt retains 8. After a count increase to 9, a zero delivery retains 9 and reports “No stock adjustment”.",
+     "defect": "Drop the explicit zero from either step, or compare a zero delivery with the opening book count after staff have already added stock."
+    },
+    {
+     "for": "M21.X1603",
+     "page": "Ward linen replenishment",
+     "gesture": "Set the lower reserve at six and allow twenty towels per cart, then issue a pack from eight.",
+     "outcome": "The count stops at 6 and the reserve review reads “Reserve of 6”.",
+     "opposite": "Apply the ten-towel cart limit and receive a pack from eight. The count stops at 10 and the cart review reads “Capacity of 10”.",
+     "defect": "Lower the reserve or enlarge the cart limit before the stock action."
+    },
+    {
+     "for": "M21.X1604",
+     "page": "Ward linen discrepancy",
+     "gesture": "Enter an over-capacity count on a cart that requires strict counting.",
+     "outcome": "The committed count shows 10 and the review reads “Within cart capacity”.",
+     "opposite": "Permit a discrepancy on the same cart. The recorded count is 14 and the review reads “Supervisor review required”.",
+     "defect": "Leave discrepancies enabled for the strict cart or force strict caps on the discrepancy report."
+    },
+    {
+     "for": "M21.X1605",
+     "page": "Ward stocktake return",
+     "gesture": "Record an empty linen cart, then file its stocktake.",
+     "outcome": "The return receipt reads “Ward stocktake filed with 0 towels”.",
+     "opposite": "Mark the count outstanding and file it. The return says “Ward stocktake filed awaiting a count”.",
+     "defect": "Write null for the empty cart or write zero for the outstanding count."
+    },
+    {
+     "for": "M21.X1606",
+     "page": "Ward stocktake change log",
+     "gesture": "Use the up arrow on a count of eight towels.",
+     "outcome": "The log reads “Staff counted one extra towel”.",
+     "opposite": "Apply the book correction from eight to ten and the log reads “Book correction added two towels”.",
+     "defect": "Read the current number as the old number in the keyboard report, or require a browser event for the book correction."
+    },
+    {
+     "for": "M21.X1607",
+     "page": "Ward stocktake handoff",
+     "gesture": "Begin recounting the eight towels on the ward trolley.",
+     "outcome": "The count receives focus and the handoff reads “Counting the ward trolley”.",
+     "opposite": "Send the tally for review. Focus leaves the count and the handoff reads “Ward tally ready for review”.",
+     "defect": "Skip entering the count for the recount or skip leaving it when opening the review."
+    },
+    {
+     "for": "M21.X1608",
+     "page": "Laundry invoice",
+     "gesture": "Prepare the euro invoice for a laundry charge of twelve and a half.",
+     "outcome": "The billed amount and the invoice preview read “€12.50”.",
+     "opposite": "Prepare the dollar invoice. Both read “$12.50”.",
+     "defect": "Use dollars for the euro invoice or use euros for the dollar invoice."
+    },
+    {
+     "for": "M21.X1609",
+     "page": "Laundry scale entry",
+     "gesture": "Set the scale for hundredths. Enter one whole unit and three fractional digits.",
+     "outcome": "The active scale reading stops at 1.23.",
+     "opposite": "Allow an untrimmed reading and the active scale accepts 1.234.",
+     "defect": "Disable decimal validation for the hundredths scale or enable it for the untrimmed scale."
+    },
+    {
+     "for": "M21.X1610",
+     "page": "Laundry scale ticket",
+     "gesture": "Weigh the measured bundle for a whole-unit consignment.",
+     "outcome": "The ticket records “12.000 kg”.",
+     "opposite": "Retain full precision for the same bundle. The ticket records “12.375 kg”.",
+     "defect": "Retain the fraction for the whole-unit run or force whole units on the precise scale."
+    },
+    {
+     "for": "M21.X1611",
+     "page": "Ward stocktake editing",
+     "gesture": "Seal an audited count against editing.",
+     "outcome": "The field retains its read-only state and the custody notice reads “Audited count is locked”.",
+     "opposite": "Open a fresh count. The field accepts the next keyboard step and the custody notice reads “Ward staff can count”.",
+     "defect": "Leave the audited field writable or leave the fresh count read-only."
+    },
+    {
+     "for": "M21.X1612",
+     "page": "Ward stocktake tools",
+     "gesture": "Set up bedside counting and clear a recorded count using its clear button.",
+     "outcome": "The new count is empty and the instruction reads “Clear a count beside the bed”.",
+     "opposite": "Choose the trolley toolkit, step the count from eight to nine and read “Step the count on the trolley”.",
+     "defect": "Retain the trolley toolkit for bedside counting or leave bedside controls selected for the trolley."
+    },
+    {
+     "for": "M21.X1613",
+     "page": "Ward stocktake corrections",
+     "gesture": "Close the ward count to further entry.",
+     "outcome": "The numeric field is disabled and the review reads “Ward count closed”.",
+     "opposite": "Reopen the count. A keyboard step changes eight to nine and the review reads “Ward count reopened”.",
+     "defect": "Keep the closed entry enabled or leave the reopened entry disabled."
+    },
+    {
+     "for": "M21.X1614",
+     "page": "Ward stocktake instructions",
+     "gesture": "Review the spoken instructions for a floor tally.",
+     "outcome": "The review reads “Count towels on the ward floor”.",
+     "opposite": "Review a delivery tally and the review reads “Count towels at receiving”.",
+     "defect": "Read an unrelated original field attribute in either review."
+    },
+    {
+     "for": "M21.X1615",
+     "page": "Ward stocktake recovery",
+     "gesture": "Keep a trolley stocktake, add a towel and reopen the worksheet.",
+     "outcome": "The worksheet restores nine towels.",
+     "opposite": "Use a one-visit worksheet, add a towel and reopen it. Its opening count is eight.",
+     "defect": "Disable persistence when keeping the worksheet or enable it for the one-visit worksheet."
+    },
+    {
+     "for": "M21.X1616",
+     "page": "Ward stocktake recovery",
+     "gesture": "Archive a zero stocktake as a recovery copy.",
+     "outcome": "The recovery receipt reads “Archived empty cart”.",
+     "opposite": "Archive an outstanding count. The receipt reads “Archived outstanding count”.",
+     "defect": "Serialize the outstanding count for the empty cart or the empty cart for the outstanding count."
+    },
+    {
+     "for": "M21.X1617",
+     "page": "Ward stocktake handoff",
+     "gesture": "Release the electronic counter to return to a paper tally.",
+     "outcome": "The guide reads “Paper tally opened”, the original input accepts paper transcription, and electronic signing closes.",
+     "opposite": "Reopen the electronic counter. The guide reads “Electronic tally open” and its numeric control remains available.",
+     "defect": "Use a refresh for the release, or end the numeric editor when reopening the electronic tally."
+    },
+    {
+     "for": "M21.X1618",
+     "page": "Laundry scale worksheet",
+     "gesture": "Print a narrow right-to-left scale column.",
+     "outcome": "The marked scale uses a 180-pixel width and the print review reads “Right-to-left scale column”.",
+     "opposite": "Print the full-width standard column. The scale uses 75% and the review reads “Standard scale column”.",
+     "defect": "Apply the standard column to the narrow selection or the narrow column to the standard selection."
+    },
+    {
+     "for": "M21.X1619",
+     "page": "Laundry scale worksheet",
+     "gesture": "Leave the printed scale width unchanged after choosing the narrow column.",
+     "outcome": "The marked scale keeps its 180-pixel width.",
+     "opposite": "Leave the width unchanged after choosing the full column. The marked scale keeps its 75% width.",
+     "defect": "Replace a null CSS width by 100% or a null pixel width by 100."
+    },
+    {
+     "for": "M21.X1620",
+     "page": "Laundry scale worksheet",
+     "gesture": "Print a permanent scale caption on an empty weighing slip.",
+     "outcome": "The “Weight to record” caption remains raised before typing and the print review reads “Permanent weight caption”.",
+     "opposite": "Use a focus-raised caption and it begins lowered. Use an inline caption and the field shows its placeholder.",
+     "defect": "Substitute the focus-raised, permanent or inline mode for the selected caption mode."
+    },
+    {
+     "for": "M21.X1621",
+     "page": "Laundry scale worksheet",
+     "gesture": "Use a ward-specific prompt for an empty scale.",
+     "outcome": "The field prompts “Weigh without the cart” and the instructions read “Ward weighing instructions”.",
+     "opposite": "Choose the community language after the ward prompt. The field returns to “Weight to record” and the instructions read “Community weighing instructions”.",
+     "defect": "Keep the community wording on the ward slip or the ward wording on the community slip."
+    },
+    {
+     "for": "M21.X1622",
+     "page": "Laundry scale worksheet",
+     "gesture": "Remove a local weighing prompt and print the unit’s fallback instructions.",
+     "outcome": "The printed guide reads “Use the ward weighing handbook”.",
+     "opposite": "Suppress wording on a self-service slip. The guide reads “Use the scale diagram”.",
+     "defect": "Write an empty string for removed instructions or null for intentionally suppressed instructions."
+    },
+    {
+     "for": "M21.X1623",
+     "page": "Laundry scale worksheet",
+     "gesture": "Prepare the ward scale slip with its preprinted source and unit.",
+     "outcome": "The slip shows “Ward scale” before the reading and “Kilograms” after it.",
+     "opposite": "Prepare a delivery slip with “Receiving scale” before the reading and “Pounds” after it. The plain replacement removes both labels and reads “Write the unit on the slip”.",
+     "defect": "Substitute the other station or unit, reverse their printed positions, or retain either label on the plain replacement."
+    },
+    {
+     "for": "M21.X1624",
+     "page": "Laundry scale worksheet",
+     "gesture": "Attach the live ward weight labels and print the measured bundle.",
+     "outcome": "The slip shows “Ward laundry” before the reading and “Net kilograms” after it.",
+     "opposite": "Attach the receiving labels and read “Supplier delivery” before the reading and “Gross pounds” after it.",
+     "defect": "Choose the other pair, read the wrong callback argument, or place the live unit before the reading and its source after it."
+    },
+    {
+     "for": "M21.X1625",
+     "page": "Ward stocktake return",
+     "gesture": "File a signed paper-to-electronic stocktake of an empty cart using the native form.",
+     "outcome": "The posted return reads “Signed empty cart”.",
+     "opposite": "File the outstanding tally through the same form. The return reads “Signed tally awaiting count”.",
+     "defect": "Write a nonzero value for the empty cart or restore a prior count on the outstanding form."
+    },
+    {
+     "for": "M21.X1626",
+     "page": "Ward stocktake return",
+     "gesture": "Open a new linen return with the standard count field.",
+     "outcome": "The field shows the member’s fractional opening amount as 12.50.",
+     "opposite": "Open an uncounted return with the same standard field. The count is blank.",
+     "defect": "Skip the bound member’s amount or replace a missing amount with zero."
+    },
+    {
+     "for": "M21.X1627",
+     "page": "Laundry invoice",
+     "gesture": "Reset an invoice previously priced in euros to the community billing currency.",
+     "outcome": "The preview reads “$12.50” and the billing note reads “Community billing currency”.",
+     "opposite": "Keep the explicit euro contract. The preview reads “€12.50” and the note reads “Contract billing currency”.",
+     "defect": "Keep EUR on the community reset or reset the explicit euro contract to its default."
+    },
+    {
+     "for": "M21.X1628",
+     "page": "Ward stock transfer",
+     "gesture": "Release a six-towel reserve before issuing a six-towel pack from eight.",
+     "outcome": "The transfer slip shows 2 and reads “Reserve released”.",
+     "opposite": "Release a ten-towel capacity limit before receiving a six-towel pack. The slip shows 14 and reads “Cart capacity released”.",
+     "defect": "Leave the lower reserve in force or retain the upper capacity limit."
+    },
+    {
+     "for": "M21.X1629",
+     "page": "Laundry scale worksheet",
+     "gesture": "Remove a ward print style and use the community sheet.",
+     "outcome": "The print notice reads “Community print style”.",
+     "opposite": "Suppress the ward style on an unbranded copy. The notice reads “Unbranded print copy”.",
+     "defect": "Write an empty CSS class for an unselected style or null for an intentionally unbranded copy."
+    },
+    {
+     "for": "M21.X1630",
+     "page": "Ward stocktake review",
+     "gesture": "With a positive emergency-linen check active, step eight towels down to the shortage threshold.",
+     "outcome": "The inline notice reads “Keep eight towels for emergency stock” while the counter retains focus.",
+     "opposite": "Step an eight-towel count upward and the review reads “Emergency reserve met” with nine on hand.",
+     "defect": "Commit against a different component event on the shortage side, or apply a threshold above nine on the sufficient-stock side."
+    },
+    {
+     "for": "M21.X1631",
+     "page": "Ward stocktake change log",
+     "gesture": "Record zero against a previously outstanding ward count.",
+     "outcome": "The log reads “First count confirmed empty”.",
+     "opposite": "Withdraw a recorded zero during recount. The log reads “Empty-cart count withdrawn”.",
+     "defect": "Treat the prior missing count as zero or treat the withdrawn count as a new zero."
+    },
+    {
+     "for": "M21.X1632",
+     "page": "Laundry transfer weight",
+     "gesture": "Receive a weighed quarter-unit parcel on a twelve-and-a-half-unit load.",
+     "outcome": "The scale reads 12.750.",
+     "opposite": "Issue the same parcel from an equivalent load. The scale reads 12.250.",
+     "defect": "Use the whole-unit default for the received parcel or for the issued parcel."
+    },
+    {
+     "for": "M21.X1633",
+     "page": "Ward stocktake handoff",
+     "gesture": "Begin recounting a tally whose number is outstanding and send it for review.",
+     "outcome": "The handoff asks “Count towels before signing”, then reads “Return held pending a count”.",
+     "opposite": "Repeat the handoff with a confirmed empty cart. It asks “Confirm the empty trolley”, then reads “Empty cart ready to sign”.",
+     "defect": "Read an outstanding focused or blurred value as zero, or read a confirmed zero as missing."
+    },
+    {
+     "for": "M21.X1634",
+     "page": "Laundry invoice",
+     "gesture": "Open the transcription guide for a charge of twelve and a half.",
+     "outcome": "The charge has focus and the transcription guide shows “12.5”.",
+     "opposite": "Prepare the signed invoice for the same charge and the preview reads “$12.50”.",
+     "defect": "Read before entering the editor for the transcription or read its editing text for the signed invoice."
+    },
+    {
+     "for": "M21.X1635",
+     "page": "Ward stocktake station",
+     "gesture": "Open the staffed trolley profile and take its next two-towel bundle.",
+     "outcome": "The count reaches 10 and the profile reads “Staffed trolley counting”.",
+     "opposite": "Open the archived supplier profile. Its configured amount reads 14.0 and the profile reads “Archived supplier count”.",
+     "defect": "Apply an archived editing flag to the staffed station or an active flag to the read-only archive."
+    },
+    {
+     "for": "M21.X1636",
+     "page": "Laundry supplier tariff",
+     "gesture": "Open the European supplier slip and review its compact printed rate.",
+     "outcome": "The field shows €12.38, the slip names the European laundry and its review reads “Compact European tariff”.",
+     "opposite": "Open the domestic tariff. The field shows $12.4, the slip names the domestic laundry and its review reads “Full domestic tariff”.",
+     "defect": "Apply the domestic raw width or currency to the European rendering, or the European width or currency to the domestic rendering."
     }
    ],
    "verdicts": [

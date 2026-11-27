@@ -55,6 +55,23 @@ public static partial class FusionDropDownListHtml
     public static DropDownListBuilder Fields<TItem, TText, TItemValue, TGroup>(this DropDownListBuilder build, Expression<Func<TItem, TText>> text, Expression<Func<TItem, TItemValue>> value, Expression<Func<TItem, TGroup>> groupBy)
         => Named(build, names => new DropDownListFieldSettings { Text = names.Of(text), Value = names.Of(value), GroupBy = names.Of(groupBy) });
 
+    /// <summary>Names the fields a local list uses for an option's label and selection value.</summary>
+    /// <param name="field">The bound list field.</param>
+    /// <param name="text">The catalogue member shown to the user.</param>
+    /// <param name="value">The catalogue member that supplies the selected value.</param>
+    /// <returns>The mapping under the field's JSON settings.</returns>
+    public static FusionDropDownListFields<TItem> ListFields<TModel, TValue, TItem, TText, TItemValue>(this InputField<TModel, TValue> field, Expression<Func<TItem, TText>> text, Expression<Func<TItem, TItemValue>> value)
+        => new(field.JsonName(text), field.JsonName(value), null);
+
+    /// <summary>Names the label, value and grouping fields of a local list.</summary>
+    /// <param name="field">The bound list field.</param>
+    /// <param name="text">The catalogue member shown to the user.</param>
+    /// <param name="value">The catalogue member that supplies the selected value.</param>
+    /// <param name="groupBy">The catalogue member that supplies the group heading.</param>
+    /// <returns>The mapping under the field's JSON settings.</returns>
+    public static FusionDropDownListFields<TItem> ListFields<TModel, TValue, TItem, TText, TItemValue, TGroup>(this InputField<TModel, TValue> field, Expression<Func<TItem, TText>> text, Expression<Func<TItem, TItemValue>> value, Expression<Func<TItem, TGroup>> groupBy)
+        => new(field.JsonName(text), field.JsonName(value), field.JsonName(groupBy));
+
     private static DropDownListBuilder List<TModel, TValue>(InputField<TModel, TValue> field)
         => DropDownListOf(field).Value(FusionData.AsWritten(field.ValueJson)).HtmlAttributes(new Dictionary<string, object> { ["name"] = field.Name });
 

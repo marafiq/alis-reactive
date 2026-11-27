@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalFamilyWindow
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Family availability review";
+    var plan = Html.ReactivePlan<ArrivalFamilyWindow>();
+}
+<h1>Family availability review</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").Min(Model.Alternate ? new DateTime(2026, 7, 1) : new DateTime(2026, 7, 10)).Max(new DateTime(2026, 7, 30)))
+        .Reactive(picker => picker.RenderDayCell, (cell, pipeline) =>
+        {
+            pipeline.When(cell.Date.Eq(new DateTime(2026, 7, 7)).And(cell.IsOutOfRange))
+                .Then(pipeline => pipeline.Element("family-notice").Text.Set("Before the approved window"))
+                .ElseIf(cell.Date.Eq(new DateTime(2026, 7, 7)).And(cell.IsOutOfRange.Not()))
+                .Then(pipeline => pipeline.Element("family-notice").Text.Set("Within the admission window"));
+        }))
+</fieldset>
+<p><output id="family-notice" aria-label="Family notice">Availability pending</output></p>
+@Html.RenderPlan(plan)

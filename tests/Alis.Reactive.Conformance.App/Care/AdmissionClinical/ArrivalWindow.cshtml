@@ -1,0 +1,49 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalWindow
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Placement window";
+    var plan = Html.ReactivePlan<ArrivalWindow>();
+}
+<h1>Placement window</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").InputFormats(new[] { "M/d/yyyy" })))
+</fieldset>
+@(Html.NativeButton("apply-approved-window", "Apply approved window")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Min.Set(new DateTime(2026, 7, 10));
+        date.Max.Set(new DateTime(2026, 7, 20));
+        date.StrictMode.Set(true);
+        date.DataBind();
+    }))
+@(Html.NativeButton("review-exceptional-date", "Review exceptional date")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Min.Set(new DateTime(2026, 7, 10));
+        date.Max.Set(new DateTime(2026, 7, 20));
+        date.StrictMode.Set(false);
+        date.DataBind();
+    }))
+@(Html.NativeButton("enforce-arrival-window", "Enforce arrival window")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Min.Set(new DateTime(2026, 7, 10));
+        date.Max.Set(new DateTime(2026, 7, 20));
+        date.StrictMode.Set(true);
+        date.DataBind();
+    }))
+@Html.RenderPlan(plan)

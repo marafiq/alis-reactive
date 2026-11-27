@@ -1,0 +1,36 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalLetterIntake
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Written-date referral";
+    var plan = Html.ReactivePlan<ArrivalLetterIntake>();
+}
+<h1>Written-date referral</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").StrictMode()))
+</fieldset>
+@(Html.NativeButton("accept-written-referral", "Accept written referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.InputFormatPatterns.Set(new[] { new FusionDateFormatPattern { Skeleton = "long" } });
+        date.DataBind();
+    }))
+@(Html.NativeButton("accept-ordinary-referral", "Accept ordinary referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.InputFormatPatterns.Set(Array.Empty<FusionDateFormatPattern>());
+        date.DataBind();
+    }))
+@Html.RenderPlan(plan)

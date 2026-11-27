@@ -1,0 +1,40 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalRecoveryDesk
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Workstation recovery preference";
+    var plan = Html.ReactivePlan<ArrivalRecoveryDesk>();
+}
+<h1>Workstation recovery preference</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").EnablePersistence(Model.Remembered)))
+</fieldset>
+@(Html.NativeButton("keep-a-draft", "Keep a draft")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.EnablePersistence.Set(true);
+        date.Refresh();
+    }))
+@(Html.NativeButton("use-the-default-preference", "Use the default preference")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.EnablePersistence.Set(false);
+        date.DataBind();
+        pipeline.When(date.EnablePersistence.Not())
+            .Then(pipeline => pipeline.Element("preference").Text.Set("Default requested"));
+    }))
+<p><output id="preference" aria-label="Preference">Referral default</output></p>
+<a href="@CarePages.ArrivalRecoverNext">Open next admission</a>
+@Html.RenderPlan(plan)

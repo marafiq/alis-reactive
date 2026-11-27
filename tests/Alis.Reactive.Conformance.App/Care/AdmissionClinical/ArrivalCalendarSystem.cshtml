@@ -1,0 +1,45 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalCalendarSystem
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission calendar edition";
+    var plan = Html.ReactivePlan<ArrivalCalendarSystem>();
+}
+<h1>Admission calendar edition</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy")))
+</fieldset>
+@(Html.NativeButton("use-chaplaincy-calendar", "Use chaplaincy calendar")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.CalendarMode.Set(FusionDatePickerCalendar.Islamic);
+        date.DataBind();
+        date.Refresh();
+        pipeline.When(date.CalendarMode.Eq(FusionDatePickerCalendar.Islamic))
+            .Then(pipeline => pipeline.Element("schedule-edition").Text.Set("Chaplaincy calendar"))
+            .Else(pipeline => pipeline.Element("schedule-edition").Text.Set("Gregorian calendar"));
+    }))
+@(Html.NativeButton("use-bed-desk-calendar", "Use bed desk calendar")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.CalendarMode.Set(FusionDatePickerCalendar.Gregorian);
+        date.DataBind();
+        date.Refresh();
+        pipeline.When(date.CalendarMode.Eq(FusionDatePickerCalendar.Islamic))
+            .Then(pipeline => pipeline.Element("schedule-edition").Text.Set("Chaplaincy calendar"))
+            .Else(pipeline => pipeline.Element("schedule-edition").Text.Set("Gregorian calendar"));
+    }))
+<p><output id="schedule-edition" aria-label="Schedule edition">Choose a calendar edition</output></p>
+@Html.RenderPlan(plan)

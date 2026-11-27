@@ -1435,6 +1435,8 @@ One commit per slice, each with its own tests, which `slice_tests` holds.
 
 The full input onboarding wave covers the [CheckBox](FusionComponents/audit/checkbox-coverage.md), [RadioButton](FusionComponents/audit/radiobutton-coverage.md) and [TextBox](FusionComponents/audit/textbox-coverage.md) at the pinned vendor versions. Their net10 pages exercise photo consent, room allocation, wristband names and family contact cards. The operation records distinguish rendered behavior from vendor-only observations and name the remaining limits.
 
+Ward staff can now file an empty linen cart, book a calendar date in the receiving desk’s time zone and select a transfer ward from a locally filtered directory. The net10 pages exercise bound values, original vendor events, rendering and persistence. The [NumericTextBox](FusionComponents/audit/numerictextbox-coverage.md), [DatePicker](FusionComponents/audit/datepicker-coverage.md) and [DropDownList](FusionComponents/audit/dropdownlist-coverage.md) records give the pinned contracts, the typed operations the pages use and the exact limits each audit found.
+
 ### U27. Fusion's app-level objects
 Features: M23.F1, M23.F2
 

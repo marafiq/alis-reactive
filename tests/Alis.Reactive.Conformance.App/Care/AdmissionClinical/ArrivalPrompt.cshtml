@@ -1,0 +1,68 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalPrompt
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Printed arrival instructions";
+    var plan = Html.ReactivePlan<ArrivalPrompt>();
+}
+<h1>Printed arrival instructions</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").Placeholder("Arrival day")))
+</fieldset>
+@(Html.NativeButton("follow-chart-instructions", "Follow chart instructions")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Placeholder.Set((string?)null);
+        date.DataBind();
+        var noHint = date.Element.HasAttribute("placeholder").Not();
+        pipeline.When(date.Placeholder.IsNull().And(noHint))
+            .Then(pipeline => pipeline.Element("printed-instruction").Text.Set("Follow the resident chart"))
+            .ElseIf(date.Placeholder.Eq(string.Empty).And(noHint))
+            .Then(pipeline => pipeline.Element("printed-instruction").Text.Set("Ask the admission nurse"));
+    }))
+@(Html.NativeButton("suppress-printed-hint", "Suppress printed hint")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Placeholder.Set(string.Empty);
+        date.DataBind();
+        var noHint = date.Element.HasAttribute("placeholder").Not();
+        pipeline.When(date.Placeholder.IsNull().And(noHint))
+            .Then(pipeline => pipeline.Element("printed-instruction").Text.Set("Follow the resident chart"))
+            .ElseIf(date.Placeholder.Eq(string.Empty).And(noHint))
+            .Then(pipeline => pipeline.Element("printed-instruction").Text.Set("Ask the admission nurse"));
+    }))
+@(Html.NativeButton("use-large-print-date-cue", "Use large-print date cue")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FloatLabelType.Set(FusionDatePickerLabel.Always);
+        date.DataBind();
+        pipeline.When(date.FloatLabelType.Eq(FusionDatePickerLabel.Always))
+            .Then(pipeline => pipeline.Element("card-instructions").Text.Set("Large-print date entry"))
+            .Else(pipeline => pipeline.Element("card-instructions").Text.Set("Compact date entry"));
+    }))
+@(Html.NativeButton("use-compact-date-cue", "Use compact date cue")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FloatLabelType.Set(FusionDatePickerLabel.Auto);
+        date.DataBind();
+        pipeline.When(date.FloatLabelType.Eq(FusionDatePickerLabel.Always))
+            .Then(pipeline => pipeline.Element("card-instructions").Text.Set("Large-print date entry"))
+            .Else(pipeline => pipeline.Element("card-instructions").Text.Set("Compact date entry"));
+    }))
+<p><output id="printed-instruction" aria-label="Printed instruction">Instructions pending</output></p>
+<p><output id="card-instructions" aria-label="Card instructions">Card edition pending</output></p>
+@Html.RenderPlan(plan)

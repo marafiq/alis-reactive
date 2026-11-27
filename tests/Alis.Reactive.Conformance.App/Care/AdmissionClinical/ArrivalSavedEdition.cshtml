@@ -1,0 +1,40 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalSavedEdition
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Saved arrival form";
+    var plan = Html.ReactivePlan<ArrivalSavedEdition>();
+}
+<h1>Saved arrival form</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build
+            .Format(Model.Ledger ? "dd.MM.yyyy" : "MMMM d, yyyy")
+            .Placeholder(Model.Ledger ? "Transfer ledger date" : "Resident arrival date")
+            .Locale("en-US").StrictMode(Model.Ledger).AllowEdit(!Model.Ledger)
+            .FirstDayOfWeek(Model.Ledger ? 1 : 0).WeekNumber(Model.Ledger)
+            .WeekRule(Model.Ledger ? Syncfusion.EJ2.Calendars.WeekRule.FirstFourDayWeek : Syncfusion.EJ2.Calendars.WeekRule.FirstDay)))
+</fieldset>
+@(Html.NativeButton("review-saved-edition", "Review saved edition")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+        var ledger = date.StrictMode.And(date.AllowEdit.Not()).And(date.FirstDayOfWeek.Eq(1)).And(date.WeekNumber).And(date.WeekRule.Eq(FusionDatePickerWeekRule.FirstFourDayWeek));
+        var letter = date.StrictMode.Not().And(date.AllowEdit).And(date.FirstDayOfWeek.Eq(0)).And(date.WeekNumber.Not()).And(date.WeekRule.Eq(FusionDatePickerWeekRule.FirstDay));
+        pipeline.When(ledger.And(date.Locale.Eq("en-US")))
+            .Then(pipeline => pipeline.Element("edition-instructions").Text.Set("Use the transfer ledger"))
+            .ElseIf(letter.And(date.Locale.Eq("en-US")))
+            .Then(pipeline => pipeline.Element("edition-instructions").Text.Set("Use the resident letter"));
+    }))
+<p><output id="edition-instructions" aria-label="Edition instructions">Edition awaiting review</output></p>
+@Html.RenderPlan(plan)

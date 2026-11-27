@@ -223,11 +223,17 @@ Each name is gate 2's; each door is the capability it carries.
   type argument admits null (M21.X701), `FocusIn`, `FocusOut` and `Change`, with `IInputComponent.Input` committed by
   `Change` (M7.N3); the payload `FusionDatePicker<TValue>.ChangedEventArgs` (`Value`, a `TValue`, and `IsInteracted`);
   and the render helpers `field.FusionDatePicker()` and `field.FusionDatePicker(build => ..)`, which render it with the
-  bound member's type, a date ALIS037 holds (M21.X702). It replaces main's six files
+  bound member's type. The demonstrated bindings are `DateTime?` and `DateTimeOffset?`. The design assigns
+  the closed type argument check to ALIS037 (M21.X702), scheduled after 1.0 in U13. It replaces main's six files
   (`Alis.Reactive.Fusion/Components/FusionDatePicker/` at 623dd4a27), whose doors carry their verdicts in
-  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  `spec/FusionComponents/features.json`. DatePicker is pinned to ej2-calendars 33.1.44
   (`@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:87`, `:488`, `:494`,
   `@syncfusion/ej2-calendars/src/calendar/calendar.d.ts:551`, `:698`, `:710`).
+  The arrival forms apply calendar bounds, entry modes, date formats and keyboard shortcuts. The change payload
+  identifies the field and staff action. The open and close payloads can veto the popup, and the day-cell payload
+  can disable a date. A form can position the live popup, change its scroll behavior and navigate the calendar.
+  The Hijri module converts the chosen day to the Gregorian booking date. The receiving desk posts the original
+  offset-bearing value through the date wire contract (D3.8, D3.9). The [operation record](audit/datepicker-coverage.md) names the supported forms and limits.
 - `M21.N16` kept: `FusionDateRangePicker`: `StartDate` and `EndDate` as `Property<DateTime?>` and `Value` as
   `Property<DateTime[]?>` (M21.X703, M21.D702), `FocusIn`, `FocusOut` and `Change`, with `IInputComponent.Input`
   committed by `Change` (M7.N3); the payload `FusionDateRangePicker.RangeEventArgs` (`StartDate`, `EndDate`, `DaySpan`,
@@ -275,14 +281,19 @@ Each name is gate 2's; each door is the capability it carries.
   `Property<TValue>` whose type argument admits null, `Text` as `Property<string?>` (M21.X506), `DataSource<TItem>()`,
   `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change`, `Focus` and `Blur`, with
   `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionDropDownList<TValue>.ChangeEventArgs`
-  (`Value`, `IsInteracted`), and the focus and blur payloads, which EJ2 types as `Object`, declaring no member (their
-  class name a gate 2 gap); and the render helpers `field.FusionDropDownList()`, `field.FusionDropDownList(build => ..)`
-  and `field.FusionDropDownList(items, build => ..)`, which render it with the bound member's type and hand EJ2 the
+  (`Value`, `IsInteracted`, the current and previous items and their data, and the original event). Focus and blur
+  use payload-free event declarations for EJ2’s `Object` notifications. The render helpers `field.FusionDropDownList()`, `field.FusionDropDownList(build => ..)`
+  and `field.FusionDropDownList(items, build => ..)` render it with the bound member's type and hand EJ2 the
   items by M21.D1, with `Fields<TItem>(text, value)` and `Fields<TItem>(text, value, groupBy)` (M21.X507). It replaces
   main's eight files (`Alis.Reactive.Fusion/Components/FusionDropDownList/` at 623dd4a27), whose doors carry their
   verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:301`, `:308`, `:365`, `:389`, `:395`, `:685`,
   `:694`, `:700`, `:706`, `:742`, `@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:390`).
+  The transfer desk can filter typed local rows, sort them, look up a referral, add or disable choices and inspect
+  the selected and previous ward. Local queries accept typed field mappings and preserve the configured JSON names.
+  Item and value templates receive the actual row. The list supplies selection, filtering, popup and binding events.
+  While the ward request is held at `Lanes.tla:Respond`, the page shows the list’s loading indicator. Success
+  binds the returned wards and an HTTP error leaves the current list available (`Request.tla:OneRouteRuns`). The [operation record](audit/dropdownlist-coverage.md) names the supported forms and limits.
 - `M21.N21` kept: `FusionDropDownTree`: `Value` as `Property<string[]?>` and `Text` as `Property<string?>` (M21.X508),
   `DataBind`, `ShowPopup`, `HidePopup`, `Clear` and `Change`, with `IInputComponent.Input` committed by `Change`
   (M7.N3); the payload `FusionDropDownTree.DdtChangeEventArgs` (`Value`, `OldValue`, `IsInteracted`); and the render
@@ -406,12 +417,20 @@ Each name is gate 2's; each door is the capability it carries.
   `IInputComponent.Input` committed by `Change` (M7.N3);
   the payloads `FusionNumericTextBox<TValue>.ChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<TValue>`,
   M21.X608, and `IsInteracted`), `FusionNumericTextBox<TValue>.NumericFocusEventArgs` and
-  `FusionNumericTextBox<TValue>.NumericBlurEventArgs`, of which the declaration reads no member; and the render helper
+  `FusionNumericTextBox<TValue>.NumericBlurEventArgs`, which expose the current count, field container,
+  notification name and original browser event; and the render helper
   `field.FusionNumericTextBox(build => ..)`, which renders `FusionNumericTextBox<TProp>`. It replaces main's eight files
   (`Alis.Reactive.Fusion/Components/FusionNumericTextBox/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:71`, `:82`, `:272`, `:278`, `:284`, `:373`, `:381`,
   `:401`, `:407`, `:440`, `:445`, `:454`).
+  The standard and configured render helpers bind the same nullable field. Finite bounds follow its numeric type.
+  Resetting a bound restores EJ2’s JavaScript number extrema, representable in a double.
+  Both step methods accept an explicit amount or use the configured step. A stocktake distinguishes an empty cart
+  from a missing count, enforces a reserve, validates an emergency shortage and posts through the bound field.
+  The billing desk reads the focused and formatted values, configures decimal precision, currency, width and
+  labels, and renders unit templates on the scale. The ward can restore a saved count or release the electronic
+  editor for paper transcription. The [operation record](audit/numerictextbox-coverage.md) names the supported forms and limits.
 - `M21.N33` kept: `FusionOtpInput`: `Value` as `Property<string>`, the text the browser holds
   (`probe:ej2-otpinput-value-after-typing`), `DataBind`, `FocusIn`, `FocusOut`, `Input`, `ValueChanged`, `Focus` and
   `Blur`, with `IInputComponent.Input` committed by `ValueChanged` (M7.N3); the payloads

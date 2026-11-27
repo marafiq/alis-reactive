@@ -1,0 +1,45 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalDispatchLanguage
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Transfer dispatch slip";
+    var plan = Html.ReactivePlan<ArrivalDispatchLanguage>();
+}
+<h1>Transfer dispatch slip</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd")))
+</fieldset>
+@(Html.NativeButton("use-french-desk", "Use French desk")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Locale.Set("fr-FR");
+        date.DataBind();
+        pipeline.When(date.Locale.Eq("fr-FR"))
+            .Then(pipeline => pipeline.Element("dispatch-label").Text.Set("Date d’admission"))
+            .ElseIf(date.Locale.Eq("en-US"))
+            .Then(pipeline => pipeline.Element("dispatch-label").Text.Set("Admission date"));
+    }))
+@(Html.NativeButton("use-english-desk", "Use English desk")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Locale.Set("en-US");
+        date.DataBind();
+        pipeline.When(date.Locale.Eq("fr-FR"))
+            .Then(pipeline => pipeline.Element("dispatch-label").Text.Set("Date d’admission"))
+            .ElseIf(date.Locale.Eq("en-US"))
+            .Then(pipeline => pipeline.Element("dispatch-label").Text.Set("Admission date"));
+    }))
+<p><output id="dispatch-label" aria-label="Dispatch label">Choose the receiving desk</output></p>
+@Html.RenderPlan(plan)

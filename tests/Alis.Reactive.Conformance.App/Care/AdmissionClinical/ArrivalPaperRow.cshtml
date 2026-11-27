@@ -1,0 +1,47 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalPaperRow
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission paper layout";
+    var plan = Html.ReactivePlan<ArrivalPaperRow>();
+}
+<h1>Admission paper layout</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").Width("60%"))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            var width = opening.Popup.Anchor.GetAttribute("style");
+            pipeline.When(width.Contains("100%"))
+                .Then(pipeline => pipeline.Element("print-instruction").Text.Set("Reserve the whole row"))
+                .ElseIf(width.Contains("180px"))
+                .Then(pipeline => pipeline.Element("print-instruction").Text.Set("Reserve the bedside column"));
+        }))
+</fieldset>
+@(Html.NativeButton("use-a-full-row", "Use a full row")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Width.Set((string?)null);
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("use-a-bedside-row", "Use a bedside row")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.WidthInPixels.Set(180);
+        date.DataBind();
+        date.Show();
+    }))
+<p><output id="print-instruction" aria-label="Print instruction">Select the paper layout</output></p>
+@Html.RenderPlan(plan)

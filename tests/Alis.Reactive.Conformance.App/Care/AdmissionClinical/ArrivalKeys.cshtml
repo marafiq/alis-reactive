@@ -1,0 +1,38 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalKeys
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Booking keyboard";
+    var plan = Html.ReactivePlan<ArrivalKeys>();
+}
+<h1>Booking keyboard</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd")))
+</fieldset>
+@(Html.NativeButton("install-shared-keyboard", "Install shared keyboard")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.KeyConfigs.Set(new Dictionary<FusionDatePickerKey, string> { [FusionDatePickerKey.AltDownArrow] = "f2", [FusionDatePickerKey.AltUpArrow] = "f3" });
+        date.DataBind();
+        date.Refresh();
+    }))
+@(Html.NativeButton("install-standard-keyboard", "Install standard keyboard")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.KeyConfigs.Set((IReadOnlyDictionary<FusionDatePickerKey, string>?)null);
+        date.DataBind();
+        date.Refresh();
+    }))
+@Html.RenderPlan(plan)

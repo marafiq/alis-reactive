@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalHandover
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Confirm the handover date";
+    var plan = Html.ReactivePlan<ArrivalHandover>();
+}
+<h1>Confirm the handover date</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Close, (closing, pipeline) =>
+        {
+            if (Model.Held)
+            {
+                closing.PreventDefault();
+                pipeline.Element("handover-review").Text.Set("Handover confirmation required");
+            }
+            else
+            {
+                pipeline.Element("handover-review").Text.Set("Calendar released");
+            }
+        }))
+</fieldset>
+<p><output id="handover-review" aria-label="Handover review">Confirmation pending</output></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,168 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model RegionalWardDirectory
+@{
+    Layout = "/Care/AdmissionClinical/_WardRoundLayout.cshtml";
+    ViewData["Title"] = "Regional ward directory";
+    var plan = Html.ReactivePlan<RegionalWardDirectory>();
+}
+<h1>Regional ward directory</h1>
+<fieldset>
+    <legend>District referrals</legend>
+    <div id="district-formats">
+        <button type="button" @Html.Raises(plan, RegionalWardActions.Paged)>Use paged directory</button>
+        <button type="button" @Html.Raises(plan, RegionalWardActions.Full)>Use full directory</button>
+    </div>
+    <a id="district-change" href="@CarePages.RegionalWardDirectory" hidden>Choose another directory format</a>
+    @(Html.InputField(plan, m => m.RegionalWard, options => options.Label("District transfer ward"))
+        .FusionDropDownList(Model.Wards, build => build.AllowFiltering(true).DebounceDelay(0).PopupHeight("200px").FilterBarPlaceholder("Search the district directory"))
+        .Reactive(list => list.Change, (change, pipeline) => pipeline
+            .When(change.Value.NotEmpty())
+            .Then(pipeline =>
+            {
+                pipeline.Element("district-referral").Text.Set(change.Value);
+                pipeline.Element("district-referral").Text.Append(" will receive the transfer.");
+            })
+            .Else(pipeline => pipeline.Element("district-referral").Text.Set("Choose the receiving district ward."))))
+    <p id="district-navigation">Choose a directory format.</p>
+    <p id="district-referral">Choose the receiving district ward.</p>
+</fieldset>
+<fieldset>
+    <legend>Emergency contacts</legend>
+    <button type="button" @Html.Raises(plan, RegionalWardActions.Routine)>Routine closure</button>
+    <button type="button" @Html.Raises(plan, RegionalWardActions.Isolate)>Isolation hold</button>
+    <button type="button" @Html.Raises(plan, RegionalWardActions.Normal)>Resume normal service</button>
+    <template id="regional-isolation-contact"><p>Call the district isolation coordinator.</p></template>
+    @(Html.InputField(plan, m => m.EmergencyWard, options => options.Label("Emergency receiving ward"))
+        .FusionDropDownList(Array.Empty<string>(), build => build.NoRecordsTemplate("Check the posted duty notice.")))
+</fieldset>
+<fieldset>
+    <legend>Travel route policy</legend>
+    @(Html.InputField(plan, m => m.PolicyRoute, options => options.Label("Search regional routes"))
+        .FusionDropDownList(new[] { "Original route" }, build => build.AllowFiltering(true).DebounceDelay(0).FilterBarPlaceholder("All, priority or standby choices"))
+        .Reactive(list => list.Filtering, (search, pipeline) =>
+        {
+            var directory = pipeline.Input(m => m.PolicyRoute).Component<FusionDropDownList<string?>>();
+            var choices = new[] { "Lift", "Courtyard" };
+            search.PreventDefaultAction.Set(true);
+            pipeline.When(search.Text.StartsWith("a"))
+                .Then(pipeline => directory.Filter<string>(choices))
+                .ElseIf(search.Text.StartsWith("s"))
+                .Then(pipeline => search.UpdateData<string>(choices, pipeline.Plugin<WardRoundQueries>().StandbyStop))
+                .Else(pipeline => directory.Filter<string>(choices, pipeline.Plugin<WardRoundQueries>().FirstStop));
+        }))
+</fieldset>
+<fieldset>
+    <legend>Notice policy</legend>
+    @(Html.InputField(plan, m => m.PolicyNotice, options => options.Label("Search notice intervals"))
+        .FusionDropDownList(new[] { 15d }, build => build.AllowFiltering(true).DebounceDelay(0).FilterBarPlaceholder("All, priority or standby choices"))
+        .Reactive(list => list.Filtering, (search, pipeline) =>
+        {
+            var directory = pipeline.Input(m => m.PolicyNotice).Component<FusionDropDownList<double?>>();
+            var choices = new[] { 0d, 30d };
+            search.PreventDefaultAction.Set(true);
+            pipeline.When(search.Text.StartsWith("a"))
+                .Then(pipeline => directory.Filter<double>(choices))
+                .ElseIf(search.Text.StartsWith("s"))
+                .Then(pipeline => search.UpdateData<double>(choices, pipeline.Plugin<WardRoundQueries>().StandbyStop))
+                .Else(pipeline => directory.Filter<double>(choices, pipeline.Plugin<WardRoundQueries>().FirstStop));
+        }))
+</fieldset>
+<fieldset>
+    <legend>Escort policy</legend>
+    @(Html.InputField(plan, m => m.PolicyEscort, options => options.Label("Search escort choices"))
+        .FusionDropDownList(new[] { true }, build => build.AllowFiltering(true).DebounceDelay(0).FilterBarPlaceholder("All, priority or standby choices"))
+        .Reactive(list => list.Filtering, (search, pipeline) =>
+        {
+            var directory = pipeline.Input(m => m.PolicyEscort).Component<FusionDropDownList<bool?>>();
+            var choices = new[] { false, true };
+            search.PreventDefaultAction.Set(true);
+            pipeline.When(search.Text.StartsWith("a"))
+                .Then(pipeline => directory.Filter<bool>(choices))
+                .ElseIf(search.Text.StartsWith("s"))
+                .Then(pipeline => search.UpdateData<bool>(choices, pipeline.Plugin<WardRoundQueries>().StandbyStop))
+                .Else(pipeline => directory.Filter<bool>(choices, pipeline.Plugin<WardRoundQueries>().FirstStop));
+        }))
+</fieldset>
+<h2>Transport releases</h2>
+<button type="button" @Html.Raises(plan, RegionalWardActions.Release)>Append released transport</button>
+<button type="button" @Html.Raises(plan, RegionalWardActions.Prioritize)>Prioritize released transport</button>
+<fieldset>
+    <legend>Released travel routes</legend>
+    @(Html.InputField(plan, m => m.ReleasedRoute, options => options.Label("District travel route"))
+        .FusionDropDownList(new[] { "Lift" }, build => build.ShowClearButton(false)))
+</fieldset>
+<fieldset>
+    <legend>Released notice intervals</legend>
+    @(Html.InputField(plan, m => m.ReleasedNotice, options => options.Label("District notice interval"))
+        .FusionDropDownList(new[] { 15d }, build => build.ShowClearButton(false)))
+</fieldset>
+<fieldset>
+    <legend>Released escort choices</legend>
+    @(Html.InputField(plan, m => m.ReleasedEscort, options => options.Label("District escort choice"))
+        .FusionDropDownList(new[] { false }, build => build.ShowClearButton(false)))
+</fieldset>
+@{
+    void DescribeNavigation(Pipeline<RegionalWardDirectory> pipeline, FusionDropDownList<string?> ward)
+    {
+        pipeline.Element("district-formats").Hide();
+        pipeline.Element("district-change").Show();
+        pipeline.When(ward.EnableVirtualization)
+            .Then(pipeline => pipeline.Element("district-navigation").Text.Set("Search by ward number outside the current page."))
+            .Else(pipeline => pipeline.Element("district-navigation").Text.Set("Use End for the final district ward."));
+    }
+
+    Html.On(plan, trigger => trigger
+        .CustomEvent(RegionalWardActions.Paged, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.RegionalWard).Component<FusionDropDownList<string?>>();
+            ward.EnableVirtualization.Set(true);
+            ward.Refresh();
+            DescribeNavigation(pipeline, ward);
+        })
+        .CustomEvent(RegionalWardActions.Full, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.RegionalWard).Component<FusionDropDownList<string?>>();
+            ward.EnableVirtualization.Set(false);
+            ward.Refresh();
+            DescribeNavigation(pipeline, ward);
+        })
+
+        .CustomEvent(RegionalWardActions.Routine, pipeline =>
+        {
+            var directory = pipeline.Input(m => m.EmergencyWard).Component<FusionDropDownList<string?>>();
+            directory.NoRecordsTemplate.Set("<p>Call the district transfer desk.</p>");
+            directory.DataBind();
+        })
+        .CustomEvent(RegionalWardActions.Isolate, pipeline =>
+        {
+            var directory = pipeline.Input(m => m.EmergencyWard).Component<FusionDropDownList<string?>>();
+            directory.NoRecordsTemplate.Set("#regional-isolation-contact");
+            directory.DataBind();
+        })
+        .CustomEvent(RegionalWardActions.Normal, pipeline =>
+        {
+            var directory = pipeline.Input(m => m.EmergencyWard).Component<FusionDropDownList<string?>>();
+            directory.NoRecordsTemplate.Set((string?)null);
+            directory.DataBind();
+        })
+        .CustomEvent(RegionalWardActions.Release, pipeline =>
+        {
+            pipeline.Input(m => m.ReleasedRoute).Component<FusionDropDownList<string?>>().AddItems<string>(new[] { "Ambulance", "Courtyard" });
+            pipeline.Input(m => m.ReleasedNotice).Component<FusionDropDownList<double?>>().AddItems<double>(new[] { 0d, 30d });
+            pipeline.Input(m => m.ReleasedEscort).Component<FusionDropDownList<bool?>>().AddItems<bool>(new[] { true });
+        })
+        .CustomEvent(RegionalWardActions.Prioritize, pipeline =>
+        {
+            pipeline.Input(m => m.ReleasedRoute).Component<FusionDropDownList<string?>>().AddItems<string>(new[] { "Ambulance", "Courtyard" }, 0);
+            pipeline.Input(m => m.ReleasedNotice).Component<FusionDropDownList<double?>>().AddItems<double>(new[] { 0d, 30d }, 0);
+            pipeline.Input(m => m.ReleasedEscort).Component<FusionDropDownList<bool?>>().AddItems<bool>(new[] { true }, 0);
+        }));
+}
+@Html.RenderPlan(plan)

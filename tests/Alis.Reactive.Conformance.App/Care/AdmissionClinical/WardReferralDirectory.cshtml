@@ -1,0 +1,234 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@using Syncfusion.EJ2.DropDowns
+@model WardReferralDirectory
+@{
+    Layout = "/Care/AdmissionClinical/_WardRoundLayout.cshtml";
+    ViewData["Title"] = "Ward referral directory";
+    var plan = Html.ReactivePlan<WardReferralDirectory>();
+}
+<h1>Ward referral directory</h1>
+<fieldset>
+    <legend>Published order</legend>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Clinical)>Clinical priority</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Alphabetical)>Alphabetical notice</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Reverse)>Reverse notice</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.PrintOrder)>Print call order</button>
+    <p id="printed-order">Instructions pending.</p>
+    @(Html.InputField(plan, m => m.Notice, options => options.Label("Ordered wards"))
+        .FusionDropDownList(Model.Wards.Take(3).ToArray(), build => build.Fields((ReferralWard ward) => ward.Name, ward => ward.Code).SortOrder("Descending")))
+</fieldset>
+<fieldset>
+    <legend>Referral search</legend>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.ClinicalSearch)>Clinical search</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.HandoverSearch)>Handover search</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Quick)>Quick ward choice</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.SearchDirections)>Read referral instructions</button>
+    <p id="directory-search-guide">Instructions pending.</p>
+    @(Html.InputField(plan, m => m.Search, options => options.Label("Referral search policy"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((ReferralWard ward) => ward.Name, ward => ward.Code).AllowFiltering(true)))
+</fieldset>
+<fieldset>
+    <legend>Destination hold</legend>
+    @(Html.InputField(plan, m => m.Hold, options => options.Label("Withdraw the highlighted ward")).NativeCheckBox())
+    @(Html.InputField(plan, m => m.Choice, options => options.Label("Receiving unit"))
+        .FusionDropDownList(Model.Wards, build => build.Fields(new DropDownListFieldSettings { Text = plan.JsonPath((ReferralWard ward) => ward.Name).Single(), Value = plan.JsonPath((ReferralWard ward) => ward.Code).Single(), Disabled = plan.JsonPath((ReferralWard ward) => ward.Held).Single() }).AllowFiltering(true))
+        .Reactive(list => list.Select, (selected, pipeline) =>
+        {
+            var ward = selected.ItemData<ReferralWard>();
+            pipeline.When(pipeline.Input(m => m.Hold).Component<NativeCheckBox>().Checked
+                    .And(ward.Read(row => row!.Code).Eq("C2")).And(selected.IsInteracted)
+                    .And(selected.E.Type.Eq("keypress")))
+                .Then(pipeline =>
+                {
+                    selected.Cancel.Set(true);
+                    pipeline.Input(m => m.Choice).Component<FusionDropDownList<string?>>().DisableItem<FusionDropDownList<string?>.ListOption>(selected.Item);
+                    pipeline.Element("receiving-desk").Text.Set(ward.Read(row => row!.Name));
+                    pipeline.Element("receiving-desk").Text.Append(" withdrawn from this round.");
+                })
+                .Else(pipeline => pipeline.Element("receiving-desk").Text.Set(ward.Read(row => row!.Instruction)));
+        }))
+    <p id="receiving-desk">Willow nursing office.</p>
+</fieldset>
+<fieldset>
+    <legend>Service directory</legend>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Urgent)>Urgent directory</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Routine)>Routine directory</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Closed)>Close service directory</button>
+    @(Html.InputField(plan, m => m.Service, options => options.Label("Directory choices"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((ReferralWard ward) => ward.Name, ward => ward.Code, ward => ward.Unit)))
+</fieldset>
+<fieldset>
+    <legend>Vacancy language</legend>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.French)>French notices</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.English)>English notices</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.PrintVacancy)>Print vacancy instructions</button>
+    <p id="printed-vacancy">Instructions pending.</p>
+    @(Html.InputField(plan, m => m.Vacancies, options => options.Label("Available referrals"))
+        .FusionDropDownList(Array.Empty<ReferralWard>(), build => build.Fields((ReferralWard ward) => ward.Name, ward => ward.Code)))
+</fieldset>
+<fieldset>
+    <legend>Ward itinerary</legend>
+    @(Html.InputField(plan, m => m.Itinerary, options => options.Label("Shortlist wards"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((ReferralWard ward) => ward.Name, ward => ward.Code).AllowFiltering(true).DebounceDelay(0).FilterBarPlaceholder("Choose an itinerary"))
+        .Reactive(list => list.Filtering, (search, pipeline) =>
+        {
+            var itinerary = pipeline.Plugin<WardRoundQueries>().Itinerary;
+            var rows = Model.Wards.ToArray();
+            pipeline.When(search.Text.Eq("f"))
+                .Then(pipeline => search.UpdateData<ReferralWard>(rows, itinerary.Clone().Take(1)))
+                .ElseIf(search.Text.Eq("r"))
+                .Then(pipeline => search.UpdateData<ReferralWard>(rows, itinerary.Clone().Skip(1)))
+                .ElseIf(search.Text.Eq("m"))
+                .Then(pipeline => search.UpdateData<ReferralWard>(rows, itinerary.Clone().Range(1, 3)))
+                .ElseIf(search.Text.Eq("p"))
+                .Then(pipeline => search.UpdateData<ReferralWard>(rows, itinerary.Clone().Page(2, 2)))
+                .Else(pipeline => search.UpdateData<ReferralWard>(rows));
+        }))
+</fieldset>
+<fieldset>
+    <legend>Unrestricted itinerary</legend>
+    @(Html.InputField(plan, m => m.AllStops, options => options.Label("Every ward"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((ReferralWard ward) => ward.Name, ward => ward.Code).AllowFiltering(true).DebounceDelay(0).FilterBarPlaceholder("Find any stop"))
+        .Reactive(list => list.Filtering, (search, pipeline) => search.UpdateData<ReferralWard>(Model.Wards.ToArray())))
+</fieldset>
+<fieldset>
+    <legend>Transfer form</legend>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Always)>Always label destination</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Floating)>Float destination label</button>
+    <button type="button" @Html.Raises(plan, ReferralDirectoryActions.Simple)>Use a simple field</button>
+    @(Html.InputField(plan, m => m.Destination, options => options.Label("Placement destination"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((ReferralWard ward) => ward.Name, ward => ward.Code).Placeholder("Receiving ward").FloatLabelType(Syncfusion.EJ2.Inputs.FloatLabelType.Always)))
+</fieldset>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ReferralDirectoryActions.PrintOrder, pipeline =>
+        {
+            var order = pipeline.Input(m => m.Notice).Component<FusionDropDownList<string?>>().SortOrder;
+            pipeline.When(order.Eq(FusionDropDownListOrder.None))
+                .Then(pipeline => pipeline.Element("printed-order").Text.Set("Call the wards in clinical priority order."))
+                .ElseIf(order.Eq(FusionDropDownListOrder.Ascending))
+                .Then(pipeline => pipeline.Element("printed-order").Text.Set("Work from the first ward name to the last."))
+                .ElseIf(order.Eq(FusionDropDownListOrder.Descending))
+                .Then(pipeline => pipeline.Element("printed-order").Text.Set("Start at the end of the alphabetical ward register."));
+        })
+        .CustomEvent(ReferralDirectoryActions.SearchDirections, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Search).Component<FusionDropDownList<string?>>();
+            pipeline.When(ward.AllowFiltering.And(ward.FilterBarPlaceholder.Eq("Search clinical wards")))
+                .Then(pipeline => pipeline.Element("directory-search-guide").Text.Set("Use the clinical directory before calling the placement team."))
+                .ElseIf(ward.AllowFiltering.And(ward.FilterBarPlaceholder.Eq("Search receiving wards")))
+                .Then(pipeline => pipeline.Element("directory-search-guide").Text.Set("Find the receiving ward before sending the handover."))
+                .ElseIf(ward.AllowFiltering.Not())
+                .Then(pipeline => pipeline.Element("directory-search-guide").Text.Set("Choose the ward from the current referral list."));
+        })
+        .CustomEvent(ReferralDirectoryActions.PrintVacancy, pipeline =>
+        {
+            var language = pipeline.Input(m => m.Vacancies).Component<FusionDropDownList<string?>>().Locale;
+            pipeline.When(language.Eq("fr-CA"))
+                .Then(pipeline => pipeline.Element("printed-vacancy").Text.Set("Contactez le bureau des admissions."))
+                .ElseIf(language.Eq("en-US"))
+                .Then(pipeline => pipeline.Element("printed-vacancy").Text.Set("Contact the admissions office."));
+        })
+        .CustomEvent(ReferralDirectoryActions.Clinical, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Notice).Component<FusionDropDownList<string?>>();
+            ward.SortOrder.Set(FusionDropDownListOrder.None);
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.Alphabetical, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Notice).Component<FusionDropDownList<string?>>();
+            ward.SortOrder.Set(FusionDropDownListOrder.Ascending);
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.Reverse, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Notice).Component<FusionDropDownList<string?>>();
+            ward.SortOrder.Set(FusionDropDownListOrder.Descending);
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.ClinicalSearch, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Search).Component<FusionDropDownList<string?>>();
+            ward.AllowFiltering.Set(true);
+            ward.FilterBarPlaceholder.Set("Search clinical wards");
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.HandoverSearch, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Search).Component<FusionDropDownList<string?>>();
+            ward.AllowFiltering.Set(true);
+            ward.FilterBarPlaceholder.Set("Search receiving wards");
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.Quick, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Search).Component<FusionDropDownList<string?>>();
+            ward.AllowFiltering.Set(false);
+            ward.FilterBarPlaceholder.Set("");
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.Urgent, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Service).Component<FusionDropDownList<string?>>();
+            ward.HeaderTemplateCallback.Set(template => template.TemplateName.Eq("headerTemplate").Choose("<h2>Urgent transfer wards</h2>", "<h2>Placement service</h2>"));
+            ward.FooterTemplateCallback.Set(template => template.TemplateName.Eq("footerTemplate").Choose("<p>Clear the receiving bed before transfer.</p>", "<p>Contact placement.</p>"));
+            ward.GroupTemplateCallback.Set(template => template.Row<ReferralGroup>().Read(group => group.Unit).Eq("Memory care").Choose("<strong>Secure care contacts</strong>", "<strong>Recovery contacts</strong>"));
+            ward.DataSource<ReferralWard>().Set(Model.Wards);
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.Routine, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Service).Component<FusionDropDownList<string?>>();
+            ward.HeaderTemplateCallback.Set(template => template.TemplateName.Eq("headerTemplate").Choose("<h2>Routine placements</h2>", "<h2>Placement service</h2>"));
+            ward.FooterTemplateCallback.Set(template => template.TemplateName.Eq("footerTemplate").Choose("<p>Confirm the handover time.</p>", "<p>Contact placement.</p>"));
+            ward.GroupTemplateCallback.Set(template => template.Row<ReferralGroup>().Read(group => group.Unit).Eq("Memory care").Choose("<strong>Memory care wards</strong>", "<strong>Recovery wards</strong>"));
+            ward.DataSource<ReferralWard>().Set(Model.Wards);
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.Closed, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Service).Component<FusionDropDownList<string?>>();
+            ward.NoRecordsTemplateCallback.Set(template => template.TemplateName.Eq("noRecordsTemplate").Choose("<p>Telephone the night placement desk.</p>", "<p>Call placement.</p>"));
+            ward.DataSource<ReferralWard>().Set(Array.Empty<ReferralWard>());
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.French, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Vacancies).Component<FusionDropDownList<string?>>();
+            ward.Locale.Set("fr-CA");
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.English, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Vacancies).Component<FusionDropDownList<string?>>();
+            ward.Locale.Set("en-US");
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.Always, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Destination).Component<FusionDropDownList<string?>>();
+            ward.FloatLabelType.Set(FusionDropDownListLabelMode.Always);
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.Floating, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Destination).Component<FusionDropDownList<string?>>();
+            ward.FloatLabelType.Set(FusionDropDownListLabelMode.Auto);
+            ward.DataBind();
+        })
+        .CustomEvent(ReferralDirectoryActions.Simple, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Destination).Component<FusionDropDownList<string?>>();
+            ward.FloatLabelType.Set(FusionDropDownListLabelMode.Never);
+            ward.DataBind();
+        }));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,47 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model LinenStockStation
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward stocktake station";
+    var plan = Html.ReactivePlan<LinenStockStation>();
+}
+<h1>Ward stocktake station</h1>
+<fieldset>
+    <legend>@(Model.Staffed ? "Staffed trolley" : "Supplier archive")</legend>
+    @(Html.InputField(plan, m => m.Towels, o => o.Label("Station count")).FusionNumericTextBox(build =>
+    {
+        if (Model.Staffed)
+        {
+            build.Format("n0").Min(4).Max(10).Step(2).Decimals(0)
+                .AllowMouseWheel().EnablePersistence().EnableRtl().Enabled().Readonly(false)
+                .ShowClearButton().ShowSpinButton().StrictMode().ValidateDecimalOnType();
+        }
+        else
+        {
+            build.Value(14).Format("n1").Min(0).Max(20).Step(1)
+                .AllowMouseWheel(false).EnablePersistence(false).EnableRtl(false).Enabled(false).Readonly()
+                .ShowClearButton(false).ShowSpinButton(false).StrictMode(false).ValidateDecimalOnType(false);
+        }
+    }))
+    @(Html.NativeButton("review-station", "Review station profile")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var station = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            var staffed = station.Enabled.And(station.Readonly.Eq(false)).And(station.ShowClearButton).And(station.ShowSpinButton)
+                .And(station.AllowMouseWheel).And(station.EnablePersistence).And(station.EnableRtl).And(station.StrictMode).And(station.ValidateDecimalOnType);
+            var archive = station.Enabled.Eq(false).And(station.Readonly).And(station.ShowClearButton.Eq(false)).And(station.ShowSpinButton.Eq(false))
+                .And(station.AllowMouseWheel.Eq(false)).And(station.EnablePersistence.Eq(false)).And(station.EnableRtl.Eq(false))
+                .And(station.StrictMode.Eq(false)).And(station.ValidateDecimalOnType.Eq(false));
+            pipeline.When(staffed).Then(p => p.Element("station-profile").Text.Set("Staffed trolley counting"))
+                .ElseIf(archive).Then(p => p.Element("station-profile").Text.Set("Archived supplier count"));
+        }))
+    <p><output id="station-profile" aria-label="Station profile">Review the station before counting</output></p>
+</fieldset>
+@Html.RenderPlan(plan)

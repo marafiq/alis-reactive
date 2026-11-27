@@ -1,0 +1,61 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model LinenSupplierTariff
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Laundry supplier tariff";
+    var plan = Html.ReactivePlan<LinenSupplierTariff>();
+    var euroSource = FusionTemplate.Create<LinenSupplierTariff>().Text("European laundry").Render(plan);
+    var euroUnit = FusionTemplate.Create<LinenSupplierTariff>().Text("Euro tariff").Render(plan);
+}
+<style>
+    .compact-tariff { font-size: .9rem; }
+    .domestic-tariff { font-size: 1.1rem; }
+</style>
+<h1>Laundry supplier tariff</h1>
+<template id="domestic-laundry"><span>Domestic laundry</span></template>
+<template id="domestic-unit"><span>Dollar tariff</span></template>
+<fieldset>
+    <legend>Contract billing rate</legend>
+    @(Html.InputField(plan, m => m.Rate, o => o.Label("Laundry rate"))
+        .FusionNumericTextBox(build =>
+        {
+            if (Model.European)
+            {
+                build.Format("c2").Currency("EUR").Decimals(2).Width(180d).CssClass("compact-tariff").Locale("en-GB")
+                    .FloatLabelType(Syncfusion.EJ2.Inputs.FloatLabelType.Always).Placeholder("European contract rate")
+                    .PrependTemplate(euroSource).AppendTemplate(euroUnit);
+            }
+            else
+            {
+                build.Format("c1").Currency("USD").Decimals(1).Width("75%").CssClass("domestic-tariff").Locale("en-US")
+                    .FloatLabelType(Syncfusion.EJ2.Inputs.FloatLabelType.Never).Placeholder("Domestic contract rate")
+                    .PrependTemplate("#domestic-laundry").AppendTemplate("#domestic-unit");
+            }
+        })
+        .Reactive(box => box.Focus, (focused, pipeline) =>
+        {
+            var rate = pipeline.Input(m => m.Rate).Component<FusionNumericTextBox<decimal?>>();
+            var width = focused.Container.GetAttribute("style");
+            pipeline.When(width.Eq("width: 180px;").And(rate.CssClass.Eq("compact-tariff")).And(rate.Locale.Eq("en-GB"))
+                    .And(rate.FloatLabelType.Eq(FusionNumericLabelMode.Always)).And(rate.Placeholder.Eq("European contract rate")))
+                .Then(p => p.Element("tariff-review").Text.Set("Compact European tariff"))
+                .ElseIf(width.Eq("width: 75%;").And(rate.CssClass.Eq("domestic-tariff")).And(rate.Locale.Eq("en-US"))
+                    .And(rate.FloatLabelType.Eq(FusionNumericLabelMode.Never)).And(rate.Placeholder.Eq("Domestic contract rate")))
+                .Then(p => p.Element("tariff-review").Text.Set("Full domestic tariff"));
+        }))
+    @(Html.NativeButton("review-tariff", "Review printed tariff")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            pipeline.Input(m => m.Rate).Component<FusionNumericTextBox<decimal?>>().FocusIn();
+        }))
+    <p><output id="tariff-review" aria-label="Tariff review">Choose the printed tariff</output></p>
+</fieldset>
+@Html.RenderPlan(plan)

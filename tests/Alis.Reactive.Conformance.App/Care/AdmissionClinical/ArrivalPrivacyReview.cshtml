@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalPrivacyReview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Private admission calendar";
+    var plan = Html.ReactivePlan<ArrivalPrivacyReview>();
+}
+<h1>Private admission calendar</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            if (Model.Alternate)
+            {
+                opening.PreventDefault();
+                pipeline.Element("privacy-review").Text.Set("Finish privacy clearance first");
+            }
+            else
+            {
+                pipeline.Element("privacy-review").Text.Set("Cleared for scheduling");
+            }
+        }))
+</fieldset>
+<p><output id="privacy-review" aria-label="Privacy review">Review pending</output></p>
+@Html.RenderPlan(plan)

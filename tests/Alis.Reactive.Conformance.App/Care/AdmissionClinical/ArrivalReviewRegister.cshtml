@@ -1,0 +1,85 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model TransferReviewRegister
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Transfer review register";
+    var plan = Html.ReactivePlan<TransferReviewRegister>();
+}
+<h1>Transfer review register</h1>
+<style>
+    .tracking-register { position: fixed; left: 24px; top: 32px; width: 360px; height: 220px; overflow-y: scroll; container-type: scroll-state; }
+    .register-sheet { position: relative; height: 260px; }
+    .register-sheet > h2 { margin: 0; }
+    .register-sheet .tracking-date { position: absolute; top: 60px; left: 5px; box-sizing: border-box; }
+    .register-sheet .next-arrival { position: absolute; top: 222px; margin: 0; }
+    .current-record-link { position: absolute; top: 238px; left: 0; line-height: 18px; }
+    .next-record-link, .current-record-link { visibility: hidden; }
+    @@container not scroll-state(scrollable: top) {
+        .next-record-link { visibility: visible; }
+    }
+    @@container not scroll-state(scrollable: bottom) {
+        .current-record-link { visibility: visible; }
+    }
+    .open-register { margin-top: 18rem; }
+</style>
+<section aria-label="Booking records" tabindex="0" class="tracking-register">
+    <div class="register-sheet">
+        <h2 id="current-arrival" tabindex="-1">Current admission</h2>
+        <a href="#next-arrival" class="next-record-link">Read next arrival</a>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").CssClass("tracking-date").Width("220px").ZIndex(2600))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            var panel = opening.Popup;
+            panel.TargetType.Set(FusionDatePickerAnchor.Relative);
+            panel.Position.Horizontal.Set(FusionDatePickerHorizontal.Center);
+            panel.Position.Vertical.Set(FusionDatePickerVertical.Top);
+            panel.OffsetX.Set(0);
+            panel.OffsetY.Set(0);
+            panel.DataBind();
+        })
+        .Reactive(picker => picker.Close, (closing, pipeline) =>
+        {
+            var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+            pipeline.When(date.Value.Eq(new DateTime(2026, 7, 14))).Then(pipeline =>
+            {
+                closing.Cancel.Set(true);
+                var panel = closing.Popup;
+                panel.UnwireScrollEvents();
+                if (Model.ResumeTracking)
+                {
+                    panel.WireScrollEvents();
+                }
+            });
+        }))
+</fieldset>
+        <p class="next-arrival" id="next-arrival" tabindex="-1">Next arrival at the west reception desk</p>
+        <a href="#current-arrival" class="current-record-link">Return to current admission</a>
+    </div>
+</section>
+
+<div class="open-register">
+@(Html.NativeButton("open-appointment-board", "Open appointment board")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+@(Html.NativeButton("retain-calendar-review", "Retain calendar review")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Hide();
+    }))
+</div>
+@Html.RenderPlan(plan)

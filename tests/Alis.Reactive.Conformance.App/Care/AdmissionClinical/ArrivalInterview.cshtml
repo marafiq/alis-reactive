@@ -1,0 +1,125 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalInterview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Arrival interview";
+    var plan = Html.ReactivePlan<ArrivalInterview>();
+}
+<h1>Arrival interview</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Focus, (focused, pipeline) => pipeline.When(focused.Model.Enabled)
+            .Then(pipeline => pipeline.Element("interview").Text.Set("Editing the arrival date")))
+        .Reactive(picker => picker.Blur, (blurred, pipeline) => pipeline.When(blurred.Model.Enabled)
+            .Then(pipeline => pipeline.Element("interview").Text.Set("Arrival editing finished"))))
+</fieldset>
+@(Html.NativeButton("begin-arrival-interview", "Begin arrival interview")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FocusIn();
+    }))
+@(Html.NativeButton("finish-arrival-interview", "Finish arrival interview")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FocusIn();
+        date.FocusOut();
+    }))
+@(Html.NativeButton("use-calendar-choices", "Use calendar choices")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.AllowEdit.Set(false);
+        date.DataBind();
+        date.Show();
+        pipeline.When(date.AllowEdit)
+            .Then(pipeline => pipeline.Element("entry-instruction").Text.Set("Enter a referral date"))
+            .Else(pipeline => pipeline.Element("entry-instruction").Text.Set("Choose an available day"));
+    }))
+@(Html.NativeButton("use-keyboard-entry", "Use keyboard entry")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.AllowEdit.Set(true);
+        date.DataBind();
+        date.Show();
+        pipeline.When(date.AllowEdit)
+            .Then(pipeline => pipeline.Element("entry-instruction").Text.Set("Enter a referral date"))
+            .Else(pipeline => pipeline.Element("entry-instruction").Text.Set("Choose an available day"));
+    }))
+@(Html.NativeButton("hold-intake", "Hold intake")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Enabled.Set(false);
+        date.DataBind();
+        date.Show();
+        pipeline.When(date.Enabled)
+            .Then(pipeline => pipeline.Element("booking-status").Text.Set("Ready to schedule"))
+            .Else(pipeline => pipeline.Element("booking-status").Text.Set("Intake on hold"));
+    }))
+@(Html.NativeButton("release-intake", "Release intake")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Enabled.Set(true);
+        date.DataBind();
+        date.Show();
+        pipeline.When(date.Enabled)
+            .Then(pipeline => pipeline.Element("booking-status").Text.Set("Ready to schedule"))
+            .Else(pipeline => pipeline.Element("booking-status").Text.Set("Intake on hold"));
+    }))
+@(Html.NativeButton("protect-signed-arrival", "Protect signed arrival")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Readonly.Set(true);
+        date.DataBind();
+        date.Show();
+        pipeline.When(date.Readonly)
+            .Then(pipeline => pipeline.Element("signature-status").Text.Set("Signed arrival"))
+            .Else(pipeline => pipeline.Element("signature-status").Text.Set("Arrival reopened"));
+    }))
+@(Html.NativeButton("reopen-arrival", "Reopen arrival")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Readonly.Set(false);
+        date.DataBind();
+        date.Show();
+        pipeline.When(date.Readonly)
+            .Then(pipeline => pipeline.Element("signature-status").Text.Set("Signed arrival"))
+            .Else(pipeline => pipeline.Element("signature-status").Text.Set("Arrival reopened"));
+    }))
+@(Html.NativeButton("use-assisted-entry", "Use assisted entry")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.OpenOnFocus.Set(true);
+        date.DataBind();
+        date.FocusIn();
+    }))
+@(Html.NativeButton("use-direct-entry", "Use direct entry")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.OpenOnFocus.Set(false);
+        date.DataBind();
+        date.FocusIn();
+    }))
+<p><output id="interview" aria-label="Interview">Interview has not begun</output></p>
+<p><output id="entry-instruction" aria-label="Entry instruction">Entry awaiting review</output></p>
+<p><output id="booking-status" aria-label="Booking status">Intake under review</output></p>
+<p><output id="signature-status" aria-label="Signature status">Signature awaiting review</output></p>
+@Html.RenderPlan(plan)

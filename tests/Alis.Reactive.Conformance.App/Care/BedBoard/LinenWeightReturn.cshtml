@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model LinenWeightReturn
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Laundry weight return";
+    var plan = Html.ReactivePlan<LinenWeightReturn>();
+}
+<h1>Laundry weight return</h1>
+<fieldset>
+    <legend>Returned bundle</legend>
+    @(Html.InputField(plan, m => m.Weight, options => options.Label("Laundry weight")).FusionNumericTextBox())
+</fieldset>
+@Html.RenderPlan(plan)

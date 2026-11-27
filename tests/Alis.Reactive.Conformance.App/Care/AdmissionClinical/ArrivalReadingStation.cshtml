@@ -1,0 +1,53 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalReadingStation
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Two-column admission board";
+    var plan = Html.ReactivePlan<ArrivalReadingStation>();
+}
+<h1>Two-column admission board</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").ZIndex(2400))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            var panel = opening.Popup;
+            panel.Collision.Horizontal.Set(FusionDatePickerCollision.None);
+            panel.Collision.Vertical.Set(FusionDatePickerCollision.None);
+            panel.Position.LeftInPixels.Set(Model.Alternate ? 420 : 64);
+            panel.Position.TopInPixels.Set(Model.Alternate ? 116 : 92);
+            panel.ZIndex.Set(3400);
+            panel.EnableRtl.Set(Model.Alternate);
+            if (Model.Alternate)
+            {
+                panel.Width.Set("24rem");
+                panel.Height.Set("22rem");
+            }
+            else
+            {
+                panel.WidthInPixels.Set(340);
+                panel.HeightInPixels.Set(320);
+            }
+            panel.DataBind();
+            pipeline.When(panel.EnableRtl)
+                .Then(pipeline => pipeline.Element("station-instruction").Text.Set("Use the right column beside the resident’s handover."))
+                .Else(pipeline => pipeline.Element("station-instruction").Text.Set("Use the left column beside the admission register."));
+        }))
+</fieldset>
+@(Html.NativeButton("open-reading-station", "Open reading station")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+<p><output id="station-instruction" aria-label="Station instruction">Choose an appointment on the admission board.</output></p>
+@Html.RenderPlan(plan)

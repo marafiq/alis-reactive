@@ -10,6 +10,12 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// </summary>
 public static partial class FusionNumericTextBoxHtml
 {
+    /// <summary>Renders a numeric text box for the field's member with EJ2's standard options.</summary>
+    /// <param name="field">The input field the box is rendered for.</param>
+    /// <returns>The rendered numeric box.</returns>
+    public static Rendered<FusionNumericTextBox<TValue>, TModel> FusionNumericTextBox<TModel, TValue>(this InputField<TModel, TValue> field)
+        => field.FusionNumericTextBox(_ => { });
+
     /// <summary>Renders a numeric text box for the field's member, holding the member's number, with what the view sets on EJ2's builder.</summary>
     /// <param name="field">The input field the box is rendered for.</param>
     /// <param name="build">What the view sets on the box.</param>

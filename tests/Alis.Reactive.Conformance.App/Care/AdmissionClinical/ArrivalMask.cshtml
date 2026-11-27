@@ -1,0 +1,44 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalMask
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Guided arrival form";
+    var plan = Html.ReactivePlan<ArrivalMask>();
+}
+<h1>Guided arrival form</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("MM / dd / yyyy")))
+</fieldset>
+@(Html.NativeButton("prepare-guided-date", "Prepare guided date")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.MaskPlaceholder.Month.Set("arrival month");
+        date.MaskPlaceholder.Day.Set("arrival day");
+        date.MaskPlaceholder.Year.Set("admission year");
+        date.EnableMask.Set(true);
+        date.DataBind();
+        date.Refresh();
+    }))
+@(Html.NativeButton("prepare-free-entry-date", "Prepare free-entry date")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.MaskPlaceholder.Month.Set("arrival month");
+        date.MaskPlaceholder.Day.Set("arrival day");
+        date.MaskPlaceholder.Year.Set("admission year");
+        date.EnableMask.Set(false);
+        date.DataBind();
+        date.Refresh();
+    }))
+@Html.RenderPlan(plan)

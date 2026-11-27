@@ -1,0 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
+@model WardStockReturn
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Signed stocktake return";
+}
+<h1>Signed stocktake return</h1>
+<output aria-label="Signed return">@(Model.Towels switch { null => "Signed tally awaiting count", 0 => "Signed empty cart", var count => $"Signed tally with {count} towels" })</output>

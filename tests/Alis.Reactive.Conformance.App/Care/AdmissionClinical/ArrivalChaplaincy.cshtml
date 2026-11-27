@@ -1,0 +1,115 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalChaplaincy
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Chaplaincy transfer coordination";
+    var plan = Html.ReactivePlan<ArrivalChaplaincy>();
+}
+<h1>Chaplaincy transfer coordination</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").CalendarMode(Syncfusion.EJ2.Calendars.CalendarType.Islamic)))
+</fieldset>
+@(Html.NativeButton("book-muharram-referral", "Book Muharram referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        var hijri = date.IslamicModule;
+        var booked = hijri.ToGregorian(1448, 1, 29);
+        var slip = hijri.GetIslamicDate(booked);
+        pipeline.When(slip.Year.Eq(1448).And(slip.Month.Eq(1)).And(slip.Date.Eq(29)))
+            .Then(pipeline => pipeline.Element("referral-date").Text.Set("29 Muharram 1448"));
+        date.Value.Set(booked.OrNull());
+        date.CalendarMode.Set(FusionDatePickerCalendar.Gregorian);
+        date.DataBind();
+        date.Refresh();
+    }))
+@(Html.NativeButton("book-safar-referral", "Book Safar referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        var hijri = date.IslamicModule;
+        var booked = hijri.ToGregorian(1448, 2, 2);
+        var slip = hijri.GetIslamicDate(booked);
+        pipeline.When(slip.Year.Eq(1448).And(slip.Month.Eq(2)).And(slip.Date.Eq(2)))
+            .Then(pipeline => pipeline.Element("referral-date").Text.Set("2 Safar 1448"));
+        date.Value.Set(booked.OrNull());
+        date.CalendarMode.Set(FusionDatePickerCalendar.Gregorian);
+        date.DataBind();
+        date.Refresh();
+    }))
+@(Html.NativeButton("review-muharram-allocation", "Review Muharram allocation")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        var service = date.IslamicModule;
+        var referral = new DateTime(2026, 7, 14);
+        var allocation = new DateTime(2026, 7, 14);
+        var thisYear = service.HijriCompareYear(referral, allocation).Eq(0);
+        var thisDecade = service.HijriCompareDecade(referral, allocation).Eq(0);
+        var sameCycle = service.IslamicCompare(referral, allocation, 10).Eq(0);
+        var month = service.IslamicCompareMonth(referral, allocation);
+        pipeline.When(thisYear.And(thisDecade).And(sameCycle).And(month.Eq(0)))
+            .Then(pipeline => pipeline.Element("allocation").Text.Set("Current chaplaincy allocation"))
+            .ElseIf(thisYear.And(month.Eq(1)))
+            .Then(pipeline => pipeline.Element("allocation").Text.Set("Next month in the current allocation year"));
+    }))
+@(Html.NativeButton("review-safar-allocation", "Review Safar allocation")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        var service = date.IslamicModule;
+        var referral = new DateTime(2026, 7, 16);
+        var allocation = new DateTime(2026, 7, 14);
+        var thisYear = service.HijriCompareYear(referral, allocation).Eq(0);
+        var thisDecade = service.HijriCompareDecade(referral, allocation).Eq(0);
+        var sameCycle = service.IslamicCompare(referral, allocation, 10).Eq(0);
+        var month = service.IslamicCompareMonth(referral, allocation);
+        pipeline.When(thisYear.And(thisDecade).And(sameCycle).And(month.Eq(0)))
+            .Then(pipeline => pipeline.Element("allocation").Text.Set("Current chaplaincy allocation"))
+            .ElseIf(thisYear.And(month.Eq(1)))
+            .Then(pipeline => pipeline.Element("allocation").Text.Set("Next month in the current allocation year"));
+    }))
+@(Html.NativeButton("prepare-guided-referral", "Prepare guided referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.CalendarMode.Set(FusionDatePickerCalendar.Islamic);
+        date.EnableMask.Set(true);
+        date.DataBind();
+        date.Refresh();
+        var required = date.RequiredModules();
+        var guided = required.Any(module => module.Member.Eq("islamic").And(module.Name.Eq("Islamic")).And(module.Args.At(0).CalendarMode.Eq(FusionDatePickerCalendar.Islamic)));
+        pipeline.When(guided.And(required.Any(module => module.Member.Eq("MaskedDateTime"))).And(date.IslamicModule.GetModuleName().Eq("islamic")))
+            .Then(pipeline => pipeline.Element("entry-instruction").Text.Set("Enter the guided Hijri date"))
+            .ElseIf(required.Count().Eq(0))
+            .Then(pipeline => pipeline.Element("entry-instruction").Text.Set("Enter the ordinary date"));
+    }))
+@(Html.NativeButton("prepare-plain-referral", "Prepare plain referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.CalendarMode.Set(FusionDatePickerCalendar.Gregorian);
+        date.EnableMask.Set(false);
+        date.DataBind();
+        date.Refresh();
+        var required = date.RequiredModules();
+        var guided = required.Any(module => module.Member.Eq("islamic").And(module.Name.Eq("Islamic")).And(module.Args.At(0).CalendarMode.Eq(FusionDatePickerCalendar.Islamic)));
+        pipeline.When(guided.And(required.Any(module => module.Member.Eq("MaskedDateTime"))).And(date.IslamicModule.GetModuleName().Eq("islamic")))
+            .Then(pipeline => pipeline.Element("entry-instruction").Text.Set("Enter the guided Hijri date"))
+            .ElseIf(required.Count().Eq(0))
+            .Then(pipeline => pipeline.Element("entry-instruction").Text.Set("Enter the ordinary date"));
+    }))
+<p><output id="referral-date" aria-label="Referral date">Referral pending</output></p>
+<p><output id="allocation" aria-label="Allocation">Allocation pending</output></p>
+<p><output id="entry-instruction" aria-label="Entry instruction">Instructions pending</output></p>
+@Html.RenderPlan(plan)

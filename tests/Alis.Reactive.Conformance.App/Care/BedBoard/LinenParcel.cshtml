@@ -1,0 +1,38 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model LinenParcel
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Laundry transfer weight";
+    var plan = Html.ReactivePlan<LinenParcel>();
+}
+<h1>Laundry transfer weight</h1>
+<fieldset>
+    <legend>Transfer load</legend>
+    @(Html.InputField(plan, m => m.Load, o => o.Label("Load weight")).FusionNumericTextBox(build => build.Format("n3")))
+</fieldset>
+<fieldset>
+    <legend>Measured parcel</legend>
+    @(Html.InputField(plan, m => m.ParcelWeight, o => o.Label("Parcel weight")).FusionNumericTextBox(build => build.Format("n3")))
+    @(Html.NativeButton("parcel-in", "Receive weighed parcel")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var load = pipeline.Input(m => m.Load).Component<FusionNumericTextBox<decimal?>>();
+            var measured = pipeline.Input(m => m.ParcelWeight).Component<FusionNumericTextBox<double>>();
+            load.Increment(measured.Value);
+        }))
+    @(Html.NativeButton("parcel-out", "Issue weighed parcel")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var load = pipeline.Input(m => m.Load).Component<FusionNumericTextBox<decimal?>>();
+            var measured = pipeline.Input(m => m.ParcelWeight).Component<FusionNumericTextBox<double>>();
+            load.Decrement(measured.Value);
+        }))
+</fieldset>
+@Html.RenderPlan(plan)

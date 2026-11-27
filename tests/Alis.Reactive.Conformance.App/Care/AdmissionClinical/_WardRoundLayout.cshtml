@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Components
+@using Syncfusion.EJ2
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="~/css/bootstrap5.3.css" asp-append-version="true">
+</head>
+<body>
+    <main>
+        @RenderBody()
+    </main>
+    @Html.ConformanceBusy()
+    @Html.ConformanceNotice()
+    <script src="~/js/ej2.min.js" asp-append-version="true"></script>
+    <script src="~/_content/AlisReactive.Fusion/js/alis-reactive-fusion-templates.js" asp-append-version="true"></script>
+    @Html.EJS().ScriptManager()
+    <script src="~/_content/AlisReactive.Fusion/js/alis-reactive-fusion.js" asp-append-version="true"></script>
+    <script src="~/js/alis-reactive-conformance.js" asp-append-version="true"></script>
+    <script src="~/_content/AlisReactive.Native/js/alis-reactive-native.js" asp-append-version="true"></script>
+    <script src="~/js/care/admissionclinical/ward-round-queries.js" asp-append-version="true"></script>
+    <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalScrollingRegister
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admissions register";
+    var plan = Html.ReactivePlan<ArrivalScrollingRegister>();
+}
+<h1>Admissions register</h1>
+<style>
+    .arrival-register { height: 16rem; width: 38rem; overflow-y: auto; container-type: scroll-state; }
+    .register-date { position: sticky; top: 0; background: white; }
+    .return-round-link { visibility: hidden; }
+    @@container not scroll-state(scrollable: bottom) {
+        .return-round-link { visibility: visible; }
+    }
+    .arrival-register li { padding: 1rem 0; }
+</style>
+<section aria-label="Arrival records" tabindex="0" class="arrival-register">
+<div class="register-date">
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            var calendar = opening.Popup;
+            calendar.ActionOnScroll.Set(Model.Alternate ? FusionDatePickerScroll.Reposition : FusionDatePickerScroll.Hide);
+            calendar.DataBind();
+            pipeline.When(calendar.ActionOnScroll.Eq(FusionDatePickerScroll.Reposition))
+                .Then(pipeline => pipeline.Element("register-guidance").Text.Set("Keep reviewing the arrival date"))
+                .Else(pipeline => pipeline.Element("register-guidance").Text.Set("Finish the date before paging onward"));
+        }))
+</fieldset>
+</div>
+<h2 id="upcoming-transfers" tabindex="-1">Upcoming transfers</h2>
+<a href="#next-round">Read next transfer round</a>
+<ul>
+@foreach (var entry in Model.Records)
+{
+    <li>@entry</li>
+}
+</ul>
+<h2 id="next-round" tabindex="-1">Next transfer round</h2>
+<p>Meet the west wing transport at reception.</p>
+<a href="#upcoming-transfers" class="return-round-link">Return to upcoming transfers</a>
+</section>
+@(Html.NativeButton("open-register-calendar", "Open register calendar")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+<p><output id="register-guidance" aria-label="Register guidance">Review the transfer list</output></p>
+@Html.RenderPlan(plan)

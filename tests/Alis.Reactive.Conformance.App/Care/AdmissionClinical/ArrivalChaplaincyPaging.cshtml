@@ -1,0 +1,55 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ChaplaincyCalendarReview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Chaplaincy calendar review";
+    var plan = Html.ReactivePlan<ChaplaincyCalendarReview>();
+}
+<h1>Chaplaincy calendar review</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").CalendarMode(Syncfusion.EJ2.Calendars.CalendarType.Islamic)))
+</fieldset>
+@(Html.NativeButton("open-monthly-review", "Open monthly review")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+        date.NavigateTo(FusionDatePickerView.Month, new DateTime(2026, 7, 14));
+    }))
+@(Html.NativeButton("open-annual-review", "Open annual review")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+        date.NavigateTo(FusionDatePickerView.Year, new DateTime(2026, 7, 14));
+    }))
+@(Html.NativeButton("open-decade-review", "Open decade review")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+        date.NavigateTo(FusionDatePickerView.Decade, new DateTime(2026, 7, 14));
+    }))
+@(Html.NativeButton("advance-calendar", "Advance calendar")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.IslamicModule.IslamicNext();
+    }))
+@(Html.NativeButton("review-previous-period", "Review previous period")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.IslamicModule.IslamicPrevious();
+    }))
+@Html.RenderPlan(plan)

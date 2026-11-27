@@ -1,0 +1,237 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model WardLinenStocktake
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward stocktake";
+    var plan = Html.ReactivePlan<WardLinenStocktake>();
+    var count = Html.InputField(plan, m => m.Towels, options => options.Label("Towels in stock"));
+}
+<h1>Ward stocktake</h1>
+<form method="post" action="@CarePages.LinenSignedReturn">
+<fieldset>
+    <legend>Trolley count</legend>
+    @(count.FusionNumericTextBox(build => build.Format("n0").EnablePersistence(Model.Recover)
+        .HtmlAttributes(new Dictionary<string, object> { ["name"] = count.Name, ["title"] = "Ward trolley tally", ["aria-label"] = Model.Receiving ? "Count towels at receiving" : "Count towels on the ward floor" }))
+        .Reactive(box => box.Change, (notice, pipeline) =>
+        {
+            pipeline.When(notice.Name.Eq("change").And(notice.IsInteracted).And(notice.OriginalEvent.Type.Eq("keydown"))
+                    .And(notice.PreviousValue.Eq(8)).And(notice.Value.Eq(9)))
+                .Then(p => p.Element("stock-change").Text.Set("Staff counted one extra towel"))
+                .ElseIf(notice.OriginalEvent.Type.NotNull())
+                .Then(p => p.Element("stock-change").Text.Set("Review staff adjustment"))
+                .ElseIf(notice.Name.Eq("change").And(notice.IsInteracted.Eq(false))
+                    .And(notice.PreviousValue.Eq(8)).And(notice.Value.Eq(10)))
+                .Then(p => p.Element("stock-change").Text.Set("Book correction added two towels"))
+                .ElseIf(notice.PreviousValue.IsNull().And(notice.Value.Eq(0)))
+                .Then(p => p.Element("stock-change").Text.Set("First count confirmed empty"))
+                .ElseIf(notice.PreviousValue.Eq(0).And(notice.Value.IsNull()))
+                .Then(p => p.Element("stock-change").Text.Set("Empty-cart count withdrawn"));
+        })
+        .Reactive(box => box.Focus, (notice, pipeline) =>
+        {
+            pipeline.When(notice.Name.Eq("focus").And(notice.OriginalEvent.Type.Eq("focus"))
+                    .And(notice.Value.Eq(8)).And(notice.Container.GetAttribute("title").Eq("Ward trolley tally")))
+                .Then(p => p.Element("tally-handoff").Text.Set("Counting the ward trolley"))
+                .ElseIf(notice.Value.IsNull()).Then(p => p.Element("tally-handoff").Text.Set("Count towels before signing"))
+                .ElseIf(notice.Value.Eq(0)).Then(p => p.Element("tally-handoff").Text.Set("Confirm the empty trolley"));
+        })
+        .Reactive(box => box.Blur, (notice, pipeline) =>
+        {
+            pipeline.When(notice.Name.Eq("blur").And(notice.OriginalEvent.Type.Eq("blur"))
+                    .And(notice.Value.Eq(8)).And(notice.Container.GetAttribute("title").Eq("Ward trolley tally")))
+                .Then(p => p.Element("tally-handoff").Text.Set("Ward tally ready for review"))
+                .ElseIf(notice.Value.IsNull()).Then(p => p.Element("tally-handoff").Text.Set("Return held pending a count"))
+                .ElseIf(notice.Value.Eq(0)).Then(p => p.Element("tally-handoff").Text.Set("Empty cart ready to sign"));
+        })
+        .Reactive(box => box.Destroyed, (notice, pipeline) =>
+        {
+            pipeline.When(notice.Name.Eq("destroyed").And(notice.Cancel.Eq(false)))
+                .Then(p =>
+                {
+                    p.Element("electronic-tally-actions").Hide();
+                    p.Element("sign-stocktake-return").Hide();
+                    p.Element("tally-guide").Text.Set("Paper tally opened");
+                });
+        }))
+    <button type="submit" id="sign-stocktake-return">Sign stocktake return</button>
+</fieldset>
+</form>
+<div id="electronic-tally-actions">
+<fieldset>
+    <legend>Stocktake return</legend>
+    @(Html.NativeButton("record-empty", "Record empty cart")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.Value.Set(0);
+            stock.DataBind();
+        }))
+    @(Html.NativeButton("mark-outstanding", "Mark count outstanding")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.Value.Set((int?)null);
+            stock.DataBind();
+        }))
+    @(Html.NativeButton("file-stocktake", "File stocktake")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            pipeline.Post<WardStockReturn>(CarePages.LinenFileStocktake, request => request.Input(record => record.Towels, pipeline.Input(m => m.Towels)))
+                .OnSuccess(Content.Text, (receipt, p) => p.Element("filing-receipt").Text.Set(receipt.Body));
+        }))
+    @(Html.NativeButton("correct-stock", "Apply book correction")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.Value.Set(10);
+            stock.DataBind();
+        }))
+    <p><output id="filing-receipt" aria-label="Filing receipt">No return filed</output></p>
+    <p><output id="stock-change" aria-label="Stock change">Opening book count</output></p>
+</fieldset>
+<fieldset>
+    <legend>Tally handoff</legend>
+    @(Html.NativeButton("begin-recount", "Begin recount")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>().FocusIn();
+        }))
+    @(Html.NativeButton("review-tally", "Send tally for review")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.FocusIn();
+            stock.FocusOut();
+        }))
+    <p><output id="tally-handoff" aria-label="Tally handoff">Tally awaiting staff</output></p>
+</fieldset>
+<fieldset>
+    <legend>Ward custody</legend>
+    @(Html.NativeButton("seal-audited", "Seal audited count")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.Readonly.Set(true);
+            stock.DataBind();
+            pipeline.When(stock.Readonly.Eq(true)).Then(p => p.Element("count-custody").Text.Set("Audited count is locked"));
+        }))
+    @(Html.NativeButton("open-count", "Open fresh count")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.Readonly.Set(false);
+            stock.DataBind();
+            pipeline.When(stock.Readonly.Eq(false)).Then(p => p.Element("count-custody").Text.Set("Ward staff can count"));
+        }))
+    @(Html.NativeButton("bedside-tools", "Bedside counting tools")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.ShowSpinButton.Set(false);
+            stock.ShowClearButton.Set(true);
+            stock.AllowMouseWheel.Set(false);
+            stock.DataBind();
+            pipeline.When(stock.ShowSpinButton.Eq(false).And(stock.ShowClearButton.Eq(true)).And(stock.AllowMouseWheel.Eq(false)))
+                .Then(p => p.Element("counting-instructions").Text.Set("Clear a count beside the bed"));
+        }))
+    @(Html.NativeButton("trolley-tools", "Trolley counting tools")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.ShowSpinButton.Set(true);
+            stock.ShowClearButton.Set(false);
+            stock.AllowMouseWheel.Set(true);
+            stock.DataBind();
+            stock.Locale.Set("en-GB");
+            stock.DataBind();
+            pipeline.When(stock.ShowSpinButton.Eq(true).And(stock.ShowClearButton.Eq(false)).And(stock.AllowMouseWheel.Eq(true)))
+                .Then(p => p.Element("counting-instructions").Text.Set("Step the count on the trolley"));
+        }))
+    @(Html.NativeButton("close-count", "Close ward count")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.Enabled.Set(false);
+            stock.DataBind();
+            pipeline.When(stock.Enabled.Eq(false)).Then(p => p.Element("ward-count").Text.Set("Ward count closed"));
+        }))
+    @(Html.NativeButton("reopen-count", "Reopen ward count")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.Enabled.Set(true);
+            stock.DataBind();
+            pipeline.When(stock.Enabled.Eq(true)).Then(p => p.Element("ward-count").Text.Set("Ward count reopened"));
+        }))
+    @(Html.NativeButton("spoken-instruction", "Review spoken instruction")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            if (Model.Receiving)
+            {
+                var root = stock.GetRootElement();
+                pipeline.When(root.HasAttribute("aria-label")).Then(p => p.Element("spoken-instruction-copy").Text.Set(root.GetAttribute("aria-label")));
+            }
+            else
+            {
+                var input = stock.Element;
+                pipeline.When(input.HasAttribute("aria-label")).Then(p => p.Element("spoken-instruction-copy").Text.Set(input.GetAttribute("aria-label")));
+            }
+        }))
+    <p><output id="count-custody" aria-label="Count custody">No audit applied</output></p>
+    <p><output id="counting-instructions" aria-label="Counting instructions">Choose counting tools</output></p>
+    <p><output id="ward-count" aria-label="Ward count">Opening stocktake</output></p>
+    <p><output id="spoken-instruction-copy" aria-label="Spoken instruction">Choose a tally</output></p>
+</fieldset>
+<fieldset>
+    <legend>Worksheet and recovery</legend>
+    @(Html.NativeButton("keep-worksheet", "Keep trolley worksheet")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.EnablePersistence.Set(true);
+            stock.Refresh();
+            pipeline.When(stock.EnablePersistence.Eq(true)).Then(p => p.Element("worksheet-storage").Text.Set("Keep on this trolley"));
+        }))
+    @(Html.NativeButton("one-visit", "Use one-visit worksheet")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.EnablePersistence.Set(false);
+            stock.Refresh();
+            pipeline.When(stock.EnablePersistence.Eq(false)).Then(p => p.Element("worksheet-storage").Text.Set("Use opening book count"));
+        }))
+    @(Html.NativeButton("archive-stock", "Archive stocktake")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            pipeline.Post<WardStockArchive>(CarePages.LinenArchiveStocktake, request => request.Json(body => body.Set(record => record.Snapshot, stock.GetPersistData())))
+                .OnSuccess(Content.Text, (archive, p) => p.Element("recovery-receipt").Text.Set(archive.Body));
+        }))
+    @(Html.NativeButton("paper-tally", "Release to paper tally")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>().Destroy();
+        }))
+    @(Html.NativeButton("electronic-tally", "Reopen electronic tally")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            stock.Refresh();
+            pipeline.When(stock.Element.GetAttribute("role").Eq("spinbutton"))
+                .Then(p => p.Element("tally-guide").Text.Set("Electronic tally open"));
+        }))
+    <p><output id="recovery-receipt" aria-label="Recovery receipt">No recovery copy</output></p>
+</fieldset>
+<p><output id="worksheet-storage" aria-label="Worksheet storage">Choose how to reopen</output></p>
+</div>
+<p><output id="tally-guide" aria-label="Tally guide">Select the handoff</output></p>
+<a href="@CarePages.LinenKept">Reopen worksheet</a>
+@Html.RenderPlan(plan)

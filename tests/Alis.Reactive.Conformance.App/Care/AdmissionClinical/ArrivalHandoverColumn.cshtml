@@ -1,0 +1,52 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalHandoverColumn
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Handover appointments";
+    var plan = Html.ReactivePlan<ArrivalHandoverColumn>();
+}
+<h1>Handover appointments</h1>
+<style>
+    .handover-column .board-date { position: fixed; top: 72px; left: 48px; height: 36px; box-sizing: border-box; }
+</style>
+<p>@(Model.Alternate ? "Review the return booking in the right column." : "Review the referral on the handover row.")</p>
+<fieldset class="handover-column">
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").CssClass("board-date").Width(240).ZIndex(2700))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            var panel = opening.Popup;
+            panel.Collision.Horizontal.Set(FusionDatePickerCollision.None);
+            panel.Collision.Vertical.Set(FusionDatePickerCollision.None);
+            panel.TargetType.Set(FusionDatePickerAnchor.Relative);
+            panel.OffsetX.Set(12);
+            panel.OffsetY.Set(8);
+            if (Model.Alternate)
+            {
+                panel.Position.LeftInPixels.Set(368);
+                panel.Position.Vertical.Set(FusionDatePickerVertical.Bottom);
+            }
+            else
+            {
+                panel.Position.Horizontal.Set(FusionDatePickerHorizontal.Center);
+                panel.Position.TopInPixels.Set(160);
+            }
+            panel.DataBind();
+        }))
+</fieldset>
+@(Html.NativeButton("open-handover-calendar", "Open handover calendar")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+@Html.RenderPlan(plan)

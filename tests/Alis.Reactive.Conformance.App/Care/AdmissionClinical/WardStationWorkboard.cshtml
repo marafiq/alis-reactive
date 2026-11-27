@@ -1,0 +1,162 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model WardStationWorkboard
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward station workboard";
+    var plan = Html.ReactivePlan<WardStationWorkboard>();
+    const double receivingColumn = 420;
+}
+<style>
+    .ward-board { max-width: 64rem; margin: 1rem 1.5rem; }
+    .ward-board-field { position: relative; width: 18rem; }
+    .station-alert { position: absolute; top: calc(100% + 2rem); left: 0; z-index: 1500; width: 100%; min-height: 2.5rem; }
+    .ward-board-columns { display: grid; grid-template-columns: 20rem minmax(20rem, 1fr); column-gap: 2rem; margin-top: 16rem; }
+</style>
+<div class="ward-board">
+    <h1>Ward station workboard</h1>
+    <button type="button" @Html.Raises(plan, WardStationActions.Personal)>Arrange my station</button>
+    <button type="button" @Html.Raises(plan, WardStationActions.Shared)>Use shared station</button>
+    <p id="board-help">Choose your station.</p>
+    <button type="button" @Html.Raises(plan, WardStationActions.FullWidth)>Use full handover width</button>
+    <button type="button" @Html.Raises(plan, WardStationActions.PocketWidth)>Use pocket handover width</button>
+    <button type="button" @Html.Raises(plan, WardStationActions.Tall)>Use tall ward roster</button>
+    <button type="button" @Html.Raises(plan, WardStationActions.Short)>Use short ward roster</button>
+    <button type="button" @Html.Raises(plan, WardStationActions.RosterFirst)>Finish ward allocation first</button>
+    <button type="button" @Html.Raises(plan, WardStationActions.AlertFirst)>Review urgent arrival first</button>
+    <p id="station-priority">No competing arrival.</p>
+    <p id="station-assignment">No ward assigned.</p>
+    <div class="ward-board-field">
+        @(Html.InputField(plan, m => m.Ward, options => options.Label("Station ward"))
+            .FusionDropDownList(Model.Wards, build => build.Fields((StationWard ward) => ward.Name, ward => ward.Name).PopupHeight("180px").AllowResize(false))
+            .Reactive(list => list.Change, (change, pipeline) => pipeline
+                .When(change.Value.NotEmpty())
+                .Then(pipeline =>
+                {
+                    pipeline.Element("station-assignment").Text.Set(change.Value);
+                    pipeline.Element("station-assignment").Text.Append(" is assigned to the receiving team.");
+                })
+                .Else(pipeline => pipeline.Element("station-assignment").Text.Set("No ward assigned.")))
+            .Reactive(list => list.ResizeStart, (pointer, pipeline) => pipeline
+                .When(pointer.Type.Eq("mousedown"))
+                .Then(pipeline =>
+                {
+                    pipeline.Element("station-reminders").Hide();
+                    pipeline.Element("prepare-sheet").Hide();
+                }))
+            .Reactive(list => list.Resizing, (pointer, pipeline) => pipeline
+                .When(pointer.Type.Eq("mousemove").And(pointer.ClientX.Gte(receivingColumn)))
+                .Then(pipeline => pipeline.Element("station-receiving-notes").Show())
+                .Else(pipeline => pipeline.Element("station-receiving-notes").Hide()))
+            .Reactive(list => list.ResizeStop, (pointer, pipeline) => pipeline
+                .When(pointer.Type.Eq("mouseup"))
+                .Then(pipeline => pipeline.Element("prepare-sheet").Show()))
+            .Reactive(list => list.Close, (closing, pipeline) =>
+            {
+                var panel = closing.Popup;
+                pipeline.When(panel.Element.OffsetWidth.Gte(420))
+                    .Then(pipeline => pipeline.Element("station-receiving-notes").Show())
+                    .Else(pipeline => pipeline.Element("station-receiving-notes").Hide());
+                pipeline.When(panel.GetRootElement().OffsetHeight.Gte(250))
+                    .Then(pipeline => pipeline.Element("station-night-pager").Show())
+                    .Else(pipeline => pipeline.Element("station-night-pager").Hide());
+            }))
+        <button class="station-alert" id="station-alert" type="button" @Html.Raises(plan, WardStationActions.Alert) hidden>Review urgent arrival</button>
+    </div>
+    <aside id="station-reminders" aria-label="Transport reminders">Call the porter before an evening transfer.</aside>
+    <button type="button" @Html.Raises(plan, WardStationActions.Reminders)>Show transport reminders</button>
+    <section class="ward-board-columns" aria-label="Shift handover preview">
+        <section>
+            <h2>Ward extensions</h2>
+            <p>Maple 214 · Cedar 319</p>
+            <p id="station-night-pager" hidden>After hours, contact the admission supervisor on pager 22.</p>
+        </section>
+        <section>
+            <h2>Receiving-team instructions</h2>
+            <p id="station-receiving-notes" hidden>Maple accepts arrivals at the charge desk. Cedar uses the south entrance.</p>
+        </section>
+    </section>
+    <button id="prepare-sheet" type="button" @Html.Raises(plan, WardStationActions.Prepare) hidden>Prepare shift handover</button>
+    <p id="station-handover">No shift handover prepared.</p>
+</div>
+@{
+    void DescribeStation(Pipeline<WardStationWorkboard> pipeline, FusionDropDownList<string?> directory)
+    {
+        pipeline.When(directory.AllowResize)
+            .Then(pipeline => pipeline.Element("board-help").Text.Set("Extend the roster into the receiving column to include arrival instructions."))
+            .Else(pipeline => pipeline.Element("board-help").Text.Set("The shared station keeps its extension-only roster."));
+    }
+
+    void DescribePriority(Pipeline<WardStationWorkboard> pipeline, FusionDropDownList<string?> directory)
+    {
+        directory.AllowFiltering.Set(true);
+        directory.FilterBarPlaceholder.Set("Find a receiving ward");
+        directory.DataBind();
+        pipeline.Element("station-alert").Show();
+        pipeline.When(directory.ZIndex.Gt(1500))
+            .Then(pipeline => pipeline.Element("station-priority").Text.Set("Choose the ward before reviewing the urgent arrival."))
+            .Else(pipeline => pipeline.Element("station-priority").Text.Set("Review the urgent arrival before choosing a ward."));
+    }
+
+    Html.On(plan, trigger => trigger
+        .CustomEvent(WardStationActions.RosterFirst, pipeline =>
+        {
+            var directory = pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>();
+            directory.ZIndex.Set(2100);
+            DescribePriority(pipeline, directory);
+        })
+        .CustomEvent(WardStationActions.AlertFirst, pipeline =>
+        {
+            var directory = pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>();
+            directory.ZIndex.Set(1100);
+            DescribePriority(pipeline, directory);
+        })
+        .CustomEvent(WardStationActions.Alert, pipeline => pipeline.Element("station-assignment").Text.Set("The duty nurse must review the urgent arrival."))
+        .CustomEvent(WardStationActions.Personal, pipeline =>
+        {
+            var directory = pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>();
+            directory.AllowResize.Set(true);
+            directory.DataBind();
+            DescribeStation(pipeline, directory);
+        })
+        .CustomEvent(WardStationActions.Shared, pipeline =>
+        {
+            var directory = pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>();
+            directory.AllowResize.Set(false);
+            pipeline.Element("prepare-sheet").Show();
+            directory.DataBind();
+            DescribeStation(pipeline, directory);
+        })
+        .CustomEvent(WardStationActions.FullWidth, pipeline => pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>().PopupWidthInPixels.Set(520d))
+        .CustomEvent(WardStationActions.PocketWidth, pipeline => pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>().PopupWidth.Set("75%"))
+        .CustomEvent(WardStationActions.Tall, pipeline => pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>().PopupHeightInPixels.Set(320d))
+        .CustomEvent(WardStationActions.Short, pipeline => pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>().PopupHeight.Set("160px"))
+        .CustomEvent(WardStationActions.Reminders, pipeline => pipeline.Element("station-reminders").Show())
+        .CustomEvent(WardStationActions.Prepare, pipeline =>
+        {
+            var directory = pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>();
+            var ward = directory.GetDataByValue<StationWard>(directory.Value.IfNull(""));
+            pipeline.When(ward.NotNull())
+                .Then(pipeline =>
+                {
+                    var handover = pipeline.Element("station-handover").Text;
+                    handover.Set(ward.Read(row => row!.Name));
+                    handover.Append(", extension ");
+                    handover.Append(ward.Read(row => row!.Extension));
+                    handover.Append(".");
+                    pipeline.When(pipeline.Element("station-receiving-notes").Hidden.Not())
+                        .Then(pipeline =>
+                        {
+                            var detail = pipeline.Element("station-handover").Text;
+                            detail.Append(" ");
+                            detail.Append(ward.Read(row => row!.Instructions));
+                        });
+                })
+                .Else(pipeline => pipeline.Element("station-handover").Text.Set("Choose a receiving ward."));
+        }));
+}
+@Html.RenderPlan(plan)

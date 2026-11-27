@@ -1,0 +1,46 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalTransport
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Transport booking";
+    var plan = Html.ReactivePlan<ArrivalTransport>();
+}
+<h1>Transport booking</h1>
+@using (var transport = Html.BeginRequestContainer(plan, "transport-booking"))
+{
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesAt, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd")))
+</fieldset>
+@(Html.NativeButton("use-summer-transport", "Use summer transport")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesAt).Component<FusionDatePicker<DateTimeOffset?>>();
+        date.Value.Set(new DateTimeOffset(2026, 7, 14, 0, 0, 0, TimeSpan.FromHours(-4)));
+        date.DataBind();
+    }))
+@(Html.NativeButton("use-winter-transport", "Use winter transport")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesAt).Component<FusionDatePicker<DateTimeOffset?>>();
+        date.Value.Set(new DateTimeOffset(2026, 1, 14, 0, 0, 0, TimeSpan.FromHours(-5)));
+        date.DataBind();
+    }))
+@(Html.NativeButton("file-transport-booking", "File transport booking")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        pipeline.Post<ArrivalTransport>(CarePages.FileArrivalTransport, request => request.Inputs(transport.Container))
+            .OnSuccess(Content.Text, (filed, pipeline) => pipeline.Element("transport-receipt").Text.Set(filed.Body));
+    }))
+}
+<p><output id="transport-receipt" aria-label="Transport receipt">Transport pending</output></p>
+@Html.RenderPlan(plan)

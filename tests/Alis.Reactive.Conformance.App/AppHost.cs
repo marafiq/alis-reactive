@@ -240,6 +240,7 @@ internal static class AppHost
             .Add<Care.EarlyCareRotaRules>()
             .Add<Care.RoundDosingRules>()
             .Add<Care.SupplyCountRules>()
+            .Add<Care.EmergencyStocktakeRules>()
             .Add<Care.DoseOrderingRules>()
             .Add<Care.RepeatDoseOrderRules>()
             .Add<Care.ShiftPlanRules>()

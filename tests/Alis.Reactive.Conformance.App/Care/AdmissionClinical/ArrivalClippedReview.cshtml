@@ -1,0 +1,71 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model SupervisorCalendarReview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Supervisor calendar review";
+    var plan = Html.ReactivePlan<SupervisorCalendarReview>();
+}
+<h1>Supervisor calendar review</h1>
+<style>
+    .edge-board .booking-slot { position: fixed; left: 48px; top: 72px; height: 36px; box-sizing: border-box; }
+    .moving-board .booking-slot { position: absolute; }
+    .moving-board.preparing-handover .booking-slot { left: 80px; top: 104px; }
+    .moving-board.handing-over { position: fixed; left: 0; top: 0; }
+    .moving-board.handing-over .booking-slot { left: -36px; top: -24px; }
+    .final-entry .booking-slot { left: 900px; top: 500px; }
+    .handing-over .booking-slot { left: -36px; top: -24px; }
+    .board-actions { margin-top: 10rem; }
+</style>
+<div id="booking-column" class="edge-board">
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").CssClass("booking-slot").Width(220).ZIndex(2950))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            var panel = opening.Popup;
+            panel.Position.LeftInPixels.Set(-36);
+            panel.Position.TopInPixels.Set(-24);
+            panel.Collision.Horizontal.Set(FusionDatePickerCollision.None);
+            panel.Collision.Vertical.Set(FusionDatePickerCollision.None);
+            panel.WidthInPixels.Set(320);
+            panel.HeightInPixels.Set(300);
+            panel.DataBind();
+        })
+        .Reactive(picker => picker.Close, (closing, pipeline) =>
+        {
+            var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+            pipeline.When(date.Value.Eq(new DateTime(2026, 7, 14))).Then(pipeline =>
+            {
+                closing.Cancel.Set(true);
+                var panel = closing.Popup;
+                panel.Collision.Horizontal.Set(Model.ShowPrintMargins ? FusionDatePickerCollision.None : FusionDatePickerCollision.Fit);
+                panel.Collision.Vertical.Set(Model.ShowPrintMargins ? FusionDatePickerCollision.None : FusionDatePickerCollision.Fit);
+                panel.ResolveCollision();
+            });
+        }))
+</fieldset>
+</div>
+<div class="board-actions">
+@(Html.NativeButton("open-appointment-board", "Open appointment board")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+@(Html.NativeButton("retain-calendar-review", "Retain calendar review")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Hide();
+    }))
+</div>
+@Html.RenderPlan(plan)

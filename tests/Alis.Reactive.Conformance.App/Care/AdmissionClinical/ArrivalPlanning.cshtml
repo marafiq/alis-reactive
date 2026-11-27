@@ -1,0 +1,71 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalPlanning
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Allocation calendar";
+    var plan = Html.ReactivePlan<ArrivalPlanning>();
+}
+<h1>Allocation calendar</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").Min(new DateTime(2026, 7, 1)).Max(new DateTime(2039, 12, 31)))
+        .Reactive(picker => picker.RenderDayCell, (cell, pipeline) =>
+        {
+            var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+            var cleaning = cell.Date.Eq(new DateTime(2026, 7, 16)).And(cell.Name.Eq("renderDayCell")).And(cell.CurrentView.Eq("Month"));
+            var available = cell.IsOutOfRange.Not().And(cell.Element.HasAttribute("id")).And(date.Min.Eq(new DateTime(2026, 7, 1))).And(date.Max.Eq(new DateTime(2039, 12, 31)));
+            pipeline.When(cleaning.And(available)).Then(pipeline =>
+            {
+                cell.IsDisabled.Set(Model.Held);
+                pipeline.When(cell.IsDisabled)
+                    .Then(pipeline => pipeline.Element("day-notice").Text.Set("Closed for cleaning"))
+                    .Else(pipeline => pipeline.Element("day-notice").Text.Set("Beds released"));
+            });
+        })
+        .Reactive(picker => picker.Navigated, (navigation, pipeline) =>
+        {
+            var august = navigation.Date.Gte(new DateTime(2026, 8, 1)).And(navigation.Date.Lt(new DateTime(2026, 9, 1)));
+            pipeline.When(august.And(navigation.Name.Eq("navigated")).And(navigation.View.Eq("Month")).And(navigation.OriginalEvent.Type.Eq("click")))
+                .Then(pipeline => pipeline.Element("allocation-note").Text.Set("Staff opened August 2026"));
+        }))
+</fieldset>
+@(Html.NativeButton("open-2028-allocation", "Open 2028 allocation")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+        date.NavigateTo(FusionDatePickerView.Year, new DateTime(2028, 7, 14));
+        pipeline.When(date.CurrentView().Eq("Year"))
+            .Then(pipeline => pipeline.Element("planning-scope").Text.Set("Annual allocation 2028"));
+    }))
+@(Html.NativeButton("open-2030s-allocation", "Open 2030s allocation")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+        date.NavigateTo(FusionDatePickerView.Decade, new DateTime(2030, 7, 14));
+        pipeline.When(date.CurrentView().Eq("Decade"))
+            .Then(pipeline => pipeline.Element("planning-scope").Text.Set("Decade allocation 2030"));
+    }))
+@(Html.NativeButton("open-december-allocation", "Open December allocation")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+        date.NavigateTo(FusionDatePickerView.Month, new DateTime(2027, 12, 14));
+        pipeline.When(date.CurrentView().Eq("Month"))
+            .Then(pipeline => pipeline.Element("allocation-note").Text.Set("Desk opened December 2027"));
+    }))
+<p><output id="planning-scope" aria-label="Planning scope">Allocation period pending</output></p>
+<p><output id="day-notice" aria-label="Day notice">Availability pending</output></p>
+<p><output id="allocation-note" aria-label="Allocation note">No calendar move recorded</output></p>
+@Html.RenderPlan(plan)
