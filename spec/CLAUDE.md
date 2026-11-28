@@ -6,6 +6,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 
 ## Standing decisions
 
+- The owner, 2026-11-27 (verbatim in `spec/NOTES.md`), on the ward Grid: the unconditional Beds rule is checked when
+  staff edit the cell. Zero shows the validator's message under Beds and a positive count saves (M21.X211).
+
 - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): FusionToast.Hide keeps EJ2's zero-argument call and
   dismisses the oldest visible toast. New notices still display first. M23.D2 and M23.X4 carry the contract.
 - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), closing the flags enum: an enum is flags to the framework when

@@ -11110,7 +11110,7 @@
     {
      "id": "M21.X203",
      "rung": "refusal",
-     "defect": "A rule a grid column's editor cannot check is dropped where the view renders with nothing said: a rule under a condition (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:96 at 623dd4a27, :112 at 65fdf118d); a rule EJ2's column validator has no key for, as GreaterThan or a comparison with another member (:104-138 at 623dd4a27, :120-144 at 65fdf118d); and one of two patterns on one column (:119-121 at 623dd4a27, where the second replaces the first, and :132 at 65fdf118d, which keeps the first). The column saves a value its validator refuses, and only the server's answer says so. The rewrite refuses it where the view renders: \"'{member}' has a rule the grid column's editor cannot check ({rule}); check it on the server with ServerOnly(), or give the column a rule its editor checks.\""
+     "defect": "A rule a grid column's editor cannot check is dropped where the view renders with nothing said: a rule under a condition (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:96 at 623dd4a27, :112 at 65fdf118d); a rule EJ2's column validator has no key for, as a comparison with another member (:104-138 at 623dd4a27, :120-144 at 65fdf118d); and one of two patterns on one column (:119-121 at 623dd4a27, where the second replaces the first, and :132 at 65fdf118d, which keeps the first). The column saves a value its validator refuses, and only the server's answer says so. The rewrite refuses it where the view renders: \"'{member}' has a rule the grid column's editor cannot check ({rule}); check it on the server with ServerOnly(), or give the column a rule its editor checks.\""
     },
     {
      "id": "M21.X204",
@@ -11146,6 +11146,11 @@
      "id": "M21.X210",
      "rung": "refusal",
      "defect": "A grid's edited rows sent in a JSON body under app JSON options whose string enum converter reads no number: the live form holds an enum as its number, which the endpoint refuses, so saving the rows answers 400. The rewrite refuses it where the view renders (D9.7): \"'r => r.Changed' holds 'status', whose enum a live object holds as 0 for Due\"."
+    },
+    {
+     "id": "M21.X211",
+     "rung": "behavior",
+     "defect": "The ward grid drops the Beds validator's unconditional GreaterThan(0) when the column editor has no built-in strict minimum. Staff can save zero beds even though the validator rejects it (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:104-138 at 623dd4a27)."
     }
    ],
    "promises": [
@@ -11180,14 +11185,6 @@
      "outcome": "The page is refused where the view renders with M21.X203's message, naming Beds and its conditional rule.",
      "opposite": "The same rule with no condition renders, and editing Beds to 0 shows its message under the cell.",
      "defect": "The conditional rule is dropped, the page renders, and a row saves 0 beds with no message until the server answers."
-    },
-    {
-     "for": "M21.X203",
-     "page": "A ward grid whose Beds column takes FusionGridValidation's rules for a validator whose Beds rule is GreaterThan(0).",
-     "gesture": "Open the page.",
-     "outcome": "The page is refused where the view renders with M21.X203's message, naming Beds and GreaterThan.",
-     "opposite": "With GreaterThanOrEqualTo(1) the page renders, and editing Beds to 0 shows its message under the cell.",
-     "defect": "GreaterThan has no column key and is dropped, so a row saves 0 beds with no message until the server answers."
     },
     {
      "for": "M21.X203",
@@ -11260,6 +11257,14 @@
      "outcome": "The page is refused where the view renders with InvalidOperationException: 'r => r.Changed' holds 'status', whose enum a live object holds as 0 for Due, a form its endpoint does not read as Due; let the endpoint read the form the live object holds, or send the rows from JSON the server writes.",
      "opposite": "Under net10's options the page renders, and Save the batch with no cell edited answers No charges changed.",
      "defect": "The rows sent with each status as its number, which the endpoint refuses, so saving the rows answers 400."
+    },
+    {
+     "for": "M21.X211",
+     "page": "On the bed board, a ward has two beds. The Beds column uses the ward validator's unconditional GreaterThan(0) rule.",
+     "gesture": "Open the ward grid, edit Beds to 0 and try to save the edit.",
+     "outcome": "The editor keeps the edit open and shows the validator's message under the Beds cell: \"'Beds' must be greater than '0'.\"",
+     "opposite": "Correct Beds to 1 and save the edit. The editor closes and the ward row shows 1 bed.",
+     "defect": "The grid accepts 0, or refuses to display the ward page before staff can edit the count."
     }
    ],
    "verdicts": [

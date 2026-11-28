@@ -1094,7 +1094,6 @@ public static class Promises
         public const string M21_X201_2 = "M21.F23 M21.X201 2";
         public const string M21_X203_0 = "M21.F23 M21.X203 0";
         public const string M21_X203_1 = "M21.F23 M21.X203 1";
-        public const string M21_X203_2 = "M21.F23 M21.X203 2";
         public const string M21_X204_0 = "M21.F23 M21.X204 0";
         public const string M21_X204_1 = "M21.F23 M21.X204 1";
         public const string M21_X205_0 = "M21.F23 M21.X205 0";
@@ -1103,6 +1102,7 @@ public static class Promises
         public const string M21_X208_0 = "M21.F23 M21.X208 0";
         public const string M21_X209_0 = "M21.F23 M21.X209 0";
         public const string M21_X210_0 = "M21.F23 M21.X210 0";
+        public const string M21_X211_0 = "M21.F23 M21.X211 0";
     }
 
     public static class M21_F24

@@ -1123,9 +1123,9 @@ two and X1.4 read a value a person chooses or types through its container (N13.1
 Seven more are placed under other hosts: X6.57's third under dateConverter, whose visit form needs a date picker bound
 to a DateTime, which no door renders, since the text box's Type is N18.4's form and the owner's, and six under hosts
 the harness does not hold yet (defaultHooks, realtimeNoOffer, noAntiforgeryChoice, noRequests and net48 twice). Three
-of the fusion-refusals screen's six stand on the Fusion layout, in `Refusals/FusionComponents/` and
+of the fusion-refusals screen's original six stand on the Fusion layout, in `Refusals/FusionComponents/` and
 `Refusals/FusionTemplates/`, each beside its rendering twin and each test red (M21.X805, M22.X1, M22.X4); M21.X203's
-three wait on the grid's validation door, as M21.X205's do. A promise placed on a care screen is a page of its own in
+two remaining refusals wait on the grid's validation door, as the edits in M21.X205 and M21.X211 do. A promise placed on a care screen is a page of its own in
 `Care/<Screen>/`, as a
 refusal's is, and two hundred and fifty care pages stand, each test red: sixty-five of the record screen's (thirteen
 of module 5's, nine each of modules 2 and 9, eight of module 3's, seven of module 1's, four of module 17's, three each

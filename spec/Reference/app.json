@@ -244,6 +244,11 @@
           "role": "the residents grid, FusionGrid with its templates, edit templates and validation"
         },
         {
+          "id": "wardBedsValidator",
+          "kind": "validator",
+          "role": "the ward's validator supplies the Beds column's rule and its message"
+        },
+        {
           "id": "bedMenu",
           "kind": "fusion",
           "role": "the bed area's FusionContextMenu"
@@ -4897,22 +4902,6 @@
     },
     {
       "feature": "M21.F23",
-      "for": "M21.X203",
-      "index": 2,
-      "screen": "fusion-refusals",
-      "hosts": [
-        "net10"
-      ],
-      "parts": [
-        "fusionRefusalValidator",
-        "refusalFusion"
-      ],
-      "harness": [
-        "seed"
-      ]
-    },
-    {
-      "feature": "M21.F23",
       "for": "M21.X204",
       "index": 0,
       "screen": "bed-board",
@@ -5029,6 +5018,22 @@
       ],
       "parts": [
         "refusalFusion"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X211",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid",
+        "wardBedsValidator"
       ],
       "harness": [
         "seed"

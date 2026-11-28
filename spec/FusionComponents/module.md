@@ -692,7 +692,8 @@ features they give.
 - A column's rule is checked by its editor or refused (M21.X203). Both lines drop a conditional rule and a rule the
   column validator has no key for where the view renders
   (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:112` at 65fdf118d); the rewrite refuses it
-  unless it is the server's.
+  unless it is the server's. The ward grid opens with an unconditional GreaterThan(0) on Beds (M21.X211). Saving
+  zero shows the validator's message under the Beds cell. Correcting the count to one lets the edit save.
 - A select editor opens at the row's value (M21.X204). Main's select templates mark no option selected
   (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:88-95` at 623dd4a27); the redesign's do
   (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:121-122` at 65fdf118d), and the rewrite keeps
