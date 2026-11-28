@@ -1,0 +1,267 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model WardAvailabilityBulletin
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward availability bulletin";
+    var plan = Html.ReactivePlan<WardAvailabilityBulletin>();
+}
+<h1>Ward availability bulletin</h1>
+<fieldset>
+    <legend>On-call availability</legend>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.Load)>Check on-call wards</button>
+    @(Html.InputField(plan, m => m.OnCallWard, options => options.Label("On-call ward"))
+        .FusionDropDownList(WardAvailabilityBulletin.PublishedWards, build => build.Fields((BulletinWard ward) => ward.Label, ward => ward.Code)))
+    <p id="on-call-status">Current ward list.</p>
+</fieldset>
+<fieldset>
+    <legend>Published bulletin</legend>
+    @(Html.InputField(plan, m => m.Withhold, options => options.Label("Withhold publication")).NativeCheckBox())
+    @(Html.InputField(plan, m => m.RequiresReview, options => options.Label("Require final review")).NativeCheckBox())
+    <button type="button" @Html.Raises(plan, WardBulletinActions.Publish)>Publish on-call bulletin</button>
+    @(Html.InputField(plan, m => m.Published, options => options.Label("Published wards"))
+        .FusionDropDownList(WardAvailabilityBulletin.PublishedWards, build => build.Fields((BulletinWard ward) => ward.Label, ward => ward.Code))
+        .Reactive(list => list.ActionBegin, (starting, pipeline) => pipeline
+            .When(starting.Data<BulletinWard>().Any(ward => ward.Code == "H5" && ward.Label == "Hazel").And(pipeline.Input(m => m.Withhold).Component<NativeCheckBox>().Checked))
+            .Then(pipeline =>
+            {
+                starting.Cancel.Set(true);
+                pipeline.Element("bulletin-status").Text.Set("Publication withheld.");
+            }))
+        .Reactive(list => list.ActionComplete, (completed, pipeline) => pipeline
+            .When(completed.Result<BulletinWard>().Any(ward => ward.Code == "H5" && ward.Label == "Hazel").And(pipeline.Input(m => m.RequiresReview).Component<NativeCheckBox>().Checked))
+            .Then(pipeline =>
+            {
+                completed.Cancel.Set(true);
+                pipeline.Element("bulletin-status").Text.Set("The completed bulletin requires review.");
+            }))
+        .Reactive(list => list.DataBound, (bound, pipeline) => pipeline
+            .When(bound.Items<BulletinWard>().Any(ward => ward.Code == "H5" && ward.Label == "Hazel"))
+            .Then(pipeline => pipeline.Element("bulletin-status").Text.Set("Three wards are on call."))))
+    <p id="bulletin-status">The current bulletin is published.</p>
+</fieldset>
+<fieldset>
+    <legend>Workstation choice</legend>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.Remember)>Remember this workstation</button>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.Shared)>Use shared workstation</button>
+    @(Html.InputField(plan, m => m.Workstation, options => options.Label("Workstation preference"))
+        .FusionDropDownList(WardAvailabilityBulletin.PublishedWards, build => build.Fields((BulletinWard ward) => ward.Label, ward => ward.Code).EnablePersistence(Model.PersonalStation)))
+    <p id="station-status">Review workstation policy.</p>
+</fieldset>
+<fieldset>
+    <legend>Placement card</legend>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.Wide)>Accessible placement card</button>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.Compact)>Compact placement card</button>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.PrintCard)>Print placement card</button>
+    <p id="printed-card-route">Instructions pending.</p>
+    @(Html.InputField(plan, m => m.Card, options => options.Label("Ward on the card"))
+        .FusionDropDownList(WardAvailabilityBulletin.PublishedWards, build => build.Fields((BulletinWard ward) => ward.Label, ward => ward.Code)))
+</fieldset>
+<fieldset>
+    <legend>Transfer panel</legend>
+    @(Html.InputField(plan, m => m.PanelHeld, options => options.Label("Hold transfer panel")).NativeCheckBox())
+    <button type="button" @Html.Raises(plan, WardBulletinActions.Open)>Open transfer panel</button>
+    @(Html.InputField(plan, m => m.OpenReview, options => options.Label("Transfer panel choices"))
+        .FusionDropDownList(WardAvailabilityBulletin.PublishedWards, build => build.Fields((BulletinWard ward) => ward.Label, ward => ward.Code))
+        .Reactive(list => list.Open, (opening, pipeline) => pipeline
+            .When(pipeline.Input(m => m.PanelHeld).Component<NativeCheckBox>().Checked)
+            .Then(pipeline =>
+            {
+                opening.Cancel.Set(true);
+                pipeline.Element("panel-status").Text.Set("Obtain placement clearance first.");
+            })
+            .Else(pipeline => pipeline.Element("panel-status").Text.Set("Choose the receiving ward."))))
+    <p id="panel-status">Review the transfer panel.</p>
+</fieldset>
+<fieldset>
+    <legend>Provisional destination</legend>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.Provisional)>Allow provisional changes</button>
+    @(Html.InputField(plan, m => m.Provisional, options => options.Label("Provisional ward"))
+        .FusionDropDownList(WardAvailabilityBulletin.PublishedWards, build => build.Fields((BulletinWard ward) => ward.Label, ward => ward.Code).ShowClearButton(false))
+        .Reactive(list => list.Change, (change, pipeline) => pipeline
+            .When(change.Value.IsNull())
+            .Then(pipeline => pipeline.Element("provisional-note").Text.Set("Choose a provisional destination."))
+            .Else(pipeline => pipeline.Element("provisional-note").Text.Set("Review this destination before confirmation."))))
+    <p id="provisional-note">Maple is provisional.</p>
+</fieldset>
+<fieldset>
+    <legend>Confirmed destination</legend>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.Confirmed)>Confirm destination</button>
+    @(Html.InputField(plan, m => m.Confirmed, options => options.Label("Confirmed ward"))
+        .FusionDropDownList(WardAvailabilityBulletin.PublishedWards, build => build.Fields((BulletinWard ward) => ward.Label, ward => ward.Code).ShowClearButton(true))
+        .Reactive(list => list.Change, (change, pipeline) => pipeline
+            .When(change.ItemData<BulletinWard>().NotNull())
+            .Then(pipeline =>
+            {
+                pipeline.Element("confirmed-note").Text.Set(change.ItemData<BulletinWard>().Read(ward => ward!.Label));
+                pipeline.Element("confirmed-note").Text.Append(" is confirmed.");
+            })))
+    <p id="confirmed-note">Cedar is confirmed.</p>
+</fieldset>
+<fieldset>
+    <legend>Ward badges</legend>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.RichBadges)>Show clinical badges</button>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.ShortBadges)>Show short badges</button>
+    @(Html.InputField(plan, m => m.Badge, options => options.Label("Available wards"))
+        .FusionDropDownList(WardAvailabilityBulletin.PublishedWards, build => build.Fields((BulletinWard ward) => ward.Label, ward => ward.Code)))
+</fieldset>
+<fieldset>
+    <legend>Bed referral</legend>
+    @(Html.InputField(plan, m => m.BedCode, options => options.Label("Bed code"))
+        .FusionDropDownList(Model.Beds, build => build.Fields((BedReferral<double> ward) => ward.Name, ward => ward.Key)))
+    @(Html.InputField(plan, m => m.EscortFlag, options => options.Label("Assistance flag"))
+        .FusionDropDownList(Model.Escorts, build => build.Fields((BedReferral<bool> ward) => ward.Name, ward => ward.Key)))
+    <button type="button" @Html.Raises(plan, WardBulletinActions.ZeroBed)>Review observation referral</button>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.NumberedBed)>Review transfer referral</button>
+    <button type="button" @Html.Raises(plan, WardBulletinActions.MissingBed)>Review unmatched referral</button>
+    <p id="bed-contact">Choose a referral.</p>
+    <p id="escort-contact">Choose an assistance flag.</p>
+</fieldset>
+<fieldset>
+    <legend>Service bulletin</legend>
+    @(Html.InputField(plan, m => m.Service, options => options.Label("Find ward service"))
+        .FusionDropDownList(WardAvailabilityBulletin.PublishedWards, build => build.Fields((BulletinWard ward) => ward.Label, ward => ward.Code).AllowFiltering(true).DebounceDelay(0).NoRecordsTemplate("No published matching wards."))
+        .Reactive(list => list.Filtering, (search, pipeline) => pipeline
+            .When(search.Text.Eq("s"))
+            .Then(pipeline =>
+            {
+                search.PreventDefaultAction.Set(true);
+                pipeline.Element("service-instruction").Text.Set("Enter a full service code.");
+            })
+            .ElseIf(search.Text.Eq("a"))
+            .Then(pipeline =>
+            {
+                search.UpdateData<BulletinWard>(WardAvailabilityBulletin.OnCall.ToArray());
+                pipeline.Element("service-instruction").Text.Set("Available on-call services.");
+            })
+            .Else(pipeline =>
+            {
+                search.Cancel.Set(true);
+                search.UpdateData<BulletinWard>(WardAvailabilityBulletin.OnCall.ToArray());
+                pipeline.Element("service-instruction").Text.Set("This service is held for review.");
+            })))
+    <p id="service-instruction">Search the published directory.</p>
+</fieldset>
+@{
+    void ReviewReferral(Pipeline<WardAvailabilityBulletin> pipeline, double code, bool escort)
+    {
+        var bed = pipeline.Input(m => m.BedCode).Component<FusionDropDownList<double?>>().GetDataByValue<BedReferral<double>>(code);
+        var support = pipeline.Input(m => m.EscortFlag).Component<FusionDropDownList<bool?>>().GetDataByValue<BedReferral<bool>>(escort);
+        pipeline.When(bed.NotNull())
+            .Then(pipeline => pipeline.Element("bed-contact").Text.Set(bed.Read(row => row!.Name)))
+            .Else(pipeline => pipeline.Element("bed-contact").Text.Set("Send this bed referral to review."));
+        pipeline.When(support.NotNull())
+            .Then(pipeline => pipeline.Element("escort-contact").Text.Set(support.Read(row => row!.Name)))
+            .Else(pipeline => pipeline.Element("escort-contact").Text.Set("Send this assistance flag to review."));
+    }
+
+    Html.On(plan, trigger => trigger
+        .CustomEvent(WardBulletinActions.PrintCard, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Card).Component<FusionDropDownList<string?>>();
+            pipeline.When(ward.EnableRtl.And(ward.CssClass.Eq("accessible-placement")))
+                .Then(pipeline => pipeline.Element("printed-card-route").Text.Set("Attach the large-print right-to-left card to the resident copy."))
+                .ElseIf(ward.EnableRtl.Not().And(ward.CssClass.Eq("compact-placement")))
+                .Then(pipeline => pipeline.Element("printed-card-route").Text.Set("File the compact left-to-right slip with the receiving ward."))
+                .Else(pipeline => pipeline.Element("printed-card-route").Text.Set("Review the transfer card format before printing."));
+        })
+        .CustomEvent(WardBulletinActions.Load, pipeline => pipeline
+            .Get(CareEndpoints.WardAvailability)
+            .WhileLoading(pipeline => pipeline.Input(m => m.OnCallWard).Component<FusionDropDownList<string?>>().ShowSpinner())
+            .OnSuccess<IReadOnlyList<BulletinWard>>((reply, pipeline) =>
+            {
+                var ward = pipeline.Input(m => m.OnCallWard).Component<FusionDropDownList<string?>>();
+                ward.DataSource<BulletinWard>().Set(reply.Body);
+                ward.DataBind();
+                ward.HideSpinner();
+                pipeline.Element("on-call-status").Text.Set("On-call wards updated.");
+            })
+            .OnError((failure, pipeline) =>
+            {
+                pipeline.Input(m => m.OnCallWard).Component<FusionDropDownList<string?>>().HideSpinner();
+                pipeline.Element("on-call-status").Text.Set("The on-call directory is unavailable.");
+            }))
+        .CustomEvent(WardBulletinActions.Publish, pipeline =>
+        {
+            var wards = pipeline.Input(m => m.Published).Component<FusionDropDownList<string?>>();
+            wards.DataSource<BulletinWard>().Set(WardAvailabilityBulletin.OnCall);
+            wards.DataBind();
+        })
+        .CustomEvent(WardBulletinActions.Remember, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Workstation).Component<FusionDropDownList<string?>>();
+            ward.EnablePersistence.Set(true);
+            ward.Refresh();
+            pipeline.When(ward.EnablePersistence)
+                .Then(pipeline => pipeline.Element("station-status").Text.Set("Ward choices are remembered here."));
+        })
+        .CustomEvent(WardBulletinActions.Shared, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Workstation).Component<FusionDropDownList<string?>>();
+            ward.EnablePersistence.Set(false);
+            ward.Refresh();
+            pipeline.When(ward.EnablePersistence.Not())
+                .Then(pipeline => pipeline.Element("station-status").Text.Set("This workstation uses the default ward."));
+        })
+        .CustomEvent(WardBulletinActions.Wide, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Card).Component<FusionDropDownList<string?>>();
+            ward.WidthInPixels.Set(420d);
+            ward.EnableRtl.Set(true);
+            ward.CssClass.Set("accessible-placement");
+            ward.DataBind();
+        })
+        .CustomEvent(WardBulletinActions.Compact, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Card).Component<FusionDropDownList<string?>>();
+            ward.Width.Set("60%");
+            ward.EnableRtl.Set(false);
+            ward.CssClass.Set("compact-placement");
+            ward.DataBind();
+        })
+        .CustomEvent(WardBulletinActions.Open, pipeline => pipeline.Input(m => m.OpenReview).Component<FusionDropDownList<string?>>().ShowPopup())
+        .CustomEvent(WardBulletinActions.Provisional, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Provisional).Component<FusionDropDownList<string?>>();
+            ward.ShowClearButton.Set(true);
+            ward.DataBind();
+        })
+        .CustomEvent(WardBulletinActions.Confirmed, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Confirmed).Component<FusionDropDownList<string?>>();
+            ward.ShowClearButton.Set(false);
+            ward.Refresh();
+        })
+        .CustomEvent(WardBulletinActions.RichBadges, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Badge).Component<FusionDropDownList<string?>>();
+            ward.ItemTemplateCallback.Set(template => template.Row<BulletinWard>().Read(row => row.Secure).Choose("<strong>Secure care ward</strong>", "<span>Open care ward</span>"));
+            ward.ValueTemplateCallback.Set(template => template.Row<BulletinWard>().Read(row => row.Secure).Choose("<strong>Secure placement handover</strong>", "<span>Open placement handover</span>"));
+            ward.DataBind();
+        })
+        .CustomEvent(WardBulletinActions.ShortBadges, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.Badge).Component<FusionDropDownList<string?>>();
+            ward.ItemTemplateCallback.Set(template => template.Row<BulletinWard>().Read(row => row.Secure).Choose("<strong>Secure</strong>", "<span>Open</span>"));
+            ward.ValueTemplateCallback.Set(template => template.Row<BulletinWard>().Read(row => row.Secure).Choose("<strong>Secure transfer</strong>", "<span>Open transfer</span>"));
+            ward.DataBind();
+        })
+        .CustomEvent(WardBulletinActions.ZeroBed, pipeline => ReviewReferral(pipeline, 0d, false))
+        .CustomEvent(WardBulletinActions.NumberedBed, pipeline => ReviewReferral(pipeline, 7d, true))
+        .CustomEvent(WardBulletinActions.MissingBed, pipeline =>
+        {
+            var support = pipeline.Input(m => m.EscortFlag).Component<FusionDropDownList<bool?>>();
+            support.DataSource<BedReferral<bool>>().Set(new[] { Model.Escorts[0] });
+            support.DataBind();
+            ReviewReferral(pipeline, 90d, true);
+        }));
+}
+@Html.RenderPlan(plan)

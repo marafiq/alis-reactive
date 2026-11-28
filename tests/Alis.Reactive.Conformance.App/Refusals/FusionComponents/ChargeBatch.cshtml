@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Grids
+@model ChargeBatch
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Charge batch";
+    var plan = Html.ReactivePlan<ChargeBatch>();
+    var columns = FusionGridColumns.Of<BatchCharge>();
+}
+<h1>Charge batch</h1>
+@(Html.FusionGrid(plan, "charge-batch", Model.Charges, build => build
+    .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(c => c.Name), HeaderText = "Resident", IsPrimaryKey = true, AllowEditing = false },
+        new() { Field = columns.Field(c => c.DueOn), HeaderText = "Due on", Type = "date", Format = "yMd", EditType = "datepickeredit" },
+    })))
+<p>Saved: <span id="saved">-</span></p>
+<button type="button" @Html.Raises(plan, ChargeBatchEvents.Save)>Save the batch</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ChargeBatchEvents.Save, pipeline => pipeline
+        .Post<SavedBatch>(ChargeBatchEvents.Saved, request => request.Json(body => body.Set(r => r.Changed, pipeline.Component<FusionGrid>("charge-batch").GetBatchChanges<BatchCharge>().ChangedRecords)))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

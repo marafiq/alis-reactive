@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NightDeskBoard
+@{
+    Layout = "/Bench/Plugins/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Night desk";
+    var plan = Html.ReactivePlan<NightDeskBoard>();
+}
+<h1>Night desk</h1>
+<button type="button" @Html.Raises(plan, NightDeskButtons.ReadTheHour)>Read the hour</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(NightDeskButtons.ReadTheHour, pipeline => pipeline.Element("hour").Text.Set(pipeline.Plugin<NightClockFace>().Hour)));
+    plan.Plugin<NightClock>().Reactive(clock => clock.Struck, pipeline => pipeline.Element("clock-struck").Text.Set("midnight"));
+}
+<section aria-label="Night clock">
+    <button type="button" id="strike-midnight">Strike midnight</button>
+</section>
+<dl>
+    <dt>Hour</dt>
+    <dd id="hour"></dd>
+    <dt>Clock struck</dt>
+    <dd id="clock-struck"></dd>
+</dl>
+@Html.RenderPlan(plan)

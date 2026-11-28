@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model CabinetLock
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Medication cabinet";
+    var plan = Html.ReactivePlan<CabinetLock>();
+}
+<h1>Medication cabinet</h1>
+<fieldset>
+    <legend>Unlock code</legend>
+    @(Html.InputField(plan, m => m.UnlockCode, options => options.Label("Unlock code")).FusionOtpInput())
+</fieldset>
+@Html.RenderPlan(plan)

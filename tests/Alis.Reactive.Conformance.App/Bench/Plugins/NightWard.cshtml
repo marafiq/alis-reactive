@@ -1,0 +1,49 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NightWardBoard
+@{
+    Layout = "/Bench/Plugins/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Night ward";
+    var plan = Html.ReactivePlan<NightWardBoard>();
+}
+<h1>Night ward</h1>
+<button type="button" @Html.Raises(plan, NightWardButtons.ReadTheLog)>Read the log</button>
+<button type="button" @Html.Raises(plan, NightWardButtons.ReadTheLantern)>Read the lantern</button>
+<button type="button" @Html.Raises(plan, NightWardButtons.StartTheRound)>Start the round</button>
+<dl>
+    <dt>Page</dt>
+    <dd id="started"></dd>
+    <dt>Log read tried</dt>
+    <dd id="log-tried"></dd>
+    <dt>Entries</dt>
+    <dd id="entries"></dd>
+    <dt>Log read done</dt>
+    <dd id="log-done"></dd>
+    <dt>Lantern read tried</dt>
+    <dd id="lantern-tried"></dd>
+    <dt>Colour</dt>
+    <dd id="colour"></dd>
+    <dt>Lantern read done</dt>
+    <dd id="lantern-done"></dd>
+    <dt>Round</dt>
+    <dd id="round"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Element("started").Text.Set("the page started"))
+        .CustomEvent(NightWardButtons.ReadTheLog, pipeline =>
+        {
+            pipeline.Element("log-tried").Text.Set("tried");
+            pipeline.Element("entries").Text.Set(pipeline.Plugin<WardShiftLog>().Entries);
+            pipeline.Element("log-done").Text.Set("read");
+        })
+        .CustomEvent(NightWardButtons.ReadTheLantern, pipeline =>
+        {
+            pipeline.Element("lantern-tried").Text.Set("tried");
+            pipeline.Element("colour").Text.Set(pipeline.Plugin<Lantern>().Colour);
+            pipeline.Element("lantern-done").Text.Set("read");
+        })
+        .CustomEvent(NightWardButtons.StartTheRound, pipeline => pipeline.Element("round").Text.Set("started")));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,67 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model PayerVerificationPage
+@{
+    var plan = Html.ReactivePlan<PayerVerificationPage>();
+}
+@using (var verification = Html.BeginRequestContainer(plan, "payer-verification"))
+{
+    @(Html.NativeHiddenField(plan, m => m.DraftId))
+    @(Html.NativeHiddenField(plan, m => m.ResidentId))
+    @(Html.NativeHiddenField(plan, m => m.ContactId))
+    @(Html.NativeHiddenField(plan, m => m.FundingSource))
+    @(Html.InputField(plan, m => m.Policy.PolicyNumber, o => o.Label("Policy to verify")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Policy.Provider, o => o.Label("Coverage provider")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Policy.ContributionPercent, o => o.Label("Policy contribution percent")).NativeTextBox())
+    <fieldset><legend>Policy starts</legend>
+        @(Html.InputField(plan, m => m.Policy.StartsOn).ConformanceComponent(Reads.DayPicker("Policy starts", Model.Policy.StartsOn, Model.Policy.EndsOn)))
+    </fieldset>
+    <fieldset><legend>Policy ends</legend>
+        @(Html.InputField(plan, m => m.Policy.EndsOn).ConformanceComponent(Reads.DayPicker("Policy ends", Model.Policy.EndsOn, Model.Policy.StartsOn)))
+    </fieldset>
+    @(Html.InputField(plan, m => m.Consent, o => o.Label("I consent to verification")).NativeCheckBox())
+    @(Html.NativeButton("verify-policy", "Verify policy").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        var panel = pipeline.Component<ConformanceComponent>("allocation-panel");
+        var main = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Post<PayerVerificationPage>(MoveInEndpoints.PayerVerification, request => request
+            .Path(m => m.DraftId, Model.DraftId)
+            .Query(m => m.Reference, panel.Value)
+            .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+            .UrlEncoded(verification.Container, fields => { })
+            .When(panel.Value.NotNull()).Then(identified => identified.Header(MoveInEndpoints.CommunityHeader, panel.ReadOnlyText)))
+            .Busy("verify-policy")
+            .Validate<PayerVerificationRules>()
+            .WhileLoading(pipeline => pipeline.Element("verification-progress").Text.Set("Verifying"))
+            .OnSuccess<VerificationReply>((answer, pipeline) => pipeline.Element("verification-status").Text.Set(answer.Body.Read(r => r.Policy.Verification.Id)))
+            .OnError<ErrorEnvelope>(422, (refused, pipeline) => pipeline.Element("verification-status").Text.Set(refused.Body.Read(r => r.Error.Message)))
+            .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+            .OnError((failed, pipeline) => pipeline.Element("verification-status").Text.Set("Verification could not reach the payer."))
+            .Finally(pipeline => pipeline.Element("verification-progress").Text.Set("Ready"))
+            .Chained((answer, pipeline) => pipeline.When(answer.Body.Read(r => r.Policy.Verification.CanProceed).And(answer.Body.Read(r => r.Policy.Verification.Details.Required)))
+                .Then(pipeline => pipeline.Get<ReceiptQuery>(MoveInEndpoints.PolicyDetails, request => request
+                    .Query(q => q.DraftId, Model.DraftId)
+                    .Query(q => q.Reference, answer.Body.Read(r => r.Policy.Verification.Details.Id))).Into("policy-details")));
+    }))
+}
+<p id="verification-progress">Ready</p>
+<p id="verification-status"></p>
+<div id="policy-details"></div>
+@{
+    plan.Component<NativeDrawer>().Reactive(drawer => drawer.BeforeClose, (closing, pipeline) => pipeline
+        .When(pipeline.Element("verification-progress").Text.Eq("Verifying"))
+        .Then(pipeline =>
+        {
+            closing.Cancel.Set(true);
+            pipeline.When(closing.ClosedBy.NotEq(DrawerClosedBy.Close)).Then(pipeline => pipeline.Element("verification-status").Text.Set("Wait for the payer to finish verification."));
+        }));
+}
+@Html.RenderPlan(plan)

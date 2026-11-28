@@ -1,0 +1,89 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model QuoteOfferPage
+@{
+    var plan = Html.ReactivePlan<QuoteOfferPage>();
+    void PriceChanged(Pipeline<QuoteOfferPage> pipeline, TypedSource<string?> total)
+    {
+        pipeline.Element("acceptance-status").Text.Set(pipeline.Concat("Price changed to ", total, " USD"));
+        pipeline.Element("acceptance-receipt").Text.Set("");
+        pipeline.Unload("accepted-assistance");
+        pipeline.Element("quote-acceptance").Text.Set("Unaccepted");
+        pipeline.Dispatch(QuoteEvents.Calculated);
+    }
+}
+@if (Model.Quote is { } quote)
+{
+    using var state = Html.BeginRequestContainer(plan, "offer-state");
+    <p id="offered-quote">@FormattableString.Invariant($"{quote.Id} revision {quote.Revision}: {quote.Pricing.MonthlyTotal:0.00} USD")</p>
+    <p id="offered-deposit">@FormattableString.Invariant($"Admission deposit: {quote.Pricing.Deposit:0.00} USD")</p>
+    @(Html.NativeHiddenField(plan, m => m.Revision))
+    @(Html.NativeHiddenField(plan, m => m.Contribution))
+    @if (quote.Pricing.Assistance.Required)
+    {
+        <p id="assistance-on-file">@FormattableString.Invariant($"{(quote.Pricing.Assistance.Accepted ? "Agreed to" : "Awaiting agreement to")} {quote.Pricing.Assistance.Reference} for {quote.Pricing.Assistance.Contribution:0.00} USD")</p>
+        @(Html.InputField(plan, m => m.AcceptAssistance, o => o.Label("Accept assistance terms")).NativeCheckBox())
+    }
+    @(Html.NativeButton("accept-quote", "Accept quote").Reactive(plan, b => b.Click, (clicked, pipeline) =>
+    {
+        var main = pipeline.Container<MoveInPage>("move-in");
+        var review = pipeline.Component<ConformanceComponent>("service-panel");
+        var displayed = state.Container.Read(m => m.Revision);
+        var decision = pipeline.When(main.Read(m => m.Care.Level).NotEq(quote.CareLevel).Or(main.Read(m => m.Payer.Kind).NotEq(quote.PayerKind)))
+            .Then(pipeline => pipeline.Element("acceptance-status").Text.Set("Recalculate for the selected care and funding."));
+        if (quote.Pricing.Assistance.Required)
+            decision = decision.ElseIf(state.Container.Read(m => m.AcceptAssistance).Not())
+                .Then(pipeline => pipeline.Element("acceptance-status").Text.Set("Accept the assistance terms."));
+        decision.ElseIf(displayed.Eq(quote.Revision).And(state.Container.Read(m => m.Contribution).Gte(0m)).And(review.Check()))
+            .Then(pipeline => pipeline.When(review.SettleCheck()).Then(pipeline => pipeline.Post<QuoteAcceptance>(MoveInEndpoints.Page + "/quote-acceptances", request => request
+                .Path(q => q.DraftId, Model.DraftId)
+                .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+                .Json(body =>
+                {
+                    var sent = body.Set(q => q.QuoteId, quote.Id).Set(q => q.Revision, displayed).Set(q => q.Version, main.Read(m => m.Version));
+                    if (quote.Pricing.Assistance.Required) sent.Set(q => q.AcceptAssistance, state.Container.Read(m => m.AcceptAssistance));
+                    else sent.Set(q => q.AcceptAssistance, false);
+                }))
+                .Busy("current-offer").NoValidation()
+                .OnSuccess<SaveReply>((accepted, pipeline) =>
+                {
+                    pipeline.Element("acceptance-receipt").Text.Set(accepted.Body.Read(r => r.Receipt.Reference));
+                    pipeline.Element("quote-acceptance").Text.Set($"Accepted revision {quote.Revision}");
+                    pipeline.Dispatch(QuoteEvents.Accepted, quote.Revision);
+                    pipeline.When(accepted.Body.Read(r => r.Review.Required))
+                        .Then(pipeline => pipeline.Element("acceptance-status").Text.Set("Reading assistance terms"))
+                        .Else(pipeline => pipeline.Element("acceptance-status").Text.Set("Quote accepted"));
+                })
+                .OnError<QuoteReply>(409, (stale, pipeline) => pipeline.When(stale.Body.Read(r => r.Quote.Revision).NotEq(displayed))
+                    .Then(pipeline => PriceChanged(pipeline, stale.Headers.Get(MoveInEndpoints.MonthlyTotalHeader)))
+                    .Else(pipeline => pipeline.Element("acceptance-status").Text.Set("The draft has changed. Recalculate the quote.")))
+                .OnError((failed, pipeline) => pipeline.Element("acceptance-status").Text.Set("Acceptance unavailable. Retry this quote."))
+                .Chained((receipt, pipeline) => pipeline.When(receipt.Body.Read(r => r.Review.Required))
+                    .Then(pipeline => pipeline.Get<QuoteAssistanceQuery>(CareEndpoints.MoveInAssistance, request => request
+                        .Query(q => q.DraftId, Model.DraftId)
+                        .Query(q => q.Revision, quote.Revision)
+                        .Query(q => q.Reference, receipt.Body.Read(r => r.Review.Reference)))
+                        .Busy("current-offer").Into("accepted-assistance")
+                        .OnError((failed, pipeline) => pipeline.Element("acceptance-status").Text.Set("Accepted. Assistance terms unavailable."))
+                        .Chained((terms, pipeline) => pipeline.Element("acceptance-status").Text.Set("Quote accepted")))))
+                .Else(pipeline => pipeline.Element("acceptance-status").Text.Set("The service desk is not ready.")))
+            .Else(pipeline => pipeline.Element("acceptance-status").Text.Set("The service desk is not ready."));
+    }))
+    Html.On(plan, trigger => trigger.DomReady(pipeline =>
+    {
+        pipeline.Element("quote-acceptance").Text.Set(Model.AcceptedRevision is { } accepted ? $"Accepted revision {accepted}" : "Unaccepted");
+        if (Model.PreviousRevision is { } previous)
+            pipeline.Element("acceptance-status").Text.Set(quote.Revision > previous
+                ? FormattableString.Invariant($"Price changed to {quote.Pricing.MonthlyTotal:0.00} USD") : "Quote unchanged.");
+    }).CustomEvent(QuoteEvents.PricesChanged, (price, pipeline) => pipeline
+        .When(price.Gt(Model.CatalogueRevision)).Then(pipeline => pipeline.Dispatch(QuoteEvents.CheckCurrentPrice, quote.Revision))));
+}
+@Html.RenderPlan(plan)

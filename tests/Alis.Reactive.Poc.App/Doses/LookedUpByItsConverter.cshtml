@@ -1,0 +1,20 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Doses charted as given or missed";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+    var charted = new[] { DoseStatus.Given, DoseStatus.Missed };
+}
+<h1>Doses charted as given or missed</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-doses", "Count doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => charted.Contains(d.Charted)))))
+
+@Html.RenderPlan(plan)

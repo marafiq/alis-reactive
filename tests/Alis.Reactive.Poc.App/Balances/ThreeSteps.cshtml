@@ -1,0 +1,25 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Three steps";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Three steps</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Log: <span id="log"></span></p>
+
+@(plan.Button("record", "Record the weighed intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Weight.Lt(80)).Then(weighed =>
+        {
+            weighed.Element("log").Text.Set("one");
+            weighed.Component<FluidBalance>("balance").Intake.Set(250);
+            weighed.Element("log").Text.Set("three");
+        });
+    }))
+
+@Html.RenderPlan(plan)

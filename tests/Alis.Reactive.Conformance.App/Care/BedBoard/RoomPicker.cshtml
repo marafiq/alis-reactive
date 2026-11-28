@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.DropDowns
+@model RoomPicker
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Room picker";
+    var plan = Html.ReactivePlan<RoomPicker>();
+    var node = FusionDropDownTreeFields.Of<RoomNode>();
+}
+<h1>Room picker</h1>
+<fieldset>
+    <legend>Room</legend>
+    @(Html.InputField(plan, m => m.Room, options => options.Label("Room"))
+        .FusionDropDownTree(build => build.Fields(new DropDownTreeFields
+        {
+            DataSource = Model.Wings,
+            Value = node.Field(n => n.Code),
+            Text = node.Field(n => n.Label),
+            Child = node.Field(n => n.Rooms),
+        })))
+</fieldset>
+@Html.RenderPlan(plan)

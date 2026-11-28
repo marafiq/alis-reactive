@@ -1,0 +1,19 @@
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Self-checked in a lambda";
+    var plan = Html.ReactivePlan<InfusionPage>();
+}
+<h1>Self-checked in a lambda</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+
+@plan.StationCensus("census")
+
+@(plan.Button("count", "Count the channels that pass their self-check")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<InfusionPump>("pump").Channels().Count(channel =>
+                channel.SelfCheck()))))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,30 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ward board";
+    var plan = Html.ReactivePlan<WardBoard>();
+}
+<h1>@Model.Ward ward board</h1>
+<button type="button" @Html.Raises(plan, WardBoards.NoList)>No list</button>
+<button type="button" @Html.Raises(plan, WardBoards.NoAlarms)>No alarms</button>
+<button type="button" @Html.Raises(plan, WardBoards.OneAlarm)>One alarm</button>
+<p>Ward: <span id="ward-status">Unknown</span></p>
+<p>Report: <span id="report-status">Waiting</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(WardBoards.NoList, pipeline => pipeline.Dispatch(WardBoards.AlarmRaised, new AlarmReport()))
+        .CustomEvent(WardBoards.NoAlarms, pipeline => pipeline.Dispatch(WardBoards.AlarmRaised, new AlarmReport { Alarms = [] }))
+        .CustomEvent(WardBoards.OneAlarm, pipeline => pipeline.Dispatch(WardBoards.AlarmRaised, new AlarmReport { Alarms = [new WardAlarm { Room = "Room 4" }] }))
+        .CustomEvent(WardBoards.AlarmRaised, (report, pipeline) =>
+        {
+            pipeline.When(report.Read(raised => raised.Alarms)!.Any()).Then(pipeline => pipeline.Element("ward-status").Text.Set("Alarms"));
+            pipeline.When(report.Read(raised => raised.Alarms)!.Any().Not()).Then(pipeline => pipeline.Element("ward-status").Text.Set("Quiet"));
+            pipeline.Element("report-status").Text.Set("Read");
+        }));
+}
+@Html.RenderPlan(plan)

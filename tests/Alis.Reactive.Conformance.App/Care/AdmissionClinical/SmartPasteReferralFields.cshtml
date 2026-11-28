@@ -1,0 +1,14 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@model SmartPasteReferralFields
+<form aria-labelledby="intake-heading">
+    <h2 id="intake-heading">Resident intake</h2>
+    <label asp-for="GivenName">Given name</label>
+    <input asp-for="GivenName" />
+    @Html.FusionSmartPasteButton("intake-paste", options =>
+    {
+        options.Content = "Smart Paste";
+        options.AiAssistEndpoint = CarePages.SmartPasteAssist;
+    })
+</form>

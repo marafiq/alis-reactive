@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@model DraftActionsPage
+@{
+    Layout = "/Care/MoveIn/_MoveInLayout.cshtml";
+    ViewData["Title"] = "Discarded move-in";
+}
+<h1>Move-in @Model.DraftId</h1>
+<p id="closed-draft">@(Model.ResidentName)’s draft is @Model.Status.</p>
+<p>Saved version: <span id="saved-version">@Model.Version</span></p>

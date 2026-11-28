@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SupplyRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Supplies of the round";
+    var plan = Html.ReactivePlan<SupplyRound>();
+}
+<h1>@Model.Name round: the supplies</h1>
+<button type="button" @Html.Raises(plan, SupplyRounds.Load)>Load</button>
+@(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner", Raises = [new RaiseStart { Button = "Send" }] }))
+<p>Supplies: <span id="supply-status">Not loaded</span></p>
+<p>Pharmacy received: <span id="supply-echo">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(SupplyRounds.Load, pipeline => pipeline.Get(SupplyRoundEndpoints.Supplies)
+        .OnSuccess<LoadedSupplies>((loaded, pipeline) => pipeline.Component<ConformanceComponent>("scanner").Records.Set(loaded.Body.Read(supplies => supplies.Records)))
+        .Chained((loaded, pipeline) =>
+        {
+            pipeline.Listen(pipeline.Component<ConformanceComponent>("scanner"), scanner => scanner.Raised, (raised, pipeline) => pipeline
+                .Post<SentSupplies>(SupplyRoundEndpoints.Sent, request => request.Json(body => body.Set(r => r.Records, loaded.Body.Read(supplies => supplies.Records))))
+                .OnSuccess(Content.Text, (echoed, pipeline) => pipeline.Element("supply-echo").Text.Set(echoed.Body)));
+            pipeline.Element("supply-status").Text.Set("Ready to send");
+        })));
+}
+@Html.RenderPlan(plan)

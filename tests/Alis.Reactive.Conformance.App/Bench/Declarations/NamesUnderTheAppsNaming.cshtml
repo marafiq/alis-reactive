@@ -1,0 +1,36 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NamesBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<NamesBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart()))
+<button type="button" @Html.Raises(plan, NameButtons.TakeTwentyFive)>Take 25</button>
+<button type="button" @Html.Raises(plan, NameButtons.ReadTheRecord)>Read the record</button>
+<button type="button" @Html.Raises(plan, NameButtons.ReadTheCamelRecord)>Read the camel record</button>
+<dl>
+    <dt>Take</dt>
+    <dd id="take-done"></dd>
+    <dt>Multi-word</dt>
+    <dd id="multi-word"></dd>
+    <dt>Camel word</dt>
+    <dd id="camel-word"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(NameButtons.TakeTwentyFive, pipeline =>
+        {
+            pipeline.Component<ConformanceComponent>("conformance").TakeNullable(25);
+            pipeline.Element("take-done").Text.Set("taken");
+        })
+        .CustomEvent(NameButtons.ReadTheRecord, pipeline => pipeline.Get(Model.Record)
+            .OnSuccess<Record>((found, pipeline) => pipeline.Element("multi-word").Text.Set(found.Body.Read(record => record.MultiWord))))
+        .CustomEvent(NameButtons.ReadTheCamelRecord, pipeline => pipeline.Get(Model.CamelRecord)
+            .OnSuccess<Record>((found, pipeline) => pipeline.Element("camel-word").Text.Set(found.Body.Read(record => record.MultiWord)))));
+}
+@Html.RenderPlan(plan)

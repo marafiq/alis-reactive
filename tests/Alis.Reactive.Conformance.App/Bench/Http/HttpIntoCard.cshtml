@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HttpCard
+@{
+    var plan = Html.ReactivePlan<HttpCard>();
+}
+@(plan.ConformanceComponent("card-component", new ConformanceStart { Text = Model.Text, Value = Model.Value, Options = Model.Codes })
+    .Reactive(component => component.Change, (change, pipeline) => pipeline.Element("picked").Text.Set(pipeline.Component<ConformanceComponent>("card-component").Value)))
+<p id="picked"></p>
+@Html.RenderPlan(plan)

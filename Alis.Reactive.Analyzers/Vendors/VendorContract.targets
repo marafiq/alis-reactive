@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup>
+    <VendorContractScript>$(MSBuildThisFileDirectory)vendor-contract.mjs</VendorContractScript>
+  </PropertyGroup>
+  <Target Name="DiscoverVendorContractInputs">
+    <Error Condition="'$(VendorContractTsConfig)' == ''" Text="Set VendorContractTsConfig to the consuming project's tsconfig.json." />
+    <PropertyGroup>
+      <VendorContractTable>$(IntermediateOutputPath)vendor-contract.tsv</VendorContractTable>
+      <VendorContractInputs>$(IntermediateOutputPath)vendor-contract.inputs.sha256</VendorContractInputs>
+    </PropertyGroup>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="node &quot;$(VendorContractScript)&quot; &quot;$(VendorContractTsConfig)&quot; &quot;$(VendorContractInputs)&quot; --inputs &quot;$(VendorContractTable)&quot;" />
+  </Target>
+  <Target Name="WriteVendorContract" DependsOnTargets="DiscoverVendorContractInputs" Inputs="$(VendorContractInputs);$(VendorContractScript);$(MSBuildThisFileFullPath)" Outputs="$(VendorContractTable)">
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="node &quot;$(VendorContractScript)&quot; &quot;$(VendorContractTsConfig)&quot; &quot;$(VendorContractTable)&quot;" />
+  </Target>
+  <Target Name="ReadVendorContract" DependsOnTargets="WriteVendorContract" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <AdditionalFiles Include="$(VendorContractTable)" />
+      <FileWrites Include="$(VendorContractTable);$(VendorContractInputs)" />
+    </ItemGroup>
+  </Target>
+</Project>

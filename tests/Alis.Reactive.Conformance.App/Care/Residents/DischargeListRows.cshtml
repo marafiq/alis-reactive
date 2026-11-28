@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DischargeListRows
+@{
+    var plan = Html.ReactivePlan<DischargeListRows>();
+    var discharge = plan.Rows<ResidentRow>("residents").NativeActionButton((activated, pipeline) => pipeline
+        .Post<DischargeRequest>(CareEndpoints.CountedDischarge, request => request.Path(discharged => discharged.ResidentId, activated.Row.Read(row => row.Id)))
+        .OnSuccess(Content.Json<DischargeCount>(), (counted, pipeline) => pipeline.Element("count").Text.Set(counted.Body.Read(discharges => discharges.Count))));
+}
+<ul aria-label="Residents">
+    @foreach (var resident in Model.Residents)
+    {
+        <li aria-label="@resident.Name">@resident.Name @discharge.Render(resident, "Discharge")</li>
+    }
+</ul>
+@Html.RenderPlan(plan)

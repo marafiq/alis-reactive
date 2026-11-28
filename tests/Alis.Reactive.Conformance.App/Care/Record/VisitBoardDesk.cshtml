@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitBoardDesk
+@{
+    var plan = Html.ReactivePlan<VisitBoardDesk>();
+}
+<h2>Visit desk</h2>
+<button type="button" @Html.Raises(plan, VisitBoardButtons.ShowDeskVisit)>Show desk visit</button>
+<p>Next visit starts: <span id="desk-visit">Not shown</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(VisitBoardButtons.ShowDeskVisit, pipeline => pipeline
+        .Get(Model.Visit)
+        .OnSuccess(Content.Json<BoardVisit>(), (visit, pipeline) => pipeline.Element("desk-visit").Text.Set(visit.Body.Read(next => next.Starts)))));
+}
+@Html.RenderPlan(plan)

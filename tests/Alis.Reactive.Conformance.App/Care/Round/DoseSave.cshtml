@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseSave
+@{
+    Layout = "/Care/Round/_TracedLayout.cshtml";
+    ViewData["Title"] = "Dose";
+    var plan = Html.ReactivePlan<DoseSave>();
+}
+<h1>Dose for @Model.Resident</h1>
+@using (var dose = Html.BeginRequestContainer(plan, "dose"))
+{
+    @(Html.NativeHiddenField(plan, m => m.Resident))
+    @(Html.NativeHiddenField(plan, m => m.Medicine))
+    <button type="button" @Html.Raises(plan, DoseSaveEvents.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(DoseSaveEvents.Save, pipeline => pipeline
+        .Post<DoseSave>(CareEndpoints.DoseSaveDoses, request => request.Inputs(dose.Container))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("echo").Text.Set(saved.Body))));
+}
+<p>Echo: <span id="echo">-</span></p>
+@Html.RenderPlan(plan)

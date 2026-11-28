@@ -1,0 +1,68 @@
+[
+ {
+  "name": "a behavior names a defect no feature holds",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"X8.13\",",
+    "new": "\"X8.99\","
+   }
+  ],
+  "expect": "ConformanceComponent's behavior names X8.99, no test of the spec"
+ },
+ {
+  "name": "a behavior names a promise index past its feature's promises",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"X7.6 #3\"",
+    "new": "\"X7.6 #9\""
+   }
+  ],
+  "expect": "ConformanceComponent's behavior names X7.6 #9, no test of the spec"
+ },
+ {
+  "name": "a behavior with its tests emptied",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"behavior\": \"Its own Change button raises its Change.\",\n          \"tests\": [\n            \"X12.9\",\n            \"X12.10\"\n          ]",
+    "new": "\"behavior\": \"Its own Change button raises its Change.\",\n          \"tests\": []"
+   }
+  ],
+  "expect": "ConformancePeer's behavior 'Its own Change button raises its Change.' names no test"
+ },
+ {
+  "name": "a behavior with no sentence",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"behavior\": \"Its own Change button raises its Change.\",",
+    "new": "\"behavior\": \"\","
+   }
+  ],
+  "expect": "ConformancePeer states a behavior with no sentence"
+ },
+ {
+  "name": "a behavior names the reference cell that hands its component",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"behavior\": \"Its own Change button raises its Change.\",\n          \"tests\": [\n            \"X12.9\",\n            \"X12.10\"\n          ]",
+    "new": "\"behavior\": \"Its own Change button raises its Change.\",\n          \"tests\": [\n            \"X12.9\",\n            \"X12.10\",\n            \"event.poc15.component.payload.before\"\n          ]"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a behavior's sentence reworded",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"behavior\": \"Its own Change button raises its Change.\",",
+    "new": "\"behavior\": \"A click on its own Change button raises its Change.\","
+   }
+  ],
+  "expect": null
+ }
+]

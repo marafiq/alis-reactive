@@ -1,0 +1,77 @@
+line	file	exports
+main	Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts	RuntimeComponentReadinessError registerComponentDriver requireComponentDriver
+main	Alis.Reactive.Assets/runtime/browser-objects/component-event-contract.ts	componentEventChannel
+main	Alis.Reactive.Assets/runtime/browser-objects/execution-context.ts	ExecutionContext
+main	Alis.Reactive.Assets/runtime/browser-objects/object-record.ts	objectRecordFrom plainObjectRecordFrom
+main	Alis.Reactive.Assets/runtime/browser-objects/runtime-object.ts	RuntimeObject
+main	Alis.Reactive.Assets/runtime/browser-objects/runtime-path.ts	RuntimePath
+main	Alis.Reactive.Assets/runtime/browser-objects/runtime-plan.ts	RuntimeComponent RuntimeComponents RuntimeObjectContracts RuntimePlan RuntimePlugins RuntimeResolutionError
+main	Alis.Reactive.Assets/runtime/browser-objects/runtime-shape.ts	RuntimeShape
+main	Alis.Reactive.Assets/runtime/browser-objects/runtime-value.ts	RuntimeValue applyShapeWhenPresent isMissingRuntimeValue
+main	Alis.Reactive.Assets/runtime/components/fusion/confirm.ts	init
+main	Alis.Reactive.Assets/runtime/components/native/drawer.ts	
+main	Alis.Reactive.Assets/runtime/components/native/loader.ts	
+main	Alis.Reactive.Assets/runtime/components/native/native-action-link.ts	initNativeActionLinks resetNativeActionLinksForTests
+main	Alis.Reactive.Assets/runtime/conditions/compare-engine.ts	evaluateCompare evaluateSyncCondition
+main	Alis.Reactive.Assets/runtime/conditions/conditions.ts	evaluateCondition evaluateConditionInCurrentLane
+main	Alis.Reactive.Assets/runtime/diagnostics/trace.ts	scope setLevel
+main	Alis.Reactive.Assets/runtime/events/event-fusion.ts	wire
+main	Alis.Reactive.Assets/runtime/events/event-native.ts	wire
+main	Alis.Reactive.Assets/runtime/events/resolver.ts	wireEvent
+main	Alis.Reactive.Assets/runtime/execution/partials/inject.ts	injectPartial
+main	Alis.Reactive.Assets/runtime/execution/reactions/execute.ts	catchAsyncReactionFailure executeReaction resetActivePlanForTests setActivePlan
+main	Alis.Reactive.Assets/runtime/execution/realtime/retry-indicator.ts	removeRetryIndicator showRetryIndicator
+main	Alis.Reactive.Assets/runtime/execution/realtime/server-push.ts	wireServerPush
+main	Alis.Reactive.Assets/runtime/execution/realtime/signalr.ts	wireSignalR
+main	Alis.Reactive.Assets/runtime/execution/requests/gather.ts	resolveRequestInput
+main	Alis.Reactive.Assets/runtime/execution/requests/http-fetch.ts	resolveFetch
+main	Alis.Reactive.Assets/runtime/execution/requests/http.ts	executeRequest
+main	Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts	requestPayloadWriterFor writeRequestPayloadValue
+main	Alis.Reactive.Assets/runtime/execution/requests/request-wire-format.ts	requestJsonBody requestWireText
+main	Alis.Reactive.Assets/runtime/execution/requests/url-template.ts	resolveRouteParams
+main	Alis.Reactive.Assets/runtime/execution/triggers/trigger.ts	wireTrigger
+main	Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts	AppliedPlans appliedPlans composeInitialPlans
+main	Alis.Reactive.Assets/runtime/lifecycle/boot.ts	boot getBootedPlan loadPartialSlot resetBootStateForTests trace unloadPartialSlot
+main	Alis.Reactive.Assets/runtime/lifecycle/component-merge.ts	mergeBootComponent mergeSlotComponent
+main	Alis.Reactive.Assets/runtime/lifecycle/merge-policy.ts	MergePolicy emptyPlan snapshotPlan
+main	Alis.Reactive.Assets/runtime/lifecycle/object-contracts.ts	mergeObjectContracts stableJson
+main	Alis.Reactive.Assets/runtime/plugins/catalog.ts	PluginCatalog pluginCatalog registerPlugin resetPluginCatalogForTests resolvePlugin
+main	Alis.Reactive.Assets/runtime/root.ts	
+main	Alis.Reactive.Assets/runtime/shared/assert-never.ts	assertNever
+main	Alis.Reactive.Assets/runtime/shared/javascript-string.ts	toJavaScriptString
+main	Alis.Reactive.Assets/runtime/shared/shape-convert.ts	applyShape booleanAsNumber convertByShape isBlankText toArray toBoolean toDate toNumber toPlainObject toString
+main	Alis.Reactive.Assets/runtime/validation/error-display.ts	addToSummary clearInline clearSummary findSummaryElement hideSummaryDiv removeSummaryEntry showInline showServerErrorInline showSummaryDiv summaryHasEntries
+main	Alis.Reactive.Assets/runtime/validation/index.ts	
+main	Alis.Reactive.Assets/runtime/validation/live-clear.ts	resetLiveClearForTests unwireField wireLiveValidation
+main	Alis.Reactive.Assets/runtime/validation/orchestrator.ts	revalidateField showServerErrors validateContainer
+main	Alis.Reactive.Assets/runtime/validation/rule-engine.ts	ruleFails
+main	Alis.Reactive.Assets/runtime/validation/rule-operands.ts	ShapedComparison ValidationLengthConstraint ValidationRangeTarget ValidationScalarTarget ValidationSubject
+main	Alis.Reactive.Assets/runtime/values/array-op-engine.ts	runArrayOp
+main	Alis.Reactive.Assets/runtime/values/evaluate.ts	evaluateValue
+redesign	Alis.Reactive.Assets/runtime/diagnostics/trace.ts	levelOf logger setLevel
+redesign	Alis.Reactive.Assets/runtime/grammar/environment.ts	Environment
+redesign	Alis.Reactive.Assets/runtime/grammar/evaluate.ts	childScope evaluate evaluateStatement isPromise labelOf rootScope
+redesign	Alis.Reactive.Assets/runtime/grammar/execute.ts	executeBlock
+redesign	Alis.Reactive.Assets/runtime/grammar/operators.ts	arithmetic compare empty equal finite greaterThan greaterThanOrEqual lessThan lessThanOrEqual matches merge negate order toArray truthy
+redesign	Alis.Reactive.Assets/runtime/grammar/paths.ts	call canHaveMembers read write
+redesign	Alis.Reactive.Assets/runtime/grammar/shape.ts	Instant asBoolean asDate asInstant asNumber asText bound isBlankText isMissing shaped
+redesign	Alis.Reactive.Assets/runtime/objects/owner.ts	Owner
+redesign	Alis.Reactive.Assets/runtime/objects/plan-objects.ts	PlanObjects
+redesign	Alis.Reactive.Assets/runtime/objects/plugins.ts	pluginNamed pluginOf registerPlugin
+redesign	Alis.Reactive.Assets/runtime/objects/vendor-driver.ts	stillHolds subscribeVendor vendorObject
+redesign	Alis.Reactive.Assets/runtime/plans/discover.ts	discoverPlans
+redesign	Alis.Reactive.Assets/runtime/plans/mount-events.ts	COMMIT_EVENT MOUNT_EVENT UNMOUNT_EVENT announceMount announceUnmount
+redesign	Alis.Reactive.Assets/runtime/plans/start.ts	runHandler startOwner startOwners
+redesign	Alis.Reactive.Assets/runtime/plugins/document.ts	documentPlugin raise
+redesign	Alis.Reactive.Assets/runtime/plugins/form/display.ts	addToSummary canRenderInline clearInline clearSummary hideSummaryDiv removeSummaryEntry showInline showServerInline showSummaryDiv showsServerMessage summaryHasEntries
+redesign	Alis.Reactive.Assets/runtime/plugins/form/form.ts	formPlugin
+redesign	Alis.Reactive.Assets/runtime/plugins/http.ts	httpPlugin send
+redesign	Alis.Reactive.Assets/runtime/plugins/model.ts	boundNameOf containedInputs invalidClassOf isMountedInput modelPlugin nameAt namedInputs
+redesign	Alis.Reactive.Assets/runtime/plugins/slot.ts	slotOwner slotPlugin
+redesign	Alis.Reactive.Assets/runtime/realtime/hub.ts	hubPlugin
+redesign	Alis.Reactive.Assets/runtime/realtime/retry-indicator.ts	removeRetryIndicator showRetryIndicator
+redesign	Alis.Reactive.Assets/runtime/realtime/stream.ts	streamPlugin
+redesign	Alis.Reactive.Assets/runtime/root.ts	
+redesign	Alis.Reactive.Assets/runtime/shared/assert-never.ts	assertNever
+redesign	Alis.Reactive.Assets/runtime/shared/javascript-string.ts	toJavaScriptString
+redesign	Alis.Reactive.Assets/runtime/shared/record.ts	isRecord

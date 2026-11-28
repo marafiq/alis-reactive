@@ -1,0 +1,23 @@
+using Alis.Reactive.Declarations;
+using Alis.Reactive.Plugins;
+using Alis.Reactive.ValuesAndSources;
+
+namespace Alis.Reactive.Conformance.App.Care;
+
+[Mirrors("Care/Residents/serving-station-with-a-paged-list", "ServingStation")]
+public sealed class ServingStation : Plugin
+{
+    public ServingStation()
+        : base("serving-station")
+    {
+    }
+
+    public StationPlates Plates => LiveObject<StationPlates>();
+}
+
+public sealed class StationPlates : JsObject
+{
+    public TypedSource<IReadOnlyList<string>> Items => DataIterator<string>();
+
+    public ReadOnly<int> Total => ReadOnly<int>(name: "count");
+}

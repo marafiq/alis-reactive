@@ -1,0 +1,8 @@
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class OutcomeFromAnInteger
+{
+    public static FailureOutcome Refused() => (FailureOutcome)7;
+}

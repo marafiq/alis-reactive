@@ -1,0 +1,14 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HourLogTools
+@{
+    var plan = Html.ReactivePlan<HourLogTools>();
+}
+<h2>@Model.Shift</h2>
+<button type="button" @Html.Raises(plan, HourLogs.LoadTheEntry)>Load the entry</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(HourLogs.LoadTheEntry, pipeline => pipeline.Get(HourLogEndpoints.Entry).Into("hour-entry")));
+}
+@Html.RenderPlan(plan)

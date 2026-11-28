@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PanelDays
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care days";
+    var plan = Html.ReactivePlan<PanelDays>();
+}
+<h1>Care days of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Care panel", Days = Model.Care }))
+<button type="button" @Html.Raises(plan, PanelDaysEvents.Send)>Send care</button>
+<p>Care sent: <span id="care-echo"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PanelDaysEvents.Send, pipeline => pipeline
+        .Get<PanelDaysQuery>(PanelDaysEndpoints.Care, request => request.Set(r => r.Care, pipeline.Component<ConformanceComponent>("care-panel").Days))
+        .OnSuccess(Content.Text, (sent, pipeline) => pipeline.Element("care-echo").Text.Set(sent.Body))));
+}
+@Html.RenderPlan(plan)

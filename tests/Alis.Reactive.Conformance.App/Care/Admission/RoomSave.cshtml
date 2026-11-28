@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomSave
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Room";
+    var plan = Html.ReactivePlan<RoomSave>();
+}
+<h1>Room</h1>
+@using (var roomForm = Html.BeginRequestContainer(plan, "room-form"))
+{
+    <div id="room-slot"></div>
+    <button type="button" @Html.Raises(plan, RoomSaveButtons.Save)>Save</button>
+    <button type="button" @Html.Raises(plan, RoomSaveButtons.ReloadTheRoom)>Reload the room</button>
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Get(RoomSaveEndpoints.Room).Into("room-slot"))
+        .CustomEvent(RoomSaveButtons.ReloadTheRoom, pipeline => pipeline.Get(RoomSaveEndpoints.Room).Into("room-slot"))
+        .CustomEvent(RoomSaveButtons.Save, pipeline => pipeline
+            .Post<RoomSave>(RoomSaveEndpoints.Saves, request => request.Inputs(roomForm.Container))
+            .WhileLoading(pipeline => pipeline.Element("room-status").Text.Set("Saving…"))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("room-status").Text.Set(saved.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))));
+}
+<p>Status: <span id="room-status">Not saved</span></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomPreview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission room preview";
+    var plan = Html.ReactivePlan<RoomPreview>();
+}
+<h1>Admission room preview</h1>
+<fieldset>
+    <legend>Provisional choice</legend>
+    @(Html.FusionRadioButton(plan, "preview-room", build => build.Label("Garden suite").Name("preview-choice").Value("garden").Checked(true)))
+</fieldset>
+@(Html.NativeButton("close-preview", "Close room preview")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+        pipeline.Component<FusionRadioButton>("preview-room").Destroy()))
+@(Html.NativeButton("continue-preview", "Continue room preview")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+        pipeline.Component<FusionRadioButton>("preview-room").FocusIn()))
+@Html.RenderPlan(plan)

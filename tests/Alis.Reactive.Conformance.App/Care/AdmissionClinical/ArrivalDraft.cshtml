@@ -1,0 +1,80 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalDraft
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Arrival draft";
+    var plan = Html.ReactivePlan<ArrivalDraft>();
+}
+<h1>Arrival draft</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").EnablePersistence(Model.Remembered))
+        .Reactive(picker => picker.Destroyed, (closed, pipeline) => pipeline.When(closed.Name.Eq("destroyed").And(closed.Cancel.Not()))
+            .Then(pipeline => pipeline.Element("editor-record").Text.Set("Arrival editor closed"))))
+</fieldset>
+@(Html.NativeButton("remember-this-arrival", "Remember this arrival")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.EnablePersistence.Set(true);
+        date.Refresh();
+        pipeline.When(date.EnablePersistence)
+            .Then(pipeline => pipeline.Element("storage-policy").Text.Set("Keep the arrival on this desk"))
+            .Else(pipeline => pipeline.Element("storage-policy").Text.Set("Use the referral default"));
+    }))
+@(Html.NativeButton("use-a-fresh-visit", "Use a fresh visit")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.EnablePersistence.Set(false);
+        date.Refresh();
+        pipeline.When(date.EnablePersistence)
+            .Then(pipeline => pipeline.Element("storage-policy").Text.Set("Keep the arrival on this desk"))
+            .Else(pipeline => pipeline.Element("storage-policy").Text.Set("Use the referral default"));
+    }))
+@(Html.NativeButton("archive-booked-referral", "Archive booked referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Value.Set(new DateTime(2026, 7, 14));
+        date.DataBind();
+        pipeline.Post<ArrivalRecovery>(CarePages.ArrivalArchive, request => request.Set(recovery => recovery.Recovery, date.GetPersistData()))
+            .OnSuccess(Content.Text, (filed, pipeline) => pipeline.Element("archive-receipt").Text.Set(filed.Body));
+    }))
+@(Html.NativeButton("archive-released-referral", "Archive released referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Value.Set((DateTime?)null);
+        date.DataBind();
+        pipeline.Post<ArrivalRecovery>(CarePages.ArrivalArchive, request => request.Set(recovery => recovery.Recovery, date.GetPersistData()))
+            .OnSuccess(Content.Text, (filed, pipeline) => pipeline.Element("archive-receipt").Text.Set(filed.Body));
+    }))
+@(Html.NativeButton("close-arrival-editor", "Close arrival editor")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Destroy();
+    }))
+@(Html.NativeButton("continue-arrival-editor", "Continue arrival editor")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FocusIn();
+        pipeline.When(date.Element.GetAttribute("role").Eq("combobox"))
+            .Then(pipeline => pipeline.Element("editor-record").Text.Set("Arrival editor in service"));
+    }))
+<p><output id="archive-receipt" aria-label="Archive receipt">Archive empty</output></p>
+<p><output id="editor-record" aria-label="Editor record">Editor awaiting review</output></p>
+<p><output id="storage-policy" aria-label="Storage policy">Referral default</output></p>
+<a href="@CarePages.ArrivalDraftReturn">Open next visit</a>
+@Html.RenderPlan(plan)

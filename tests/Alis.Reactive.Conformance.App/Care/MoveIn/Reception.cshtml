@@ -1,0 +1,78 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model ReceptionPage
+@{
+    var plan = Html.ReactivePlan<ReceptionPage>();
+    var count = Html.InputField(plan, m => m.Copies, options => options.Label("Badge copies"));
+    var relationship = Html.InputField(plan, m => m.Relationship, options => options.Label("Relationship"));
+    var consent = Html.InputField(plan, m => m.Consent, options => options.Label("Visitor consent"));
+    var desk = Html.InputField(plan, m => m.Desk, options => options.Label("Reception desk"));
+}
+<h2>Visitor reception</h2>
+<form id="reception-sign-in" method="post" action="@Url.Action(nameof(MoveInDeskController.SignInVisitor), "MoveInDesk", new { Model.DraftId })">
+@using (var reception = Html.BeginRequestContainer(plan, "reception"))
+{
+    @Html.AntiForgeryToken()
+    @(Html.NativeHiddenField(plan, m => m.DraftId))
+    @(Html.NativeHiddenField(plan, m => m.ResidentId))
+    @(Html.NativeHiddenField(plan, m => m.CoordinatorId))
+    @(Html.NativeHiddenField(plan, m => m.OperationId))
+    @(Html.InputField(plan, m => m.VisitorName, options => options.Label("Visitor name")).NativeTextBox())
+    @(relationship.Render<NativeDropDown>(Html.DropDownListFor(m => m.Relationship, Html.GetEnumSelectList<ContactRelationship>(), new { id = relationship.Id })))
+    @(consent.Render<NativeCheckBox>(Html.Raw($"<input type=\"checkbox\" name=\"{Html.NameFor(m => m.Consent)}\" value=\"true\" id=\"{consent.Id}\">")))
+    @(count.Render<NativeTextBox>(Html.TextBoxFor(m => m.Copies, new { type = "number", id = count.Id })))
+    <label>Reserved badge <input name="ReservedBadge" value="Staff" disabled></label>
+    <button type="submit" name="Navigation" value="true" formmethod="post" formenctype="application/x-www-form-urlencoded"
+            formaction="@Url.Action(nameof(MoveInDeskController.SignInVisitor), "MoveInDesk", new { Model.DraftId })">Sign in and open receipt</button>
+    @(Html.NativeButton("save-visitor", "Save visitor").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<ReceptionPage>(MoveInEndpoints.Reception, request => request
+            .Path(m => m.DraftId, Model.DraftId)
+            .Header(MoveInEndpoints.CoordinatorHeader, reception.Container.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, reception.Container.Read(m => m.OperationId))
+            .UrlEncoded(reception.Container, body => body.Input(r => r.Desk, pipeline.Input(m => m.Desk))))
+        .Validate<ReceptionRules>()
+        .WhileLoading(pipeline => pipeline.Element("reception-answer").Text.Set("Signing in the visitor."))
+        .OnSuccess(Content.Html, (receipt, pipeline) =>
+        {
+            pipeline.Into("reception-receipt", receipt.Body);
+            pipeline.Element("reception-answer").Text.Set("Visitor signed in.");
+        })
+        .OnError(400, Content.None, (invalid, pipeline) => pipeline.Element("reception-answer").Text.Set("Reception could not accept the submitted details."))
+        .OnError(403, Content.None, (forbidden, pipeline) => pipeline.Element("reception-answer").Text.Set("This coordinator cannot sign in visitors here."))
+        .OnError<ErrorEnvelope>(422, (refusal, pipeline) => pipeline.Element("reception-answer").Text.Set(refusal.Body.Read(r => r.Error.Message)))
+        .OnError((failure, pipeline) =>
+        {
+            pipeline.Element("reception-answer").Text.Set("Sign-in unconfirmed.");
+            pipeline.Notice().Error("Reception could not confirm this sign-in.");
+        })))
+}
+</form>
+@(desk.Render<NativeTextBox>(Html.TextBoxFor(m => m.Desk, new { id = desk.Id, form = "reception-sign-in" })))
+<label for="reception-document-caption">Reception document caption</label>
+@(plan.Render<NativeTextBox>("reception-document-caption", Html.TextBox("ReceptionDocumentCaption", "Reception intake", new { id = "reception-document-caption" })))
+<p id="reception-answer" role="status"></p>
+<div id="reception-receipt"></div>
+@Html.ActionLink("Admission history", nameof(MoveInDeskController.AdmissionHistory), "MoveInDesk", new { Model.DraftId })
+<fieldset>
+    <legend>Reception apartment</legend>
+    @(plan.ConformanceElement("reception-apartment-reader", new ElementStart { Room = Model.Apartment })
+        .Reactive(element => element.Opened, (signal, pipeline) => pipeline.When(signal.Type.Eq("opened")).Then(pipeline =>
+        {
+            pipeline.Element("reception-direction").Text.Set("Directions pending.");
+            pipeline.When(signal.Detail.IsNull()).Then(pipeline => pipeline.Element("reception-room").Text.Set("No apartment supplied."));
+            pipeline.When(signal.Detail.NotNull().And(signal.Detail.Read(detail => detail.Room).NotEmpty()))
+                .Then(pipeline => pipeline.Element("reception-room").Text.Set(pipeline.Concat("Apartment ", signal.Detail.Read(detail => detail.Room))));
+        }))
+        .Reactive(element => element.Keydown, (key, pipeline) => pipeline.When(key.Key.Eq("Enter")).Then(pipeline => pipeline
+            .When(pipeline.Element("reception-room").Text.StartsWith("Apartment "))
+            .Then(pipeline => pipeline.Element("reception-direction").Text.Set(pipeline.Concat("Directions confirmed for ", pipeline.Element("reception-room").Text, ".")))
+            .Else(pipeline => pipeline.Element("reception-direction").Text.Set("Select an apartment before confirming directions.")))))
+    <p id="reception-room">No apartment selected.</p>
+    <p id="reception-direction">Directions pending.</p>
+</fieldset>
+@Html.RenderPlan(plan)

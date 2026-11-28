@@ -1,0 +1,14 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class NoRetryOnPostAfterSuccess
+{
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake))
+            .OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success("Resident admitted"))
+            .NoRetry();
+}

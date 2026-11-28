@@ -1,504 +1,266 @@
 #!/usr/bin/env bash
-# Observable Playwright/NUnit runner.
-#
-# Use this instead of raw `dotnet test` for browser tests. The wrapper makes both
-# filtered and full runs observable by printing the active filter, teeing live
-# output to a log, writing TRX/diagnostic artifacts, and enabling blame-hang.
-# Browser assets are built before dotnet test, never during the VSTest phase.
 set -euo pipefail
-
 cd "$(dirname "$0")/.."
 
-project="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj"
-results_dir="tests/Alis.Reactive.PlaywrightTests/TestResults/observable"
-configuration="${CONFIGURATION:-Debug}"
-hang_timeout="${PLAYWRIGHT_HANG_TIMEOUT:-10m}"
-filter=""
-shard=""
-print_filter=0
-list_only=0
-retry_failed=0
-no_build=0
-
-assembly_path() {
-  printf 'tests/Alis.Reactive.PlaywrightTests/bin/%s/net10.0/Alis.Reactive.PlaywrightTests.dll' "$configuration"
-}
-
-check_asset_output_is_fresh() {
-  local label="$1"
-  local output="$2"
-  shift 2
-
-  if [ ! -f "$output" ]; then
-    echo "[playwright:runner] ERROR: $label output '$output' does not exist." >&2
-    echo "[playwright:runner] Run npm run build:all before Playwright." >&2
-    exit 3
-  fi
-
-  local changed
-  changed="$(
-    find "$@" \
-      -type f \
-      \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.mjs' -o -name '*.css' -o -name '*.json' \) \
-      -newer "$output" \
-      -print \
-      | head -20
-  )"
-
-  if [ -n "$changed" ]; then
-    echo "[playwright:runner] ERROR: $label output is stale." >&2
-    echo "[playwright:runner] Sources newer than '$output':" >&2
-    printf '%s\n' "$changed" >&2
-    echo "[playwright:runner] Run npm run build:all before Playwright." >&2
-    exit 3
-  fi
-}
-
-check_browser_assets_are_fresh() {
-  check_asset_output_is_fresh \
-    "runtime bundle" \
-    "Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js" \
-    Alis.Reactive.Assets/runtime \
-    Alis.Reactive.Assets/esbuild.config.mjs \
-    Alis.Reactive.Assets/package.json \
-    Alis.Reactive.Assets/tsconfig.json
-
-  check_asset_output_is_fresh \
-    "design-system CSS" \
-    "Alis.Reactive.Assets/dist/css/design-system.dev.css" \
-    Alis.Reactive.Assets/design-system \
-    Alis.Reactive.Assets/vite.design-system.config.ts \
-    Alis.Reactive.Assets/package.json
-
-  check_asset_output_is_fresh \
-    "Syncfusion CSS" \
-    "Alis.Reactive.Assets/dist/css/syncfusion.dev.css" \
-    Alis.Reactive.Assets/fusion \
-    Alis.Reactive.Assets/vite.fusion.config.ts \
-    Alis.Reactive.Assets/package.json
-
-  check_asset_output_is_fresh \
-    "sandbox plugin bundle" \
-    "Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js" \
-    Alis.Reactive.SandboxApp/Scripts \
-    Alis.Reactive.SandboxApp/esbuild.config.mjs \
-    Alis.Reactive.SandboxApp/package.json
-
-  check_asset_output_is_fresh \
-    "sandbox CSS" \
-    "Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css" \
-    Alis.Reactive.SandboxApp/Styles \
-    Alis.Reactive.SandboxApp/build-css.mjs \
-    Alis.Reactive.SandboxApp/vite.config.ts \
-    Alis.Reactive.SandboxApp/package.json
-}
-
-check_no_build_is_fresh() {
-  local assembly
-  assembly="$(assembly_path)"
-
-  if [ ! -f "$assembly" ]; then
-    echo "[playwright:runner] ERROR: --no-build requested, but '$assembly' does not exist." >&2
-    echo "[playwright:runner] Run scripts/playwright.sh without --no-build, or run dotnet build first." >&2
-    exit 3
-  fi
-
-  local changed_dotnet
-  changed_dotnet="$(
-    find \
-      Alis.Reactive \
-      Alis.Reactive.Analyzers \
-      Alis.Reactive.DesignSystem \
-      Alis.Reactive.FluentValidator \
-      Alis.Reactive.Fusion \
-      Alis.Reactive.Native \
-      Alis.Reactive.NativeTagHelpers \
-      Alis.Reactive.SandboxApp \
-      tests/Alis.Reactive.Playwright.Extensions \
-      tests/Alis.Reactive.PlaywrightTests \
-      \( -path '*/bin' -o -path '*/bin/*' -o -path '*/obj' -o -path '*/obj/*' \) -prune -o \
-      -type f \
-      \( -name '*.cs' -o -name '*.cshtml' -o -name '*.csproj' -o -name '*.props' -o -name '*.targets' \) \
-      -newer "$assembly" \
-      -print \
-      | head -20
-  )"
-
-  if [ -n "$changed_dotnet" ]; then
-    echo "[playwright:runner] ERROR: --no-build would run stale Playwright binaries." >&2
-    echo "[playwright:runner] Source files are newer than '$assembly':" >&2
-    printf '%s\n' "$changed_dotnet" >&2
-    echo "[playwright:runner] Run scripts/playwright.sh without --no-build, or rebuild first." >&2
-    exit 3
-  fi
-}
-
-# The CI shard partition (docs/CI.md, "Sharding"). VSTest filters have no wildcards, so Fusion
-# component namespaces are split by their first letter: `~.Components.Fusion.A` is a contains
-# match on the namespace segment, and every letter is listed so a new component always lands in
-# exactly one shard. The last shard is the complement of the others, so a new top-level namespace
-# can never fall outside every shard.
-fusion_letters() {
-  local expr="" letter
-  for letter in "$@"; do
-    expr="${expr:+$expr|}FullyQualifiedName~.Components.Fusion.$letter"
-  done
-  printf '%s' "$expr"
-}
-
-# The CI shards, in matrix order. .github/workflows/gate.yml lists the same names (scripts/test.sh
-# fails when the two lists differ), and every name has an arm in shard_filter below.
-shards="fusion-a-f-and-core fusion-g-l-and-http fusion-m-z components-and-validation conditions-patterns-and-rest"
-
-shard_filter() {
-  case "$1" in
-    fusion-a-f-and-core)
-      printf '(%s)|FullyQualifiedName~.CoreBehaviors.' "$(fusion_letters A B C D E F)"
-      ;;
-    fusion-g-l-and-http)
-      printf '(%s)|FullyQualifiedName~.HttpPipeline.' "$(fusion_letters G H I J K L)"
-      ;;
-    fusion-m-z)
-      printf '(%s)' "$(fusion_letters M N O P Q R S T U V W X Y Z)"
-      ;;
-    components-and-validation)
-      printf '(FullyQualifiedName~.Components.&FullyQualifiedName!~.Components.Fusion.)|FullyQualifiedName~.Validation.'
-      ;;
-    conditions-patterns-and-rest)
-      printf 'FullyQualifiedName!~.Components.&FullyQualifiedName!~.Validation.&FullyQualifiedName!~.CoreBehaviors.&FullyQualifiedName!~.HttpPipeline.'
-      ;;
-    *)
-      echo "Unknown shard '$1'. Known shards: $shards." >&2
-      exit 2
-      ;;
-  esac
-}
-
-# Builds the filter that re-runs exactly the tests listed (one FQN per line). A parametrised test
-# carries its arguments after "(", which VSTest cannot match exactly, so it falls back to a
-# contains match on the method — re-running every row of that method.
-retry_filter_for() {
-  local expr="" fqn
-  while IFS= read -r fqn; do
-    [ -z "$fqn" ] && continue
-    case "$fqn" in
-      *"("*) expr="${expr:+$expr|}FullyQualifiedName~${fqn%%(*}" ;;
-      *)     expr="${expr:+$expr|}FullyQualifiedName=$fqn" ;;
-    esac
-  done <<< "$1"
-  printf '%s' "$expr"
-}
+name="Alis.Reactive.Conformance.PlaywrightTests"
+project="tests/$name"
+app="Alis.Reactive.Conformance.App"
+assembly="$project/bin/Release/net10.0/$name.dll"
+budget="$project/Harness/measured.json"
+weights="$project/shard-weights.json"
+measured_runs=20
+own_versions="0.0.0-playwright"
 
 usage() {
   cat <<'USAGE'
 Usage:
-  scripts/playwright.sh
-  scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"
-  scripts/playwright.sh --filter "Name=test_one|Name=test_two"
-  scripts/playwright.sh Components.Fusion.Grid
-  scripts/playwright.sh --shard fusion-m-z --no-build
-  scripts/playwright.sh --shard fusion-m-z --print-filter
-  scripts/playwright.sh --shard fusion-m-z --list --no-build
+  scripts/playwright.sh <selector> [--host <name>]
+  scripts/playwright.sh --pool <name> [--shard <i>/<k>]
+  scripts/playwright.sh --measure <selector>
+  scripts/playwright.sh --measure-parallelism <selector>
+
+Builds the browser tests and the conformance app, runs the tests one selector names, and reads the run:
+  [playwright:result] <selection> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s>s <test>
+The run fails when it wrote no TRX, selected no test, ran other than it selected, failed a test, ran a test over
+the budget, or left a server alive. It retries nothing.
+
+Selectors, one a run:
+  --all                 every test the project holds
+  --unit U<n>           the tests the spec lands in that unit
+  --through U<n>        the tests the spec lands in that unit and in every unit before it
+  --feature M<n>.F<n>   the tests of that feature
+  --screen <id>         the tests app.json places on that screen
+  --test <constant>     one test, by its promise constant as a test writes it after Promises. (M3_F1.X8_27_2)
+  --pool <name>         one pool of the tests the project holds: core, hosts or fusion
+  <name>                a folder or a fixture of the test project, by its name (RequestsAndResponses)
 
 Options:
-  --filter <expr>       VSTest filter expression to pass through unchanged.
-  --shard <name>        Run one CI shard: a fixed, documented partition of the suite
-                        (docs/CI.md, "Sharding"). Names: fusion-a-f-and-core,
-                        fusion-g-l-and-http, fusion-m-z, components-and-validation,
-                        conditions-patterns-and-rest. Cannot be combined with --filter.
-  --list-shards         Print the CI shard names, one per line, and exit.
-  --print-filter        Print the resolved VSTest filter and exit without running.
-  --list                Print the fully qualified names the filter or shard selects, one
-                        per line, without running them: dotnet test --list-tests for the
-                        discovered set (it ignores --filter), then the same filter grammar
-                        applied by scripts/vstest-filter.mjs. The five shards' lists
-                        together must equal the full list, each test exactly once
-                        (docs/CI.md, "Sharding").
-  --retry-failed <n>    After a red run, re-run only the failed tests, up to n more
-                        times (default 0). A test that then passes is reported as flaky:
-                        [playwright:flaky] lines and TestResults/observable/flaky-<stamp>.txt.
-  --no-build            Skip the project build and run the existing binaries.
-                        Use after npm run build:all + dotnet build.
-                        Fails if C# or Razor sources are newer than the test DLL.
-  --configuration <cfg> Build/test configuration. Defaults to Debug.
-  --hang-timeout <dur>  Per-test blame-hang timeout. Defaults to 10m.
-  -h, --help            Show this help.
+  --host <name>   Take that host alone. Without it a run takes the hosts the conformance app serves on this machine.
+                  The net48 and consumerNet48 hosts run under IIS Express on Windows. Under a fresh app's host
+                  the run builds that app on the packs and starts its own
+                  server: with no PACKAGE_VERSION set it packs at a version of its own first (scripts/pack.sh), so
+                  what the shipped projects hold reaches the app's page; with it set it takes the packs in nupkgs/.
+                  Before it builds a fresh app it removes every version restored in the app's obj/packages/ but
+                  the one it builds on, and a run that packed its own version removes those packs and their
+                  restored folders when it ends, whatever its exit code.
+  --shard <i>/<k> Take the i-th of a pool's k shards, its units placed longest first by the weights --measure wrote.
+  --measure       Run the selection 20 times, each green, and write to the harness's measured.json the budget,
+                  four times the slowest test, and the action wait and the navigation wait, each four times the
+                  slowest step of its kind, and to shard-weights.json the seconds each shard unit took in a run.
+                  A measured run sets no measured wait and records every step. A selection of Fusion fixtures'
+                  tests alone writes the same fields in measured.json's fusion block, which a Fusion fixture reads;
+                  a selection that mixes them with other tests is refused before it runs.
+  --measure-parallelism
+                  Run the selection 20 times at each of 1, 2, 4 and 8 tests at once, each a measured run, and write
+                  to measured.json the count a run takes: the quickest of 2, 4 and 8 whose green runs took at most
+                  one part in 1.6 of the time at 1, else 1. A budget is measured again at a count that changed.
+  -h, --help      Show this help.
 
-During a run, look for:
-  [playwright:start] ... Fully.Qualified.Test.Name
-  [playwright:end]   ... Status ... Fully.Qualified.Test.Name
-
-If a run appears stuck, the most recent [playwright:start] line is the active
-test. Logs, TRX, and VSTest diagnostics are written under:
-  tests/Alis.Reactive.PlaywrightTests/TestResults/observable/
+A run's files are under tests/Alis.Reactive.Conformance.PlaywrightTests/TestResults/<its stamp>/.
 USAGE
 }
 
-while [ "$#" -gt 0 ]; do
-  case "$1" in
-    --filter)
-      if [ "$#" -lt 2 ]; then
-        echo "--filter requires a value." >&2
-        exit 2
-      fi
-      filter="$2"
-      shift 2
-      ;;
-    --filter=*)
-      filter="${1#--filter=}"
-      shift
-      ;;
-    --shard)
-      if [ "$#" -lt 2 ]; then
-        echo "--shard requires a value." >&2
-        exit 2
-      fi
-      shard="$2"
-      shift 2
-      ;;
-    --shard=*)
-      shard="${1#--shard=}"
-      shift
-      ;;
-    --list-shards)
-      printf '%s\n' $shards
-      exit 0
-      ;;
-    --print-filter)
-      print_filter=1
-      shift
-      ;;
-    --list)
-      list_only=1
-      shift
-      ;;
-    --retry-failed)
-      if [ "$#" -lt 2 ]; then
-        echo "--retry-failed requires a value." >&2
-        exit 2
-      fi
-      retry_failed="$2"
-      shift 2
-      ;;
-    --retry-failed=*)
-      retry_failed="${1#--retry-failed=}"
-      shift
-      ;;
-    --no-build)
-      no_build=1
-      shift
-      ;;
-    --configuration)
-      if [ "$#" -lt 2 ]; then
-        echo "--configuration requires a value." >&2
-        exit 2
-      fi
-      configuration="$2"
-      shift 2
-      ;;
-    --configuration=*)
-      configuration="${1#--configuration=}"
-      shift
-      ;;
-    --hang-timeout)
-      if [ "$#" -lt 2 ]; then
-        echo "--hang-timeout requires a value." >&2
-        exit 2
-      fi
-      hang_timeout="$2"
-      shift 2
-      ;;
-    --hang-timeout=*)
-      hang_timeout="${1#--hang-timeout=}"
-      shift
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    *)
-      if [ -n "$filter" ]; then
-        echo "Unexpected argument '$1'. Use --filter for complex expressions." >&2
-        exit 2
-      fi
-      filter="FullyQualifiedName~$1"
-      shift
-      ;;
-  esac
-done
-
-if [ -n "$shard" ]; then
-  if [ -n "$filter" ]; then
-    echo "--shard cannot be combined with --filter or a positional filter." >&2
-    exit 2
-  fi
-  filter="$(shard_filter "$shard")"
-fi
-
-case "$retry_failed" in
-  ''|*[!0-9]*)
-    echo "--retry-failed expects a non-negative integer, got '$retry_failed'." >&2
-    exit 2
-    ;;
-esac
-
-if [ "$print_filter" -eq 1 ]; then
-  printf '%s\n' "${filter:-<full suite>}"
-  exit 0
-fi
-
-# Listing needs the test assembly but no browser assets and no sandbox, so it builds without the
-# npm step and skips the asset freshness checks.
-if [ "$list_only" -eq 1 ]; then
-  if [ "$no_build" -eq 0 ]; then
-    echo "[playwright:runner] building test project for listing (browser assets not needed)" >&2
-    dotnet build "$project" -c "$configuration" -p:BuildReactiveBrowserAssets=false >&2
-  else
-    check_no_build_is_fresh
-  fi
-  # The NUnit adapter's default display name is the bare method name; FullName makes each line a
-  # fully qualified, unique test name. dotnet test --list-tests lists every discovered test and
-  # ignores --filter, so the shard or --filter expression is applied afterwards with the same
-  # grammar (scripts/vstest-filter.mjs).
-  list_cmd=(
-    dotnet test "$project"
-    -c "$configuration"
-    -p:BuildReactiveBrowserAssets=false
-    --no-build
-    --nologo
-    --list-tests
-    -- NUnit.DisplayName=FullName
-  )
-  discovered="$("${list_cmd[@]}" | awk '/^The following Tests are available:/ { listing = 1; next } listing && /^    / { sub(/^    /, ""); print }')"
-  if [ -n "$filter" ]; then
-    printf '%s\n' "$discovered" | node scripts/vstest-filter.mjs "$filter" | sort
-  else
-    printf '%s\n' "$discovered" | sort
-  fi
-  exit 0
-fi
-
-mkdir -p "$results_dir"
-# The stamp names this run's log, TRX and diagnostics. scripts/test.sh --parallel hands one stamp to
-# all its shards (ALIS_PLAYWRIGHT_RUN_STAMP) so their files read as one run; each shard appends its
-# name after a dot, so concurrent shards never share a file name.
-stamp="${ALIS_PLAYWRIGHT_RUN_STAMP:-$(date +%Y%m%d-%H%M%S)}"
-if [ -n "$shard" ]; then
-  stamp="$stamp.$shard"
-fi
-
-echo "[playwright:runner] project=$project"
-echo "[playwright:runner] configuration=$configuration"
-echo "[playwright:runner] shard=${shard:-<none>}"
-echo "[playwright:runner] filter=${filter:-<full suite>}"
-echo "[playwright:runner] hang-timeout=$hang_timeout"
-echo "[playwright:runner] retry-failed=$retry_failed"
-
-check_browser_assets_are_fresh
-
-if [ "$no_build" -eq 0 ]; then
-  echo "[playwright:runner] building test project"
-  dotnet build "$project" -c "$configuration"
-else
-  echo "[playwright:runner] skipping build (--no-build)"
-  check_no_build_is_fresh
-fi
-echo "[playwright:runner] disabling VSTest-time browser asset rebuild"
-
-attempt_trx=""
-
-# One dotnet test invocation. $1 suffixes the artifact names ("" for the first attempt, then
-# "-retry1", "-retry2", ...), $2 is the VSTest filter. Returns dotnet test's exit code.
-run_attempt() {
-  local suffix="$1"
-  local attempt_filter="$2"
-  local log_path="$results_dir/playwright-$stamp$suffix.log"
-  local diag_path="$results_dir/vstest-$stamp$suffix.diag.log"
-  local trx_name="playwright-$stamp$suffix.trx"
-  attempt_trx="$results_dir/$trx_name"
-
-  echo "[playwright:runner] log=$log_path"
-  echo "[playwright:runner] trx=$attempt_trx"
-  echo "[playwright:runner] diag=$diag_path"
-
-  local cmd=(
-    dotnet test "$project"
-    -c "$configuration"
-    -p:BuildReactiveBrowserAssets=false
-    --no-build
-    --nologo
-    --logger "console;verbosity=detailed"
-    --logger "trx;LogFileName=$trx_name"
-    --results-directory "$results_dir"
-    --diag "$diag_path"
-    --blame-hang
-    --blame-hang-dump-type none
-    --blame-hang-timeout "$hang_timeout"
-  )
-
-  if [ -n "$attempt_filter" ]; then
-    cmd+=(--filter "$attempt_filter")
-  fi
-
-  printf '[playwright:runner] command='
-  printf '%q ' "${cmd[@]}"
-  printf '\n'
-
-  local status
-  set +e
-  "${cmd[@]}" 2>&1 | tee "$log_path"
-  status="${PIPESTATUS[0]}"
-  set -e
-
-  echo "[playwright:runner] exit-code=$status"
-  echo "[playwright:runner] log=$log_path"
-  echo "[playwright:runner] trx=$attempt_trx"
-  echo "[playwright:runner] diag=$diag_path"
-  return "$status"
+refuse() {
+  echo "[playwright:runner] $1" >&2
+  exit 2
 }
 
-if run_attempt "" "$filter"; then status=0; else status=$?; fi
-
-# Re-run only what failed, up to --retry-failed times. Every attempt keeps its own log, TRX and
-# diagnostics; the final exit code is the last attempt's. Tests that fail and then pass are the
-# flaky list — visible in the output, in flaky-<stamp>.txt, and in the GitHub job summary.
-retries_done=0
-flaky=()
-while [ "$status" -ne 0 ] && [ "$retries_done" -lt "$retry_failed" ]; do
-  failed_tests="$(node scripts/trx-failed-tests.mjs "$attempt_trx")"
-  if [ -z "$failed_tests" ]; then
-    echo "[playwright:retry] no failed test recorded in $attempt_trx (crash or hang?); not retrying"
-    break
-  fi
-  retries_done=$((retries_done + 1))
-  failed_count="$(printf '%s\n' "$failed_tests" | wc -l | tr -d ' ')"
-  echo "[playwright:retry] attempt $((retries_done + 1)) of $((retry_failed + 1)): re-running $failed_count failed test(s)"
-  printf '%s\n' "$failed_tests" | sed 's/^/[playwright:retry]   /'
-  if run_attempt "-retry$retries_done" "$(retry_filter_for "$failed_tests")"; then status=0; else status=$?; fi
-  while IFS= read -r fqn; do
-    [ -n "$fqn" ] && flaky+=("$fqn")
-  done < <(node scripts/trx-failed-tests.mjs "$attempt_trx" passed)
+selector=()
+selectors=0
+host=()
+shard=()
+measure=0
+parallelism=0
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --all) selector=("$1"); selectors=$((selectors + 1)); shift ;;
+    --unit|--through|--feature|--screen|--test|--pool)
+      [ "$#" -ge 2 ] || refuse "$1 takes a value."
+      selector=("$1" "$2"); selectors=$((selectors + 1)); shift 2 ;;
+    --host)
+      [ "$#" -ge 2 ] || refuse "--host takes a value."
+      host=("$1" "$2"); shift 2 ;;
+    --shard)
+      [ "$#" -ge 2 ] || refuse "--shard takes a value."
+      shard=("$1" "$2"); shift 2 ;;
+    --measure) measure=1; shift ;;
+    --measure-parallelism) parallelism=1; shift ;;
+    -h|--help) usage; exit 0 ;;
+    -*) refuse "'$1' is no option; --help lists them." ;;
+    *) selector=("$1"); selectors=$((selectors + 1)); shift ;;
+  esac
 done
+[ "$selectors" -eq 1 ] || refuse "a run takes one selector, and $selectors were given; --help lists them."
+[ "$((measure + parallelism))" -le 1 ] || refuse "--measure and --measure-parallelism are two measurements; a run takes one."
 
-if [ "${#flaky[@]}" -gt 0 ]; then
-  flaky_path="$results_dir/flaky-$stamp.txt"
-  printf '%s\n' "${flaky[@]}" | sort -u > "$flaky_path"
-  echo "[playwright:flaky] $(wc -l < "$flaky_path" | tr -d ' ') test(s) failed, then passed on re-run (list: $flaky_path):"
-  sed 's/^/[playwright:flaky]   /' "$flaky_path"
-  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
-    {
-      echo "### Flaky on this run: failed, then passed on re-run"
-      echo
-      sed 's/^/- `/; s/$/`/' "$flaky_path"
-      echo
-      echo "Two red runs in a row is a regression or a quarantine candidate: docs/CI.md, \"Flaky tests\"."
-    } >> "$GITHUB_STEP_SUMMARY"
-  fi
-  # The job stays green, and nobody opens the summary of a green job: a warning annotation puts each
-  # flaky test on the pull request's checks, so a re-run never turns a failure into silence.
-  if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
-    sed 's/^/::warning title=Flaky test::/; s|$| failed, then passed on re-run (docs/CI.md, "Flaky tests")|' "$flaky_path"
-  fi
+stop_servers_whose_test_process_ended() {
+  local pid args test_process stopped=0
+  while read -r pid args; do
+    [[ "$args" == *"$1"* ]] || continue
+    [[ "$args" =~ --test-host[[:space:]]+([0-9]+) ]] || continue
+    test_process="${BASH_REMATCH[1]}"
+    kill -0 "$test_process" 2>/dev/null && continue
+    echo "[playwright:runner] $2: pid $pid, $1, whose test process $test_process has ended" >&2
+    kill -9 "$pid" 2>/dev/null || true
+    stopped=$((stopped + 1))
+  done < <(ps -eo pid=,args=)
+  printf '%s' "$stopped"
+}
+
+run="$project/TestResults/$(date +%Y%m%d-%H%M%S)-$$"
+mkdir -p "$run"
+
+echo "[playwright:runner] building the browser bundle, then $project"
+if ! node build.mjs || ! dotnet build "$project" -c Release --nologo; then
+  echo "[playwright:runner] the build failed; no test ran." >&2
+  exit 4
 fi
 
-exit "$status"
+dotnet run scripts/list-tests.cs -p:RestorePackagesWithLockFile=false -- "$assembly" > "$run/tests.tsv"
+python3 spec/tools/landings.py > "$run/landings.tsv"
+filter="$(node scripts/playwright-select.mjs --spec "$run/landings.tsv" --assembly "$run/tests.tsv" --weights "$weights" --out "$run/selection.json" \
+  "${selector[@]}" ${host[@]+"${host[@]}"} ${shard[@]+"${shard[@]}"})"
+echo "[playwright:runner] filter: ${filter:-every test}"
+
+fresh_apps=()
+while IFS= read -r fresh_app; do fresh_apps+=("$fresh_app"); done < <(
+  node -e 'for (const app of JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).freshApps) console.log(app);' "$run/selection.json")
+
+ALIS_PREPARE_MOVE_IN="$(node -p 'JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).prepareMoveIn.join(",")' "$run/selection.json")"
+export ALIS_PREPARE_MOVE_IN
+selected_host="${host[1]:-default}"
+packed_apps=(${fresh_apps[@]+"${fresh_apps[@]}"})
+case "$selected_host" in
+  net48|consumerNet48)
+    [ "${OS:-}" = Windows_NT ] || refuse "$selected_host needs IIS Express on Windows."
+    if [ "$selected_host" = net48 ]; then packed_apps+=("tests/$app.Net48"); fi ;;
+esac
+
+remove_every_restored_version_but_the_runs() {
+  local version
+  for version in "$1"/obj/packages/alisreactive*/*; do
+    if [ -d "$version" ] && [ "$(basename "$version")" != "$PACKAGE_VERSION" ]; then rm -rf "$version"; fi
+  done
+}
+
+remove_the_packs_this_run_wrote() {
+  local pack fresh_app version
+  for pack in nupkgs/*."$PACKAGE_VERSION".nupkg nupkgs/*."$PACKAGE_VERSION".snupkg; do
+    if [ -f "$pack" ]; then rm -f "$pack"; fi
+  done
+  for fresh_app in "${packed_apps[@]}"; do
+    for version in "$fresh_app"/obj/packages/alisreactive*/"$PACKAGE_VERSION"; do
+      if [ -d "$version" ]; then rm -rf "$version"; fi
+    done
+  done
+}
+
+build_failed() {
+  echo "[playwright:runner] the build failed; no test ran." >&2
+  exit 4
+}
+
+if [ "${#packed_apps[@]}" -gt 0 ]; then
+  if [ -z "${PACKAGE_VERSION:-}" ]; then
+    PACKAGE_VERSION="$own_versions.$(date -u +%Y%m%d%H%M%S)"
+    export PACKAGE_VERSION
+    trap remove_the_packs_this_run_wrote EXIT
+    echo "[playwright:runner] packing at $PACKAGE_VERSION, which ${packed_apps[*]} builds on"
+    scripts/pack.sh "$PACKAGE_VERSION" || build_failed
+  else
+    echo "[playwright:runner] ${packed_apps[*]} builds on the packs in nupkgs/ at $PACKAGE_VERSION"
+  fi
+  for packed_app in "${packed_apps[@]}"; do
+    if [[ "$selected_host" = net48 || "$selected_host" = consumerNet48 ]] && [ "${ALIS_PREBUILT_MVC5:-}" = "$selected_host" ]; then
+      echo "[playwright:runner] using the CI build of $packed_app at $PACKAGE_VERSION"
+    else
+      remove_every_restored_version_but_the_runs "$packed_app"
+      if [ "$selected_host" = consumerNet48 ]; then
+        pwsh -NoProfile -Command '
+          $ErrorActionPreference = "Stop"
+          $msbuild = $env:MSBUILD_EXE
+          if (!$msbuild) { $msbuild = (Get-Command MSBuild.exe -ErrorAction Stop).Source }
+          & $msbuild tests/Alis.Reactive.Consumer.Net48/Alis.Reactive.Consumer.Net48.csproj -restore -t:Rebuild -p:Configuration=Release -warnaserror
+          exit $LASTEXITCODE' || build_failed
+      else
+        dotnet build "$packed_app" -c Release -warnaserror --no-incremental --nologo || build_failed
+      fi
+    fi
+  done
+fi
+
+stop_every_server_whose_test_process_ended() {
+  local fresh_app
+  left="$(stop_servers_whose_test_process_ended "$app.dll" "$1")"
+  fresh_left=0
+  for fresh_app in ${fresh_apps[@]+"${fresh_apps[@]}"}; do
+    fresh_left=$((fresh_left + $(stop_servers_whose_test_process_ended "$(basename "$fresh_app").dll" "$1")))
+  done
+}
+
+run_the_tests() {
+  local command=(dotnet test "$project" -c Release --no-build --nologo
+    --logger "console;verbosity=normal" --logger "trx;LogFileName=$1.trx" --results-directory "$run")
+  if [ -n "$filter" ]; then command+=(--filter "$filter"); fi
+  command+=(-- "NUnit.NumberOfTestWorkers=$2")
+  if [ "${OS:-}" = Windows_NT ]; then
+    pwsh -NoProfile -File scripts/playwright-windows.ps1 "$run/$1-hosts" "$selected_host" "${command[@]:1}" 2>&1
+  else
+    "${command[@]}" 2>&1
+  fi
+}
+
+read_servers_left() {
+  if [ "${OS:-}" = Windows_NT ]; then
+    read -r left fresh_left < "$run/$1-hosts/servers-left" || refuse "the Windows runner did not report server cleanup for $1."
+  else
+    stop_every_server_whose_test_process_ended "$2"
+  fi
+}
+
+run_measured() {
+  export ALIS_MEASURED_STEPS="$PWD/$run/$1.steps.tsv"
+  local test_exit=0
+  run_the_tests "$1" "$2" > "$run/$1.log" || test_exit=$?
+  unset ALIS_MEASURED_STEPS
+  read_servers_left "$1" "a server left alive after the measured run $1"
+  [ "$((left + fresh_left))" -eq 0 ] || refuse "the measured run $1 left $((left + fresh_left)) server alive; nothing is written."
+  [ "$test_exit" -eq 0 ] || refuse "the measured run $1 exited $test_exit; read $run/$1.log."
+}
+
+at_once=""
+if [ "$parallelism" -eq 0 ]; then
+  at_once="$(node scripts/playwright-result.mjs --at-once --budget "$budget")" \
+    || refuse "no count of tests at once is measured in $budget; scripts/playwright.sh --measure-parallelism writes it."
+fi
+
+if [ "${OS:-}" != Windows_NT ]; then
+  stop_every_server_whose_test_process_ended "stopped a server an earlier run left alive"
+fi
+
+if [ "$parallelism" -eq 1 ]; then
+  measured=()
+  for count in 1 2 4 8; do
+    measured+=(--at "$count")
+    for number in $(seq 1 "$measured_runs"); do
+      run_measured "parallel-$count-$number" "$count"
+      measured+=("$run/parallel-$count-$number.trx")
+    done
+    echo "[playwright:runner] measured $measured_runs runs at $count at once"
+  done
+  node scripts/playwright-result.mjs --measure-parallelism --selection "$run/selection.json" --budget "$budget" "${measured[@]}"
+elif [ "$measure" -eq 1 ]; then
+  node scripts/playwright-result.mjs --measurable --selection "$run/selection.json" || exit 2
+  for number in $(seq 1 "$measured_runs"); do
+    run_measured "measure-$number" "$at_once"
+    echo "[playwright:runner] measured run $number of $measured_runs"
+  done
+  node scripts/playwright-result.mjs --measure --selection "$run/selection.json" --budget "$budget" --weights "$weights" "$run"/measure-*.trx
+else
+  test_exit=0
+  run_the_tests run "$at_once" | tee "$run/run.log" || test_exit=$?
+  read_servers_left run "a server left alive after this run"
+  echo "[playwright:runner] log: $run/run.log"
+  node scripts/playwright-result.mjs --selection "$run/selection.json" --trx "$run/run.trx" --budget "$budget" --servers-left "$left" --fresh-servers-left "$fresh_left"
+  exit "$test_exit"
+fi

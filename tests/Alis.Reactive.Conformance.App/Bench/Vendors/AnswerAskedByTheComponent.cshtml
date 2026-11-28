@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AnswerAskedByTheComponentBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<AnswerAskedByTheComponentBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance-source", new ConformanceStart { ReadOnlyText = Model.Ward }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Items = Model.Items }))
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Component<ConformanceComponent>("conformance").Answer.Set(_ => pipeline.Component<ConformanceComponent>("conformance-source").ReadOnlyText)));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,48 @@
+namespace Alis.Reactive.Conformance.World;
+
+public static partial class CarePages
+{
+    private const string Shell = Area + "shell/";
+
+    public const string WardOverview = Shell + "ward-overview";
+
+    public const string CarePlanDrawer = Shell + "care-plan-drawer";
+
+    public const string ShiftNotes = Shell + "shift-notes";
+
+    public const string ShiftNotesSliding = Shell + "shift-notes/sliding";
+
+    public const string WideDrawer = Shell + "wide-drawer";
+
+    public const string WardDischarge = Shell + "ward-discharge";
+
+    public const string FusionDischarge = Shell + "fusion-discharge";
+
+    public const string FusionDischargeInSpanish = Shell + "fusion-discharge/es";
+
+    public const string FusionWardTrail = "/wards";
+
+    public const string FusionNorthWingTrail = "/wards/north";
+
+    public const string FusionWardNavigation = Shell + "fusion-ward-navigation";
+
+    public const string FusionResidentSidebar = Shell + "fusion-resident-sidebar";
+
+    public const string FusionResidentSidebarCollapsed = FusionResidentSidebar + "/collapsed";
+
+    public const string FusionCareToolbar = Shell + "fusion-care-toolbar";
+
+    public const string DrawerDischarge = Shell + "drawer-discharge";
+
+    public const string FamilyNotice = Shell + "family-notice";
+
+    public const string DischargeNote = Shell + "discharge-note";
+
+    public const string DischargeDesk = Shell + "discharge-desk";
+
+    public const string FamilyDischarge = Shell + "family-discharge";
+
+    public const string Notices = Shell + "notices";
+
+    public const string TheWorldsNotice = Shell + "the-worlds-notice";
+}

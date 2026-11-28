@@ -1,0 +1,8 @@
+line	name	file
+redesign	alis.document	Alis.Reactive.Assets/runtime/root.ts
+redesign	alis.form	Alis.Reactive.Assets/runtime/root.ts
+redesign	alis.http	Alis.Reactive.Assets/runtime/root.ts
+redesign	alis.hub	Alis.Reactive.Assets/runtime/root.ts
+redesign	alis.model	Alis.Reactive.Assets/runtime/root.ts
+redesign	alis.slot	Alis.Reactive.Assets/runtime/root.ts
+redesign	alis.stream	Alis.Reactive.Assets/runtime/root.ts

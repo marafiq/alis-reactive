@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardNoticePage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ward notice";
+    var plan = Html.ReactivePlan<WardNoticePage>();
+}
+<h1>Ward notice</h1>
+<dl>
+    <dt>Version</dt>
+    <dd id="notice-version">-</dd>
+    <dt>Wards</dt>
+    <dd id="notice-wards">-</dd>
+    <dt>Missing</dt>
+    <dd id="notice-missing">-</dd>
+</dl>
+<button type="button" @Html.Raises(plan, WardNotices.Load)>Load</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardNotices.Load, pipeline => pipeline.Get(Model.Notice)
+        .OnSuccess(Content.None, (notice, pipeline) =>
+        {
+            pipeline.Element("notice-version").Text.Set(notice.Headers.Get("etag"));
+            pipeline.Element("notice-wards").Text.Set(notice.Headers.Get("X-Ward"));
+            pipeline.Element("notice-missing").Text.Set(notice.Headers.Get("X-Missing"));
+        })));
+}
+@Html.RenderPlan(plan)

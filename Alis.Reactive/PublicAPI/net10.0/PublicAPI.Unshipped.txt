@@ -1,0 +1,977 @@
+#nullable enable
+Alis.Reactive.ArrayLambdas.DataLists
+Alis.Reactive.Conditions.Choices
+Alis.Reactive.Conditions.Comparisons
+Alis.Reactive.Conditions.MembershipTests
+Alis.Reactive.Conditions.TextTests
+Alis.Reactive.Conditions.ValueTests
+Alis.Reactive.Declarations.Callback<TArgs, TResult>
+Alis.Reactive.Declarations.Callback<TArgs, TResult>.Set(System.Func<TArgs!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! answer) -> void
+Alis.Reactive.Declarations.Data<T>
+Alis.Reactive.Declarations.Data<T>.Read<TResult>(System.Linq.Expressions.Expression<System.Func<T, TResult>!>! path) -> Alis.Reactive.ValuesAndSources.TypedSource<TResult>!
+Alis.Reactive.Declarations.Event
+Alis.Reactive.Declarations.Event<TArgs>
+Alis.Reactive.Declarations.EventListening
+Alis.Reactive.Declarations.EventedObject
+Alis.Reactive.Declarations.EventedObject.EventedObject() -> void
+Alis.Reactive.Declarations.Field
+Alis.Reactive.Declarations.Field<TValue>
+Alis.Reactive.Declarations.JsObject
+Alis.Reactive.Declarations.JsObject.Argument<TValue>(int position) -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Declarations.JsObject.CallItself() -> void
+Alis.Reactive.Declarations.JsObject.CallItself(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments) -> void
+Alis.Reactive.Declarations.JsObject.CallItself<TResult>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments) -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.Callback<TArgs, TResult>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.Callback<TArgs!, TResult>!
+Alis.Reactive.Declarations.JsObject.DataIterator<TItem>() -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TItem>!>!
+Alis.Reactive.Declarations.JsObject.Event(string? name = null, string! declaredBy = "") -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Declarations.JsObject.Event<TArgs>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Declarations.Event<TArgs!>!
+Alis.Reactive.Declarations.JsObject.JsObject() -> void
+Alis.Reactive.Declarations.JsObject.LiveIterator<TItem>() -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
+Alis.Reactive.Declarations.JsObject.LiveObject<TObject>(string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> TObject!
+Alis.Reactive.Declarations.JsObject.LiveObjects<TItem>(string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
+Alis.Reactive.Declarations.JsObject.Method(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, string! declaredBy = "") -> void
+Alis.Reactive.Declarations.JsObject.Method(string? name = null, bool optional = false, string! declaredBy = "") -> void
+Alis.Reactive.Declarations.JsObject.Method<TResult>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.Method<TResult>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.MethodAsync(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, string! declaredBy = "") -> void
+Alis.Reactive.Declarations.JsObject.MethodAsync(string? name = null, bool optional = false, string! declaredBy = "") -> void
+Alis.Reactive.Declarations.JsObject.MethodAsync<TResult>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.MethodAsync<TResult>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.MethodAt(int position) -> void
+Alis.Reactive.Declarations.JsObject.MethodAt(int position, System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments) -> void
+Alis.Reactive.Declarations.JsObject.Property<TValue>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.Property<TValue>!
+Alis.Reactive.Declarations.JsObject.ReadOnly<TValue>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Declarations.JsObject.ReturnedObject<TObject>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> TObject!
+Alis.Reactive.Declarations.JsObject.ReturnedObject<TObject>(string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> TObject!
+Alis.Reactive.Declarations.JsObject.ReturnedObjects<TItem>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
+Alis.Reactive.Declarations.JsObject.ReturnedObjects<TItem>(string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
+Alis.Reactive.Declarations.JsObject.WriteOnly<TValue>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.WriteOnly<TValue>!
+Alis.Reactive.Declarations.LiveObjects<TItem>
+Alis.Reactive.Declarations.LiveObjects<TItem>.All(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Any() -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Any(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.At(int position) -> TItem!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Count() -> Alis.Reactive.ValuesAndSources.TypedSource<int>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Count(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<int>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Find(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> TItem!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Find<TResult>(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate, System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! field) -> Alis.Reactive.ValuesAndSources.TypedSource<TResult>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Select<TObject>(System.Func<TItem!, TObject!>! held) -> Alis.Reactive.Declarations.LiveObjects<TObject!>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Select<TResult>(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! field) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TResult>!>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Where(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! keep) -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
+Alis.Reactive.Declarations.MethodResult<TResult>
+Alis.Reactive.Declarations.MethodResult<TResult>.Read<TRead>(System.Linq.Expressions.Expression<System.Func<TResult, TRead>!>! path) -> Alis.Reactive.ValuesAndSources.TypedSource<TRead>!
+Alis.Reactive.Declarations.MirrorsAttribute
+Alis.Reactive.Declarations.MirrorsAttribute.MirrorsAttribute(string! module, string! name) -> void
+Alis.Reactive.Declarations.MirrorsAttribute.Module.get -> string!
+Alis.Reactive.Declarations.MirrorsAttribute.Name.get -> string!
+Alis.Reactive.Declarations.NoPayload
+Alis.Reactive.Declarations.NoPayload.NoPayload() -> void
+Alis.Reactive.Declarations.NullableWrites
+Alis.Reactive.Declarations.Property<TValue>
+Alis.Reactive.Declarations.Property<TValue>.Set(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+Alis.Reactive.Declarations.Property<TValue>.Set(TValue value) -> void
+Alis.Reactive.Declarations.ReadOnly<TValue>
+Alis.Reactive.Declarations.ReadOnly<TValue>.Read<TResult>(System.Linq.Expressions.Expression<System.Func<TValue, TResult>!>! path) -> Alis.Reactive.ValuesAndSources.TypedSource<TResult>!
+Alis.Reactive.Declarations.TypedDslExemptionAttribute
+Alis.Reactive.Declarations.TypedDslExemptionAttribute.Reason.get -> string!
+Alis.Reactive.Declarations.TypedDslExemptionAttribute.TypedDslExemptionAttribute(string! reason) -> void
+Alis.Reactive.Declarations.WriteOnly<TValue>
+Alis.Reactive.Declarations.WriteOnly<TValue>.Set(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+Alis.Reactive.Declarations.WriteOnly<TValue>.Set(TValue value) -> void
+Alis.Reactive.Elements.ChildElement
+Alis.Reactive.Elements.ChildElement.ChildElement() -> void
+Alis.Reactive.Elements.ChildElement.GetAttribute(Alis.Reactive.ValuesAndSources.Arg<string!>! name) -> Alis.Reactive.Declarations.MethodResult<string?>!
+Alis.Reactive.Elements.ChildElement.HasAttribute(Alis.Reactive.ValuesAndSources.Arg<string!>! name) -> Alis.Reactive.Declarations.MethodResult<bool>!
+Alis.Reactive.Elements.ClassList
+Alis.Reactive.Elements.ClassList.Add(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! name) -> void
+Alis.Reactive.Elements.ClassList.Add(string? name) -> void
+Alis.Reactive.Elements.ClassList.ClassList() -> void
+Alis.Reactive.Elements.ClassList.Remove(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! name) -> void
+Alis.Reactive.Elements.ClassList.Remove(string? name) -> void
+Alis.Reactive.Elements.ClassList.Toggle(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! name) -> void
+Alis.Reactive.Elements.ClassList.Toggle(string? name) -> void
+Alis.Reactive.Elements.ClassList.Items.get -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<string!>!>!
+Alis.Reactive.Elements.Element
+Alis.Reactive.Elements.Element.Children.get -> Alis.Reactive.Elements.ElementChildren!
+Alis.Reactive.Elements.Element.Classes.get -> Alis.Reactive.Elements.ClassList!
+Alis.Reactive.Elements.Element.Element() -> void
+Alis.Reactive.Elements.Element.Hidden.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Elements.Element.Hide() -> void
+Alis.Reactive.Elements.Element.Html.get -> Alis.Reactive.Elements.ElementContent!
+Alis.Reactive.Elements.Element.Show() -> void
+Alis.Reactive.Elements.Element.Text.get -> Alis.Reactive.Elements.ElementContent!
+Alis.Reactive.Elements.ElementChildren
+Alis.Reactive.Elements.ElementChildren.Items.get -> Alis.Reactive.Declarations.LiveObjects<Alis.Reactive.Elements.ChildElement!>!
+Alis.Reactive.Elements.ElementChildren.ElementChildren() -> void
+Alis.Reactive.Elements.ElementContent
+Alis.Reactive.Elements.ElementContent.Append(string? text) -> void
+Alis.Reactive.Elements.ElementContent.Append<TValue>(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+Alis.Reactive.Elements.ElementContent.Set(string? text) -> void
+Alis.Reactive.Elements.ElementContent.Set(System.DateTime value) -> void
+Alis.Reactive.Elements.ElementContent.Set(System.DateOnly day) -> void
+Alis.Reactive.Elements.ElementContent.Set(System.TimeOnly time) -> void
+Alis.Reactive.Elements.ElementContent.Set<TValue>(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+Alis.Reactive.InputsAndIds.ComponentInput
+Alis.Reactive.InputsAndIds.IInputComponent
+Alis.Reactive.InputsAndIds.IInputComponent.Input.get -> Alis.Reactive.InputsAndIds.ComponentInput!
+Alis.Reactive.InputsAndIds.IdGenerator
+Alis.Reactive.InputsAndIds.InputFieldOptions
+Alis.Reactive.InputsAndIds.InputFieldOptions.Hidden() -> Alis.Reactive.InputsAndIds.InputFieldOptions!
+Alis.Reactive.InputsAndIds.InputFieldOptions.Label(string! text) -> Alis.Reactive.InputsAndIds.InputFieldOptions!
+Alis.Reactive.InputsAndIds.InputFieldOptions.Required() -> Alis.Reactive.InputsAndIds.InputFieldOptions!
+Alis.Reactive.InputsAndIds.ReactiveClassNames
+Alis.Reactive.InputsAndIds.ReactiveClassNames.Field.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.Field.set -> void
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldLabel.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldLabel.set -> void
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldMessage.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldMessage.set -> void
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldRequired.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldRequired.set -> void
+Alis.Reactive.InputsAndIds.ReactiveClassNames.InvalidInput.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.InvalidInput.set -> void
+Alis.Reactive.Plugins.Plugin
+Alis.Reactive.Plugins.Plugin.Name.get -> string!
+Alis.Reactive.Plugins.Plugin.Plugin(string! name) -> void
+Alis.Reactive.Plugins.Plugin.Plugin(string! name, Alis.Reactive.Declarations.EventListening! events) -> void
+Alis.Reactive.RenderingAndDelivery.ClassNameServices
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.BindsAList.get -> bool
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Html.get -> Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Id.get -> string!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Json<TOptions>(TOptions options) -> string!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.JsonName<TItem, TMember>(System.Linq.Expressions.Expression<System.Func<TItem, TMember>!>! member) -> string!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Member.get -> System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Name.get -> string!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Render<TComponent>(Microsoft.AspNetCore.Html.IHtmlContent! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.ValueJson.get -> string!
+Alis.Reactive.RenderingAndDelivery.InputFields
+Alis.Reactive.RenderingAndDelivery.MemberPartials
+Alis.Reactive.RenderingAndDelivery.PlanHtml
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Component<TComponent>() -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Json<TValue>(TValue value) -> string!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.JsonPath<TItem, TMember>(System.Linq.Expressions.Expression<System.Func<TItem, TMember>!>! path) -> System.Collections.Generic.IReadOnlyList<string!>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Raises<TPayload, TMember>(Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, System.Linq.Expressions.Expression<System.Func<TPayload, TMember>!>! member, string! template) -> string!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Plugin<TPlugin>() -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Render<TComponent>(string! id, Microsoft.AspNetCore.Html.IHtmlContent! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.RequireMembersTheBrowserOrders<TItem>(System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! ordering) -> void
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Rows<TRow>(string! rowsId) -> Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.ViewValueJson<TItem>(System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! term) -> string!
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive(System.Func<TPlugin!, Alis.Reactive.Declarations.Event!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive(System.Func<TPlugin!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive<TArgs>(System.Func<TPlugin!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive<TArgs>(System.Func<TPlugin!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void
+Alis.Reactive.RenderingAndDelivery.RequestBlocks
+Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>
+Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>.Container.get -> Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>!
+Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>.Dispose() -> void
+Alis.Reactive.RenderingAndDelivery.RequestServices
+Alis.Reactive.RenderingAndDelivery.RequestTimeZone
+Alis.Reactive.RenderingAndDelivery.RowEntries<TRow>
+Alis.Reactive.RenderingAndDelivery.RowEntries<TRow>.Add(TRow row) -> string!
+Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>
+Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>.Id.get -> string!
+Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>.Row.get -> TRow
+Alis.Reactive.RenderingAndDelivery.RowLink
+Alis.Reactive.RenderingAndDelivery.RowLink.Address.get -> string!
+Alis.Reactive.RenderingAndDelivery.RowLink.Id.get -> string!
+Alis.Reactive.RenderingAndDelivery.RowLinkEntries<TRow>
+Alis.Reactive.RenderingAndDelivery.RowLinkEntries<TRow>.Add(TRow row) -> Alis.Reactive.RenderingAndDelivery.RowLink!
+Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>
+Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>.Declare<TPlugin, TObject, TArgs>(System.Func<TPlugin!, Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>!>!>!, TObject!>! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Func<TArgs!, Alis.Reactive.Declarations.ReadOnly<TRow>!>! row, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.RowEntries<TRow>!
+Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>.DeclareLink<TPlugin, TObject, TArgs>(System.Func<TPlugin!, Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<Alis.Reactive.RenderingAndDelivery.RowEntry<TRow>!>!>!, TObject!>! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Func<TArgs!, Alis.Reactive.Declarations.ReadOnly<TRow>!>! row, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.RenderingAndDelivery.RowLinkEntries<TRow>!
+Alis.Reactive.RenderingAndDelivery.TracingServices
+Alis.Reactive.RenderingAndDelivery.ValidationServices
+Alis.Reactive.RequestsAndResponses.BrowserFile
+Alis.Reactive.RequestsAndResponses.BrowserFile.BrowserFile() -> void
+Alis.Reactive.RequestsAndResponses.BrowserFile.LastModified.get -> Alis.Reactive.Declarations.ReadOnly<long>!
+Alis.Reactive.RequestsAndResponses.BrowserFile.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.RequestsAndResponses.BrowserFile.Size.get -> Alis.Reactive.Declarations.ReadOnly<long>!
+Alis.Reactive.RequestsAndResponses.BrowserFile.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.RequestsAndResponses.Content
+Alis.Reactive.RequestsAndResponses.ErrorContent<TBody>
+Alis.Reactive.RequestsAndResponses.ErrorResponses
+Alis.Reactive.RequestsAndResponses.Failure
+Alis.Reactive.RequestsAndResponses.Failure.Headers.get -> Alis.Reactive.RequestsAndResponses.ResponseHeaders!
+Alis.Reactive.RequestsAndResponses.Failure.Outcome.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.RequestsAndResponses.FailureOutcome!>!
+Alis.Reactive.RequestsAndResponses.Failure.Status.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.RequestsAndResponses.Failure<TError>
+Alis.Reactive.RequestsAndResponses.Failure<TError>.Body.get -> Alis.Reactive.Declarations.ReadOnly<TError>!
+Alis.Reactive.RequestsAndResponses.Failure<TError>.Headers.get -> Alis.Reactive.RequestsAndResponses.ResponseHeaders!
+Alis.Reactive.RequestsAndResponses.Failure<TError>.Outcome.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.RequestsAndResponses.FailureOutcome!>!
+Alis.Reactive.RequestsAndResponses.Failure<TError>.Status.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.RequestsAndResponses.FailureOutcome
+Alis.Reactive.RequestsAndResponses.Markup
+Alis.Reactive.RequestsAndResponses.NoContent
+Alis.Reactive.RequestsAndResponses.Notice
+Alis.Reactive.RequestsAndResponses.Notice.Error(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Error(string! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Info(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Info(string! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Success(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Success(string! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Warning(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Warning(string! text) -> void
+Alis.Reactive.RequestsAndResponses.PageUrl<TPage>
+Alis.Reactive.RequestsAndResponses.PageUrl<TPage>.Read<TValue>(System.Linq.Expressions.Expression<System.Func<TPage, TValue>!>! member) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>
+Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>.Read<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>
+Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>.Body.get -> Alis.Reactive.Declarations.ReadOnly<TBody>!
+Alis.Reactive.RequestsAndResponses.Response<TRequest>
+Alis.Reactive.RequestsAndResponses.Response<TRequest>.Headers.get -> Alis.Reactive.RequestsAndResponses.ResponseHeaders!
+Alis.Reactive.RequestsAndResponses.Response<TRequest>.Request.get -> Alis.Reactive.Declarations.ReadOnly<TRequest>!
+Alis.Reactive.RequestsAndResponses.Response<TRequest>.Status.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.RequestsAndResponses.ResponseFile
+Alis.Reactive.RequestsAndResponses.ResponseFile.Name.get -> string!
+Alis.Reactive.RequestsAndResponses.ResponseFile.Name.init -> void
+Alis.Reactive.RequestsAndResponses.ResponseFile.ResponseFile() -> void
+Alis.Reactive.RequestsAndResponses.ResponseFile.Size.get -> long
+Alis.Reactive.RequestsAndResponses.ResponseFile.Size.init -> void
+Alis.Reactive.RequestsAndResponses.ResponseFile.Type.get -> string!
+Alis.Reactive.RequestsAndResponses.ResponseFile.Type.init -> void
+Alis.Reactive.RequestsAndResponses.ResponseHeaders
+Alis.Reactive.RequestsAndResponses.ResponseHeaders.Get(string! name) -> Alis.Reactive.Declarations.MethodResult<string?>!
+Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>
+Alis.Reactive.RequestsAndResponses.ValidationProblem
+Alis.Reactive.RequestsAndResponses.ValidationProblem.Errors.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Collections.Generic.IReadOnlyList<string!>!>!
+Alis.Reactive.RequestsAndResponses.ValidationProblem.Errors.init -> void
+Alis.Reactive.RequestsAndResponses.ValidationProblem.ValidationProblem() -> void
+Alis.Reactive.Tracing.ReactiveTracing
+Alis.Reactive.Tracing.ReactiveTracing.Console.get -> bool
+Alis.Reactive.Tracing.ReactiveTracing.Console.set -> void
+Alis.Reactive.TriggersAndPipelines.AntiforgeryIn
+Alis.Reactive.TriggersAndPipelines.AppEvent
+Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Header<TValue>(string! name, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.File(Alis.Reactive.RequestsAndResponses.BrowserFile! file) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Header<TValue>(string! name, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Json(Alis.Reactive.RequestsAndResponses.RequestContainer<TRequest>! container, System.Action<Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Json(System.Action<Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Multipart(Alis.Reactive.RequestsAndResponses.RequestContainer<TRequest>! container, System.Action<Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Multipart(System.Action<Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Text(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Text(string! text) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.UrlEncoded(Alis.Reactive.RequestsAndResponses.RequestContainer<TRequest>! container, System.Action<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.UrlEncoded(System.Action<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>
+Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>.Component<TComponent>() -> TComponent!
+Alis.Reactive.TriggersAndPipelines.Branches<TModel>
+Alis.Reactive.TriggersAndPipelines.Branches<TModel>.Else(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! branch) -> void
+Alis.Reactive.TriggersAndPipelines.Branches<TModel>.ElseIf(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.Guard<TModel>!
+Alis.Reactive.TriggersAndPipelines.CondensedRequests
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.Chained(System.Action<TReply, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! chained) -> void
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnSuccess(Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.ElementSteps
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.Chained(System.Action<TReply, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! chained) -> void
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnSuccess(Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.Guard<TModel>
+Alis.Reactive.TriggersAndPipelines.Guard<TModel>.Then(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! branch) -> Alis.Reactive.TriggersAndPipelines.Branches<TModel>!
+Alis.Reactive.TriggersAndPipelines.HandlerPolicy
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.Chained(System.Action<TReply, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! chained) -> void
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.OnError(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.OnError(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.OnSuccess(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>
+Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Input<TMember, TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Input<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.File(System.Linq.Expressions.Expression<System.Func<TRequest, Microsoft.AspNetCore.Http.IFormFile?>!>! member, Alis.Reactive.RequestsAndResponses.BrowserFile! file) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.File(System.Linq.Expressions.Expression<System.Func<TRequest, System.Collections.Generic.List<Microsoft.AspNetCore.Http.IFormFile!>!>!>! member, Alis.Reactive.Declarations.LiveObjects<Alis.Reactive.RequestsAndResponses.BrowserFile!>! files) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.Input<TMember, TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.Input<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.NoModel
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.Chained(System.Action<TReply, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! chained) -> void
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnSuccess(Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PartsGuard<TParts>
+Alis.Reactive.TriggersAndPipelines.PartsGuard<TParts>.Then(System.Action<TParts!>! branch) -> TParts!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Component<TComponent>() -> TComponent!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Component<TComponent>(string! id) -> TComponent!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Concat(params Alis.Reactive.ValuesAndSources.TextPart![]! parts) -> Alis.Reactive.ValuesAndSources.TypedSource<string!>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Container<TContainer>(string! containerId) -> Alis.Reactive.RequestsAndResponses.RequestContainer<TContainer>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Delete(string! url) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Delete<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Dispatch(Alis.Reactive.TriggersAndPipelines.AppEvent! appEvent) -> void
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Dispatch<TPayload>(Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, Alis.Reactive.ValuesAndSources.TypedSource<TPayload>! payload) -> void
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Dispatch<TPayload>(Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, TPayload payload) -> void
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Get(string! url) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Get<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Head(string! url) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Head<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Input<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.List<T>(params Alis.Reactive.ValuesAndSources.ITypedSource<T>![]! items) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<T>!>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Listen<TObject, TArgs>(TObject! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> void
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Listen<TObject, TArgs>(TObject! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> void
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Object<T>(System.Action<Alis.Reactive.ValuesAndSources.ObjectMembers<T>!>! members) -> Alis.Reactive.ValuesAndSources.TypedSource<T>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Options(string! url) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Options<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.PageUrl<TPage>() -> Alis.Reactive.RequestsAndResponses.PageUrl<TPage>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.PageUrl<TPage>(string! template) -> Alis.Reactive.RequestsAndResponses.PageUrl<TPage>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Plugin<TPlugin>() -> TPlugin!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Post(string! url) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Post<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Put(string! url) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Put<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Unload(string! elementId) -> void
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.Guard<TModel>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.Chained(System.Action<TReply, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! chained) -> void
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnSuccess(Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.Chained(System.Action<TReply, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! chained) -> void
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.NoBusy() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.NoDefaults() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.NoRetry() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.NoValidation() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnSuccess(Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Header<TValue>(string! name, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Header<TValue>(string! name, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.Antiforgery(Alis.Reactive.TriggersAndPipelines.AntiforgeryIn! place) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<Alis.Reactive.TriggersAndPipelines.NoModel!>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.NoAntiforgery() -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<Alis.Reactive.TriggersAndPipelines.NoModel!>!>! failed) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.OnError(int status, Alis.Reactive.RequestsAndResponses.NoContent! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<Alis.Reactive.TriggersAndPipelines.NoModel!>!, Alis.Reactive.TriggersAndPipelines.Pipeline<Alis.Reactive.TriggersAndPipelines.NoModel!>!>! error) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.OnError<TError>(System.Action<Alis.Reactive.RequestsAndResponses.Failure<TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<Alis.Reactive.TriggersAndPipelines.NoModel!>!>! failed) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<Alis.Reactive.TriggersAndPipelines.NoModel!, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<Alis.Reactive.TriggersAndPipelines.NoModel!>!>! error) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.Retry(int attempts, System.TimeSpan firstWait) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.ShowBusy() -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.ShowValidationErrors() -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestDefaults.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<Alis.Reactive.TriggersAndPipelines.NoModel!>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
+Alis.Reactive.TriggersAndPipelines.RequestSteps
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.CustomEvent(Alis.Reactive.TriggersAndPipelines.AppEvent! appEvent, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.CustomEvent(Alis.Reactive.TriggersAndPipelines.AppEvent! appEvent, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.CustomEvent<TPayload>(Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.Declarations.Data<TPayload>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.CustomEvent<TPayload>(Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, System.Action<Alis.Reactive.Declarations.Data<TPayload>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.DomReady(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>
+Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Input<TMember, TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Input<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Header<TValue>(string! name, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Path<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!>!
+Alis.Reactive.Validation.CascadeMode
+Alis.Reactive.Validation.CascadeMode.Continue = 0 -> Alis.Reactive.Validation.CascadeMode
+Alis.Reactive.Validation.CascadeMode.Stop = 1 -> Alis.Reactive.Validation.CascadeMode
+Alis.Reactive.Validation.CustomContext<T>
+Alis.Reactive.Validation.CustomContext<T>.AddFailure(string! message) -> void
+Alis.Reactive.Validation.CustomContext<T>.AddFailure<TMember>(System.Linq.Expressions.Expression<System.Func<T, TMember>!>! member, string! message) -> void
+Alis.Reactive.Validation.CustomContext<T>.Model.get -> T
+Alis.Reactive.Validation.EndpointChecks
+Alis.Reactive.Validation.IConditionBuilder
+Alis.Reactive.Validation.IConditionBuilder.Otherwise(System.Action! rules) -> void
+Alis.Reactive.Validation.IRuleBuilder<T, TProperty>
+Alis.Reactive.Validation.IRuleBuilder<T, TProperty>.Cascade(Alis.Reactive.Validation.CascadeMode mode) -> Alis.Reactive.Validation.IRuleBuilder<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilder<T, TProperty>.SetValidator(Alis.Reactive.Validation.IValidator<TProperty>! validator) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.DependentRules(System.Action! rules) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.ServerOnly() -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.UnlessOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.When(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.WhenOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.WithMessage(System.Func<T, string!>! message) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.WithMessage(string! message) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.WithName(string! displayName) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IValidator<T>
+Alis.Reactive.Validation.IValidator<T>.Validate(T instance) -> Alis.Reactive.Validation.ValidationResult!
+Alis.Reactive.Validation.IValidator<T>.Validate(T instance, string! ruleSet) -> Alis.Reactive.Validation.ValidationResult!
+Alis.Reactive.Validation.IValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+Alis.Reactive.Validation.IValidator<T>.ValidateAsync(T instance, string! ruleSet, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+Alis.Reactive.Validation.InlineValidator<T>
+Alis.Reactive.Validation.InlineValidator<T>.InlineValidator() -> void
+Alis.Reactive.Validation.ReactiveFluentValidationBuilder
+Alis.Reactive.Validation.ReactiveFluentValidationBuilder.Add<TValidator>() -> Alis.Reactive.Validation.ReactiveFluentValidationBuilder!
+Alis.Reactive.Validation.ReactiveValidator
+Alis.Reactive.Validation.ReactiveValidator<T>
+Alis.Reactive.Validation.ReactiveValidator<T>.Include(Alis.Reactive.Validation.IValidator<T>! rules) -> void
+Alis.Reactive.Validation.ReactiveValidator<T>.ReactiveValidator() -> void
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleFor<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilder<T, TProperty>!
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleForEach<TElement>(System.Linq.Expressions.Expression<System.Func<T, System.Collections.Generic.IEnumerable<TElement>!>!>! collection) -> Alis.Reactive.Validation.IRuleBuilder<T, TElement>!
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleLevelCascadeMode.get -> Alis.Reactive.Validation.CascadeMode
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleLevelCascadeMode.set -> void
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleSet(string! ruleSet, System.Action! rules) -> void
+Alis.Reactive.Validation.ReactiveValidator<T>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.UnlessAsync(System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.UnlessOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.Validate(T instance) -> Alis.Reactive.Validation.ValidationResult!
+Alis.Reactive.Validation.ReactiveValidator<T>.Validate(T instance, string! ruleSet) -> Alis.Reactive.Validation.ValidationResult!
+Alis.Reactive.Validation.ReactiveValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+Alis.Reactive.Validation.ReactiveValidator<T>.ValidateAsync(T instance, string! ruleSet, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+Alis.Reactive.Validation.ReactiveValidator<T>.When(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.WhenAsync(System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.WhenOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.RuleBuilderExtensions
+Alis.Reactive.Validation.ValidationFailure
+Alis.Reactive.Validation.ValidationFailure.ErrorMessage.get -> string!
+Alis.Reactive.Validation.ValidationFailure.PropertyName.get -> string!
+Alis.Reactive.Validation.ValidationResult
+Alis.Reactive.Validation.ValidationResult.Errors.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.Validation.ValidationFailure!>!
+Alis.Reactive.Validation.ValidationResult.ErrorsByField.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string![]!>!
+Alis.Reactive.Validation.ValidationResult.IsValid.get -> bool
+Alis.Reactive.ValuesAndSources.Arg
+Alis.Reactive.ValuesAndSources.Arg<T>
+Alis.Reactive.ValuesAndSources.ITypedSource<T>
+Alis.Reactive.ValuesAndSources.NullableReferences
+Alis.Reactive.ValuesAndSources.NullableValues
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, TValue value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
+Alis.Reactive.ValuesAndSources.TextPart
+Alis.Reactive.ValuesAndSources.TypedSource<T>
+Alis.Reactive.Vendors.Component
+Alis.Reactive.Vendors.Component.Component() -> void
+Alis.Reactive.Vendors.ComponentVendor
+Alis.Reactive.Vendors.ComponentVendor.Name.get -> string!
+Alis.Reactive.Vendors.IAppLevelComponent
+Alis.Reactive.Vendors.IAppLevelComponent.DefaultId.get -> string!
+Alis.Reactive.Vendors.VendorLookup
+abstract Alis.Reactive.Declarations.EventedObject.Listening.get -> Alis.Reactive.Declarations.EventListening!
+abstract Alis.Reactive.Vendors.Component.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+const Alis.Reactive.Tracing.ReactiveTracing.SourceName = "Alis.Reactive" -> string!
+override Alis.Reactive.Elements.Element.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+override Alis.Reactive.Vendors.ComponentVendor.ToString() -> string!
+override sealed Alis.Reactive.Plugins.Plugin.Listening.get -> Alis.Reactive.Declarations.EventListening!
+override sealed Alis.Reactive.Vendors.Component.Listening.get -> Alis.Reactive.Declarations.EventListening!
+static Alis.Reactive.ArrayLambdas.DataLists.All<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.ArrayLambdas.DataLists.Any<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.ArrayLambdas.DataLists.Any<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.ArrayLambdas.DataLists.Count<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list) -> Alis.Reactive.ValuesAndSources.TypedSource<int>!
+static Alis.Reactive.ArrayLambdas.DataLists.Count<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<int>!
+static Alis.Reactive.ArrayLambdas.DataLists.Find<TItem, TResult>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! predicate, System.Linq.Expressions.Expression<System.Func<TItem, TResult>!>! field) -> Alis.Reactive.ValuesAndSources.TypedSource<TResult>!
+static Alis.Reactive.ArrayLambdas.DataLists.Find<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<TItem>!
+static Alis.Reactive.ArrayLambdas.DataLists.OrderBy<TItem, TKey>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, TKey>!>! key) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TItem>!>!
+static Alis.Reactive.ArrayLambdas.DataLists.OrderBy<TItem, TKey>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, TKey?>!>! key) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TItem>!>!
+static Alis.Reactive.ArrayLambdas.DataLists.OrderBy<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, string?>!>! key, System.StringComparer! comparer) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TItem>!>!
+static Alis.Reactive.ArrayLambdas.DataLists.OrderByDescending<TItem, TKey>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, TKey>!>! key) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TItem>!>!
+static Alis.Reactive.ArrayLambdas.DataLists.OrderByDescending<TItem, TKey>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, TKey?>!>! key) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TItem>!>!
+static Alis.Reactive.ArrayLambdas.DataLists.OrderByDescending<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, string?>!>! key, System.StringComparer! comparer) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TItem>!>!
+static Alis.Reactive.ArrayLambdas.DataLists.Select<TItem, TResult>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, TResult>!>! field) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TResult>!>!
+static Alis.Reactive.ArrayLambdas.DataLists.Sum<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, decimal>!>! term) -> Alis.Reactive.ValuesAndSources.TypedSource<decimal>!
+static Alis.Reactive.ArrayLambdas.DataLists.Sum<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, double>!>! term) -> Alis.Reactive.ValuesAndSources.TypedSource<double>!
+static Alis.Reactive.ArrayLambdas.DataLists.Sum<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, int>!>! term) -> Alis.Reactive.ValuesAndSources.TypedSource<int>!
+static Alis.Reactive.ArrayLambdas.DataLists.Where<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! keep) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TItem>!>!
+static Alis.Reactive.Conditions.Choices.Choose<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! test, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! whenTrue, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! whenFalse) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.Choose<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! test, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! whenTrue, TValue whenFalse) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.Choose<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! test, TValue whenTrue, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! whenFalse) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.Choose<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! test, TValue whenTrue, TValue whenFalse) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.IfNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, Alis.Reactive.ValuesAndSources.TypedSource<TValue!>! fallback) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue!>!
+static Alis.Reactive.Conditions.Choices.IfNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! fallback) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.IfNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, TValue fallback) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.IfNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, TValue! fallback) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue!>!
+static Alis.Reactive.Conditions.Comparisons.And(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! left, Alis.Reactive.ValuesAndSources.TypedSource<bool>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Eq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Eq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Not(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Or(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! left, Alis.Reactive.ValuesAndSources.TypedSource<bool>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.Between<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! low, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! high) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.Between<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, TValue low, TValue high) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.Between<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! low, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! high) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.Between<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, TValue low, TValue high) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.In<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IReadOnlyList<TValue>!>! values) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.In<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, params TValue[]! values) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.NotIn<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IReadOnlyList<TValue>!>! values) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.NotIn<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, params TValue[]! values) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.Contains(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<string?>! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.Contains(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.EndsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<string?>! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.EndsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.Matches(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! pattern) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.MinLength(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<int>! length) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.MinLength(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, int length) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.StartsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<string?>! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.StartsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.IsEmpty(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.IsEmpty<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IReadOnlyList<TItem>?>! list) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.IsNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.IsNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.NotEmpty(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.NotEmpty<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IReadOnlyList<TItem>?>! list) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.NotNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.NotNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Declarations.EventListening.CallbackProperties.get -> Alis.Reactive.Declarations.EventListening!
+static Alis.Reactive.Declarations.EventListening.EventTarget.get -> Alis.Reactive.Declarations.EventListening!
+static Alis.Reactive.Declarations.EventListening.Methods(string! subscribe, string! unsubscribe) -> Alis.Reactive.Declarations.EventListening!
+static Alis.Reactive.Declarations.EventListening.ReturnedUnsubscriber(string! subscribe) -> Alis.Reactive.Declarations.EventListening!
+static Alis.Reactive.Declarations.Field.Of<TRow, TValue>(System.Linq.Expressions.Expression<System.Func<TRow, TValue>!>! member) -> Alis.Reactive.Declarations.Field<TValue>!
+static Alis.Reactive.Declarations.JsObject.AbortSignal() -> Alis.Reactive.ValuesAndSources.Arg!
+static Alis.Reactive.Declarations.JsObject.Answer<TArgs, TResult>(System.Func<TArgs!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! answer) -> Alis.Reactive.ValuesAndSources.Arg!
+static Alis.Reactive.Declarations.JsObject.Fixed<TValue>(TValue value) -> Alis.Reactive.ValuesAndSources.Arg!
+static Alis.Reactive.Declarations.JsObject.Pass<TDeclared, TSource>(Alis.Reactive.ValuesAndSources.TypedSource<TSource>! value) -> Alis.Reactive.ValuesAndSources.Arg!
+static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.Property<TValue?>! property, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.WriteOnly<TValue?>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+static Alis.Reactive.InputsAndIds.ComponentInput.Of<TItem, TArgs>(Alis.Reactive.Declarations.LiveObjects<TItem!>! value, Alis.Reactive.Declarations.Event<TArgs!>! committedBy) -> Alis.Reactive.InputsAndIds.ComponentInput!
+static Alis.Reactive.InputsAndIds.ComponentInput.Of<TValue, TArgs>(Alis.Reactive.Declarations.ReadOnly<TValue>! value, Alis.Reactive.Declarations.Event<TArgs!>! committedBy) -> Alis.Reactive.InputsAndIds.ComponentInput!
+static Alis.Reactive.InputsAndIds.IdGenerator.For<TModel, TProp>(System.Linq.Expressions.Expression<System.Func<TModel, TProp>!>! member) -> string!
+static Alis.Reactive.RenderingAndDelivery.ClassNameServices.AddReactiveClassNames(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.InputsAndIds.ReactiveClassNames!>! names) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
+static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member, System.Action<Alis.Reactive.InputsAndIds.InputFieldOptions!>! options) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
+static Alis.Reactive.RenderingAndDelivery.MemberPartials.PartialFor<TModel, TMember>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, System.Linq.Expressions.Expression<System.Func<TModel, TMember>!>! member) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Html.IHtmlContent!>!
+static Alis.Reactive.RenderingAndDelivery.MemberPartials.PartialFor<TModel, TMember>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, System.Linq.Expressions.Expression<System.Func<TModel, TMember>!>! member, string! viewName) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Html.IHtmlContent!>!
+static Alis.Reactive.RenderingAndDelivery.PlanHtml.On<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Action<Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!>! trigger) -> void
+static Alis.Reactive.RenderingAndDelivery.PlanHtml.Raises<TModel, TPayload>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.RenderingAndDelivery.PlanHtml.Raises<TModel, TPayload>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, TPayload payload) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.RenderingAndDelivery.PlanHtml.Raises<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, Alis.Reactive.TriggersAndPipelines.AppEvent! appEvent) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.RenderingAndDelivery.PlanHtml.ReactivePlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html) -> Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>!
+static Alis.Reactive.RenderingAndDelivery.PlanHtml.RenderPlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestContainer<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! containerId) -> Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>!
+static Alis.Reactive.RenderingAndDelivery.RequestServices.AddReactiveRequests(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.TriggersAndPipelines.RequestDefaults!>! requests) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Alis.Reactive.RenderingAndDelivery.RequestTimeZone.RendersUnder(this Microsoft.AspNetCore.Http.HttpContext! context, System.TimeZoneInfo! timeZone) -> void
+static Alis.Reactive.RenderingAndDelivery.TracingServices.AddReactiveTracing(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Tracing.ReactiveTracing!>! tracing) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Alis.Reactive.RenderingAndDelivery.ValidationServices.AddReactiveFluentValidation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Validation.ReactiveFluentValidationBuilder!>! validators) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Alis.Reactive.RequestsAndResponses.Content.File.get -> Alis.Reactive.RequestsAndResponses.SuccessContent<Alis.Reactive.RequestsAndResponses.ResponseFile!>!
+static Alis.Reactive.RequestsAndResponses.Content.Html.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<Alis.Reactive.RequestsAndResponses.Markup!>!
+static Alis.Reactive.RequestsAndResponses.Content.Json<TBody>() -> Alis.Reactive.RequestsAndResponses.ErrorContent<TBody>!
+static Alis.Reactive.RequestsAndResponses.Content.None.get -> Alis.Reactive.RequestsAndResponses.NoContent!
+static Alis.Reactive.RequestsAndResponses.Content.Text.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<string!>!
+static Alis.Reactive.RequestsAndResponses.ErrorResponses.ToErrorResponse(this Alis.Reactive.Validation.ValidationResult! result) -> Microsoft.AspNetCore.Mvc.ActionResult!
+static Alis.Reactive.TriggersAndPipelines.AppEvent.Declare(string? name = null, string! declaredBy = "") -> Alis.Reactive.TriggersAndPipelines.AppEvent!
+static Alis.Reactive.TriggersAndPipelines.AppEvent.Declare<TPayload>(string? name = null, string! declaredBy = "") -> Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TMember, TValue>(this Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TMember, TValue>(this Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TMember, TValue>(this Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TMember, TValue>(this Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Input<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Inputs<TRequest>(this Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>! request, Alis.Reactive.RequestsAndResponses.RequestContainer<TRequest>! container) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Inputs<TRequest>(this Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>! request, Alis.Reactive.RequestsAndResponses.RequestContainer<TRequest>! container) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Into<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>! request, string! elementId) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.Markup!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Into<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>! request, string! elementId) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.Markup!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Into<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>! request, string! elementId) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.Markup!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Into<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>! request, string! elementId) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.Markup!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Into<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>! request, string! elementId) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.Markup!>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Notice<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline) -> Alis.Reactive.RequestsAndResponses.Notice!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.OnSuccess<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>! request, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.OnSuccess<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>! request, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.OnSuccess<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>! request, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.OnSuccess<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>! request, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.OnSuccess<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>! request, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.OnSuccess<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>! request, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+static Alis.Reactive.TriggersAndPipelines.ElementSteps.Element<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, string! id) -> Alis.Reactive.Elements.Element!
+static Alis.Reactive.TriggersAndPipelines.HandlerPolicy.Overlap.get -> Alis.Reactive.TriggersAndPipelines.HandlerPolicy!
+static Alis.Reactive.TriggersAndPipelines.HandlerPolicy.Replace.get -> Alis.Reactive.TriggersAndPipelines.HandlerPolicy!
+static Alis.Reactive.TriggersAndPipelines.HandlerPolicy.Skip.get -> Alis.Reactive.TriggersAndPipelines.HandlerPolicy!
+static Alis.Reactive.TriggersAndPipelines.RequestSteps.Into<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, string! elementId, Alis.Reactive.ValuesAndSources.ITypedSource<Alis.Reactive.RequestsAndResponses.Markup!>! html) -> void
+static Alis.Reactive.TriggersAndPipelines.RequestSteps.Parallel<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, params System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>![]! branches) -> void
+static Alis.Reactive.TriggersAndPipelines.RequestSteps.ShowValidationErrors<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.ValuesAndSources.ITypedSource<Alis.Reactive.RequestsAndResponses.ValidationProblem!>! problem) -> void
+static Alis.Reactive.TriggersAndPipelines.RequestSteps.Validate<TModel, TContainer>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.RequestsAndResponses.RequestContainer<TContainer>! container) -> void
+static Alis.Reactive.TriggersAndPipelines.RequestSteps.Validate<TModel, TContainer>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.RequestsAndResponses.RequestContainer<TContainer>! container, string! ruleSet) -> void
+static Alis.Reactive.Validation.EndpointChecks.Validate<TRequest, TValidator>(this Microsoft.AspNetCore.Mvc.ControllerBase! controller, TRequest request) -> Alis.Reactive.Validation.ValidationResult!
+static Alis.Reactive.Validation.EndpointChecks.Validate<TRequest, TValidator>(this Microsoft.AspNetCore.Mvc.ControllerBase! controller, TRequest request, string! ruleSet) -> Alis.Reactive.Validation.ValidationResult!
+static Alis.Reactive.Validation.EndpointChecks.ValidateAsync<TRequest, TValidator>(this Microsoft.AspNetCore.Mvc.ControllerBase! controller, TRequest request, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+static Alis.Reactive.Validation.EndpointChecks.ValidateAsync<TRequest, TValidator>(this Microsoft.AspNetCore.Mvc.ControllerBase! controller, TRequest request, string! ruleSet, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.ChildRules<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Action<Alis.Reactive.Validation.InlineValidator<TProperty>!>! rules) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.CreditCard<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Custom<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Action<TProperty, Alis.Reactive.Validation.CustomContext<T>!>! check) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.CustomAsync<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<TProperty, Alis.Reactive.Validation.CustomContext<T>!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! check) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.EmailAddress<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Empty<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Equal<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Equal<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.ExclusiveBetween<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty from, TProperty to) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.ExclusiveBetween<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty from, TProperty to) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.InclusiveBetween<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty from, TProperty to) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.InclusiveBetween<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty from, TProperty to) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.IsInEnum<T, TEnum>(this Alis.Reactive.Validation.IRuleBuilder<T, TEnum>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TEnum>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.IsInEnum<T, TEnum>(this Alis.Reactive.Validation.IRuleBuilder<T, TEnum?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TEnum?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Length<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, int length) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Length<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, int minimum, int maximum) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Matches<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, string! pattern) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Matches<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, string! pattern, System.Text.RegularExpressions.RegexOptions options) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.MaximumLength<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, int maximum) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.MinimumLength<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, int minimum) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Must<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<T, TProperty, bool>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Must<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<TProperty, bool>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.MustAsync<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<T, TProperty, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.MustAsync<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<TProperty, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.NotEmpty<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.NotEqual<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.NotEqual<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.NotNull<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.PrecisionScale<T>(this Alis.Reactive.Validation.IRuleBuilder<T, decimal>! rule, int precision, int scale, bool ignoreTrailingZeros) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, decimal>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.PrecisionScale<T>(this Alis.Reactive.Validation.IRuleBuilder<T, decimal?>! rule, int precision, int scale, bool ignoreTrailingZeros) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, decimal?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Url<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(Alis.Reactive.ValuesAndSources.TypedSource<T>! source) -> Alis.Reactive.ValuesAndSources.Arg<T>!
+static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(T value) -> Alis.Reactive.ValuesAndSources.Arg<T>!
+static Alis.Reactive.ValuesAndSources.NullableReferences.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue!>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!
+static Alis.Reactive.ValuesAndSources.NullableValues.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!
+static Alis.Reactive.ValuesAndSources.TextPart.implicit operator Alis.Reactive.ValuesAndSources.TextPart!(string? text) -> Alis.Reactive.ValuesAndSources.TextPart!
+static Alis.Reactive.ValuesAndSources.TypedSource<T>.implicit operator Alis.Reactive.ValuesAndSources.TextPart!(Alis.Reactive.ValuesAndSources.TypedSource<T>! source) -> Alis.Reactive.ValuesAndSources.TextPart!
+static Alis.Reactive.Vendors.ComponentVendor.Define(string! name, Alis.Reactive.Vendors.VendorLookup! lookup, string! subscribe, string! unsubscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.Define(string! name, string! objectPath, string! subscribe, string! unsubscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.DefineCallbackProperties(string! name, Alis.Reactive.Vendors.VendorLookup! lookup, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.DefineCallbackProperties(string! name, string! objectPath, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.DefineReturnedUnsubscriber(string! name, Alis.Reactive.Vendors.VendorLookup! lookup, string! subscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.DefineReturnedUnsubscriber(string! name, string! objectPath, string! subscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.Native.get -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.VendorLookup.ByPlugin(string! name) -> Alis.Reactive.Vendors.VendorLookup!
+static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Content -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
+static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Network -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
+static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Redirect -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
+static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Status -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
+static readonly Alis.Reactive.TriggersAndPipelines.AntiforgeryIn.FormField -> Alis.Reactive.TriggersAndPipelines.AntiforgeryIn!
+static readonly Alis.Reactive.TriggersAndPipelines.AntiforgeryIn.Header -> Alis.Reactive.TriggersAndPipelines.AntiforgeryIn!
+Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.ConnectionState.Closed = 3 -> Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.ConnectionState.Connecting = 0 -> Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.ConnectionState.Open = 1 -> Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.ConnectionState.Reconnecting = 2 -> Alis.Reactive.Realtime.ConnectionState
+Alis.Reactive.Realtime.RealtimeChoices
+Alis.Reactive.Realtime.RealtimeChoices.NoReconnectOffer() -> Alis.Reactive.Realtime.RealtimeChoices!
+Alis.Reactive.Realtime.RealtimeChoices.ReconnectionInterval(System.TimeSpan wait) -> Alis.Reactive.Realtime.RealtimeChoices!
+Alis.Reactive.Realtime.RealtimeChoices.ShowReconnect() -> Alis.Reactive.Realtime.RealtimeChoices!
+Alis.Reactive.Realtime.ServerEvent<TMessage>
+Alis.Reactive.Realtime.ServerEvent<TMessage>.Of(TMessage message) -> Alis.Reactive.Realtime.ServerMessage!
+Alis.Reactive.Realtime.ServerEvents
+Alis.Reactive.Realtime.ServerMessage
+Alis.Reactive.Realtime.ServerPushSource<TStream>
+Alis.Reactive.Realtime.ServerPushStream
+Alis.Reactive.Realtime.ServerPushStream.Close() -> void
+Alis.Reactive.Realtime.ServerPushStream.Closed.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.ServerPushStream.Message<TMessage>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Realtime.ServerEvent<TMessage>!
+Alis.Reactive.Realtime.ServerPushStream.Reconnected.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.ServerPushStream.Reconnecting.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.ServerPushStream.ServerPushStream() -> void
+Alis.Reactive.Realtime.ServerPushStream.State.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Realtime.ConnectionState>!
+Alis.Reactive.Realtime.HubPush<TMessage>
+Alis.Reactive.Realtime.HubPush<TMessage>.SendAsync(Microsoft.AspNetCore.SignalR.IClientProxy! clients, TMessage message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Alis.Reactive.Realtime.HubReconnected
+Alis.Reactive.Realtime.HubReconnected.ConnectionId.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Realtime.HubReconnected.HubReconnected() -> void
+Alis.Reactive.Realtime.SignalRHub
+Alis.Reactive.Realtime.SignalRHub.Closed.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.SignalRHub.ConnectionId.get -> Alis.Reactive.Declarations.ReadOnly<string?>!
+Alis.Reactive.Realtime.SignalRHub.Invoke<TResult>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Realtime.SignalRHub.Invoke<TResult>(string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Realtime.SignalRHub.Push<TMessage>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Realtime.HubPush<TMessage>!
+Alis.Reactive.Realtime.SignalRHub.Reconnected.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Realtime.HubReconnected!>!
+Alis.Reactive.Realtime.SignalRHub.Reconnecting.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Realtime.SignalRHub.Send(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string! declaredBy = "") -> void
+Alis.Reactive.Realtime.SignalRHub.Send(string! declaredBy = "") -> void
+Alis.Reactive.Realtime.SignalRHub.SignalRHub() -> void
+Alis.Reactive.Realtime.SignalRHub.State.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Realtime.ConnectionState>!
+Alis.Reactive.Realtime.SignalRSource<THub>
+Alis.Reactive.RenderingAndDelivery.RealtimeServices
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Stream<TStream>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream) -> TStream!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream, TMessage>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Realtime.ServerEvent<TMessage>!>! message, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream, TMessage>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Realtime.ServerEvent<TMessage>!>! message, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Declarations.Event!>! lifecycle, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.ServerPush<TStream>(Alis.Reactive.Realtime.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Declarations.Event!>! lifecycle, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Hub<THub>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub) -> THub!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub, TArgs>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Declarations.Event<TArgs!>!>! lifecycle, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub, TArgs>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Declarations.Event<TArgs!>!>! lifecycle, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub, TMessage>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Realtime.HubPush<TMessage>!>! push, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub, TMessage>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Realtime.HubPush<TMessage>!>! push, System.Action<Alis.Reactive.Declarations.Data<TMessage>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Declarations.Event!>! lifecycle, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.SignalR<THub>(Alis.Reactive.Realtime.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Declarations.Event!>! lifecycle, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline, string! callerFile = "", int callerLine = 0) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+static Alis.Reactive.Realtime.ServerEvents.Write(Microsoft.AspNetCore.Http.HttpContext! context, System.Collections.Generic.IAsyncEnumerable<Alis.Reactive.Realtime.ServerMessage!>! messages) -> Microsoft.AspNetCore.Http.HttpResults.ServerSentEventsResult<string!>!
+static Alis.Reactive.Realtime.ServerPushStream.At<TStream>(string! url) -> Alis.Reactive.Realtime.ServerPushSource<TStream!>!
+static Alis.Reactive.Realtime.SignalRHub.At<THub>(string! url) -> Alis.Reactive.Realtime.SignalRSource<THub!>!
+static Alis.Reactive.RenderingAndDelivery.RealtimeServices.AddReactiveRealtime(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Realtime.RealtimeChoices!>! live) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

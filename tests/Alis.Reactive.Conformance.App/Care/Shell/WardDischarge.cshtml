@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardDischarge
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Discharge";
+    var plan = Html.ReactivePlan<WardDischarge>();
+}
+<h1>Discharge @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, WardDischargeButtons.Discharge)>Discharge @Model.Resident</button>
+<p>Decision: <output id="decision"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardDischargeButtons.Discharge, pipeline =>
+        pipeline.When(pipeline.Component<NativeConfirm>().Ask("Discharge Ada from the ward?"))
+            .Then(pipeline => pipeline.Element("decision").Text.Set("Discharged"))
+            .Else(pipeline => pipeline.Element("decision").Text.Set("Kept"))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,440 @@
+import { describe, expect, test } from "vitest";
+import { PageInputs, type HiddenInput } from "./index";
+
+type Plan = Parameters<PageInputs["join"]>[0];
+type Owner = Parameters<PageInputs["join"]>[1];
+type Source = Parameters<Parameters<PageInputs["join"]>[3]>[0];
+type Model = Extract<Plan["objects"][string], { kind: "plugin" }>["data"];
+type Inputs = Extract<Model, { kind: "model" }>["inputs"];
+type Containers = Extract<Model, { kind: "model" }>["containers"];
+
+class Visit implements Owner {
+  readonly drops: (() => void)[] = [];
+  runs(): void { return undefined; }
+  mounts(): void { return undefined; }
+  listens(): void { return undefined; }
+  holds(): void { return undefined; }
+  registers(drop: () => void): void { this.drops.push(drop); }
+  release(): void { for (const drop of this.drops.splice(0)) drop(); }
+}
+
+const intake: Containers = { intake: { model: "Admission", prefix: { name: "", path: [] }, summary: "intake_summary", live: [] } };
+type Converted = Inputs[string]["converted"];
+type Blank = Inputs[string]["blank"];
+const convertedFrom = (read: Source): Converted => ({ kind: "as", expr: read, shape: { kind: "nullable", inner: { kind: "any" } } });
+type Sent = Inputs[string]["sent"];
+const textSentValue = { kind: "field", form: { kind: "text" }, whenNothing: "empty", whenBlank: "send" } as const;
+const textField: Sent = { kind: "lit", value: textSentValue };
+const valued = (value: () => unknown) => (source: Source): unknown => (source === textField ? literalValue(source) : value());
+const field = (name: string, path: Inputs[string]["path"], converted: Converted, blank: Blank = { kind: "lit", value: null }, sent: Sent = textField): Inputs[string] =>
+  ({ name, path, converted, blank, sent, committed: "change", invalidClass: "invalid", message: "" });
+const literal = (value: number | string): Blank => ({ kind: "lit", value });
+const fields: Inputs = { own: field("Nights", ["nights"], convertedFrom(literal(5))) };
+
+function plan(inputs: Inputs = fields, containers: Containers = intake, planId = "Admission"): Plan {
+  return {
+    version: 7, planId,
+    culture: { name: "en-US", collation: "en-US", decimal: ".", group: ",", integer: { group: false, exponent: false }, fraction: { group: true, exponent: true } },
+    timeZone: { kind: "clock" }, trace: { kind: "off" }, vendors: {}, handlers: [],
+    objects: { $model: { kind: "plugin", name: "alis.model", key: "", listen: { kind: "method", subscribe: "addEventListener", unsubscribe: "removeEventListener" }, data: { kind: "model", inputs, containers } } },
+  };
+}
+
+function literalValue(source: Source): unknown {
+  if (source.kind === "as") return literalValue(source.expr);
+  if (source.kind !== "lit") throw new Error("This contribution reads a literal.");
+  return source.value;
+}
+
+function page(containers = new Map([["intake", new Set(["own", "slot", "second"])]]), hidden: readonly HiddenInput[] = []): PageInputs {
+  return new PageInputs(id => {
+    const inputs = containers.get(id);
+    return inputs === undefined ? null : input => inputs.has(input);
+  }, id => (containers.has(id) ? hidden : null));
+}
+
+describe("when alis.model reads what a container sends", () => {
+  test("ReadIsWhatTheEndpointBinds: the contributed value is read with its own plan's evaluator", () => {
+    const inputs = page();
+    const owner = new Visit();
+    inputs.join(plan(), owner, "on the page", literalValue);
+    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom({ kind: "ref", name: "room" })) }, {}, "RoomCard"), owner, "in slot 'room'", valued(() => "B-12"));
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5, room: "B-12" });
+  });
+
+  test("ReadStopsWhenItsSendStops: a missing container element stops the read", () => {
+    const inputs = page(new Map());
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    expect(() => inputs.sent("intake", "Admission")).toThrow(/^No element has the id 'intake'\.$/);
+  });
+
+  test("ReadStopsWhenItsSendStops: the container must have a live rendering under the requested model", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    expect(() => inputs.sent("intake", "Other")).toThrow(/^Container 'intake' is rendered for model 'Admission', not 'Other'\.$/);
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
+  });
+
+  test("ReadStopsWhenItsSendStops: a container no live plan renders stops even when its element exists", () => {
+    const inputs = page();
+    expect(() => inputs.sent("intake", "Admission")).toThrow(/^No live plan renders container 'intake' for model 'Admission'\.$/);
+  });
+
+  test("OneValueOnEveryHost: two scalar bindings stop before either input is evaluated", () => {
+    const inputs = page();
+    const evaluated: string[] = [];
+    inputs.join(plan(), new Visit(), "on the page", valued(() => { evaluated.push("own"); return 5; }));
+    inputs.join(plan({ slot: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), new Visit(), "in slot 'card'", valued(() => { evaluated.push("slot"); return 8; }));
+    expect(() => inputs.sent("intake", "Admission")).toThrow(/^Inputs 'own' and 'slot' both bind 'Nights' inside container 'intake'\.$/);
+    expect(evaluated).toStrictEqual([]);
+  });
+
+  test("ReadFindsWhatItsContainerSends: an outside input is neither read nor a duplicate", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    inputs.join(plan({ other: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), new Visit(), "on the page", valued(() => { throw new Error("The outside input was read."); }));
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
+  });
+
+  test("indexed bindings build lists and dictionary keys without treating their distinct names as duplicates", () => {
+    const inputs = page();
+    inputs.join(plan({
+      own: field("Doses[0].Amount", ["doses", 0, "amount"], convertedFrom(literal(2))),
+      slot: field("Doses[1].Amount", ["doses", 1, "amount"], convertedFrom(literal(3))),
+      second: field("Rounds[night].Name", ["rounds", "night", "name"], convertedFrom(literal("Ada"))),
+    }), new Visit(), "on the page", literalValue);
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ doses: [{ amount: 2 }, { amount: 3 }], rounds: { night: { name: "Ada" } } });
+  });
+
+  test("a path beginning at a list position builds the container's list body", () => {
+    const inputs = page();
+    inputs.join(plan({
+      own: field("[0].Name", [0, "name"], convertedFrom(literal("Ada"))),
+      slot: field("[1].Name", [1, "name"], convertedFrom(literal("Grace"))),
+    }), new Visit(), "on the page", literalValue);
+    expect(inputs.sent("intake", "Admission")).toStrictEqual([{ name: "Ada" }, { name: "Grace" }]);
+  });
+
+  test("a body key named like an inherited member remains its own data", () => {
+    const inputs = page();
+    inputs.join(plan({ own: field("Map[__proto__].Name", ["map", "__proto__", "name"], convertedFrom(literal("Ada"))) }), new Visit(), "on the page", literalValue);
+    expect(inputs.sent("intake", "Admission")).toStrictEqual(JSON.parse('{"map":{"__proto__":{"name":"Ada"}}}'));
+  });
+
+  test("sent builds a fresh body and reads values in the call's step", () => {
+    const containers = new Map([["intake", new Set(["own"])]]);
+    const inputs = page(containers);
+    let nights = 5;
+    inputs.join(plan(), new Visit(), "on the page", valued(() => nights));
+    const before = inputs.sent("intake", "Admission");
+    nights = 9;
+    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom(literal("B-12"))) }, {}), new Visit(), "in slot 'card'", literalValue);
+    containers.set("intake", new Set(["own", "slot"]));
+    expect(before).toStrictEqual({ nights: 5 });
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 9, room: "B-12" });
+  });
+
+  test("ReadSeesTheSlotThatJoinedOrLeftBeforeIt: joining stops a duplicate and release removes it", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    const slot = new Visit();
+    inputs.join(plan({ slot: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), slot, "in slot 'card'", literalValue);
+    expect(() => inputs.sent("intake", "Admission")).toThrow(/^Inputs 'own' and 'slot' both bind 'Nights' inside container 'intake'\.$/);
+    slot.release();
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
+  });
+
+  test("AnUnsentMemberReadsWhatTheEndpointBinds: no binding leaves the body member absent for its data start", () => {
+    const inputs = page();
+    inputs.join(plan({}, intake), new Visit(), "on the page", literalValue);
+    const slot = new Visit();
+    inputs.join(plan({ slot: field("Nights", ["nights"], convertedFrom(literal(8))) }, {}), slot, "in slot 'card'", literalValue);
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 8 });
+    slot.release();
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({});
+  });
+
+  test("an owner's release drops its containers as well as its inputs", () => {
+    const inputs = page();
+    const owner = new Visit();
+    inputs.join(plan(), owner, "on the page", literalValue);
+    owner.release();
+    expect(() => inputs.sent("intake", "Admission")).toThrow(/^No live plan renders container 'intake' for model 'Admission'\.$/);
+    inputs.join(plan({}, intake), new Visit(), "on the page", literalValue);
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({});
+  });
+
+  test("releasing one rendering leaves another live rendering of the same container", () => {
+    const inputs = page();
+    const first = new Visit();
+    inputs.join(plan({}, intake), first, "on the page", literalValue);
+    inputs.join(plan({}, intake), new Visit(), "in slot 'card'", literalValue);
+    first.release();
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({});
+  });
+
+  test("R14.6 refuses the whole contribution and names the input and both plan places", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    const refused = new Visit();
+    expect(() => { inputs.join(plan({ second: field("Room", ["room"], convertedFrom(literal("B-12"))), ...fields }, {}), refused, "in slot 'card'", literalValue); })
+      .toThrow(/^Input 'own' is already held by plan 'Admission' on the page; plan 'Admission' in slot 'card' did not start\.$/);
+    refused.release();
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
+  });
+
+  test("R14.6 permits an input id after the previous owner's release", () => {
+    const inputs = page();
+    const first = new Visit();
+    inputs.join(plan(), first, "on the page", literalValue);
+    first.release();
+    inputs.join(plan({ own: field("Nights", ["nights"], convertedFrom(literal(9))) }), new Visit(), "in slot 'card'", literalValue);
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 9 });
+  });
+});
+
+describe("when a check reads what a container sends", () => {
+  const typed = (text: string): Converted => ({ kind: "as", expr: literal(text), shape: { kind: "nullable", inner: { kind: "number", of: "integer", text: "view", overflow: "nothing" } } });
+  const counted = (text: string): Inputs => ({ own: field("Count", ["count"], typed(text), literal(0)), outside: field("Name", ["name"], convertedFrom(literal("Ada"))) });
+  const read = (expression: Source): unknown => {
+    if (expression.kind === "lit") return expression.value;
+    if (expression.kind !== "as" || expression.expr.kind !== "lit") throw new Error("This contribution reads a literal or a number typed into it.");
+    const text = expression.expr.value;
+    return typeof text === "string" && /^[0-9]+$/.test(text) ? Number(text) : null;
+  };
+
+  test("UnsentInputsUnread: the capture holds the container's inputs alone, each under its binding name", () => {
+    const inputs = page(new Map([["intake", new Set(["own"])]]));
+    inputs.join(plan(counted("12")), new Visit(), "on the page", read);
+    const captured = inputs.captured("intake", "Admission");
+    expect(captured.body).toStrictEqual({ count: 12 });
+    expect(captured.inputs.map(input => [input.name, input.entry.id])).toStrictEqual([["Count", "own"]]);
+  });
+
+  test("NoTypedValueLost: a text the member's type cannot hold is read back for its check", () => {
+    const inputs = page(new Map([["intake", new Set(["own"])]]));
+    inputs.join(plan(counted("12a")), new Visit(), "on the page", read);
+    const [input] = inputs.captured("intake", "Admission").inputs;
+    if (input === undefined) throw new Error("The container sends one input.");
+    expect(inputs.captured("intake", "Admission").body).toStrictEqual({ count: 0 });
+    expect(inputs.typedText(input)).toBe("12a");
+  });
+
+  test("NoTypedValueLost: a text that converts, and a blank text, read no typed text", () => {
+    for (const text of ["12", "", "   "]) {
+      const inputs = page(new Map([["intake", new Set(["own"])]]));
+      inputs.join(plan(counted(text)), new Visit(), "on the page", read);
+      const [input] = inputs.captured("intake", "Admission").inputs;
+      if (input === undefined) throw new Error("The container sends one input.");
+      expect(inputs.typedText(input)).toBeNull();
+    }
+  });
+
+  test("NoTypedValueLost: an input that left the page stops its check", () => {
+    const inputs = page(new Map([["intake", new Set(["own"])]]));
+    const owner = new Visit();
+    inputs.join(plan(counted("12a")), owner, "on the page", read);
+    const [input] = inputs.captured("intake", "Admission").inputs;
+    if (input === undefined) throw new Error("The container sends one input.");
+    owner.release();
+    expect(() => inputs.typedText(input)).toThrow(/^Input 'own' left the page before its check read it\.$/);
+  });
+});
+
+describe("when an input is checked live", () => {
+  const live = (validator: string, body: string): Containers[string]["live"][number] => ({ validator, ruleSet: "default", body: literal(body) });
+  const nights = field("Nights", ["nights"], convertedFrom(literal(5)));
+  const room = field("Room", ["room"], convertedFrom(literal("B-12")));
+  const held: Inputs = { own: nights, second: room };
+  const sentOwn = { name: "Nights", path: ["nights"], entry: { id: "own", binding: nights }, sent: textSentValue };
+  const sentSecond = { name: "Room", path: ["room"], entry: { id: "second", binding: room }, sent: textSentValue };
+
+  test("each container that holds the input gives its live check over its own inputs, and a container that does not hold it gives none", () => {
+    const inputs = page(new Map([["intake", new Set(["own", "second"])], ["kin", new Set(["own"])], ["ward", new Set(["second"])], ["bare", new Set(["own"])]]));
+    inputs.join(plan(held, {
+      intake: { model: "Admission", prefix: { name: "", path: [] }, summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
+      kin: { model: "Admission", prefix: { name: "", path: [] }, summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
+      ward: { model: "Admission", prefix: { name: "", path: [] }, summary: "ward_summary", live: [live("WardRules", "the ward's body")] },
+      bare: { model: "Admission", prefix: { name: "", path: [] }, summary: "bare_summary", live: [] },
+    }), new Visit(), "on the page", literalValue);
+    expect(inputs.liveChecksOf("own")).toStrictEqual([
+      { registration: "AdmissionRules:default", body: "the intake's body", inputs: [sentOwn, sentSecond] },
+      { registration: "KinRules:default", body: "the kin's body", inputs: [sentOwn] },
+    ]);
+  });
+
+  test("a container whose element the page lacks gives no live check, and a released one gives none", () => {
+    const inputs = page(new Map([["kin", new Set(["own"])]]));
+    const owner = new Visit();
+    inputs.join(plan(held, {
+      intake: { model: "Admission", prefix: { name: "", path: [] }, summary: "intake_summary", live: [live("AdmissionRules", "the intake's body")] },
+      kin: { model: "Admission", prefix: { name: "", path: [] }, summary: "kin_summary", live: [live("KinRules", "the kin's body")] },
+    }), owner, "on the page", literalValue);
+    expect(inputs.liveChecksOf("own")).toStrictEqual([{ registration: "KinRules:default", body: "the kin's body", inputs: [sentOwn] }]);
+    owner.release();
+    expect(inputs.liveChecksOf("own")).toStrictEqual([]);
+    expect(inputs.entries()).toStrictEqual([]);
+  });
+});
+
+describe("when an answer shows where a request's failures go", () => {
+  test("InlineOnlyAtTheSentInput: the table holds an entry sent until its input leaves, and a load under the same id is another entry", () => {
+    const inputs = page();
+    const slot = new Visit();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom(literal("B-12"))) }, {}, "RoomCard"), slot, "in slot 'room'", literalValue);
+    const [own, room] = inputs.captured("intake", "Admission").inputs;
+    if (own === undefined || room === undefined) throw new Error("The container sends two inputs.");
+    expect([inputs.holds(own.entry), inputs.holds(room.entry)]).toStrictEqual([true, true]);
+    slot.release();
+    expect(inputs.holds(room.entry)).toBe(false);
+    inputs.join(plan({ slot: field("Room", ["room"], convertedFrom(literal("B-12"))) }, {}, "RoomCard"), new Visit(), "in slot 'room'", literalValue);
+    expect([inputs.holds(own.entry), inputs.holds(room.entry)]).toStrictEqual([true, false]);
+  });
+
+  test("FailureReachesSummary: a container's summary is the element its live rendering names", () => {
+    const inputs = page();
+    const owner = new Visit();
+    inputs.join(plan({}, intake), owner, "on the page", literalValue);
+    expect(inputs.summaryOf("intake")).toBe("intake_summary");
+    owner.release();
+    expect(() => inputs.summaryOf("intake")).toThrow(/^No live plan renders container 'intake', whose summary shows the request's failures\.$/);
+  });
+});
+
+describe("when a request captures what it sends", () => {
+  test("RecordsAMissingContainer: a container whose element the page lacks is recorded missing, not stopped at the read", () => {
+    const inputs = page(new Map());
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    expect(inputs.sends("intake", "Admission")).toStrictEqual({ kind: "missing", id: "intake" });
+  });
+
+  test("ContainerOfItsOwnModel: a container rendered for another model stops the request where it is read", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    expect(() => inputs.sends("intake", "Visit")).toThrow(/^Container 'intake' is rendered for model 'Admission', not 'Visit'\.$/);
+    expect(inputs.sends("intake", "Admission")).toMatchObject({ kind: "captured", id: "intake", body: { members: { nights: 5 }, hidden: [] } });
+  });
+
+  test("AHiddenInputReachesAFormBodyAlone: a request's capture carries the hidden inputs inside its container, and its check reads no member from them", () => {
+    const inputs = page(undefined, [{ name: "Shift", value: "Night" }]);
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    const container = inputs.sends("intake", "Admission");
+    expect(container).toMatchObject({ kind: "captured", body: { members: { nights: 5 }, hidden: [{ name: "Shift", value: "Night" }] } });
+    expect(inputs.checked({ container, individual: [] }, null, [])?.body).toStrictEqual({ nights: 5 });
+    expect(inputs.sent("intake", "Admission")).toStrictEqual({ nights: 5 });
+  });
+
+  test("RecordsAMissingInput: an input the page lacks is recorded missing and its value reads nothing", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    expect(inputs.input("gone", "Ward", ["ward"])).toStrictEqual({ kind: "missing", id: "gone", name: "Ward" });
+    expect(inputs.valueOf("gone")).toBeUndefined();
+    expect(inputs.input("own", "Stay", ["stay"])).toStrictEqual({ kind: "captured", input: { name: "Stay", path: ["stay"], entry: { id: "own", binding: field("Nights", ["nights"], convertedFrom(literal(5))) }, sent: textSentValue } });
+    expect(inputs.valueOf("own")).toBe(5);
+  });
+
+  test("CheckedIsWhatIsSent: the checked body holds the set members, with the container's inputs over them", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    const container = inputs.sends("intake", "Admission");
+    const checked = inputs.checked({ container, individual: [] }, null,
+      [{ path: ["nights"], value: { kind: "held", value: 2 } }, { path: ["ward"], value: { kind: "held", value: "North" } }, { path: ["room"], value: { kind: "nothing" } }]);
+    expect(checked?.body).toStrictEqual({ nights: 5, ward: "North" });
+    expect(checked?.inputs.map(input => input.entry.id)).toStrictEqual(["own"]);
+    expect(inputs.checked({ container: { kind: "none" }, individual: [] }, { ward: "East" }, [])).toStrictEqual({ body: { ward: "East" }, inputs: [] });
+  });
+
+  test("CheckedWaitsForTheGuard: a missing container or input leaves the check to the guard that stops the request", () => {
+    const inputs = page();
+    expect(inputs.checked({ container: { kind: "missing", id: "intake" }, individual: [] }, null, [])).toBeNull();
+    expect(inputs.checked({ container: { kind: "none" }, individual: [{ kind: "missing", id: "gone", name: "Ward" }] }, null, [])).toBeNull();
+  });
+});
+
+describe("when an input is sent by its binding's sent", () => {
+  const blankDate = (whenBlank: "send" | "leave" | "leaveUnlessAlone"): Sent => ({ kind: "lit", value: { kind: "field", form: { kind: "date" }, whenNothing: "leave", whenBlank } });
+  const days = (itemWhenNothing: "empty" | "stop"): Sent => ({ kind: "lit", value: {
+    kind: "enum", form: { kind: "list", item: { kind: "enum", values: [{ held: 0, name: "Mon" }] }, itemWhenNothing },
+    json: { kind: "list", item: { kind: "enum", values: [{ held: 0, sent: "Mon" }] }, itemWhenNothing }, whenNothing: "leave", whenBlank: "send",
+  } });
+  const nothing: Source = { kind: "lit", value: null };
+
+  test("InputSentLeavesTheBlank: under whenBlank leave an input whose converted holds nothing is left out of the body its read and its request share", () => {
+    const left = page();
+    left.join(plan({ own: field("Due", ["due"], convertedFrom(nothing), literal("0001-01-01T00:00:00"), blankDate("leave")), second: field("Reason", ["reason"], convertedFrom(literal("Falls"))) }), new Visit(), "on the page", literalValue);
+    expect(left.sent("intake", "Admission")).toStrictEqual({ reason: "Falls" });
+    const sent = page();
+    sent.join(plan({ own: field("Due", ["due"], convertedFrom(nothing), literal("0001-01-01T00:00:00"), blankDate("send")), second: field("Reason", ["reason"], convertedFrom(literal("Falls"))) }), new Visit(), "on the page", literalValue);
+    expect(sent.sent("intake", "Admission")).toStrictEqual({ due: "0001-01-01T00:00:00", reason: "Falls" });
+  });
+
+  test("ReadStopsWhenItsSendStops: under whenBlank leaveUnlessAlone a blank input is left out, and stops the container's read where no other input writes a field of its item", () => {
+    const blankWhen = (): Inputs[string] => field("Visits[0].When", ["visits", 0, "when"], convertedFrom(nothing), literal("0001-01-01T00:00:00"), blankDate("leaveUnlessAlone"));
+    const alone = page();
+    alone.join(plan({ own: blankWhen(), second: field("Resident", ["resident"], convertedFrom(literal("Ada"))) }), new Visit(), "on the page", literalValue);
+    expect(() => alone.sent("intake", "Admission")).toThrow(/^Input 'Visits\[0\]\.When' is left out while it holds its blank, and no other input of container 'intake' writes a field of its item, so the endpoint's list would end before it on both hosts\.$/);
+    const beside = page();
+    beside.join(plan({ own: blankWhen(), second: field("Visits[0].Note", ["visits", 0, "note"], convertedFrom(literal("Bloods"))) }), new Visit(), "on the page", literalValue);
+    expect(beside.sent("intake", "Admission")).toStrictEqual({ visits: [{ note: "Bloods" }] });
+    const dated = page();
+    dated.join(plan({ own: field("Visits[0].When", ["visits", 0, "when"], convertedFrom(literal("2026-12-01T00:00:00")), literal("0001-01-01T00:00:00"), blankDate("leaveUnlessAlone")) }), new Visit(), "on the page", literalValue);
+    expect(dated.sent("intake", "Admission")).toStrictEqual({ visits: [{ when: "2026-12-01T00:00:00" }] });
+  });
+
+  test("ItemNothingStopsTheRead: a list input whose item reads nothing where the item admits none stops the container's read, and one that admits null holds it", () => {
+    const visitDays: Source = { kind: "lit", value: [0, null] };
+    const stopped = page();
+    stopped.join(plan({ own: field("VisitDays", ["visitDays"], convertedFrom(visitDays), { kind: "lit", value: [] }, days("stop")) }), new Visit(), "on the page", literalValue);
+    expect(() => stopped.sent("intake", "Admission")).toThrow(/^The request's member 'VisitDays' must hold a list whose items all hold values\.$/);
+    const held = page();
+    held.join(plan({ own: field("VisitDays", ["visitDays"], convertedFrom(visitDays), { kind: "lit", value: [] }, days("empty")) }), new Visit(), "on the page", literalValue);
+    expect(held.sent("intake", "Admission")).toStrictEqual({ visitDays: [0, null] });
+  });
+});
+
+describe("when a container is rendered under a field prefix", () => {
+  const shiftSix = { model: "ShiftRow", prefix: { name: "Rows[1]", path: ["rows", 1] }, summary: "shift-6_summary", live: [] };
+  const rows: Containers = { "shift-6": shiftSix };
+  const row: Inputs = {
+    carer: field("Rows[1].Carer", ["rows", 1, "carer"], convertedFrom(literal("Ben"))),
+    hours: field("Rows[1].Hours", ["rows", 1, "hours"], convertedFrom(literal(6))),
+  };
+  const shift = (hidden: readonly HiddenInput[] = []): PageInputs => page(new Map([["shift-6", new Set(["carer", "hours", "id", "note"])]]), hidden);
+
+  test("ATypedTextReachesTheEndpoint: each input is sent under its name and its path past the prefix", () => {
+    const inputs = shift();
+    inputs.join(plan(row, rows, "ShiftRow"), new Visit(), "in the row's partial", literalValue);
+    const captured = inputs.captured("shift-6", "ShiftRow");
+    expect(captured.body).toStrictEqual({ carer: "Ben", hours: 6 });
+    expect(captured.inputs.map(input => [input.name, input.path])).toStrictEqual([["Carer", ["carer"]], ["Hours", ["hours"]]]);
+  });
+
+  test("AnInputOutsideThePrefixStopsTheSend: an input whose path the prefix does not open stops the capture, naming the input, the container and the prefix", () => {
+    const inputs = shift();
+    const owner = new Visit();
+    inputs.join(plan(row, rows, "ShiftRow"), owner, "in the row's partial", literalValue);
+    inputs.join(plan({ note: field("Note", ["note"], convertedFrom(literal("Late"))) }, {}, "ShiftNote"), owner, "in slot 'shift-note-6'", literalValue);
+    expect(() => inputs.captured("shift-6", "ShiftRow")).toThrow(/^Input 'note' binds 'Note' inside container 'shift-6', whose field prefix 'Rows\[1\]' does not open it\.$/);
+  });
+
+  test("two renderings of one container under two prefixes stop, as two models stop", () => {
+    const inputs = shift();
+    inputs.join(plan(row, rows, "ShiftRow"), new Visit(), "in the row's partial", literalValue);
+    inputs.join(plan({}, { "shift-6": { ...shiftSix, prefix: { name: "Rows[2]", path: ["rows", 2] } } }, "AnotherRow"), new Visit(), "in another partial", literalValue);
+    expect(() => inputs.captured("shift-6", "ShiftRow")).toThrow(/^Container 'shift-6' is rendered under the field prefixes 'Rows\[1\]' and 'Rows\[2\]'\.$/);
+  });
+
+  test("a live check takes its inputs as its container sends them", () => {
+    const inputs = shift();
+    const checked: Containers = { "shift-6": { ...shiftSix, live: [{ validator: "ShiftRules", ruleSet: "default", body: literal("the row's body") }] } };
+    inputs.join(plan(row, checked, "ShiftRow"), new Visit(), "in the row's partial", literalValue);
+    expect(inputs.liveChecksOf("carer").map(check => check.inputs.map(input => input.name))).toStrictEqual([["Carer", "Hours"]]);
+  });
+
+  test("AHiddenInputReachesAFormBodyAlone: a framework input rendered as a hidden input is sent once, under its name past the prefix", () => {
+    const inputs = shift([{ name: "Rows[1].Id", value: "6" }, { name: "Shift", value: "Night" }]);
+    inputs.join(plan({ id: field("Rows[1].Id", ["rows", 1, "id"], convertedFrom(literal(6))) }, rows, "ShiftRow"), new Visit(), "in the row's partial", literalValue);
+    expect(inputs.sends("shift-6", "ShiftRow")).toMatchObject({ kind: "captured", body: { members: { id: 6 }, hidden: [{ name: "Shift", value: "Night" }] } });
+  });
+});

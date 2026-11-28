@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@inject MoveInReads Reads
+@model SecondaryCoverageInput
+@{
+    var plan = Html.ReactivePlan<SecondaryCoverageInput>();
+}
+<fieldset>
+    <legend>Secondary coverage</legend>
+    @(Html.InputField(plan, m => m.PolicyNumber, o => o.Label("Secondary policy number")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Provider, o => o.Label("Secondary provider")).NativeTextBox())
+    @(Html.InputField(plan, m => m.ContributionPercent, o => o.Label("Secondary contribution percent")).NativeTextBox())
+    <fieldset><legend>Secondary coverage starts</legend>
+        @(Html.InputField(plan, m => m.StartsOn).ConformanceComponent(Reads.DayPicker("Secondary coverage starts", Model.StartsOn, Model.EndsOn)))
+    </fieldset>
+    <fieldset><legend>Secondary coverage ends</legend>
+        @(Html.InputField(plan, m => m.EndsOn).ConformanceComponent(Reads.DayPicker("Secondary coverage ends", Model.EndsOn, Model.StartsOn)))
+    </fieldset>
+</fieldset>
+@Html.RenderPlan(plan)

@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Kin
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Move in";
+    ViewData.TemplateInfo.HtmlFieldPrefix = "NextOfKin";
+    var plan = Html.ReactivePlan<Kin>();
+}
+<h1>Move in</h1>
+@(Html.InputField(plan, m => m.Name, options => options.Label("Next of kin")).NativeTextBox())
+<p id="saved"></p>
+<button type="button" @Html.Raises(plan, MoveIns.Save)>Save</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MoveIns.Save, pipeline => pipeline
+        .Post<MoveIn>(RefusalEndpoints.MoveIns, request => request.UrlEncoded(body => body.Input(r => r.NextOfKin.Name, pipeline.Input(m => m.Name))))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,40 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionPrintPacket
+@{
+    var plan = Html.ReactivePlan<AdmissionPrintPacket>();
+}
+<section id="admission-print-sheet">
+    @{ Html.InputField(plan, m => m.DraftId).WriteAdmissionReference(Model.Revision); }
+    <label for="packet-copy">Printable packet</label>
+    <textarea id="packet-copy" readonly rows="6">@Model.Contents</textarea>
+    <p>Supporting documents: @string.Join(", ", Model.Documents)</p>
+</section>
+@(Html.NativeButton("print-packet", "Print packet").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+{
+    var draft = pipeline.Container<MoveInPage>("move-in");
+    var page = pipeline.Plugin<AdmissionPagePlugin>();
+    var signer = pipeline.Plugin<Initials>().Of(Model.ResidentName);
+    pipeline.Post<PrintIntent>(MoveInEndpoints.PrintIntents, request => request
+            .Path(m => m.DraftId, Model.DraftId)
+            .Header(MoveInEndpoints.CoordinatorHeader, draft.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, draft.Read(m => m.OperationId))
+            .Json(body => body
+                .Set(m => m.PacketRevision, Model.Revision)
+                .Set(m => m.PageUrl, page.Url).Set(m => m.Signer, signer)))
+        .NoValidation()
+        .OnSuccess<SaveReply>((accepted, pipeline) =>
+        {
+            page.Prepare(pipeline.Object<AdmissionPrintPacket>(packet => packet.Set(m => m.DraftId, accepted.Body.Read(r => r.Receipt.DraftId))
+                .Set(m => m.Revision, accepted.Body.Read(r => r.Receipt.Version))));
+            page.Print();
+            pipeline.Element("packet-print-status").Text.Set(pipeline.Concat("Print requested by ", signer));
+        })
+        .OnError<ErrorEnvelope>(409, (stale, pipeline) => pipeline.Element("packet-print-status").Text.Set(stale.Body.Read(r => r.Error.Message)));
+}))
+<p id="packet-print-status">Ready to print</p>
+@Html.RenderPlan(plan)

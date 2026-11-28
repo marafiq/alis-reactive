@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundNotices
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Round";
+    var plan = Html.ReactivePlan<RoundNotices>();
+}
+<h1>Round</h1>
+<button type="button" @Html.Raises(plan, ShiftNoticeButtons.RecordADose)>Record a dose</button>
+<button type="button" @Html.Raises(plan, ShiftNoticeButtons.ReportAFall)>Report a fall</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ShiftNoticeButtons.RecordADose, pipeline => pipeline.Notice().Success("Dose recorded"))
+        .CustomEvent(ShiftNoticeButtons.ReportAFall, pipeline => pipeline.Notice().Error("Fall reported")));
+}
+@Html.RenderPlan(plan)

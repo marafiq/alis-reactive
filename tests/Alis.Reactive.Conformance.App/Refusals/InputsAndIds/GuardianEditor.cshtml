@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model Guardian
+@{
+    var plan = Html.ReactivePlan<Guardian>();
+}
+@(Html.InputField(plan, m => m.Name, options => options.Label("Guardian")).NativeTextBox())
+@Html.RenderPlan(plan)

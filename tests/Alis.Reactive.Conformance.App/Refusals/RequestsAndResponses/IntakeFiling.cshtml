@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model IntakeFiling
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The intake";
+    var plan = Html.ReactivePlan<IntakeFiling>();
+    var resident = Model.Resident;
+}
+<h1>Intake of @resident</h1>
+<button type="button" @Html.Raises(plan, IntakeFilings.Save)>Save</button>
+<p id="intake-filed"></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(IntakeFilings.Save, pipeline => pipeline
+        .Post<FiledIntake>(RefusalEndpoints.Intake, request => request.Set(r => r.Resident, resident))
+        .OnSuccess(Content.Text, (filed, pipeline) => pipeline.Element("intake-filed").Text.Set(filed.Body))));
+}
+@Html.RenderPlan(plan)

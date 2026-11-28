@@ -1,0 +1,72 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AllocationOwnerPage
+@{
+    var plan = Html.ReactivePlan<AllocationOwnerPage>();
+    void Hear(ConformancePeer peer, Pipeline<AllocationOwnerPage> pipeline)
+    {
+        var assessment = pipeline.Container<MobilityRequest>("assessment");
+        peer.Ratio.Set(assessment.Read(m => m.Ratio));
+        peer.Text.Set("Mobility assessment");
+        pipeline.Element("assessment-description").Text.Set(peer.Text);
+        pipeline.Listen(peer, handed => handed.Change, (change, pipeline) => pipeline.When(change.IsInteracted).Then(pipeline =>
+        {
+            var moveIn = pipeline.Container<MoveInPage>("move-in");
+            pipeline.Post<MobilityRequest>(MoveInEndpoints.MobilityReview, request => request
+                .Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+                .Header(MoveInEndpoints.AssessmentHeader, Model.Reference)
+                .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+                .Json(body => body
+                    .Set(sent => sent.Ratio, peer.Ratio)
+                    .Set(sent => sent.Description, change.Value.IfNull(peer.Text))
+                    .Set(sent => sent.PreviousDescription, change.PreviousValue)))
+                .Validate<MobilityRules>()
+                .OnSuccess<SaveReply>((saved, pipeline) => pipeline.Element("assessment-result").Text.Set(pipeline.Concat("Mobility review accepted: ", saved.Body.Read(reply => reply.Receipt.Reference))))
+                .OnError<ErrorEnvelope>(422, (failed, pipeline) => pipeline.Element("assessment-result").Text.Set(failed.Body.Read(reply => reply.Error.Message)))
+                .OnError((failed, pipeline) => pipeline.Element("assessment-result").Text.Set("The mobility review request failed."))
+                .Chained((saved, pipeline) => pipeline.Get<DeskQuery>(CareEndpoints.MoveInOwnerHistory, request => request.Query(query => query.DraftId, saved.Body.Read(reply => reply.Receipt.DraftId))).Into("owner-history"));
+        }));
+    }
+}
+<h3>Allocation assessment</h3>
+@await Html.PartialAsync("/Care/MoveIn/Assessment.cshtml", new MobilityRequest { DraftId = Model.DraftId, Ratio = 25 })
+<p id="assessment-description"></p>
+<p id="assessment-result"></p>
+@(Html.NativeButton("open-payer-owner", "Open payer handoff").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Get<DeskQuery>(CareEndpoints.MoveInPayerOwner, request => request.Query(query => query.DraftId, Model.DraftId)).Into("payer-owner")))
+@(Html.NativeButton("close-payer-owner", "Close payer handoff").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Unload("payer-owner")))
+<div id="payer-owner"></div>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline =>
+    {
+        var component = pipeline.Component<ConformanceComponent>("allocation-panel");
+        pipeline.Listen(component, panel => panel.Handed, (peer, pipeline) => Hear(peer, pipeline));
+        pipeline.Listen(component, panel => panel.Raised, (raised, pipeline) => Hear(raised.Peer, pipeline));
+        pipeline.Listen(pipeline.Component<ConformanceCallbacks>("room-handoff"), callbacks => callbacks.OnRaised, (raised, pipeline) =>
+        {
+            pipeline.Component<ConformanceCallbacks>("room-handoff").Append("Admission");
+            var moveIn = pipeline.Container<MoveInPage>("move-in");
+            pipeline.When(raised.Room.Matches("^[0-9]+$")).Then(pipeline => pipeline
+                .Post<RoomReviewRequest>(MoveInEndpoints.RoomReview, request => request
+                    .Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+                    .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+                    .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId))
+                    .Json(body => body
+                        .Set(sent => sent.Room, raised.Room)
+                        .Set(sent => sent.Reference, pipeline.Concat("ROOM", raised.Room))
+                        .Set(sent => sent.CoordinatorId, moveIn.Read(m => m.CoordinatorId))))
+                .Validate<RoomReviewRules>()
+                .OnSuccess<SaveReply>((saved, pipeline) => pipeline.Element("room-result").Text.Set(pipeline.Concat("Room review accepted: ", saved.Body.Read(reply => reply.Receipt.Reference))))
+                .OnError<ErrorEnvelope>(423, (failed, pipeline) => pipeline.Element("room-result").Text.Set(failed.Body.Read(reply => reply.Error.Message)))
+                .Chained((saved, pipeline) => pipeline.Get<DeskQuery>(CareEndpoints.MoveInOwnerHistory, request => request.Query(query => query.DraftId, saved.Body.Read(reply => reply.Receipt.DraftId))).Into("owner-history")));
+        });
+    }));
+}
+@Html.RenderPlan(plan)

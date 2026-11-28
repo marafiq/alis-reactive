@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AnsweredAlarm
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Answered alarm";
+    var plan = Html.ReactivePlan<AnsweredAlarm>();
+}
+<h1>@Model.Alarm of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Alarm })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => raised.WriteOnlyText.Set("Kappa"))
+    .Reactive(panel => panel.Raised, (raised, pipeline) => raised.Answer.Set(item => pipeline.Concat(item.Name, " by Lambda"))))
+@Html.RenderPlan(plan)

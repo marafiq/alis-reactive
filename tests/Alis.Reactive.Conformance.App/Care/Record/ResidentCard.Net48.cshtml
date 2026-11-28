@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentCard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident card";
+    var plan = Html.ReactivePlan<ResidentCard>();
+}
+<h1>Resident card</h1>
+<section id="card-tab" aria-label="Details"></section>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.DetailsTab).Into("card-tab")));
+}
+@Html.RenderPlan(plan)

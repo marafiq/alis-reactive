@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitChoices
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Visits";
+    var plan = Html.ReactivePlan<VisitChoices>();
+}
+<h1>Visits</h1>
+@(Html.FusionSplitButton(plan, "visit-choices", build => build
+    .Content("Book a visit")
+    .Items(new List<FusionSplitButton.ItemModel> { new() { Text = "Reschedule a visit" }, new() { Text = "Cancel a visit" } }))
+    .Reactive(button => button.Select, (chosen, pipeline) => pipeline
+        .Element("visit-choice").Text.Set(chosen.Item.Read(item => item.Text))))
+<p>Chosen: <output id="visit-choice">-</output></p>
+@Html.RenderPlan(plan)

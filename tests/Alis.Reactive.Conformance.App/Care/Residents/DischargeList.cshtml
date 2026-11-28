@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DischargeList
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Discharges";
+    var plan = Html.ReactivePlan<DischargeList>();
+}
+<h1>Discharges</h1>
+<button type="button" @Html.Raises(plan, DischargeListButtons.LoadResidents)>Load residents</button>
+<div id="residents-slot"></div>
+<p>Discharged: <span id="count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DischargeListButtons.LoadResidents, pipeline => pipeline
+        .Get(WardRowsEndpoints.DischargeListRows)
+        .Into("residents-slot")));
+}
+@Html.RenderPlan(plan)

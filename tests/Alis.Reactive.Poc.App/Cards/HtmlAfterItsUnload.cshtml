@@ -1,0 +1,14 @@
+@using Alis.Reactive.Poc.App.Cards
+@model CardsWard
+@{
+    var plan = Html.ReactivePlan<CardsWard>();
+}
+<section id="card"></section>
+
+@(plan.Button("close", "Close the card")
+    .Reactive(button => button.Click, pipeline => pipeline.Unload("card")))
+
+@(plan.Button("write-card", "Write the card")
+    .Reactive(button => button.Click, pipeline => pipeline.Element("card").Html.Set("<p>Written</p>")))
+
+@Html.RenderPlan(plan)

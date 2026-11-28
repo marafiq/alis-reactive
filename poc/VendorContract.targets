@@ -1,0 +1,22 @@
+<Project>
+
+  <PropertyGroup>
+    <VendorContractScript>$(MSBuildThisFileDirectory)tools/vendor-contract.mjs</VendorContractScript>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)Alis.Reactive.Poc.Analyzers/Alis.Reactive.Poc.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <VendorContractInput Include="$(VendorContractScript);$(VendorContractTsConfig);$(MSBuildThisFileDirectory)runtime/tsconfig.json;$(MSBuildThisFileDirectory)../package-lock.json" />
+  </ItemGroup>
+
+  <Target Name="WriteVendorContract" Inputs="@(VendorContractInput)" Outputs="$(IntermediateOutputPath)vendor-contract.tsv">
+    <Exec Command="node &quot;$(VendorContractScript)&quot; &quot;$(VendorContractTsConfig)&quot; &quot;$(IntermediateOutputPath)vendor-contract.tsv&quot;" />
+  </Target>
+
+  <Target Name="ReadVendorContract" DependsOnTargets="WriteVendorContract" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <AdditionalFiles Include="$(IntermediateOutputPath)vendor-contract.tsv" />
+    </ItemGroup>
+  </Target>
+
+</Project>

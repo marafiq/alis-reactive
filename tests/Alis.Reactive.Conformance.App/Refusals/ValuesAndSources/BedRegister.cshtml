@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedRegister
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Bed register";
+    var plan = Html.ReactivePlan<BedRegister>();
+}
+<h1>Bed register of the @Model.Ward</h1>
+@(plan.ConformanceComponent("register", new ConformanceStart { Text = "Register" }))
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(BedRegisters.Beds)
+        .OnSuccess<RegisteredBeds>((registered, pipeline) => pipeline.Component<ConformanceComponent>("register").Records.Set(registered.Body.Read(register => register.Beds)))));
+}
+@Html.RenderPlan(plan)

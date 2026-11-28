@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model MemoryCareInput
+@{
+    var plan = Html.ReactivePlan<MemoryCareInput>();
+}
+<fieldset>
+    <legend>Memory care</legend>
+    @(Html.InputField(plan, m => m.AssessmentCode, options => options.Label("Assessment code")).NativeTextBox())
+    @(Html.InputField(plan, m => m.SecureUnitConsent, options => options.Label("Secure unit consent")).NativeCheckBox())
+    @(Html.InputField(plan, m => m.RepresentativeContactId, options => options.Label("Representative contact")).NativeTextBox())
+</fieldset>
+@Html.RenderPlan(plan)

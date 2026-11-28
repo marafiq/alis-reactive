@@ -1,0 +1,64 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalFormats
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Arrival correspondence";
+    var plan = Html.ReactivePlan<ArrivalFormats>();
+}
+<h1>Arrival correspondence</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").StrictMode(true)))
+</fieldset>
+@(Html.NativeButton("print-ledger-date", "Print ledger date")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Format.Set("dd.MM.yyyy");
+        date.DataBind();
+    }))
+@(Html.NativeButton("print-resident-letter", "Print resident letter")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Format.Set("MMMM d, yyyy");
+        date.DataBind();
+    }))
+@(Html.NativeButton("use-full-correspondence-date", "Use full correspondence date")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FormatPattern.Set(new FusionDateFormatPattern { Skeleton = "full" });
+        date.DataBind();
+    }))
+@(Html.NativeButton("restore-local-date", "Restore local date")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Format.Set((string?)null);
+        date.DataBind();
+    }))
+@(Html.NativeButton("accept-european-referral", "Accept European referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.InputFormats.Set(new[] { "dd.MM.yyyy" });
+        date.DataBind();
+    }))
+@(Html.NativeButton("use-ordinary-referral", "Use ordinary referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.InputFormats.Set((string[]?)null);
+        date.DataBind();
+    }))
+@Html.RenderPlan(plan)

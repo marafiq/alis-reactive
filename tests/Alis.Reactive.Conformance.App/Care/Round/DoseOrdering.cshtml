@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseOrdering
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose order";
+    var plan = Html.ReactivePlan<DoseOrdering>();
+}
+<h1>Dose order</h1>
+@using (var order = Html.BeginRequestContainer(plan, "dose-order"))
+{
+    <fieldset>
+        <legend>Doses</legend>
+        @(Html.InputField(plan, m => m.Doses, options => options.Label("Doses")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("show-doses", "Show").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Element("dose-echo").Text.Set(order.Container.Read(m => m.Doses))))
+    @(Html.NativeButton("save-order", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<DoseOrdering>(DoseOrderingEndpoints.Orders, request => request.Inputs(order.Container))
+        .Validate<DoseOrderingRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("order-status").Text.Set(saved.Body))))
+}
+<p>Doses ordered: <span id="dose-echo"></span></p>
+<p>Order: <span id="order-status">Not saved</span></p>
+@Html.RenderPlan(plan)

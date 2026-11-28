@@ -1,0 +1,60 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model TransferHandoverReview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Transfer calendar review";
+    var plan = Html.ReactivePlan<TransferHandoverReview>();
+}
+<h1>Transfer calendar review</h1>
+<style>
+    .local-register { position: fixed; top: 56px; left: 24px; width: 420px; height: 190px; overflow-y: scroll; }
+    .local-register .ward-handover { margin-top: 12rem; }
+    .review-actions { margin-top: 16rem; }
+</style>
+<section aria-label="Transfer handover" class="@(Model.UseBookingSheet ? "booking-sheet" : "local-register")">
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Close, (closing, pipeline) =>
+        {
+            var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+            pipeline.When(date.Value.Eq(new DateTime(2026, 7, 14))).Then(pipeline =>
+            {
+                closing.Cancel.Set(true);
+                var panel = closing.Popup;
+                var parents = panel.GetScrollableParent(panel.AnchorTarget);
+                pipeline.When(parents.Count().Eq(1).And(parents.At(0).NodeType.Eq(1)).And(parents.At(0).NodeName.Eq("SECTION")))
+                    .Then(pipeline => pipeline.Element("review-instruction").Text.Set("Use the next record in this transfer register."))
+                    .ElseIf(parents.Count().Eq(1).And(parents.At(0).NodeType.Eq(9)).And(parents.At(0).NodeName.Eq("#document")))
+                    .Then(pipeline => pipeline.Element("review-instruction").Text.Set("Use the handover on the booking sheet."));
+            });
+        }))
+</fieldset>
+<h2 class="ward-handover">Ward handover</h2>
+<p>Confirm the room with the receiving team.</p>
+</section>
+<div class="review-actions">
+@(Html.NativeButton("open-transfer-review", "Open transfer review")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+@(Html.NativeButton("continue-calendar-review", "Continue calendar review")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Hide();
+    }))
+</div>
+<p><output id="review-instruction" aria-label="Review instruction">Review the selected arrival.</output></p>
+@Html.RenderPlan(plan)

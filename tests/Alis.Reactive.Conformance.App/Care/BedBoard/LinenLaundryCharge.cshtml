@@ -1,0 +1,95 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model LaundryInvoice
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Laundry invoice";
+    var plan = Html.ReactivePlan<LaundryInvoice>();
+}
+<h1>Laundry invoice</h1>
+<fieldset>
+    <legend>Invoiced charge</legend>
+    @(Html.InputField(plan, m => m.Charge, options => options.Label("Laundry charge"))
+        .FusionNumericTextBox(build => build.Format("n2")))
+    @(Html.NativeButton("euro", "Prepare euro invoice")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var field = pipeline.Input(m => m.Charge).Component<FusionNumericTextBox<decimal?>>();
+            field.Format.Set("c2");
+            field.Currency.Set("EUR");
+            field.DataBind();
+            pipeline.When(field.Format.Eq("c2").And(field.Currency.Eq("EUR")))
+                .Then(p => p.Element("invoice-preview").Text.Set(field.GetText()));
+        }))
+    @(Html.NativeButton("dollar", "Prepare dollar invoice")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var field = pipeline.Input(m => m.Charge).Component<FusionNumericTextBox<decimal?>>();
+            field.Format.Set("c2");
+            field.Currency.Set("USD");
+            field.DataBind();
+            pipeline.When(field.Format.Eq("c2").And(field.Currency.Eq("USD")))
+                .Then(p => p.Element("invoice-preview").Text.Set(field.GetText()));
+        }))
+</fieldset>
+<p><output id="invoice-preview" aria-label="Invoice preview">Invoice not prepared</output></p>
+@(Html.NativeButton("community-currency", "Use community billing currency")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var charge = pipeline.Input(m => m.Charge).Component<FusionNumericTextBox<decimal?>>();
+            charge.Currency.Set((string?)null);
+            charge.DataBind();
+            pipeline.When(charge.Currency.IsNull())
+                .Then(p =>
+                {
+                    p.Element("invoice-preview").Text.Set(charge.GetText());
+                    p.Element("billing-source").Text.Set("Community billing currency");
+                });
+        }))
+@(Html.NativeButton("euro-contract", "Keep euro contract")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var charge = pipeline.Input(m => m.Charge).Component<FusionNumericTextBox<decimal?>>();
+            charge.Format.Set("c2");
+            charge.Currency.Set("EUR");
+            charge.DataBind();
+            pipeline.When(charge.Currency.Eq("EUR"))
+                .Then(p =>
+                {
+                    p.Element("invoice-preview").Text.Set(charge.GetText());
+                    p.Element("billing-source").Text.Set("Contract billing currency");
+                });
+        }))
+<p><output id="billing-source" aria-label="Billing source">No contract selected</output></p>
+<fieldset>
+    <legend>Charge transcription</legend>
+    @(Html.NativeButton("read-transcription", "Read amount for transcription")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var charge = pipeline.Input(m => m.Charge).Component<FusionNumericTextBox<decimal?>>();
+            charge.Format.Set("c2");
+            charge.Currency.Set("USD");
+            charge.DataBind();
+            charge.FocusIn();
+            pipeline.Element("transcription-guide").Text.Set(charge.GetText());
+        }))
+    @(Html.NativeButton("signed-charge", "Read signed invoice")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var charge = pipeline.Input(m => m.Charge).Component<FusionNumericTextBox<decimal?>>();
+            charge.Format.Set("c2");
+            charge.Currency.Set("USD");
+            charge.DataBind();
+            charge.FocusIn();
+            charge.FocusOut();
+            pipeline.Element("invoice-preview").Text.Set(charge.GetText());
+        }))
+    <p><output id="transcription-guide" aria-label="Transcription guide">Choose a charge</output></p>
+</fieldset>
+@Html.RenderPlan(plan)

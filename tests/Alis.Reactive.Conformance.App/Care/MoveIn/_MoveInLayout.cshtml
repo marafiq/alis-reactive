@@ -1,0 +1,38 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@inject AdmissionDeskProfile Admissions
+@using Alis.Reactive.Native.NativeAppLevelObjects
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+    <style>
+        @@media print {
+            html[data-print-mode="admission"] body * { visibility: hidden; }
+            html[data-print-mode="admission"] #admission-print-sheet,
+            html[data-print-mode="admission"] #admission-print-sheet * { visibility: visible; }
+            html[data-print-mode="admission"] #admission-print-sheet { position: absolute; left: 0; top: 0; }
+        }
+    </style>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <main>
+        @RenderBody()
+    </main>
+    @Html.NativeDrawer("Close")
+    @Html.NativeConfirm("Please confirm", ok: "Yes", cancel: "No")
+    @Html.NativeReconnectOffer("Live availability is unavailable.", retry: "Reconnect")
+    @Html.ConformanceBusy()
+    @Html.ConformanceNotice()
+    <script src="~/js/alis-reactive-conformance.js" asp-append-version="true"></script>
+    @if (Admissions.UsesSession)
+    {
+        <script src="~/js/world/care-session.js" asp-append-version="true"></script>
+    }
+    <script src="~/js/care/movein/admission-page.js" asp-append-version="true"></script>
+    <script src="~/_content/AlisReactive.Native/js/alis-reactive-native.js" asp-append-version="true"></script>
+    <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
+</body>
+</html>

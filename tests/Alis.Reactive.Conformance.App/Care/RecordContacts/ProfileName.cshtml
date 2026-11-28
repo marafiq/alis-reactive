@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ProfileName
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident profile";
+    var plan = Html.ReactivePlan<ProfileName>();
+}
+<h1>Resident profile</h1>
+<fieldset>
+    <legend>Preferred name</legend>
+    @(Html.InputField(plan, m => m.PreferredName, options => options.Label("Preferred name")).FusionTextBox())
+</fieldset>
+@Html.RenderPlan(plan)

@@ -1,0 +1,277 @@
+using System.Diagnostics;
+using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+using Alis.Reactive.Conformance.App.World;
+using Alis.Reactive.Conformance.World;
+using Alis.Reactive.RenderingAndDelivery;
+using Alis.Reactive.RequestsAndResponses;
+using Alis.Reactive.Tracing;
+using Alis.Reactive.TriggersAndPipelines;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
+using OpenTelemetry;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Trace;
+using Syncfusion.Licensing;
+
+namespace Alis.Reactive.Conformance.App;
+
+internal static class AppHost
+{
+    private const string Urls = "urls";
+    private const string ASecondPort = "http://127.0.0.1:0";
+    private const string SyncfusionsLicenceKey = "SYNCFUSION_LICENSE_KEY";
+
+    internal static void RegisterSyncfusionsLicence(IConfiguration configuration)
+    {
+        if (configuration[SyncfusionsLicenceKey] is { Length: > 0 } licence) SyncfusionLicenseProvider.RegisterLicense(licence);
+    }
+
+    internal static void SetJsonOptions(string host, JsonSerializerOptions json)
+    {
+        switch (host)
+        {
+            case HostNames.Admissions:
+            case HostNames.PublicInformation:
+            case HostNames.Net10:
+            case HostNames.FusionShell:
+            case HostNames.NoRequests:
+            case HostNames.NoAntiforgeryChoice:
+            case HostNames.SiteHeader:
+            case HostNames.AntiforgeryField:
+            case HostNames.NoShowValidationErrors:
+            case HostNames.ClassNames:
+            case HostNames.DefaultHooks:
+            case HostNames.Tracing:
+            case HostNames.TracingSinkThrows:
+            case HostNames.RealtimeNoOffer:
+            case HostNames.NoReconnectComponent:
+            case HostNames.NoReconnectOffer:
+                WriteEnumNames(json);
+                return;
+            case HostNames.NumbersAsText:
+                WriteEnumNames(json);
+                json.NumberHandling = JsonNumberHandling.WriteAsString;
+                return;
+            case HostNames.DateConverter:
+                WriteEnumNames(json);
+                json.Converters.Add(new DayFirstDates());
+                return;
+            case HostNames.SnakeCase:
+                WriteEnumNames(json);
+                json.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+                return;
+            case HostNames.PascalCase:
+                WriteEnumNames(json);
+                json.PropertyNamingPolicy = null;
+                return;
+            case HostNames.EnumsAsNumbers:
+                return;
+            case HostNames.EnumNamesAlone:
+                json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
+                return;
+            case HostNames.JsonContract:
+                WriteEnumNames(json);
+                json.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+                json.RespectRequiredConstructorParameters = true;
+                json.TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { LeaveOutTheAdmissionsPharmacy } };
+                return;
+            default:
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.FusionShell}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.EnumNamesAlone}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}, {HostNames.AntiforgeryField}, {HostNames.NoShowValidationErrors}, {HostNames.ClassNames}, {HostNames.DefaultHooks}, {HostNames.Tracing}, {HostNames.TracingSinkThrows}, {HostNames.RealtimeNoOffer}, {HostNames.NoReconnectComponent} and {HostNames.NoReconnectOffer}.");
+        }
+    }
+
+    private static void LeaveOutTheAdmissionsPharmacy(JsonTypeInfo type)
+    {
+        if (type.Type != typeof(Care.WardAdmission)) return;
+        var pharmacy = JsonNamingPolicy.CamelCase.ConvertName(nameof(Care.WardAdmission.Pharmacy));
+        type.Properties.Remove(type.Properties.Single(member => member.Name == pharmacy));
+    }
+
+    internal static void AddRequests(string host, IServiceCollection services)
+    {
+        switch (host)
+        {
+            case HostNames.Admissions:
+                Care.AdmissionRequestPolicy.Register(services);
+                return;
+            case HostNames.PublicInformation:
+                services.AddReactiveRequests(requests => requests.NoAntiforgery());
+                return;
+            case HostNames.NoRequests:
+                return;
+            case HostNames.NoAntiforgeryChoice:
+                services.AddReactiveRequests(requests => { });
+                return;
+            case HostNames.SiteHeader:
+                services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.Header).Header("Care-Site", "North"));
+                return;
+            case HostNames.AntiforgeryField:
+                services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.FormField));
+                return;
+            case HostNames.NoShowValidationErrors:
+                services.AddReactiveRequests(requests => TheRoutesAndRetry(requests.Antiforgery(AntiforgeryIn.Header).ShowBusy()));
+                return;
+            case HostNames.DefaultHooks:
+                services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.Header)
+                    .WhileLoading(pipeline => pipeline.Plugin<CareSession>().Renew())
+                    .Finally(pipeline =>
+                    {
+                        pipeline.Element(DefaultHooks.RequestLog).Text.Append("defaults finally ");
+                        pipeline.Plugin<CareSession>().Flush();
+                        pipeline.Element(DefaultHooks.FlushLine).Text.Set("flushed");
+                    }));
+                return;
+            default:
+                services.AddReactiveRequests(requests => TheDefaults(requests, AntiforgeryIn.Header));
+                return;
+        }
+    }
+
+    private static RequestDefaults TheDefaults(RequestDefaults requests, AntiforgeryIn place)
+        => TheRoutesAndRetry(requests.Antiforgery(place).ShowBusy().ShowValidationErrors());
+
+    private static RequestDefaults TheRoutesAndRetry(RequestDefaults requests) => requests
+        .OnError(401, Content.None, (expired, pipeline) => pipeline.Notice().Warning("Your session has ended."))
+        .OnError((failed, pipeline) => pipeline.Notice().Error("The request failed."))
+        .Retry(3, TimeSpan.FromSeconds(2));
+
+    internal static void AddRealtime(string host, IServiceCollection services)
+    {
+        services.AddSingleton(new Components.LiveLayout(host != HostNames.NoReconnectComponent));
+        services.AddSignalR();
+        services.AddOptions<JsonHubProtocolOptions>().Configure<IOptions<JsonOptions>>((hub, mvc) => hub.PayloadSerializerOptions = mvc.Value.JsonSerializerOptions);
+        switch (host)
+        {
+            case HostNames.RealtimeNoOffer:
+                services.AddReactiveRealtime(live => live.ReconnectionInterval(Components.LiveStreams.Reconnection));
+                return;
+            case HostNames.NoReconnectOffer:
+                services.AddReactiveRealtime(live => live.NoReconnectOffer().ReconnectionInterval(Components.LiveStreams.Reconnection));
+                return;
+            default:
+                services.AddReactiveRealtime(live => live.ShowReconnect().ReconnectionInterval(Components.LiveStreams.Reconnection));
+                return;
+        }
+    }
+
+    internal static void AddClassNames(string host, IServiceCollection services)
+    {
+        if (host != HostNames.ClassNames) return;
+        services.AddReactiveClassNames(names =>
+        {
+            names.FieldMessage = "invalid-feedback";
+            names.InvalidInput = "is-invalid";
+        });
+    }
+
+    internal static void AddTracing(string host, WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton(host == HostNames.TracingSinkThrows ? Care.TracedLayoutSink.TheAppsThrowingObject : Care.TracedLayoutSink.TheOpenTelemetryAdapter);
+        if (!Traces(host)) return;
+        if (!builder.Environment.IsDevelopment()) throw new InvalidOperationException("The tracing host exports to the World area's collector, which the app serves in Development alone.");
+
+        var urls = builder.Configuration[Urls] ?? throw new InvalidOperationException("The tracing host adds a second port to the address --urls names.");
+        builder.WebHost.UseUrls(urls, ASecondPort);
+        builder.Services.AddOpenTelemetry().WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation()
+            .AddSource(ReactiveTracing.SourceName)
+            .SetSampler(services => new ParentBasedSampler(new RendersSampler(services.GetRequiredService<IHttpContextAccessor>(), services.GetRequiredService<Worlds>())))
+            .AddProcessor(services => new SimpleActivityExportProcessor(new InMemoryExporter<Activity>(services.GetRequiredService<ExportedActivities>()))));
+        builder.Services.AddCors();
+        builder.Services.AddOptions<CorsOptions>().Configure<SecondOrigin>((cors, second) => cors.AddPolicy(SecondOrigin.Policy, policy => policy
+            .SetIsOriginAllowed(second.IsThisServers)
+            .WithMethods(HttpMethods.Get)
+            .WithHeaders(HeaderNames.TraceParent, HeaderNames.TraceState, HeaderNames.Baggage)));
+    }
+
+    internal static void UseTracing(string host, WebApplication app)
+    {
+        if (!Traces(host)) return;
+
+        app.UseRouting();
+        app.UseSecondOrigin();
+        app.UseCors();
+        app.MapCollector();
+    }
+
+    private static bool Traces(string host) => host is HostNames.Tracing or HostNames.TracingSinkThrows;
+
+    internal static void AddValidation(IServiceCollection services)
+        => services.AddReactiveFluentValidation(validators => Care.MoveInValidators.AddTo(validators
+            .Add<Bench.CodeRules>()
+            .Add<Bench.StrictCodeRules>()
+            .Add<Bench.EntriesRules>()
+            .Add<Bench.FirstRules>()
+            .Add<Care.ArrivalIntakeRules>()
+            .Add<Care.ArrivalDeskRules>()
+            .Add<Care.ArrivalKinRules>()
+            .Add<Care.NightCoverRules>()
+            .Add<Care.IntakeValidator>()
+            .Add<Care.FamilyValidator>()
+            .Add<Care.BedAssignmentRules>()
+            .Add<Care.BedNoteRules>()
+            .Add<Care.EveningBedNoteRules>()
+            .Add<Care.BedHandoverRules>()
+            .Add<Care.DeputyAppointmentRules>()
+            .Add<Care.DeputyNamelessAppointmentRules>()
+            .Add<Care.HomeLeadRules>()
+            .Add<Care.DeputyCodeCardRules>()
+            .Add<Care.HouseholdContactsRules>()
+            .Add<Care.AdmissionWardRules>()
+            .Add<Care.IntakeAssessmentRules>()
+            .Add<Care.QuickAdmissionRules>()
+            .Add<Care.ResidentIntakeRules>()
+            .Add<Care.ResidentAdmissionRules>()
+            .Add<Care.NextOfKinAdmissionRules>()
+            .Add<Care.RoomAdmissionRules>()
+            .Add<Care.RoomNumberingRules>()
+            .Add<Care.StateMoveInTexasRules>()
+            .Add<Care.StateMoveInMassachusettsRules>()
+            .Add<Care.VisitorSignInRules>()
+            .Add<Care.WardAssignmentRules>()
+            .Add<Care.CarePlanRules>()
+            .Add<Care.CareRotaRules>()
+            .Add<Care.EarlyCareRotaRules>()
+            .Add<Care.RoundDosingRules>()
+            .Add<Care.SupplyCountRules>()
+            .Add<Care.EmergencyStocktakeRules>()
+            .Add<Care.DoseOrderingRules>()
+            .Add<Care.RepeatDoseOrderRules>()
+            .Add<Care.ShiftPlanRules>()
+            .Add<Care.LeastDoseRoundRules>()
+            .Add<Care.RoundValidator>()
+            .Add<Care.WardRoundDoseRules>()
+            .Add<Care.VisitorPassRules>()
+            .Add<Care.CareLevelChoiceRules>()
+            .Add<Care.KinDeskRules>()
+            .Add<Care.ServerCheckedKinDeskRules>()
+            .Add<Care.WardSignInRules>()
+            .Add<Care.AddressAdmissionRules>()
+            .Add<Care.WardPharmacyAdmissionRules>()
+            .Add<Care.WardPharmacyAdmissionInItsContractRules>()
+            .Add<Care.ResidentDetailsRules>()
+            .Add<Care.RosterRules>()
+            .Add<Care.ShiftRules>()
+            .Add<Care.HandoverNotesRules>()
+            .Add<Refusals.VisitValidator>()
+            .Add<Refusals.RosterRules>()));
+
+    private static void WriteEnumNames(JsonSerializerOptions json) => json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+
+    private sealed class DayFirstDates : JsonConverter<DateTime>
+    {
+        private const string Form = "dd.MM.yyyy";
+
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => DateTime.ParseExact(reader.GetString()!, Form, CultureInfo.InvariantCulture);
+
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+            => writer.WriteStringValue(value.ToString(Form, CultureInfo.InvariantCulture));
+    }
+}

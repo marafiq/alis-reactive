@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CallbackCard
+@{
+    var plan = Html.ReactivePlan<CallbackCard>();
+}
+<p>@Model.Note</p>
+<button type="button" @Html.Raises(plan, CallbackCardButtons.OpenTheInnerCard)>Open the inner card</button>
+<button type="button" @Html.Raises(plan, CallbackCardButtons.CloseTheInnerCard)>Close the inner card</button>
+<section id="inner" aria-label="Inner card"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Listen(
+            pipeline.Component<ConformanceCallbacks>("callbacks"),
+            callbacks => callbacks.OnRaised,
+            (raised, pipeline) => pipeline.Component<ConformanceCallbacks>("callbacks").Append("card")))
+        .CustomEvent(CallbackCardButtons.OpenTheInnerCard, pipeline => pipeline.Get(VendorSlotCards.InnerCard).Into("inner"))
+        .CustomEvent(CallbackCardButtons.CloseTheInnerCard, pipeline => pipeline.Unload("inner")));
+}
+@Html.RenderPlan(plan)

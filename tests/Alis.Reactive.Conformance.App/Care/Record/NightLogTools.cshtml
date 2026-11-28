@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NightLogTools
+@{
+    var plan = Html.ReactivePlan<NightLogTools>();
+}
+<h2>@Model.Shift</h2>
+<button type="button" @Html.Raises(plan, NightLogs.LoadTheEntry)>Load the entry</button>
+<button type="button" @Html.Raises(plan, NightLogs.CloseTheEntry)>Close the entry</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(NightLogs.LoadTheEntry, pipeline => pipeline.Get(NightLogEndpoints.Entry).Into("log-entry"))
+        .CustomEvent(NightLogs.CloseTheEntry, pipeline => pipeline.Unload("log-entry")));
+}
+@Html.RenderPlan(plan)

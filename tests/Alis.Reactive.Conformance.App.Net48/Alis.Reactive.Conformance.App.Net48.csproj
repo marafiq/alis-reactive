@@ -1,0 +1,86 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>Alis.Reactive.Conformance.App</RootNamespace>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <ConformanceApp>$(MSBuildThisFileDirectory)../Alis.Reactive.Conformance.App/</ConformanceApp>
+    <WorldContract>$(MSBuildThisFileDirectory)../Alis.Reactive.Conformance.World/</WorldContract>
+    <TwinSite Condition="'$(OS)' == 'Windows_NT'">C:\AlisReactive.Twin\</TwinSite>
+    <TwinSite Condition="'$(OS)' != 'Windows_NT'">$(MSBuildThisFileDirectory)obj/site/</TwinSite>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AlisReactive" Version="$(PACKAGE_VERSION)" />
+    <PackageReference Include="AlisReactive.Native" Version="$(PACKAGE_VERSION)" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.15" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="PolySharp" Version="1.17.0" PrivateAssets="all" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(WorldContract)**/*.cs" Exclude="$(WorldContract)bin/**;$(WorldContract)obj/**" Link="WorldContract/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(ConformanceApp)**/*.Net48.cs" Exclude="$(ConformanceApp)bin/**;$(ConformanceApp)obj/**" Link="ConformanceApp/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(ConformanceApp)World/ReadyPage.cs" Link="ConformanceApp/World/ReadyPage.cs" />
+    <Compile Include="$(ConformanceApp)Refusals/RequestsAndResponses/RoundsBoard.cs" Link="ConformanceApp/Refusals/RequestsAndResponses/RoundsBoard.cs" />
+    <Compile Include="$(ConformanceApp)Care/Record/VisitBoard.cs" Link="ConformanceApp/Care/Record/VisitBoard.cs" />
+    <Compile Include="$(ConformanceApp)Care/Record/ShiftRoster.cs" Link="ConformanceApp/Care/Record/ShiftRoster.cs" />
+    <Compile Include="$(ConformanceApp)Care/Record/CarePlanReview.cs" Link="ConformanceApp/Care/Record/CarePlanReview.cs" />
+    <Compile Include="$(ConformanceApp)Care/Record/HandoverNotes.cs" Link="ConformanceApp/Care/Record/HandoverNotes.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/AdmitResident.cs" Link="ConformanceApp/Care/Admission/AdmitResident.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/IntakeDocuments.cs" Link="ConformanceApp/Care/Admission/IntakeDocuments.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/IntakeDocumentFile.cs" Link="ConformanceApp/Care/Admission/IntakeDocumentFile.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/RoomNumbering.cs" Link="ConformanceApp/Care/Admission/RoomNumbering.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/RoomIntake.cs" Link="ConformanceApp/Care/Admission/RoomIntake.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/SavedIntake.cs" Link="ConformanceApp/Care/Admission/SavedIntake.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/ContactMoveIn.cs" Link="ConformanceApp/Care/Admission/ContactMoveIn.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/BedNotes.cs" Link="ConformanceApp/Care/Admission/BedNotes.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/ResidentDetails.cs" Link="ConformanceApp/Care/Admission/ResidentDetails.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/DeputyAppointment.cs" Link="ConformanceApp/Care/Admission/DeputyAppointment.cs" />
+    <Compile Include="$(ConformanceApp)Care/Round/LeastDoseRound.cs" Link="ConformanceApp/Care/Round/LeastDoseRound.cs" />
+    <TwinView Include="$(ConformanceApp)**/*.Net48.cshtml" Exclude="$(ConformanceApp)bin/**;$(ConformanceApp)obj/**" />
+    <TwinView Include="$(ConformanceApp)World/Ready.cshtml" />
+    <TwinView Include="$(ConformanceApp)Refusals/RequestsAndResponses/RoundsBoard.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Record/VisitBoard.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Record/VisitBoardDesk.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Record/ShiftRosterRow.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Record/ShiftRosterNote.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Record/ShiftSheet.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Record/CarePlanReview.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Record/HandoverNotes.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/AdmitResident.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/IntakeDocuments.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/RoomNumbering.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/RoomIntake.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/SavedIntake.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/ContactMoveInKinCard.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/BedNotes.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/ResidentDetails.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/DeputyAppointment.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/DeputyNamelessAppointment.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Round/LeastDoseRound.cshtml" />
+  </ItemGroup>
+
+  <Target Name="LayOutTheSite" AfterTargets="Build" DependsOnTargets="CopyAlisReactiveBrowserFiles">
+    <ItemGroup>
+      <TwinSiteView Include="@(TwinView)" SitePath="$([MSBuild]::MakeRelative('$(ConformanceApp)', '%(FullPath)'))" />
+      <TwinSiteOwnFile Include="Web.config;Global.asax;Shared/**/*.cshtml;Content/**/*" />
+      <TwinSiteScript Include="$(ConformanceApp)wwwroot/js/alis-reactive-conformance.js" />
+      <TwinSiteAssembly Include="$(OutDir)**/*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(TwinSiteView)" DestinationFiles="@(TwinSiteView->'$(TwinSite)%(SitePath)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(TwinSiteOwnFile)" DestinationFiles="@(TwinSiteOwnFile->'$(TwinSite)%(Identity)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(TwinSiteScript)" DestinationFolder="$(TwinSite)js/" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(TwinSiteAssembly)" DestinationFiles="@(TwinSiteAssembly->'$(TwinSite)bin/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

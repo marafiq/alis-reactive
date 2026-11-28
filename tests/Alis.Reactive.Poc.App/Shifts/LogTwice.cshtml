@@ -1,0 +1,24 @@
+@using Alis.Reactive.Poc.App.Shifts
+@model ShiftsPage
+@{
+    ViewData["Title"] = "A shift log two scripts provide";
+    Layout = "_LogTwiceLayout";
+    var plan = Html.ReactivePlan<ShiftsPage>();
+}
+<h1>A shift log two scripts provide</h1>
+
+<p>Reading: <span id="read-tried">not tried</span></p>
+<p>Last note: <span id="last-note">none read</span></p>
+<p>Greeting: <span id="greeting">none</span></p>
+
+@(plan.Button("read-last", "Read the last note")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("read-tried").Text.Set("tried");
+        pipeline.Element("last-note").Text.Set(pipeline.Plugin<ShiftLog>().LastNote);
+    }))
+
+@(plan.Button("greet", "Greet the shift")
+    .Reactive(button => button.Click, pipeline => pipeline.Element("greeting").Text.Set("hello")))
+
+@Html.RenderPlan(plan)

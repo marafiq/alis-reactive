@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model KinCards
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Contacts";
+}
+<h1>Contacts</h1>
+<section aria-label="Next of kin">
+    <h2>Next of kin</h2>
+    @await Html.PartialFor(m => m.NextOfKin, "/Care/Admission/KinCopyCard.cshtml")
+</section>
+<section aria-label="Alternate">
+    <h2>Alternate</h2>
+    @await Html.PartialFor(m => m.Alternate, "/Care/Admission/KinCopyCard.cshtml")
+</section>

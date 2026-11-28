@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CarerHandover
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Shift handover";
+    var plan = Html.ReactivePlan<CarerHandover>();
+}
+<h1>Shift handover for @Model.Resident</h1>
+@(Html.InputField(plan, m => m.DayCarer, options => options.Label("Day carer")).NativeTextBox())
+<button type="button" @Html.Raises(plan, CarerHandovers.Send)>Send handover</button>
+<button type="button" @Html.Raises(plan, CarerHandovers.SendDay)>Send day handover</button>
+<p id="handover">No handover sent.</p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CarerHandovers.Send, pipeline => pipeline
+        .Get(CarerHandoverEndpoints.NightRoster)
+        .OnSuccess<NightRoster>((roster, pipeline) => pipeline
+            .Post<CarersHandedOver>(CarerHandoverEndpoints.Handovers, request => request
+                .Json(body => body.Set(handover => handover.Carers, pipeline.List<string?>(
+                    [pipeline.Input(m => m.DayCarer).Component<NativeTextBox>().Value, roster.Body.Read(night => night.OnCall)]))))
+            .OnSuccess(Content.Text, (recorded, pipeline) => pipeline.Element("handover").Text.Set(recorded.Body)))));
+    Html.On(plan, trigger => trigger.CustomEvent(CarerHandovers.SendDay, pipeline => pipeline
+        .Post<CarersHandedOver>(CarerHandoverEndpoints.Handovers, request => request
+            .Json(body => body.Set(handover => handover.Carers, pipeline.List<string?>(
+                [pipeline.Input(m => m.DayCarer).Component<NativeTextBox>().Value]))))
+        .OnSuccess(Content.Text, (recorded, pipeline) => pipeline.Element("handover").Text.Set(recorded.Body))));
+}
+@Html.RenderPlan(plan)

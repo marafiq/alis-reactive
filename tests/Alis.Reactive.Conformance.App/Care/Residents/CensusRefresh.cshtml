@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusRefresh
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Census";
+    var plan = Html.ReactivePlan<CensusRefresh>();
+}
+<h1>Census of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, CensusRefreshes.Refresh)>Refresh census</button>
+<p>Census source: <span id="census-source"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CensusRefreshes.Refresh, pipeline => pipeline.Parallel(
+        pipeline => pipeline.Get(CareEndpoints.CensusFromTheFirstSource).OnSuccess(pipeline => pipeline.Element("census-source").Text.Set("first")),
+        pipeline => pipeline.Get(CareEndpoints.CensusFromTheSecondSource).OnSuccess(pipeline => pipeline.Element("census-source").Text.Set("second")))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,36 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalTemplateMask
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Saved date entry template";
+    var plan = Html.ReactivePlan<ArrivalTemplateMask>();
+}
+<h1>Saved date entry template</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build =>
+        {
+            build.Format("MM / dd / yyyy").EnableMask();
+            if (Model.Nursing)
+            {
+                build.MaskPlaceholder(new Syncfusion.EJ2.Calendars.DatePickerMaskPlaceholder
+                {
+                    Month = "nursing month", Day = "nursing day", Year = "nursing year"
+                });
+            }
+            else
+            {
+                build.MaskPlaceholder(words => words.Month("transfer month").Day("transfer day").Year("transfer year"));
+            }
+        }))
+</fieldset>
+@Html.RenderPlan(plan)

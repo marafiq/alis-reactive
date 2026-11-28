@@ -1,0 +1,13 @@
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class SecondBodyDoor
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
+            .Json(body => body.Set(r => r.Name, "Ann"))
+            .Multipart(body => body.Set(r => r.Name, "Ann")));
+}

@@ -1,0 +1,73 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model LinenBundleWeighing
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Laundry scale";
+    var plan = Html.ReactivePlan<LinenBundleWeighing>();
+}
+<h1>Laundry scale</h1>
+<fieldset>
+    <legend>Measured bundle</legend>
+    @(Html.InputField(plan, m => m.Kilograms, options => options.Label("Bundle weight"))
+        .FusionNumericTextBox(build => build.Format("n3")))
+    @(Html.NativeButton("hundredths", "Use hundredths scale")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var field = pipeline.Input(m => m.Kilograms).Component<FusionNumericTextBox<decimal?>>();
+            field.Value.Set((decimal?)null);
+            field.Decimals.Set(2d);
+            field.ValidateDecimalOnType.Set(true);
+            field.DataBind();
+            pipeline.When(field.ValidateDecimalOnType.Eq(true).And(field.Decimals.Eq(2d)))
+                .Then(p => p.Element("scale-policy").Text.Set("Read to two decimal places"));
+        }))
+    @(Html.NativeButton("untrimmed", "Allow untrimmed entry")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var field = pipeline.Input(m => m.Kilograms).Component<FusionNumericTextBox<decimal?>>();
+            field.Value.Set((decimal?)null);
+            field.Decimals.Set(2d);
+            field.ValidateDecimalOnType.Set(false);
+            field.DataBind();
+            pipeline.When(field.ValidateDecimalOnType.Eq(false).And(field.Decimals.Eq(2d)))
+                .Then(p => p.Element("scale-policy").Text.Set("Accept raw scale reading"));
+        }))
+    @(Html.NativeButton("whole", "Weigh in whole units")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var field = pipeline.Input(m => m.Kilograms).Component<FusionNumericTextBox<decimal?>>();
+            field.Decimals.Set(0d);
+            field.Value.Set(12.375m);
+            field.DataBind();
+            pipeline.When(field.Decimals.Eq(0d))
+                .Then(p =>
+                {
+                    p.Element("scale-ticket").Text.Set(field.GetText());
+                    p.Element("scale-ticket").Text.Append(" kg");
+                });
+        }))
+    @(Html.NativeButton("precise", "Weigh at full precision")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var field = pipeline.Input(m => m.Kilograms).Component<FusionNumericTextBox<decimal?>>();
+            field.Decimals.Set((double?)null);
+            field.Value.Set(12.375m);
+            field.DataBind();
+            pipeline.When(field.Decimals.IsNull())
+                .Then(p =>
+                {
+                    p.Element("scale-ticket").Text.Set(field.GetText());
+                    p.Element("scale-ticket").Text.Append(" kg");
+                });
+        }))
+</fieldset>
+<p><output id="scale-ticket" aria-label="Scale ticket">Bundle not weighed</output></p>
+<p><output id="scale-policy" aria-label="Scale precision">Choose the scale precision</output></p>
+@Html.RenderPlan(plan)

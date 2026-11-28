@@ -1,0 +1,5 @@
+{
+  "extends": "../Alis.Reactive.Assets/tsconfig.json",
+  "include": ["*.ts", "Tracing/**/*.ts"],
+  "exclude": ["bin", "obj", "wwwroot"]
+}

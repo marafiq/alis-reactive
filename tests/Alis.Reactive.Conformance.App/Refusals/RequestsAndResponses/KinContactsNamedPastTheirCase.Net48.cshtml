@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model KinDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Next of kin";
+    var plan = Html.ReactivePlan<KinDesk>();
+    var daughter = new KinContactPastItsCase { GivenName = "Ada" };
+}
+<h1>Next of kin of @Model.Resident</h1>
+@(Html.NativeButton("save-kin", "Save the next of kin").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Post<KinContactsPastTheirCase>(KinContactsEndpoints.PastTheirCase, request => request.Json(body => body.Set(r => r.Daughter, daughter)))
+    .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+<p id="saved"></p>
+@Html.RenderPlan(plan)

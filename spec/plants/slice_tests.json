@@ -1,0 +1,57 @@
+[
+ {
+  "name": "a slice's one placement removed",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "    {\n      \"feature\": \"M21.F4\",\n      \"for\": \"M21.X1001\",\n      \"index\": 0,\n      \"screen\": \"record-contacts\",\n      \"hosts\": [\n        \"net10\"\n      ],\n      \"parts\": [\n        \"careSections\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]\n    },\n    {\n      \"feature\": \"M21.F6\",\n      \"for\": \"M21.X1002\",\n      \"index\": 0,\n      \"screen\": \"fusion-layout\",\n      \"hosts\": [\n        \"fusionShell\"\n      ],\n      \"parts\": [\n        \"trail\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]\n    }",
+    "new": "    {\n      \"feature\": \"M21.F6\",\n      \"for\": \"M21.X1002\",\n      \"index\": 0,\n      \"screen\": \"fusion-layout\",\n      \"hosts\": [\n        \"fusionShell\"\n      ],\n      \"parts\": [\n        \"trail\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]\n    }"
+   }
+  ],
+  "expect": "M21.F4 FusionAccordion has no placed behavior test"
+ },
+ {
+  "name": "a new slice's placement points past its promises",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"feature\": \"M25.F7\",\n      \"for\": \"M25.X11\",\n      \"index\": 0,",
+    "new": "\"feature\": \"M25.F7\",\n      \"for\": \"M25.X11\",\n      \"index\": 1,"
+   }
+  ],
+  "expect": "M25.F7 The framework's own reconnect offer, new as a component has no placed behavior test"
+ },
+ {
+  "name": "a slice's placed test turned to a refusal",
+  "edits": [
+   {
+    "file": "spec/NativeComponents/features.json",
+    "old": "\"id\": \"M24.X6\",\n          \"rung\": \"behavior\",",
+    "new": "\"id\": \"M24.X6\",\n          \"rung\": \"refusal\","
+   }
+  ],
+  "expect": "M24.F2 NativeButton has no placed behavior test"
+ },
+ {
+  "name": "two placements in another order",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "    {\n      \"feature\": \"M21.F4\",\n      \"for\": \"M21.X1001\",\n      \"index\": 0,\n      \"screen\": \"record-contacts\",\n      \"hosts\": [\n        \"net10\"\n      ],\n      \"parts\": [\n        \"careSections\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]\n    },\n    {\n      \"feature\": \"M21.F6\",\n      \"for\": \"M21.X1002\",\n      \"index\": 0,\n      \"screen\": \"fusion-layout\",\n      \"hosts\": [\n        \"fusionShell\"\n      ],\n      \"parts\": [\n        \"trail\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]\n    }",
+    "new": "    {\n      \"feature\": \"M21.F6\",\n      \"for\": \"M21.X1002\",\n      \"index\": 0,\n      \"screen\": \"fusion-layout\",\n      \"hosts\": [\n        \"fusionShell\"\n      ],\n      \"parts\": [\n        \"trail\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]\n    },\n    {\n      \"feature\": \"M21.F4\",\n      \"for\": \"M21.X1001\",\n      \"index\": 0,\n      \"screen\": \"record-contacts\",\n      \"hosts\": [\n        \"net10\"\n      ],\n      \"parts\": [\n        \"careSections\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]\n    }"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a placement run on both hosts",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "    {\n      \"feature\": \"M24.F2\",\n      \"for\": \"M24.X6\",\n      \"index\": 0,\n      \"screen\": \"record\",\n      \"hosts\": [\n        \"net10\"\n      ],\n      \"parts\": [\n        \"recordButton\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]\n    }",
+    "new": "    {\n      \"feature\": \"M24.F2\",\n      \"for\": \"M24.X6\",\n      \"index\": 0,\n      \"screen\": \"record\",\n      \"hosts\": [\n        \"net10\",\n        \"net48\"\n      ],\n      \"parts\": [\n        \"recordButton\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]\n    }"
+   }
+  ],
+  "expect": null
+ }
+]

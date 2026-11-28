@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Circle
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Circle of care";
+    var plan = Html.ReactivePlan<Circle>();
+}
+<h1>Circle of care</h1>
+@using (var circle = Html.BeginRequestContainer(plan, "circle"))
+{
+    <section aria-label="First member">
+        <h2>First member</h2>
+        @await Html.PartialFor(m => m.Members[0], "/Care/Admission/CircleMemberCard.cshtml")
+    </section>
+    <section aria-label="Second member">
+        <h2>Second member</h2>
+        @await Html.PartialFor(m => m.Members[1], "/Care/Admission/CircleMemberCard.cshtml")
+    </section>
+    <button type="button" @Html.Raises(plan, Circles.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(Circles.Save, pipeline => pipeline
+        .Post<Circle>(CircleEndpoints.Circles, request => request.Json(circle.Container, body => { }))
+        .OnSuccess(Content.Text, (bound, pipeline) => pipeline.Element("bound").Text.Set(bound.Body))));
+}
+<p>Saved circle: <span id="bound">-</span></p>
+@Html.RenderPlan(plan)

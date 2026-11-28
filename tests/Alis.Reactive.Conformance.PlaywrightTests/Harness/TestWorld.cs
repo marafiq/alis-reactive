@@ -1,0 +1,165 @@
+using System.Collections.Concurrent;
+using System.Net.Http.Json;
+using Alis.Reactive.Conformance.World;
+using Microsoft.Playwright;
+
+namespace Alis.Reactive.Conformance.PlaywrightTests.Harness;
+
+public sealed class TestWorld
+{
+    private static readonly DateTime ClockStart = new(2026, 1, 15, 12, 0, 0, DateTimeKind.Utc);
+    private static readonly TimeSpan ClockStep = TimeSpan.FromMilliseconds(100);
+    private static readonly TimeSpan RetryBudget = TimeSpan.FromSeconds(30);
+    private const string Negotiate = "/negotiate";
+    private readonly HttpClient _harness;
+    private readonly IBrowserContext _context;
+    private readonly ConcurrentQueue<string> _consoleErrors = new();
+    private readonly ConcurrentQueue<Uri> _sent = new();
+    private readonly ConcurrentDictionary<string, int> _reached = new(StringComparer.Ordinal);
+
+    private TestWorld(HttpClient harness, IBrowserContext context, IPage page)
+    {
+        _harness = harness;
+        _context = context;
+        Page = page;
+        page.Console += (_, message) => Keep(message);
+        page.Request += (_, request) => _sent.Enqueue(new Uri(request.Url));
+    }
+
+    public IPage Page { get; }
+
+    [BesideThePage]
+    public IReadOnlyCollection<string> ConsoleErrors => _consoleErrors;
+
+    [BesideThePage]
+    public int SentTo(string endpoint) => _sent.Count(address => address.AbsolutePath == endpoint);
+
+    public async Task Seed(Seed seed) => (await _harness.PostAsJsonAsync(WorldEndpoints.Seed, seed)).EnsureSuccessStatusCode();
+
+    public Task<ArmedGate> Arm<TGate>(TGate gate)
+        where TGate : struct, Enum
+        => Arm(new GateOrder { Gate = GateName.Of(gate) });
+
+    public Task<ArmedGate> Arm<TGate>(TGate gate, string endpoint)
+        where TGate : struct, Enum
+        => Arm(new GateOrder { Gate = GateName.Of(gate), At = endpoint });
+
+    public async Task Restart(string elementId)
+    {
+        using var answer = await _harness.PostAsJsonAsync(WorldEndpoints.HostRestart, new RestartOrder { ElementId = elementId });
+        if (answer.StatusCode == System.Net.HttpStatusCode.Conflict)
+            throw new InvalidOperationException("The host did not restart the component at '" + elementId + "': " + await answer.Content.ReadAsStringAsync());
+        answer.EnsureSuccessStatusCode();
+    }
+
+    [Gesture]
+    public async Task Push(string stream, string type, string data)
+    {
+        using var answer = await _harness.PostAsJsonAsync(WorldEndpoints.StreamPush, new StreamOrder { Stream = stream, Event = type, Data = data });
+        answer.EnsureSuccessStatusCode();
+        _reached[stream] = (await answer.Content.ReadFromJsonAsync<StreamOrder>())!.Count;
+    }
+
+    [BesideThePage]
+    public int Reached(string stream) => _reached[stream];
+
+    public Task Opened(string stream) => Connections(stream, 1);
+
+    public Task Closed(string stream) => Connections(stream, 0);
+
+    [Gesture]
+    public async Task<DroppedStream> Drop(string stream)
+    {
+        (await _harness.PostAsJsonAsync(WorldEndpoints.StreamDrop, new StreamOrder { Stream = stream })).EnsureSuccessStatusCode();
+        return new DroppedStream(_harness, stream);
+    }
+
+    [Gesture]
+    public async Task<RefusedStream> Refuse(string stream)
+    {
+        (await _harness.PostAsJsonAsync(WorldEndpoints.StreamRefuse, new StreamOrder { Stream = stream })).EnsureSuccessStatusCode();
+        return new RefusedStream(_harness, stream);
+    }
+
+    private async Task Connections(string stream, int count)
+        => (await _harness.PostAsJsonAsync(WorldEndpoints.StreamOpen, new StreamOrder { Stream = stream, Count = count })).EnsureSuccessStatusCode();
+
+    public Task CollectGarbage() => Page.RequestGCAsync();
+
+    public Task InstallTheClock() => Page.Clock.InstallAsync(new ClockInstallOptions { TimeDate = ClockStart });
+
+    public Task HoldTheClock() => Page.Clock.PauseAtAsync(ClockStart.AddHours(1));
+
+    public Task RunTheClockFor(TimeSpan run) => Page.Clock.RunForAsync((long)run.TotalMilliseconds);
+
+    public async Task RunTheClockFor(TimeSpan run, string hub)
+    {
+        for (var ran = TimeSpan.Zero; ran < run; ran += ClockStep)
+        {
+            await Answered(hub);
+            await Page.Clock.RunForAsync((long)ClockStep.TotalMilliseconds);
+        }
+    }
+
+    public async Task RunTheClockUntilItSends(string endpoint, int requests)
+    {
+        var run = TimeSpan.Zero;
+        while (SentTo(endpoint) < requests)
+        {
+            if (run >= RetryBudget)
+                throw new InvalidOperationException("The page sent " + SentTo(endpoint) + " of " + requests + " requests to " + endpoint + " in " + RetryBudget.TotalSeconds + " seconds of its clock.");
+            await Page.Clock.RunForAsync((long)ClockStep.TotalMilliseconds);
+            run += ClockStep;
+        }
+    }
+
+    private async Task<ArmedGate> Arm(GateOrder order)
+    {
+        using var answer = await _harness.PostAsJsonAsync(WorldEndpoints.ArmGate, order);
+        answer.EnsureSuccessStatusCode();
+        var armed = await answer.Content.ReadFromJsonAsync<GateOrder>();
+        return new ArmedGate(_harness, armed!);
+    }
+
+    private async Task Answered(string hub)
+        => (await _harness.PostAsJsonAsync(WorldEndpoints.StreamAnswered, new StreamOrder { Stream = hub, Count = SentTo(hub + Negotiate) })).EnsureSuccessStatusCode();
+
+    private void Keep(IConsoleMessage message)
+    {
+        if (message.Type == "error") _consoleErrors.Enqueue(message.Text);
+    }
+
+    internal static async Task<TestWorld> Open(ConformanceHost host, string zone, bool ofAFusionFixture, bool clipboard)
+    {
+        var key = Guid.NewGuid().ToString("N");
+        var harness = new HttpClient { BaseAddress = host.Address };
+        harness.DefaultRequestHeaders.Add("Cookie", $"{WorldKey.Cookie}={key}");
+        var context = await NewContext(host, zone, javaScriptEnabled: true, ofAFusionFixture, clipboard);
+        await context.AddCookiesAsync([new Cookie { Name = WorldKey.Cookie, Value = key, Url = host.Address.ToString() }]);
+        return new TestWorld(harness, context, await context.NewPageAsync());
+    }
+
+    internal static async Task<IBrowserContext> NewContext(ConformanceHost host, string zone, bool javaScriptEnabled, bool ofAFusionFixture, bool clipboard = false)
+    {
+        var context = await Run.Browser.NewContextAsync(new BrowserNewContextOptions
+        {
+            BaseURL = host.Address.ToString(),
+            Locale = "en-US",
+            TimezoneId = zone,
+            JavaScriptEnabled = javaScriptEnabled,
+            Permissions = clipboard ? ["clipboard-read"] : null,
+        });
+        await Waits.Open(context, ofAFusionFixture);
+        return context;
+    }
+
+    internal async Task<IList<string>> End()
+    {
+        await Waits.Close(_context);
+        using var answer = await _harness.PostAsync(WorldEndpoints.End, content: null);
+        answer.EnsureSuccessStatusCode();
+        var end = await answer.Content.ReadFromJsonAsync<WorldEnd>();
+        _harness.Dispose();
+        return end!.GatesStillParked;
+    }
+}

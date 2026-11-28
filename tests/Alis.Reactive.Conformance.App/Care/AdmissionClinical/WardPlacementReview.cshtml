@@ -1,0 +1,223 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model WardPlacementReview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Placement review";
+    var plan = Html.ReactivePlan<WardPlacementReview>();
+    var richItem = FusionTemplate.Create<PlacementWard>().Span(ward => ward.Label).Text(" · ").Span(ward => ward.Wing).Render(plan);
+    var shortItem = FusionTemplate.Create<PlacementWard>().Span(ward => ward.Label).Render(plan);
+    var richGroup = FusionTemplate.Create<PlacementWard>().Text("Clinical floor: ").Span(ward => ward.Wing).Render(plan);
+    var shortGroup = FusionTemplate.Create<PlacementWard>().Span(ward => ward.Wing).Render(plan);
+    var richValue = FusionTemplate.Create<PlacementWard>().Text("Transfer to ").Span(ward => ward.Label).Render(plan);
+    var shortValue = FusionTemplate.Create<PlacementWard>().Span(ward => ward.Label).Text(" ward").Render(plan);
+}
+<h1>Placement review</h1>
+<fieldset>
+    <legend>Transfer history</legend>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Apply)>Apply Maple referral</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Clear)>Remove assignment</button>
+    @(Html.InputField(plan, m => m.Assignment, options => options.Label("Transfer history"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((PlacementWard ward) => ward.Label, ward => ward.Code))
+        .Reactive(list => list.Change, (changed, pipeline) =>
+        {
+            pipeline.When(changed.Value.NotNull())
+                .Then(pipeline =>
+                {
+                    pipeline.Element("assignment-now").Text.Set(changed.Item.TextContent);
+                    pipeline.When(changed.IsInteracted.And(changed.OriginalEvent.Type.Eq("keydown")).And(changed.E.Type.Eq("keydown")))
+                        .Then(pipeline => pipeline.Element("assignment-method").Text.Set("Staff chose the destination with the keyboard."))
+                        .Else(pipeline => pipeline.Element("assignment-method").Text.Set("Applied from the referral."));
+                })
+                .Else(pipeline =>
+                {
+                    pipeline.Element("assignment-now").Text.Set("Unassigned");
+                    pipeline.Element("assignment-method").Text.Set("No destination assigned.");
+                });
+            pipeline.When(changed.PreviousItemData<PlacementWard>().NotNull())
+                .Then(pipeline => pipeline.Element("assignment-before").Text.Set(changed.PreviousItem.TextContent))
+                .Else(pipeline => pipeline.Element("assignment-before").Text.Set("None"));
+        }))
+    <p id="assignment-method">No handover recorded.</p>
+    <p id="assignment-now">Unassigned</p>
+    <p id="assignment-before">None</p>
+</fieldset>
+<fieldset>
+    <legend>Round stop</legend>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.First)>Select first stop</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Last)>Select last stop</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.ByName)>Find Cedar by name</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.ByCode)>Find Maple by referral</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Review)>Review selected destination</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.NoWard)>Leave destination open</button>
+    @(Html.InputField(plan, m => m.Stop, options => options.Label("Round stop"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((PlacementWard ward) => ward.Label, ward => ward.Code)))
+    <p id="stop-position">No stop chosen.</p>
+    <p id="stop-label">No destination.</p>
+</fieldset>
+<fieldset>
+    <legend>Confirmed destination</legend>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Hold)>Block assignment changes</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.ReadOnly)>Lock confirmed assignment</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Release)>Release assignment</button>
+    @(Html.InputField(plan, m => m.Editable, options => options.Label("Confirmed destination"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((PlacementWard ward) => ward.Label, ward => ward.Code)))
+    <p id="edit-policy">Changes are available.</p>
+</fieldset>
+<fieldset>
+    <legend>Keyboard placement</legend>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Focus)>Start keyboard review</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Blur)>Finish keyboard review</button>
+    @(Html.InputField(plan, m => m.Keys, options => options.Label("Keyboard placement"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((PlacementWard ward) => ward.Label, ward => ward.Code))
+        .Reactive(list => list.Focus, pipeline => pipeline.Element("keyboard-instruction").Text.Set("Use the arrow keys to choose a receiving ward."))
+        .Reactive(list => list.Blur, pipeline => pipeline.Element("keyboard-instruction").Text.Set("Return to the transfer handover."))
+        .Reactive(list => list.Change, (chosen, pipeline) => pipeline
+            .When(chosen.Value.Eq("C2"))
+            .Then(pipeline => pipeline.Input(m => m.Keys).Component<FusionDropDownList<string?>>().FocusOut())))
+    <p id="keyboard-instruction">Ready to review.</p>
+</fieldset>
+<fieldset>
+    <legend>Placement list</legend>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Detail)>Detailed placement list</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Concise)>Concise placement list</button>
+    @(Html.InputField(plan, m => m.Display, options => options.Label("Placement list"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((PlacementWard ward) => ward.Label, ward => ward.Code, ward => ward.Wing)))
+</fieldset>
+<fieldset>
+    <legend>Placement instructions</legend>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Urgent)>Urgent placement layout</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Routine)>Routine placement layout</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.ReadHint)>Print placement instructions</button>
+    @(Html.InputField(plan, m => m.LayoutWard, options => options.Label("Placement instructions"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((PlacementWard ward) => ward.Label, ward => ward.Code).Placeholder("Choose a ward").HtmlAttributes(new Dictionary<string, object> { ["aria-label"] = "Placement destination" })))
+    <p id="printed-hint">No instructions printed.</p>
+    <p id="placement-contact">Review the destination.</p>
+</fieldset>
+<fieldset>
+    <legend>Placement preview</legend>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Close)>Close placement preview</button>
+    <button type="button" @Html.Raises(plan, PlacementReviewActions.Keep)>Keep preview open</button>
+    @(Html.InputField(plan, m => m.Preview, options => options.Label("Placement preview"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((PlacementWard ward) => ward.Label, ward => ward.Code))
+        .Reactive(list => list.Destroyed, (closed, pipeline) => pipeline
+            .When(closed.Name.Eq("destroyed").And(closed.Cancel.Not()))
+            .Then(pipeline => pipeline.Element("preview-notice").Text.Set("The temporary placement preview has closed."))))
+    <p id="preview-notice">Preview available.</p>
+</fieldset>
+@{
+    void DescribeEditing(Pipeline<WardPlacementReview> pipeline)
+    {
+        var ward = pipeline.Input(m => m.Editable).Component<FusionDropDownList<string?>>();
+        pipeline.When(ward.Enabled.Not())
+            .Then(pipeline => pipeline.Element("edit-policy").Text.Set("The assignment is blocked."))
+            .ElseIf(ward.Readonly)
+            .Then(pipeline => pipeline.Element("edit-policy").Text.Set("The confirmed destination is read-only."))
+            .Else(pipeline => pipeline.Element("edit-policy").Text.Set("Changes are available."));
+    }
+
+    Html.On(plan, trigger => trigger
+        .CustomEvent(PlacementReviewActions.Apply, pipeline => pipeline.Input(m => m.Assignment).Component<FusionDropDownList<string?>>().Value.Set("M1"))
+        .CustomEvent(PlacementReviewActions.Clear, pipeline => pipeline.Input(m => m.Assignment).Component<FusionDropDownList<string?>>().Clear())
+        .CustomEvent(PlacementReviewActions.First, pipeline => {
+            var stop = pipeline.Input(m => m.Stop).Component<FusionDropDownList<string?>>();
+            stop.Index.Set(0);
+            stop.DataBind();
+        })
+        .CustomEvent(PlacementReviewActions.Last, pipeline => {
+            var stop = pipeline.Input(m => m.Stop).Component<FusionDropDownList<string?>>();
+            stop.Index.Set(1);
+            stop.DataBind();
+        })
+        .CustomEvent(PlacementReviewActions.ByName, pipeline => {
+            var stop = pipeline.Input(m => m.Stop).Component<FusionDropDownList<string?>>();
+            stop.Text.Set("Cedar");
+            stop.DataBind();
+        })
+        .CustomEvent(PlacementReviewActions.ByCode, pipeline => {
+            var stop = pipeline.Input(m => m.Stop).Component<FusionDropDownList<string?>>();
+            stop.Value.Set("M1");
+            stop.DataBind();
+        })
+        .CustomEvent(PlacementReviewActions.NoWard, pipeline => {
+            var stop = pipeline.Input(m => m.Stop).Component<FusionDropDownList<string?>>();
+            stop.Index.Set((int?)null);
+            stop.DataBind();
+        })
+        .CustomEvent(PlacementReviewActions.Review, pipeline => {
+            var stop = pipeline.Input(m => m.Stop).Component<FusionDropDownList<string?>>();
+            pipeline.Element("stop-label").Text.Set(stop.Text.IfNull("No destination."));
+            pipeline.When(stop.Index.Eq(0))
+                .Then(pipeline => pipeline.Element("stop-position").Text.Set("First stop"))
+                .ElseIf(stop.Index.Eq(1))
+                .Then(pipeline => pipeline.Element("stop-position").Text.Set("Second stop"))
+                .Else(pipeline => pipeline.Element("stop-position").Text.Set("No stop chosen."));
+        })
+        .CustomEvent(PlacementReviewActions.Hold, pipeline => {
+            var ward = pipeline.Input(m => m.Editable).Component<FusionDropDownList<string?>>();
+            ward.Enabled.Set(false);
+            ward.Readonly.Set(false);
+            ward.DataBind();
+            DescribeEditing(pipeline);
+        })
+        .CustomEvent(PlacementReviewActions.ReadOnly, pipeline => {
+            var ward = pipeline.Input(m => m.Editable).Component<FusionDropDownList<string?>>();
+            ward.Enabled.Set(true);
+            ward.Readonly.Set(true);
+            ward.DataBind();
+            DescribeEditing(pipeline);
+        })
+        .CustomEvent(PlacementReviewActions.Release, pipeline => {
+            var ward = pipeline.Input(m => m.Editable).Component<FusionDropDownList<string?>>();
+            ward.Enabled.Set(true);
+            ward.Readonly.Set(false);
+            ward.DataBind();
+            DescribeEditing(pipeline);
+        })
+        .CustomEvent(PlacementReviewActions.Focus, pipeline => pipeline.Input(m => m.Keys).Component<FusionDropDownList<string?>>().FocusIn())
+        .CustomEvent(PlacementReviewActions.Blur, pipeline => pipeline.Input(m => m.Keys).Component<FusionDropDownList<string?>>().FocusOut())
+        .CustomEvent(PlacementReviewActions.Detail, pipeline => {
+            var display = pipeline.Input(m => m.Display).Component<FusionDropDownList<string?>>();
+            display.HeaderTemplate.Set("<strong>Clinical placement directory</strong>");
+            display.FooterTemplate.Set("<p>Contact the transfer desk before moving.</p>");
+            display.ItemTemplate.Set(richItem);
+            display.GroupTemplate.Set(richGroup);
+            display.ValueTemplate.Set(richValue);
+            display.DataBind();
+        })
+        .CustomEvent(PlacementReviewActions.Concise, pipeline => {
+            var display = pipeline.Input(m => m.Display).Component<FusionDropDownList<string?>>();
+            display.HeaderTemplate.Set("<strong>Destinations</strong>");
+            display.FooterTemplate.Set("<p>Choose a destination.</p>");
+            display.ItemTemplate.Set(shortItem);
+            display.GroupTemplate.Set(shortGroup);
+            display.ValueTemplate.Set(shortValue);
+            display.DataBind();
+        })
+        .CustomEvent(PlacementReviewActions.Urgent, pipeline => {
+            var ward = pipeline.Input(m => m.LayoutWard).Component<FusionDropDownList<string?>>();
+            ward.Placeholder.Set("Choose an urgent destination");
+            ward.DataBind();
+        })
+        .CustomEvent(PlacementReviewActions.Routine, pipeline => {
+            var ward = pipeline.Input(m => m.LayoutWard).Component<FusionDropDownList<string?>>();
+            ward.Placeholder.Set("Choose a routine destination");
+            ward.DataBind();
+        })
+        .CustomEvent(PlacementReviewActions.ReadHint, pipeline => {
+            var ward = pipeline.Input(m => m.LayoutWard).Component<FusionDropDownList<string?>>();
+            pipeline.Element("printed-hint").Text.Set(ward.GetRootElement().GetAttribute("placeholder"));
+            pipeline.When(ward.Element.GetAttribute("placeholder").Eq("Choose an urgent destination").And(ward.Placeholder.Eq("Choose an urgent destination")))
+                .Then(pipeline => pipeline.Element("placement-contact").Text.Set("Call the urgent placement desk."))
+                .Else(pipeline => pipeline.Element("placement-contact").Text.Set("Contact the routine placement desk."));
+        })
+        .CustomEvent(PlacementReviewActions.Close, pipeline => pipeline.Input(m => m.Preview).Component<FusionDropDownList<string?>>().Destroy())
+        .CustomEvent(PlacementReviewActions.Keep, pipeline => pipeline.Element("preview-notice").Text.Set("The placement preview remains available.")));
+}
+@Html.RenderPlan(plan)

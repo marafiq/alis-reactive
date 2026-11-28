@@ -1,0 +1,73 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PhotoReleaseFiling
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Photo release filing";
+    var plan = Html.ReactivePlan<PhotoReleaseFiling>();
+}
+<h1>Photo release filing</h1>
+<form method="post" action="@CarePages.PhotoReleaseFiling">
+    <fieldset>
+        <legend>Signed photo release</legend>
+        @(Html.InputField(plan, m => m.PhotoConsent, options => options.Label("Photo permission"))
+            .FusionCheckBox(build =>
+            {
+                build.Value(Model.Clinical ? "clinical" : "directory");
+                if (Model.LocalNotice)
+                {
+                    build.HtmlAttributes(new Dictionary<string, object> { ["aria-label"] = "Permission for a directory photo" });
+                }
+            }))
+        @(Html.NativeButton("change-photo-destination", Model.Clinical ? "Use directory filing" : "Use clinical filing")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                consent.Value.Set(Model.Clinical ? "directory" : "clinical");
+                consent.DataBind();
+            }))
+        @(Html.NativeButton("clear-photo-destination", "Clear filing code")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                consent.Value.Set(string.Empty);
+                consent.DataBind();
+            }))
+        @(Html.NativeButton("review-photo-destination", "Review filing destination")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var consent = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>();
+                pipeline.When(consent.Value.Eq("clinical"))
+                    .Then(pipeline => pipeline.Element("photo-filing-destination").Text.Set("Clinical record"))
+                    .ElseIf(consent.Value.Eq("directory"))
+                    .Then(pipeline => pipeline.Element("photo-filing-destination").Text.Set("Resident directory"))
+                    .Else(pipeline => pipeline.Element("photo-filing-destination").Text.Set("General consent"));
+            }))
+        <p><output id="photo-filing-destination" aria-label="Filing destination">Select a filing destination</output></p>
+        @(Html.NativeButton("prepare-signed-photo-copy", "Prepare signed copy")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var input = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>().Element;
+                pipeline.When(input.HasAttribute("aria-label"))
+                    .Then(pipeline => pipeline.Element("photo-copy-notice").Text.Set(input.GetAttribute("aria-label")))
+                    .Else(pipeline => pipeline.Element("photo-copy-notice").Text.Set("Photo permission"));
+            }))
+        <p><output id="photo-copy-notice" aria-label="Signed copy notice">Prepare the signed copy</output></p>
+        @(Html.NativeButton("review-spoken-photo-notice", "Review spoken instruction")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var root = pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>().GetRootElement();
+                pipeline.When(root.HasAttribute("aria-label"))
+                    .Then(pipeline => pipeline.Element("spoken-photo-notice").Text.Set(root.GetAttribute("aria-label")))
+                    .Else(pipeline => pipeline.Element("spoken-photo-notice").Text.Set("Photo permission"));
+            }))
+        <p><output id="spoken-photo-notice" aria-label="Spoken instruction">Review the filing instructions</output></p>
+        <button type="submit">File release</button>
+    </fieldset>
+</form>
+@Html.RenderPlan(plan)

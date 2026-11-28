@@ -1,0 +1,22 @@
+@using Alis.Reactive.Poc.App.Families
+@model FamilyForm
+@{
+    ViewData["Title"] = "Family";
+    var plan = Html.ReactivePlan<FamilyForm>();
+}
+<h1>Family</h1>
+
+@using (Html.BeginForm("Family", "Families", FormMethod.Post))
+{
+    @Html.InputField(plan, m => m.ResidentName).TextBox("Resident name")
+    @Html.EditorFor(m => m.Contacts)
+    <button type="submit">Save family</button>
+}
+
+@(plan.Button("preview-family", "Preview the family card")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("card-kin").Text.Set(pipeline.Input(m => m.Contacts[1].Phone).Component<NativeTextBox>().Value)))
+
+<p>Mobile: <strong id="card-kin">no preview</strong></p>
+
+@Html.RenderPlan(plan)

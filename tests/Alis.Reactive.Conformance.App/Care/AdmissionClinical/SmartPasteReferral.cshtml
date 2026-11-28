@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model SmartPasteReferral
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident referral";
+    var plan = Html.ReactivePlan<SmartPasteReferral>();
+}
+<h1>Resident referral</h1>
+<label for="referral-note">Referral note</label>
+<textarea id="referral-note" readonly>@Model.ReferralNote</textarea>
+@if (Model.StartsWithoutForm)
+{
+    <button type="button" @Html.Raises(plan, SmartPasteReferralButtons.LoadIntake)>Load intake</button>
+    <section id="resident-intake" aria-label="Intake form"></section>
+    Html.On(plan, trigger => trigger.CustomEvent(SmartPasteReferralButtons.LoadIntake, pipeline => pipeline
+        .Get(CarePages.SmartPasteReferralFields)
+        .Into("resident-intake")));
+}
+else
+{
+    @await Html.PartialAsync("/Care/AdmissionClinical/SmartPasteReferralFields.cshtml", Model.Fields)
+}
+@Html.RenderPlan(plan)

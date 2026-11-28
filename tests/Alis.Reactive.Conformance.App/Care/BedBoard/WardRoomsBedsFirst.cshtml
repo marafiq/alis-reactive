@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@model WardRooms
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "North ward";
+    var plan = Html.ReactivePlan<WardRooms>();
+    var band = FusionTemplate.Create<AgedResident>()
+        .Span(m => m.Name)
+        .Text(" ")
+        .When(m => m.Age < 90, then: t => t.Span("under 90"), @else: e => e.Span("90 and over"))
+        .Render(plan);
+    var spare = FusionTemplate.Create<WardRoom>()
+        .Span(m => m.Room)
+        .Text(" ")
+        .When(m => m.Beds > 2, then: t => t.Span("spare"), @else: e => e.Span("full"))
+        .Render(plan);
+}
+<h1>North ward</h1>
+<fieldset>
+    <legend>Residents</legend>
+    @(Html.InputField(plan, m => m.ResidentNames, options => options.Label("Residents"))
+        .FusionMultiSelect(Model.Residents, build => build.Fields((AgedResident r) => r.Name, r => r.Name).ItemTemplate(band)))
+</fieldset>
+<fieldset>
+    <legend>Rooms</legend>
+    @(Html.InputField(plan, m => m.RoomNames, options => options.Label("Rooms"))
+        .FusionMultiSelect(Model.Rooms, build => build.Fields((WardRoom r) => r.Room, r => r.Room).ItemTemplate(spare)))
+</fieldset>
+@Html.RenderPlan(plan)

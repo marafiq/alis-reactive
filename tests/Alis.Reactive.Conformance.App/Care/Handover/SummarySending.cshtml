@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model SummarySending
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Handover summary";
+    var plan = Html.ReactivePlan<SummarySending>();
+}
+<h1>Handover summary</h1>
+<form method="post" action="@SummarySendingEndpoints.Summaries">
+    <fieldset>
+        <legend>Summary</legend>
+        @(Html.InputField(plan, m => m.Summary, options => options.Label("Summary")).FusionRichTextEditor())
+    </fieldset>
+    <button type="submit">Send</button>
+</form>
+@Html.RenderPlan(plan)

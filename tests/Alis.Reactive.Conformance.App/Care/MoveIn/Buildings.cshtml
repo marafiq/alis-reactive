@@ -1,0 +1,33 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+@(Html.InputField(plan, m => m.Location.BuildingId, options => options.Label("Building")).NativeDropDown(build => build.Placeholder("Choose a building").Items(Reads.BuildingsOf(Model.Location.CommunityId)))
+    .Reactive(building => building.Change, HandlerPolicy.Replace, (changed, pipeline) =>
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Unload("apartments");
+        pipeline.Unload("beds");
+        pipeline.Unload("availability-owner");
+        pipeline.Element("building-status").Text.Set("");
+        pipeline.Element("bed-status").Text.Set("No bed chosen");
+        pipeline.When(moveIn.Read(m => m.Location.CommunityId).NotEmpty().And(moveIn.Read(m => m.Location.BuildingId).NotEmpty()))
+            .Then(pipeline => pipeline
+                .Get<LocationQuery>(CareEndpoints.MoveInApartments, request => request
+                    .Query(query => query.DraftId, pipeline.PageUrl<MoveInPageAddress>(MoveInEndpoints.Page).Read(address => address.DraftId))
+                    .Query(query => query.CommunityId, moveIn.Read(m => m.Location.CommunityId))
+                    .Query(query => query.BuildingId, moveIn.Read(m => m.Location.BuildingId))
+                    .Query(query => query.Level, moveIn.Read(m => m.Care.Level))
+                    .Query(query => query.Culture, "en-US"))
+                .Into("apartments")
+                .OnError<ErrorEnvelope>(422, (refused, pipeline) => pipeline.Element("building-status").Text.Set(refused.Body.Read(envelope => envelope.Error.Message))));
+    }))
+@Html.RenderPlan(plan)

@@ -1,0 +1,20 @@
+@using System.Text.RegularExpressions
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Refused pattern";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Refused pattern</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-matching", "Count matching doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => Regex.IsMatch(d.Medicine, "[\\d]")))))
+
+@Html.RenderPlan(plan)

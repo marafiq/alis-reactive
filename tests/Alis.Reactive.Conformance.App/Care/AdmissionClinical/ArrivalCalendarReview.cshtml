@@ -1,0 +1,77 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalCalendarReview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission calendar";
+    var plan = Html.ReactivePlan<ArrivalCalendarReview>();
+}
+<h1>Admission calendar</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            opening.Cancel.Set(Model.Signed);
+            pipeline.When(opening.Cancel)
+                .Then(pipeline => pipeline.Element("calendar-access").Text.Set("Signed arrival locked"))
+                .Else(pipeline => pipeline.Element("calendar-access").Text.Set("Arrival calendar available"));
+        })
+        .Reactive(picker => picker.Close, (closing, pipeline) =>
+        {
+            closing.Cancel.Set(Model.Held);
+            pipeline.When(closing.Cancel)
+                .Then(pipeline => pipeline.Element("date-review").Text.Set("Continue reviewing dates"))
+                .Else(pipeline => pipeline.Element("date-review").Text.Set("Date review finished"));
+        }))
+</fieldset>
+@(Html.NativeButton("open-arrival-calendar", "Open arrival calendar")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+@(Html.NativeButton("return-to-intake", "Return to intake")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Hide();
+    }))
+@(Html.NativeButton("plan-by-month", "Plan by month")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Start.Set(FusionDatePickerView.Year);
+        date.Depth.Set(FusionDatePickerView.Year);
+        date.DataBind();
+        date.Show();
+        pipeline.When(date.Start.Eq(FusionDatePickerView.Year).And(date.Depth.Eq(FusionDatePickerView.Year)).And(date.CurrentView().Eq("Year")))
+            .Then(pipeline => pipeline.Element("calendar-scope").Text.Set("Choose an admission month"))
+            .ElseIf(date.Start.Eq(FusionDatePickerView.Month).And(date.Depth.Eq(FusionDatePickerView.Month)).And(date.CurrentView().Eq("Month")))
+            .Then(pipeline => pipeline.Element("calendar-scope").Text.Set("Choose an arrival day"));
+    }))
+@(Html.NativeButton("plan-by-day", "Plan by day")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Start.Set(FusionDatePickerView.Month);
+        date.Depth.Set(FusionDatePickerView.Month);
+        date.DataBind();
+        date.Show();
+        pipeline.When(date.Start.Eq(FusionDatePickerView.Year).And(date.Depth.Eq(FusionDatePickerView.Year)).And(date.CurrentView().Eq("Year")))
+            .Then(pipeline => pipeline.Element("calendar-scope").Text.Set("Choose an admission month"))
+            .ElseIf(date.Start.Eq(FusionDatePickerView.Month).And(date.Depth.Eq(FusionDatePickerView.Month)).And(date.CurrentView().Eq("Month")))
+            .Then(pipeline => pipeline.Element("calendar-scope").Text.Set("Choose an arrival day"));
+    }))
+<p><output id="calendar-access" aria-label="Calendar access">Access awaiting decision</output></p>
+<p><output id="date-review" aria-label="Date review">Review in progress</output></p>
+<p><output id="calendar-scope" aria-label="Calendar scope">Scope pending</output></p>
+@Html.RenderPlan(plan)

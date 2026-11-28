@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusRaisedTime
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "A visit's time";
+    var plan = Html.ReactivePlan<CensusRaisedTime>();
+}
+<h1>A visit's time</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census" })
+    .Reactive(census => census.Raised, (raised, pipeline) =>
+    {
+        pipeline.When(raised.Time.Lt(new TimeOnly(12, 0)))
+            .Then(pipeline => pipeline.Element("part-of-day").Text.Set("morning"))
+            .Else(pipeline => pipeline.Element("part-of-day").Text.Set("afternoon"));
+        pipeline.Element("time-log").Text.Set("checked");
+    }))
+<p>The visit is in the <span id="part-of-day">-</span></p>
+<p>Time log: <span id="time-log"></span></p>
+@Html.RenderPlan(plan)

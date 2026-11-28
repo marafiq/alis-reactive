@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Elements
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PartyBell
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The gate";
+    var plan = Html.ReactivePlan<PartyBell>();
+}
+<h1>Visitors of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, PartyBells.Announced)>Ring the bell</button>
+<button type="button" @Html.Raises(plan, PartyBells.Announced, new PartyArrival { PartySize = 3 })>Ring for three</button>
+<p>Party size: <span id="party-size"></span></p>
+<p>Bell: <output id="bell-status">Silent</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PartyBells.Announced, (announced, pipeline) =>
+    {
+        pipeline.Element("party-size").Text.Set(announced.Read(arrival => arrival.PartySize));
+        pipeline.Element("bell-status").Text.Set("Rung");
+    }));
+}
+@Html.RenderPlan(plan)

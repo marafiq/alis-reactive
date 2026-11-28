@@ -1,0 +1,34 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusScores
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Room scores";
+    var plan = Html.ReactivePlan<CensusScores>();
+}
+<h1>Room scores</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Items = Model.Rooms }))
+<p>Scores on the census: <span id="score-count">-</span></p>
+<p id="score-status"></p>
+<button type="button" @Html.Raises(plan, CensusScoreEvents.CountScores)>Count</button>
+<p>Head counts on the census: <span id="head-counts">-</span></p>
+<p>Head counts not taken: <span id="head-counts-not-taken">-</span></p>
+<button type="button" @Html.Raises(plan, CensusScoreEvents.CountHeadCounts)>Count head counts</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CensusScoreEvents.CountScores, pipeline =>
+    {
+        pipeline.Element("score-status").Text.Set("Counting");
+        pipeline.Element("score-count").Text.Set(pipeline.Component<ConformanceComponent>("census").Items.Select(item => item.OptionalScore).Count());
+        pipeline.Element("score-status").Text.Set("Counted");
+    }));
+    Html.On(plan, trigger => trigger.CustomEvent(CensusScoreEvents.CountHeadCounts, pipeline =>
+    {
+        var census = pipeline.Component<ConformanceComponent>("census");
+        pipeline.Element("head-counts").Text.Set(census.Items.Select(item => item.OptionalCount).Count());
+        pipeline.Element("head-counts-not-taken").Text.Set(census.Items.Select(item => item.OptionalCount).Count(count => count == null));
+    }));
+}
+@Html.RenderPlan(plan)

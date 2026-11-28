@@ -1,0 +1,1017 @@
+{
+  "module": "Vendors",
+  "features": [
+    {
+      "id": "M12.F1",
+      "summary": "A vendor: the data a component's declaration carries, in closed sets the one driver follows. Where the object lives, a path from the element or a lookup the vendor's code provides as a plugin; how a listener subscribes, a method pair, a callback property whose listeners chain on one framework function per object and property, or a subscribe method that returns its unsubscriber; where the object holds its element; what a listener receives, its arguments, with the payload at the place its event declares and the vendor's continuation called at its position; a callback the vendor calls for an answer, written as an expression; the vendor contract, which checks every declaration against the vendor's typed API at build; and the bridge to a component's own code: alis:mount and alis:unmount, announced over the content a boot, a slot's load or its unload covers, and the page's plugin queue, through which a vendor's code provides its lookup, read at boot before alis:mount, each later push registering at once. Main has no vendor data: its runtime holds a driver per vendor name, native and fusion, and reads Syncfusion's object by name. The redesign writes a vendor's path, listening and payload kind into the plan, with two listening kinds and a path alone; its payload kind, VendorEventPayload, leaves for the handler's payload place (D17.4).",
+      "status": "redesign-only",
+      "types": [
+        "Alis.Reactive:ComponentVendor",
+        "Alis.Reactive:VendorEventPayload"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "redesign",
+          "text": "public static ComponentVendor Native { get; } = new ComponentVendor(",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:59"
+        },
+        {
+          "line": "redesign",
+          "text": "new MethodVendorListening(\"addEventListener\", \"removeEventListener\"),",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:62"
+        },
+        {
+          "line": "redesign",
+          "text": "public static ComponentVendor Define(",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:78"
+        },
+        {
+          "line": "redesign",
+          "text": "VendorEventPayload payload)",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:83"
+        },
+        {
+          "line": "redesign",
+          "text": "public static ComponentVendor DefineCallbackProperties(",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:109"
+        },
+        {
+          "line": "redesign",
+          "text": "internal Vendor ToGrammar() => new Vendor(_objectPath.TargetText, _listening, _payload);",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:123"
+        },
+        {
+          "line": "redesign",
+          "text": "public override string ToString() => Name;",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:126"
+        },
+        {
+          "line": "redesign",
+          "text": "\"Vendor name '\" + name + \"' must start with a letter and contain only ASCII letters, digits, underscore, or hyphen.\",",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:134"
+        },
+        {
+          "line": "redesign",
+          "text": "public enum VendorEventPayload",
+          "cite": "Alis.Reactive/Grammar/VendorEventPayload.cs:8"
+        },
+        {
+          "line": "redesign",
+          "text": "Argument,",
+          "cite": "Alis.Reactive/Grammar/VendorEventPayload.cs:11"
+        },
+        {
+          "line": "redesign",
+          "text": "Element,",
+          "cite": "Alis.Reactive/Grammar/VendorEventPayload.cs:14"
+        },
+        {
+          "line": "redesign",
+          "text": "throw new Error(`[alis] #${element.id} has no ${vendorName} object yet (${vendor.objectPath.join(\".\")})`);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:13"
+        },
+        {
+          "line": "redesign",
+          "text": "return read(element, vendor.objectPath, \"optional\", `#${element.id}`) === object;",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:17"
+        },
+        {
+          "line": "redesign",
+          "text": "case \"method\":     return subscribeByMethod(root, vendorName, listen, event, vendorListener);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:30"
+        },
+        {
+          "line": "redesign",
+          "text": "case \"assignment\": return assignListener(root, vendorName, event, vendorListener);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:31"
+        },
+        {
+          "line": "redesign",
+          "text": "if (typeof previous === \"function\") previous.apply(this, args);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:59"
+        },
+        {
+          "line": "redesign",
+          "text": "if (first instanceof CustomEvent) return isMissing(first.detail) ? first : first.detail;",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:90"
+        },
+        {
+          "line": "redesign",
+          "text": "if (first instanceof Event) return first.currentTarget ?? first;",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:91"
+        },
+        {
+          "line": "redesign",
+          "text": "if (stillHolds(element, vendor, root)) unsubscribe();",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:41"
+        },
+        {
+          "line": "redesign",
+          "text": "}",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:51"
+        },
+        {
+          "line": "redesign",
+          "text": "export const MOUNT_EVENT = \"alis:mount\";",
+          "cite": "Alis.Reactive.Assets/runtime/plans/mount-events.ts:5"
+        },
+        {
+          "line": "redesign",
+          "text": "export const UNMOUNT_EVENT = \"alis:unmount\";",
+          "cite": "Alis.Reactive.Assets/runtime/plans/mount-events.ts:6"
+        },
+        {
+          "line": "redesign",
+          "text": "document.addEventListener(\"alis:mount\", event => forEachWithin(event, selector, construct));",
+          "cite": "Alis.Reactive.Assets/components/hooks.ts:15"
+        },
+        {
+          "line": "redesign",
+          "text": "document.addEventListener(\"alis:unmount\", event => forEachWithin(event, selector, destroy));",
+          "cite": "Alis.Reactive.Assets/components/hooks.ts:19"
+        },
+        {
+          "line": "redesign",
+          "text": "(host.__alisPlugins ??= []).push({ name, instance });",
+          "cite": "Alis.Reactive.Assets/components/hooks.ts:34"
+        },
+        {
+          "line": "redesign",
+          "text": "for (const plugin of runtimeWindow.__alisPlugins ?? []) registerPlugin(plugin.name, pluginOf(plugin.name, plugin.instance));",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:44"
+        },
+        {
+          "line": "redesign",
+          "text": "delete runtimeWindow.__alisPlugins;",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:45"
+        },
+        {
+          "line": "redesign",
+          "text": "announceMount(document.body);",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:47"
+        },
+        {
+          "line": "redesign",
+          "text": "announceUnmount(target);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:32"
+        },
+        {
+          "line": "redesign",
+          "text": "announceMount(target);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:36"
+        },
+        {
+          "line": "redesign",
+          "text": "throw new InvalidOperationException($\"Two different vendors are named '{name}'. Give each vendor its own name.\");",
+          "cite": "Alis.Reactive/PlanModel/Writing/Scope.cs:270"
+        },
+        {
+          "line": "main",
+          "text": "const root = (element as FusionElement).ej2_instances?.[0];",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:81"
+        },
+        {
+          "line": "main",
+          "text": "registerComponentDriver(\"native\", nativeComponentDriver);",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89"
+        },
+        {
+          "line": "main",
+          "text": "registerComponentDriver(\"fusion\", fusionComponentDriver);",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:90"
+        },
+        {
+          "line": "main",
+          "text": "const listenersDroppedOnDestroy = source.isDestroyed;",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:34"
+        },
+        {
+          "line": "proposed",
+          "text": "public override ComponentVendor Vendor => ComponentVendor.Define(\"oxygengauge\", VendorLookup.ByPlugin(\"oxygen-gauges\"), subscribe: \"on\", unsubscribe: \"off\");",
+          "doors": [
+            "N17.6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public override ComponentVendor Vendor => ComponentVendor.DefineReturnedUnsubscriber(\"wardfeed\", objectPath: \"feed\", subscribe: \"subscribe\");",
+          "doors": [
+            "N17.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public ReadOnly<DoseRow> Row => Argument<DoseRow>(1);",
+          "doors": [
+            "N17.8"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public void Show(Arg<string[]> items) => MethodAt(1, [items]);",
+          "doors": [
+            "N17.8",
+            "N5.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "chart.TickLabel.Set(tick => tick.Label);",
+          "doors": [
+            "N17.9"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "chart.SortTicks(tick => tick.Doses);",
+          "doors": [
+            "N17.9"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "p.Listen(opened.Read(o => o.Card), card => card.Cleaned, (cleaned, pipeline) => pipeline.Element(\"cleaned-by\").Text.Set(cleaned.Read(c => c.Nurse)));",
+          "doors": [
+            "N12.1",
+            "N5.6"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "plugin",
+        "fn",
+        "get",
+        "call",
+        "listen",
+        "method",
+        "assignment",
+        "returned",
+        "answer"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:59-136"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Grammar/VendorEventPayload.cs:8-15"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Writing/Scope.cs:265-275"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Components/Contracts/IComponent.cs:9"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plans/mount-events.ts:5-20"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/components/hooks.ts:14-35"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:44-52"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:32-39"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q12",
+        "Q4",
+        "Q5",
+        "Q18"
+      ],
+      "meanings": [
+        {
+          "id": "M12.D1",
+          "meaning": "A vendor name names one vendor: one place of the object (its path or its lookup), one listening and one element path. Two definitions of one name whose data differ are refused: at build by ALIS034 when both are constants of one compilation, and where the view renders when one plan names both, as the redesign refuses them."
+        }
+      ],
+      "oracle": "The DOM Standard's EventTarget, addEventListener and removeEventListener, and CustomEvent's detail; ECMAScript's property assignment, call and Object.freeze, by which a vendor's object adds, assigns, refuses and removes a listener; and each vendor's typed API as TypeScript 6.0.3 types it (D17.5).",
+      "checker": [
+        "core:Q17",
+        "core:Q12",
+        "CallbackProperty.tla:EveryHearerHearsOnceInOrder",
+        "CallbackProperty.tla:AThrowSkipsNoHandler",
+        "CallbackProperty.tla:ALiveHandlerKeepsTheFrameworksFunction",
+        "CallbackProperty.tla:TheLastReleasePutsBackItsValue",
+        "CallbackProperty.tla:ARefusedAssignmentStartsNoHandler",
+        "CallbackProperty.tla:AReplacedObjectIsNotWritten",
+        "Ownership.tla:ListenOncePerObject",
+        "Ownership.tla:ListenLeavesWithItsOwner",
+        "Ownership.tla:ThrownListenerRunsNothing",
+        "Run.tla:WritesAfterTheTurnAreRefused",
+        "Ownership.tla:NoRemoveOnCollected"
+      ],
+      "defects": [
+        {
+          "id": "X17.1",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.2",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.5",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.13",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.16",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.18",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.19",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.28",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.29",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.30",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.39",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.40",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.41",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.42",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.43",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.44",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.45",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.46",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.47",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.48",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.11",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.12",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.14",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.15",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.17",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.20",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.21",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.22",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.23",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.49",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.50",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.51",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.52",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.16",
+          "rung": "behavior"
+        },
+        {
+          "id": "M12.X1",
+          "rung": "analyzer",
+          "defect": "Two definitions of one vendor name with different data both render, so one plan's handlers find the object by another definition's path or listening, or the view throws only where both meet in one plan (M12.D1). ALIS034 (N18.12) reports two constant definitions of one name whose path, lookup, listening or element path differ in one compilation; where the view renders, a plan that names both is refused with \"Two different vendors are named '{name}'. Give each vendor its own name.\" (Alis.Reactive/PlanModel/Writing/Scope.cs:270 at 65fdf118d)."
+        },
+        {
+          "id": "M12.X3",
+          "rung": "analyzer",
+          "defect": "A vendor's object path with an empty step, as \"slate.\", writes a path whose step names nothing, so every step that reaches the object stops in the browser. ALIS034 (N18.12) reports a constant object path or element path with an empty step; where the view renders on code it does not follow, the path is refused with \"Path '{text}' contains an empty segment at index {index}. Use dot-separated property names without consecutive, leading, or trailing dots.\" (Alis.Reactive/WireTerms/Path.cs:124-125 at 65fdf118d)."
+        },
+        {
+          "id": "X12.18",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.53",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.54",
+          "rung": "type"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X17.3",
+          "page": "The bench page renders a ConformanceElement at the id element, declared with ComponentVendor.Native, for room 12; its Opened is an Event<ElementSignal> whose payload is the event the element dispatches: ElementSignal declares Type, a ReadOnly<string>, and Detail, a ReadOnly<OpenedDetail?> of the class OpenedDetail with a string Room. The element's Open with room button dispatches a CustomEvent named opened with the detail {\"room\": \"12\"}, and its Open with no room button dispatches opened with no detail. The Opened handler writes the payload's Type into opened-type and its Detail's Room into opened-room.",
+          "gesture": "Click Open with room, then Open with no room.",
+          "outcome": "After each click opened-type reads opened; after the first opened-room reads 12, and after the second it is empty.",
+          "opposite": "Click Open with room once more: opened-type reads opened and opened-room reads 12.",
+          "defect": "The payload follows the dispatch, not the declaration: the redesign hands the handler a CustomEvent's detail when it carries one and the event when it carries none (Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:89-92 at 65fdf118d), so opened-type is empty after Open with room."
+        },
+        {
+          "for": "X17.10",
+          "page": "The bench page holds two elements of the conformance library: registered-1, for which the library made a ConformanceRegistered with the reading 97, and registered-2, for which it made none until the page's button Make the second registers one with the reading 88. The library keeps them in a WeakMap of its own, off their elements, found by the lookup it registers as the plugin conformance-registry, named by VendorLookup.ByPlugin(\"conformance-registry\") in the declaration's vendor. ConformanceRegistered declares Reading, a ReadOnly<int>; Threshold, a Property<int> it shows; Lower() and Raise(), which show Alarm lowered and Alarm raised beside it; and Alarmed, an Event its button Sound the alarm raises. Read the first writes registered-1's Reading into reading-1; Set the threshold to 92 writes 92 into registered-1's Threshold; Raise the alarm and Lower the alarm call registered-1's Raise() and Lower(); registered-1's Alarmed handler writes alarmed into alarm-heard; Read the second writes reading into second-tried, then registered-2's Reading into reading-2 and read into second-done.",
+          "gesture": "Click Read the first, Set the threshold to 92, Raise the alarm, Lower the alarm and Sound the alarm; then click Read the second and Raise the alarm.",
+          "outcome": "reading-1 reads 97, registered-1 shows the threshold 92, alarm-heard reads alarmed, and registered-1 shows Alarm lowered after Lower the alarm and Alarm raised after the last click; second-tried reads reading, and reading-2 and second-done are empty.",
+          "opposite": "Click Make the second, then Read the second: reading-2 reads 88 and second-done reads read, so the lookup runs when a step reaches the object.",
+          "defect": "The lookup is skipped or read once: an object kept off its element reads nothing and its alarm never moves, so reading-1 is empty; or an object the library never made reads nothing and the pipeline goes on, so second-done reads read (D17.3, D4.1)."
+        },
+        {
+          "for": "X17.11",
+          "page": "The bench page renders a ConformanceStore at the id store, declared with ComponentVendor.DefineReturnedUnsubscriber(\"conformance-store\", objectPath: \"conformanceStore\", subscribe: \"subscribe\"), whose Posted is an Event<Posted> with a string Message. The store's button Post an update posts the message Bed 4 needs water, and the store shows the count of listeners it holds as subscribers: n. The page's Posted handler writes the payload's Message into last-update. Open the card loads the slot store-card with a partial whose plan, when it loads, listens to the store's Posted, reached by its element's id, with a pipeline that adds one to the page's tally and writes it into card-heard, an element outside the slot; Close the card unloads it.",
+          "gesture": "Click Open the card, Post an update, Close the card, then Post an update.",
+          "outcome": "After the first Post an update, card-heard reads 1 and the store shows subscribers: 2; after Close the card the store shows subscribers: 1; after the second Post an update, card-heard still reads 1 and last-update reads Bed 4 needs water.",
+          "opposite": "Click Open the card and Post an update again: card-heard reads 2 and the store shows subscribers: 2.",
+          "defect": "The release calls nothing, or a method named as the subscribe's pair, where the store removes a listener only by the function its subscribe returned, so the store keeps subscribers: 2 and the second Post an update writes 2 into card-heard."
+        },
+        {
+          "for": "X17.12",
+          "page": "The bench page renders a ConformanceCallbacks at the id callbacks, whose OnSearch its vendor raises through the onSearch callback property with two arguments, the typed query and the object's continuation, which lists each name it is handed under the object's search box. The payload SearchArgs declares Query, Argument<string>(0), and Show, MethodAt(1, [names]). The OnSearch handler writes Query into searched-for and calls Show with the page's list of names, Ada Byrne and Adam Cole.",
+          "gesture": "Type Ad into the search box, and wait until searched-for reads Ad.",
+          "outcome": "searched-for reads Ad, and the box lists Ada Byrne and Adam Cole.",
+          "opposite": "Before any typing, the box lists no name and searched-for is empty.",
+          "defect": "The continuation at position 1 is not called, or is called with nothing, so the box lists no name; or Query reads an argument other than the first, so searched-for is empty (D17.4)."
+        },
+        {
+          "for": "X17.14",
+          "page": "The bench page with two ConformanceComponents, each declaring Answer, a Callback<Item, string> its own Ask button calls for each item, drawing the answers in its answer line; a component with no Answer draws each item's position, 1, 2 and 3. Both hold the items Ada, Bea and Cy. The view sets conformance-answered's Answer to item => item.Name and leaves conformance-plain's unset.",
+          "gesture": "Click Ask on conformance-answered, then on conformance-plain.",
+          "outcome": "conformance-answered's answer line reads Ada, Bea and Cy.",
+          "opposite": "conformance-plain's answer line reads 1, 2 and 3.",
+          "defect": "The answer is not the function the vendor calls, or answers nothing, so conformance-answered's answer line reads 1, 2 and 3, or is empty (D17.12)."
+        },
+        {
+          "for": "X17.15",
+          "page": "The bench page with the ConformanceComponent conformance, whose Raised is an Event<Raised> with a string Text, and the ConformanceRegistered registered-1, whose Alarmed is an Event with no payload. conformance's button Raise with no payload raises raised with no argument, its button Raise with text 7 raises raised with {\"text\": \"7\"}, and after each raise its own code shows its count of raises, Raised 1 and on; registered-1's button Sound the alarm raises alarmed with no argument. The Raised handler writes raising into raise-tried as its first step, then the payload's Text into raise-text; the Alarmed handler writes alarmed into alarm-heard.",
+          "gesture": "Click Raise with no payload, then Sound the alarm.",
+          "outcome": "After Raise with no payload, conformance shows Raised 1 and raise-tried and raise-text are empty; after Sound the alarm, alarm-heard reads alarmed.",
+          "opposite": "Click Raise with text 7: raise-tried reads raising, raise-text reads 7 and conformance shows Raised 2.",
+          "defect": "The missing payload reads as nothing and the handler runs, so raise-tried reads raising after Raise with no payload, as the redesign reads a payload's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d); or the stop reaches the vendor, so conformance shows no count of raises; or Alarmed's empty payload stops it, so alarm-heard is empty."
+        },
+        {
+          "for": "X17.17",
+          "page": "The bench page renders a ConformanceCallbacks at the id callbacks, declared with ComponentVendor.DefineCallbackProperties(\"conformance-callbacks\", objectPath: \"conformanceCallbacks\"), whose OnRaised, an Event<RaisedRoom> with a string Room, is heard through its onRaised property; its own code assigns onRaised a function that appends own to its log, and its button Raise room 7 calls onRaised with the room 7, each call writing a new line into the log; and a ConformanceStore at the id store, declared with ComponentVendor.DefineReturnedUnsubscriber(\"conformance-store\", objectPath: \"conformanceStore\", subscribe: \"subscribe\"), whose Posted is an Event<Posted> with a string Message and whose button Post an update posts Bed 4 needs water. The OnRaised handler writes the payload's Room into raised-room; the Posted handler writes its Message into posted-message.",
+          "gesture": "Click Raise room 7, then Post an update.",
+          "outcome": "raised-room reads 7, posted-message reads Bed 4 needs water, and the log's line reads own.",
+          "opposite": "Before either click, raised-room and posted-message are empty; Raise room 7 alone leaves posted-message empty.",
+          "defect": "A listening outside the method pair reaches no handler: the onRaised property is never assigned or the store's subscribe is never called, so raised-room or posted-message stays empty; the redesign has no returned unsubscriber (Alis.Reactive/Vendors/ComponentVendor.cs:78-121 at 65fdf118d).",
+          "observes": "CallbackProperty.tla:Raise"
+        },
+        {
+          "for": "X17.20",
+          "page": "The bench page with a text box unit-name and three ConformanceComponents. conformance-caption and conformance-footer each declare Answer, a Callback<Item, string> it calls for each item at each click of its own Ask button and shows in its answer line; conformance holds the text Day, and the page's button Set the text to Night writes Night into its Text. The view sets conformance-caption's Answer to unit-name's value and conformance-footer's to conformance's Text; conformance-footer holds one item, Ada. conformance-caption also declares SortItems(Answer<Item, int> key), a Method that orders and redraws its items by the key its answer gives for each; its items are Ada with the value 2, Bea with 4 and Cy with 1, listed in that order, and the page's button Sort by value calls conformance-caption.SortItems(item => item.Value).",
+          "gesture": "Type East into unit-name and click Ask on conformance-caption and conformance-footer; type West over it, click Set the text to Night and click both Asks again; click Sort by value.",
+          "outcome": "After the first Asks conformance-caption's answer line reads East, East and East and conformance-footer's Day; after the second West, West and West and Night; after Sort by value conformance-caption lists Cy, Ada and Bea, in that order.",
+          "opposite": "Before any typing, Ask on conformance-caption shows three empty answers and conformance-footer's Ask shows Day, and conformance-caption lists Ada, Bea and Cy.",
+          "defect": "The answer reads the page once, when it is assigned, so the second Asks still show East or Day; or the sort's argument is passed as a value, not as the function the vendor calls for each item, so the items keep Ada, Bea and Cy (D17.12)."
+        },
+        {
+          "for": "X17.21",
+          "page": "The bench page with two ConformanceComponents: conformance-source, whose ReadOnlyText holds Ward 3 until its own button Remove the read-only text deletes that member, and conformance, holding one item, whose Answer, a Callback<Item, string>, it calls when a write changes its Text, before it draws the answer in its answer line, so a throw from Answer leaves the answer it drew. The view sets conformance's Answer to conformance-source's ReadOnlyText. Set the text North writes North into conformance's Text, then set into north-done; Set the text South writes trying into south-tried, writes South into conformance's Text, then set into south-done.",
+          "gesture": "Click Set the text North, conformance-source's Remove the read-only text, then Set the text South.",
+          "outcome": "After Set the text North the answer line reads Ward 3 and north-done reads set; after Set the text South, south-tried reads trying, south-done is empty, and the answer line still reads Ward 3.",
+          "opposite": "Without Remove the read-only text, Set the text South leaves the answer line Ward 3 and writes set into south-done.",
+          "defect": "The stopped answer gives its vendor nothing or a default and the pipeline goes on, so south-done reads set or the answer line is empty (D17.12)."
+        },
+        {
+          "for": "X17.22",
+          "page": "The bench page with two ConformanceComponents: conformance-source, whose ReadOnlyText holds Ward 3 until its own button Remove the read-only text deletes that member, and conformance, holding one item, whose Answer, a Callback<Item, string>, its own Ask button calls in the component's own turn before it draws the answer in its answer line; the button's code shows the message of an error the call throws in the component's error line, so a throw leaves the answer it drew. The view sets conformance's Answer to conformance-source's ReadOnlyText.",
+          "gesture": "Click conformance's Ask, conformance-source's Remove the read-only text, then conformance's Ask.",
+          "outcome": "After the first Ask the answer line reads Ward 3 and the error line is empty; after the second, the error line shows a message and the answer line still reads Ward 3.",
+          "opposite": "Without Remove the read-only text, the second Ask leaves the error line empty and the answer line Ward 3.",
+          "defect": "The stopped answer returns nothing to the vendor's call in place of the throw, so the component draws an empty answer and the error line stays empty (D17.12)."
+        },
+        {
+          "for": "X17.23",
+          "page": "The bench page with two ConformanceComponents, each declaring Pair, a Callback<PairArgs, string> its own Ask button calls with a key first and a record second, as a value accessor is called, and draws each record's answer in its answer line. PairArgs declares Key, Argument<string>(0), the first argument's text, and Record, Argument<Record>(1), a Record with a string Name and an int Count. Both hold the records Ada with the count 2, Bea with 4 and Cy with 1, and call with the key count. The view sets conformance-records' Pair to args => args.Record.Name and conformance-keys' to args => args.Key.",
+          "gesture": "Click Ask on conformance-records and on conformance-keys.",
+          "outcome": "conformance-records' answer line reads Ada, Bea and Cy.",
+          "opposite": "conformance-keys' answer line reads count, count and count.",
+          "defect": "The answer reads Record from the first argument, the key, so conformance-records' answer line is empty (D17.4)."
+        },
+        {
+          "for": "X17.49",
+          "page": "The bench page renders a ConformanceCallbacks at the id callbacks, declared with ComponentVendor.DefineCallbackProperties(\"conformance-callbacks\", objectPath: \"conformanceCallbacks\"), whose OnRaised, an Event<RaisedRoom> with a string Room, is heard through its onRaised property; its own code assigns onRaised a function that appends own to its log, and its button Raise room 7 calls onRaised with the room 7, each call writing a new line into the log. Its button Make it throw makes its own function throw after it appends, and the object shows the error it meets in callbacks-error. The page's plan has two OnRaised handlers, which append page-1 and page-2. Open the card loads the slot card, whose plan, when it loads, listens to the object's OnRaised, reached by its element's id, appending card; the card's content holds the slot inner, loaded by Open the inner card, whose plan listens the same way, appending inner; Open the notes loads the page's slot notes, whose plan listens the same way, appending notes; Close the inner card and Close the notes unload theirs.",
+          "gesture": "Click Open the card, Open the inner card, Open the notes and Raise room 7; Close the inner card and Raise room 7; Close the notes and Raise room 7; Open the inner card and Raise room 7; Make it throw and Raise room 7.",
+          "outcome": "The log's lines read, in order: own page-1 page-2 card inner notes; own page-1 page-2 card notes; own page-1 page-2 card; own page-1 page-2 card inner; own page-1 page-2 card inner, with callbacks-error showing the object's throw.",
+          "opposite": "Before any slot opens, Raise room 7 writes the line own page-1 page-2.",
+          "defect": "A listener runs twice or out of the order it subscribed, a release removes a listener other than its own, or the object's throw skips the listeners after it, so a line differs; the redesign calls the replaced value before its listener, unguarded (Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:59 at 65fdf118d), so the last line reads own.",
+          "observes": "CallbackProperty.tla:UnloadB"
+        },
+        {
+          "for": "X17.50",
+          "page": "The bench page renders a ConformanceCallbacks at the id callbacks, declared with ComponentVendor.DefineCallbackProperties(\"conformance-callbacks\", objectPath: \"conformanceCallbacks\"), whose OnRaised, an Event<RaisedRoom> with a string Room, is heard through its onRaised property; its own code assigns onRaised a function that appends own to its log, and its button Raise room 7 calls onRaised with the room 7, each call writing a new line into the log. Its button Check shows, in holds, whether onRaised holds its own function (own), the script's (script) or another (other); the conformance library's button Replace the callback, standing for a page's script, assigns onRaised a function that appends script. No page handler listens to the object. Open the card loads the slot card, whose plan, when it loads, listens to the object's OnRaised, reached by its element's id, appending card; Close the card unloads it.",
+          "gesture": "Click Open the card, Check and Raise room 7; Close the card, Check and Raise room 7; Open the card, Replace the callback and Raise room 7; Close the card, Open the card and Raise room 7; Close the card, Check and Raise room 7.",
+          "outcome": "holds reads other, then own, then script; the log's lines read, in order: own card; own; script; script card; script.",
+          "opposite": "Before any slot opens, Check reads own and Raise room 7 writes the line own.",
+          "defect": "The framework writes the property again at a later listener or puts back a value over one a script assigned, so the script's function is lost at Close the card and the last line reads own; or the script's assignment leaves the card's handler running, so the third line reads script card.",
+          "observes": "CallbackProperty.tla:Script"
+        },
+        {
+          "for": "X17.51",
+          "page": "The bench page renders two ConformanceCallbacks, callbacks-a and callbacks-b, declared with ComponentVendor.DefineCallbackProperties(\"conformance-callbacks\", objectPath: \"conformanceCallbacks\"), whose OnRaised, an Event<RaisedRoom> with a string Room, is heard through the object's onRaised property. Each object's own code assigns onRaised a function that appends its id, callbacks-a or callbacks-b, to the log, each call writing a new line; callbacks-a's buttons are Raise A and Freeze A, and callbacks-b's Raise B and Freeze B, each Freeze freezing its object. Open card A loads the slot card-a, whose plan, when it loads, listens to callbacks-a's OnRaised, reached by its element's id, appending card-a; Open card B and Close card B load and unload card-b, which listens to callbacks-b the same way, appending card-b. Open the notes loads the slot notes, whose button Listen to A runs a pipeline that writes listening into listen-tried, listens to callbacks-a's OnRaised with a pipeline that appends notes, then writes listened into listen-done.",
+          "gesture": "Click Freeze A, Open card A and Raise A; click Open the notes and Listen to A; click Open card B, Freeze B, Raise B, Close card B and Raise B.",
+          "outcome": "The log's lines read callbacks-a, then callbacks-b card-b, then callbacks-b; Open card A shows one console error naming callbacks-a and onRaised, and Close card B one naming callbacks-b and onRaised; listen-tried reads listening and listen-done is empty.",
+          "opposite": "Without Freeze A, Open card A and Raise A write the line callbacks-a card-a, and Listen to A writes listened into listen-done.",
+          "defect": "The refused assignment passes unnoticed, so card-a counts as listening and the notes' listen goes on, listen-done reading listened; or the refused put-back leaves the framework's function calling card-b's listener, so the last line reads callbacks-b card-b.",
+          "observes": "CallbackProperty.tla:Freeze"
+        },
+        {
+          "for": "X17.52",
+          "page": "The bench page renders a ConformanceCallbacks at the id callbacks, declared with ComponentVendor.DefineCallbackProperties(\"conformance-callbacks\", objectPath: \"conformanceCallbacks\"), whose OnRaised, an Event<RaisedRoom> with a string Room, is heard through its onRaised property; each object's own code assigns onRaised a function that appends own with the object's generation, own 1 for the first, and its button Raise room 7 calls onRaised with the room 7, each call writing a new line into the log. The harness's restart, standing for the object's host, destroys the object and puts a new one, own 2, at conformanceCallbacks on the same element. Open the card loads the slot card, whose plan, when it loads, listens to the object's OnRaised, reached by its element's id, appending card; Close the card unloads it.",
+          "gesture": "Click Open the card; restart the object through the harness; click Close the card and Raise room 7; then click Open the card and Raise room 7.",
+          "outcome": "The log's lines read own 2, then own 2 card, and the console shows no error.",
+          "opposite": "Without the restart, Open the card and Raise room 7 write own 1 card, and Close the card then Raise room 7 writes own 1.",
+          "defect": "The release puts the old object's function onto the new object, so the first line reads own 1; or the card's listener stays tied to the old object and the new object is not assigned when the card opens again, so the second line reads own 2.",
+          "observes": "CallbackProperty.tla:Restart"
+        },
+        {
+          "for": "X12.9",
+          "page": "The bench page renders the ConformanceComponent at the id conformance, whose button Raise raises Raised with a payload holding its peer, a ConformancePeer on an element of its own whose vendor names its element path, the same peer at each click; its button Raise with a new peer puts a new peer on a new element and raises Raised with it. Each peer's button Change raises its Change. The Raised handler's listen step listens to the payload's Peer's Change with a pipeline that adds one to the page's tally and writes it into changed-count.",
+          "gesture": "Click Raise and the peer's Change; click Raise again and the peer's Change.",
+          "outcome": "After the first Change, changed-count reads 1; after the second, 2.",
+          "opposite": "Click Raise with a new peer and the new peer's Change: changed-count reads 3.",
+          "defect": "The same peer reached again adds a second listener, so the second Change writes 3.",
+          "observes": "Ownership.tla:ListenA"
+        },
+        {
+          "for": "X12.10",
+          "page": "The resident record with the care panel, a ConformanceComponent that stays on the page and raises Handed with the ConformancePeer it hands, and that peer, which the page renders beside the panel at the id peer, as native.json's event.poc15.component cells render one, and whose own button Change raises its Change; the panel's button Hand a peer hands it. Open the panel card loads the slot panel-card, whose plan listens to the care panel's Handed, reached by its element's id, and in that pipeline listens to the payload peer's Change with a pipeline that adds one to the page's tally and writes it into changed-count, an element outside the slot; Close the panel card unloads it.",
+          "gesture": "Click Open the panel card, the care panel's Hand a peer and the peer's Change; click Close the panel card and the peer's Change.",
+          "outcome": "After the first Change, changed-count reads 1, and after the second it still reads 1.",
+          "opposite": "Without Close the panel card, the second Change writes 2.",
+          "defect": "The listen's listener stays on the peer past its owner's release, so the second Change writes 2."
+        },
+        {
+          "for": "X12.16",
+          "page": "The bench page, whose own code provides the plugin bench-clock, whose events subscribe with on and off; its button Break off makes off throw, and its button Tick raises tick. Open the card loads the bench slot's card, whose plan's Tick handler adds one to the page's tally and writes it into ticks-heard, an element outside the slot; Close the card unloads it.",
+          "gesture": "Click Break off, Open the card, Close the card, Open the card, then Tick.",
+          "outcome": "ticks-heard reads 1.",
+          "opposite": "Without Break off, Open the card, Close the card and Tick leave ticks-heard empty.",
+          "defect": "A listener whose removal threw still runs, since it was not marked released before its removal, so ticks-heard reads 2.",
+          "observes": "Ownership.tla:UnsubscribeThrows"
+        },
+        {
+          "for": "X17.49",
+          "page": "The bench page renders a ConformanceCallbacks at the id callbacks, declared with ComponentVendor.DefineCallbackProperties(\"conformance-callbacks\", objectPath: \"conformanceCallbacks\"), whose OnRaised, an Event<RaisedRoom> with a string Room, is heard through its onRaised property; its own code assigns onRaised a function that appends own to its log, and its button Raise room 7 calls onRaised with the room 7, each call writing a new line into the log. The page's plan has two OnRaised handlers, which append page-1 and page-2. Open the slot loads the slot holder, whose plan, when it loads, listens to the object's OnRaised, reached by its element's id, appending outer; the holder's content holds the slot inner, loaded by Open the inner slot, whose plan listens the same way, appending inner.",
+          "gesture": "Click Open the slot, Open the inner slot and Raise room 7; click Open the slot again and Raise room 7.",
+          "outcome": "The log's lines read own page-1 page-2 outer inner, then own page-1 page-2 outer.",
+          "opposite": "Before any slot opens, Raise room 7 writes the line own page-1 page-2.",
+          "defect": "A load over the holder starts its new listener before it releases the old ones, or keeps the inner slot's, so the second line holds outer twice or still holds inner (CallbackProperty.tla's EveryHearerHearsOnceInOrder).",
+          "observes": "CallbackProperty.tla:LoadA"
+        },
+        {
+          "for": "X17.49",
+          "page": "The bench page renders a ConformanceCallbacks at the id callbacks, declared with ComponentVendor.DefineCallbackProperties(\"conformance-callbacks\", objectPath: \"conformanceCallbacks\"), whose OnRaised, an Event<RaisedRoom> with a string Room, is heard through its onRaised property; its own code assigns onRaised a function that appends own to its log, and its button Raise room 7 calls onRaised with the room 7, each call writing a new line into the log. The page's plan has two OnRaised handlers, which append page-1 and page-2. Open the slot loads the slot holder, whose plan, when it loads, listens to the object's OnRaised, reached by its element's id, appending outer; the holder's content holds the slot inner, loaded by Open the inner slot, whose plan listens the same way, appending inner.",
+          "gesture": "Click Open the slot, Open the inner slot and Raise room 7; click Open the inner slot again and Raise room 7.",
+          "outcome": "The log's lines read own page-1 page-2 outer inner, twice.",
+          "opposite": "With the holder open and the inner slot never opened, Raise room 7 writes the line own page-1 page-2 outer.",
+          "defect": "A load over the inner slot keeps the old listener beside the new one, so the second line reads inner twice, or drops it, so the line ends at outer (CallbackProperty.tla's EveryHearerHearsOnceInOrder).",
+          "observes": "CallbackProperty.tla:LoadB"
+        },
+        {
+          "for": "X17.50",
+          "page": "The bench page renders a ConformanceCallbacks at the id callbacks, declared with ComponentVendor.DefineCallbackProperties(\"conformance-callbacks\", objectPath: \"conformanceCallbacks\"), whose OnRaised, an Event<RaisedRoom> with a string Room, is heard through its onRaised property; its own code assigns onRaised a function that appends own to its log, and its button Raise room 7 calls onRaised with the room 7, each call writing a new line into the log. Its button Check shows, in holds, whether onRaised holds its own function (own) or another (other). The page's plan has two OnRaised handlers, which append page-1 and page-2. Open the slot loads the slot holder, whose plan, when it loads, listens to the object's OnRaised, reached by its element's id, appending outer; the holder's content holds the slot inner, loaded by Open the inner slot, whose plan listens the same way, appending inner; Close the slot unloads the holder.",
+          "gesture": "Click Open the slot, Open the inner slot and Raise room 7; click Close the slot, Check and Raise room 7.",
+          "outcome": "The log's lines read own page-1 page-2 outer inner, then own page-1 page-2, and holds reads other.",
+          "opposite": "Before any slot opens, Raise room 7 writes the line own page-1 page-2.",
+          "defect": "The close puts back the object's own function at its first release while the page's handlers still listen, so the second line reads own and holds reads own (CallbackProperty.tla's PutBackAtFirst mutant, which breaks ALiveHandlerKeepsTheFrameworksFunction).",
+          "observes": "CallbackProperty.tla:UnloadA"
+        },
+        {
+          "for": "X12.18",
+          "page": "A page that renders the ConformanceComponent at the id conformance, whose button Raise raises its Raised event with a payload holding its peer, a ConformancePeer on an element of its own, and whose button Drop the peer removes that element and lets go of that peer; the component also holds the first peer it built by a WeakRef, which its FirstPeerState reads, and the page's button Check the first peer writes collected or alive into peer-state. Open the slot loads the slot holder, whose plan's Raised handler listens to the payload's peer's change, adding one to the page's tally and writing it into heard, an element outside the slot; Close the slot unloads it, after which the page writes closed into slot-state.",
+          "gesture": "Click Open the slot, Raise and Drop the peer; force a garbage collection with Playwright's Page.RequestGCAsync; click Check the first peer; click Close the slot.",
+          "outcome": "peer-state reads collected before Close the slot; after it slot-state reads closed and the console shows no error.",
+          "opposite": "Without Drop the peer, peer-state reads alive after the collection, and after Close the slot a change of the peer leaves heard unchanged.",
+          "defect": "The listen step holds the peer strongly, so peer-state reads alive after the collection; or the unload calls the collected peer's removeEventListener, so the console shows the TypeError and slot-state stays empty.",
+          "observes": "Ownership.tla:Collect"
+        }
+      ],
+      "verdicts": []
+    },
+    {
+      "id": "M12.F2",
+      "summary": "A component on the page: Component, the base of a component's declaration, a live object whose listening is its vendor's; IComponent, carrying the ComponentVendor a declaration names; plan.Render<TComponent>(id, markup), which writes the markup a render helper gives, and RenderedComponent's Reactive, a handler of a declared event from the plan's start, which names the element as that declaration's component in the plan; and pipeline.Component<TComponent>(id), the component on the element of that id, typed by its declaration. An element holds one component in a plan, and a handler whose element holds no object when its plan starts does not start and stops no other. Main's IComponent names its vendor by a string its runtime picks a driver by, and main reaches a component through ComponentRef, whose writes and calls are internal; the redesign carries the vendor as data and reaches a component as its declaration.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:Component",
+        "Alis.Reactive:IComponent",
+        "Alis.Reactive:RenderedComponent<TComponent, TModel>",
+        "Alis.Reactive:ComponentRef<TComponent, TModel>"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent>(string! refId) -> ComponentRef<TComponent, TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent>(string! refId) -> TComponent!",
+        "Alis.Reactive:ReactivePlan<TModel>.Render<TComponent>(string! elementId, Microsoft.AspNetCore.Html.IHtmlContent! markup) -> RenderedComponent<TComponent, TModel!>!",
+        "Alis.Reactive:ReactivePlan<TModel>.Render<TComponent>(string! elementId, System.Web.IHtmlString! markup) -> RenderedComponent<TComponent, TModel!>!"
+      ],
+      "sentences": [
+        {
+          "line": "redesign",
+          "text": "ComponentVendor Vendor { get; }",
+          "cite": "Alis.Reactive/Components/IComponent.cs:9"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class RenderedComponent<TComponent, TModel>",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:36"
+        },
+        {
+          "line": "redesign",
+          "text": "public RenderedComponent<TComponent, TModel> Reactive<TArgs>(",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:79"
+        },
+        {
+          "line": "redesign",
+          "text": "context.DeclareComponent(_componentId, Declaration.Vendor);",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:94"
+        },
+        {
+          "line": "redesign",
+          "text": "context.On(objects => objects.Element(_componentId), declaredEvent.ObjectPath, declaredEvent.Name, body);",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:95"
+        },
+        {
+          "line": "redesign",
+          "text": "public RenderedComponent<TComponent, TModel> Reactive(",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:103"
+        },
+        {
+          "line": "redesign",
+          "text": "public RenderedComponent<TComponent, TModel> Render<TComponent>(",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:68"
+        },
+        {
+          "line": "redesign",
+          "text": "return new RenderedComponent<TComponent, TModel>(this, elementId, markup);",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:80"
+        },
+        {
+          "line": "redesign",
+          "text": "public TComponent Component<TComponent>(string refId)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:168"
+        },
+        {
+          "line": "redesign",
+          "text": "=> Live<TComponent>(refId);",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:170"
+        },
+        {
+          "line": "redesign",
+          "text": "$\"'{vendor.Name}', but an element holds one component: name it by the declaration of the component its view renders.\");",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:129"
+        },
+        {
+          "line": "redesign",
+          "text": "if (!element) throw new Error(`[alis] #${locator.id} is not on the page`);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:55"
+        },
+        {
+          "line": "main",
+          "text": "string Vendor { get; }",
+          "cite": "Alis.Reactive/Components/Contracts/IComponent.cs:9"
+        },
+        {
+          "line": "main",
+          "text": "public class ComponentRef<TComponent, TModel>",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:11"
+        },
+        {
+          "line": "main",
+          "text": "Pipeline.AddStep(ReactionGraph.Set(",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:39"
+        },
+        {
+          "line": "main",
+          "text": "ComponentSource.Of(componentKey), property.Member, value));",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:40"
+        },
+        {
+          "line": "main",
+          "text": "public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:127"
+        },
+        {
+          "line": "main",
+          "text": "return new ComponentRef<TComponent, TModel>(refId, this);",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:130"
+        },
+        {
+          "line": "proposed",
+          "text": "public sealed class DoseTimer : Component { public override ComponentVendor Vendor => ComponentVendor.Define(\"dosetimer\", \"timer\", \"on\", \"off\"); }",
+          "doors": [
+            "M12.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "p.Component<DoseTimer>(\"dose-timer\").Restart();",
+          "doors": [
+            "M12.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "plan.Render<DoseTimer>(\"dose-timer\", Html.Partial(\"_DoseTimer\")).Reactive(t => t.Elapsed, (elapsed, pipeline) => pipeline.Element(\"elapsed-for\").Text.Set(elapsed.Read(e => e.Resident)));",
+          "doors": [
+            "M12.N3",
+            "N5.6"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "call",
+        "listen"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/Component.cs:21-24"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/IComponent.cs:9"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:36-117"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:68-80"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:168-170"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:120-136"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:11-65"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:127-130"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-55"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:44-52"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q12",
+        "Q4",
+        "Q14"
+      ],
+      "meanings": [
+        {
+          "id": "M12.D2",
+          "meaning": "A handler of a component's event subscribes when its plan's owner starts, after alis:mount has announced the content that owner covers, at boot and at a slot's load alike. A handler whose element the page lacks, or whose element holds no object at its vendor's place, does not start and never starts later: the console shows one error naming the element and its vendor, and the plan's other handlers subscribe. A step that reaches that element when it runs finds the object then, and stops only its own pipeline when it is still missing (D4.1)."
+        }
+      ],
+      "oracle": "ASP.NET Core's IHtmlContent and MVC 5's IHtmlString, through which a view writes a component's markup, and the DOM Standard's getElementById, by which the runtime finds a component's element.",
+      "checker": [
+        "core:Q17",
+        "core:Q12",
+        "Ownership.tla:NoUnsubscribeOnDestroyed",
+        "Ownership.tla:NoRemoveOnDestroyedListened",
+        "Ownership.tla:ListenersDoNotAccumulate",
+        "Absence.tla:RequiredAbsentStops",
+        "Absence.tla:StopEndsOnlyItsHandler"
+      ],
+      "defects": [
+        {
+          "id": "X17.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.13",
+          "rung": "behavior"
+        },
+        {
+          "id": "M12.X2",
+          "rung": "refusal",
+          "defect": "An element a plan names as the component of two vendors renders, so the plan finds one element's object by two vendors' places and listenings. Where the view renders it is refused with \"Element '{id}' is named as a component of vendor '{first}' and as one of vendor '{second}', but an element holds one component: name it by the declaration of the component its view renders.\" (Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:128-129 at 65fdf118d)."
+        },
+        {
+          "id": "M12.X4",
+          "rung": "behavior",
+          "defect": "A handler whose element holds no object when its plan starts stops the plan's other handlers from subscribing, subscribes later to an object built after the start, or fails with no error naming it (M12.D2)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X17.4",
+          "page": "The bench page with the ConformanceComponent conformance, which the test app brings as an app brings a component: its declaration, its render helper and its browser code are the app's own, and its code builds it on alis:mount. It shows its amount and declares Amount, a Property<decimal> that starts at 30 here; Add(Arg<decimal> amount), a Method that adds the amount to its Amount; and Raised, an Event<Raised> with a string Text, which its button Raise raises with the text Ada. Read the amount writes Amount into amount-read; Set 15 writes 15 into Amount; Add 15 calls Add(15); the Raised handler writes the payload's Text into raised-for.",
+          "gesture": "Click Set 15 and Read the amount; click Add 15 and Read the amount; click the component's Raise.",
+          "outcome": "After the first Read the amount, amount-read reads 15 and the component shows 15; after the second, amount-read reads 30 and the component shows 30; after Raise, raised-for reads Ada.",
+          "opposite": "Before any click, the component shows 30, and amount-read and raised-for are empty.",
+          "defect": "A step reaches only a component the framework's packages onboard, as main's runtime holds drivers for native and fusion alone (Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89-90 at 623dd4a27), so amount-read, the component's amount or raised-for stays as it was."
+        },
+        {
+          "for": "X12.7",
+          "page": "The resident record, whose slot panel-slot, loaded by Open the panel and unloaded by Close the panel, renders a ConformanceComponent, which its code builds on alis:mount, and a text raised-heard inside the panel; the panel's plan has the component's Raised handler, which writes raised into raised-heard. The component's button Raise raises Raised, and its button Destroy destroys it and takes it off its element.",
+          "gesture": "Click Open the panel, the component's Destroy, Close the panel, Open the panel, then the component's Raise.",
+          "outcome": "raised-heard reads raised, and the console shows no error.",
+          "opposite": "In the first panel, before Destroy, Raise writes raised into raised-heard as well.",
+          "defect": "The release calls the destroyed component's unsubscribe, which throws, so the console shows an error, or the error stops the next load, so the new panel's raised-heard stays empty."
+        },
+        {
+          "for": "X12.13",
+          "page": "The resident record, whose slot panel-card, loaded by Open the card and unloaded by Close the card, renders a ConformanceComponent; the card's plan has the component's Raised handler, which adds one to the page's tally and writes it into raised-heard, an element outside the slot. The component's button Raise raises Raised; every object's unsubscribe adds one to the page's count in off-calls, and a destroy, by its host or on alis:unmount, calls no unsubscribe. The harness's restart, standing for the component's host, destroys it and puts a new ConformanceComponent object on the same element (Ownership.tla's HostDestroys).",
+          "gesture": "Click Open the card and Raise; restart the component through the harness; click Raise, then Close the card.",
+          "outcome": "raised-heard reads 1, off-calls reads 0 after Close the card, and the console shows no error.",
+          "opposite": "Without the restart, the second Raise writes 2 into raised-heard.",
+          "defect": "The handler follows the element to the new object, so raised-heard reads 2; or the release calls the unsubscribe of the destroyed object it listened to, so off-calls reads 1 and the console shows the error the destroyed object throws.",
+          "observes": "Ownership.tla:HostDestroys"
+        },
+        {
+          "for": "M12.X2",
+          "page": "A refusal page that renders the ConformanceComponent conformance, whose plan's button Ping and write runs a pipeline that calls Ping() on conformance reached through ConformanceComponent's declaration, of the vendor conformance-component, then writes 0.5 into the Ratio of conformance reached through ConformancePeer's declaration, of the vendor conformance-peer.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"Element 'conformance' is named as a component of vendor 'conformance-component' and as one of vendor 'conformance-peer', but an element holds one component: name it by the declaration of the component its view renders.\"",
+          "opposite": "With both steps reaching conformance through ConformanceComponent's declaration, the page renders and Ping and write pings the component and sets its ratio to 0.5.",
+          "defect": "Both vendors are written, so the page renders and each step finds conformance by its own declaration's vendor, one of them reading what the component is not.",
+          "existing_test": "redesign WhenAVendorIsDeclaredWrongly.an_element_named_as_the_components_of_two_vendors_is_refused"
+        },
+        {
+          "for": "M12.X4",
+          "page": "The bench page with a ConformanceComponent whose code builds it only when the page's button Build the component is clicked; the page's plan has the component's Raised handler, which writes raised into raised-heard, and the button Say hello, which writes hello into greeting. A built component's button Raise raises Raised.",
+          "gesture": "Click Say hello; then click Build the component and the component's Raise.",
+          "outcome": "greeting reads hello and the console shows one error naming the component's element and its vendor; after Raise, raised-heard is empty.",
+          "opposite": "On the same page with the component built on alis:mount, Raise writes raised into raised-heard.",
+          "defect": "The missing object stops every handler of the plan from subscribing, so greeting stays empty; or the handler subscribes at a later step, so raised-heard reads raised; or no error names the handler.",
+          "existing_test": "redesign WhenAComponentIsNotBuiltYet.a_handler_of_a_component_not_built_yet_stops_no_other_handler_from_listening"
+        },
+        {
+          "for": "X12.13",
+          "page": "The bench page renders the ConformanceComponent at the id conformance, whose button Raise raises its Raised event; every object's unsubscribe adds one to the page's count in off-calls, and a destroy calls no unsubscribe. The harness's restart, standing for the component's host, destroys the object and puts a new ConformanceComponent object on the same element (Ownership.tla's HostDestroysListened). Open the slot loads the slot holder, whose plan, when it loads, listens to the ConformanceComponent's Raised, reached by its element's id, adding one to the page's tally and writing it into heard, an element outside the slot; Close the slot unloads it.",
+          "gesture": "Click Open the slot and Raise; restart the component through the harness; click Raise, then Close the slot.",
+          "outcome": "heard reads 1, off-calls reads 0 after Close the slot, and the console shows no error.",
+          "opposite": "Without the restart, Close the slot writes 1 into off-calls.",
+          "defect": "The release removes the listen from the object the element holds now, which never subscribed, or calls the destroyed object's unsubscribe, so off-calls reads 1 or the console shows an error; or the listen follows the element to the new object, so heard reads 2 (Ownership.tla's RemoveOnDestroyed mutant, which breaks NoRemoveOnDestroyedListened).",
+          "observes": "Ownership.tla:HostDestroysListened"
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "ComponentRef<TComponent, TModel>",
+          "verdict": "refused",
+          "reason": "A reach whose writes and calls are internal, EmitSet and EmitCall over a member named as a string (Alis.Reactive/Components/Contracts/ComponentRef.cs:31-65 at 623dd4a27), so only the framework's packages declare what a step does on a component, and a component an app brings has no door. The rewrite reaches a component as its declaration (M12.N2), whose members a step reads with Read (N5.6) and calls with any number of arguments (N5.3).",
+          "carriers": [
+            "M12.N2",
+            "N5.3",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "IComponent.Vendor.get -> string!",
+          "verdict": "refused",
+          "reason": "A vendor named by a string the runtime picks a driver by, native or fusion (Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89-90 at 623dd4a27), so the runtime names each vendor it serves. The rewrite carries the vendor as data the one driver follows (D17.3): IComponent.Vendor is the ComponentVendor a declaration names (M12.N1).",
+          "carriers": [
+            "M12.N1"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Component<TComponent>(string! refId) -> ComponentRef<TComponent, TModel!>!",
+          "verdict": "kept",
+          "as": [
+            "M12.N2"
+          ]
+        }
+      ]
+    }
+  ]
+}

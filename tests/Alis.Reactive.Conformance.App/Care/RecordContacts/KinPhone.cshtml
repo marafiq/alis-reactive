@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model KinPhone
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Next of kin";
+    var plan = Html.ReactivePlan<KinPhone>();
+}
+<h1>Next of kin</h1>
+<fieldset>
+    <legend>Phone</legend>
+    @(Html.InputField(plan, m => m.Phone, options => options.Label("Phone")).FusionMaskedTextBox(build => build.Mask("000-000-0000")))
+</fieldset>
+<fieldset>
+    <legend>Prepare the phone number</legend>
+    @(Html.NativeButton("prepare-slip", "Prepare contact slip")
+        .Reactive(plan, button => button.Click, (_, pipeline) => pipeline.Element("contact-slip-number").Text.Set(
+            pipeline.Input(m => m.Phone).Component<FusionMaskedTextBox>().GetMaskedValue())))
+    <output id="contact-slip-number" aria-label="Contact slip number">No contact slip prepared</output>
+    @(Html.NativeButton("prepare-dialer", "Prepare dialer entry")
+        .Reactive(plan, button => button.Click, (_, pipeline) => pipeline.Element("dialer-number").Text.Set(
+            pipeline.Input(m => m.Phone).Component<FusionMaskedTextBox>().Value)))
+    <output id="dialer-number" aria-label="Dialer number">No dialer entry prepared</output>
+</fieldset>
+@Html.RenderPlan(plan)

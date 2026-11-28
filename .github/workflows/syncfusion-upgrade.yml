@@ -1,0 +1,41 @@
+name: Syncfusion upgrade
+
+on:
+  pull_request:
+    paths:
+      - Directory.Packages.props
+      - package.json
+      - package-lock.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: syncfusion-upgrade-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  upgrade:
+    name: the pin, the EJ2 probes, the fusion pool
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    container:
+      image: mcr.microsoft.com/playwright/dotnet:v1.64.1-noble@sha256:6955861f6e17b2580c00f0970198e446f006cdae6c34fb8f9ad5318aaab50da0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-toolchain
+      - name: The pin agrees in NuGet, npm and the lock
+        run: node scripts/pin-syncfusion.mjs --check
+      - name: The probes, EJ2's browser probes among them
+        run: python3 spec/tools/check.py --check probes
+      - name: The fusion pool
+        env:
+          SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
+        run: scripts/playwright.sh --pool fusion

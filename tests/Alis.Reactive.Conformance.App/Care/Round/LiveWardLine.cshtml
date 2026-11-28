@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveRound
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveRound>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+<p>Nurse line call: <span id="line-call"></span></p>
+<p>Nurse line closed: <span id="line-closed"></span></p>
+<p>Nurse line dropped: <span id="line-dropped"></span></p>
+<p>Nurse line back: <span id="line-back"></span></p>
+<p>Roster: <span id="roster"></span></p>
+<button type="button" @Html.Raises(plan, LiveLineButtons.AskForTheRoster)>Ask for the roster</button>
+<p>Roster asked: <span id="roster-again"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Element("roster").Text.Set(pipeline.Hub(WardLine.Live).Roster()))
+        .SignalR(WardLine.Live, line => line.Welcome, (welcome, pipeline) => pipeline.Element("line-call").Text.Set(welcome.Read(w => w.Accepted)))
+        .SignalR(WardLine.Live, line => line.Closed, pipeline => pipeline.Element("line-closed").Text.Set("closed"))
+        .SignalR(WardLine.Live, line => line.Reconnecting, pipeline => pipeline.Element("line-dropped").Text.Set("dropped"))
+        .SignalR(WardLine.Live, line => line.Reconnected, (_, pipeline) => pipeline.Element("line-back").Text.Set("back"))
+        .CustomEvent(LiveLineButtons.AskForTheRoster, pipeline => pipeline.Element("roster-again").Text.Set(pipeline.Hub(WardLine.Live).Roster())));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,51 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ReturnedItemsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Returned items";
+    var plan = Html.ReactivePlan<ReturnedItemsBoard>();
+}
+<h1>Returned items</h1>
+@(plan.ConformanceComponent("conformance-held", new ConformanceStart { Text = Model.Text, CurrentItem = Model.CurrentItem, CurrentItemLacksValue = true }))
+@(plan.ConformanceComponent("conformance-empty", new ConformanceStart { Text = Model.Text }))
+<button type="button" @Html.Raises(plan, ReturnedItemButtons.WriteTheValue)>Write the value</button>
+<button type="button" @Html.Raises(plan, ReturnedItemButtons.ReadTheEmptyCurrent)>Read the empty current</button>
+<button type="button" @Html.Raises(plan, ReturnedItemButtons.ReadTheHeldCurrent)>Read the held current</button>
+<button type="button" @Html.Raises(plan, ReturnedItemButtons.ShowTheText)>Show the text</button>
+<dl>
+    <dt>Write tried</dt>
+    <dd id="write-tried"></dd>
+    <dt>Write done</dt>
+    <dd id="write-done"></dd>
+    <dt>Read tried</dt>
+    <dd id="read-tried"></dd>
+    <dt>Empty current's name</dt>
+    <dd id="current-name"></dd>
+    <dt>Read done</dt>
+    <dd id="read-done"></dd>
+    <dt>Held current's name</dt>
+    <dd id="held-name"></dd>
+    <dt>Text</dt>
+    <dd id="text-read"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ReturnedItemButtons.WriteTheValue, pipeline =>
+        {
+            pipeline.Element("write-tried").Text.Set("writing");
+            pipeline.Component<ConformanceComponent>("conformance-held").Current().Value.Set(7);
+            pipeline.Element("write-done").Text.Set("written");
+        })
+        .CustomEvent(ReturnedItemButtons.ReadTheEmptyCurrent, pipeline =>
+        {
+            pipeline.Element("read-tried").Text.Set("reading");
+            pipeline.Element("current-name").Text.Set(pipeline.Component<ConformanceComponent>("conformance-empty").Current().Name);
+            pipeline.Element("read-done").Text.Set("read");
+        })
+        .CustomEvent(ReturnedItemButtons.ReadTheHeldCurrent, pipeline => pipeline.Element("held-name").Text.Set(pipeline.Component<ConformanceComponent>("conformance-held").Current().Name))
+        .CustomEvent(ReturnedItemButtons.ShowTheText, pipeline => pipeline.Element("text-read").Text.Set(pipeline.Component<ConformanceComponent>("conformance-empty").Text)));
+}
+@Html.RenderPlan(plan)

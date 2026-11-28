@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WeekSummary
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident record";
+    var plan = Html.ReactivePlan<WeekSummary>();
+}
+<h1>Record of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, WeekSummaries.OpenTheSummary)>Open the summary</button>
+<button type="button" @Html.Raises(plan, WeekSummaries.LoadTheSummary)>Load summary</button>
+<p>Summary: <output id="summary-status"></output></p>
+<section id="summary-tab" aria-label="Tab"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(WeekSummaries.OpenTheSummary, pipeline => pipeline.Get(WeekSummaryEndpoints.Tab).Into("summary-tab"))
+        .CustomEvent(WeekSummaries.LoadTheSummary, pipeline => pipeline
+            .Get(CareEndpoints.WeekSummaryNotes)
+            .Busy("summary-panel")
+            .WhileLoading(pipeline => pipeline.Element("summary-status").Text.Set("Loading"))
+            .OnSuccess(Content.Text, (summary, pipeline) => pipeline.Element("summary-notes").Text.Set(summary.Body))));
+}
+@Html.RenderPlan(plan)

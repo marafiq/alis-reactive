@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MobilityRequest
+@{
+    var plan = Html.ReactivePlan<MobilityRequest>();
+    void FileAssessment(Pipeline<MobilityRequest> pipeline, bool ratioOnly)
+    {
+        var moveIn = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Post<MobilityRequest>(MoveInEndpoints.MobilityReview, request =>
+        {
+            var identified = request.Path(sent => sent.DraftId, moveIn.Read(m => m.DraftId))
+                .Header(MoveInEndpoints.AssessmentHeader, moveIn.Read(m => m.Care.Assisted!.AssessmentCode))
+                .Header(MoveInEndpoints.CoordinatorHeader, moveIn.Read(m => m.CoordinatorId))
+                .Header(MoveInEndpoints.OperationHeader, moveIn.Read(m => m.OperationId));
+            if (ratioOnly)
+                identified.Json(body => body.Input(sent => sent.Ratio, pipeline.Input(m => m.Ratio))
+                    .Set(sent => sent.Description, "Mobility assessment"));
+            else
+                identified.Json(pipeline.Container<MobilityRequest>("assessment"), body => body
+                    .Set(sent => sent.Description, "Mobility assessment"));
+        })
+            .Validate<MobilityRules>()
+            .OnSuccess<SaveReply>((saved, pipeline) => pipeline.Element("assessment-filing-result").Text.Set(pipeline.Concat("Mobility review accepted: ", saved.Body.Read(reply => reply.Receipt.Reference))))
+            .OnError<ErrorEnvelope>(422, (failed, pipeline) => pipeline.Element("assessment-filing-result").Text.Set(failed.Body.Read(reply => reply.Error.Message)))
+            .Chained((saved, pipeline) => pipeline.Get<DeskQuery>(CareEndpoints.MoveInOwnerHistory, request => request.Query(query => query.DraftId, saved.Body.Read(reply => reply.Receipt.DraftId))).Into("owner-history"));
+    }
+}
+@(Html.NativeButton("file-assessment", "File assessment").Reactive(plan, button => button.Click, (clicked, pipeline) => FileAssessment(pipeline, false)))
+@(Html.NativeButton("file-assessed-ratio", "File assessed ratio").Reactive(plan, button => button.Click, (clicked, pipeline) => FileAssessment(pipeline, true)))
+<p id="assessment-filing-result"></p>
+@Html.RenderPlan(plan)

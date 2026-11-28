@@ -1,0 +1,45 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SavedRoomCard
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Saved resident room card";
+    var plan = Html.ReactivePlan<SavedRoomCard>();
+    var roomLabel = Model.Arabic ? "<span lang='ar'>غرفة مفردة</span>" : "<span lang='en'>Single room</span>";
+    const string stockStyle = "<style>.saved-card .stock-note { display: block; }</style>";
+}
+<style>
+    .stock-note { display: none; }
+    .e-radio-wrapper.arabic-edition .e-label { font-size: 1.25rem; line-height: 1.8; }
+    .e-radio-wrapper.english-edition .e-label { font-size: 1.125rem; line-height: 1.5; }
+</style>
+<h1>Saved resident room card</h1>
+<article class="saved-card">
+    <fieldset>
+        <legend>Saved card preview</legend>
+        @(Html.FusionRadioButton(plan, "saved-room", build => build.Name("saved-room-choice").Value("single")
+            .Label(roomLabel + stockStyle)
+            .CssClass(Model.Arabic ? "arabic-edition" : "english-edition")
+            .EnableRtl(Model.Arabic)
+            .LabelPosition(Model.Arabic ? Syncfusion.EJ2.Buttons.RadioLabelPosition.Before : Syncfusion.EJ2.Buttons.RadioLabelPosition.After)
+            .EnableHtmlSanitizer(!Model.Arabic)
+            .Locale(Model.Arabic ? "ar" : "en-US")))
+    </fieldset>
+    <p class="stock-note">Use the house print stock</p>
+</article>
+@(Html.NativeButton("preview-print-layout", "Preview print layout")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var room = pipeline.Component<FusionRadioButton>("saved-room");
+        pipeline.When(room.CssClass.Eq("arabic-edition").And(room.EnableRtl).And(room.LabelPosition.Eq(FusionRadioButtonLabelPosition.Before)))
+            .Then(pipeline => pipeline.Element("print-layout").Text.Set("Print right to left with the room name first"))
+            .ElseIf(room.CssClass.Eq("english-edition").And(room.EnableRtl.Not()).And(room.LabelPosition.Eq(FusionRadioButtonLabelPosition.After)))
+            .Then(pipeline => pipeline.Element("print-layout").Text.Set("Print left to right with the room name last"))
+            .Else(pipeline => pipeline.Element("print-layout").Text.Set("Check the room card layout before printing"));
+    }))
+<p><output id="print-layout" aria-label="Print instruction">Layout awaiting review</output></p>
+@Html.RenderPlan(plan)

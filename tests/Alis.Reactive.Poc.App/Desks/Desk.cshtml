@@ -1,0 +1,31 @@
+@using Alis.Reactive.Poc.App.Desks
+@model MonitorDeskShift
+@{
+    ViewData["Title"] = "Monitor desk";
+    var plan = Html.ReactivePlan<MonitorDeskShift>();
+}
+<h1>Monitor desk</h1>
+
+@plan.DeskMonitor("ada-monitor", "Ada")
+@plan.DeskMonitor("ben-monitor", "Ben")
+
+<p>Picked: <span id="picked">nobody</span>, who was <span id="picked-status">unknown</span></p>
+<p>Handed over: <span id="handed">nobody</span>, who was <span id="handed-status">unknown</span></p>
+
+@(plan.MonitorDesk("desk", ["ada-monitor", "ben-monitor"])
+    .Reactive(desk => desk.Picked, (monitor, pipeline) =>
+    {
+        pipeline.Element("picked").Text.Set(monitor.Resident);
+        pipeline.Element("picked-status").Text.Set(monitor.Status);
+        monitor.Status.Set("watched");
+        monitor.Page();
+    })
+    .Reactive(desk => desk.Handed, (handed, pipeline) =>
+    {
+        pipeline.Element("handed").Text.Set(handed.Monitor.Resident);
+        pipeline.Element("handed-status").Text.Set(handed.Monitor.Status);
+        handed.Monitor.Status.Set("handed over");
+        handed.Monitor.Page();
+    }))
+
+@Html.RenderPlan(plan)

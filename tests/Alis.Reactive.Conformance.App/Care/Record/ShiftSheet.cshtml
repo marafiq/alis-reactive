@@ -1,0 +1,36 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftSheet
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Shift sheet";
+    var plan = Html.ReactivePlan<ShiftSheet>();
+}
+<h1>Shift sheet</h1>
+@for (var position = 0; position < Model.Rows.Count; position++)
+{
+    var at = position;
+    <fieldset>
+        <legend>Shift @Model.Rows[at].Id</legend>
+        <fieldset>
+            <legend>Carer</legend>
+            @(Html.InputField(plan, m => m.Rows[at].Carer, options => options.Label("Carer")).NativeTextBox())
+        </fieldset>
+        <fieldset>
+            <legend>Hours</legend>
+            @(Html.InputField(plan, m => m.Rows[at].Hours, options => options.Label("Hours")).NativeTextBox())
+        </fieldset>
+        @(Html.NativeButton("save-sheet-shift-" + Model.Rows[at].Id, "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+            .Put<ShiftRow>(CareEndpoints.ShiftSheetShifts, request => request
+                .Input(sent => sent.Carer, pipeline.Input(m => m.Rows[at].Carer))
+                .Input(sent => sent.Hours, pipeline.Input(m => m.Rows[at].Hours))
+                .Set(sent => sent.Id, Model.Rows[at].Id))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("sheet-status").Text.Set(saved.Body))))
+    </fieldset>
+}
+<p id="sheet-status"></p>
+@Html.RenderPlan(plan)

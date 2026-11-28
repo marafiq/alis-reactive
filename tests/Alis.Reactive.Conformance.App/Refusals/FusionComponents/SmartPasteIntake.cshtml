@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model PasteIntake
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Intake";
+    var plan = Html.ReactivePlan<PasteIntake>();
+}
+<h1>Intake</h1>
+@Html.FusionSmartPasteButton("intake-paste", options =>
+{
+    options.Content = "Smart Paste";
+    options.AiAssistEndpoint = Model.AssistEndpoint;
+})
+@Html.RenderPlan(plan)

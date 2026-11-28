@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model NextOfKinAdmission
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<NextOfKinAdmission>();
+}
+<h1>Admission</h1>
+@using (Html.BeginRequestContainer(plan, "next-of-kin"))
+{
+    <fieldset>
+        <legend>Name</legend>
+        @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>Phone</legend>
+        @(Html.InputField(plan, m => m.Phone, options => options.Label("Phone")).NativeTextBox())
+    </fieldset>
+}
+@Html.RenderPlan(plan)

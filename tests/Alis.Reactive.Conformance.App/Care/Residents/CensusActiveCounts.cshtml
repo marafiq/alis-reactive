@@ -1,0 +1,34 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusActiveCounts
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Active rooms";
+    var plan = Html.ReactivePlan<CensusActiveCounts>();
+}
+<h1>Active rooms</h1>
+@(plan.ConformanceComponent("census-north", new ConformanceStart { Text = "North wing census", Items = Model.North }))
+<p>Active rooms of the north wing: <span id="census-north-count">-</span></p>
+<p id="census-north-status"></p>
+<button type="button" @Html.Raises(plan, CensusActiveCountEvents.North)>Count the north wing census</button>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", NullableItems = null }))
+<p>Spare rooms of the census: <span id="census-count">-</span></p>
+<p id="census-status"></p>
+<button type="button" @Html.Raises(plan, CensusActiveCountEvents.Census)>Count the census</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CensusActiveCountEvents.North, pipeline =>
+    {
+        pipeline.Element("census-north-status").Text.Set("Counting");
+        pipeline.Element("census-north-count").Text.Set(pipeline.Component<ConformanceComponent>("census-north").Items.Count(item => item.Active));
+        pipeline.Element("census-north-status").Text.Set("Counted");
+    }));
+    Html.On(plan, trigger => trigger.CustomEvent(CensusActiveCountEvents.Census, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Counting");
+        pipeline.Element("census-count").Text.Set(pipeline.Component<ConformanceComponent>("census").NullableItems.Count());
+        pipeline.Element("census-status").Text.Set("Counted");
+    }));
+}
+@Html.RenderPlan(plan)

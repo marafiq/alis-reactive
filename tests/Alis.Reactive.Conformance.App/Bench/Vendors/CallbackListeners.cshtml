@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CallbackListenersBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<CallbackListenersBoard>();
+}
+<h1>The bench</h1>
+<h2>@Model.Caption</h2>
+@(plan.ConformanceCallbacks("callbacks", new CallbacksStart())
+    .Reactive(callbacks => callbacks.OnRaised, (raised, pipeline) => pipeline.Component<ConformanceCallbacks>("callbacks").Append("page-1"))
+    .Reactive(callbacks => callbacks.OnRaised, (raised, pipeline) => pipeline.Component<ConformanceCallbacks>("callbacks").Append("page-2")))
+<button type="button" @Html.Raises(plan, CallbackListenersButtons.OpenTheCard)>Open the card</button>
+<button type="button" @Html.Raises(plan, CallbackListenersButtons.OpenTheNotes)>Open the notes</button>
+<button type="button" @Html.Raises(plan, CallbackListenersButtons.CloseTheNotes)>Close the notes</button>
+<section id="card" aria-label="Card"></section>
+<section id="notes" aria-label="Notes"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(CallbackListenersButtons.OpenTheCard, pipeline => pipeline.Get(VendorSlotCards.CallbackCard).Into("card"))
+        .CustomEvent(CallbackListenersButtons.OpenTheNotes, pipeline => pipeline.Get(VendorSlotCards.Notes).Into("notes"))
+        .CustomEvent(CallbackListenersButtons.CloseTheNotes, pipeline => pipeline.Unload("notes")));
+}
+@Html.RenderPlan(plan)

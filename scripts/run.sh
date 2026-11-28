@@ -7,11 +7,12 @@ usage() {
 Usage:
   scripts/run.sh
 
-Builds browser assets and starts the sandbox:
+Builds the browser bundle and the conformance app, and starts the app in Development:
   http://localhost:5220
 
-Use Ctrl+C in this terminal to stop the sandbox. Playwright starts its own
-sandbox, so do not run this script before Playwright tests.
+A browser that opens a page with no world gets a world of its own, so the app runs for a person as it does
+for a test. Use Ctrl+C in this terminal to stop it. Playwright starts its own server, so a run of the tests
+needs none of this.
 USAGE
 }
 
@@ -29,11 +30,5 @@ case "${1:-}" in
     ;;
 esac
 
-echo "[run] ensuring npm dependencies"
-[ -d node_modules ] || npm ci
-
-echo "[run] building browser assets"
-npm run build:all
-
-echo "Starting sandbox -> http://localhost:5220 (Ctrl+C to stop)"
-dotnet run --project Alis.Reactive.SandboxApp
+node build.mjs
+ASPNETCORE_ENVIRONMENT=Development exec dotnet run --project tests/Alis.Reactive.Conformance.App -- --urls http://localhost:5220 --host net10

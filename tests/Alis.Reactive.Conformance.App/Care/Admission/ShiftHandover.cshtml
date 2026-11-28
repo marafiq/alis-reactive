@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HandoverNote
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Shift handover";
+    var plan = Html.ReactivePlan<HandoverNote>();
+}
+<h1>Shift handover</h1>
+@using (var handover = Html.BeginRequestContainer(plan, "shift-handover"))
+{
+    @(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Shift, options => options.Label("Shift")).NativeDropDown(build => build.Items(ShiftHandoverLists.Shifts())))
+    @(Html.NativeButton("hand-over", "Hand over").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<HandoverNote>(ShiftHandoverEndpoints.Handovers, request => request.Json(handover.Container, body => { }))
+        .OnSuccess(Content.Text, (handed, pipeline) => pipeline.Element("handed-over").Text.Set(handed.Body))))
+}
+<p>Handover: <span id="handed-over"></span></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,11 @@
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class ContainerInsideABody
+{
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake, RequestContainer<IntakeRequest> details)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Json(intake, body => body.Inputs(details)));
+}

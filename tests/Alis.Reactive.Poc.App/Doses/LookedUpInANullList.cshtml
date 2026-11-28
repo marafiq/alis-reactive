@@ -1,0 +1,20 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Doses of this ward";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+    string[]? none = null;
+}
+<h1>Doses of this ward</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-doses", "Count doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => none!.Contains(d.Ward!)))))
+
+@Html.RenderPlan(plan)

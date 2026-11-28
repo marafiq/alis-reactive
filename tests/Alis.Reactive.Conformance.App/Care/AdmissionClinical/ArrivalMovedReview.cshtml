@@ -1,0 +1,95 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model HandoverBookingReview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Handover booking review";
+    var plan = Html.ReactivePlan<HandoverBookingReview>();
+}
+<h1>Handover booking review</h1>
+<style>
+    .edge-board .booking-slot { position: fixed; left: 48px; top: 72px; height: 36px; box-sizing: border-box; }
+    .moving-board .booking-slot { position: absolute; }
+    .moving-board.preparing-handover .booking-slot { left: 80px; top: 104px; }
+    .moving-board.handing-over { position: fixed; left: 0; top: 0; }
+    .moving-board.handing-over .booking-slot { left: -36px; top: -24px; }
+    .final-entry .booking-slot { left: 900px; top: 500px; }
+    .handing-over .booking-slot { left: -36px; top: -24px; }
+    .board-actions { margin-top: 10rem; }
+</style>
+<div id="booking-column" class="edge-board moving-board">
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").CssClass("booking-slot").Width(220).ZIndex(2950))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            var panel = opening.Popup;
+            panel.TargetType.Set(FusionDatePickerAnchor.Relative);
+            panel.Position.Horizontal.Set(FusionDatePickerHorizontal.Left);
+            panel.Position.Vertical.Set(FusionDatePickerVertical.Center);
+            panel.OffsetX.Set(0);
+            panel.OffsetY.Set(0);
+            panel.Collision.Horizontal.Set(FusionDatePickerCollision.Fit);
+            panel.Collision.Vertical.Set(FusionDatePickerCollision.Fit);
+            panel.WidthInPixels.Set(320);
+            panel.HeightInPixels.Set(300);
+            panel.DataBind();
+        })
+        .Reactive(picker => picker.Close, (closing, pipeline) =>
+        {
+            var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+            pipeline.When(date.Value.Eq(new DateTime(2026, 7, 14)).And(closing.Popup.GetRootElement().GetAttribute("role").Eq("dialog"))).Then(pipeline =>
+            {
+                closing.Cancel.Set(true);
+                var panel = closing.Popup;
+                pipeline.When(pipeline.Element("review-location").Text.Eq("Handover counter"))
+                    .Then(pipeline =>
+                    {
+                        if (Model.KeepPaperMargins)
+                        {
+                            panel.RefreshPosition(panel.AnchorTarget, skipCollision: true);
+                        }
+                        else
+                        {
+                            panel.RefreshPosition(panel.AnchorTarget);
+                        }
+                    })
+                    .Else(pipeline => panel.RefreshPosition());
+            });
+        }))
+</fieldset>
+</div>
+<div class="board-actions">
+@(Html.NativeButton("open-appointment-board", "Open appointment board")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+@(Html.NativeButton("prepare-booking-column", "Prepare booking column")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        pipeline.Element("booking-column").Classes.Add("preparing-handover");
+        pipeline.Element("review-location").Text.Set("Preparation desk");
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Hide();
+    }))
+<p><output id="review-location" aria-label="Review location">Admission desk</output></p>
+@(Html.NativeButton("retain-calendar-review", "Retain calendar review")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        pipeline.Element("booking-column").Classes.Add("handing-over");
+        pipeline.Element("review-location").Text.Set("Handover counter");
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Hide();
+    }))
+</div>
+@Html.RenderPlan(plan)

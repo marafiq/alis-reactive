@@ -1,0 +1,21 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StrengthCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The strength check";
+    var plan = Html.ReactivePlan<StrengthCheck>();
+    var medicine = Model.Medicine;
+}
+<h1>The strength check</h1>
+<p>@Model.Medicine: <span id="strength"></span></p>
+<button type="button" @Html.Raises(plan, StrengthChecks.Check)>Check the strength</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(StrengthChecks.Check, pipeline => pipeline.Get(ConditionEndpoints.DosesOfAStrength)
+        .OnSuccess<List<DoseOfAStrength>>((doses, pipeline) => pipeline.When(doses.Body.Find(d => d.Medicine == medicine, d => d.Strength).Gt(5))
+            .Then(pipeline => pipeline.Element("strength").Text.Set("above 5 mg")))));
+}
+@Html.RenderPlan(plan)

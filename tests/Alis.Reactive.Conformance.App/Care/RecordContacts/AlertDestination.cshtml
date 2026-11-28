@@ -1,0 +1,39 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AlertDestination
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident alert destination";
+    var plan = Html.ReactivePlan<AlertDestination>();
+}
+<h1>Resident alert destination</h1>
+<form method="post" action="@CarePages.AlertDestination">
+    @(Html.InputField(plan, m => m.AlertDesk, options => options.Label("Send alerts to selected desk")).FusionSwitch(build => build.Value("day")))
+    <p>Selected desk: <output id="selected-alert-desk">Day desk</output></p>
+    @(Html.NativeButton("use-night-destination", "Use night destination")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var destination = pipeline.Input(m => m.AlertDesk).Component<FusionSwitch>();
+            destination.Value.Set("night");
+            destination.DataBind();
+            pipeline.When(destination.Value.Eq("night"))
+                .Then(chosen => chosen.Element("selected-alert-desk").Text.Set("Night desk"))
+                .Else(chosen => chosen.Element("selected-alert-desk").Text.Set("Day desk"));
+        }))
+    @(Html.NativeButton("review-alert-destination", "Review alert destination")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var destination = pipeline.Input(m => m.AlertDesk).Component<FusionSwitch>();
+            pipeline.When(destination.Value.Eq("night"))
+                .Then(pipeline => pipeline.Element("alert-destination-review").Text.Set("Night desk"))
+                .Else(pipeline => pipeline.Element("alert-destination-review").Text.Set("Day desk"));
+        }))
+    <p><output id="alert-destination-review" aria-label="Destination review">Awaiting review</output></p>
+    <button type="submit">Save alert destination</button>
+</form>
+@Html.RenderPlan(plan)

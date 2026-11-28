@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model DutyBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Duty board";
+    var plan = Html.ReactivePlan<DutyBoard>();
+}
+<h1>Duty board</h1>
+<button type="button" @Html.Raises(plan, DutyBoards.FindTheNurse)>Find the nurse</button>
+<p id="duty-line">-</p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(DutyBoards.FindTheNurse, pipeline => pipeline.Get(Model.Nurse)
+            .OnSuccess<NurseOnDuty>((found, pipeline) => pipeline.Element("duty-line").Text.Set(pipeline.Concat("Nurse [", found.Body.Read(nurse => nurse.Name), "] on duty")))));
+}
+@Html.RenderPlan(plan)

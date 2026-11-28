@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CarePlanReview
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care plan review";
+    var plan = Html.ReactivePlan<CarePlanReview>();
+}
+<h1>Care plan review of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, CarePlanReviews.MarkReviewed)>Mark reviewed</button>
+<button type="button" @Html.Raises(plan, CarePlanReviews.MarkReviewedAndShowTheReviewer)>Mark reviewed and show the reviewer</button>
+<p>Review: <span id="review-status">Not reviewed</span></p>
+<p>Reviewer: <span id="reviewer">Not shown</span></p>
+<p>Reviews on record: <span id="reviews">@Model.Reviews</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(CarePlanReviews.MarkReviewed, pipeline => pipeline.Put(CarePlanReviewEndpoints.Reviewed)
+            .OnSuccess(Content.None, (reviewed, pipeline) => pipeline.Element("review-status").Text.Set("Reviewed"))
+            .OnError((failed, pipeline) => pipeline.Element("review-status").Text.Set(failed.Outcome)))
+        .CustomEvent(CarePlanReviews.MarkReviewedAndShowTheReviewer, pipeline => pipeline.Put(CarePlanReviewEndpoints.Reviewed)
+            .OnSuccess<PlanReviewer>((review, pipeline) => pipeline.Element("reviewer").Text.Set(review.Body.Read(reviewer => reviewer.Name)))
+            .OnError((failed, pipeline) => pipeline.Element("reviewer").Text.Set(failed.Outcome))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,9 @@
+@using System.Globalization
+@using Alis.Reactive.Poc.App.Rounds
+@model RoundForm
+@{
+    ViewData["Title"] = "Round saved";
+}
+<h1>Round saved</h1>
+
+<p>Dose: <strong id="saved-dose">@Model.Dose.ToString(CultureInfo.InvariantCulture)</strong></p>

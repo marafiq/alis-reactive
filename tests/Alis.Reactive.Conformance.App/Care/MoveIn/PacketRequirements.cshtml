@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@model PacketRequirements
+@{
+    Layout = "/Care/MoveIn/_MoveInLayout.cshtml";
+    ViewData["Title"] = "Packet requirements";
+}
+<h1>Packet requirements for @Model.DraftId</h1>
+<p>@(Model.AcceptedRevision is { } revision ? $"Accepted quote revision {revision}." : "Accept a quote before creating the packet.")</p>
+@if (Model.MissingDocuments.Count > 0)
+{
+    <h2>Documents still required</h2>
+    <ul>
+        @foreach (var kind in Model.MissingDocuments)
+        {
+            <li>@(kind == DocumentKind.MedicationList ? "Medication list" : kind.ToString())</li>
+        }
+    </ul>
+}
+else
+{
+    <p>All required documents are on file.</p>
+}
+<a href="@(CarePages.MoveIns + Model.DraftId)">Return to the move-in</a>

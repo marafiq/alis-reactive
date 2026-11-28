@@ -1,0 +1,49 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model CareInput
+@{
+    var plan = Html.ReactivePlan<CareInput>();
+    Action<Pipeline<CareInput>, SectionKind> questions = (pipeline, section) => pipeline
+        .Get<SectionQuery>(CareEndpoints.MoveInCareSections, request => request
+            .Query(query => query.DraftId, pipeline.PageUrl<MoveInPageAddress>(MoveInEndpoints.Page).Read(address => address.DraftId))
+            .Query(query => query.Section, section)
+            .Query(query => query.Level, pipeline.Container<MoveInPage>("move-in").Read(m => m.Care.Level))
+            .Query(query => query.Culture, "en-US"))
+        .Into("care-branch")
+        .OnError<ErrorEnvelope>(422, (refused, pipeline) => pipeline.Element("care-status").Text.Set(refused.Body.Read(envelope => envelope.Error.Message)));
+}
+<p>Saved care: <span id="saved-care">@Reads.SavedCare(Model)</span></p>
+<fieldset>
+    <legend>Care level</legend>
+    @(Html.InputField(plan, m => m.Level, options => options.Label("Care level")).NativeRadioGroup(group => group.Option("Independent").Option("Assisted").Option("Memory").Option("Skilled"))
+        .Reactive(level => level.Change, (changed, pipeline) =>
+        {
+            pipeline.Element("care-status").Text.Set("");
+            pipeline.When(pipeline.Container<MoveInPage>("move-in").Read(m => m.Care.Level).NotEq(Model.Level))
+                .Then(pipeline => pipeline
+                    .When(pipeline.Component<NativeConfirm>().Ask("Replace the current care answers?"))
+                    .Then(pipeline => pipeline.Dispatch(MoveInCareEvents.AnswersReplaced))
+                    .Else(pipeline => pipeline.Dispatch(MoveInCareEvents.AnswersKept)))
+                .Else(pipeline => pipeline.Dispatch(MoveInCareEvents.AnswersReplaced));
+        }))
+</fieldset>
+<p id="care-status"></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MoveInCareEvents.AnswersReplaced, HandlerPolicy.Replace, pipeline =>
+    {
+        var level = pipeline.Container<MoveInPage>("move-in").Read(m => m.Care.Level);
+        pipeline.Unload("care-branch");
+        pipeline.When(level.Eq(CareLevel.Independent)).Then(pipeline => questions(pipeline, SectionKind.IndependentCare))
+            .ElseIf(level.Eq(CareLevel.Assisted)).Then(pipeline => questions(pipeline, SectionKind.AssistedCare))
+            .ElseIf(level.Eq(CareLevel.Memory)).Then(pipeline => questions(pipeline, SectionKind.MemoryCare))
+            .Else(pipeline => questions(pipeline, SectionKind.SkilledCare));
+    }));
+}
+@Html.RenderPlan(plan)

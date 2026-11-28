@@ -1,0 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
+@model RoomBookingReceipt
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Room booking confirmed";
+}
+<h1>Room booking confirmed</h1>
+<output aria-label="Booking receipt">@Model.Description</output>

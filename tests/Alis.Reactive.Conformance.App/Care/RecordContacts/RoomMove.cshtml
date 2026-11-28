@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@model RoomMove
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Room move";
+    var plan = Html.ReactivePlan<RoomMove>();
+}
+<h1>Room move</h1>
+<fieldset>
+    <legend>Room</legend>
+    @(Html.InputField(plan, m => m.Room, options => options.Label("Room")).FusionInPlaceEditor(build => build.Mode(SfInPlace.RenderMode.Inline))
+        .Reactive(editor => editor.ActionBegin, (begun, pipeline) => pipeline.Element("saved-as").Text.Set(begun.Data.Read(data => data.Name))))
+</fieldset>
+<fieldset>
+    <legend>Bed</legend>
+    @(Html.InputField(plan, m => m.Bedside.Bed, options => options.Label("Bed")).FusionInPlaceEditor(build => build.Mode(SfInPlace.RenderMode.Inline))
+        .Reactive(editor => editor.ActionBegin, (begun, pipeline) => pipeline.Element("saved-as").Text.Set(begun.Data.Read(data => data.Name))))
+</fieldset>
+<p>Saved as: <output id="saved-as">-</output></p>
+@Html.RenderPlan(plan)

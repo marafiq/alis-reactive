@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.Native.NativeComponents
+@model HintChange
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Helen Martinez's intake";
+    var plan = Html.ReactivePlan<HintChange>();
+}
+<h1>Helen Martinez's intake</h1>
+<fieldset>
+    <legend>Allergies</legend>
+    @(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies"))
+        .FusionMultiSelect(HelensAllergies.Offered(), build => build.Fields((HelenAllergy a) => a.Name, a => a.Code).Placeholder("Choose allergies")))
+</fieldset>
+@(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+<button type="button" @Html.Raises(plan, HintChanges.PenicillinOnly)>Penicillin only</button>
+<button type="button" @Html.Raises(plan, HintChanges.ClearHint)>Clear hint</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(HintChanges.PenicillinOnly, pipeline => pipeline
+        .Input(m => m.AllergyCodes).Component<FusionMultiSelect<int[]?>>().Placeholder.Set("Helen: penicillin only")));
+    Html.On(plan, trigger => trigger.CustomEvent(HintChanges.ClearHint, pipeline => pipeline
+        .Input(m => m.AllergyCodes).Component<FusionMultiSelect<int[]?>>().Placeholder.Set(pipeline.Input(m => m.Note).Component<NativeTextBox>().Value)));
+}
+@Html.RenderPlan(plan)

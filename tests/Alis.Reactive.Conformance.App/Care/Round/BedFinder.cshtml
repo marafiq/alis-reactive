@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedFinder
+@{
+    Layout = "/Care/Round/_TracedLayout.cshtml";
+    ViewData["Title"] = "Free beds";
+    var plan = Html.ReactivePlan<BedFinder>();
+}
+<h1>Free beds of the @Model.Ward ward</h1>
+<button type="button" @Html.Raises(plan, BedFinderEvents.Find)>Find beds</button>
+<p>Free beds: <span id="beds">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BedFinderEvents.Find, HandlerPolicy.Replace, pipeline => pipeline.Get(CareEndpoints.FreeBeds)
+        .OnSuccess(Content.Json<FreeBeds>(), (found, pipeline) => pipeline.Element("beds").Text.Set(found.Body.Read(beds => beds.Count)))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,13 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class NoRetryOnPost
+{
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake))
+            .NoRetry();
+}

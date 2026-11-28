@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DischargeChecklist
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Discharge";
+    var plan = Html.ReactivePlan<DischargeChecklist>();
+}
+<h1>Discharge</h1>
+@(Html.FusionDialog(plan, "checklist", build => build
+    .Header("Discharge checklist")
+    .Content("Pack the resident's medication and return the room key.")
+    .Width("360px")
+    .Visible(Model.ShownAtOpen)))
+<button type="button" @Html.Raises(plan, DischargeChecklists.Open)>Open checklist</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DischargeChecklists.Open, pipeline => pipeline
+        .Component<FusionDialog>("checklist").Show()));
+}
+@Html.RenderPlan(plan)

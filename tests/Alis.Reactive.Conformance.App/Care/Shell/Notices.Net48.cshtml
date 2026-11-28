@@ -1,0 +1,10 @@
+@using Alis.Reactive.RenderingAndDelivery
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Notices";
+}
+<h1>Notices</h1>
+<ul>
+    <li><a href="@Url.AppendVersion("~/Content/Shell/north.txt")">Open the north notice</a></li>
+    <li><a href="@Url.AppendVersion("~/Content/Shell/south.txt")">Open the south notice</a></li>
+</ul>

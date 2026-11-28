@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitDaysChange
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visit days";
+    var plan = Html.ReactivePlan<VisitDaysChange>();
+}
+<h1>Visit days</h1>
+@(Html.InputField(plan, m => m.VisitDays, options => options.Label("Visit days")).NativeCheckList(list => list.Option("Mon").Option("Tue").Option("Wed")))
+<button type="button" @Html.Raises(plan, VisitDaysChanges.ChangeDays)>Change days</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(VisitDaysChanges.ChangeDays, pipeline => pipeline.Input(m => m.VisitDays).Component<NativeCheckList>().Focus()));
+}
+@Html.RenderPlan(plan)

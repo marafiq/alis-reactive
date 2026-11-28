@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HandoverCutoff
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The handover";
+    var plan = Html.ReactivePlan<HandoverCutoff>();
+    var cutoff = Model.Cutoff;
+}
+<h1>The @Model.Ward ward's handover</h1>
+<button type="button" @Html.Raises(plan, WardHandoverChecks.Check)>Check handover</button>
+<p>Handed over: <span id="handover-status"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardHandoverChecks.Check, pipeline => pipeline.Get(WardHandoverEndpoints.Handover)
+        .OnSuccess<WardHandover>((answer, pipeline) => pipeline.When(answer.Body.Read(handover => handover.At).Lt(cutoff))
+            .Then(pipeline => pipeline.Element("handover-status").Text.Set("early")))));
+}
+@Html.RenderPlan(plan)

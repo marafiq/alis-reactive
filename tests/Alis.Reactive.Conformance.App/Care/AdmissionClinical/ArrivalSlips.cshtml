@@ -1,0 +1,46 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalSlips
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Transport and return slips";
+    var plan = Html.ReactivePlan<ArrivalSlips>();
+}
+<h1>Transport and return slips</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd")))
+</fieldset>
+<fieldset>
+    <legend>Return date</legend>
+    @(Html.InputField(plan, m => m.ReturnsOn, options => options.Label("Returns on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd")))
+</fieldset>
+@(Html.NativeButton("preview-transport-slip", "Preview transport slip")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        var name = date.Element.GetAttribute("name");
+        var value = date.GetRootElement().GetAttribute("value");
+        pipeline.When(name.Eq("ArrivesOn").And(value.Eq("2026-07-14")))
+            .Then(pipeline => pipeline.Element("slip-preview").Text.Set("Transport arrival booked for 14 July"));
+    }))
+@(Html.NativeButton("preview-return-slip", "Preview return slip")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ReturnsOn).Component<FusionDatePicker<DateTime?>>();
+        var name = date.Element.GetAttribute("name");
+        var value = date.GetRootElement().GetAttribute("value");
+        pipeline.When(name.Eq("ReturnsOn").And(value.Eq("2026-07-20")))
+            .Then(pipeline => pipeline.Element("slip-preview").Text.Set("Return transfer booked for 20 July"));
+    }))
+<p><output id="slip-preview" aria-label="Slip preview">Choose the slip to preview</output></p>
+@Html.RenderPlan(plan)

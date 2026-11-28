@@ -1,0 +1,83 @@
+using System;
+using System.Linq;
+using Alis.Reactive.Elements;
+using Alis.Reactive.RequestsAndResponses;
+using Alis.Reactive.Schema;
+using Alis.Reactive.Validation;
+using Alis.Reactive.ValuesAndSources;
+
+namespace Alis.Reactive.TriggersAndPipelines;
+
+/// <summary>
+/// The steps of a pipeline around its requests: requests sent at once, a check with no request, a server's errors
+/// shown, and a reply's HTML loaded.
+/// </summary>
+public static class RequestSteps
+{
+    /// <summary>Runs several pipelines at once, each sending its own request; the steps after this one run when every one has finished.</summary>
+    /// <param name="pipeline">The pipeline the step is written in.</param>
+    /// <param name="branches">The pipelines to run at once.</param>
+    public static void Parallel<TModel>(this Pipeline<TModel> pipeline, params Action<Pipeline<TModel>>[] branches)
+    {
+        var writer = pipeline.Writer;
+        var entered = writer.PathAwaited;
+        writer.Write(new AllStatement([.. branches.Select(branch => writer.Branch(entered, () => branch(new Pipeline<TModel>(writer))).Block)]));
+    }
+
+    /// <summary>Checks a container's inputs, as it sends them, by the validator registered for its model, with no request.</summary>
+    /// <remarks>
+    /// The check runs the validator's default rule set in the browser, over the model the endpoint would bind from the
+    /// container's inputs, and a text a member's type cannot hold fails that member as the endpoint's binder does. A
+    /// rule only the server decides is left to the server. A check that fails stops the pipeline. A model with no
+    /// registered validator is refused where the view renders.
+    /// </remarks>
+    /// <param name="pipeline">The pipeline the step is written in.</param>
+    /// <param name="container">The container whose inputs are checked.</param>
+    public static void Validate<TModel, TContainer>(this Pipeline<TModel> pipeline, RequestContainer<TContainer> container)
+        => FormChecks.WithNoRequest<TContainer>(pipeline.Writer, container.ElementId, BrowserRegistrations.DefaultRuleSet);
+
+    /// <summary>Checks a container's inputs, as it sends them, by the validator registered for its model under the rule set named, with no request.</summary>
+    /// <remarks>
+    /// The check runs the rules the validator declares inside that rule set and no other, in the browser, over the model
+    /// the endpoint would bind from the container's inputs, as a request's <c>Validate&lt;TValidator&gt;(ruleSet)</c> does.
+    /// A check that fails stops the pipeline. A model with no registered validator, and a rule set its validator runs
+    /// no rule under, are refused where the view renders.
+    /// </remarks>
+    /// <param name="pipeline">The pipeline the step is written in.</param>
+    /// <param name="container">The container whose inputs are checked.</param>
+    /// <param name="ruleSet">The rule set's name, as the validator's <c>RuleSet</c> declares it.</param>
+    public static void Validate<TModel, TContainer>(this Pipeline<TModel> pipeline, RequestContainer<TContainer> container, string ruleSet)
+        => FormChecks.WithNoRequest<TContainer>(pipeline.Writer, container.ElementId, ruleSet);
+
+    /// <summary>Shows a server's validation errors as the request's failures: every message in its summary, and each at the input the request sent under its key.</summary>
+    /// <remarks>The request is the one whose route the step is written in. A step in no route of a request is refused where the view renders.</remarks>
+    /// <param name="pipeline">The pipeline of a request's route.</param>
+    /// <param name="problem">The source of the errors: the body of a 400 answer, or another route's.</param>
+    public static void ShowValidationErrors<TModel>(this Pipeline<TModel> pipeline, ITypedSource<ValidationProblem> problem)
+        => RequestScopes.ShowValidationErrors(pipeline.Writer, Sources.Of(problem ?? throw new ArgumentNullException(nameof(problem))));
+
+    /// <summary>Loads the HTML a reply read into an element, replacing what the element held.</summary>
+    /// <remarks>What the element held is released first: its plans stop and its components leave.</remarks>
+    /// <param name="pipeline">The pipeline of a request's route.</param>
+    /// <param name="elementId">The id of the element the HTML is loaded into.</param>
+    /// <param name="html">The source of the HTML: the body of a reply read as HTML.</param>
+    public static void Into<TModel>(this Pipeline<TModel> pipeline, string elementId, ITypedSource<Markup> html)
+    {
+        if (elementId is null) throw new ArgumentNullException(nameof(elementId));
+        if (html is null) throw new ArgumentNullException(nameof(html));
+        var writer = pipeline.Writer;
+        writer.Write(SlotPlugin.Loads(writer.Content, elementId, Sources.Of(html)));
+    }
+}
+
+/// <summary>
+/// The door of a pipeline to an element of the page.
+/// </summary>
+public static class ElementSteps
+{
+    /// <summary>Reaches an element of the page by the id the view gave it.</summary>
+    /// <param name="pipeline">The pipeline the step is written in.</param>
+    /// <param name="id">The element's id.</param>
+    /// <returns>The element.</returns>
+    public static Element Element<TModel>(this Pipeline<TModel> pipeline, string id) => pipeline.Component<Element>(id);
+}

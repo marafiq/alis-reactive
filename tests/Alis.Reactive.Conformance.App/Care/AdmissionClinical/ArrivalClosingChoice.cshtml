@@ -1,0 +1,38 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalHandoverDecision
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Family arrival handover";
+    var plan = Html.ReactivePlan<ArrivalHandoverDecision>();
+}
+<h1>Family arrival handover</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Change, (changed, pipeline) =>
+        {
+            var appointment = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+            if (Model.OfficeArranged)
+            {
+                appointment.Hide();
+            }
+            else
+            {
+                appointment.Hide(changed.Interaction);
+            }
+        })
+        .Reactive(picker => picker.Close, (notice, pipeline) => pipeline.When(notice.OriginalEvent.Type.Eq("click"))
+            .Then(pipeline => pipeline.Element("handover-decision").Text.Set("The family chose the arrival date."))
+            .Else(pipeline => pipeline.Element("handover-decision").Text.Set("The scheduling desk finalized the choice."))))
+</fieldset>
+<p><output id="handover-decision" aria-label="Handover decision">Awaiting arrival choice.</output></p>
+@Html.RenderPlan(plan)

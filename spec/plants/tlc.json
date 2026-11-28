@@ -1,0 +1,368 @@
+[
+ {
+  "name": "a step-5 mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.violates.ChildEndsBeforeParent.cfg",
+    "old": "CONSTANT Mutant = \"DisposeEndsRunFirst\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Tracing.violates.ChildEndsBeforeParent.cfg: expected ChildEndsBeforeParent violated, saw Model checking completed"
+ },
+ {
+  "name": "a config that must hold now carries a mutant",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.holds.OwnPlanStops.cfg",
+    "old": "CONSTANT Mutant = \"none\"",
+    "new": "CONSTANT Mutant = \"NameWithoutPrefix\""
+   }
+  ],
+  "expect": "Partials.holds.OwnPlanStops.cfg: expected green, saw violated: AttachedInputBindsItsMember"
+ },
+ {
+  "name": "a counterexample of the redesign's validation shows another gap",
+  "edits": [
+   {
+    "file": "spec/Validation/ValidationToday.violates.AConditionReadsTheObjectsStart.cfg",
+    "old": "INVARIANT AConditionReadsTheObjectsStart",
+    "new": "INVARIANT AListNotSentReadsItsStart"
+   }
+  ],
+  "expect": "expected AConditionReadsTheObjectsStart violated, saw violated: AListNotSentReadsItsStart"
+ },
+ {
+  "name": "Tracing's main config in another order",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.cfg",
+    "old": "INVARIANT TraceHeadersStayHome\nINVARIANT SinkFailureChangesNothing\n",
+    "new": "INVARIANT SinkFailureChangesNothing\nINVARIANT TraceHeadersStayHome\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "recorded results for another jar pin",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/tools/tla2tools.lock",
+    "old": "  \"sha256\": \"",
+    "new": "  \"sha256\": \"0000000000000000000000000000000000000000000000000000000000000000\",\n  \"original_sha256\": \""
+   }
+  ],
+  "expect": "spec/STATE.json has no recorded TLC outcomes for jar SHA-256"
+ },
+ {
+  "name": "a recorded counterexample marked green",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/STATE.json",
+    "old": "          \"Tracing.violates.ChildEndsBeforeParent.cfg\": {\n            \"green\": false,",
+    "new": "          \"Tracing.violates.ChildEndsBeforeParent.cfg\": {\n            \"green\": true,"
+   }
+  ],
+  "expect": "Tracing.violates.ChildEndsBeforeParent.cfg: expected ChildEndsBeforeParent violated"
+ },
+ {
+  "name": "recorded results for the current jar with a different lock format",
+  "recorded": true,
+  "edits": [
+   {
+    "file": "spec/tools/tla2tools.lock",
+    "old": "{\n",
+    "new": "{  \n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a second mutant of an invariant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ReadStopsWhenItsSendStops.UnlistedStopsTheSend.cfg",
+    "old": "CONSTANT Mutant = \"UnlistedStopsTheSend\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.ReadStopsWhenItsSendStops.UnlistedStopsTheSend.cfg: expected ReadStopsWhenItsSendStops violated, saw Model checking completed"
+ },
+ {
+  "name": "a second mutant's config with its other invariants in another order",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ReadStopsWhenItsSendStops.UnlistedStopsTheSend.cfg",
+    "old": "INVARIANT OneValueOnEveryHost\nINVARIANT ReadIsWhatTheEndpointBinds\n",
+    "new": "INVARIANT ReadIsWhatTheEndpointBinds\nINVARIANT OneValueOnEveryHost\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a hand-written control's mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.AnUnsentMemberReadsWhatTheEndpointBinds.HandWrittenControlSent.cfg",
+    "old": "CONSTANT Mutant = \"HandWrittenControlSent\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.AnUnsentMemberReadsWhatTheEndpointBinds.HandWrittenControlSent.cfg: expected AnUnsentMemberReadsWhatTheEndpointBinds violated, saw Model checking completed"
+ },
+ {
+  "name": "a container's native submission mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/RequestsAndResponses/Request.violates.FailedCheckSendsNothing.ContainerSubmitsNatively.cfg",
+    "old": "CONSTANT Mutant = \"ContainerSubmitsNatively\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Request.violates.FailedCheckSendsNothing.ContainerSubmitsNatively.cfg: expected FailedCheckSendsNothing violated, saw Model checking completed"
+ },
+ {
+  "name": "a text item's null-on-every-host mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/RequestsAndResponses/Request.violates.ItemNothingBindsAsDeclared.TextItemNullOnEveryHost.cfg",
+    "old": "CONSTANT Mutant = \"TextItemNullOnEveryHost\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Request.violates.ItemNothingBindsAsDeclared.TextItemNullOnEveryHost.cfg: expected ItemNothingBindsAsDeclared violated, saw Model checking completed"
+ },
+ {
+  "name": "a hidden input's unsent mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenLeftUnsent.cfg",
+    "old": "CONSTANT Mutant = \"HiddenLeftUnsent\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenLeftUnsent.cfg: expected AHiddenInputReachesAFormBodyAlone violated, saw Model checking completed"
+ },
+ {
+  "name": "a hidden input's mutant that sends it outside a form body disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenSentOutsideAFormBody.cfg",
+    "old": "CONSTANT Mutant = \"HiddenSentOutsideAFormBody\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.AHiddenInputReachesAFormBodyAlone.HiddenSentOutsideAFormBody.cfg: expected AHiddenInputReachesAFormBodyAlone violated, saw Model checking completed"
+ },
+ {
+  "name": "a member sent outside the body read at its start, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.cfg",
+    "old": "CONSTANT Mutant = \"OutsideReadAtItsStart\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "MVC 5's query beside a body left unread, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.QueryBesideUnreadOnNet48.cfg",
+    "old": "CONSTANT Mutant = \"QueryBesideUnreadOnNet48\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.QueryBesideUnreadOnNet48.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "net10's query beside a body read, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.QueryBesideReadOnNet10.cfg",
+    "old": "CONSTANT Mutant = \"QueryBesideReadOnNet10\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.QueryBesideReadOnNet10.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "the outside read on MVC 5 alone, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.OutsideReadOnNet48Alone.cfg",
+    "old": "CONSTANT Mutant = \"OutsideReadOnNet48Alone\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.OutsideReadOnNet48Alone.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "an empty query text read as text, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.OutsideEmptyStaysText.cfg",
+    "old": "CONSTANT Mutant = \"OutsideEmptyStaysText\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.OutsideEmptyStaysText.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "a [FromForm] endpoint with no body to bind, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.ConfinedEndpointLeavesWhatWasSent.cfg",
+    "old": "CONSTANT Mutant = \"ConfinedEndpointLeavesWhatWasSent\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.ConfinedEndpointLeavesWhatWasSent.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "a model that takes the query beside its body on net10, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.SentOutsideAgrees.ModelTakesTheQueryBesideItsBody.cfg",
+    "old": "CONSTANT Mutant = \"ModelTakesTheQueryBesideItsBody\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.SentOutsideAgrees.ModelTakesTheQueryBesideItsBody.cfg: expected SentOutsideAgrees violated, saw Model checking completed"
+ },
+ {
+  "name": "a named set's check run under the default set, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.TheNamedSetIsTheOneRun.cfg",
+    "old": "CONSTANT Mutant = \"CheckRunsTheDefaultSet\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.TheNamedSetIsTheOneRun.cfg: expected TheNamedSetIsTheOneRun violated, saw Model checking completed"
+ },
+ {
+  "name": "the browser's verdict under the default set where the check names one, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.Agreement.CheckRunsTheDefaultSet.cfg",
+    "old": "CONSTANT Mutant = \"CheckRunsTheDefaultSet\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.Agreement.CheckRunsTheDefaultSet.cfg: expected Agreement violated, saw Model checking completed"
+ },
+ {
+  "name": "a named set no rule declares that renders, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.ANamedSetSelectsARule.cfg",
+    "old": "CONSTANT Mutant = \"ANamedSetNoRuleDeclaresRenders\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Validation.violates.ANamedSetSelectsARule.cfg: expected ANamedSetSelectsARule violated, saw Model checking completed"
+ },
+ {
+  "name": "the witness of a named set's rule the default leaves out reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.ReachANamedSetRunsARuleTheDefaultLeavesOut.cfg",
+    "old": "INVARIANT ReachANamedSetRunsARuleTheDefaultLeavesOut",
+    "new": "INVARIANT ReachTheDefaultSetLeavesANamedRuleOut"
+   }
+  ],
+  "expect": "expected ReachANamedSetRunsARuleTheDefaultLeavesOut violated, saw violated: ReachTheDefaultSetLeavesANamedRuleOut"
+ },
+ {
+  "name": "the witness of the default set leaving a named rule out reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/Validation/Validation.violates.ReachTheDefaultSetLeavesANamedRuleOut.cfg",
+    "old": "INVARIANT ReachTheDefaultSetLeavesANamedRuleOut",
+    "new": "INVARIANT ReachANamedSetRunsARuleTheDefaultLeavesOut"
+   }
+  ],
+  "expect": "expected ReachTheDefaultSetLeavesANamedRuleOut violated, saw violated: ReachANamedSetRunsARuleTheDefaultLeavesOut"
+ },
+ {
+  "name": "a prefix kept in the names a container sends, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ATypedTextReachesTheEndpoint.cfg",
+    "old": "CONSTANT Mutant = \"PrefixKept\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.ATypedTextReachesTheEndpoint.cfg: expected ATypedTextReachesTheEndpoint violated, saw Model checking completed"
+ },
+ {
+  "name": "an input outside the prefix sent, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.AnInputOutsideThePrefixStopsTheSend.cfg",
+    "old": "CONSTANT Mutant = \"OutsideThePrefixSent\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "ContainerRead.violates.AnInputOutsideThePrefixStopsTheSend.cfg: expected AnInputOutsideThePrefixStopsTheSend violated, saw Model checking completed"
+ },
+ {
+  "name": "the witness of a text bound under a prefix reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ReachATextBoundUnderAPrefix.cfg",
+    "old": "INVARIANT ReachATextBoundUnderAPrefix",
+    "new": "INVARIANT ReachStopOnAnInputOutsideThePrefix"
+   }
+  ],
+  "expect": "expected ReachATextBoundUnderAPrefix violated, saw violated: ReachStopOnAnInputOutsideThePrefix"
+ },
+ {
+  "name": "the witness of a stop on an input outside the prefix reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/InputsAndIds/ContainerRead.violates.ReachStopOnAnInputOutsideThePrefix.cfg",
+    "old": "INVARIANT ReachStopOnAnInputOutsideThePrefix",
+    "new": "INVARIANT ReachATextBoundUnderAPrefix"
+   }
+  ],
+  "expect": "expected ReachStopOnAnInputOutsideThePrefix violated, saw violated: ReachATextBoundUnderAPrefix"
+ },
+ {
+  "name": "a kin's prefix kept in the names its container sends, the mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.violates.KinContainerBindsItsAttachedMembers.cfg",
+    "old": "CONSTANT Mutant = \"KinPrefixKept\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Partials.violates.KinContainerBindsItsAttachedMembers.cfg: expected KinContainerBindsItsAttachedMembers violated, saw Model checking completed"
+ },
+ {
+  "name": "the witness of a kin bound under its prefix reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.violates.ReachKinBoundUnderItsPrefix.cfg",
+    "old": "INVARIANT ReachKinBoundUnderItsPrefix",
+    "new": "INVARIANT ReachKinSendStopsOnNet48"
+   }
+  ],
+  "expect": "expected ReachKinBoundUnderItsPrefix violated, saw violated: ReachKinSendStopsOnNet48"
+ },
+ {
+  "name": "the witness of a kin's send stopping on net48 reaches the other witness",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.violates.ReachKinSendStopsOnNet48.cfg",
+    "old": "INVARIANT ReachKinSendStopsOnNet48",
+    "new": "INVARIANT ReachKinBoundUnderItsPrefix"
+   }
+  ],
+  "expect": "expected ReachKinSendStopsOnNet48 violated, saw violated: ReachKinBoundUnderItsPrefix"
+ }
+]

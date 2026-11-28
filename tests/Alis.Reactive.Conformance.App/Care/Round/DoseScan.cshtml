@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseScan
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose scan";
+    var plan = Html.ReactivePlan<DoseScan>();
+    var doses = new HeldStart { Items = [new ItemStart { Name = "Dose A" }, new ItemStart { Name = "Dose B" }, new ItemStart { Name = "Dose C" }] };
+}
+<h1>Dose scan: @Model.Resident</h1>
+@(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner", Held = doses })
+    .Reactive(scanner => scanner.Raised, HandlerPolicy.Skip, (raised, pipeline) =>
+    {
+        pipeline.Element("scan-history").Text.Append("Scanned");
+        raised.Held.ItemAt(raised.Count).Act();
+        pipeline.Element("scan-history").Text.Append("Checked");
+        pipeline.Post(DoseScanEndpoints.Reviews)
+            .Finally(pipeline => pipeline.Element("scan-history").Text.Append("Finished"));
+    }))
+<p>History: <span id="scan-history"></span></p>
+@Html.RenderPlan(plan)

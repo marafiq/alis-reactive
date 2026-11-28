@@ -1,0 +1,2160 @@
+# spec
+
+This folder is the design of the Alis.Reactive rewrite: the core design, its TLA+ specs, the modules mapped
+onto it, and the units the rewrite runs in. `spec/BRIEF.md` is the session brief and the authority on what
+goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-only.
+
+## Standing decisions
+
+- The owner, 2026-11-27 (verbatim in `spec/NOTES.md`), on the ward Grid: the unconditional Beds rule is checked when
+  staff edit the cell. Zero shows the validator's message under Beds and a positive count saves (M21.X211).
+
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): FusionToast.Hide keeps EJ2's zero-argument call and
+  dismisses the oldest visible toast. New notices still display first. M23.D2 and M23.X4 carry the contract.
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), closing the flags enum: an enum is flags to the framework when
+  its own `[Flags]` marks it, on both hosts, and the startup names none. The core reads the mark once, in TypeKnowledge,
+  a read on D18.1's list (N16.4); the startup door that named a flags enum leaves both hosts' surface, with its
+  registry; ALIS038 keeps its two value rules where the build sees such an enum used, an `IsInEnum` over it and a
+  request member that sends it (N16.5, X16.23 to X16.26). It reverses gate 1's P2 of 2026-11-09.
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), on the forms gate 2's G13 left to the owner: yes to
+  `container.Read(m => m.Member)` (N13.1), the endpoint's check `EndpointChecks`' `Validate` returning its result, which
+  the action answers through `ToErrorResponse` (N16.1), `AbortSignal()` among a declaration's arguments, which only a
+  component's author writes (N17.5), and `Validate<TValidator>(ruleSet)` on a request (D16.2). A handler's policy
+  (N11.1) stands as built: a door with no policy runs overlap, so a view names `HandlerPolicy` only to replace or skip.
+  A flags enum is the flags unit's (N16.4), decided the same day.
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): one door for each list operation. An object JavaScript iterates
+  declares its iterator under a member it names, `Items`, by `LiveIterator<TItem>()` or `DataIterator<TItem>()`, and the
+  list operations run on that member (`Children.Items.Count()`). the Iterables class's 27 forwarders and the
+  interfaces ILiveIterable and IDataIterable leave, replacing the lead's form of 2026-11-13 (D5.13, N5.7).
+- The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mistakes log stays short enough to stay in context, each kind
+  of mistake with what stops it and no count. A mistake is fixed where it is found, a kind no row names gets a row, and
+  no rule line is written for each mistake. It replaces the counts and the holder's rung of 2026-11-12, 2026-11-14 and
+  2026-11-23, and `scripts/land-unit.sh` carries and checks no count.
+- The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), choice C of the form-data boundary: a member a request sends
+  outside its body is checked where MVC's binder reads it, on MVC 5 the body, then the path, then the query; on net10
+  a body that binds members is read alone, and a text, a file or no body binds no member, so the check reads the
+  members the path and the query send as form data and every other at its start (D16.5, X16.46). No query member is
+  carried in the body too: on net10 a query member beside a body that binds members is read at its start, the quirk
+  D16.5 and the `Query` doors' XML doc state.
+- The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): one concept on the developer's surface, the request container.
+  Html.BeginRequestForm, its block, RequestForm<TModel> and Form(form) leave, each carried by the container's door; a
+  request sends what its plan declares and the hidden inputs inside its container (below), and nothing else, the
+  browser's `FormData` builds the body it sends, and the plan's container carries no kind.
+- The owner, 2026-11-25 (verbatim in `spec/NOTES.md`): the container takes care of hidden fields in the browser, since
+  views hold no form semantics. A hidden input inside a container's element, with a name and not disabled, is sent
+  under its name in a URL-encoded or a multipart body, `FormData` building that payload in TypeScript and never
+  replacing the container. The lead's reading within it: a JSON body and a GET's query carry none, since a hidden text
+  has no declared type and an antiforgery token never rides in a URL (D9.15, D14.8, D16.5). The owner can overrule it.
+- The owner, 2026-11-25 (verbatim in `spec/NOTES.md`), yes to lines 2 to 5 of ValidationForms' section 10, each in a
+  container's terms. `pipeline.Validate(container, ruleSet)` checks a container with no request under the rule set it
+  names (N16.3, X16.48). A check under a rule set its validator runs no rule under, a child validator's rules among
+  them, is refused where the view renders and where the endpoint checks, and a check under the default set never is
+  (D16.2, X16.49, X16.50). F7, a live check that names its rule set, builds nothing until a view shows a blur whose
+  message differs by rule set; its form then is a closed choice the block door takes, LiveCheck.Under with the rule
+  set or LiveCheck.None, written into the container's live field, with no PublicAPI line before that view. The core
+  adds no door for a grid: the grid's own unit decides between M21.F23's adapter and the owner's words of 2026-11-20
+  ("adapter is not default choice"), and the one thing it can ask of the core, a check over a value a source hands, is
+  named in section 8 of that design. Line 1: a container under a field prefix is its view's model, which sends, reads
+  and checks the inputs inside it under the names past the prefix, and an input inside it that the prefix does not open
+  stops it (D14.8, X16.51 to X16.56).
+- The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), yes to choice A for a field left out under a list index: a field
+  left out under a list index that leaves its item with no field stops the request, or is refused where the view
+  renders. `WhenBlank` gains "leaveUnlessAlone", which C# writes where an input's path holds a list index and it would
+  write "leave", and a query or form data member past a list position that can be left out, with no member of its item
+  always sent, is refused where the view renders (D9.10).
+- The owner, 2026-11-23 (verbatim in `spec/NOTES.md`): 1.0 is done when the core framework, every Fusion component and
+  selected Native components are done, each Fusion component onboarded one at a time with its full powers through
+  `.claude/skills/onboard-component/SKILL.md`. The framework package reaches 1.0 first.
+- The owner, 2026-11-20, correcting the browser validation proposal: preserve existing use cases and establish the one shared operation before proposing a new overload. Each additional form needs a concrete case and a shown difference in meaning. The plan states what the browser reads and runs.
+- The owner, 2026-11-20: run TLC on the Mac to conserve hosted CI hours. The Mac checks changed models and configs
+  and records their results with the verified jar's SHA-256. Hosted CI verifies the current inputs and required
+  verdict of every recorded result. The model-executing plants run with TLC on the Mac.
+- The owner, 2026-11-05: this is a complete rewrite, not a rebuild, and it has to be right.
+- The owner, 2026-11-05: no module and no feature on either line is lost, and the session improves every
+  aspect. A door whose form is refused names the doors that carry its capability; `spec/tools/check.py`
+  prints the features lost, and done is zero.
+- The owner, 2026-11-05: Alis.Reactive.NativeTagHelpers and Alis.Reactive.DesignSystem are out of scope on
+  both lines (BRIEF.md section 4). Their inventory rows stay, marked out, and no check counts them.
+- The owner, 2026-11-05: neither line's public surface is the contract. Main opened the core's internals to
+  its own packages, and the redesign repeats the same mistakes; both lines are evidence of features, not of
+  the design. A door is public only when a view author, a validator author or a component author needs it.
+  A door that is an implementation detail is refused with that reason and the doors that carry its feature.
+- The owner, 2026-11-05: any component can be onboarded on the core's public surface. Fusion and Native get
+  nothing an app does not.
+- The owner, 2026-11-05: the core takes as few dependencies as it can, and each one is the owner's decision.
+  Dependency injection is one. Every dependency is pinned to one version; at gate 1 (C7) the
+  DI abstractions take one exact version per target framework, set beside System.Text.Json's 10.0.12. The owner's
+  rule of 2026-11-11 moves both to the 10.0 line's latest patch, section 2.7's.
+- The owner, 2026-11-05: the HTTP module is requests and responses. What comes back from the server belongs
+  to it: the status, the body, how the browser decodes it, and the error body each host sends.
+- The owner, 2026-11-05: work survives compaction. A correction is written here and in `spec/NOTES.md` the
+  turn it is given, and the compact hook prints this section.
+- The owner, 2026-11-06: the request lifecycle keeps every feature and has a condensed default shape that
+  covers most requests; a developer overrides any part. `.cshtml` MVC views made parameters and conditions
+  complicated, and a more condensed typed syntax that loses no feature is welcome (step 7, gate 2).
+- The owner, 2026-11-06: a request runs in any event or callback; conditions work uniformly in every block
+  of a request.
+- The owner, 2026-11-06: conditions have had two syntaxes in views; there is one uniform syntax, a branch
+  holds several statements, and a branch is a simple lexical scope, as a C# `{}` block is.
+- The owner, 2026-11-06: dates and time zones were not done right or to the standards; the spec states each
+  date form by the standard it follows and pins each host's reading and writing of it by a probe.
+- The owner, 2026-11-06: validation that agrees on the server and in the browser is a must, and much time was
+  lost on it. The module uses no reflection, has one uniform syntax, and supports conditional and complex
+  validation on both sides.
+- The owner, 2026-11-06: culture is the server's, never the browser's: the server is the truth, and every
+  culture-dependent read or write of a number or a date in the browser follows the culture the view rendered
+  under.
+- The owner, 2026-11-06: Syncfusion is one consumer of the framework, its dependency inverted. Syncfusion
+  works with camel-case JSON and with other naming, so the framework supports the JSON naming an app
+  configures, not camel case alone.
+- The owner, 2026-11-06: MVC partial semantics get special attention. No weakly typed passing (ViewData)
+  carries plan state. ResolvePlan and the plan primitives were designed to stop poisoning the HTTP request;
+  a design that stores plan state on the request is the easy route, and it is refused.
+- The owner, 2026-11-06: plugins are an integral part of the design, where customization is needed and a
+  better developer experience can be offered; the request lifecycle calls into a plugin in a typed way,
+  as every block does.
+- The owner, 2026-11-06: "follows the server" means the framework allows the server to decide. Example to
+  think through, never a framework concept: a company has many communities, each with its own configured
+  time zone. The framework offers the time zone a view renders under as the app's choice, as culture is.
+- The owner, 2026-11-06: we design a framework, not a one-off case. A host difference is the framework's to
+  absorb behind one door on both hosts; the net48 time zone maps its Windows id to IANA by a table made once.
+- The owner, 2026-11-06: the framework's views are `.cshtml` MVC views, on MVC 5 and ASP.NET Core MVC, never
+  Razor Pages; the spec says "view" or "MVC view", and "Razor" only inside a code path.
+- The owner, 2026-11-06: the framework controls every input's id. Without it the browser starts guessing,
+  validation does not find its inputs, and views of different partials that share an id conflict; the
+  declaring-class id is that decision.
+- The owner, 2026-11-06: templates have a typed way to write HTML, with much room to grow; keep it. It relies on
+  Syncfusion's compile, and it stays the Fusion module's, not rewritten: it brings a JavaScript dependency the
+  bundle always holds and no server dependency. The owner, 2026-11-10, raised a core template engine at gate 2 and
+  reversed it the same hour, so the rewrite proceeds (verbatim in `spec/NOTES.md`): Syncfusion's engine stays through
+  the rewrite, and a core engine returns only as the owner's own decision.
+- The owner, 2026-11-10, choosing G6's default plus a view name (verbatim in `spec/NOTES.md`): MVC's design of its
+  views must not fall apart, and a view name beats the boilerplate of a type per view. A door keeps MVC's own design
+  of its views working: `Html.PartialFor(m => m.Member)` names the view by the member's type, and a view name, a
+  string kind, names it when a type has several.
+- The owner, 2026-11-10: "u made it look like serval time that it was easy and SF will work without any issues". A
+  new direction is put to the owner with its cost and its risks beside its evidence, never with the evidence alone.
+- The owner, 2026-11-10, at gate 2: "run few experiments with software devs about their authoring experience and
+  consider but core design don't take 90 degree turn - it's about bringing more finished and polished questions to
+  me". A form goes to the owner after authoring experiments have polished it, and no experiment turns the core design.
+- The owner, 2026-11-10, gate 2's G13: a form the spec deferred to gate 2 is approved at what its line writes, the form
+  or default it states, else the door as the POC or spec/api compiles it; an item with neither comes back to the owner
+  with a form before the unit that builds it.
+- The owner, 2026-11-06, to be made unmistakable: the framework depends on no consumer. The dependency is
+  inverted: Fusion and Native are consumers built on the core's public surface, and the core names none of them.
+- The owner, 2026-11-06: bad patterns start small and spiral, so each mechanism stays limited to its exact use
+  case. Browser and server validation work from one fact, a rule written once and never twice.
+- The owner, 2026-11-06: MVC partials are a great feature for dynamic UI: a partial loads where a condition
+  holds and leaves when it changes (a state whose form needs 10 fields, another whose form needs 20). Each
+  partial has its own tight model, and validation rules are written for that model; more models, decoupled,
+  and the plan stays tight, never carried on the HTTP request or by weak typing. The request lifecycle with all
+  its features and its condensed default form is the game changer.
+- The owner, 2026-11-06: a partial is attached to its parent's plan (one model with several associations) or
+  independent (loaded where a condition holds, its own thing), and both work. Partials nest: inside a plan a
+  view renders another, entirely different view with its own plan and its own children. Main merged plans by
+  an algorithm on purpose; the rewrite improves on it from the framework's core.
+- The owner, 2026-11-10, after MVC's rendering forms were tried: "I am fine with prefix as long as MVC permitives work",
+  and a partial needs to know only whether it is its own plan or attached to another plan. The prefix design stays
+  (D14.3): every MVC door that renders a member's view under its prefix attaches it (D16.3); a view rendered with a
+  model and no prefix is its own plan, named as MVC names it.
+- The owner, 2026-11-06, said several times: never just agree. An example the owner gives is an example, not the
+  rule ("my 500 was an example"). Think each piece of advice and each gap through against the evidence, and
+  disagree with the reason where it does not hold: that is the job. This feedback is never lost.
+- The owner, 2026-11-06: Syncfusion and the native components are consumers of the framework, the dependency
+  inverted. The core exposes only what onboarding a component needs, takes no vendor library (Syncfusion's
+  DataManager is named: the framework's own typed request lifecycle feeds components), and onboards no new
+  component itself: any developer onboards one. After each compaction, reread these decisions, `spec/NOTES.md`
+  and the root vision, which the compact hook prints, so the design does not drift.
+- The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
+  declaration, never by what the browser finds.
+- The owner, 2026-11-06: OpenTelemetry tracing is in scope and baked into the design (Q20): it records how the
+  framework processes a request from start to end, helps while developing, and is optional, never always on.
+- The owner, 2026-11-06: null and undefined are never a state, in C#, in TypeScript, anywhere; a value that can be absent is a closed
+  union, and null is only a value the data holds. The nuance, the owner's words: "That is about the framework, not about the
+  value." A contract whose field is nullable (a birth country typed as a string or null) is valid, and its declaration says so (`string?`).
+- The owner, 2026-11-06: "when we onboard a component, we onboard the typed API exactly what that component has. So if the typed
+  API is not available, then how would you even call via framework?" A declaration mirrors the typed API member for member, on
+  every live object whatever holds it, a payload included: presence and nullability come from that API (D5.3).
+- The owner, 2026-11-06: "Object which collide with the built-in C# object." No door takes the name of a .NET type:
+  `LiveObject<T>()` and its list form replace `Object<T>()` and `Objects<T>()` (N5.5), since a member named
+  `Object` on `JsObject` shadows `System.Object` in every declaration. CA1720 refused it in the POC's build
+  (latest-recommended analysis, warnings as errors).
+- The owner, 2026-11-06: "In the model, in the CSHTML, let's have a rule that both has to be same. Override cannot
+  change it." An override keeps the JSON name and the write of the member it overrides. A read names the member as
+  the class that declares it names it, and the class the read starts from must write that name. An override that
+  changes either is the analyzer's to refuse at build (N18.5, built in POC 13f as ALIS025) (D18.3). The owner
+  approved the solution the same day.
+- Chosen within the owner's yes, 2026-11-07: a member System.Text.Json writes unlike the app's options (its own
+  `[JsonConverter]`, or `[JsonNumberHandling]` on it or its class whose writing bits differ) is held in that form. In
+  a list's lambda, a value compared with it by `==` or `!=` is written in that form, so an enum with its own
+  `JsonStringEnumConverter` compares as it is written; every other computation with it is refused, and a path past
+  its own converter is refused on every data read (D4.2, D6.12, POC 13f-ii). This departs from D6.12's earlier
+  "refuses it in a comparison", because the probe wrote the compared value through the member's form with no
+  reflection. A `float` or `double` written as text is refused in equality too (-0 writes "-0", NaN equals its own
+  text). Chosen within the owner's yes, 2026-11-09, gate 1's P15: a `decimal` the options or number handling write as
+  text is compared by `==` and `!=` by value through the operator `eqDecimal`, since 0.10m and 0.1m write "0.10" and
+  "0.1"; its ordering stays refused, and the POC refuses its equality until the rewrite builds it (D6.12).
+- Chosen within the owner's yes, 2026-11-07: a source carries the form its value is held in. A value written beside
+  it (a condition's literal, `IfNull`'s fallback, `Choose`'s literal arm) is written in that form (D7.7, D8.10, POC
+  13f-iii). Chosen within the owner's yes, 2026-11-09, gate 1's P8: who wrote a value decides its base form, the
+  app's for what the server's JSON wrote and the live form for what a live object holds or hands, a payload declared
+  as data included; the live form keeps the app's naming and its `RespectRequiredConstructorParameters` (the owner,
+  2026-11-15) and nothing else its options set (every number a JSON
+  number, every null written, no converter of the app's), so a live object takes a source in the app's form as held
+  where the forms agree, a number held as text converted, an enum mapped by D9.13's rows, whose reads gate 1 granted
+  (C37), and refuses anything else (X7.10); a literal JavaScript would read as another value is refused (X7.13); and
+  the type check requires `[JsonPropertyName]` on a member it checks against a name the vendor declares (X17.48).
+- Chosen within the owner's yes, 2026-11-07: a view reads past a nullable member in a data lambda with no `!` where
+  the browser reads nothing past null. CS8602, and CS8629 on `.Value`, are suppressed on an expression that reads the
+  item, in the predicate of `Count`, `Where`, `Any`, `All` and `Find`, the field of `Select` and `Find`, and the path of
+  `Read`, and on a cast from a nullable there, which reads as its `Value` does (D6.14, POC 13g-ii). The warning stays
+  where null stops the pipeline (a `Sum` term, an `OrderBy` key), on a value the view holds, and on an input's member
+  path, which keeps the warning MVC's own helpers give (N6.3, POC 13g). Chosen within the owner's yes, 2026-11-09,
+  gate 1's P6: a `Select` field whose type holds no null stops the pipeline where it reads nothing, so its warning
+  stays, and one whose type holds null is null in its list (D6.16).
+- Chosen within the owner's yes, 2026-11-08, 17c(a3-i): a request's member lambda in `Query` and `Set` names the key it
+  sends and is never run, so CS8602 past a holder that holds null is suppressed there (ALIS036, N9.5) and a view writes
+  `r => r.Handover.Round` with no `!`. The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: POC 14 builds one request, `Get(url).Into(container)`, since a slot
+  loads only through a request (D10.11). The gate 1 flag that the approved list holds no request POC is amended to
+  name it: a GET whose success body loads a slot, and nothing else of the HTTP module.
+- Chosen within the owner's yes, 2026-11-07, POC 14: a declaration's unsubscribe is looked up with its subscribe when
+  its handler starts, and a handler whose object lacks it, or whose returned subscribe gives back no remover, does not
+  start (the second's listener runs nothing), since no release could remove what it added. Plans start in the order
+  the page holds their scripts. A slot announces the unmount of its content whether or not a plan gave it an owner
+  (D12.3). `HttpSend` is a literal in the POC, which has no `record` node. Chosen within the owner's yes, 2026-11-09,
+  gate 1's P13: the build checks the same listening members against the declaration's type wherever it reads the
+  listening (a vendor or `EventListening` in the declaration's own compilation, its names constants); a vendor a
+  referenced assembly defines is checked by that assembly's build, and on another build's declaration, as one computed
+  at run time, it is met where a handler starts (D17.5, X17.45).
+- Chosen within the owner's yes, 2026-11-07, POC 14d: a `listen` block reads the bindings of the blocks around it, and binds
+  its payload and arguments under names of its own; a write to the payload of the event around it is refused where the
+  view renders, and so is a listen on an object declared optional or nullable. An object whose events a pipeline listens
+  to is an `EventedObject`, which declares its `EventListening` (once named PluginEvents: one name for one concept with two
+  holders), so a listen on an object that declares no listening does not compile. The forms are gate 2's.
+- Chosen within the owner's yes, 2026-11-07, POC 14e: D12.9 follows D14.6, since D14.1 refuses a record shared by the
+  views of a response: a plan that sets the text or HTML of its own slot is refused where the view renders, and across
+  plans the step stops in the browser, on a held slot's element or on an element that holds it. A slot is held while a
+  live plan names it and while content a load or the server put in it has a live owner. An element's text and HTML
+  mark their `set` as a content write.
+- Chosen within the owner's yes, 2026-11-07, POC 15b-ii: a payload declared as a `Component` is that component, whose
+  setter takes a write whenever the step runs, so D11.4's refusals (after an awaited step, and inside a `listen`) do
+  not apply to it. The meaning is keyed on the declaration, never on the expression's shape; every other payload is
+  refused as before.
+- Chosen within the owner's yes, 2026-11-07, POC 15b-iii: a `Component` is an `EventedObject`, whose listening is its
+  vendor's; an `EventedObject` declares its `EventListening` by overriding its listening (14d took it in the
+  constructor), so neither holds a nullable. A listen on a component a payload hands over is removed at release only
+  while the element it held when it listened still holds it where the vendor's `locate` finds it, the rule a handler's
+  release follows; the vendor names where its object holds its element with an element path. Refused where the view
+  renders: a listen on one whose vendor names no element path. Chosen within the owner's yes, 2026-11-09, gate 1's P5,
+  answering 14a-i's flag (3): a listen on a component reached by its element's id is the door a slot's plan has to a
+  component the page rendered, released by the element it reached, so its vendor needs no element path (D12.8).
+- Chosen within the owner's yes, 2026-11-07, unit 17a, and moved to N10.7's form in 17c(a3-ii), 2026-11-08: a request's
+  routes are written on the request, `pipeline.Get<TRequest>(url, request => request.Set(r => r.Member, value or
+  source)).OnSuccess<T>((reply, pipeline) => ..).OnError<T>(status, (reply, pipeline) => ..).OnError((failed, pipeline)
+  => ..)`; the body is `reply.Body`, a source read through the data path `MethodResult.Read` uses, and a header is
+  `reply.Headers.Get(name)`, on every reply, read by the browser's `Headers.get` (N10.7). The form is gate 2's.
+- Chosen within the owner's yes, 2026-11-07, unit 16a: a declaration's value type is checked against its vendor's
+  TypeScript at build (ALIS037, the type check, which POC 16a numbered ALIS025, the override analyzer's id, D17.5), the rule
+  `spec/Core/DESIGN.md` states for a payload ("The member's C# type is the API's value type") and the analyzer
+  checked only for null: a property's value, both ways, a method's result, awaited or
+  not, and the data past them member by member by their JSON names. The closed set: text (string, char, Guid, an
+  enum whose type carries a string converter, and on net10 DateOnly and TimeOnly, by gate 1's P9), a number (the
+  numeric types, any other enum, by gate 1's P8), a boolean, a
+  date (DateTime, DateTimeOffset, read from text too, since data carries a date as text), a list of these, and an
+  object whose members the vendor's type declares, or takes through a string index signature as the index's type. A
+  member
+  the vendor's type declares and the data lacks reads its start (D4.2 unchanged); a member it does not declare is
+  refused, on the declaration's line, with its path. The vendor's untyped shapes (any, unknown, object, Object) take
+  any type. Refused, each a gap to name: a member that holds a promise, a function, nothing, or more than one kind
+  of value. A component reached where its vendor hands a base of the type it mirrors is refused on the reaching line
+  (ALIS021). Chosen within the owner's yes, 2026-11-09, gate 1's P12: a method's arguments, a callback's answer, a
+  listener's argument at a position and the result of a call of the object itself are checked against the same
+  contract, built in the rewrite's analyzer unit (D17.5, X17.40 to X17.42).
+- The owner, 2026-11-07, walking the SDK map and a native input: "please take my input about keeping the quality high, as we
+  have to onboard 100 of components". Onboarding is judged as one of hundreds: a rough edge in a declaration is
+  repeated in every component that meets it. Approved on the walk: a payload, and what it holds, nests in its component's
+  class as that event's own slice, and two events that hand the same shape each declare it ("as payloads grow in their
+  own way so duplication is fine there"); a component an event hands stays its own class. The walk's findings (where a
+  reached declaration's error lands, a handler's way to its own component, a text's length in a view, the id string a
+  view repeats, `name:`'s null) are in `spec/NOTES.md`, 2026-11-07, each for gate 2.
+- The owner, 2026-11-07, after trying a component on a native input whose event hands promises: "yes, covering this
+  is necessary along with harmony with other modules", then "Ok I let you complete the work as POC and improve design
+  once ready I will try and I will try other features as well". The native input and the promise payload are completed
+  as POC pages with their proof, the design gaps the walk found are closed in the POC where the core states the meaning,
+  and the owner tries the result before gate 1.
+- The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
+  reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
+  and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's
+  identity and the declaring class of a lambda's member are within the rule (D18.1, D18.4). Of the alternates the
+  owner chose the declaring class: "I'm good with the declaring type... Use caution really, really good so we
+  don't trip over." Every read of type information in the core is on the owner's list in `WhenTheCoreIsCompiled`,
+  which fails on any other.
+- The owner, 2026-11-06: "capturing the model value is important to keep our framework handle dynamic cases,
+  otherwise it will become pointless. ... I would allow that" (reflection, over refusing captured values). An array
+  lambda reads a value the view holds (`r => r.Ward == Model.Ward`, or a local it captures) when the view renders,
+  by reading each field and property of its member chain with reflection (D6.7). The two reads go on the owner's
+  list in `WhenTheCoreIsCompiled`.
+- Chosen within the owner's yes, 2026-11-06: the member-chain read over compiling or caching compiled accessors,
+  because it generates no code, holds no cache, needs no warm-up and is the same API on net48 and net10; it reads
+  a value in 0.02 µs (a local) to 0.04 µs (`Model.Ward`) on net10, against 32 to 39 µs to compile per value (the
+  redesign's way). A view value that calls a method or computes (`Model.Ward.ToUpper()`) is refused, naming its
+  door, a local computed before the lambda. The owner, 2026-11-06: "I am totally fine as long as its captured as
+  view render so dynmic stuff.. but if var works i do not see any downside. I am always hestiant reaching to
+  reflection, or even compile" (D6.7).
+- The owner, 2026-11-06, chose the identity table for the .NET members an array lambda calls (`Trim`, `Length`,
+  `Year`, LINQ's own operations inside a lambda): one closed table keyed by the identity the expression tree carries,
+  built from typed lambdas, one file and one entry on the owner's list (D6.5, D18.1).
+- The owner, 2026-11-06, chose that an `int` total past the range of `int` stops its pipeline, as .NET's checked
+  `Sum` refuses it (D6.11).
+- The owner, 2026-11-06: "for decimal use normal finance standard bascially what banks use or have it configured
+  at global level". A `decimal` is summed in the browser as decimal arithmetic, never binary floating point: the
+  terms are added as whole numbers at the largest scale among them and the point is placed once, exact as .NET's
+  `decimal` addition is (D6.11). Then: "imo its 2 digits after decimal point enough for this framework with knob on
+  how to roudn". Two app-wide knobs, places (2) and rounding (.NET's banker's rounding, half to even, unless the
+  app chooses half away from zero). They apply only where an operation must round (a division, an average, a value fitted to its
+  places); sums and comparisons stay exact, because doses in this domain carry three places (digoxin 0.125 mg) and
+  a browser that rounds them to 0.12 disagrees with .NET. The owner: "ah i see", "good point".
+- The owner, 2026-11-06: branches that nest to any depth (D8.7, D8.8) are "golden".
+- The owner, 2026-11-06: the slices are vertical in an app as in the framework (the owner's words are in
+  `spec/NOTES.md`). An action that needs a model has a model of its own, plain, shared with no other view; an app
+  shares a base class only for abstract members it enforces. README.md and the component onboarding skill teach
+  it as the app's standard; the framework refuses nothing for it.
+- The owner, 2026-11-06: no defensive code where a type or a check stops the bug; no closest match; fail loudly, so a
+  bug surfaces and challenges the design. Tests are Playwright in a real browser, never jsdom, which is brittle.
+  The reference components are built around JavaScript object complexity (dot notation, properties, callbacks,
+  events) in several versions, to match Syncfusion's complexity when it is onboarded as a consumer. Analyzers are a
+  harness written as .NET's open-source analyzers are, never another surface; a test's name, its arranged data and
+  its assertion are each crucial, and their absence has cost months.
+- The owner, 2026-11-06: "Let's drop real time from .NET 4.8." Realtime is net10's alone: its doors are on net10's
+  surface only, the net48 realtime rows of the inventory stay, marked out, and no check counts them as lost.
+- The owner, 2026-11-06: strict quality is enforced by tools, in the browser's TypeScript by lint rules and in C# by
+  analyzers, and the analyzers are written so rigorously that they never become another surface that drifts: a
+  harness, not extra work. The tests and the custom components are what proves the framework's coverage. Each lint
+  rule and each analyzer enforces one line of this spec, the line names its rule, and a rule with no line leaves.
+- The owner, 2026-11-06: before implementation, a proved plan. The core's modules with their coupling and cohesion
+  found early; tools chosen so they are no burden; the spec's own work reviewed so it does not become another layer
+  that breeds; a greenfield plan proven by POCs. The domain model that captures intent is sound, and onboarding is
+  proven for a writable property, a readable one, dot notation, complex arrays, an event, a callback and the vendor's
+  way of finding its JavaScript object. The fluent builder's naming is close and is improved. Gate 1 waits for the POCs.
+- The owner, 2026-11-06: the TLA+ work must be good in code, not hypothetical. A model invariant that restates its
+  own action proves nothing; a model earns its place only over interleavings, and each of its invariants is a named
+  Playwright test on the code it models.
+- The owner, 2026-11-06: "I am totally fine with one assembly, but namespacing is logical [modularization]." The core
+  is one assembly; each module is one namespace and one folder of the same name, its public and internal types
+  together, and the namespace is the module boundary.
+- The owner, 2026-11-06, on the POC 4 report: "i will with your recommondations - decide for quality". So: a data
+  member absent from a present item reads its starting value, as the endpoint binds it (Decision 1, A); a holder that
+  is null or absent still reads nothing (D4.2). Text ordered with no comparer orders by the view's culture with the
+  browser's collator, the invariant culture as `en`, invariant globalization mode as ordinal, and a culture the
+  browser lacks stops the pipeline (Decision 3, a). `Regex.IsMatch` in a list's lambda is keyed in the identity table
+  and its pattern passes D16.11's one reader, the rules `Matches` takes; the core runs no `Regex`, and the key is the
+  ban's one exception (Decision 2, decided for quality: the redesign has the member, and a second regex meaning is
+  worse than either option). The CA1304 and CA1311 suppressions on the identity table and the POC app's request
+  culture are approved, and so is the list of fifteen POCs in `spec/NOTES.md`.
+- The owner, 2026-11-06, confirming the scope of Decision 1: "that observation is correct", then "so having some sort of
+  good explicit solution is needed". Every typed data read, not only a list's lambda, reads an absent member's start,
+  and the plan states it: each step of a `data` read carries `start`, `nothing` or `unbound` (D4.2). The root CLAUDE.md's
+  "Data reads as nothing when absent" describes main and the redesign, and changes when the rewrite lands.
+- Chosen within the owner's yes, 2026-11-06: a data read's start is System.Text.Json's binding under the app's options,
+  on both hosts, the contract that wrote and names the data (D2.9). The owner's words were "as the endpoint binds it";
+  on net48 the endpoint is MVC 5's binder, which fills the nested objects a model starts with and cannot create a type
+  with no public parameterless constructor (a positional record), so on net48 the browser reads a start that endpoint
+  would not bind. One meaning on both hosts is the framework absorbing the host difference; a form's check still
+  follows the endpoint that binds its body, by host (D16.6). The owner can overrule it.
+- Chosen within Decision 3 (a), 2026-11-06: the plan carries the collation once, in its culture (D3.11), and C# picks
+  each sort's comparison from how .NET compares under the view's culture: `"a"` after `"B"` is invariant globalization
+  mode, ordered by code unit; a culture whose sort is an alternate one ("de-DE_phoneb") is refused, because .NET's
+  order for it is not one order across hosts (on macOS .NET 10 orders it as "de-DE") and the browser's tag for it is
+  not certain; `StringComparer.CurrentCulture` orders as no comparer does. The owner can overrule each.
+- Chosen within Decision 2, 2026-11-06, on a probe: D16.11's reader refuses `IgnoreCase`, which D16.11 admitted with
+  `CultureInvariant`. The sweep of the BMP's case pairs found no JavaScript flag that folds case as .NET does (166 pairs
+  differ under "i", 100 under "iu", among them "s" against U+017F), and the "u" flag reads a negated class by code
+  point. The door is both cases spelled ("[Aa]spirin"). The browser's copy carries no flag; its closed set of
+  constructs, lookbehind among them, agreed in both engines on every probed input. The owner can overrule it.
+- The owner, 2026-11-07, after the MVC views POC: "go always remember, we are holding quality bar high, developer
+  experience matter". Each door is judged by what a developer types in a real MVC view and what they meet when it
+  goes wrong: a mistake surfaces where the view renders when the framework can see it, and otherwise the browser's
+  error names the member and the cure.
+- Chosen within the owner's yes, 2026-11-07: after a failed post, a component's typed starting value is the model's
+  value as the action leaves it, not the text the browser sent, on both hosts: net10 keeps no typed form of an
+  attempted value, MVC 5 converts one only by a `System.Type`, and a typed component shows what the server decided;
+  a text box keeps MVC's attempted text (D17.13).
+  The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: the vendor contract (D17.5) is a table of every type each module of the
+  app's TypeScript program declares, written by an MSBuild target into obj/ before CoreCompile and never committed,
+  because lib.dom alone holds 60,695 members and a stale committed copy could compile green. A component or plugin
+  declaration names its type with `[Mirrors(module, type)]`; nullability follows variance (what the member reads fits
+  the C# type, what the C# type writes fits the member); a drift a browser test arranges on purpose carries
+  `SuppressMessage` naming the test. The owner can overrule it. Chosen within the owner's yes, 2026-11-09, gate 1's
+  P11: a member's JSDoc `@default null` is part of its API, so the contract reads the member as holding null and cites
+  the tag's d.ts file and line, and a `T?` declaration of it (NumericTextBox's `value: number`) needs no suppression;
+  the suppression set stays the one above (D5.3, D17.5, X17.44).
+- Chosen within the owner's yes, 2026-11-07, reversing D7.3's `OrNull()` at a struct's set on a new fact (the contract
+  makes every `T | null` member a `T?`, and the POC's census broke 178 writes): a set on `Property<T?>` or
+  `WriteOnly<T?>` takes a `T` source as C# assignment does (`NullableWrites`, N7.6), a door added to the public surface.
+  Its cost: it is an extension in `Alis.Reactive.Components`, and a view that does not import it meets a bare CS1503.
+  The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a declaration a root reaches is checked at the type the vendor's API gives
+  what reaches it, with no attribute of its own (D17.5, X17.29). A drift is cured where the vendor's types under-state
+  what it hands (the current pump typed `InfusionPump<PumpChannel>`), and suppressed naming its test only where a
+  browser test arranges it (an older build's bed or alarm). A positional door on a declaration no listener or callback
+  hands is refused at the build, not first where the view renders (X17.30). Root checks stay live and reached checks
+  run at the compilation's end. The owner can overrule it. Chosen within the owner's yes, 2026-11-09, gate 1's P10: a
+  callable property typed by an alias with one type parameter its own type does not name, whose function types its
+  first parameter `any`, hands that type argument as its listener's first parameter, read from the declared type node,
+  so Syncfusion's `EmitType<ChangeEventArgs>` hands `ChangeEventArgs` (D17.5, X17.43).
+- Chosen within the owner's yes, 2026-11-07: presence is the member's mark, not its holder's (D5.3). An optional member
+  that its holder lacks or holds as undefined is absent, since TypeScript's `?` admits both (a class field compiled to
+  ES2022 holds undefined): it reads nothing, a call of it runs nothing, and a write sets it. An optional member of a
+  live object declared neither optional nor nullable stops when that object holds nothing, as any member of it does.
+  The plan's read presence is two halves, the holder and the member, so it gains `optionalMember` beside `optional`.
+  The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a live object a member holds or a method returns, which its API types
+  `T | null` or `T | undefined`, is declared `nullable: true`, and its members read nothing while it holds nothing.
+  ALIS019 refuses the declaration without it, by variance as a value's nullability (a `nullable: true` the API does not
+  need is allowed). `optional:` and `nullable:` are named arguments in the POC, and their form goes to gate 2 with
+  N5.4's. The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a declaration door is the body of the property or method it declares
+  (ALIS023), and the arguments the build reads are constants (ALIS024). A public member that returns a private
+  member's door is not refused: the private member declares its own JavaScript name, which only the contract checks,
+  on roots and reached types, and ALIS016 then points at the private member. The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a date or an instant that reads nothing writes no text, and a request sends
+  it by D9.10's table: a `DateTimeOffset` is left out and binds its start, a `DateTimeOffset?` binds `null` (D3.8,
+  `spec/PathsAndWire/DateWire.tla` NothingWritesNoText). The redesign's earliest moment was the start of a non-nullable member with no
+  initializer, which leaving it out binds; sent always, it bound a nullable as that moment and overrode an initializer.
+  The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a list item that reads nothing is sent as an empty field when its type admits
+  nothing (`string`, a nullable scalar) and stops the request otherwise, decided by a closed set of types, never by a
+  type's members (`ComparedTypes.AdmitsNothing`). A present value not in its member's form stops the request. The owner
+  can overrule it.
+- The owner, 2026-11-07, on 17a's report: "when you say not exercise, this is a hatchword to make mistakes or drift". A
+  unit's report carries no "not exercised" line: what the spec decides for the unit's door is built and proven in that
+  unit, or the unit is not reported done. 17a reported done with `Set` taking text only; unit 17b builds the members
+  D9.6, D9.10, D9.19 and D9.4 decide. An environment the POC lacks (net48) is a work item with its unit, not a caveat.
+- The owner, 2026-11-07, on an object's field names in a query: "I would prefer source generated because that makes
+  the code more stable, internal, performant. ... If that goes beyond it, we can enforce a standard on the query string
+  itself ... Reflection is ... there to help you out to drive the quality of the framework. It's not to hinder your
+  progress." A request member that holds an object or a list of objects is keyed by its fields' C# names (D2.5) from a
+  table a source generator writes at build: for each complex parameter of a controller action and each type reachable
+  from it, typed member lambdas the core names by expression text and by `JsonPath`, with no run-time reflection. Views
+  are compiled by Razor's own generator, which no other generator sees, so the endpoint's parameter is the trigger.
+  The query standard (keys as the JSON names, read back on the server by the naming policy) is the fallback.
+- Chosen within the owner's yes, 2026-11-07, 17b-ii's probe (31 facts, D9.10, D9.13, D9.19, D9.20): an object that reads
+  nothing is left out of a query or form data, since an empty field binds null on MVC 5 and keeps the start on net10; an
+  item of a list of objects that reads nothing stops the request; a list member is sent only when declared `List<T>`; a
+  member net10 binds under another name, a `[BindNever]` member and a member of another list type are marked in the
+  generated table and refused where a view sends them, never at build, so an app's endpoints no framework view sends still
+  build. A parameter prefix and a parameter named like its type's member bind none of the keys, accepted at gate 1 as
+  MVC's binding, which the request door's XML doc names (C25). Request.tla checks the first two over both hosts. The owner can overrule
+  each.
+- The owner, 2026-11-07 (verbatim in `spec/NOTES.md`): the official default is C# 7.3, most of C# 8 works on net48 with
+  few gotchas, so assume C# 8. An MVC 5 app is assumed at C# 8, so nothing the framework writes into an app needs
+  C# 9 (no module initializer); generated code is written in C# 7.3 syntax, which compiles in an app left at the default.
+- The owner, 2026-11-07: "yeah one call is fine". An app hands the generated request tables to the framework with one
+  startup call, the same on both hosts (net48 `Application_Start`, net10's startup file); no host registers by itself.
+- The owner, 2026-11-07, on the generators: "I think for validators it does make sense. Compile time JSOn i would defer
+  it". A generator writes the app's validator list in the validation unit, replacing `Add<TValidator>()` per validator
+  (D16's gate 1 exception); compile-time plan JSON is deferred, so 17b-ii measures no render-cost baseline for it.
+  On `Set`: "Ok if Set is better than keep it. I will work with u on one example when ready"; the name stays until then.
+- The owner, 2026-11-07, on sending an object in a query: "instead of making it complex ... burden is on the dev to know what
+  query string name is and what type of value", then "I am fine for lambda, but you have to evaluate the value it is
+  bring". A request sends each field the view names, typed by its member lambda (`r => r.Handover.Round`), keyed by the
+  lambda's C# path; no generator, table or reflection serves requests. The validator generator and its startup call
+  stay. D9.19 and D9.20 are rewritten once the owner has seen the complete example.
+- The owner, 2026-11-07: "we really do not want take control mvc binding - must have solid reasons to do it". The framework
+  writes the keys and values MVC's own binder reads, pinned by probes on both hosts, and adds no value provider, binder
+  or model of the binder without a reason the owner accepts.
+- Chosen within the owner's yes, 2026-11-09, by precedent ("well solve 17c like you solve similar problems, it do not
+  need me to give you decision"): D9.13's rows are written through HeldForm from the enum's values, never from a
+  generated table, and the reads that list the values are D18.1's, granted at gate 1 (C37); a source's combination of
+  an enum `[Flags]` does not mark stops; a JSON body's enum is the form its endpoint binds. The owner can
+  overrule each. Chosen within the owner's yes, 2026-11-09, gate 1's P2, and reversed by the owner, 2026-11-26 (verbatim
+  in `spec/NOTES.md`), which the standing decision above holds: an enum is flags to the framework when its own `[Flags]`
+  marks it, which the core reads once (N16.4), and no startup call names it; a source's value of it is split as
+  `Enum.ToString` splits it and sent as that text, and `IsInEnum` over it is FluentValidation's flags meaning on both
+  sides; ALIS038 holds such an enum, where an `IsInEnum` reads it or a request member sends it, to values from 0 to
+  2^53 - 1 that are disjoint or nested (D9.13, D16.10, N16.5).
+- The owner, 2026-11-07: a request is the HTTP message, and the core holds its parts: the method, the path, the query,
+  the headers and a body with its media type, JSON and multipart form data (a form that uploads files among them);
+  the response's status and its body as JSON, text or HTML. The methods are GET, HEAD, OPTIONS, POST, PUT and DELETE (OPTIONS by the owner's "OPTIONS support is
+  required as well"). PATCH is
+  not a method of 1.0, by the owner's leave: its two body standards (RFC 7396, RFC 6902) carry their own media types
+  and give a member left out and a member sent as null different meanings, which D9.10's table does not state. Every
+  part takes every source (Q7), and every response body is a source for the modules after it: the page's query read
+  in a condition inside an event, a chained request's URL from the first response or the page's query. `Set` and the
+  other condensed doors write the plan the full form writes, so they add no plan shape; a door the view calls with only
+  its own type argument is an instance member, since an extension of a generic receiver binds that call in neither the
+  classic form nor a C# 14 block (N10.7).
+- The owner, 2026-11-07: "You can only skip Patch", because a content type or a primitive done wrong breaks
+  encapsulation everywhere above it. The request bodies are the Fetch Standard's: none, JSON, URL-encoded, multipart,
+  text and one file as the whole body. The response bodies are read as none, JSON, text, HTML or a file the browser saves.
+  Text is decoded by its `charset` parameter, because fetch's `text()` decodes UTF-8 whatever the header says. Streams
+  stay out by the owner's 2026-06-10 decision.
+- The owner, 2026-11-07: "multi part body think in permtives, multiple files with other payload is right complexity".
+  A multipart body is an ordered list of parts, each a name and either text or a file (its bytes, file name and media
+  type); several files and fields go in one body, under one name or nested by C# path (`Documents[0].File` beside
+  `Documents[0].Title`). The host's file types (`IFormFile` on net10, MVC 5's posted-file base, and their lists) only type the
+  member.
+- The owner, 2026-11-08: the framework ships its spinner and toast, and the condensed form depends on contracts the core
+  owns, a busy indicator and a notice, never on their CSS or markup; an app puts its own component behind either, and
+  the full form takes full control. The core counts each target's requests and calls its show at the first and its
+  hide at the last, so a component with a plain show and hide is correct under Parallel, two pipelines at once, retry,
+  replace and a slot's unload (`spec/RequestsAndResponses/Composition.tla`).
+- The owner, 2026-11-08: the default loader shows on the target a request updates, right for parallel requests of 5
+  and 1 seconds on one target or on two (verbatim in `spec/NOTES.md`). Busy is a state of a target, as WAI-ARIA's aria-busy is:
+  the elements its success route writes outside a condition, the element it loads, the container it sends, or the elements
+  `Busy` names in place of those, else the page; the C# derives them, the plan carries them, and the core counts each
+  target on its own (D10.21).
+- The owner, 2026-11-08, on schema.md left behind the HTTP decisions and N10.7 drifted from D10.14's retry: a drift is a
+  big mistake, caught or not. A decision changes in one commit with every place that carries its meaning: its D and N
+  lines, its question's schema nodes, `spec/Core/schema.md`, the TLA+ specs, `spec/api` and this file; the unit's report
+  names each one it touched, and why each other one stands. A green check proves only what it compares.
+- The owner, 2026-11-08: a page holds many forms or none, and a request works without a form on the full form's
+  parts; no door, default or check assumes one form per page or a form behind every request.
+- The owner, 2026-11-08: forms nest, sit out of band, or are containers of any kind; the concept is the request
+  container, and no type is named PageForm. The core sends a container's framework inputs (`Inputs`), in a form body
+  the hidden inputs inside it too (D9.15), and the view's own input (`Input`) beside it; `FormData` is the browser's way
+  to build a form-data body (the owner, 2026-11-25).
+- The owner, 2026-11-08: a rule the source states is the compiler's. A type stages the door; where no type can, an
+  analyzer refuses it; a refusal where the view renders names what only the render knows (the app's options, a value
+  read at run time, another view). Every compiler rule of both lines carries a verdict in the core design.
+- The owner, 2026-11-08: parallel names are prohibited. One concept has one door, and a slice's door that repeats a
+  core door (a link's own `Post` beside the pipeline's) is refused.
+- The owner, 2026-11-08: row actions serve any grid-like component, never one vendor's. An action is declared once,
+  outside its rows, as one request in the condensed form with a payload of any type, and each row renders it with its
+  own values; declared once is no license for a weaker design (types, one request module, every module, no guessing).
+- The owner, 2026-11-08: every module works with every other, each HTTP thing is a typed JavaScript object whose members
+  are sources and dot-walk (the response's status, headers and body, the page's URL, the request's fields), and main is
+  the floor of features, never the bar of quality.
+- The owner, 2026-11-08: every stage is a pipeline, and each holds several statements of every module: a handler, each
+  branch, each route, `WhileLoading`, `Finally`, the block `Chained` runs, each `Parallel` branch and the defaults' blocks.
+  Conditions, the page's URL, every reply's status, headers and body, and the request as sent dot-walk in each, and a
+  chained request reads every reply and request around it. A step that waits holds what follows it, a route's tail
+  included (D11.10, D11.5, `spec/Execution/Run.tla`).
+- Chosen within the owner's yes, 2026-11-08: a row action is one handler per action and one entry per rendered
+  control, and the entry holds only the row members the action's block reads; a button takes any block and a link a
+  block whose one request is a GET, its href; the handler's policy spans the action's rows, and a link reads nothing
+  another script did with the click (D17.15). Both lines write a whole plan per link. The owner can overrule it.
+- The owner, 2026-11-08, amending G2: "I can give you go ahead for amend, but you have to make sure the quality bar stay
+  high, and think through and tell me if this make sense or not." HTTP adds one statement, `request`, whose executor is
+  `spec/RequestsAndResponses/Request.tla`'s state machine, and a pipeline is one run, `spec/Execution/Run.tla`'s, whose driver alone touches a
+  promise (D10.23, D11.11, D11.12). The bar the owner set with it: the machines simplify the runtime's mix of sync and
+  async, and an async call in a stack that started sync is proven by TLA+ and then in the browser.
+- The owner, 2026-11-09: "the synfusion TS is loose ... for event payload, hook up in the code with javascript in
+  browser, and see what they are - I would not go after fullest chain of dom calls there but only public props and
+  methods or promises", and "focus on stable high quality framework, since depenancy is inverted and component can be
+  onbarded, for the featuers where there is low confidence, developers can request it and onboard, but I would love to
+  make it automated but with high confidence." A shipped declaration holds a vendor member only with high confidence:
+  the vendor's TypeScript declares it public (neither `@private` nor `@hidden`) with a concrete type, or a browser probe
+  (`spec/probes/ej2-payloads.mjs`) pins what the browser hands or takes where that TypeScript says `any`, `Object` or a
+  loose union. Any other member is refused with its reason, carried by the doors an app onboards it with (M21.N2,
+  M12.N1), and the probes rerun on every vendor upgrade.
+- The owner, 2026-11-09, on a Fusion slice's class name: "I prefixed with Fusion*" "to avoid name collision", and
+  chose Syncfusion's name after the prefix. A slice's class is `Fusion` and the EJ2 class it renders, so an app that
+  imports Syncfusion's own C# types (its MaskedTextBox in Syncfusion.EJ2.Inputs) meets no ambiguous name, and Syncfusion's
+  documentation names the same component: FusionInputMask becomes FusionMaskedTextBox, and FusionFileUpload becomes
+  FusionUploader; the other 48 slices already follow it.
+- The owner, 2026-11-09: "html browser proof will actually be part of rewrite with high confidence where public
+  members are not clear enough". Each browser fact a declaration rests on names the proof the rewrite ships with it:
+  a sandbox page that shows the pinned member through the framework's own read (a payload member set as an
+  element's text), and a Playwright test that makes the real gesture and reads that text. It reruns on every
+  Syncfusion upgrade, so a vendor that changes a shape fails the upgrade before an app meets it. The probe's own
+  listener (`spec/probes/ej2-payloads.mjs`) is the spec's oracle, never the rewrite's proof.
+- The owner, 2026-11-09, in plain words: "Write a TS custom component with all the complex features, framework has
+  the ability to onboard and use that component to behavior test the framework where tests stay stable and catch
+  real issues." It is BRIEF.md's native reference: a TypeScript component the framework writes as an app writes one,
+  onboarded only through the core's public surface (its own vendor data, `alis:mount`), holding every conformance
+  cell, and replacing the 16 partial components of today's framework test app. Framework behavior is proven on it
+  once per cell, FusionMultiSelect proving that a real vendor's contract onboards the same way (the owner's choice
+  over two custom components). The owner's examples, "promise in payload, or a async method 3 level deep in complex
+  pay load", and every payload door the POCs proved are cells (BRIEF.md section 8). With the owner's
+  yes, a shipped slice's proofs cover only what its declaration adds (its members' names and shapes, its browser
+  facts, its own defects) and never re-prove a cell through another slice.
+- The owner, 2026-11-10, confirming the reference component (verbatim in `spec/NOTES.md`): the framework is held stable at
+  several levels, the analyzers as a harness and the browser tests. The browser tests run on one custom TypeScript
+  component whose features are wide enough to cover the surface of every feature the framework supports: each
+  variation at the sizes that show its rule (a payload walked one level, then two), with TLA+ carrying the rest, so no
+  test is bound by a vendor's speed or limited by its capability. Syncfusion's onboarding is proven by one component,
+  FusionMultiSelect, exercising the same kinds of features on its own members and what it brings of its own. The
+  custom component's name says it covers the framework's features, never a domain word such as a ward: the owner took
+  ConformanceComponent, the component the conformance matrix runs on, the same day.
+- The owner, 2026-11-10, on the conformance app (verbatim in `spec/NOTES.md`): ConformanceComponent tests the surface of
+  invoking a JavaScript object in all its variations, and the HTTP and partials lifecycles need more, so the browser
+  tests run on one conformance app built from several components, some of them Syncfusion's, that covers 100% of the
+  framework's features. It is a common-sense app, whose screens, hierarchy and behavior read as a real app's, its
+  feedback loop fast and in a real browser, and the TLA+ specs' actions list the variations it exercises.
+- The owner, 2026-11-10, yes to the care home app (verbatim in `spec/NOTES.md`), with the quality bar held on its test
+  data: no test is false confidence, brittle or slow, since those breed one-off hacks and the quality falls, as on main.
+  Before the rewrite, a plan for test quality, repeatability and shards, and the exact solution structure, its tools,
+  the TLA+ specs and the folder hierarchy as vertical slices, with the 10,000-foot view, so the rewrite starts equipped.
+- The owner, 2026-11-10: no relying on Syncfusion to cover the framework, the trap main fell into. A core module's
+  browser test runs on ConformanceComponent, native inputs and the app-level objects, never through a Syncfusion
+  component; a Syncfusion component on a care home screen is tested only by its own slice's tests, which prove what its
+  declaration adds. The app's check refuses a core module's test whose screen part is a Fusion slice.
+- The owner, 2026-11-10: two custom components show the framework onboards any vendor that follows its rules: a second
+  joins ConformanceComponent with vendor data different in every part (where its object lives, how it subscribes and
+  unsubscribes, what a listener receives), beside FusionMultiSelect, Syncfusion's real vendor. The tests are vertical
+  slices too, each in its module's folder and named for its behavior, so the test tree never becomes the next fight.
+- The owner, 2026-11-10: the TLA+ specs and every tool the spec built carry over to the rewrite, so a feature asked for a
+  month later starts from what the repo holds, never from rediscovery. The spec is the repo's feature workflow: its
+  living checks run in CI, its test specs are bound to the tests and its TLA+ actions to the harness's gates by name.
+- The owner, 2026-11-10: publishing the NuGet packages, and how a developer uses them in an app (the framework's
+  browser assets reaching both hosts), is part of the plan before the rewrite, at the same bar. The package ids stay the
+  same, but for AlisReactive.FluentValidator's (below); Alis.Reactive.NativeTagHelpers ships as an empty package until it is written, after the rewrite, and so does
+  Alis.Reactive.DesignSystem, since the key principle is the inverted dependency: nothing depends on a design system.
+  Both were scope creep and need a redesign later, or leave: the structure reserves nothing for them, and their future is
+  the owner's decision.
+- The owner, 2026-11-10, asked what AlisReactive.FluentValidator ships, since the core implements the validation grammar
+  without the FluentValidation library: "if not needed remove it that is better". The rewrite packs five of main's six
+  ids. Of main's 113 FluentValidator doors on each target, 8 moved into AlisReactive and M8.F1 gives the other 105 their
+  verdicts, 103 refused with their carriers and 2 kept (`spec/inventory/doors.tsv`). Main's `ReactiveValidator<T>` derives
+  from FluentValidation's `AbstractValidator<T>`, so an app on main's release candidates drops the reference and moves
+  each validator onto the core's `ReactiveValidator<T>`, whose `RuleFor` rules reach the browser in place of main's ClientRule calls.
+- The owner, 2026-11-10, asked whether main's docs site (docs-site, deployed to GitHub Pages on each push to main, and
+  tools/ApiDocGenerator, which writes its API page) survives the rewrite, after the redesign's line had dropped it:
+  "Retire the site". The docs are README.md, packed as every package's readme, and the XML docs on the shipped surface;
+  a line that says the docs carry something names the one that does, and `spec/REWRITE.md` names the unit that writes it.
+- The owner, 2026-11-10, while the lead was restoring main's packages.config layout: "I'm not in favor of taking
+  garbage from main. Like, do the right thing, keep the quality high, drop if you need to." Then: "quality pincipals
+  must not degrade anywhere". This narrows 2026-11-05's "no feature lost" for main, whose lines are evidence of
+  features and not of the design: what main ships stays when it holds the rewrite's bar, and leaves with its reason
+  and evidence in `spec/REWRITE.md` section 3 when it does not; a door that leaves keeps its verdict in features_lost.
+  Main's packages.config layout leaves.
+- The lead, 2026-11-10, within gate 1's C8 and gate 2's G13: N20.2's default ships the OpenTelemetry adapter as one more
+  id, AlisReactive.OpenTelemetry, beside the five of main's six that stay, since D20.2 keeps it out of the core, and the
+  core's net48 references take System.Diagnostics.DiagnosticSource (D20.8). Every pin in `spec/REWRITE.md` section 2.7 is
+  one exact version: the net48 references confirmed by a restore at those versions, the adapter's three npm packages by
+  an install with every peer met.
+- The owner, 2026-11-10: the Native components are great consumers and are written for real, with the dependency
+  inverted: NativeToast, NativeDrawer (main's panel) and the common components (text box, check box, drop-down, radio
+  group, check list, text area, button, hidden field, action link) are production components on the core's public
+  surface only.
+  The app-level components serve a legacy app's layout, where a drawer, toast or confirm appears in a target the layout
+  holds, as main designed them; the rewrite keeps that meaning and decides its form from the facts. The Native
+  components are written to the highest bar: a component-writing expert's review, and the strictest TypeScript lint
+  the repo can hold, so the code is held to it.
+- The owner, 2026-11-10: consumer packages stay separate, each kind of consumer its own package on the core alone and on
+  no other consumer, since they differ (plain-DOM native elements against shadow-DOM web components). The line between
+  coverage and consumers: the test consumers, ConformanceComponent and ConformanceElement, carry the framework's
+  coverage in the conformance app and never ship; a shipped consumer's tests prove only what its declaration adds. A
+  web components package is one more package id, the owner's decision after the rewrite.
+- The lead, 2026-11-10, on the owner's "I let you decide now": `spec/REWRITE.md` holds the repository the rewrite
+  builds (tree, slices, SliceTree, naming, harness, TLA+ owners, tools, shards, CI, packages, what retires) and its
+  units, 26 then and 27 since the order of 2026-11-11 below. Two independent designs fed it; where they differed:
+  vitest and PlanTests stayed as feedback, which the owner's decision of 2026-11-11 below replaces with a module's
+  pure tests, no CSS ships, a fresh MVC 5 app proves delivery apart from the twin, only the Fusion pool gets the
+  Syncfusion key, and every wait, budget and parallelism is measured before it is set. The units run in the order pages
+  need doors after a walking skeleton, since a first-row unit has no page to prove it on; check.py places every feature
+  in one unit and lands each test in the unit that brings the last door its screen parts need.
+- The lead, 2026-11-10, within the owner's two components: a declaration carries one vendor, so the conformance
+  library is six declarations, and between them they hold every kind of D17.3's closed sets: ConformanceComponent (a
+  path from its element, a method pair), ConformancePeer (the component its payloads hand over, with an element path),
+  ConformanceElement (the custom element that is its own object, ComponentVendor.Native), ConformanceRegistered (a
+  plugin lookup, the pair on and off), ConformanceStore (a returned unsubscriber) and ConformanceCallbacks (callback
+  properties, and a payload read by argument position). A test of a vendor kind runs on the declaration that holds it;
+  the app check refuses a kind no placed test reaches, and counts no Syncfusion declaration toward it.
+- The owner, 2026-11-09: "TLA+ ... help design this out because main badly failed at slow tests and broken ones
+  that can not be fully relied". The lead's design within it: the TLC specs carry every ordering of the async lanes,
+  so no browser test provokes a race by timing. A promise on an async lane names the one action of a spec's `Next`
+  it observes (`Request.tla` Route, `Run.tla`, `Composition.tla`, `Ownership.tla`, `Lanes.tla`, `Realtime.tla`,
+  `Tracing.tla`, `CallbackProperty.tla`), the test app's endpoint holds the machine at that action until the
+  test releases it through the harness, a request of the test's own and never a control on the page under test,
+  and every action is named by one promise: the browser proves the code refines each action once, and the browser test count is the actions plus the cells plus each slice's own surface. A timer the
+  plan carries (a toast's time, a debounce, a retry's wait) runs on Playwright's clock (`Page.Clock`), never real
+  time, and a collection the design's weak holds depend on is forced by Playwright's Page.RequestGCAsync, confirmed
+  by the page's own weak hold before the test goes on (X12.18). An action that fires under no mutant-free run leaves its
+  spec's `Next` (Tracing.tla's Finish and Send, Run.tla's ChainedSecond, 2026-11-10). Step 9 writes the actions
+  into the promises; step 10's check.py refuses an action no promise names and a promise naming an action its spec lacks.
+- The owner, 2026-11-10 (verbatim in `spec/NOTES.md`): the tests' quality checks live in a project of their own, apart
+  from the code, since a test written beside its implementation mimics it and the quality falls slowly. The lead's
+  design, `spec/REWRITE.md` section 2.10: a Playwright project references no assembly of the framework or the app,
+  only the world contract, Alis.Reactive.Conformance.World, so a test finds an element as a user does and expects a
+  literal; Alis.Reactive.TestRules holds the test rules TEST001 to TEST013, Roslyn analyzers with their cases, which
+  with check.py's test_rules hold every rule and smell of `.claude/rules/tests.md`; a unit writes its tests from their
+  promises before the doors they need, and U2 lands the rules before the first feature test. The evidence: 51 test
+  files of the redesign find their inputs with IdGenerator.For, which rule 7 of tests.md forbade in prose.
+- The owner, 2026-11-11, ending a session that lost the owner's trust (verbatim in `spec/NOTES.md`): "you have TLA plus.
+  You have proved everything"; "no low quality and low confidence even medium stuff goes through"; an analyzer is
+  written at the highest quality, "not a throw against the wall"; "this whole weeks of effort is to produce quality", so
+  the spec's work is used "unless there is bug fix with the knowledge and quality bar being held"; "i can not repeat all
+  the feedback i have given over the days"; the rewrite goes on "but not like this". That session put 4,307 of the 4,828
+  lines it added into `spec/tools/check.py` and its plants, wrote three of U2's four harness tests against rules the
+  same file states, and called a question the specs answer low confidence. So: the spec's work is used as it stands, and
+  a change to it is a bug fix made with its knowledge and at its bar; an analyzer and a test rule are written to the
+  highest bar, as 2026-11-06's decision states it; the owner's feedback is read from this section, `spec/NOTES.md` and
+  the lead's memory, and is never asked for again. The lead's rules from it, each the owner's to change: a line enters a
+  spec file or a test only after the rules its file states are read against it; a question the TLA+ specs, the
+  principles or the owner's decisions answer is decided from them and held; `spec/tools/check.py` and its plants change
+  only where a check reports wrongly on correct content or passes a defect met in content, each fix with a refused and
+  an accepted plant, and a new check waits for the owner's yes; no agent words a rule, and an agent decides only the
+  forms its own task meets, by quality (the owner's words of 2026-11-14, root CLAUDE.md's forks section); a fork takes
+  one bounded task and is landed or dropped in its session; a unit is committed on its own full check and its own
+  rules test; progress is the open queue shrinking toward U1's cut.
+- The owner, 2026-11-11, as the next session read the POC's analyzers (verbatim in `spec/NOTES.md`): "i never said use
+  poc analyzer as verbatim, do you know how to write good analyzers?" The handoff had asked for authoring rules read
+  "from what the POC's analyzers already do"; that clause is void. An analyzer, a suppressor and a test rule are written
+  as .NET's own are, and `.claude/rules/analyzers.md` holds how, loaded where an analyzer or its cases are opened: one
+  id for one line of the spec, tracked in release files the build compares with every descriptor; semantic reads only;
+  cases on Microsoft.CodeAnalysis.Testing, a refused case for each message and an accepted case one fact away for each
+  condition. The analyzers of main, of the redesign and of the POC are evidence of the rules and their cases, and the
+  unit that lands a rule writes it to that file.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "use latest stable versions sir except where sf is pinned for a
+  reason", and of the tools, "i m shocked that tooling quality was not addressed". Section 2.7's pins had been copied
+  from what the tree held. So: a pin is the latest stable version on the day its unit lands it, looked up at its own
+  registry and proven by a restore or an install and a run; a pin below the latest names what holds it in its row of
+  `spec/REWRITE.md` section 2.7, and Syncfusion's hold is the owner's. The lead's holds, each the owner's to lift: the
+  analyzers compile against Roslyn 4.14.0, Visual Studio 2022's last compiler, since a compiler below an analyzer's
+  Roslyn refuses to load it; what runs in a host follows the net10 host's 10.0 line (the net48 references, the hub's
+  client); TypeScript and Microsoft.AspNetCore.Mvc.Testing are held by a peer range and by net10.0. The SDK is
+  11.0.100 and Node 26.13.0. Dependabot proposes every newer stable version, majors among them, and the nightly
+  workflow compares the tools it does not read; a finding of either package audit fails the checks.
+- The lead, 2026-11-11, within the owner's decision of 2026-11-06 that each lint rule enforces one line of the spec
+  and the line names its rule: the lint beyond its two presets is the closed list of `spec/REWRITE.md` section 2.7
+  (an exhaustive switch for S4, strict boolean conditions for S2, no `==`, an element found by its id, imports by the
+  slice table), each named at its line and each proven by a refused and an accepted file; TypeScript runs with every
+  strictness option on, erasableSyntaxOnly holding S8's no enum on the compiler's rung. The strict lint and options
+  were run over the POC's runtime, which had never been linted: one compiler finding and 22 lint findings in 2,241
+  lines. A selector for `instanceof`, a catch or `??` is not on the list, since that runtime holds each by design;
+  one joins only with the spec line that makes it exact. The owner can overrule each.
+- The lead, 2026-11-11, within the owner's decision of 2026-11-10 on the test rules: TEST002, TEST004, TEST005, TEST006
+  and TEST013 are stated over closed lists of what a test takes (`spec/REWRITE.md` section 2.10), never over lists of
+  what it must not: a refused list misses every member it does not name, and Playwright 1.64.1 holds members the old rows
+  did not name that run script in the page, raise an event no gesture raised, read the page once or match a snapshot. The lists are
+  read from the gestures and outcomes of the spec's own tests and from the pinned packages, each name compiled
+  against them; `Assert.That` reads what the browser reports beside the page, the console's errors among it, which
+  those tests read and TEST006 had refused. The owner can overrule each list.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "put these in project local claude.md as per best practice,
+  tighten the quality repeatable loop". A rule for one kind of file lives in a path-scoped file under `.claude/rules`,
+  loaded where it applies (`.claude/rules/analyzers.md`); what every unit keeps is root CLAUDE.md's, which a session
+  re-reads after a compaction: the pins rule, and one loop of seven steps in its Spec-first section, each exit a
+  line a tool printed. The loop replaces Workflow's five states and holds what a prompt had to repeat: read before
+  writing, decide from the proof in hand, one meaning with every carrier, a rule proven by a refused and an accepted
+  case, the full check at the committed head before the push, a mistake said in one line. The cut rewrites that file
+  within Claude Code's 200-line guide; until then it holds the redesign's sections too.
+- The lead, 2026-11-11, within the owner's decisions of 2026-11-06 (an analyzer is written as .NET's own are and
+  enforces one line of the spec) and of 2026-11-08 (a rule the source states is the compiler's): ALIS009's conditions
+  are M20.D7's. `dynamic` is refused as `object` is, and a delegate's and an expression's type arguments are read. A
+  string is read by the words of its parameter's name, as .NET's CA1054 reads a URI parameter's, over a closed list of
+  sixteen words that holds every name both lines matched whole and "param", from main's doors that key a request by a
+  string. The build reads the name and never what the string means, so a member-naming string under another name
+  passes it and is read in the package's PublicAPI text. The exemption is
+  `Alis.Reactive.Declarations.TypedDslExemptionAttribute`, on the row below Vendors and Plugins. The rule's reach to a
+  declaration and a render helper in a compilation with no slice table lands in U13, with the types it reads. The owner
+  can overrule each.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "With regard to merge, rewrite wins. I mean, I don't understand
+  the confusion here now." The lead had ended a turn before section 2.7's runner, since it touches the path the POC's
+  suites run through, and had read the conformance project as keeping the POC's descriptor until `poc/` leaves. So:
+  where the rewrite's design and an older line meet, the POC's runner and scripts today and main at the pull request
+  that lands the rewrite, the rewrite's piece is written as its spec states it and the older line gives way. The POC,
+  main and the redesign stay evidence; nothing of the rewrite is shaped to keep one of them running, and the lead
+  stops for none of them. That "merge" is every place the lines meet is the lead's reading, the owner's to correct.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "The schema is done. Only bugs will be addressed if found." The
+  rewrite runs outside in: "once the CSHTML is there, all the open doors as per agreed schema, then you can write
+  tests, the playwright ones. So those tests would fail, and then you can keep bringing one module at a time in the
+  mix", a piece tested alone against the schema, and "when all the scenes or Lego pieces comes together, eventually
+  the playwright test will pass". To the lead's three conditions on it: "why would u think otherwise? why we did all
+  the TLA+ work for ?" The TLA+ specs fixed every ordering and named every step so that a test is written from the
+  spec before the code, and the lead attaches no condition. The order: the schema's nodes and generated contract with
+  the public surface as signatures (`spec/api` compiles it); every screen's view; every Playwright test from its
+  promise, failing; then one module at a time in the slice table's order, Schema first, each half tested alone
+  against the schema; a module is done when its tests pass and each fails on its planted defect. `spec/REWRITE.md`
+  section 4 states the order as the decision of the same day below settles it. TEST013 is built to section 2.10's list, which counts a navigation as a gesture, and
+  section 2.5's bindings check is U2's, by the owner's decision of 2026-11-10.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`), on the lead's word for a test written ahead of its code: "Test
+  is not a draft, its failing test that actually proves behavior when turned green. Draft is hedge word to drift and
+  write sloppy code so u can argue later because of it was draft." A test is written once, at the full bar of
+  `.claude/rules/tests.md`: it tests behavior and never internals, is named for its promise inside the test
+  architecture of `spec/REWRITE.md` sections 2.4 and 2.5, and runs by one repeatable command. It fails until its code
+  lands and proves the behavior when it turns green. "TLA+ is central part of the rewrite not a throw away": a held
+  step of a test names the action of its spec, and the specs stay the design's proof through every unit. Before the
+  tests are written, the Playwright project's own CLAUDE.md holds bad tests of main and the redesign as examples,
+  each beside the rule it breaks: "You can get plenty of bad tests examples to put it in test project claude.md for
+  the test quality."
+- The owner, 2026-11-11 (five messages, verbatim in `spec/NOTES.md`): the rewrite states its standards so that each
+  question has one answer in one place. For each kind of test: what it is, what it proves, what it prevents, its
+  quality standard, the one repeatable command that runs it and when it applies. The kinds are the architecture tests,
+  the Playwright tests with their project's own enforced standard, and "a module level pure tests for public surface";
+  "Tests will never ever test implementation or internals (intenal exposure is forbidden)." The TypeScript runtime
+  answers the same: its standards, its lint rules, its pure tests, its folder's own rule file. "every project is
+  vertically sliced namespaced logically." "TLA+ proved it, it is central governing pience of re-write." Root
+  CLAUDE.md says how it governs encapsulation, TLA+, the map and the doors, and how each bad practice is stopped; the
+  tree's view from above shows the architecture on one screen; each standard says how drift is stopped and how the
+  confidence of a piece of work is determined. "now all these things are not meant to cause paranoie and waste and
+  un-necessery waits and fear based engineering": a standard is held by the tool on its rung, a piece of work is
+  proven once on the rung that holds it, and no guard is added for a defect nobody met. A module's pure tests take
+  the place the plan gave PlanTests and vitest as feedback. The plan's first page, `spec/REWRITE.md` section 1, root
+  CLAUDE.md and each project's own rule file state it. The owner's order for it, the same hour: "Please write a structured list of every aspect of
+  re-write, with project, quality enforcement, session handof when and why, how to begin..how to reorient", and
+  "Answer every single question with certainity and have the setup in place, test the whole govervance of re-write
+  then only talk to me. You are 100% allowed to disagree with me when you have a genuine argument". So the lead
+  answers each question in the tree, puts each standard's enforcement in place, proves each enforcement by a refused
+  and an accepted case, and reports to the owner once, when all of it stands; a disagreement is stated with its
+  argument where it arises.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): governance is closed in a session of its own. "Prepare a
+  handoff for a dedicated session where the govervance become a closed topic. Governance must establish feedback look
+  as in flip notes, u corrected forks mistakes", each "linked to claude. so that we are not going in circles". So
+  every correction has one home where the work happens: a reversal of the lead's ("flips must be linked to
+  claude.mds...as in if flip apply to tests then there..."), a fork's or an agent's mistake the lead corrected, a
+  mistake of a session and an owner's correction each become a rule line in the rule file that owns the subject, and
+  the record of it names that file. The framework's projects hold one simple rule for code that compiles for net48
+  and net10.0 in their own rule file ("a simple rule will solve that for ever in local project"). When and where a
+  fork is used is stated once, since "all of that is known at this point after extensive sessions, pocs, tla+ work".
+  A gap is closed and proven, or it is open: "do not read closing the gaps as if you can or use this an execure as
+  best effort. Prove your goverance work". The delivery loop is this Mac's: "you will use local mac for faster
+  delivery loop, once rewrite is done CI can pass its results, no need to hedge and buy time into that"; a run of CI
+  and a number measured there gate no unit. A fork's result is proven by the command its task names, run once where
+  it lands, and of a check that costs what the work costs: "if you going to spend same amount of time checking then
+  do it yourself".
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`), after the lead argued the order of the rewrite: "ok i concede my
+  position." The order after U2: U3 lands the seam and the surface whole and makes one thin path real (a plan
+  renders, the runtime boots, a trigger runs a pipeline that sets an element's text); then one module a unit in the
+  slice table's order, each unit owning its module's two halves and its pure tests, its browser tests turning green
+  and failing on their planted defects in that unit; then Native; then Fusion. The argument that decided it: every
+  door that renders a plan lives in the last core row, so in a strict row-by-row order no framework browser test
+  passes before that row; the runtime's code that touches the DOM has no proof but Playwright, since its pure tests
+  run in node with no DOM; and a module's done, its tests green and each failing on its planted defect, is then
+  checkable only once, at the end, for everything. This is the order the outside-in decision above runs in, and
+  `spec/REWRITE.md` section 4 states it with its units.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`), on the governance session's cold read and on every review:
+  "don't make it so that every review or whatever the strategy you are using keep bringing issues and becomes an
+  infinite loop, and then it drift, and then it becomes its own work." A review is bounded before it starts: a
+  fixed list of questions, each with the answer that passes. A finding is an answer that fails, and nothing else. A
+  failed answer is fixed in the page it was read from and asked once more; after that second reading the review
+  ends, and what still fails goes to the owner in one line. What a reviewer raises outside its list is not worked:
+  it is one line to the owner. The governance session's work list closes when its inventory is written; an item
+  joins it after that only for a defect met while doing a listed item. The one round is no net for the writer: "tell
+  the first agent, either you or fork whoever writes that don't throw over the wall to one round we have, because
+  that is all bad behaviors that that agent will check and I will fix. I expect quality work on the first run."
+  Whoever writes a page or a piece of code, the lead or a fork, finishes it to the full bar before it is read.
+- The lead, 2026-11-11, within the decision above on the closed lists of the test rules: the harness's list takes
+  four more members of Playwright 1.64.1, which section 2.5's measured waits need and the list had left out.
+  `Assertions.SetDefaultExpectTimeout`, since an expectation's wait is a wait, and every wait is the harness's, set
+  from measurement; and a context's `Tracing` with its `StartAsync` and `StopAsync`, since Playwright's .NET surface
+  gives a call's start and end nowhere but in its trace, and the waits are four times the slowest step. A test
+  takes none of the four. Beside the same measurement, the lead's reading of section 2.8's parallelism: the count of
+  tests at once is measured apart from the budget, since four settings of 20 runs each cost four measurements, and
+  the budget is measured at the count the parallelism measurement kept. The owner can overrule each.
+- The lead, 2026-11-11, landing the grammar (U3) within D19.1 to D19.9 and the owner's decision of the same day
+  that the schema is done and only its bugs are addressed. The grammar's classes are `Alis.Reactive/Schema`'s, the
+  module table's name, where N19.1 and N19.2 name the redesign's `Grammar`. A kind's class is its kind and then its
+  union (`SetStatement`, `LitExpression`), which the contract generator holds. A path that takes no `each` is a list
+  of `PathStep`, a member or an index, and a registration's path is a list of `RegistrationStep`, which adds `each`:
+  one type for both would give `each` a second handler in every path walk (S4, S5). Two gaps met in schema.md are
+  the owner's to settle, each built at the reading that adds no kind and no null: a `lit`'s value is the JSON C#
+  wrote, since schema.md's `includes` writes the view's list as a `lit` where the `lit` row says a scalar or null;
+  and a container's `live`, "none, or the `Live`", is a list of at most one `Live` (S2). The owner can overrule each.
+- The lead, 2026-11-11, within the owner's order of the same day (the surface as signatures, then one module a
+  unit) and the owner's decision of 2026-11-06 (fail loudly, no fallback): a door U3 declares ahead of its module's
+  unit throws `NotImplementedException` until that unit builds it. An inert door, one that renders its page and
+  writes no plan, is a default no line states. Its cost: a screen whose doors are not built answers 500, so the
+  gate's sweep of the app states that case when U3 writes the views. A signature's proof is the doc ids of the
+  built core compared with the ids the fluent probe prints for `spec/api`, namespaces mapped by REWRITE 2.2. The
+  owner can overrule it.
+- The owner, 2026-11-12 (verbatim in `spec/NOTES.md`): "keep the log of mistaks sir, and make sure u have a way a to
+  continusuly improve as we progress". So every mistake is an entry of `spec/MISTAKES.md`, written the turn it is
+  found: what was written or done, where it was caught, what it cost, its cause as a class, and what holds the
+  class. The way the work improves is the class: a class met a second time is held too low, so in that unit it moves
+  up a rung, from a rule line to a step whose result a commit shows, from that step to a tool with its cases, and a
+  rung that needs the owner's yes goes to the owner in one line with its cost. A piece begins by reading the
+  classes, and a handoff reports the entries since the last one by class. It replaces the line of root CLAUDE.md
+  that let a correction a rule already stated add nothing: two mistakes of 2026-11-11 and 2026-11-12 had one cause,
+  and that line recorded the second as no news.
+- The owner, 2026-11-12 (verbatim in `spec/NOTES.md`), when the lead asked for the C# form of the plan's block: "there
+  were more than 100+ POCs done hows that possible - if its miss, its bug", and of a `using` block, "using will nest
+  the whole html". Each of the 266 views of the POC's app that open a plan, and the one of `spec/api`, opens it with
+  `Html.ReactivePlan<TModel>()` and writes it with `Html.RenderPlan(plan)` as its last line, its markup flat. D14.7 and N14.2 had replaced that by a block no POC
+  built: the miss is the spec's bug, fixed in every line that carried it. The owner chose how a view that forgets
+  `RenderPlan` is caught: one analyzer rule, ALIS041 (N18.15), which refuses at build a plan a view opens and never
+  renders, landed with the thin path. The lead's line within that choice, the owner's to overrule: the same rule
+  refuses a plan rendered twice and a door that takes the plan after it rendered, the two defects the block was
+  written for (M9.X1). A design line that no POC and no compiled sentence carries is a bug, raised as one with the
+  search that found it, and never a form to invent.
+- The lead, 2026-11-12, building the thin path's load trigger within gate 2's G13 and the owner's decision of the
+  same day that a design line no POC and no compiled sentence carries is a bug, never a form to invent. Two lines
+  were missing. How the plan carries on load: no line stated it and the POC has no on load, so it is as the
+  redesign writes it at the State SHA, which `spec/Core/schema.md` is a diff against and changes in nothing here: a
+  handler of the event `ready` on the document plugin's object, `$document` (M1.D1 and schema.md state it now, with
+  the redesign's lines). The name of the type M1.F1's sentence hands its `trigger`: the sentence fixes the two
+  doors, `Html.On` and `DomReady`, and names no type; it is `Trigger<TModel>`, as both lines' pipeline builder is
+  `Pipeline<TModel>` in every door `spec/api` compiles. The owner can overrule each.
+- The lead, 2026-11-12, writing the runtime's dispatch within the owner's order of 2026-11-11 and the decision of
+  the same day on a door that is not built. The plan's words are "the runtime's dispatch, a case for every kind".
+  The lint refuses a switch that lacks a kind, so a switch is whole from its first line: the evaluator's two
+  switches, over the statements and the expressions, are written whole, and a kind whose module's unit has not
+  built it throws there, as a door does. A nested union's switch (the shapes, the absences, the zones, the trace, a
+  listen's release) is written whole by the unit that builds the handler which reaches it: before that it would be
+  a function nothing calls. The object locators', a vendor's listening's and a handler's policy's are written,
+  since the thin path reaches them. The owner can overrule it.
+- The lead, 2026-11-12, within the decision of 2026-11-11 on the test rules' closed lists: TEST004's list for the
+  harness takes one more member, an attribute that is a test action of NUnit's, applied from a file of
+  `tests/Alis.Reactive.Conformance.PlaywrightTests/Harness`. The list named a setup fixture, which NUnit runs for its own namespace alone, and ALIS011 keeps a
+  harness file in the harness's namespace, so the first test of a module's namespace found no browser open: the
+  harness's own tests, U2's, all sit in its namespace. A test action on the assembly opens the run once for every
+  fixture and closes it at the assembly's end. Outside the harness the rule refuses it as it refuses a setup
+  attribute. The owner can overrule it.
+- The lead, 2026-11-12, stating the next cases of WhenAnAppRendersItsPages within the decision of 2026-11-11 on a
+  door that is not built, which sent a page that answers 500 for one to the sweep. The plan names the cases and no
+  line says how the sweep reads each. A page whose door is not built is listed apart from a problem, until U27
+  builds the last door; the page's browser test stays red meanwhile. A route's parameter takes its value from a
+  link a page holds, and a route no page links to is refused as unopened. A page of the refusals area that
+  answers 500 with an `InvalidOperationException` is refused by design, and the same answer on any other page is
+  a problem. The sweep's own host hears what a page threw; nothing of the app changes. The owner can overrule each.
+- The owner, 2026-11-12 (verbatim in `spec/NOTES.md`), after the lead had put ALIS041's reach on MVC 5 to the owner
+  three times: "I think it's a non-issue at this point", "I am not understanding why you are fussing over it. The
+  MVC5 is compiled the way the documentation says." On MVC 5 ASP.NET compiles a view where it first renders, so no
+  analyzer reads it at build. A view there that never renders its plan shows a page whose handlers do nothing, the
+  first time its developer opens it, as on both older lines today; README says so with the net48 delivery, and it
+  is no work of the rewrite. The lead's rule from it: a limit that shows itself the first time a developer opens
+  the page, and that both older lines share, is stated once, in the notes and in the unit that documents it, and
+  is no item for the owner.
+- The lead, 2026-11-12, on the clause REWRITE 2.5 had U3 add to the bindings check, a view's module namespaces held
+  to its test's feature and parts: it is left out. As worded it refuses the view of 430 of the 452 placed tests,
+  since every view that opens a plan names the two namespaces P2 and P3 fill with every module's doors, and
+  app.json names no view for a test, so it reads a screen and one test's part clears every view. A test landed
+  before a door its page calls fails its unit's run, since a door that is not built throws, and the cure is a part
+  in its placement. It was put to the owner as one line and not taken up, and it is no principle, closed rule or
+  scope: a guard no view needs yet. The exact form, a page named by each placement and a reader of the doors each
+  view calls, is a new check, which the owner's yes of 2026-11-14 below lets in.
+- The owner, 2026-11-12 (verbatim in `spec/NOTES.md`), after the lead had called the conformance app many sessions
+  of work: "My expectation is that TLA plus proves the schema, POCs, main, everything is in place, and you sort of
+  taking hell of a time." Then: "Quality has to stay. Quality comes from action, not too much thinking. Too much
+  thinking just slows you down. That is what fear-based behavior is." The design is in place and what is left is
+  execution: a line is read, the code is written and its proof is run. No status counts sessions or calls the size
+  of the work a problem, and a question the lines answer is not turned over twice. The gate, the proofs and the
+  commit's discipline stay as they are.
+- The lead, 2026-11-12, where two lines of the plan meet: U3 writes every screen's view, and U13's paragraph lands
+  the conformance library's declarations with the doors that reach them. A view that holds a component does not
+  compile without its declaration, so U3 writes each declaration's C#, member for member from
+  `spec/Reference/native.json`, with the app's data classes and enums its members name, and U13 writes its
+  TypeScript, builds the doors and turns its cells green. A payload is a class of its own beside its component,
+  since native.json names it as its event is named and C# refuses a nested type of a member's name; a type one
+  component reaches sits in that component's folder, and one several reach sits in
+  `tests/Alis.Reactive.Conformance.App/Components`. `Field` and
+  `Field<TValue>`, M11.F1's types, are declared in `Declarations` with `Field.Of`; the redesign's public `Name` is
+  not, since M11.X2 gives the name to the app's options, known where the view renders. The owner can overrule each.
+- The lead, 2026-11-12, declaring the app event family, which `spec/api` compiles no sentence with, from M1.N2 to
+  M1.N5 and M1.F2's proposed sentences: `AppEvent.Declare()` and `AppEvent.Declare<TPayload>()`, each with the
+  `name:` its line states and no constraint on the payload's class, since no line states one;
+  `trigger.CustomEvent`, its payload a `Data<TPayload>` as M1.N3 words it, a class of `Declarations` with `Read`
+  (N5.6, D5.2); `pipeline.Dispatch` with a literal or a source; and `Html.Raises`, which returns what a view
+  writes inside a tag on each host. `pipeline.Object<T>` (N7.1) waits for the first view that builds a payload
+  from sources. A door a module's page names and `spec/api` does not compile is declared the same way, from its
+  line and its sentence, with the first view that calls it. The owner can overrule each.
+- The lead, 2026-11-12, declaring the door five bench cells, M5.F1's sentences and X3.8's page call, an element's
+  text set from a source that is no text: `Text` and `Html` are each an `ElementContent`, a class of `Elements`
+  that reads as a source of text and whose `Set` takes a text literal or a source of any type. M5.N1 named each a
+  string property "taking a literal or any source of D7.2", and a string property takes a source of text alone
+  (D7.3), so its own sentence did not compile; both older lines take a source of any type there, and an overload
+  on the string property would reach every component's. D7.3 and M5.N1 state it. A literal that is no text at an
+  element's text, X3.13's and X3.14's dates, is declared with the first of their pages. The same commit gives
+  the bench its component's builds: a world names one (`ComponentVersion` of the world contract, the versions
+  `spec/Reference/native.json` lists) and the page starts its component as that build. The owner can overrule each.
+- The lead, 2026-11-12, on the three callback cells of event.poc15, whose promises set an answer that joined an
+  item's name and a literal: no door joins text, the grammar's operators hold no join, and no line names the
+  capability, so the sentence could not be written. The promises are reworded to an answer that reads a source
+  alone, `item => item.Name`, as every other answer sentence of the spec does (D17.12), and the lines they read
+  are restated to match: the held line reads "Held: acted for One". A door that joins text is a new production
+  and waits for the owner's word; nothing is built toward it. The owner can overrule the rewording.
+- The lead, 2026-11-12, on three source cells, source.PropertySet, source.WriteOnlySet and source.MethodArgument,
+  whose promises set a text without null from the component's Value, a nullable text: the compiler refuses the
+  sentence (CS8620, which D7.3 and N18.14 keep an error), and D7.3 names the cure, so each promise reads the
+  value through `IfNull("none")`. The position still receives the component's member. The owner can overrule it.
+- The lead, 2026-11-12, on four promises of the bench's requests that stated what the design does not: three
+  wrote a query's key in lower case, where D2.5 makes a key the member's C# name, so each reads `?Code=` and
+  `&Day=`; and http.whileLoading's opposite stopped the request "in its guard" with the heading unchanged, where
+  D10.23 runs a request's WhileLoading before its guard, so the opposite is a request whose argument stops when
+  it is read. The owner can overrule each.
+- The lead, 2026-11-12, declaring `pipeline.Object<T>` (N7.1), which `spec/api` compiles no sentence with, from
+  its line, D7.4 and M1.F2's proposed sentence, with source.DispatchPayloadMember's view: the door is the
+  pipeline's and returns a source of the object; its members are an `ObjectMembers<T>`, a class of
+  `ValuesAndSources`, whose `Set` takes a literal or a source and returns the members, the three forms the JSON
+  body's `Set` has. Its callback's parameter is the app's word for what it holds. The owner can overrule it.
+- The lead, 2026-11-12, where two more lines of the plan meet: U3 writes every screen's view, and U23 writes the
+  Native components. A view that holds a Native component does not compile without its declaration and its
+  render helper, so U3 declares each slice with the first view that holds it: the declaration member for member
+  from its line of `spec/NativeComponents/module.md` and its feature's proposed sentences, the render helper as
+  a signature that throws until U23 builds it, as a core door does. `NativeTextBox` is the first (M24.N1, M24.N9),
+  with the core's doors it stands on: `IInputComponent` and `ComponentInput.Of` (M7.N3) and the field's options,
+  `InputFieldOptions` (M7.N2), in `InputsAndIds`, placed by P1; a field's `Render<TComponent>` takes an input
+  only (M7.X2). The text box's `Type` is not declared: N18.4 sent its form to gate 2, its line writes none and
+  neither the POC nor `spec/api` compiles one, so by G13 it comes to the owner with a form before U23. The owner
+  can overrule each.
+- The lead, 2026-11-12, declaring M3.N1's text tests with the first views that call them: `Contains`,
+  `StartsWith` and `EndsWith`, each with a literal or a source (N7.3), `Matches` with a literal pattern alone
+  (D7.5), and `MinLength`, each an extension on `ITypedSource<string?>`, so a text without null is tested as it
+  is, as a set takes one (D7.3 states it). The value tests and the membership tests are declared with the first view that
+  calls each. The owner can overrule it.
+- The lead, 2026-11-12, on the cell source.MatchesPattern, whose promise read the pattern from the component:
+  D7.5 gives `Matches` a literal pattern alone and X7.4 puts a source there on the type rung, so no sentence
+  writes it. The cell is refused by the type, as the matrix's two cells ALIS032 refuses are refused at build: it
+  keeps its row of `spec/Reference/matrix.json` with D7.5 and X7.4, and holds no promise, no placement and no
+  browser test. The text `Matches` tests is a condition's left operand, which source.ConditionLeft proves. The
+  bench places ninety-eight cells. The owner can overrule it.
+- The lead, 2026-11-12, on the C# form of a view's request container, which D14.8 states as a block and N14.3 sent to
+  gate 2. No line writes it, and no sentence of `spec/api`, of a module's features, of the POC or of the redesign
+  compiles it: the handles are parameters in `spec/api`, and the POC's nine forms are MVC's own BeginForm helper, none
+  sent by a pipeline. By G13 the form is the owner's before the unit that builds it. Seven bench cells and every care
+  screen's form are views U3 writes, so U3 declares the lead's proposal as signatures and puts it to the owner in the
+  handoff: `Html.BeginRequestContainer(plan, containerId)`, a door of `RenderingAndDelivery` on each host, returning a
+  block a view ends by `using`, as it ends MVC's own BeginForm helper: `RequestContainerBlock<TModel>`, whose
+  `Container` is the `RequestContainer<TModel>`. A pipeline that sends the container is written inside the block, and
+  another view reaches the container by `pipeline.Container<TModel>(containerId)`. The live check a block names (D16.15)
+  is declared with the first view that names one. The cost of another form: one line of each view that holds a
+  container. The owner, 2026-11-25, decided it: container, never form.
+- The lead, 2026-11-12, on the cell http.beside.hidden, whose promise read the form data as it leaves the page:
+  `Inputs(container)` on a request with a body sends its inputs as multipart, whose text holds a boundary the browser
+  makes, so no test reads it whole as a literal. The promise reads what the endpoint bound, which the page shows: the
+  test app's batch notes endpoint answers the batch and the code, and shown reads "B-2026-11-10: a-1". The conformance
+  component is an input by `spec/Reference/native.json`'s `input`, so its declaration is an `IInputComponent`, and a
+  second render helper renders it for a field. The owner can overrule it.
+- The lead, 2026-11-12, settling what three forks read into while writing twenty refusal pages, each form fixed
+  by its test. A message is its X line's text with each placeholder filled as the view writes the thing: `{term}`
+  is the lambda's body ("d.Seal == seal"), `{member}` and `{read}` a lambda's path ("d.Seal", "owed.Due"),
+  `{value}` the view's own expression ("Model.Cover.Name"), `{type}` the C# keyword ("decimal"), `{view}` the
+  view's path from the app's root, unquoted, and `{cause}` and `{base}` the words D6.12 lists ("the app's options"
+  for a list the server wrote). A list a refusal page's lambda reads is a response body of the page's own
+  endpoint, so its base is the app's. X6.48's sentence is written `(int)none!`, since CS8629 stays on a value the
+  view holds (D6.14). X14.5's promise named its model in the redesign's test app; it names the conformance
+  app's namespace now, and five more promises of module 7 that name that app are corrected as their tests are
+  written. An endpoint a test names is a constant of the world contract (`RefusalEndpoints`, a part a module); one
+  only its page names is a constant beside its controller. M1.X8's and M1.X9's messages are the redesign's whole
+  text, as their lines say, and name `p.Dispatch`, where the rewrite's locked parameter name is `pipeline`: the
+  wording is the owner's, put in the handoff. The owner can overrule each.
+- The lead, 2026-11-12, landing the validator grammar Q16's Doors keep as signatures of `Alis.Reactive/Validation`,
+  a fork's work read at the source, each door throwing until U17, with `AddReactiveFluentValidation` in
+  `RenderingAndDelivery` by P3. The redesign's source at 65fdf118d is the evidence of each signature, and where
+  its docs and a line of Q16 differ the docs follow the line (`Matches`, `IsInEnum`, `PrecisionScale`). Four
+  readings, each the owner's to overrule. The kept list's check `Add` names no door of either line's public
+  surface, so nothing is declared for it. `Matches` over a `Regex` is not declared, since the core bans the type
+  and the pattern's text carries it (D16.11). `RuleLevelCascadeMode`, a door of the redesign the inventory
+  holds and the list does not name, is declared, so no door is lost; `ValidationFailure`'s `ToString` waits for
+  U17, since a text that throws serves no reader. The untyped `ReactiveValidator` keeps a constructor no app
+  reaches, as both older lines have it, so RS0022 is suppressed on the typed validator's constructor with its
+  reason: the first suppression in the rewrite's shipped code, which the owner approves or replaces by an open
+  constructor or by no untyped base.
+- The lead, 2026-11-12, landing seven more refusal pages, a fork's work, with one correction of the conformance
+  library. X4.13 refuses a path past a member its own converter writes, "`[JsonConverter]` on the member", and D4.2
+  gives a converter on the member's type another refusal; the library carried `ConvertedSpot`'s converter on the
+  type, so X4.13's pages would have met the other message. `Binding`'s `Converted` carries the converter now, and
+  `spec/Reference/native.json` says so. The forms the fork read into stand as it wrote them: X8.22's line holds
+  no placeholder, so its message names no read; where two lists name one member, each lambda's parameter is the
+  page's word for its item ("charted.Status"); the page of X4.13's and X18.8's opposite case reads the same
+  shape from a response body of its own endpoint. The owner can overrule each.
+- The lead, 2026-11-12, landing the seven remaining component slices of module 24 as signatures, a fork's work
+  read at the source: `NativeButton`, `NativeCheckBox`, `NativeCheckList`, `NativeDropDown`, `NativeHiddenField`,
+  `NativeRadioGroup` and `NativeTextArea`, each from its line of `spec/NativeComponents/module.md`, to the text
+  box's exemplar. They are declared ahead of their first views, since the validation cells, the refusal pages
+  that wait and every care screen hold one. A member whose parameters no line states takes the form both older
+  lines share, a parameter named as the text box and the core name theirs. Three things are left out, each
+  reported, none invented: `Type` of the button and of the text box (N18.4, the owner's form); the three methods
+  of the click's payload, whose declared form no line gives; and `[Mirrors]` on the check list, whose element
+  type no line gives a TypeScript module. The click payload's numbers are `int` where the DOM
+  standards type a long and `double` elsewhere, lib.dom's `number`, to be held by the contract check in U23. The
+  owner can overrule each.
+- The lead, 2026-11-12, landing twenty-six care pages, three forks' work read at the source, and settling what
+  they read into. The net10 host's JSON options are `spec/Reference/app.json`'s, camel-case members and enum
+  names, which `tests/Alis.Reactive.Conformance.App/Program.cs` now sets: it is ASP.NET's own configuration and needs
+  no door. The lead
+  had told the forks the host sets no JSON options, from the app's code and not from that definition, so four
+  promises that need enum names stood unwritten (X6.12, X6.16, X6.26, X6.28); they are pages to write now. The
+  rest of that host's definition (Fusion, the busy and reconnect components, the request defaults, the flags
+  enums, a request culture) lands with the doors and the pages that need each. A data lambda that reads a
+  member past one that holds null is written with `!` until D6.14's suppressor is built, and loses the mark
+  then. X6.32's first item of an order is written `Find(d => true, d => d.Name)`: no door reads a list's first
+  item, a gap raised with that use. X7.6's fourth promise named a text and a number as `Choose`'s two arms, which
+  the type refuses; it names 1000 and `Total()` now, shown before the unit. The conformance component's start
+  gains `Raises` and a text that holds null, as its behaviors state. The owner can overrule each.
+- The lead, 2026-11-12, landing sixteen more pages, three forks' work, and settling what they read into. A
+  request that sends the member an input binds is written `request.Input(r => r.Member, pipeline.Input(m =>
+  m.Member))` (N9.3): X9.20's picker is a `NativeDropDown` bound to the page's enum, since a text source at an
+  enum member does not compile. A promise that says the network holds no request is read by the element the
+  answer would fill keeping what it showed, beside the opposite case that fills it, until the harness holds a
+  page's requests for a test to read. A route that takes a parameter is linked from a plain page of its screen,
+  so the sweep of the app's pages opens it. A page reaches another origin as the same host under its other
+  loopback name. A seed is added where a test changes what an endpoint does while its page is open
+  (`Seed.TheBedsEndpointDropsItsConnection`). The container block names no element kind, so a promise's fieldset
+  is the block's element with a heading inside; the kind is part of the form the owner decides. One fact for
+  U11: which `Contains` C# 14 binds for an array inside an expression lambda is not read yet, and the identity
+  table keys what the tree carries. The owner can overrule each.
+- The lead, 2026-11-12, landing thirty-six more pages, three forks' work, and settling what they read into. A
+  promise that says the console holds one error whose words no line states is read by the count of the
+  console's errors, one, beside its visible outcome; its words join the assertion when a line states them. A
+  container's inputs sent alone as JSON, and a form's sent URL-encoded, are written with an empty body,
+  `request.Json(container, body => { })`: no door sends either with nothing beside it, a gap raised with these
+  two uses. X17.22's error line is read as holding a message; its words are fixed by its test when U13 builds
+  the component. The four other conformance declarations have a render helper each, and the component's
+  start classes hold what the pages start them with (`RaiseStart`, `RecordStart`, `ItemStart`, `ElementStart`,
+  `RegisteredStart`); what each of those components shows (the statuses Threshold, Alarm and Subscribers, the
+  lists Log and Names, an answer line of several answers as its items) is the forks' reading of
+  `spec/Reference/native.json`, to be stated among its behaviors when U13 writes their TypeScript. A bench page's
+  own plugin sits beside the page that calls it (`PageTally`, `BenchClock`). The owner can overrule each.
+- The lead, 2026-11-12, landing forty-five more pages, three forks' work, and settling what they read into. The
+  conformance component's start holds what each page starts it with, a member added with the first page that
+  needs it and written by the render helper as the plan writes a literal (records, items that lack a declared
+  member, a nullable list that holds null, bindings, raise buttons); two forks that add one member are joined
+  by hand. The world's record endpoint reaches the settle gate, and four seeds change what the bench's
+  component holds. A bench page whose plugins are scripts names them through its own layout,
+  `tests/Alis.Reactive.Conformance.App/Bench/Plugins/_ScriptedLayout.cshtml`, which links the files U13 writes. A
+  null literal at a `Set` or an argument is ambiguous to the compiler, so a view passes a null it holds as a
+  typed value. Three gaps are raised, none worked around: the result of a list operation, an
+  `IReadOnlyList<T>`, does not fit a property declared `List<T>` (M4.X3's sentence); M4.X2's promise needs a
+  record whose code holds null, which `spec/Reference/native.json` types a text; and no door writes a list as an
+  element's rows (X4.9). The owner can overrule each.
+- The lead, 2026-11-12, writing the six validation cells of the bench, read against D16.2, D16.13, D13.6 and G13.
+  The forms of a field's message and of a form's summary are MVC's own pattern, as D16.13 writes them (a summary
+  that lists the property errors, a message for each field), approved at that by G13; a test reads each in its own
+  scope, as the Playwright project's file says, and a page groups each field it checks in a fieldset or a region of
+  its own.
+  No door names a rule set (D16.2 sends the sentence to gate 2; neither spec/api nor the POC compiles one), so the
+  plain rule and the rule under `When` are two validators of one form, each named by the request's
+  `Validate<TValidator>()`; whether U17 lets two registered validators of one model stand beside the condensed
+  default is U17's question, raised here. The validators are written and not registered, since the startup call
+  throws until U17; the form endpoints answer what they bound, since N16.1's door is not declared. The owner can
+  overrule each. U17's catalog answered it: a model has one registered validator (D16.2), so the rule under `When`
+  checks a model of its own, `StrictConformanceForm`, posted to its own endpoint, and the app registers each
+  validator a request names, an endpoint resolves or a promise of the condensed default checks (the lead,
+  2026-11-16).
+- The lead, 2026-11-12, landing twenty-five more pages, three forks' work, and settling what they read into. A care
+  page's plugins are the test app's, declared on the core's doors beside the page (a bell, a tally, a radio whose
+  unsubscribe throws, each script written by U13), and a care screen whose pages name scripts keeps its own layout,
+  since the bench's sits on its row of the app's table. M9.X2's vendor helper writes an element and a script, as its
+  promise states: the content a slot loads holds a vendor's script when a vendor helper renders it, which the
+  views rule does not reach in a helper. A plan that is not JSON is served only by the page's own endpoint, written by hand with the marker
+  `Alis.Reactive/RenderingAndDelivery/ViewPlans.cs` writes, since the framework never writes one. An element a page
+  writes in a request's `Finally` shows a test that a stopped step has finished, since a stop runs each `Finally` of
+  the requests it happens inside (D10.23). A listen from a partial's or a card's plan on another plan's component is
+  written on that plan's load. X13.4 reads its summary as the page's list items, as the validation cells do. Raised
+  for the owner: TEST009 refuses an expected value the test typed, and M24.X10's outcome is the value the server
+  renders back into the box after a refused bind; the promise waits, and so does its net48 leg on the harness.
+- The lead, 2026-11-12, declaring the reference Fusion slice as signatures (M21.N1, M21.N2), the exemplar of the
+  other Fusion slices, each name read from EJ2 33.1.47's TypeScript. `FusionComponent` carries `FusionVendor` as a
+  property, since `ComponentVendor.Define` throws until module 12's unit builds it and a static field would fail
+  every Fusion type that loads. Both lines' `Fields<TItem>(text, value)` takes `Expression<Func<TItem, object?>>`,
+  which ALIS009 refuses, so each member it selects is a type parameter of its own, `Fields<TItem, TText, TItemValue>`
+  and `Fields<TItem, TText, TItemValue, TGroup>`, still an extension of EJ2's `MultiSelectBuilder`, which `build`
+  hands (M21.D1); EJ2's builder carries no item type, so a view names the item's class in the first lambda's
+  parameter. The items the view hands and the items `UpdateData` shows are an `IReadOnlyList<TItem>`,
+  and `DataSource<TItem>()` a `Property<IReadOnlyList<TItem>>`. The tagging payload's `ItemData<TItem>()` reads the
+  app's item, as the cell event.object reads `Read(d => d.Name)`, in place of EJ2's `FieldSettingsModel`. No member
+  carries `name:`. No analyzer reads `[Mirrors]` until N17.2's is built, so the build proves these names compile and
+  no more. The owner can overrule each.
+- The lead, 2026-11-12, landing fifteen pages of module 8, two forks' work, and settling what they read into. A page
+  shows a 400 by `ShowValidationErrors` in the request's error scope for status 400, as the admission screen's
+  addressed move-in does, since the condensed default needs a validator registered at startup. An answer a
+  placement has the harness seed is the endpoint's own rule (room 13 is closed), with no seed. X16.7's tabs are two
+  exclusive native disclosure panels inside the container, since a tab its slot loads on a click holds no message
+  element while closed and no door shows or hides an element (M5.N1); the placement's tab slot waits on that door.
+  X16.2's container holds the Phone input alone and the lead's name stands outside it, so both saves send the
+  container whose summary the promise reads (D13.6, D16.13). X16.3's validator names the deputy with the
+  null-forgiving operator: FluentValidation 12.1.1 warns CS8620 on the promise's sentence over a nullable member
+  and runs no child rule on a null one (a scratch probe), so the form is FluentValidation's own. "No message shows"
+  reads as no summary item once the answer line shows. The owner can overrule each.
+- The lead, 2026-11-12, landing twelve Fusion slices of the admission-clinical screen as signatures, two forks'
+  work, and settling what they read into. The multi-column combo box's helper is written with every type argument,
+  `FusionMultiColumnComboBox<TModel, TMember, TValue>`, since C# takes all of a method's type arguments or none and
+  its line writes TValue alone. An event whose payload EJ2 types as an object of no shape (a drop-down's focus and
+  blur) is the core's `Event`, with no payload declared. A payload member EJ2 marks optional whose line gives no
+  nullable type is optional and not nullable (the check box's checked, the radio button's value). A slice keeps
+  its line's members and no more: the combo box declares no items property, and the multi-column combo box's value
+  and text are text that admits null, as M21.X511 states. A render helper that takes the view's HTML helper is
+  split by host (the radio button's, the stepper's, the smart paste button's); the uploader's take the file members
+  `MultipartBody.File` takes on each host (M21.X710), and the date range picker's take a list of dates that admits
+  null alone, since two overloads cannot differ by an annotation. The uploader's files-changed event and its
+  payload are the framework's (M21.D701) and mirror no EJ2 type. A gap, raised for the core: the uploader's input
+  is its files, the browser files EJ2's public list of files holds (M21.D701), and `ComponentInput.Of` takes a
+  declared `ReadOnly`, while no door reads one from the members of a returned list, so the uploader's `Files`
+  throws until module 7's unit designs that door. A promise's "FusionRadioButtons" is the plural of the radio
+  button, no door. The owner can overrule each.
+- The lead, 2026-11-12, landing twenty Fusion slices of the record-contacts and handover screens as signatures,
+  three forks' work, and settling what they read into. A data class a slice hands EJ2 or reads from a payload (a
+  split button's or a drop-down button's item, a Kanban column, an in-place editor's action data) names each member
+  by `JsonPropertyName` with EJ2's name (X17.48), and a member EJ2 marks optional admits null; a Kanban column's key
+  is required, typed by the cards' key (M21.X303). An enum a slice hands EJ2 (the text box's icon place, the
+  button's icon position, the Kanban's dialog action) carries a string enum converter and each member's EJ2 name
+  by `JsonStringEnumMemberName`, which an app's own enum converter honors too (M21.X602, M21.X301). A method keeps
+  the arguments its line or the older lines' door gives: the Kanban's card and dialog methods as the redesign's,
+  the accordion's expand with both its arguments; an overload for an argument EJ2 marks optional waits for a
+  promise that needs it. A member EJ2's TypeScript does not type and a probe pins (the in-place editor's payload
+  names and action data) is declared from the probe. A render helper's element id is `elementId` in every slice,
+  where a line writes id; a position in pixels is a double. A slice's component code under the runtime's
+  components folder (the mention's) is its unit's. The owner can overrule each.
+- The lead, 2026-11-12, declaring M25.N6, the core door module 25's pages and the bench's confirm cell wait on:
+  `IAppLevelComponent` with `DefaultId`, an instance member (M25.D6), in `Vendors`, placed by P4;
+  `pipeline.Component<TComponent>()` beside the reach by id; and `plan.Component<TComponent>()`, which returns a
+  `ReactiveComponent<TComponent, TModel>`, a handler type beside the plugin's, since the line names none and an
+  app-level object's element is the layout's, so the view writes no markup for it. Each constrains its declaration
+  to a component that is an app-level object. U22 builds both from M25.D6 with module tests of the plans they write,
+  and their browser tests land in U24 with the objects they reach (the lead, 2026-11-16). The owner can overrule it.
+- The lead, 2026-11-12, declaring N17.5, the argument kind that hands a declared method the abort signal of its
+  block (D17.11), which NativeConfirm's ask and FusionConfirm's need (M25.N4, M23.F2). No line gives its form, and
+  neither `spec/api`, the POC, main nor the redesign compiles one: a search of each one's C# for a signal argument
+  found none. By G13 the form is the owner's before U8 builds it, so U3 declares the lead's proposal as a
+  signature: `AbortSignal()`, an `Arg` among a declaration's argument kinds beside `Answer`, `Fixed` and `Pass`,
+  named for lib.dom's type the method receives. A declaration lists it among its method's arguments where the
+  method takes the signal, and a view passes nothing for it. The cost of another form: one line in each
+  declaration that lists it. The owner approved it, 2026-11-26.
+- The lead, 2026-11-13, landing seventeen Fusion slices of the handover, bed-board and fusion-layout screens as
+  signatures, three forks' work read at the source, and settling what they read into. Four forms are the lead's,
+  each read at EJ2 33.1.47's source: the scheduler's `DataBound` is the core's `Event`, since EJ2 raises it with
+  null (crud.js:59) and a payload read at the first argument would stop its handler; the context menu's open
+  payload writes `Top` and `Left` as the menu's does, since EJ2 reads both back for either (menu-base.js:1107,
+  :1145); and an enum whose line refuses integer values carries a converter of its own that refuses them, the
+  carousel's slide direction and the button's icon position, which wave 9 had landed with the converter that
+  takes them. The forms the forks took stand as written: a data class a method returns where its line names a JSON
+  name (the chip list's `Indexes`); text where a line names no enum (the scheduler's view, the pivot view's
+  display); a payload its line names and reads nothing of as an empty class; the smart text area's options with
+  no `Value`, since its helpers start at the member's value (M21.X605); a helper over a member of any type where
+  its line names none, as the text area's; a menu item's items as a list that admits null. Raised for U13: the
+  pivot view's `DataSourceSettingsModel`, which its line mirrors, is exported by no index of its package. The
+  owner can overrule each.
+- The lead, 2026-11-13, after the owner asked where the TLA+ work shows (verbatim in `spec/NOTES.md`): a confirm's
+  own asks are an ordering no spec held, so `ConfirmAsks.tla`, module 25's, checks them before NativeConfirm is
+  declared. Two runs ask, each ask waits its turn, a person answers the open one, a run's end aborts its ask while
+  it waits or is open, and the confirm unmounts: six invariants, each killed by its mutant, and four witnesses
+  (M25.D4, M23.D3). The run's side, a signal that aborts when its run ends and nothing that runs after it, stays
+  `Run.tla`'s and `Lanes.tla`'s, which M25.F4 names; N17.5's `AbortSignal()` hands that signal. Both confirms'
+  features name the six invariants. An abort while an ask waits and an unmount with asks left have no promise
+  yet; their promises are written with module 25's pages. The owner can overrule it.
+- The lead, 2026-11-13, landing module 22's three template types as signatures from a fork's work read at the
+  source. The forms the fork took from the redesign stand: `Render` takes the view's plan as its own type
+  parameter and returns the text a slice's template option takes (M22.D3); `EventButton` takes the core's
+  `AppEvent<TPayload>` with no constraint, as the core declares none; `Badge` keeps the optional class
+  "e-badge"; the three-argument `Img` is the template builder's alone; `Create<TModel>()` names the item as the
+  builder does. Two names are the lead's: `Div` takes its content builder as `build`, the name every render
+  helper gives its builder, and the smart text area's helper takes its options as `options`, the name of every
+  other options callback, where wave 10 had landed `configure` for both. `When`'s branches stay `then` and
+  `else`, M22.N2's. The owner can overrule each.
+- The lead, 2026-11-13, declaring module 25's and module 23's app-level slices as signatures. The drawer's
+  `BeforeCloseArgs` stays flat, `ClosedBy` and `Cancel` as M25.N1 names them, so M25.D1 now has the drawer code
+  raise "beforeClose" as an event whose own members are the payload: a listener reads its payload at its first
+  argument (D17.4), where a `CustomEvent` puts both under `detail`, one more member each handler names. The
+  loader's, toast's and reconnect offer's contracts are declared by U24, which builds what calls them, since no
+  view reaches them (D10.21); U3 declares their render helpers, the reconnect offer's on net10 alone. The drawer
+  and both confirms carry no `Mirrors` yet: their members are written by the framework's own code, which U24 and
+  U27 write, so they mirror no vendor's types until then; FusionToast mirrors EJ2's Toast. A row control's
+  attribute doors are N18.4's, whose forms go to gate 2, so only its `CssClass` is declared. The two confirms'
+  `Ask` rest on `ConfirmAsks.tla`'s six invariants with `Run.tla`'s and `Lanes.tla`'s. The owner can overrule each.
+- The lead, 2026-11-13, landing FusionGrid (M21.N23) as signatures from a fork's work read at the source. The forms the
+  fork took stand: a member beyond the line where a renamed door needs one (`GetCurrentViewRecords<TRow>()`,
+  `GetRowIndexByPrimaryKey<TKey>`); `Page<TRow>()` holding `FusionGrid.DataResult<TRow>`, EJ2's `DataResult` nested; a
+  row's key as the view's `TKey`, since EJ2 takes text or a number; the filter operators of text alone; a payload's
+  `Name` optional only where EJ2 marks it, and `Cancel` only where EJ2's type declares it; the edit templates returning
+  the text EJ2's builder takes; `where TRow : class`, as EJ2's builder requires. Two doors of the line wait on gaps,
+  each named with its use case. The line's grid validation door, From over a validator's rules and Field over a column,
+  gives a grid column EJ2's rules from the app's validator (M21.X203 to M21.X205); the core's surface holds no value
+  that carries a validator's browser rules, since N16.2's registration is internal, so the door waits on a core door U17
+  names with that registration; M20.N1's exemption already covers the dictionary EJ2's column takes. A filter
+  predicate's value, `FusionGrid.Predicate`'s, is EJ2's union of text, number, date, boolean and lists, which no type of
+  the line names; it waits on its form, U26's. The owner can overrule each.
+- The lead, 2026-11-13, writing the pages module 25's slices unblock: the bench's lane.confirm cell and the care pages
+  X11.2, X16.15 and X16.16. The shell's pages take a layout of their own that renders the drawer and the confirm, as
+  an app's layout renders its app-level objects; a page whose request sends no container renders the notice region
+  itself, the summary place D16.13 gives that request, with no pipeline door. The lead had said X16.15 and X16.16 wait
+  on a notice door; D16.13 says otherwise, and the rule line is the conformance app's CLAUDE.md. The lead had said too
+  that the core declares no notice door, which was false: a pipeline's Notice is declared, and the shell's toast
+  promises call it. A test reads the page behind an open modal dialog by role, since Playwright 1.64.1's role match
+  hides an element by its computed style and aria-hidden alone. X16.16's page routes the server's 400 by
+  `ShowValidationErrors`, as the admission screen's other pages do. The owner can overrule each.
+- The lead, 2026-11-13, writing the shell screen's seven pages module 25's slices unblock (M25.X1, M25.X2, X17.6,
+  X17.7, M25.X5, M25.X6 and M25.X7). The shell's layout renders the confirm as M25.F4's promises write it, titled
+  Please confirm with Yes and No, and X11.2's test reads that title. A page's stylesheet is a style element in the
+  layout's Styles section; M25.X1's two pages give the drawer a transform its visible class undoes, one with no
+  transition and one with a 50 ms transform transition, since a transition runs only where the transform changes.
+  A click behind the open confirm takes Playwright's force option, since the actionability check waits on a button
+  the backdrop covers, where a person's click lands on the backdrop. M25.X6's question is the text box's value read
+  through OrNull, since the confirm's Ask takes a nullable text. An element a promise does not name is the page's
+  own: the decision line M25.X6's and M25.X7's pages show, and the note the drawer's partial shows.
+  Five shell promises wait: X17.8 on a handler's policy (N11.1), M25.X3 on the busy indicator's startup call, and
+  X17.9, M25.X8 and M25.X9 on the startup call of the request defaults. The owner can overrule each.
+- The lead, 2026-11-13, writing M25.X12, the browser promise of `ConfirmAsks.tla`'s NothingWaitsForAnEndedRun: a
+  family partial whose two handlers of one click ask, the second waiting behind the first, and a refresh of its slot
+  held at the answer gate, whose release ends both runs (D12.4), so no dialog shows. Both asks are one plan's, since
+  D11.5 orders the two handlers of one event in the plan's order.
+  D11.8's await bullet is amended: it listed the older lines' Confirm as an await no abort reaches, where
+  NativeConfirm's ask takes the block's signal (N17.5) and answers false on an abort (M25.D4). UnmountAnswersEveryAsk
+  has no browser promise, since the page's confirm never unmounts while the page lives (D12.1, D13.1); that is the
+  owner's to decide, with the lead's recommendation that TLC hold it. The owner can overrule each.
+- The lead, 2026-11-13, writing the Fusion exemplar, the admission-clinical screen's first page: M21.X2's allergy
+  FusionMultiSelect over the items its view hands it, in a form whose Save sends the chosen codes. The app references
+  Alis.Reactive.Fusion, and a Fusion page takes `tests/Alis.Reactive.Conformance.App/Shared/_FusionLayout.cshtml`, which
+  holds what the app's other layout holds: U25 links EJ2's script and theme there, before the framework's, with the
+  licence and the fixture's one way to take EJ2's script (`spec/REWRITE.md`, section 2.5); Fusion takes no startup call,
+  since AddReactiveFusion leaves (M21.N2). The page answers 500 at the request form block, the first door it meets that
+  is not built, and the multi-select's render helper is the next. EJ2 33.1.47's box, read in Chromium by the lead's
+  probe, names itself "multiselect" and links no label, so the test finds it as the combobox inside the group the page
+  gives the field. The owner can overrule each.
+- The lead, 2026-11-13, declaring M3.N1's value and membership tests as signatures, with the pages that first call them.
+  `IsNull` and `NotNull` take a source of a nullable struct, so a test of an `int`, never null, is refused by the type
+  (CS0452), and a source of any reference type, its non-nullable form as well, since the browser's data holds null where
+  a declaration holds text: M3.X1 tests a record's Name, a `string`, that holds null. `IsEmpty` and `NotEmpty` take a
+  text or a list; `In` and `NotIn` take the values or the source of a list, and `Between` two literals or two sources of
+  a struct that orders, its nullable form as well, as N8.2's comparisons take theirs. The record's Name starts at null,
+  as M3.X1 states, and the care panel's raise hands a record, none, or one with no member. M1.X10's third button
+  raises a typed event from markup with no payload, the raise M1.N5 states, declared with its page. The owner can
+  overrule each.
+- The lead, 2026-11-13, landing the bed-board screen's fifteen pages from a fork's work read at the source. A template's
+  opposite that changes the view's code is a second view
+  (`tests/Alis.Reactive.Conformance.App/Care/BedBoard/WardRoomsBedsFirst.cshtml`); a row that lacks a member or holds it
+  null is written by the page's endpoint as an anonymous object beside the row's record, since rows handed with the view
+  hold every member; a carousel renders with AutoPlay off, so the slide shown waits on no time. A context menu renders with its animation off
+  (its effect None), since EJ2 33.1.47's menu takes focus only when its opening animation ends, so a key pressed on
+  the open menu waits on no time (the lead, 2026-11-17, from batch 4's red leg). The drop-down tree, the pivot, the
+  Kanban board, the schedule and a multi-column combo box's columns name each field through their slice's door,
+  `FusionDropDownTreeFields`, `FusionPivotViewFields`, `FusionKanbanFields`, `FusionScheduleFields` and
+  `FusionMultiColumnComboBoxColumns`, each `Of<TItem>().Field(..)` as `FusionGridColumns` names a grid column's: each
+  render helper writes the nodes, rows, cards or events a view hands EJ2 by the plan's writer after the view's build
+  (M21.D1) and names each field the door returned as that writer names the member, so a renamed member, or one that
+  carries [JsonPropertyName], reaches EJ2's fields with no string, where `nameof` named what EJ2's own writer writes,
+  each member's C# name, which holds under Newtonsoft's process-wide defaults alone (M21.X3) (the lead, 2026-11-17,
+  from U26's batch 5a; the owner, 2026-11-17, M21.X1050 to M21.X1057). M21.X201's three exports read
+  Exporting while the export runs, which a test reads only while the export
+  is held, and their placement names the seed alone: they wait on the harness's remaining verbs, the clock read against
+  EJ2's export first. X15.5 waits on the pascalCase host. The owner can overrule each.
+- The lead, 2026-11-13, landing the record-contacts screen's seventeen pages from a fork's work read at the source.
+  The mention attaches to the note box a view gives it, a text area with its label, by EJ2's target, since a mention
+  binds no member; a promise's opposite that the view's options change is a model member the builder reads, served at a
+  second address; a test reads EJ2 33.1.47's rating as the slider it names itself, by its value, a list box's chosen
+  item by EJ2's state class on the visible option, and a closed accordion panel by its hidden text. The fork's probe
+  found no slider role on EJ2's slider rendered over an input, so U26 renders FusionSlider's host as the element EJ2
+  gives that role. M21.X205's two rules wait on the grid's validation door, as the FusionGrid line says. The owner can
+  overrule each.
+- The lead, 2026-11-13, landing fourteen of the admission-clinical screen's pages from a fork's work read at the
+  source. A drop-down list's choice in the opposite case is a key pressed on the closed list (X507), since EJ2 33.1.47
+  drops an option clicked while the list opens; a multi-column combo box opens by Alt+ArrowDown on its combobox (X512),
+  since its popup icon has no role or name, and its row is clicked by its grid cell; a radio button is clicked by its
+  label, which takes the click meant for its input (X1022). The multi-column combo box names its columns through EJ2's
+  own column objects by the members' JSON names, since M21.N31 declares no typed columns as FusionGrid declares its; a
+  typed door for them is a gap the lead raises, as the drop-down tree's fields are. The uploader's test reads the first
+  POST around the choice and Save (X1014), since a font or an image the page loads in that window is a GET and the
+  uploader's send is a POST. The check box's test reads its role's checked state, which the input the view renders holds
+  before EJ2 starts; U25's planted defect decides whether that state catches a box rendered with no starting value, and
+  where it does not, the test reads the state class EJ2 sets on the box it shows. M21.X3 and M21.X505 are the lead's
+  next piece; X803's first promise waits on the antiforgery startup call and the clipboard, its second on the net48
+  host, and X804 on the clipboard, for which the harness grants no permission. The owner can overrule each.
+- The lead, 2026-11-13, writing M21.X3's and M21.X505's pages. X505's gesture reads "Open the language box's popup.",
+  as X512's reads, since EJ2 33.1.47 renders the combo box's popup button with no role or name; the box opens by
+  Alt+ArrowDown on its combobox, and the opposite case chooses Punjabi by two presses of the down arrow on the closed
+  box, since an option clicked while the list opens was dropped in three of three rounds of the lead's probe in
+  Chromium, and the two presses chose it in three of three. Fusion takes no startup call (M21.N2), so its render helpers
+  are the Fusion code that runs in an app's process: X3's page renders a Fusion text box before its preview, so a render
+  that set Newtonsoft's process-wide settings shows in the app's own call. Its opposite case is a second address whose
+  endpoint writes under the app's own camel-case settings; the app takes Newtonsoft.Json as Syncfusion's package brings
+  it, with no reference of its own. X803's first promise and X804 wait on the clipboard, and X803's second on the net48
+  host. The owner can overrule each.
+- The lead, 2026-11-13, writing three of the fusion-refusals screen's pages. A Fusion refusal page sits in
+  `tests/Alis.Reactive.Conformance.App/Refusals/` under its module's folder, on the Fusion layout, at an address of
+  RefusalPages under the refusal area, so the sweep of the app's pages reads it as refused by design, and its test sits
+  as a Fusion slice's or a template screen's does. M21.X805's heading is its X line's quoted message, whole, which ends
+  with no full stop; the page of its rendering twin gives the button the text Smart Paste. A template's rendering twin
+  is a second view, as the bed-board screen's are. M21.X203's three wait on the grid's validation door, as M21.X205's
+  do. The owner can overrule each.
+- The lead, 2026-11-13, writing the harness's net10 hosts whose definition in `spec/Reference/app.json` is the app's
+  JSON options alone: numbersAsText, dateConverter, snakeCase, pascalCase and enumsAsNumbers. The conformance app
+  takes the host it runs under as its argument `--host`, with no default, and sets that host's options in one place,
+  `tests/Alis.Reactive.Conformance.App/AppHost.cs`, so the options the 2026-11-12 line has the app's Program set for
+  net10 are set there now; each variant keeps net10's other options and changes the one its definition names. An app
+  started under no host or one it does not serve stops at start with the hosts it serves, since a test run under a
+  host the app ignores would prove net10's wire. The jsonContract host waits on its Admission class and fusionShell on
+  its layout. The owner can overrule each.
+- The lead, 2026-11-13, landing the handover screen's thirteen pages from a fork's work read at the source. The
+  numeric text box takes its format through the build callback M21.N32 declares (X1019). A list view's starting
+  selection is a step the page runs when its document is ready, since EJ2 33.1.47's list view takes no selected item
+  at start, and the opposite case of an unselection reads its outcome after the status that shows the handler returned
+  (X509). The AI assist view's send button is the one button of its footer toolbar, which EJ2 names
+  "assist-footer-toolbar" and renders with no name (X901). The drop-down button's items are the slice's own
+  `FusionDropDownButton.ItemModel` (X1012). The Kanban names its key field, its columns' keys and its cards' header
+  field through EJ2's own builder by the members' JSON names (X1017); a typed door for them is a gap the lead raises,
+  as the multi-column combo box's columns are. The OTP input renders its boxes on a div, which U26's helper renders,
+  since EJ2 33.1.47 renders none on an input (X612), and the time picker's value reads EJ2's default en-US format
+  (X1031). The owner can overrule each.
+- The lead, 2026-11-13, writing the first pages under the System.Text.Json hosts. X7.14's Add gets the supply again
+  and passes its vial count to the scanner's Add, as X7.12's Check gets the chart again, and a line set after the call
+  shows the handler returned before the opposite case reads the amount it leaves. M11.X1's record endpoint writes a
+  class of its own that holds MultiWord alone, so the snake-case host writes {"multi_word": 40}, and the camel record
+  endpoint answers its JSON as text, since no option of the app writes camel case under that host. M11.X2's records come from the page's own endpoint, as the app writes them (2026-11-15). A Fable agent at xhigh designed how a test reads two lines no
+  landed test read, decided from its answer read at the source: TakeNullable's line is a status named Took whose whole
+  text is "Took 25", and the component's records' names are a list named Records, read item by item inside the
+  component's element, beside the status Records, the records line; native.json's two behaviors and the tests'
+  CLAUDE.md state both. The owner can overrule each.
+- The lead, 2026-11-13, adding the harness door a promise's opposite case under another host needs, designed by a
+  Fable agent at xhigh and decided from its answer read at the source. A test opens that case's world by
+  `NewWorldUnder` with the other host's name of `Hosts`; the fixture keeps the hosts its placement lists, so the
+  runner's cases, the shards and the categories are unchanged, and a world under another host starts that host's
+  server inside the test's own run and budget (slowest 1.38s in the harness test's first green run). The harness test
+  reads a word slip an MVC action writes with MVC's JSON options, since the World area's minimal endpoints write with
+  the HTTP options, which no host sets. X8.22's first promise moves to numbersAsText, since its page's numbers are the
+  ones the app's number handling writes as text, and its opposite case opens under net10. The owner can overrule each.
+- The lead, 2026-11-13, landing six pages whose opposite case opens under another host, a fork's work read at the
+  source, and writing X8.22's first. A refusal whose opposite case holds under another host's options is one page at
+  one address, opened in a second world by `NewWorldUnder`. X6.12's message takes the cure its braces give a whole
+  number, a decimal or an enum, its selector dropped; X6.57's `{type}` for a `DateTime` is "DateTime", and its
+  `{term}` in a pipeline condition is the read's path ("handover.At"). X6.16's page counts doses of an enum of its
+  own, `CountedDoseStatus`, since the round screen's `DoseStatus` holds no Held and sits on another row. X8.22's first
+  promise read the conformance component's records, which the live form holds as JSON numbers under every host (D7.7),
+  so its refusal could not hold: its page now reads the residents' fluid ratios, a response body of its own endpoint,
+  as the refusal pages' lists are (2026-11-12), and the move of 553d078f3 to numbersAsText stands on that page.
+  X6.57's third waits on a date picker bound to a DateTime, which no door renders (N18.4). The owner can overrule
+  each.
+- The lead, 2026-11-13, declaring N13.1, a container's typed read of a member as it sends it, designed by a Fable
+  agent at xhigh and decided from its answer read at the source. No line and no compiled sentence wrote its form, so
+  by G13 it is the owner's, and U3 declares the lead's proposal as a signature: `container.Read(m => m.Member)`, a
+  member of `RequestContainer<TModel>`, the handle a block's `Container` holds and
+  `pipeline.Container<TModel>(containerId)` returns, named `Read` as `PageUrl<TPage>.Read`, a payload's `Read` and a
+  method result's are. It is no second door beside `pipeline.Input(m => m.Member)`, which reaches the input by its id
+  and reads its component's members in their own types (D13.3, D7.2). D7.7 now puts the read in the live form, since
+  the input that holds the value wrote it, as conversions.md's key for it already says. A page that reads a number a
+  person types renders the field in a container block, X8.4's pain assessment the first; eight more pages wait on it,
+  five of the record screen's, X7.11's two and X1.4. X7.7's first promise read none for a cleared int field, where
+  D3.6 reads the member's start, so its opposite reads 0. The cost of another form: one line in each view that reads a
+  typed member. The owner approved it, 2026-11-26.
+- The lead, 2026-11-13, on the owner's "make the decision that give quality, and TLA+ covers it and roll with it"
+  (verbatim in `spec/NOTES.md`): N13.1's read is what the endpoint binds from what its container sends, read in its
+  step (D13.3). One input reads its value, a blank or unconverted one the member's start (D3.6); a member no input
+  inside the container binds reads its start (D4.2); two inputs under the name, or a container the page lacks, stop
+  it, as they stop the container's request (D13.4, D9.15). `ContainerRead.tla`, module 7's, checks it over slot loads,
+  unloads and typing between reads: six invariants, each killed by a mutant (main's page-wide read by name, the read
+  Q13's evidence cites that takes the last matching input, a body that leaves with two inputs under one name, a blank
+  read as nothing as X7.7's first opposite had it, a read that keeps the inputs it first found, a missing member read
+  as nothing), and four witnesses. A spec's mutant fails its own invariant wherever it fails any, read by running the
+  mutant under the invariant that every other holds or its own fails, since TLC's workers find states in no fixed
+  order and the tlc check reads the first invariant violated (the lead's mistake, 2026-11-13). X8.4's and X7.7's pages
+  test ReadIsWhatTheEndpointBinds and X13.2's OneValueOnEveryHost; X13.6 and X13.10 test ReadStopsWhenItsSendStops, a
+  slot's second input under the name and a container the page lacks, X13.7 AnUnsentMemberReadsWhatTheEndpointBinds,
+  X13.8 ReadSeesTheSlotThatJoinedOrLeftBeforeIt and X13.9 ReadFindsWhatItsContainerSends, each test red. The owner can
+  overrule it.
+- The lead, 2026-11-13, landing the eight pages that read a typed value through its container (N13.1), a fork's work
+  read at the source, and settling what it read into. X8.14's promise names the check endpoint the doctor's
+  SettleCheck() awaits and the answer the harness seeds it, so the world holds it at the settle gate, answering yes
+  where no seed does, and native.json's Settle behavior names it beside the record endpoint SettleRecord() awaits.
+  X7.7's second promise read a cleared target after a check that had shown Within target, an outcome a handler that
+  stopped would also leave, so its cleared case opens a fresh record, whose badge starts empty, and its opposite, a
+  target of 400, reads Over target there. X7.11's second promise names no test for its `Choose`, so the page's is a
+  check box, Seen at the bedside, read by the container's `Read`. X8.13's page writes which button's branch ran, so
+  the calls are read after the handler returned. The owner can overrule each.
+- The lead, 2026-11-13, declaring N11.1, a handler's policy, designed by a Fable agent at xhigh and decided from its
+  answer read at the source. No line and no compiled sentence wrote its form (the POC writes overlap alone), so by G13
+  it is the owner's, and U3 declares the lead's proposal as a signature: `HandlerPolicy`, a sealed class of
+  `TriggersAndPipelines` with a private constructor and three static values, `Overlap`, `Replace` and `Skip`, as
+  `EventListening` is shaped, passed before the pipeline callback in an overload beside each door that starts a
+  handler: `trigger.CustomEvent`, `Reactive` on a rendered component, on a plugin and on an app-level object,
+  `pipeline.Listen`, Native's button `Reactive` and both row actions. It reads in the promises' order, trigger,
+  policy, block; `Lanes.tla` fixes a handler's policy at its start, so no pipeline sentence sets it, where a step
+  could write it twice or in a branch not taken; it adds no callback to the locked table. On load takes none: it runs
+  once per start of its owner and a slot's reload is a new owner (M1.D1, D12.4), so it writes overlap. `Overlap` stays
+  public as the grammar's third value, so a consumer that forwards a policy names the default; its cost is a second
+  spelling of a door that names none. A consumer door that starts a handler off the core's doors adds its own overload
+  and forwards the policy. X17.8's text joined from a source and a literal is N7.7's, and X11.15,
+  X11.21 and X11.22 wait on the defaultHooks host. The form stands (the owner, 2026-11-26): a view names no policy
+  unless it replaces or skips.
+- The lead, 2026-11-13, declaring N10.1, the endpoint's error answer, as its line writes it:
+  `ValidationResult.ToErrorResponse()`, an extension of `RequestsAndResponses`, module 6's, in a file of each host,
+  returning that host's MVC `ActionResult`, so an action that returns `IActionResult` or `ActionResult` returns it
+  where it returns `ValidationProblem` today. On net10 it answers D10.8's body as MVC's validation problem, on net48
+  as a JSON result IIS keeps as written (D10.8). X10.5's admission form stands on it on net10, its test red;
+  X10.7, the same form under IIS, is placed on net48 and waits on that host.
+- The lead, 2026-11-13, declaring N10.4, a condition on a part a request sends, designed by a Fable agent at xhigh
+  (N10.4-FABLE.md of the handoff folder) and decided from its answer read at the source. A chained request and a
+  parallel branch are pipelines and take the pipeline's `When` (D10.16, D10.23), as X10.11's badge desk writes it. No
+  line wrote a part's form, so by G13 it is the owner's, and U3 declares the lead's proposal as a signature:
+  `PartsGuard` of `TriggersAndPipelines`, with `Then`, and `When` on each of the eight parts classes, each handing its
+  branch the stage that takes no body and no container, so the body and the container are named before the first
+  condition. A part a failed condition leaves out is never sent, and the endpoint binds the member's start (D10.16;
+  Request.tla's FailedConditionSendsNothing is X10.10's planted defect). A branch's parameter is the app's word for
+  what it sends, as X10.10's page names it note, since no parameter but the pipeline's hides an enclosing name
+  (`.claude/rules/csharp.md`); the callback table gains no row. The owner's answer of 2026-11-16 below settles the
+  three things it waited on: the form stands, each sent part carries its condition's `when` (schema.md's
+  `HttpSend`), and a container's inputs take no condition, since a container fixes the body's format. X10.10 stands
+  on it.
+- The lead, 2026-11-13, landing three pages of a handler's policy, a Fable agent's work at xhigh read at the source,
+  and settling what it read into. Each endpoint reaches Lanes.tla's Respond with its own path, as the care actions of
+  the residents and admission screens reach theirs; the app's rule gives a gate other than the answer gate its filter
+  with the first page that holds it, and seven care actions now reach a gate inline, which one piece moves to a filter
+  for each gate. X11.6 and X17.36 take the policy from the page's model at two addresses each; X11.7 takes skip at one
+  address. X11.7's count of the posts the endpoint received is its answer, "Saved once" or "Saved twice", since no
+  member of the harness reads a count. X17.36's GET is the promise's "/Residents/{residentId}", and a page of links to
+  it lets the page sweep open the route. A read after a release names no state the release brings: the late answer of
+  X11.6's and X17.36's replace cases lands after the read can pass, since no harness verb reports a released answer
+  delivered, so the harness gains that verb before the unit that turns those two green, and their planted defects are
+  read then. X11.24 waits on an append to an element's text, which no door writes.
+- The lead, 2026-11-13, declaring N16.1, the endpoint's check, designed by a Fable agent at xhigh (N16.1-FABLE.md of
+  the handoff folder) and decided from its answer read at the source. No line wrote its form, so by G13 it is the
+  owner's, and U3 declares the lead's proposal as a signature: `EndpointChecks` of `Validation`, in a file of each
+  host, with `Validate` and `ValidateAsync`, extensions of the action's controller that take the request's model and
+  name the request's type and its validator as type arguments, the validator under the request's own constraint. MVC's
+  own binder binds the model, as the owner's line of 2026-11-07 keeps it; the door adds the binder's refusals (D16.4,
+  D16.7) and checks under the default rule set, since no request door names a rule set yet (D16.2). It returns the
+  result, and the action answers a failed one through N10.1, so one door writes D10.8's body. X16.16's endpoint checks
+  through it in place of its hand copy of the rule, and X8.3's visitor sign-in stands on it, its test red. Three
+  things waited for the owner: the form, approved on 2026-11-26, which checks and leaves the answer to N10.1 where N16.1's line says the door
+  answers, so an action that ignores the result saves an unchecked model; how MVC 5's own validation stays out of the
+  model state on net48, which no line states, read by an MVC 5 probe before U17 builds that half; and net48's hosts
+  for X8.3 or X16.16, since no placed promise runs the net48 half. The bench's validation endpoints answer what they
+  bound, which their promises read.
+- The lead, 2026-11-13, declaring N16.4's flags enum named at startup and D16.2's rule set a request names, designed
+  by a Fable agent at xhigh (N16.4-FABLE.md of the handoff folder) and decided from its answer read at the source. No
+  line wrote either form, so by G13 each is the owner's, and U3 declares the lead's proposals as signatures:
+  the door `Flags` on `ReactiveFluentValidationBuilder`, the builder `AddReactiveFluentValidation` hands its callback,
+  since the registration names each validator and each flags enum once (spec/Validation/module.md); and
+  `Validate<TValidator>(ruleSet)` beside each of the twelve request doors' `Validate<TValidator>()`, with N16.1's
+  endpoint check taking the same name, a text as the validator's own `RuleSet` takes it. The callback keeps its
+  parameter's name; the agent's rename is no door's. Three things wait for the owner: the forms; a named enum's start
+  read by a rule in the browser, which under the net10 host's enum names is a text of names that no operator of the
+  grammar splits, so C# writes the start as its number or the grammar gains an operator; and the refusal of a rule set
+  the validator does not declare, which needs its X line before U17. X16.22's care rota stands on the record screen,
+  its test red. It has two models, since a member the body lacks reads the model's start and its opposite case starts
+  Rota at Early, each with a validator of two rule sets. Its endpoints echo what they bind, as the Playwright
+  project's file reads a check that sends nothing from the answer line: a check on the server would answer the
+  browser's message with a 400 of the same words, and the test analyzers leave a page's requests to the harness, which
+  reports none, so no page calls the endpoint check's rule-set overload yet. The startup call that names the two enums
+  waits for U17, since that door threw until then and would stop the app. The owner's reversal of 2026-11-26 took the
+  door out: `[Flags]` marks a flags enum, and the core reads it (N16.4).
+- The lead, 2026-11-13, declaring N5.7's iterator with M5.N3's `ElementChildren` and M5.N4's `ChildElement`, designed
+  by a Fable agent at xhigh (N5.7-FABLE.md of the handoff folder) and decided from its answer read at the source.
+  D5.13, N5.7 and M5.F1's proposed sentences write the view's half, the object taking the list operations beside its
+  own members (`Children.Count()`), so by G13 that is the form. No line wrote the declaration's half, and U3 declares
+  the lead's proposal as signatures: `LiveIterator<TItem>()` and `DataIterator<TItem>()`, protected on `JsObject` and
+  taking no name, since the member is always the iterator; ILiveIterable and IDataIterable, which an
+  iterable implements with the door as its body; and the nine operations of `LiveObjects<TItem>` and the eighteen of
+  `DataLists` as extensions of them in the Iterables class, each the operation over the items, so the build binds each to the
+  one it forwards and its docs are that one's. A live object that iterates and is no collection declares the door
+  under a member it names. M5.F1's class count is reworded to the ordinal `StartsWith`, the overload the translated
+  members' table takes. Two things wait for the owner: the form, against the smaller one the agent names,
+  `Children.Items.Count()`, two doors and no forwarder with D5.13's clause reworded; and an operation D6.2 gains
+  later, which needs its forwarder where no compiler asks for one. X6.56's lunch seating and M5.X2's table support
+  stand on the residents screen, each test red, a Fable agent's work at xhigh landed from the source with one model
+  member no seat set removed. No seed member carries a seat, so each page renders what its own model holds. The lunch
+  seating's opposite case is a plugin of the page's own whose list member declares a data iterator over a paged
+  result, its script U13's, and the page sets the result's count before the step that counts its items, so a test
+  reads the stop at the count and not at the plugin's lookup. The residents screen gains a scripted layout of its own,
+  as the record screen's.
+- The lead, 2026-11-13, on X16.20's live check and M4.X3's sorted list, designed by a Fable agent at xhigh
+  (LIVE-LIST-FABLE.md of the handoff folder) and decided from its answer read at the source. X16.20's page names no
+  state of D16.15's live check: its form and the fieldset container inside it are bare blocks, live through the
+  validator registered at startup, so the page stands now, red, and the registration waits for U17 as X16.22's does
+  (both registered since 2026-11-16; the live check itself waits on its block's door, D16.15).
+  The live check a block names is declared with the first view that names one, as the lead's line of 2026-11-12 says;
+  the agent's form for it, a closed value of two states, none and a rule set by its name, passed to both block doors,
+  is in that file for then. The gap the lead raised on 2026-11-12, a list operation's result that does not fit a
+  property declared `List<T>`, is the declaration's: `spec/Reference/native.json` and the reference component declare
+  its three array-valued properties `Property<IReadOnlyList<T>>`, as the Fusion slices declare theirs, and every
+  sentence over them still builds, so M4.X3's census sort stands, red. Two things wait for the owner: D5.3 gaining
+  that a member the API types as an array is declared `IReadOnlyList<T>`, and whether `NativeCheckList.Value`, a
+  `Property<string[]>` by its own line, follows.
+- The owner, 2026-11-13, on the lead's line of 2026-11-12 that a door joining text waits for the owner's word
+  (verbatim in `spec/NOTES.md`): "ok if its align with quality, specs tla+ covers it - then add it - consult fable
+  xhigh to make sure its done right". A Fable agent at xhigh checked the form against the spec's lines, the schema and
+  the TLA+ specs (TEXT-VERIFY-FABLE.md of the handoff folder), and the lead decided from its answer read at the
+  source. A text joined from texts and sources is `pipeline.Concat(first, second, ..)` (N7.7), each part a `TextPart`,
+  which C# converts a text and a source of any type to. The plan writes a `call` of the array's `join` over a `list`
+  of the parts, so the grammar gains no kind and no operator: D6.6's array members gain `join` and D7.2's sources the
+  joined text. The one premise no spec held, that C# hands `join` every part as a text, is Schema.tla's
+  JoinedPartsAreTexts, which its mutant kills. An append to an element's text or HTML writes the content `set` that
+  `Set` writes, whose stop over a held slot (D12.9, X12.12) no spec holds, so the append is declared after that
+  ordering is written as a spec, as root CLAUDE.md requires, and the same spec covers `Set`. The lead's line of
+  2026-11-12 on event.poc15's three cells stands: their promises read the source alone.
+- The owner, 2026-11-13 (verbatim in `spec/NOTES.md`), on the lead's proposal of an operator that would refuse a
+  source joined into a text by `+`, and on D6.10's twelve overloads that refuse a list's operation over a text: "why
+  obsolete code is in re-write - get it right sir - it seems like u did not think through design - or have analyzer
+  right". No member exists only to refuse a call: a door no author needs is no door, and a defect no type stages is
+  the analyzer's to refuse at build, by the owner's decision of 2026-11-08. The twelve overloads leave with the
+  analyzer line that takes their refusal, and the text a source is joined into by .NET gets a line of its own; a Fable
+  agent at xhigh designs both rules (TEXT-ANALYZERS-FABLE.md of the handoff folder), and the lead decides them from
+  its answer read at the source.
+- The owner, 2026-11-13 (verbatim in `spec/NOTES.md`), to the lead's recommendation from that answer: "Okay, go ahead,
+  add it to recommendation. So it is right. I already said yes." ALIS043 (N18.17), a source .NET makes a text of,
+  lands in U3, since the thin path's text door takes any .NET text and such a page shows the source's type name today;
+  ALIS042 (N18.16), a list's operation over a text, lands with its door in U11, where every operation throws until
+  then. The analyzer agent's line it numbered X7.17 is X7.19, since X7.17 and X7.18 hold the joined text's browser
+  promises.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), leaving for eight to ten hours: "if a decision is needed,
+  Quality and fable xhigh will decide with tla+ - step back and do the right - never do the hack". A decision the work
+  needs while the owner is away goes to a Fable agent at xhigh and is decided by quality from the TLA+ specs, the lead
+  landing it from the answer read at the source, as root CLAUDE.md's forks section states, and none is taken by a
+  shortcut around the spec. The lead's reading, the owner's to overrule: a decision on a principle, a closed rule or
+  the scope still goes to the owner as one line, as root CLAUDE.md's loop states.
+- The lead, 2026-11-14, landing `SlotHolds.tla`, module 18's, the ordering of D12.9's content write over a held slot,
+  from a Fable agent's design at xhigh (SLOTHOLDS-FABLE.md of the handoff folder) read at the source and run by the
+  lead. No spec held that ordering, which `Set` writes and every door that writes a content `set` shares, so it is
+  written before such a door is declared, as root CLAUDE.md requires. It is a spec of its own, since Ownership.tla
+  holds no slot outside its card, no element around a slot and no write, and module 18's Boundaries now give it the
+  holds a slot keeps. A page and a card, the slot the card is loaded into, the card's own slot and a notes slot
+  outside it, from three boots of what the server put there: five invariants, each killed by its mutant
+  (OwnSlotUnchecked, ContentPlanHoldsNothing, SlotOwnerHoldsNoKey, OwnElementOnly, HoldSurvivesRelease), each mutant
+  failing its own invariant wherever it fails any, and twelve witnesses. Three carriers stated the hold of a live plan
+  alone, where D12.9 holds a slot by its content too: schema.md's `set` row, R14.7 and X12.12's last sentence say both
+  now. R14.7's one error names the first held slot at or inside the element in document order, so an element that
+  holds several names one. The owner can overrule each.
+- The lead, 2026-11-14, writing the four pages that test `SlotHolds.tla`'s invariants beside X12.12's first, read
+  against the agent's six cases in SLOTHOLDS-FABLE.md. Each promise is a page of its own on the record screen, as a
+  care promise is: the shift tray, a card's step over the slot it was loaded into; the team board, a page's step over
+  an element that holds a held slot; the visit desk, a page's step over an empty slot an open card's plan names; the
+  night log, content a closed card loaded into a slot outside it, which stays held until that slot unloads. A step
+  that stops is read by the status the step before it sets, which the step after it would overwrite, and the console's
+  one error is read after that status, as a promise whose error words no line states is read; X12.12's first test
+  reads its error now, which its promise named and its test had left out. The agent's fifth case, a slot whose only
+  plan left, is the opposite case of the first, the visit desk's and the night log's, each a different way the hold
+  leaves, so it has no page of its own; the team board's opposite is an element that holds no slot, since the page's
+  own slot is held while the page lives. The append's case lands with its door. The owner can overrule each.
+- The lead, 2026-11-14, declaring the append to an element's text or HTML on `SlotHolds.tla`, from the form
+  TEXT-VERIFY-FABLE.md of the handoff folder gives, read at the source: `ElementContent.Append` takes a text or a
+  source of any type, as `Set` does, and writes the content again with the value after it, the `set` a `Set` of
+  `pipeline.Concat(content, value)` writes, so it is a content write and stops over a held slot as `Set` does (M5.N1,
+  D12.9). It throws until module 5's unit builds it. Both `Text` and `Html` take it, as M5.N1's one `ElementContent`
+  gives both, and `Html`'s append makes the element's children again, which the owner decides: keeping it costs
+  nothing, and refusing it on `Html` splits `ElementContent` into two classes. The append's own case is M5.X4, a value
+  that reads nothing adds nothing and the step after it runs; an append to an element the page lacks stops as every
+  element step does, M5.X1's meaning (D4.1), so it has no page of its own; the append over a held slot is X12.12's
+  sixth page. The owner can overrule each.
+- The lead, 2026-11-14, landing three gated pages on the append and the joined text from a page-writer's work on the
+  latest Fable model at xhigh, read at the source: X10.6's wing counts, X11.14's bed admission and X17.8's discharge
+  intake. A log is one element's text that each step appends a word and a space to, read whole. X10.6's opposite, both
+  GETs released together, names no order its two answers reach the page in, so it is the other order of release, the
+  discharges GET first, read whole. X11.14's route that sends no second request is a second view at its own address,
+  since no model member changes a route's code. X17.8's Save is a click the page raises, whose handler dispatches the
+  intake event with the resident's name, and its test arms the answer gate before it opens the page, since the GET it
+  holds is sent as the page loads. The owner can overrule each.
+- The lead, 2026-11-14, writing X11.19's page, the record's answered alarm, after a page-writer on the latest Fable
+  model at xhigh reported its opposite case unwritable, read at the source. The opposite put an awaited step before
+  the second handler's write of the payload's Answer, a write to the payload itself after an await, which D11.4
+  refuses and X11.1 holds at build by ALIS032, so no page renders it and no browser test reads it; and it read an
+  empty answer line, where native.json's care panel shows the item's name with unanswered when no handler set an
+  answer. The opposite is now the second handler left out, a second view at its own address, the panel showing Payload
+  text: Kappa and One unanswered, and the defect's words read the same line. The owner can overrule each.
+- The lead, 2026-11-14, deciding the append's form by the owner's answer to keep or split `Html`'s append, verbatim in
+  `spec/NOTES.md`: "i would opt for two things, better experience of dev, and quality". Neither: in Chromium 156 a
+  write of `textContent` or `innerHTML` to the content with the value after it made new nodes, so a listener, a
+  mounted component, a typed value and the focus were lost, while `append` and `insertAdjacentHTML("beforeend", ...)`
+  kept all of them. From a Fable agent's design at xhigh (APPEND-FORM.md and PROMISES.md of the session's scratch
+  folder, read at the source), `Text.Append` and `Html.Append` keep their place and signatures and write a `call` of
+  the element's `insertAdjacentText` and `insertAdjacentHTML` at "beforeend", the value's joined text, run only where
+  that text is not empty, since an empty insert adds a text node of no length in that browser. It removes nothing, so
+  it is no content write and no hold stops it; what it adds holds the slot for no one and leaves at that slot's next
+  load or unload. `SlotHolds.tla` gains the add, its sixth invariant AStepOverWhatAStepAddedWrites and the mutant
+  AddedContentHolds, TLC green with each of the six mutants failing its own invariant alone. X12.12's sixth promise
+  becomes M5.X5's first, the hour log, whose append adds where a set from Clear the hour stops, and M5.X5 gains three:
+  a set over a slot that holds only what a step added writes, what a step added leaves at its slot's unload, and an
+  append beside a typed box and a button keeps both. This reverses the lead's line of 2026-11-14 that declared the
+  append as a content set. The owner can overrule each.
+- The lead, 2026-11-14, on the isolation of a spec's mutants, which the line of 2026-11-13 on `ContainerRead.tla`
+  stated as a state predicate and the lead ran on three specs alone, a mistake of the lead's in `spec/MISTAKES.md`.
+  TLC 2.19 as pinned checks a state's invariants when it generates the state and enqueues the state after, so no
+  successor of a failing state is generated, and it names two invariants that fail in one state in its config's order:
+  a Fable agent at xhigh read both in the jar's bytecode and by runs, and the lead read the bytecode at the source. So
+  a mutant is isolated when, on every behavior, its own invariant fails no later than any other. It is read by running
+  the mutant with a history variable that holds whether its own invariant has failed, under the invariant that every
+  other holds, its own fails or it has failed before; and a spec's violates configs each list the invariant its name
+  carries first, so a state where two fail names its own. A mutant that modeled two defects is narrowed within its own
+  text, the base's states unchanged: Lanes' AllSettledEarly and ReplaceKeepsOld, Partials' IdWithoutPrefix,
+  CallbackProperty's Replace and Run's UnwindRestartsFinally and EnclosingRunsOn. Thirteen specs read every mutant
+  isolated and list their own first, Ownership.tla among them. Run.tla lists its own first and reads thirteen of its
+  fourteen mutants isolated. The isolation is run no more, by the owner's yes to the lead's recommendations of
+  2026-11-14: AfterIfReadsBefore's pair, Composition.tla and Request.tla are not read for it, and a spec's mutants are
+  held by each one failing its own invariant, which the full check reads. A new TLC jar is read for both facts before
+  its pin moves. The owner can overrule it.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on the order of an app event's handlers across plans: "I'll
+  go with your recommendation". An app event's handlers run in the order they subscribed, as D17.3 orders a
+  callback property's listeners: a page's plans in the order the page holds their scripts, a slot's when its load
+  starts them, a reloaded slot's after every handler still live, so a slot the server rendered hears before its
+  page (D11.5, M1.D2, `Ownership.tla`'s HandlersHearInTheOrderTheySubscribed, killed by LoadRestartsThePage, from
+  the orders designer's answer). X12.2's call list is one list again, read in order.
+- The lead, 2026-11-14, landing `Run.tla`'s order of a new run under replace from the orders designer's answer, a
+  Fable agent at xhigh, read at the source. A run that the old run's own step raises under replace begins at the
+  old run's first return after its cut, waiting or ended, and by then a `Finally` layer the old run's requests had
+  loaded has begun, as D11.11 states: TheOldFinallyRunsBeforeTheNewRun, killed by SecondBeginsInTheRaise, X11.24's
+  first defect. UnwindRestartsFinally restarts a running `Finally` of either layer only where no abort unwound it,
+  and EnclosingRunsOn keeps the waiting request's frame, its `Finally` owed, beneath the steps that run on; each is
+  narrowed within its own text, the base's states unchanged. The owner can overrule it.
+- The lead, 2026-11-14, landing X11.24's page, the bedside bell, from the record page-writer's work and the orders
+  designer's answer. Its replace log rests on `Run.tla`'s TheOldFinallyRunsBeforeTheNewRun. Its opposite states the
+  overlap's log whole, rang 1 rang 2 finally 1 after 1 finally 2 after 2: the dispatch runs the new run to its
+  request inside the old route's step (M1.D2, whose oracle is the DOM's dispatch), and no answer settles while a run
+  runs (`Run.tla`'s Settle), so `Run.tla` gains no action for the order. The owner can overrule it.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on the tests U3 cannot write: "Okay, yes, you have the TLA plus
+  schema, you have a great deal of knowledge already proved." A browser test that waits on a later unit, a startup
+  call that throws until its unit, a host its startup builds, a door or a harness verb it builds, or a fact no spec
+  line states, is written, failing, first in that unit, before its code; each harness verb beyond seed and gate lands
+  with the first unit whose test uses it, and U3 is closed. Of the 469 placed browser tests, 330 stand written; the
+  139 that wait land with their units.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on a status and on the hedges check's stop: "you can keep
+  reporting [TLA+], but you gotta be specific what you're saying and how many units are left", and "Replace it with
+  must." A status says what works, how many of the plan's units are left and what of the unit in work is left, each by
+  its count, and a TLA+ run by its spec, what it reads and its count (root CLAUDE.md's Sessions). `should` in the
+  spec's prose, a quote of the owner's among it, is written `must`; `spec/NOTES.md` keeps the owner's words as said.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on the pace: "you are using it as an excuse to just slow the
+  delivery", "I'll go with your recommendations", and "Mistakes are supposed to be caught very quickly, not that they
+  become their own maintenance." The lead's faults, measured since the cut: 134 of 323 commits were STATE commits, a
+  morning went to the isolation of TLA+ mutants, and the log of mistakes grew to 903 lines; one working behavior, the
+  thin path. Decided: a push lands a unit or ends a session, behind the full check; the isolation is run no more;
+  `spec/MISTAKES.md` counts each mistake in its kind; a decision that follows from a yes of the owner's is the lead's,
+  stated as done.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), to the lead's question whether a browser test lands in the unit
+  of the last door its view calls: "Yes". Most pages call doors of later units (a trigger's `CustomEvent`, a list's
+  `Find`, the conformance component, a request), so a unit's run selected tests it cannot turn green. `landings.py` and
+  the check that places each test read the views each test opens and the core's doors each view calls, and land the
+  test in the unit that builds the last of them, the reader the line of 2026-11-12 left waiting.
+- The lead, 2026-11-14, building `Matches` (M3.N1) on D16.11's one reader, `Alis.Reactive/Conditions/BrowserPattern.cs`,
+  the first row its three doors share: no X line writes a pipeline condition's refusal of a pattern, so it is X6.38's
+  reason after "The pattern '{pattern}'", the subject X16.12 gives a rule's pattern, an `InvalidOperationException`
+  as every refusal where the view renders. The owner can overrule it.
+- The lead, 2026-11-14, building `Choose` (N7.4): C# binds `test.Choose(first, second)` over two sources of a class that
+  derives from `TypedSource<T>` (an element's `Text`, a declared `Property<T>`) to the form for two values, its `TValue` the
+  source's class, an identity conversion that beats the form for two sources, so the plan would write each source as a
+  JSON value. No type stages it apart, so that form refuses a value that is a source where the view renders, naming the
+  type argument that binds the form for sources (`test.Choose<string?>(first, second)`). An analyzer refusing it at build
+  and its X line wait for the owner.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on a date's members in a list's lambda: "keep server as truth
+  for DLS, as instructured to you its designed specifically for time zone communities have, TLA+ had proved it so -
+  again action it". A date's `Year`, `Month`, `Day`, `Hour`, `Minute` and `Second`, and a `DayOfWeek` compared, read
+  the wall fields of the value as the server wrote it, as its key reads it (D6.12): never the browser's clock, so no
+  `as date`, whose `Date` moves a wall time daylight saving skips or repeats. A question the specs already answer goes
+  to no one (the lead's mistake, 2026-11-14).
+- The lead, 2026-11-14, landing the request culture, designed by Codex at max from a scoped brief and decided from its
+  answer read at the source: a request names its culture in its address's query "culture", from a closed list, none
+  meaning "en-US" and any other value, or two, answering 400, set by one middleware of the conformance app before MVC
+  reads the request, since ASP.NET Core's request localization picks a culture by its name and the phonebook sort's
+  name is "de-DE" (`spec/REWRITE.md` section 2.5). A host's process culture is fr-FR, which no request names, and a host
+  is ready once it answers the world's ready endpoint. X6.36's page stands on it, its test red until its doors land.
+  The owner can overrule it.
+- The lead, 2026-11-14, on D6.10's refusal where the view renders, a Codex consult at max read at the source: the
+  render holds a source's plan expression and never the view's text, and `CallerArgumentExpression` neither follows a
+  helper's argument nor reaches an MVC 5 view at C# 8, so ALIS042 keeps its message and the render's names the
+  operation (M4.X1, D18.6). It finds a text by `list is ITypedSource<string>`, an interface test as `Alis.Reactive/Conditions/Choices.cs`
+  makes one, so no read of a type's identity joins the owner's list. The owner can overrule it.
+- The lead, 2026-11-15, landing a source's own form in a condition, a choice and a live write (D7.7, D8.10), from
+  Codex's piece read at the source, under the owner's "I'll go with your recommendation" (2026-11-14): X7.10's
+  message names the read and not its type, so no type's name is read and the owner's list is unchanged; a number a
+  member's own number handling writes as text reaches a live member as its number by `as`, as the app's form's does;
+  `In` over literal values compares a source in its own form by `Eq` (M3.D1); and a text test, an emptiness test or a
+  list operation over a value its own converter writes whole throws `NotImplementedException` until a line states
+  it. The owner can overrule it.
+- The lead, 2026-11-15, landing U12's results (D4.7, D5.11, D8.7), from Codex's consult and build read at the source:
+  a result read once, by the call of a result that binds `read` just after it, binds `read` too, so
+  `Echo(Total())` under an `Or` calls neither unless the term is reached; a result's binding is decided once its
+  handler closes, every chain folded; a result's scope is read from the handler's final statements by its one `ref`,
+  so another plan's `result1` is refused where it is read. The owner can overrule it.
+- The owner, 2026-11-15, asked for the grammar's 52nd kind with its example (a slot's plan listening to the page's
+  pump by its id, whose host restarts it before the slot unloads): "approved", then "TLA+ must be updated". A `listen`
+  on a component reached by its element's id carries the release `located`, which names the object id whose element
+  the step reaches the object by: the release reads that element when the step listens and removes the listener only
+  while it still holds the object where its vendor's `locate` finds it (D12.5, D12.8), so its vendor needs no element
+  path and the runtime infers nothing from the step's object. D19.2 closes the set at 52, and `spec/Schema/Schema.tla`
+  holds `located` among its release kinds, one handler each.
+- The lead, 2026-11-15, landing U13's page plugin scripts, a fork's work read at the source. Each folder under
+  `tests/Alis.Reactive.Conformance.App/Bench/` and `tests/Alis.Reactive.Conformance.App/Care/` is a slice of its own,
+  which ALIS010 holds, so a scripted page takes the scripted layout of its own folder and the 2026-11-12 line's one
+  bench layout, Bench/Plugins', serves that folder's pages alone. A page's script is a TypeScript file beside the page,
+  at the address its folder's constants give it, bundled by `build.mjs` into the app's wwwroot, which git ignores; it
+  imports nothing and provides its plugins on the page's queue (D17.14). Two declarations follow their promises: the
+  page plugin of source.PluginArgument is named pageLog, as its cell's promise names it, and the night clock's event
+  is its onStruck property (M13.X2, X17.24). The owner can overrule each.
+- The lead, 2026-11-15, landing U14 from a fork's work read at the source: which declaration of a plugin declares an
+  event is no fact the core reads without reflection, so a plugin's locator carries the listening a handler or a
+  listen step hears it by, EventTarget where nothing hears it, and a plan that hears one name by two listenings is
+  refused where the view renders, naming each declaration by its event and its listening, since its class's name is
+  type information off the owner's list (M13.D1, D17.14). The owner can overrule it.
+- The lead, 2026-11-15, writing N13.1's plan form, which no line and no compiled sentence wrote, from two consults of
+  Codex read at the source, the second an adversarial reading under which `ContainerRead.tla`'s six invariants hold: a
+  container read is a `data` read over `alis.model`'s `sent`, called with the container's id and the key of its model,
+  which returns the body the container sends, built in the read's step (D13.3, D14.8, schema.md). Its steps are the
+  member's by wire name, each absence as D4.2 writes it, in the live form (D7.7); a list position between them is a
+  `get` of the item with `optional`, so an item the body lacks reads nothing, and a dictionary entry is a data step of
+  its key, which reads nothing when the body lacks it, since a new instance's dictionary holds no entry. `Live.body`
+  and a request's `Inputs(container)` read the same method, so a container's send has one reader. No node kind and
+  no field is added. The owner can overrule it.
+- The lead, 2026-11-15, before U16's third piece, deciding two forms the lines left apart: a blank input's literal
+  is written in the live form, since an input's value is (D7.7) and the two meet in one `coalesce`; written in the
+  app's form, a cleared number read "0" as text under an app's number handling while a typed one sent a number. A
+  number shape's blank is a JSON number, which System.Text.Json reads under every number handling (D3.6). And R14.6's
+  error names each plan by its id and its place, the page or its slot, since a plan carries no view outside a trace
+  (D20.7) and a slot's partial of the page's model shares the page plan's id (X14.7). The owner can overrule each.
+- The lead, 2026-11-15, from a consult of Codex read at the source: three promises (X9.13, X10.17, X10.20) said the
+  status keeps Waiting when the guard refuses, while D10.23's table and Request.tla run `loading` before `guard`
+  (Request.tla's `Loading` moves to "guard", a failed `Guard` to "finally"); each outcome now reads the status its
+  WhileLoading wrote, and completed loading is no defect. Their tests are U18's to write.
+- The owner, 2026-11-15: "Date - server is truth - I told u", "It will send timezone info", then "Date has eatn days
+  worth of tokens". A date in the browser means what the server states: C# writes whether the value is a `DateTime`
+  or a `DateTimeOffset` wherever the browser converts it, and the plan carries the view's time zone, so the browser
+  chooses nothing. The runtime's conversions that stop because the shape does not say which (a `Date`'s text, a
+  `Date`'s instant under a zone) take that statement from the plan, and no date question goes to the owner again.
+- The lead, 2026-11-15, landing the owner's date line in the conversions, built by Codex from a scoped brief and read
+  at the source: the string shape carries "date" ("none", "date" or "instant") and "negativeZero", the text the
+  declared number type writes for minus zero on the rendering host under the view's culture; the instant shape carries
+  "from"; the number shape carries "overflow" ("infinity" for net10's double and float, "nothing" for every other
+  type and host); and each object field is a `FieldConversion` whose "nothing" is "omit" or "null", as the member's
+  JSON binding reads it. An item that converts to nothing joins a list's text as empty text, as .NET joins a null. A
+  wall time daylight saving skips or repeats takes the zone's standard offset, as .NET's GetUtcOffset gives it on
+  net10 (D3.12 cites the probe), its net48 half resting on the same API's documentation;
+  under the browser's clock the browser reads it, since the server names no zone then. The owner can overrule each.
+- The lead, 2026-11-15, on the owner's words of 2026-11-14 ("I'll go with your recommendation ... you keep bringing up
+  these issues which you can decide for yourself pretty easily. The quality must hold.") and of 2026-11-15 ("But
+  exactly wait on my direction after all this time."): a form, a wording or a harness setting no line writes, which
+  G13 sent back to the owner, is the lead's, decided from the spec, the POCs and the TLA+ specs by quality and
+  recorded as one line; only a principle, a closed rule or the scope goes to the owner, as root CLAUDE.md states.
+- The lead, 2026-11-15, closing the gap of 2026-11-12 that no door writes a list as an element's rows (X4.9):
+  X4.9's reads are written as an element's text, a list's as its items joined by a comma (`spec/Core/conversions.md`),
+  and each element a read writes starts reading unknown, since a read that stops and one that reads nothing leave an
+  empty element alike; the promise needs no row, so no door is added.
+- The owner, 2026-11-15, asked whether the analyzers that repeat a refusal where the view renders wait until after
+  1.0: "I am okay for analyzers to wait. It was to drive quality." The analyzers no unit has built wait until after
+  1.0, U11's and U13's among them; each meaning they would guard at build stays held by its refusal where the view
+  renders and its browser test, and a unit whose open pieces are such analyzers closes on its browser tests.
+- The lead, 2026-11-15, building `Concat` (N7.7): a null list of parts throws `ArgumentNullException`, as the core
+  throws for a null argument in four files, `Alis.Reactive/Validation/Checks.cs` among them; an
+  `InvalidOperationException` stays the refusal of a meaning where the view renders (2026-11-14), and a null list
+  states no meaning. A literal is judged at every depth against the contract it was written by, a member a derived
+  type adds by the discriminator it is written under; an `object` member's number is written unjudged, since its
+  JSON names no .NET type to judge it by. The owner can overrule it.
+- The owner, 2026-11-15, after the net10 defaults sent X-Requested-With: "I think I have noted before Excel clustered
+  with. If you design it correctly with the content types around HTTP standards, explain to me why you keep going
+  back to Excel clustered with" (dictated, for X-Requested-With), restating the decision of 2026-11-06
+  (`spec/NOTES.md`). No request default of the conformance app sends X-Requested-With: a request says what it takes
+  by `Accept`, from its route's content kind (D9.13), and a header every request sends is an app's own choice
+  (D9.12), which makes every request it reaches on another origin a preflighted one.
+- The owner, 2026-11-15, on P8's live form, given the lead's two options and its recommendation: "I'll go with your
+  recommendation, though I don't fully understand the context yet. But let's go with your recommendation." The live
+  form keeps the app's `RespectRequiredConstructorParameters` (`Alis.Reactive/PathsAndWire/AppJson.cs`), since the
+  setting says what the data must hold, not how a value is written: a constructor parameter live data lacks stops a
+  read through its holder, as the server's binding refuses it (D4.2, X4.10).
+- The lead, 2026-11-16, deciding U22's forms no line writes, by the line of 2026-11-15 above, from a Fable designer's
+  design read at the source. (1) U22 builds `plan.Component`, `ReactiveComponent`'s four `Reactive` and
+  `pipeline.Component` from M25.D6, and the antiforgery filter from D9.22, each proven by module tests of what it
+  writes; their browser tests land where check.py lands them. (2) `Rows<TModel, TRow>`'s members are fixed by a
+  designer from D17.15 and N17.12 before U22 builds them, proven by a module test whose helper the test project writes
+  on the public surface, as an app's would be. (3) A net48 app registers its JSON options with a startup call
+  AddReactiveJson(json => ...) on a class JsonServices in `RenderingAndDelivery`, beside the four startup calls; a
+  view reads them through MVC's resolver and is refused where it finds none, by an X line worded with the twin's
+  piece. N10.6 is this.JsonResponse(body), an extension of the action's `Controller` in a net48 file
+  JsonResponses.Net48.cs of `RequestsAndResponses`, which writes the body under those options. (4) The twin links the
+  app's views and models; a controller of a page placed on net48 has a file beside it named for its host, Net48, which
+  the twin alone compiles and the app's project leaves out; the twin holds its own layouts, which link with
+  Url.AppendVersion. (5) Visual Studio's MSBuild builds the fresh MVC 5 app (`msbuild /restore`, MSBuild found by
+  vswhere in a step of the job's own, which hands its full path to the build step, run by PowerShell: bash on the
+  Windows runner printed "msbuild: command not found" after the setup-msbuild action and again after that step put
+  the folder on the PATH: the lead, 2026-11-18, from the job's logs at af5ad37a9 and 5ed0e0a5e); the twin is SDK-style on net48 and builds
+  with `dotnet build`. (6) A script delivery.sh beside the others is the delivery proof's one command: it packs at a
+  version of the run's own, builds the fresh net10 app from the packs, and runs WhenAConsumerAppIsBuilt and the
+  browser tests under consumerNet10; `scripts/check.sh` leaves WhenAConsumerAppIsBuilt out by name. (7) A fixture
+  under two hosts carries each host as the category of its own instance. (8) One harness door opens a person's page
+  with JavaScript off. (9) M19.X2 keeps the redesign's message whole, the physical path among it, since that path
+  tells a developer where the server looked; its promise reads the message whole, the physical path built from the
+  folder the harness serves the twin from (the designer recommended dropping the path). (10) As the design writes
+  them: M19.N1's parameter is appRelativeUrl, what it holds; the net48 copy target is packed in the package's build
+  and buildTransitive folders for net48; a fresh app and the twin take the run's version through a NuGet config of
+  their own that maps the AlisReactive ids to the packs' folder and keeps the restored packages under the app's own
+  obj folder, beside an empty `Directory.Build.targets`; the twin's resolver wraps the one MVC starts with;
+  verify-net48 sets the runner's zone to UTC before the twin starts. The owner can overrule each.
+- The owner, 2026-11-19: "well fix net48 as well so we gain high confidence". Windows CI runs the written MVC 5
+  cases under IIS Express on the packed twin and the fresh consumer. Each run starts its site, waits until MVC
+  renders its readiness page and reports its own browser results and server cleanup.
+- The lead, 2026-11-16, deciding N3.5's door, a form the line of 2026-11-15 gives the lead, from a Fable designer's
+  work read at the source: `RequestTimeZone.RendersUnder` on the request's context, HttpContext on net10 and
+  HttpContextBase on net48, keeps the chosen TimeZoneInfo in the request's Items under a key of its own, and each
+  view's plan names that zone's IANA id where the view renders; a request that chooses none renders under the
+  browser's clock (D3.12). D14.1 refuses plan state carried between views on the request; the zone is the app's
+  choice for the request, as its culture is, which every view of the request reads and no view writes, so that line
+  does not reach it. A zone passed to each view would let a partial render under the clock where its argument is
+  left out. The net48 table is CLDR release-49's, pinned by its SHA-256 and written again by `scripts/check.sh`,
+  and README.md carries the Unicode License V3 notice. M18.X1's first promise runs under net10 and the twin, where
+  section 2.9 of spec/REWRITE.md places it. The owner can overrule it.
+- The lead, 2026-11-16, on Rows' members, decision (2) of the line above, from a Fable designer's design read at the
+  source; N17.12 and D17.15 state them. The core writes an action's whole handler, one call of the helper's plugin
+  with the entries and one listen on what it returns, and the helper names three members by lambda, so no helper
+  writes another step there or leaves the listen out. `RowEntry` keeps D17.15's word. A link's address writes the
+  closed set of forms D17.15 names, since a date, an instant and a fraction need what the row alone does not hold. The
+  busy target of a component a payload holds is U18's, so U24 changes no line of the core.
+- The lead, 2026-11-16, closing the gap of 2026-11-12 that M4.X2's promise needs a record whose code holds null:
+  `spec/Reference/native.json` types the record's code as text or null, the app's class still starting it at C0,
+  and the conformance library's record start gives a code as text, leaves it out, or sends it as null, so the
+  census panel holds a record its script sends with no code beside one that holds null. The owner can overrule it.
+- The lead, 2026-11-16, U23's gap G1: a render helper learns whether its member binds a list from the input field's
+  `BindsAList`, read from the shape the core's one finder gives the input, so NativeCheckList renders a list
+  member as boxes the browser submits under one name; a test of the member's C# type in the helper would send a
+  flags enum by the boxes. The shape is the live form's writing of the member's type, so a converter the member
+  names, which D7.7 keeps in the live form, does not reach it; no page binds such a member, and the first that does
+  decides it. The owner can overrule it.
+- The lead, 2026-11-16, deciding the forms of M8.F4 no line wrote, from its builder's reading of MVC and the redesign
+  at the source: a binding name's first message shows at its input, as MVC's ValidationMessageFor shows a key's first
+  error, and every message in the summary, a list hidden while it holds none; each check clears the messages of the
+  inputs it sent before it shows its own, and a check that passes shows no notice. D10.18's structured copy is what a
+  vendor or an app's plugin receives; the runtime's own plugins read what the run holds, so the run's record of each
+  input it sent keeps the table's entry, which Ownership.tla models by its generation. The owner can overrule it.
+- The owner, 2026-11-16, answering the lead's asks, verbatim: "1- Validation overal vision is super clear, so 1 must
+  work accordingly. That is the support validation on both side written once on server side with validation module. 2-
+  The IP address is lower prirority, land 99% with not supported noted. Goal is to support what browser support since
+  literally that is why we are sending to back to server wiht our module. 3- Go with more stable and high quality
+  solution with enums,its been discussed many times at this point. 4- sending -- think about user perspective, there
+  could be cases when a default needs to send, if amodel is there, send it i would say that will cover any defaults.
+  5- one refrelection read is fine. 6- priority is to ship core all modules so its high quality, and stable." Read by
+  the lead: (1) the five check operators join the closed list, emailAddress, creditCard, url, precisionScale and
+  inFlags, so a rule written once on the server runs in the browser too (U17); (2) Url() takes no shape test: the
+  browser checks by the URL Standard's parser and the server by System.Uri, and a text they part on is not supported,
+  noted in D16.10; (3) the JSON body's enum node is built (U18); (5) MemberInfo, read in
+  TypeKnowledge/WrittenMember.cs to name a payload member as C# writes it, joins the owner's list of type-information
+  reads (U20); (6) the core's modules ship first, each high quality and stable, and Fusion's units after them. (4),
+  asked again with three use cases, the owner answered, verbatim: "i think it makes sense to not send anything if
+  condition is false, server has to handle that correctly, its correct rule." So N10.4 stands as D10.16 and
+  Request.tla state it: a part a failed condition guards is left out and the endpoint binds its own default, and each
+  sent part gains the schema field its condition needs (U18); a page that must send a value either way writes it with
+  Choose. On CascadeMode.Stop in the browser, explained with its example, verbatim: "yes, i am ok with your
+  recommondation. nice one": the browser honours Stop, each later check of the rule passing where an earlier one
+  failed, written into its fn with no schema change, and X16.34's refusal of a Stop rule's later checks leaves with it
+  (U17, its own piece).
+- The lead, 2026-11-16, building the JSON body's enum node by the owner's answer (3) above, decided by quality: a
+  `json` body carries `enums`, each the member's name, its wire path and a `JsonForm` (`enum`, `flags` or `list`)
+  whose rows go from the held form, written as the query's `enum` and `flags` rows are, to the JSON its endpoint binds,
+  on net10 the member's type under MVC's `JsonOptions` and on net48 its C# name; the browser applies them in the
+  request's `guard`, where the query's stop, so a held form no row lists stops there and the check reads the held form
+  (schema.md, D9.13, X9.29). A literal enum is written in the same endpoint form. Schema.tla lists no contract field,
+  so no TLC spec changes. Two promises are reworded to the lines, by the lead: X9.20's page reads the ward from a
+  reply, the app's form, since a select's value is in the live form (D7.7, gate 1's P8), so only a source the server's
+  JSON wrote can hold two values in one form; X7.11's opposites compare the choice with Given and show a literal, since
+  a value its own converter writes is shown by the server (D7.7). The owner can overrule it.
+- The owner, 2026-11-16, answering the lead's ask to name an array in a message as C# writes it, verbatim:
+  "approved for change string[]". Read by the lead: Type.GetElementType, read in TypeKnowledge/ClassNames.cs, joins
+  the owner's list of type-information reads (U4), so a message names an array by its innermost element as C# writes
+  it, then each rank's brackets, the outermost first (D18.1); an id's scope keeps the array's Type.Name (D14.3).
+- The owner, 2026-11-17, answering the lead's ask to mark a refused check's stop in the plan, verbatim: "yes
+  approved". Read by the lead: the stop node carries its cause, a check that refused or a stop the view wrote,
+  written by the C# that writes the stop, so the runtime records a refused check as the event alis.refused and a
+  written stop as alis.stop, each with its reason (D20.4), and reads no reason's text to tell them apart; a grammar
+  change, the owner's.
+- The lead, 2026-11-17, correcting the ask above, the lead's mistake: no door writes a stop on any line (spec/api,
+  spec/Fluent, main, the redesign); a check that refused writes every stop (FormChecks.cs, RequestChecks.cs), so a
+  cause would hold one value no plan varies. No grammar change landed and the yes is unused: the stop's row says a
+  check writes it, the runtime records it as alis.refused with its reason, and alis.stop names a pipeline the page or
+  its data halts (D20.4). A door that writes a stop from a view is a new production, asked with its use case.
+- The owner, 2026-11-17, answering the lead's two asks on request shapes, verbatim: "i will go with your calls."
+  Read by the lead: a JSON list position set from a value the body leaves out when it reads nothing is refused
+  where the view renders, as a gap before a set position is (D9.7), since the endpoint would bind an item the
+  request never set; the cure, a literal or the list sent whole. A reply's read of a member the request sent in its
+  JSON body is refused where the view renders with its cure, its source or the path, query or form data: neither
+  main's ResponseBuilder nor the redesign's has a door that reads a sent member back, so no feature is lost, and
+  the plan keeps no sent body (no grammar change).
+- The owner, 2026-11-17, answering the lead's ask on the hub's client, verbatim: "yes on hub.clinet." Read by the
+  lead: a hub's plugin data carries its `waits` (D21.13) and its `client`, the versioned URL of SignalR's client,
+  which the C# writes, and the core loads that client once, when the first plan that names a hub starts, where D21.1
+  said the view links it; a page whose plans name no hub loads no SignalR client (X21.5), and a load that fails is a
+  failed try of the hub's start (Realtime.tla's Connect); a grammar change, the owner's.
+- The owner, 2026-11-17, answering the lead's ask on a container's read of a member the app's JSON options leave
+  out, verbatim: "2-yes, if its ignored ofcourse. it can not be in plan." Read by the lead: such a read stays
+  refused where the view renders, and validation reads such a member from the field the form posts under its C#
+  name, never its value from the plan.
+- The owner, 2026-11-17, answering the lead's ask on GHSA-fc5q-39xc-vjpf, which failed every landing's
+  npm audit with no patched version of picomatch published, verbatim: "Exempt by id (Recommended)". Read by the
+  lead: `scripts/npm-audit.mjs` fails on every advisory but the ones it excuses by id, and excuses one only while
+  the lock holds the latest published version of its package; once a newer version is published, or npm no
+  longer reports it, the check fails until the lock moves and the id leaves (`spec/REWRITE.md`, section 2.7).
+  An excused advisory is the owner's each time; `WhenThePackagesAreAudited` holds the rule.
+- The owner, 2026-11-17, answering the lead's ask on FusionUploader's FilesChanged, raised by the slice's code
+  through EJ2's trigger, which ej2-base 33.1.47 marks private (base.d.ts:98), verbatim: "yes, but let it be known
+  somewhere explicigt, i will revist later on why u could not find the actual event that achieve the task, their
+  file upload is quite modern". Read by the lead: the one private member a slice's code calls, held by M21.X1014's,
+  M21.X1039's and M21.X1040's tests at the pinned version, and open for the owner's revisit. What the lead read in
+  ej2-inputs' uploader.js: no public event fires once the list holds a chosen file; fileListRendering fires in
+  internalCreateFileList (:1402) before filesData takes the file (:1407), change only after a server upload or
+  removal (:1130, :2249), actionComplete only once every file's upload completes (:2306-2313), and selected,
+  removing and clearing before the list changes (D701); a listener EJ2's public addEventListener holds is notified
+  by trigger alone.
+- The owner, 2026-11-17 (verbatim in `spec/NOTES.md`): "Rewrite must apply wherever it applies. That's the point of
+  rewrite, that things become easier to maintain." Read by the lead: one pattern wherever it applies, in two pieces.
+  (1) Each slice that takes an item's member names takes them through a typed door, each member named as the plan's
+  writer names it, as FusionDropDownList's Fields names its text and value: FusionDropDownTree's fields,
+  FusionPivotView's rows and values, FusionKanban's key and card fields, FusionSchedule's event fields and a
+  FusionMultiColumnComboBox column's field, so a member that carries [JsonPropertyName] reaches EJ2 as the plan writes
+  it, with no string in the view. (2) A template condition reads a view's value, or a literal, by D6.7's reader in the
+  core, reached through ReactivePlan's public surface beside JsonPath and Json, and writes it as the plan writes the
+  item's member it is compared with: an enum its number, or its name when its type or the member carries a string
+  converter, and an ordering against a value written as text is refused as a list's lambda refuses one; Fusion holds
+  no reflection and no compiled expression of its own, and the owner's list in WhenTheCoreIsCompiled does not change.
+- The owner, 2026-11-17, answering the lead's ask 4 (X17.38), verbatim: "4- yes approved". Read by the lead: a class,
+  Append or Hidden write on a row action's control marks that control as an element, so the write works and only that
+  row's control shows busy while its request runs (D17.15, D10.21); a grammar change, the owner's; built after U26's
+  landings, with X17.38's test red first and failing on its planted defect.
+- The owner, 2026-11-17, answering the lead's ask B (an input bound to a whole object, a list of objects or a
+  dictionary), verbatim: "B - approved but note down improvement to be made." Read by the lead: such an input is
+  refused where its field renders, naming the doors that carry it (an input per member, `Html.PartialFor(m => m.Member)`,
+  or `Set` from the component in a JSON body); InputShapes.Of's last arm refuses, after the uploader's file arm lands.
+  The improvement to be made, after 1.0, from the investigation of 2026-11-17 (complex/reply.md, part C): an input whose
+  value is an object, a list of objects or a dictionary, sent in a query or form data as MVC binds it
+  (`Location.Lat=..`, `Items[0].Name=..`, `Doses[morning]=..`). Five pieces: a wire form in the grammar for an object's
+  fields (JSON name, C# name, form; a list's item and a dictionary's value as one); the C# writer naming each field's C#
+  name on both hosts (a second use of the type-information read on the owner's list, WrittenMember.cs); the runtime's
+  fields with D9.10's rows nested; Validation showing a failure under the input's path at that input and re-checking it
+  live; probes and browser tests on both hosts (a dictionary of objects, a key holding a dot or a bracket, empty list and
+  dictionary, MVC 5's short form, number, enum and Guid keys). Its trigger: an app that brings such a component.
+- The owner, 2026-11-17, on unit 3, a shape kind `enum` for `as`, the grammar production its design asks for, verbatim:
+  "Okay, I'll go with your recommendation. Hopefully you have thought through the use cases where it is necessary.
+  Don't lower the quality or bring stuff because you have short-sighted." Read by the lead: yes to the one
+  production; the case list is settled before the build (the design's cases, checked by a read-only Codex
+  inspection, each re-read at the source), and nothing is cut to land sooner. A source in the app's form set into a
+  live object carries `as(value, enum)` wherever the two forms write an enum otherwise, the rows read from each
+  form's own writing (D7.7, D3.13, X7.20); D19.2 closes the set at 53, and `spec/Schema/Schema.tla` holds `enum`
+  among its shape kinds, one handler.
+- The owner, 2026-11-18, answering the lead's ask on what an element's text shows for an enum, unit 3 as built having
+  shown its number, since D7.7 counts an element's text a live write, verbatim: "Yes, I agree with the enum. If there
+  is an intact ad, we'll see it later. Let's get back to the framework. So ship it." Read by the lead ("intact ad"
+  is the dictation's rendering of "impact"): yes to the lead's recommendation. An enum set as an element's text or
+  HTML shows the name the app's JSON writes, as before; the mapping to the live form is for a live object's members
+  and for a method's or a plugin's arguments (D7.7, X7.20). Then the piece lands.
+- For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
+  not apply, and the matrices are an upfront grid by the owner's decision.
+- Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
+  an agent's draft is a lead until its cites are re-read at the source.
+- The owner, 2026-11-18, after the lead reported that the hook a compaction runs printed a file of the lead's private
+  folder (verbatim in `spec/NOTES.md`): "It shouldn't be reading your private files, sir." It reads inside the repo:
+  "That's not the right way." And of the process: a "state machine, so that it is crystal clear". So nothing
+  a session reads to resume lives outside the repo: `HANDOFF.md` is the handoff, the tracked `.claude/settings.json`
+  holds the hook that prints it after a compaction, and the survival check reads both. The process is one state
+  machine, the table of `.claude/rules/process.md`, which `scripts/state.py` reads as its data: each state, what
+  holds in it, what is read first, the one command that leaves it, its exit line and where a failure goes. The
+  lead's line within it, the owner's to change: the lane's scripts leave a changed `HANDOFF.md` alone, so its queue
+  is edited while a unit lands and goes out with the next push.
+- The owner, 2026-11-18, of that machine (both verbatim in `spec/NOTES.md`): "Is there a mistake read part of the state
+  machine? How it gets logged, how it gets read, what is read by you, what is read by agents, is there any
+  difference? Document that whole process", and "If you are handing out work to agents, have it that as a part of the
+  state machine. Is the scope and the outcomes defined? Definition of done is clear. And then when it returns work,
+  what is the steps?" So a unit's landing folder holds the files the machine reads: "brief.md" before any work, its
+  six parts Scope, Rules, Outcome, Done, Commands and Reply, the one thing an agent is handed beside its definition and the
+  lead's own for a unit of its own; an agent's "reply.md"; and the lead's "read.md", its steps when work returns,
+  ending in a verdict to land, to send back or to drop. `scripts/land-unit.sh` lands a unit only while the script
+  reads it as ready. A mistake is logged on a failure and at a return, one count in its kind, and read at every
+  start, where the hook prints each kind with its count; `HANDOFF.md` lists each kind that grew since the last push.
+  The process file states who reads what, the lead, a Claude agent and Codex, and what shows it.
+- The owner, 2026-11-18, the same hour (verbatim in `spec/NOTES.md`): "What other steps are missing? How about quality
+  rules? Do they matter to you? how my nodes are gonna be followed up, how you're gonna apply them to quality rules if
+  they belong to it, where you're gonna keep the decisions. So it cannot be one bulky file. So state machine has to be
+  accurate and optimized, not a hellhole." So the machine names each step that was missing. A note of the owner's is
+  an entry of the notes block of `HANDOFF.md` the turn it arrives, with its kind, its home and its follow-up, and the
+  script prints one that lacks any; a quality rule's home is the rule file of its kind of file and a tool on its
+  rung. A brief names, under "Rules", the rule files and the decisions its unit reads. CI's jobs at the pushed
+  commit are a state, read by `scripts/ci.py`. Each file a reader is given has one job and a limit of lines, and
+  the script prints one that is over: this file among them, 2,000 lines whose newest decisions the harness does
+  not show a reader, so its decisions are split by module, word for word, by the unit that follows this one.
+- The owner, 2026-11-18, on the machine as built (verbatim in `spec/NOTES.md`): the mistakes are condensed past a
+  threshold "so that LLMs can comply with it"; "The quality rules must be read"; "TLA plus is the central piece, but
+  don't waste time in process and get nothing done"; "Leave some room for agents to work and for yourself to work";
+  "If it doesn't work in the state machine, then change it. Don't wait for my commands as long as it doesn't lower
+  the quality of the framework"; and of a fault in an agent's work, "clearly you gave a task and you didn't give the
+  instructions. If that happens, that's on you", and it goes into the process. So: `spec/MISTAKES.md` has a
+  limit of lines and of ten kinds, and past it a unit condenses it; a brief's "Rules" name, by path, the rule
+  files, the decisions and the TLA+ spec of each ordering its unit meets, and the script reads a brief that names
+  no file the repo holds as unbriefed; the machine holds the hand-offs alone and adds no step that proves nothing;
+  the lead re-evaluates the machine when ten units have landed since it changed, or when a state fails the work,
+  and changes it without waiting for the owner, never lowering the framework's quality bar; and a fault in
+  returned work is held against the brief first, the lead's mistake where the brief did not give the instruction,
+  with the missing line added to the process file, the agent's definition or the rule file that owns it.
+- The owner, 2026-11-18, after a unit's delivery proof stopped before its browser step (verbatim in `spec/NOTES.md`):
+  "the browser never ran because your process was wrong ... Get it into the process." Mistakes are to be few. The
+  unit had been built on a base where its own proof command was red for a cause another unit fixes. So a brief's
+  "Done" holds a line "At the base:", what each proof command printed at the base before any work, and the script
+  reads a brief without it as unbriefed; a unit whose command is red there for a cause outside it names the unit
+  that fixes the cause on a line "After:", is read as waiting, and is landed only once that unit has landed and its
+  own proof has run on the new head.
+- The owner, 2026-11-18, on the machine as the lead had written it, one table with sentences around it and checks
+  hidden in its script (verbatim in `spec/NOTES.md`): "I thought you were doing state machine. You are back to writing
+  plain instructions again." So `.claude/rules/process.md` is tables alone: six tracks whose rows are states in the
+  order they are tested, each with its guard by name, what is read first, the command that leaves it, its exit line,
+  the state it goes to and where a failure goes; and one table that says what the script checks for each guard.
+  `scripts/state.py` interprets those tables, runs each guard by the function of its name, and stops where a guard
+  stands on one side alone. A rule of the process is a row or a guard, never a sentence beside the table.
+- The owner, 2026-11-18 (verbatim in `spec/NOTES.md`): "I want you to build a skill out of that TLA plus and schema,
+  which will be used by every consumer as well", and of what it is, "a guiding principle for any developer to write any
+  complex app by simple decisions, because it has a map, right? It has clear names, right?" The skill is
+  `.claude/skills/build-a-screen/SKILL.md`: a decision map, section by section a question a developer asks, each
+  answered by one door as the PublicAPI text names it, the meaning that decides between two doors, the TLA+
+  invariant that fixes an ordering and a landed view that shows it. It holds no feature of any one app and no list
+  of combinations, which are an app's own spec. Its examples are copied whole from views a browser test runs.
+- The owner, 2026-11-18, on README's first example and both fresh apps' home views (verbatim in `spec/NOTES.md`):
+  "Dude, why would you use dynamic? The whole point of the framework is tight, and you end up using dynamic. What a
+  pity." A plan's model is a class the app wrote, the view's `@model`, never `dynamic` and never `object`: every door
+  after `Html.ReactivePlan<TModel>()` is typed by it. `.claude/rules/views.md` states it; the fresh apps' home page
+  has a model of its own, Welcome, and README shows it. An analyzer that refuses a plan opened over `dynamic` or
+  `object` is the rung that holds it in an app's build, and is the unit that follows.
+- The owner, 2026-11-18, on the app that proves the framework as an app uses it (verbatim in `spec/NOTES.md`): "you
+  have to first list down every feature the app will have", then "I did not iterate complete set of features ...
+  you have specs, you have TLA+". The move-in app's only spec is `spec/Reference/move-in.md`: its domain and literal
+  seed, its endpoints, its screens, its features MI.1 to MI.31 by their interactions, its validators and five
+  situations a feature, derived from the door map, the rule grammar, the schema and the TLA+ specs, never from a
+  list of the owner's examples. A unit of the app builds its features from that file, proves each situation by a
+  browser test that reads what the model holds after and at the next read, and adds to the file's ninth part each
+  place the source won over it and each gap it met. What the owner reads of the app is each behavior named as
+  proven or not proven, never a count ("I need that complex app behavior asserted and proved").
+- The owner, 2026-11-17 and 2026-11-23 (verbatim in `spec/NOTES.md`): the seven operators no C# writes, `add`, `sub`,
+  `mul`, `mod`, `neg`, `finite` and `merge`, leave the grammar so the framework reaches 1.0. The table "After 1.0" of
+  `spec/NOTES.md` holds each, what the rewrite writes in its place and what brings it back: an arithmetic operator
+  returns with .NET's meaning for each number type, as the sums are written (D6.11), through `spec/Schema/Schema.tla`'s
+  `Operators` first.
+- The owner, 2026-11-24 (verbatim in `spec/NOTES.md`), to the design of an input's binding in the plan, put as one
+  family with its model run under TLC: "yes to both - please re-orient on quality to make this change, quality can
+  not be lowered". The two decisions: `sent`, the bug fix, in which `InputBinding` carries the form its input is
+  sent in and the request's table of forms leaves; and the split of its `value` into `converted` and `blank`. They
+  land smallest first, each to the full bar: the check of a text or file body, which D16.5 states and no decision
+  needs (X16.46); the writer's move, with `as` writing its own kind and the plan's bytes unchanged; the split; then
+  `sent`.
+- Chosen within the owner's yes, 2026-11-24, building `sent` from its consult's read: a start the field's form cannot
+  write, an enum's that no value names or a date's, is left out while the input holds it, by the binding's
+  `whenBlank`, since an empty field binds a nullable member null where the approved meaning binds the start; an enum
+  input's rows are what its component's value holds (text: the C# name, the number as text and the live form's text;
+  the enum: its live form), matched exactly as every enum shape is, so another casing of a C# name, which both hosts
+  bind, reads the start; a list input whose item reads nothing where the item admits none stops the container's read
+  with its send (`ContainerRead.tla`, ItemNothingStopsTheSendAlone). The owner can overrule each.
+
+## Modules
+
+The owner, 2026-11-05: "The modules are close to right", with requests and responses as one module. Each
+module's folder is its name in PascalCase. A core module's C# is in Alis.Reactive and its browser code in
+Alis.Reactive.Assets.
+
+| # | Module | Who sees it | What it owns | Questions |
+|---|--------|-------------|--------------|-----------|
+| 1 | Triggers and pipelines | view author | on load, on an event, declared app events, dispatch, the steps a pipeline runs | Q11 |
+| 2 | Values and sources | view author | the one read, literals, the one conversion, every source at every value position, the page's URL | Q2, Q3, Q7 |
+| 3 | Conditions | view and validator author | one condition core behind the pipeline, validator and template doors | Q8 |
+| 4 | Array lambdas | view author | Where, Select, Any and the rest over items with dotted members | Q6 |
+| 5 | Elements | view author | an element's text, HTML, classes and attributes, by id | Q4 |
+| 6 | Requests and responses | view author | the typed request; the response, its status, its body and how the browser decodes it, the error body per host; the flow: success, error, chained, parallel, loading, finally, into | Q9, Q10 |
+| 7 | Inputs and ids | view author | an input bound to a member under MVC partials, and the refusals at render | Q14 |
+| 8 | Validation | validator author | a rule written once, the server's verdict and the browser's rule in agreement, registration through dependency injection | Q16 |
+| 9 | Partials and slots | view author | plan composition by plan id, slot load and unload | Q12, Q14 |
+| 10 | Realtime | view author | server-sent events and SignalR on net10 only: holds, lifecycle triggers, typed messages, the hub's own asset | Q5, Q11, Q21 |
+| 11 | Declarations | component author | the live-object and data vocabulary, and which members are required | Q5 |
+| 12 | Vendors | component author | vendor data, the one driver, mount and unmount, the bridge to a component's browser code | Q17 |
+| 13 | Plugins | component author | the escape hatch: a plugin by name with typed members | Q7 |
+| 14 | Schema | internal | the closed node set of the plan grammar and the generated TypeScript contract | Q19 |
+| 15 | Paths and wire | internal | the typed path step, a member's four names, encoding and dates per host | Q1, Q2, Q3 |
+| 16 | Type knowledge | internal | members, shapes, item types and defaults, without reflection | Q18 |
+| 17 | Execution | internal | the evaluator, lanes and time, boot | Q4, Q11 |
+| 18 | Ownership and state | internal | the page, a plan and a slot, what each holds, dispose, where state lives | Q12, Q13 |
+| 19 | Rendering and delivery | host | rendering a plan, assets by content hash, the net48 and net10 host splits | Q14 |
+| 20 | Analyzers | build | the ALIS rules, and the new rules for reflection and vendor contract drift | Q18 |
+| 21 | Fusion components | built on the core | the Syncfusion slices, with the reference FusionMultiSelect | Q17 |
+| 22 | Fusion templates | built on the core | the Syncfusion template engine and its conditionals | Q15 |
+| 23 | Fusion app-level objects | built on the core | FusionConfirm and FusionToast | Q11 |
+| 24 | Native components | built on the core | the plain-DOM components, with the native reference | Q17 |
+| 25 | Native app-level objects | built on the core | NativeDrawer, NativeLoader, NativeConfirm, NativeToast and the action link, the framework's own, styled by the app | Q11, Q17 |
+| 26 | Tracing | view author and operator | the diagnostics port, the plan's trace context, spans and events by a closed vocabulary, propagation to the server, the server's activity source, the OpenTelemetry adapter built on the port | Q20 |
+
+## Files
+
+| File | What it holds | Written by |
+|------|---------------|------------|
+| `spec/BRIEF.md` | the session brief, with the owner's corrections | the owner's words |
+| `spec/NOTES.md` | one entry per decision, fact or owner answer, two lines at most, with its evidence | appended by hand |
+| `spec/MISTAKES.md` | the kinds of mistake, ten at most, each with what stops it | a row by hand, the turn a new kind is met |
+| `spec/tools/check.py` | every check the brief's section 1 names, and a brief mode for the compact hook | hand |
+| `spec/STATE.json` | the phase, the step, each check's result and counts, the next action | `spec/tools/check.py` only |
+| `spec/Elements/module.md`, one per module folder, named as the module table names it in PascalCase, hyphens dropped | the core questions the module uses; its doors, "M5.N1" for module 5's first, each with what it replaces, and each core door it keeps, so every core door is named by a module; the improvements it proposes, each with its evidence; every cite at the SHA it names ("at 623dd4a27"), or at HEAD, the redesign or main when it names none | hand |
+| `spec/Elements/features.json`, one per module folder | one entry per feature, "M5.F1" for module 5's first: its declaring types as "package:type"; the doors of another type it claims, as a module claims its entry doors on the pipeline builder; its sentences of main and the redesign, each found at the lines it cites at its line's SHA, and the proposed ones with their doors; its schema nodes; the C# that writes it and the runtime that executes it, each cite tagged with its line, and the redesign's at the State SHA wherever the feature is the redesign's; its core questions; its own meanings, "M5.D1", only where no core answer gives one; its oracle; its checker, "core:Q4" or a checked TLC invariant; its defects, a core "X7.8" or its own "M5.X1", each with its rung, every core defect in exactly one feature; a promise for each refusal and behavior defect, one for each place its line names; its status, by the lines its doors are on, or internal for a feature of an internal module that owns no door, or new for a feature of any other module that owns no door, one of whose sentences names a door its module.md's Doors section marks new; and a verdict for each main-only door: kept, renamed to doors, or refused with its reason and its carriers, each a core or module door | hand; the six feature checks of `spec/tools/check.py` read it |
+| `spec/Reference/matrix.json`, `spec/Reference/syncfusion.json`, `spec/Reference/native.json` | the conformance matrix: BRIEF.md section 8's bullets word for word, one cell per item, each with the D and X lines it rests on, the schema kinds its run writes and whether it runs or is refused; for every cell, FusionMultiSelect's member by its line in EJ2's installed TypeScript declarations, or the scan that finds none, and the cells MultiSelect tests as its own, each with the reason Syncfusion's onboarding needs it; and the conformance library's declarations, ConformanceComponent and the five beside it, each component's vendor in D17.3's closed sets, their types, members and versions, with the member path that runs each cell | hand; the matrix check of `spec/tools/check.py` reads them |
+| `spec/REWRITE.md` | the repository the rewrite builds and its units, each with its features | hand; the rewrite check of `spec/tools/check.py` reads it |
+| `spec/Reference/app.json` | the care home conformance app: its areas, harness verbs, part kinds and hosts; each screen with what a user does there and its parts, the Syncfusion ones on a page under it; and the screen, hosts, parts and harness verbs of every feature test and every cell test | hand; the app check of `spec/tools/check.py` reads it |
+
+## How a step runs
+
+A spec unit closes the loop of root CLAUDE.md's Spec-first section: re-read the step's section of `spec/BRIEF.md`,
+change it, append what was decided to `spec/NOTES.md`, commit by path, run `python3 spec/tools/check.py` at that head,
+and push the spec branch the one way section 16 of the brief allows, then `spec/STATE.json` as that run wrote it.
+A plant names the text it replaces, so a commit that rewrites a line of the spec moves the anchor of each plant that
+names it in the same commit, and the plants of the checks that read the line run before the full check (the lead's
+mistakes, 2026-11-11).

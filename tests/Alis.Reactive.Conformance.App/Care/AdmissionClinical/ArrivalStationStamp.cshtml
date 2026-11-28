@@ -1,0 +1,61 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalStationStamp
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Transport handover stamp";
+    var plan = Html.ReactivePlan<ArrivalStationStamp>();
+}
+<h1>Transport handover stamp</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("EEE, MM/dd/yyyy HH:mm:ss")))
+</fieldset>
+@(Html.NativeButton("use-transport-words", "Use transport words")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        var words = date.MaskPlaceholder;
+        words.DayOfTheWeek.Set("service weekday");
+        words.Month.Set("transfer month");
+        words.Day.Set("transfer day");
+        words.Year.Set("transfer year");
+        words.Hour.Set("departure hour");
+        words.Minute.Set("departure minute");
+        words.Second.Set("departure second");
+        date.EnableMask.Set(true);
+        date.DataBind();
+        date.Refresh();
+        var guidance = words.DayOfTheWeek.Eq("service weekday").And(words.Month.Eq("transfer month")).And(words.Day.Eq("transfer day")).And(words.Year.Eq("transfer year")).And(words.Hour.Eq("departure hour")).And(words.Minute.Eq("departure minute")).And(words.Second.Eq("departure second"));
+        pipeline.When(date.EnableMask.And(guidance))
+            .Then(pipeline => pipeline.Element("stamp-guide").Text.Set("Transcribe the departure stamp"));
+    }))
+@(Html.NativeButton("use-facility-words", "Use facility words")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        var words = date.MaskPlaceholder;
+        words.DayOfTheWeek.Set("ward weekday");
+        words.Month.Set("ward month");
+        words.Day.Set("ward day");
+        words.Year.Set("ward year");
+        words.Hour.Set("arrival hour");
+        words.Minute.Set("arrival minute");
+        words.Second.Set("arrival second");
+        date.EnableMask.Set(true);
+        date.DataBind();
+        date.Refresh();
+        var guidance = words.DayOfTheWeek.Eq("ward weekday").And(words.Month.Eq("ward month")).And(words.Day.Eq("ward day")).And(words.Year.Eq("ward year")).And(words.Hour.Eq("arrival hour")).And(words.Minute.Eq("arrival minute")).And(words.Second.Eq("arrival second"));
+        pipeline.When(date.EnableMask.And(guidance))
+            .Then(pipeline => pipeline.Element("stamp-guide").Text.Set("Transcribe the arrival stamp"));
+    }))
+<p><output id="stamp-guide" aria-label="Stamp guide">Choose the stamp vocabulary</output></p>
+@Html.RenderPlan(plan)

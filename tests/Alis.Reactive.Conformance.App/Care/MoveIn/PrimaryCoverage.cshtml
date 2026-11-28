@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@inject MoveInReads Reads
+@model CoverageInput
+@{
+    var plan = Html.ReactivePlan<CoverageInput>();
+}
+@(Html.InputField(plan, m => m.PolicyNumber, o => o.Label("Primary policy number")).NativeTextBox())
+@(Html.InputField(plan, m => m.Provider, o => o.Label("Primary provider")).NativeTextBox())
+@(Html.InputField(plan, m => m.ContributionPercent, o => o.Label("Primary contribution percent")).NativeTextBox())
+<fieldset><legend>Primary coverage starts</legend>
+    @(Html.InputField(plan, m => m.StartsOn).ConformanceComponent(Reads.DayPicker("Primary coverage starts", Model.StartsOn, Model.EndsOn)))
+</fieldset>
+<fieldset><legend>Primary coverage ends</legend>
+    @(Html.InputField(plan, m => m.EndsOn).ConformanceComponent(Reads.DayPicker("Primary coverage ends", Model.EndsOn, Model.StartsOn)))
+</fieldset>
+@Html.RenderPlan(plan)

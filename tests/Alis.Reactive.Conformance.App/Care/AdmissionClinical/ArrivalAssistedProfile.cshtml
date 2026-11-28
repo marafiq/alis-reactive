@@ -1,0 +1,46 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalAssistedProfile
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Saved admission access";
+    var plan = Html.ReactivePlan<ArrivalAssistedProfile>();
+}
+<h1>Saved admission access</h1>
+<style>
+    .signed-intake { opacity: .8; }
+    .assisted-intake { font-size: 1.1rem; }
+</style>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd")
+            .Placeholder("Referral date")
+            .FloatLabelType(Model.Alternate ? Syncfusion.EJ2.Inputs.FloatLabelType.Always : Syncfusion.EJ2.Inputs.FloatLabelType.Auto)
+            .Start(Model.Alternate ? Syncfusion.EJ2.Calendars.CalendarView.Month : Syncfusion.EJ2.Calendars.CalendarView.Year)
+            .Depth(Model.Alternate ? Syncfusion.EJ2.Calendars.CalendarView.Month : Syncfusion.EJ2.Calendars.CalendarView.Year)
+            .Enabled(!Model.Alternate).Readonly(Model.Alternate).OpenOnFocus(!Model.Alternate)
+            .ShowClearButton(!Model.Alternate).ShowTodayButton(!Model.Alternate)
+            .EnableRtl(Model.Alternate).CssClass(Model.Alternate ? "signed-intake" : "assisted-intake")))
+</fieldset>
+@(Html.NativeButton("review-saved-access", "Review saved access")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FocusIn();
+        var assisted = date.Enabled.And(date.Readonly.Not()).And(date.OpenOnFocus).And(date.ShowClearButton).And(date.ShowTodayButton);
+        var signed = date.Enabled.Not().And(date.Readonly).And(date.OpenOnFocus.Not()).And(date.ShowClearButton.Not()).And(date.ShowTodayButton.Not());
+        pipeline.When(assisted.And(date.CssClass.Eq("assisted-intake")).And(date.EnableRtl.Not()))
+            .Then(pipeline => pipeline.Element("access-instruction").Text.Set("Choose a month for the admission"))
+            .ElseIf(signed.And(date.CssClass.Eq("signed-intake")).And(date.EnableRtl))
+            .Then(pipeline => pipeline.Element("access-instruction").Text.Set("Consult the signed transfer"));
+    }))
+<p><output id="access-instruction" aria-label="Access instruction">Review not started</output></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RadioWardAdaCard
+@{
+    var plan = Html.ReactivePlan<RadioWardAdaCard>();
+    plan.Plugin<CardRadio>().Reactive(radio => radio.Call, pipeline => pipeline.Element("card-heard").Text.Set("Ada's card heard the call"));
+}
+<h2>@Model.Name</h2>
+<button type="button" @Html.Raises(plan, RadioWardButtons.PutAdasNotesAway)>Put the notes away</button>
+<section id="ada-notes" aria-label="Notes">
+    @await Html.PartialAsync("/Care/Record/RadioWardAdaNotes.cshtml", Model.Notes)
+</section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RadioWardButtons.PutAdasNotesAway, pipeline => pipeline.Unload("ada-notes")));
+}
+@Html.RenderPlan(plan)

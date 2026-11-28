@@ -1,0 +1,475 @@
+{
+  "module": "Elements",
+  "features": [
+    {
+      "id": "M5.F1",
+      "summary": "An element found by the id the view gave it: its text and HTML set to a literal or a source, its classes added, removed and toggled, shown and hidden, and its children and classes read as lists.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:HtmlElement",
+        "Alis.Reactive:ElementContent",
+        "Alis.Reactive:ElementClassList",
+        "Alis.Reactive:ChildElement",
+        "Alis.Reactive:ElementBuilder<TModel>"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Element(string! elementId) -> ElementBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Element(string! elementId) -> HtmlElement!",
+        "Alis.Reactive:PipelineBuilder<TModel>.FromDom(string! elementId, string! member) -> ReactiveArray<string!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.FromDom<TElement>(string! elementId, string! member) -> ReactiveArray<TElement>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "p.Element(\"dom-total-classes\").SetText(p.FromDom(\"dom-card\", \"classList\").Count());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:12"
+        },
+        {
+          "line": "main",
+          "text": "p.Element(\"dom-high-risk-count\").SetText(p.FromDom<DomChild>(\"risk-list\", \"children\").Count(x => x.GetAttribute(\"data-risk\") == \"high\"));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:22-23"
+        },
+        {
+          "line": "main",
+          "text": "p.Element(\"dom-card\").AddClass(\"risk-extra\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:30"
+        },
+        {
+          "line": "main",
+          "text": "then.Element(\"dom-memory-yes\").Show()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:18"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element($\"{table}-seated\").Text.Set(seats.Count());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:26"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element($\"{table}-close-supervision\").Text.Set(seats.Count(seat => seat.GetAttribute(\"data-supervision\") == \"close\"));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:27"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element($\"{table}-risk-count\").Text.Set(flags.Where(flag => flag.StartsWith(\"risk-\")).Count());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:18"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element(table).ClassList.Add(\"risk-fall\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:40"
+        },
+        {
+          "line": "redesign",
+          "text": "other.Element($\"{table}-memory-care\").Hide()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:34"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4-seated\").Text.Set(pipeline.Element(\"table-4-seats\").Children.Items.Count());",
+          "doors": [
+            "M5.N5",
+            "M5.N1",
+            "M5.N3",
+            "N5.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4-close-supervision\").Text.Set(pipeline.Element(\"table-4-seats\").Children.Items.Count(seat => seat.GetAttribute(\"data-supervision\").Eq(\"close\")));",
+          "doors": [
+            "M5.N3",
+            "M5.N4",
+            "N8.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4-risk-count\").Text.Set(pipeline.Element(\"table-4\").Classes.Items.Count(flag => flag.StartsWith(\"risk-\", StringComparison.Ordinal)));",
+          "doors": [
+            "M5.N1",
+            "M5.N2",
+            "N5.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4\").Classes.Add(\"risk-fall\");",
+          "doors": [
+            "M5.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4-memory-care\").Show();",
+          "doors": [
+            "M5.N1"
+          ]
+        }
+      ],
+      "nodes": [
+        "set",
+        "do",
+        "let",
+        "if",
+        "call",
+        "get",
+        "op",
+        "lit",
+        "ref",
+        "fn",
+        "obj",
+        "element"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:52-73"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Reactions/Steps.cs:133-140"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:106-110"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/ElementBuilder.cs:31-147"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Arrays.cs:50-59"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:35-48"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/operators.ts:86-93"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:154-190"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/values/array-op-engine.ts:107-115"
+        }
+      ],
+      "core": [
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q12",
+        "Q17"
+      ],
+      "meanings": [],
+      "oracle": "The HTML standard's textContent, innerHTML, classList, hidden, children, getAttribute and hasAttribute, as lib.dom types them in TypeScript 6.0.3, where hidden is boolean | \"until-found\", which the element's declaration mirrors (D5.3).",
+      "checker": [
+        "core:Q4",
+        "core:Q5",
+        "core:Q6",
+        "core:Q7",
+        "core:Q12",
+        "SlotHolds.tla:AStepOverANamedSlotThatHoldsContentStops",
+        "SlotHolds.tla:AStepOverANamedSlotThatHoldsNoneStops",
+        "SlotHolds.tla:AStepOverContentInASlotNoPlanNamesStops",
+        "SlotHolds.tla:AStepOverAnElementHoldingAHeldSlotStops",
+        "SlotHolds.tla:OnlyAHeldSlotStopsAStep",
+        "SlotHolds.tla:AStepOverWhatAStepAddedWrites"
+      ],
+      "defects": [
+        {
+          "id": "X7.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.56",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.15",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X12.12",
+          "rung": "behavior"
+        },
+        {
+          "id": "M5.X1",
+          "rung": "behavior",
+          "defect": "A note hidden by Hide shows again after Show, and a step on an element the page lacks stops its pipeline, so the step after it does not run (D4.1)."
+        },
+        {
+          "id": "M5.X2",
+          "rung": "behavior",
+          "defect": "A seat's GetAttribute reads null for an attribute the seat lacks, a value: Eq(\"close\") does not hold over it and NotEq(\"close\") does (D8.9); and HasAttribute holds for an attribute with no value."
+        },
+        {
+          "id": "M5.X3",
+          "rung": "behavior",
+          "defect": "A text set from a value that reads nothing, an optional member its holder lacks (D5.3), shows nothing, and the step after it runs (D4.5)."
+        },
+        {
+          "id": "M5.X4",
+          "rung": "behavior",
+          "defect": "An append of a value that reads nothing, a payload's member when no payload was raised (D4.2), adds nothing to the content, and the step after it runs (D7.6, D4.5)."
+        },
+        {
+          "id": "M5.X5",
+          "rung": "behavior",
+          "defect": "An append adds its value after what the element holds and removes nothing (M5.N1): over a held slot it adds where a set stops, and the slot's content and its plan stay (D12.9); a slot that holds only what a step added is held by no one, so a set writes over it; what a step added to a slot leaves at that slot's unload (D12.4); and a value a person typed and a handler inside the element stay."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X7.8",
+          "page": "A record card with its class list and a summary panel.",
+          "gesture": "Click add, remove, toggle twice, then the toggle whose name reads nothing, then load the summary.",
+          "outcome": "The card holds the class after add, loses it after remove, gains and loses it on the two toggles, and keeps its classes when the name reads nothing; the summary shows its markup.",
+          "opposite": "HTML set from a value that reads nothing leaves the panel empty, where the text undefined would show.",
+          "defect": "classList.add(null) adds the class null, and innerHTML set to undefined shows undefined."
+        },
+        {
+          "for": "X6.56",
+          "page": "Lunch seating: two table cards, each with a seat list whose seats carry data-supervision, and a fall risk button.",
+          "gesture": "Open the page, then click the fall risk button of table 4.",
+          "outcome": "Table 4 shows 4 seated and 2 needing close supervision, and its flag count rises by one after the click.",
+          "opposite": "A station whose list holds a paged result stops at the count, and the text the step after it sets keeps its text.",
+          "defect": "An operation that calls filter on an HTMLCollection stops, or a count over a value with no iterator shows 0."
+        },
+        {
+          "for": "X12.12",
+          "page": "A card loaded into a slot, with a button that sets the slot's text.",
+          "gesture": "Load the card, then click the button.",
+          "outcome": "The step stops with one error that names the slot, and the card stays as it was loaded.",
+          "opposite": "Once the card's plan leaves and the slot holds no content a load or the server put there, the same button sets the text.",
+          "defect": "A text write over a slot leaves the loaded card's behavior running under content it no longer shows."
+        },
+        {
+          "for": "X12.12",
+          "page": "The shift tray: the tray's tools, loaded into the tray, with Clear the tray, whose step sets the tray's status to Clearing, then the tray's text, then the status to Tray cleared, and Mark the shift, whose step sets the text of the tools' shift note, which holds no slot.",
+          "gesture": "Open the tray, then click Clear the tray.",
+          "outcome": "The step stops with one console error: the status reads Clearing and the tools stay as they were loaded.",
+          "opposite": "Mark the shift shows Shift marked in the shift note, with no console error.",
+          "defect": "A card's step over the slot it was loaded into is not held, so the tray shows Cleared, its tools are gone and the status reads Tray cleared."
+        },
+        {
+          "for": "X12.12",
+          "page": "The team board: the board's tools, loaded into a slot inside the board, with Clear the board, whose step sets the board's status to Clearing, then the board's text, then the status to Board cleared, and Clear the noticeboard, whose step sets the text of the noticeboard, which holds no slot.",
+          "gesture": "Open the board's tools, then click Clear the board.",
+          "outcome": "The step stops with one console error: the status reads Clearing and the tools stay inside the board.",
+          "opposite": "Clear the noticeboard shows Noticeboard cleared, with no console error.",
+          "defect": "A step over an element is checked against the element alone, so the board's text replaces the slot inside it and its tools, and the status reads Board cleared."
+        },
+        {
+          "for": "X12.12",
+          "page": "The visit desk: the desk's tools, loaded into the desk, whose plan loads a visit into the visit note, a slot outside the desk, and Mark no visit, whose step sets the desk's status to Marking, then the visit note's text, then the status to Marked.",
+          "gesture": "Open the desk, then click Mark no visit.",
+          "outcome": "The step stops with one console error: the status reads Marking and the visit note stays empty.",
+          "opposite": "Once the desk is closed, the same click shows No visit today in the visit note and Marked in the status, with no console error.",
+          "defect": "A slot a live plan names that holds nothing is not held, so the visit note shows No visit today while the tools that load it are open."
+        },
+        {
+          "for": "X12.12",
+          "page": "The night log: the log's tools, loaded into the log desk, whose plan loads an entry into the entry slot outside the desk and unloads it, and Mark no entry, whose step sets the log's status to Marking, then the entry slot's text, then the status to Marked.",
+          "gesture": "Open the desk, load the entry, close the desk, then click Mark no entry.",
+          "outcome": "The step stops with one console error: the status reads Marking, the entry stays, and its Acknowledge still shows Acknowledged.",
+          "opposite": "Opening the desk again and closing the entry before the desk closes, the same click shows No entry tonight and Marked, with no console error.",
+          "defect": "Content a load put in a slot is held only while the plan that loaded it lives, so closing the desk lets the click replace the entry."
+        },
+        {
+          "for": "M5.X1",
+          "page": "A note with Show and Hide buttons, and a button whose step sets text on an element the page lacks before it sets the status.",
+          "gesture": "Click Hide, then Show, then the button with the missing element.",
+          "outcome": "The note hides, then shows; the status keeps its text after the third click.",
+          "opposite": "Show on a note that already shows leaves it showing.",
+          "defect": "A step on a missing element writes nothing and the pipeline runs on, so the status changes."
+        },
+        {
+          "for": "M5.X2",
+          "page": "A table of four seats: two with data-supervision close, one with standard, one with no data-supervision, and one seat holding data-wheelchair with no value.",
+          "gesture": "Open the page.",
+          "outcome": "Close supervision shows 2, not close shows 2, and wheelchair seats show 1.",
+          "opposite": "A count of seats holding data-hoist, which no seat holds, shows 0.",
+          "defect": "GetAttribute's null read as nothing, so not close shows 1, or HasAttribute reading a valueless attribute as absent, so wheelchair seats show 0."
+        },
+        {
+          "for": "M5.X3",
+          "page": "The care panel, the resident record's ConformanceComponent, whose two buttons raise Raised from its own JavaScript, its payload declaring OptionalText optional: No text with a payload that lacks the optionalText member, and Ward round with the optional text Ward round. The handler sets the first status from the payload's OptionalText, then sets the second status to Saved.",
+          "gesture": "Click No text.",
+          "outcome": "The first status is empty and the second shows Saved.",
+          "opposite": "Clicking Ward round, the first status shows Ward round.",
+          "defect": "The missing text shown as the text undefined or null, or the missing value stopping the pipeline so the second status keeps its text."
+        },
+        {
+          "for": "M5.X4",
+          "page": "The arrivals board: Bea arrived raises Arrived with the nurse Bea, Someone arrived raises it with no payload, and the handler appends the payload's nurse to the arrivals line, which starts Arrivals:, then sets the board's status to Noted.",
+          "gesture": "Click Someone arrived.",
+          "outcome": "The arrivals line still reads Arrivals: and the status reads Noted.",
+          "opposite": "Clicking Bea arrived, the line reads Arrivals: Bea and the status Noted.",
+          "defect": "The missing nurse appended as the text undefined or null, or the missing value stopping the pipeline so the status keeps Waiting."
+        },
+        {
+          "for": "M5.X5",
+          "page": "The hour log: the log's tools, loaded into the desk, whose plan loads an entry into the hour slot outside the desk; Note the hour, whose step sets the log's status to Noting, then appends Noted at 02:00 to the hour slot's text, then sets the status to Noted; and Clear the hour, whose step sets the status to Clearing, then the hour slot's text to No entry this hour, then the status to Cleared.",
+          "gesture": "Open the desk, load the entry, then click Note the hour.",
+          "outcome": "The status reads Noted and the hour slot reads Hourly entry Turned at midnight. Acknowledge Entry: Not acknowledged Noted at 02:00, with no console error, and the entry's Acknowledge then shows Acknowledged.",
+          "opposite": "With the desk open and the entry loaded, Clear the hour stops with one console error: the status reads Clearing, the entry stays, and its Acknowledge still shows Acknowledged.",
+          "defect": "An append written as a content set of the joined text stops over the held slot, so the status reads Noting and nothing is added; written with no content mark, it leaves the hour slot one text, and the entry's Acknowledge is gone."
+        },
+        {
+          "for": "M5.X5",
+          "page": "The turn chart: the chart's tools, loaded into the desk, whose plan loads a turn plan into the turn slot outside the desk; Log a turn, whose step appends Turned at 02:00 to the turn slot's text; and Start again, whose step sets the chart's status to Starting, then the turn slot's text to No turns yet, then the status to Started.",
+          "gesture": "Open the desk, close the desk, click Log a turn, then click Start again.",
+          "outcome": "The turn slot reads Turned at 02:00 after Log a turn and No turns yet after Start again, and the status reads Started, with no console error.",
+          "opposite": "With the desk left open, Log a turn shows Turned at 02:00 and Start again stops with one console error: the status reads Starting and the turn slot still reads Turned at 02:00.",
+          "defect": "A slot's hold read from whether its element holds anything, so the text a step added holds the turn slot and Start again stops once the desk has closed."
+        },
+        {
+          "for": "M5.X5",
+          "page": "The meal card, one plan: Open the menu loads today's menu into the menu slot; Add a note, whose step appends Soft diet today to the menu slot's text, then sets the card's status to Note added; and Close the menu, whose step unloads the menu slot, then sets the status to Menu closed.",
+          "gesture": "Open the menu, click Add a note, then click Close the menu.",
+          "outcome": "The status reads Note added after the second click and Menu closed after the third, and the menu slot is then empty, with no console error.",
+          "opposite": "Clicking Add a note after the menu has closed, the menu slot reads Soft diet today and the status Note added.",
+          "defect": "An unload that removes the slot's child elements alone, so Soft diet today stays in the menu slot after the menu closed; or an append over a slot its own plan loads refused where the view renders, as a set is, so the card does not open."
+        },
+        {
+          "for": "M5.X5",
+          "page": "The night checks: a section Night checks that holds the Witness code box, a NativeTextBox, and Sign off, a NativeButton whose handler sets the sheet's status, which starts Not signed, to Signed off when the box reads 0200 and to Code refused otherwise; and Add a check, outside the section, whose step appends the paragraph Checked at 02:00 to the section's HTML.",
+          "gesture": "Type 0200 into Witness code, click Add a check, then click Sign off.",
+          "outcome": "The section shows Checked at 02:00 and the status reads Signed off.",
+          "opposite": "With nothing typed, the same two clicks show Checked at 02:00 and the status Code refused.",
+          "defect": "An append that writes the section's HTML again makes a new box and a new button, so the typed code is gone and Sign off runs nothing: the status keeps Not signed."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "ElementBuilder<TModel>",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.AddClass(string! className) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N2"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.Hide() -> PipelineBuilder<TModel!>!",
+          "verdict": "kept",
+          "as": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.RemoveClass(string! className) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N2"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetHtml(string! html) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetHtml<TPayload>(TPayload source, System.Linq.Expressions.Expression<System.Func<TPayload, object!>!>! path) -> PipelineBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "Its path is typed object, which erases the value's type and which ALIS009 refuses on the public surface; the field is a typed source of the payload or the response, which Text.Set and Html.Set take.",
+          "carriers": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetHtml<TProp>(TypedSource<TProp>! source) -> ElementBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetText(string! text) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetText<TPayload>(TPayload source, System.Linq.Expressions.Expression<System.Func<TPayload, object!>!>! path) -> PipelineBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "Its path is typed object, which erases the value's type and which ALIS009 refuses on the public surface; the field is a typed source of the payload or the response, which Text.Set and Html.Set take.",
+          "carriers": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetText<TProp>(TypedSource<TProp>! source) -> ElementBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetText<TResponse>(ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object!>!>! path) -> PipelineBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "Its path is typed object, which erases the value's type and which ALIS009 refuses on the public surface; the field is a typed source of the payload or the response, which Text.Set and Html.Set take.",
+          "carriers": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!",
+          "verdict": "kept",
+          "as": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.ToggleClass(string! className) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N2"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Element(string! elementId) -> ElementBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N5"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.FromDom(string! elementId, string! member) -> ReactiveArray<string!>!",
+          "verdict": "refused",
+          "reason": "A string names the member it reads, which ALIS009 refuses; the element's classes are a declared iterator of text, and any other list a declaration declares with its iterator.",
+          "carriers": [
+            "M5.N2",
+            "N5.7"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.FromDom<TElement>(string! elementId, string! member) -> ReactiveArray<TElement>!",
+          "verdict": "refused",
+          "reason": "A string names the member it reads, which ALIS009 refuses; the element's children are a declared iterator whose items are typed.",
+          "carriers": [
+            "M5.N3",
+            "N5.7"
+          ]
+        }
+      ]
+    }
+  ]
+}

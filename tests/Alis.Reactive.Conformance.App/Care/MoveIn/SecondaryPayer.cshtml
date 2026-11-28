@@ -1,0 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+@await Html.PartialFor(m => m.Payer.Secondary, "/Care/MoveIn/SecondaryCoverage.cshtml")
+@Html.RenderPlan(plan)

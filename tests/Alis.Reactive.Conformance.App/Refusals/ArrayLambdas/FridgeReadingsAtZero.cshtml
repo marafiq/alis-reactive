@@ -1,0 +1,17 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FridgeLog
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The fridge log";
+    var plan = Html.ReactivePlan<FridgeLog>();
+}
+<h1>@Model.Fridge: today's readings</h1>
+<p>Readings at zero: <span id="count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(FridgeReadingEndpoints.Readings)
+        .OnSuccess<List<FridgeReading>>((readings, pipeline) => pipeline.Element("count").Text.Set(readings.Body.Count(r => r.Temperature == 0.0)))));
+}
+@Html.RenderPlan(plan)

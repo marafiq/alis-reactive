@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@model FamilyForm
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Helen Martinez's intake";
+    var plan = Html.ReactivePlan<FamilyForm>();
+}
+<h1>Helen Martinez's intake</h1>
+@using (var family = Html.BeginRequestContainer(plan, "family"))
+{
+    <fieldset>
+        <legend>Guardian's allergies</legend>
+        @await Html.PartialFor(m => m.Guardian, "/Care/AdmissionClinical/GuardianAllergyBox.cshtml")
+    </fieldset>
+    @(Html.NativeButton("save", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<FamilyForm>(GuardianAllergyEndpoints.Family, request => request.Inputs(family.Container))
+        .Validate<FamilyValidator>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p>Saved: <output id="saved">Not saved</output></p>
+@Html.RenderPlan(plan)

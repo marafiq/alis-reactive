@@ -1,0 +1,8 @@
+using Alis.Reactive.Values;
+
+namespace Cells;
+
+public static partial class Positions
+{
+    public static void Unlisted(CellBoard target, TypedSource<string?> value) => target.Note.Set(value);
+}

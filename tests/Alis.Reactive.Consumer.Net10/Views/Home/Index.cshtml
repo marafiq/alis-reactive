@@ -1,0 +1,15 @@
+@using Alis.Reactive.Consumer.Net10.Models
+@using Alis.Reactive.Consumer.Net10.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Welcome
+@{
+    ViewData["Title"] = "Home";
+    var plan = Html.ReactivePlan<Welcome>();
+}
+<p id="consumer-status">Not booted</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("consumer-status").Text.Set(Model.Message)));
+}
+@(plan.AppButton("acknowledge", "Acknowledge").Reactive(button => button.Click, (clicked, pipeline) => pipeline.Component<AppButton>("acknowledge").TextContent.Set("Acknowledged")))
+@Html.RenderPlan(plan)

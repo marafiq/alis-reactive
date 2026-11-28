@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents board";
+    var plan = Html.ReactivePlan<ResidentBoard>();
+}
+<h1>Board of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, ResidentBoardEvents.Load)>Load board</button>
+<button type="button" @Html.Raises(plan, ResidentBoardEvents.LoadWithoutAllergies)>Load board without allergies</button>
+<p id="board-status"></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentBoardEvents.Load, pipeline =>
+    {
+        pipeline.Parallel(
+            pipeline => pipeline.Get(ResidentBoardEndpoints.Residents).OnSuccess(pipeline => pipeline.Get(CareEndpoints.ResidentBoardAllergies)),
+            pipeline => pipeline.Get(ResidentBoardEndpoints.Staff));
+        pipeline.Element("board-status").Text.Set("Board ready");
+    }));
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentBoardEvents.LoadWithoutAllergies, pipeline =>
+    {
+        pipeline.Parallel(
+            pipeline => pipeline.Get(ResidentBoardEndpoints.Residents),
+            pipeline => pipeline.Get(ResidentBoardEndpoints.Staff));
+        pipeline.Element("board-status").Text.Set("Board ready");
+    }));
+}
+@Html.RenderPlan(plan)

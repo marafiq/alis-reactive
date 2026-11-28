@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.InputsAndIds
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MoveInPage
+@{
+    var plan = Html.ReactivePlan<MoveInPage>();
+    var level = Model.Care.Level.ToString();
+    var levelInput = IdGenerator.For<MoveInPage, CareLevel>(m => m.Care.Level);
+}
+@switch (Model.Care.Level)
+{
+    case CareLevel.Assisted:
+        @await Html.PartialFor(m => m.Care.Assisted, "/Care/MoveIn/AssistedCare.cshtml")
+        break;
+    case CareLevel.Memory:
+        @await Html.PartialFor(m => m.Care.Memory, "/Care/MoveIn/MemoryCare.cshtml")
+        break;
+    case CareLevel.Skilled:
+        @await Html.PartialFor(m => m.Care.Skilled, "/Care/MoveIn/SkilledCare.cshtml")
+        break;
+    default:
+        @await Html.PartialFor(m => m.Care.Independent, "/Care/MoveIn/IndependentCare.cshtml")
+        break;
+}
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MoveInCareEvents.AnswersKept, pipeline => pipeline.Component<NativeRadioGroup>(levelInput).Value.Set(level)));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,34 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Navigations
+@model FusionResidentSidebar
+@{
+    Layout = "/Care/Shell/_FusionShellLayout.cshtml";
+    ViewData["Title"] = "Ward overview";
+    var plan = Html.ReactivePlan<FusionResidentSidebar>();
+}
+@(Html.FusionSidebar(plan, "resident-sidebar", build => build
+    .Type(SidebarType.Push)
+    .Width("16rem")
+    .IsOpen(Model.ShowResidents)
+    .ContentTemplate(@<nav aria-label="Residents" class="p-3">
+        <h2>Residents</h2>
+        <ul>
+            <li><a href="@CarePages.ResidentRoster">Resident roster</a></li>
+            <li><a href="@CarePages.RoundResidents">Residents on this round</a></li>
+        </ul>
+    </nav>)))
+<section class="e-main-content p-3">
+    <h1>Ward overview</h1>
+    <button type="button" @Html.Raises(plan, FusionResidentSidebarButtons.Show)>Show residents</button>
+    <button type="button" @Html.Raises(plan, FusionResidentSidebarButtons.Hide)>Hide residents</button>
+</section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(FusionResidentSidebarButtons.Show, pipeline => pipeline.Component<FusionSidebar>("resident-sidebar").Show())
+        .CustomEvent(FusionResidentSidebarButtons.Hide, pipeline => pipeline.Component<FusionSidebar>("resident-sidebar").Hide()));
+}
+@Html.RenderPlan(plan)

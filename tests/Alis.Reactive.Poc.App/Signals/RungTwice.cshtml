@@ -1,0 +1,17 @@
+@using Alis.Reactive.Poc.App.Signals
+@model SignalsPage
+@{
+    ViewData["Title"] = "Rung twice";
+    var plan = Html.ReactivePlan<SignalsPage>();
+}
+<h1>Rung twice</h1>
+
+<p>Room: <span id="room">unread</span></p>
+
+@(plan.CallBell("bell")
+    .Reactive(bell => bell.Ring, (ring, pipeline) =>
+        pipeline.Element("room").Text.Set(ring.Room))
+    .Reactive(bell => bell.Ring, (ring, pipeline) =>
+        pipeline.Element("room").Text.Set("rung")))
+
+@Html.RenderPlan(plan)

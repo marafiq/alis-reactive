@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model EmergencyLinenStocktake
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Emergency linen stocktake";
+    var plan = Html.ReactivePlan<EmergencyLinenStocktake>();
+}
+<h1>Emergency linen stocktake</h1>
+@using (Html.BeginRequestContainer(plan, "emergency-stocktake"))
+{
+    <fieldset>
+        <legend>Emergency reserve</legend>
+        @(Html.InputField(plan, m => m.Towels, o => o.Label("Emergency towels")).FusionNumericTextBox(build => build.Format("n0"))
+            .Reactive(box => box.Change, (changed, pipeline) => pipeline.When(changed.Value.Gte(8))
+                .Then(p => p.Element("reserve-review").Text.Set("Emergency reserve met"))
+                .Else(p => p.Element("reserve-review").Text.Set("Emergency reserve depleted"))))
+    </fieldset>
+}
+<p><output id="reserve-review" aria-label="Reserve review">Check the emergency reserve</output></p>
+@Html.RenderPlan(plan)

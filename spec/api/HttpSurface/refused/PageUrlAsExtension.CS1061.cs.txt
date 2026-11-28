@@ -1,0 +1,13 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class PageUrlAsExtension
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
+            .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)));
+}

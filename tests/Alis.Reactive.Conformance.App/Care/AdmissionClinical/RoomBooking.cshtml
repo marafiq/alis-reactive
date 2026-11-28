@@ -1,0 +1,36 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionRoomBooking
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Room booking";
+    var plan = Html.ReactivePlan<AdmissionRoomBooking>();
+}
+<h1>Room booking</h1>
+<form method="post" action="@CarePages.AdmissionRoomBooking">
+    @(Html.FusionRadioButton(plan, "booking-room", build =>
+    {
+        build.Label("Single room").Name("bed").Value("contract").Checked(true);
+        if (Model.Contract)
+        {
+            build.HtmlAttributes(new Dictionary<string, object> { ["value"] = "contract" });
+        }
+    }))
+    @(Html.NativeButton("allocate-garden", "Allocate garden wing")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var room = pipeline.Component<FusionRadioButton>("booking-room");
+            room.Value.Set("garden");
+            room.DataBind();
+            pipeline.When(room.Value.Eq("garden"))
+                .Then(pipeline => pipeline.Element("proposed-booking").Text.Set("Garden wing"));
+        }))
+    <p><output id="proposed-booking" aria-label="Proposed booking">Wing awaiting allocation</output></p>
+    <button type="submit">Confirm booking</button>
+</form>
+@Html.RenderPlan(plan)

@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DischargeAccount
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Discharge account";
+    var plan = Html.ReactivePlan<DischargeAccount>();
+}
+<h1>Discharge account of @Model.Resident</h1>
+<p>Status: <span id="discharge-status">Pending</span></p>
+@using (var account = Html.BeginRequestContainer(plan, "discharge-account"))
+{
+    @(Html.InputField(plan, m => m.Balance, options => options.Label("Balance")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, DischargeAccounts.Discharge)>Discharge</button>
+    Html.On(plan, trigger => trigger.CustomEvent(DischargeAccounts.Discharge, pipeline =>
+    {
+        pipeline.When(account.Container.Read(m => m.Balance).Eq(0)).Then(pipeline =>
+        {
+            pipeline.Element("discharge-status").Text.Set("Clearing");
+            pipeline.Element("discharge-log").Text.Set("Cleared");
+            pipeline.Element("discharge-status").Text.Set("Discharged");
+        });
+        pipeline.Element("discharge-progress").Text.Set("Done");
+    }));
+}
+<p>Log: <span id="discharge-log"></span></p>
+<p>Progress: <span id="discharge-progress"></span></p>
+@Html.RenderPlan(plan)

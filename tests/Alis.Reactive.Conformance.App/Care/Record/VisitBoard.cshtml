@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visit board";
+    var plan = Html.ReactivePlan<VisitBoard>();
+}
+<h1>Visit board</h1>
+<section aria-label="Visit board">
+    <button type="button" @Html.Raises(plan, VisitBoardButtons.ShowVisit)>Show visit</button>
+    <p>Next visit starts: <span id="board-visit">Not shown</span></p>
+</section>
+<button type="button" @Html.Raises(plan, VisitBoardButtons.OpenKolkataDesk)>Open Kolkata desk</button>
+<section id="desk" aria-label="Desk"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(VisitBoardButtons.ShowVisit, pipeline => pipeline
+            .Get(VisitBoardEndpoints.NextVisit)
+            .OnSuccess(Content.Json<BoardVisit>(), (visit, pipeline) => pipeline.Element("board-visit").Text.Set(visit.Body.Read(next => next.Starts))))
+        .CustomEvent(VisitBoardButtons.OpenKolkataDesk, pipeline => pipeline.Get(Model.Desk).Into("desk")));
+}
+@Html.RenderPlan(plan)

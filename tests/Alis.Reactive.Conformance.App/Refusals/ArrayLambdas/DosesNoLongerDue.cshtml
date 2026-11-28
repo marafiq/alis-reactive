@@ -1,0 +1,17 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NoLongerDueRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The round's doses";
+    var plan = Html.ReactivePlan<NoLongerDueRound>();
+}
+<h1>@Model.Name round: doses no longer due</h1>
+<p>Doses given or held: <span id="count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(NoLongerDueDoseEndpoints.Doses)
+        .OnSuccess<List<NoLongerDueDose>>((doses, pipeline) => pipeline.Element("count").Text.Set(doses.Body.Count(d => d.Status > DoseStatus.Due)))));
+}
+@Html.RenderPlan(plan)

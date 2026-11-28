@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@inject MoveInReads Reads
+@model AssistedCareInput
+@{
+    var plan = Html.ReactivePlan<AssistedCareInput>();
+}
+<fieldset>
+    <legend>Assisted care</legend>
+    @(Html.InputField(plan, m => m.AssessmentCode, options => options.Label("Assessment code")).NativeTextBox())
+    @(Html.InputField(plan, m => m.AssistanceHours, options => options.Label("Assistance hours")).NativeTextBox())
+    @(Html.InputField(plan, m => m.MobilityNote, options => options.Label("Mobility note")).NativeTextBox())
+</fieldset>
+<fieldset>
+    <legend>Assessment date</legend>
+    @(Html.InputField(plan, m => m.AssessmentDate, options => options.Label("Assessment date")).ConformanceComponent(Reads.DayPicker("Assessment date", Model.AssessmentDate, Reads.Today(), Reads.Today().AddDays(-7))))
+</fieldset>
+@Html.RenderPlan(plan)

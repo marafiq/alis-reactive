@@ -1,0 +1,36 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RecordCard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Record card";
+    var plan = Html.ReactivePlan<RecordCard>();
+}
+<h1>Record of @Model.Resident</h1>
+<article id="record-card" class="card">
+    <h2>@Model.Resident</h2>
+    <p>Room @Model.Room</p>
+</article>
+<button type="button" @Html.Raises(plan, RecordCards.Flag)>Flag</button>
+<button type="button" @Html.Raises(plan, RecordCards.ClearFlag)>Clear flag</button>
+<button type="button" @Html.Raises(plan, RecordCards.ToggleFlag)>Toggle flag</button>
+<button type="button" @Html.Raises(plan, RecordCards.MarkTheRound)>Mark the round</button>
+<p id="mark-status">Round not checked</p>
+<button type="button" @Html.Raises(plan, RecordCards.LoadSummary)>Load summary</button>
+<section id="record-summary" aria-label="Summary">No summary loaded</section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(RecordCards.Flag, pipeline => pipeline.Element("record-card").Classes.Add("flagged"))
+        .CustomEvent(RecordCards.ClearFlag, pipeline => pipeline.Element("record-card").Classes.Remove("flagged"))
+        .CustomEvent(RecordCards.ToggleFlag, pipeline => pipeline.Element("record-card").Classes.Toggle("flagged"))
+        .CustomEvent(RecordCards.MarkTheRound, pipeline => pipeline.Get(RecordCardEndpoints.Mark)
+            .OnSuccess<CardMark>((mark, pipeline) =>
+            {
+                pipeline.Element("record-card").Classes.Toggle(mark.Body.Read(card => card.Mark));
+                pipeline.Element("mark-status").Text.Set("Round checked");
+            }))
+        .CustomEvent(RecordCards.LoadSummary, pipeline => pipeline.Get(Model.Summary)
+            .OnSuccess<CardSummary>((summary, pipeline) => pipeline.Element("record-summary").Html.Set(summary.Body.Read(card => card.Markup)))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CareReview
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care review";
+    var plan = Html.ReactivePlan<CareReview>();
+}
+<h1>Care review</h1>
+@using (var review = Html.BeginRequestContainer(plan, "care-review"))
+{
+    @(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Level, options => options.Label("Level")).NativeDropDown(build => build.Placeholder("Choose a level").Items(Html.GetEnumSelectList<ReviewLevel>())))
+    @(Html.NativeButton("save-review", "Save review").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<CareReview>(CareReviewEndpoints.Reviews, request => request.UrlEncoded(review.Container, body => { }))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("reviewed").Text.Set(saved.Body))))
+}
+<p>Reviewed: <span id="reviewed"></span></p>
+@Html.RenderPlan(plan)

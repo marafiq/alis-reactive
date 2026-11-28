@@ -1,0 +1,191 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model WristbandNames
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Wristband names";
+    var plan = Html.ReactivePlan<WristbandNames>();
+}
+<h1>Wristband names</h1>
+@using (Html.BeginRequestContainer(plan, "wristband-profile"))
+{
+    <fieldset>
+        <legend>Wristband name</legend>
+        @(Html.InputField(plan, m => m.PreferredName, options => options.Label("Preferred name"))
+            .FusionTextBox(build => build.Enabled(!Model.Locked).Readonly(Model.Protected).EnablePersistence(Model.Remember)
+                .CssClass("wristband-entry").Placeholder("Name for the wristband"))
+            .Reactive(box => box.Input, (entry, pipeline) =>
+            {
+                var forWristband = entry.Container.GetAttribute("class").Contains("wristband-entry");
+                var typing = entry.OriginalEvent.Type.Eq("input").And(forWristband).And(entry.Value.NotEmpty());
+                pipeline.When(typing.And(entry.PreviousValue.IsNull()))
+                    .Then(pipeline => pipeline.Element("name-draft").Text.Set("Add a wristband name"))
+                    .ElseIf(typing.And(entry.PreviousValue.Eq("Nell")))
+                    .Then(pipeline => pipeline.Element("name-draft").Text.Set("Replace wristband name"));
+            })
+            .Reactive(box => box.Change, (changed, pipeline) =>
+            {
+                var current = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>().Value;
+                pipeline.When(changed.Value.IsNull().And(changed.IsInteracted.Not()).And(changed.PreviousValue.NotEmpty()))
+                    .Then(pipeline => pipeline.Element("name-withdrawal").Text.Set("Directory name withdrawn"))
+                    .ElseIf(changed.Value.Eq(string.Empty).And(changed.IsInteracted).And(changed.PreviousValue.NotEmpty()))
+                    .Then(pipeline => pipeline.Element("name-withdrawal").Text.Set("Staff cleared the printed name"));
+                var onWristband = changed.Container.GetAttribute("class").Contains("wristband-entry");
+                var fromStaff = changed.IsInteracted.And(changed.OriginalEvent.Type.In("change", "blur"));
+                pipeline.When(fromStaff.And(onWristband).And(changed.PreviousValue.Eq("Nell")).And(changed.Value.Eq(current)).And(current.NotEmpty()))
+                    .Then(pipeline => pipeline.Element("name-decision").Text.Set("Staff amendment to Nell"))
+                    .ElseIf(changed.OriginalEvent.Type.NotNull())
+                    .Then(pipeline => pipeline.Element("name-decision").Text.Set("Review current wristband"))
+                    .ElseIf(changed.IsInteracted.Eq(false).And(changed.PreviousValue.IsNull()).And(changed.Value.Eq("Eleanor")).And(current.Eq("Eleanor")))
+                    .Then(pipeline => pipeline.Element("name-decision").Text.Set("Directory entry for Eleanor"))
+                    .Else(pipeline => pipeline.Element("name-decision").Text.Set("Review current wristband"));
+            })
+            .Reactive(box => box.Focus, (focused, pipeline) =>
+            {
+                var editing = focused.OriginalEvent.Type.Eq("focus").And(focused.Container.GetAttribute("class").Contains("wristband-entry"));
+                pipeline.When(editing.And(focused.Value.NotEmpty()))
+                    .Then(pipeline => pipeline.Element("name-guidance").Text.Set("Editing the recorded name"))
+                    .ElseIf(editing.And(focused.Value.IsNull()))
+                    .Then(pipeline => pipeline.Element("name-guidance").Text.Set("Adding a preferred name"));
+            })
+            .Reactive(box => box.Blur, (left, pipeline) =>
+            {
+                var complete = left.OriginalEvent.Type.Eq("blur").And(left.Container.GetAttribute("class").Contains("wristband-entry"));
+                pipeline.When(complete.And(left.Value.NotEmpty()))
+                    .Then(pipeline => pipeline.Element("name-print").Text.Set("Ready to print"))
+                    .ElseIf(complete.And(left.Value.IsNull()))
+                    .Then(pipeline => pipeline.Element("name-print").Text.Set("Name still needed"));
+            })
+            .Reactive(box => box.Destroyed, (closed, pipeline) =>
+            {
+                pipeline.When(closed.Name.Eq("destroyed").And(closed.Cancel.Not()))
+                    .Then(pipeline => pipeline.Element("name-preview").Text.Set("Preview closed"));
+            }))
+        @if (Model.PreferredName is null)
+        {
+            <p>No wristband name on file</p>
+        }
+
+        @(Html.NativeButton("start-name-entry", "Edit wristband name")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+                name.FocusIn();
+            }))
+        @(Html.NativeButton("finish-name-entry", "Finish editing")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+                name.FocusIn();
+                name.FocusOut();
+            }))
+        @(Html.NativeButton("use-directory-name", "Use directory name")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+                name.Value.Set("Eleanor");
+                name.DataBind();
+            }))
+        @(Html.NativeButton("clear-preferred-name", "Remove preferred name")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+                name.Value.Set((string?)null);
+                name.DataBind();
+            }))
+        <p><output id="name-draft" aria-label="Wristband draft">No changes in progress</output></p>
+        <p><output id="name-withdrawal" aria-label="Name withdrawal">Name on file</output></p>
+        <p><output id="name-decision" aria-label="Wristband decision">Check the resident file</output></p>
+        <p><output id="name-guidance" aria-label="Editing guidance">Ready to edit</output></p>
+        <p><output id="name-print" aria-label="Print readiness">Review the name</output></p>
+        @(Html.NativeButton("name-print-lock", Model.Locked ? "Release printing lock" : "Lock for printing")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+                name.Enabled.Set(Model.Locked);
+                name.DataBind();
+                pipeline.When(name.Enabled.And(name.Element.HasAttribute("disabled").Not()))
+                    .Then(pipeline =>
+                    {
+                        pipeline.Input(m => m.PreferredName).Component<FusionTextBox>().FocusIn();
+                        pipeline.Element("name-access").Text.Set("Staff can edit");
+                    })
+                    .ElseIf(name.Enabled.Eq(false).And(name.Element.HasAttribute("disabled")))
+                    .Then(pipeline => pipeline.Element("name-access").Text.Set("Locked for printing"));
+            }))
+        <p><output id="name-access" aria-label="Editing access">Check the editing lock</output></p>
+        @(Html.NativeButton("protect-profile-name", Model.Protected ? "Allow name edits" : "Protect recorded name")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+                name.Readonly.Set(!Model.Protected);
+                name.Placeholder.Set(Model.Protected ? "Enter preferred name" : "Check against wristband");
+                name.DataBind();
+                pipeline.When(name.Readonly.And(name.Placeholder.Eq("Check against wristband")))
+                    .Then(pipeline => pipeline.Element("name-permission").Text.Set("Read-only profile"))
+                    .ElseIf(name.Readonly.Eq(false).And(name.Placeholder.Eq("Enter preferred name")))
+                    .Then(pipeline => pipeline.Element("name-permission").Text.Set("Editable profile"));
+            }))
+        <p><output id="name-permission" aria-label="Profile permission">Review editing permission</output></p>
+        @(Html.NativeButton("save-wristband", "Save preferred name")
+            .Reactive(plan, button => button.Click, (_, pipeline) => pipeline
+                .Post<WristbandNameChange>(CarePages.WristbandNameSave, request => request.Input(change => change.PreferredName, pipeline.Input(m => m.PreferredName)))
+                .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("name-receipt").Text.Set(saved.Body))))
+        <p><output id="name-receipt" aria-label="Profile receipt">No changes saved</output></p>
+        <a href="@CarePages.WristbandNameSaved">Open saved profile</a>
+    </fieldset>
+}
+<fieldset>
+    <legend>Reception desk drafts</legend>
+    @(Html.NativeButton("remember-wristband", "Remember wristband here")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+            name.EnablePersistence.Set(true);
+            name.Refresh();
+            pipeline.When(name.EnablePersistence)
+                .Then(pipeline => pipeline.Element("name-storage").Text.Set("Remember on this desk"));
+        }))
+    @(Html.NativeButton("resident-file-name", "Use resident file")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+            name.EnablePersistence.Set(false);
+            name.DataBind();
+            pipeline.When(name.EnablePersistence.Eq(false))
+                .Then(pipeline => pipeline.Element("name-storage").Text.Set("Use resident file"));
+        }))
+    <p><output id="name-storage" aria-label="Draft storage">Choose the draft source</output></p>
+    <a href="@CarePages.WristbandNameRemembered">Return to the reception desk</a>
+    @(Html.NativeButton("archive-wristband", "Archive recovery copy")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+            pipeline.Post<WristbandArchive>(CarePages.WristbandNameRecovery, request => request.Json(body => body.Set(archive => archive.Snapshot, name.GetPersistData())))
+                .OnSuccess(Content.Text, (recovered, pipeline) => pipeline.Element("name-recovery").Text.Set(recovered.Body));
+        }))
+    <p><output id="name-recovery" aria-label="Recovery copy">No recovery copy selected</output></p>
+</fieldset>
+<fieldset>
+    <legend>Wristband preview</legend>
+    @(Html.NativeButton("close-wristband", "Close wristband preview")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+            name.Destroy();
+        }))
+    @(Html.NativeButton("rebuild-wristband", "Rebuild wristband preview")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var name = pipeline.Input(m => m.PreferredName).Component<FusionTextBox>();
+            name.Refresh();
+        }))
+    <p><output id="name-preview" aria-label="Preview state">Preview open</output></p>
+</fieldset>
+@Html.RenderPlan(plan)

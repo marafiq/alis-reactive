@@ -1,0 +1,57 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BoundTotalsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Totals and checks";
+    var plan = Html.ReactivePlan<BoundTotalsBoard>();
+}
+<h1>Totals and checks</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Count = Model.Count, Items = Model.Items }))
+<button type="button" @Html.Raises(plan, BoundTotalButtons.ReadTheTotalTwice)>Read the total twice</button>
+<button type="button" @Html.Raises(plan, BoundTotalButtons.CallTheTotalTwice)>Call the total twice</button>
+<button type="button" @Html.Raises(plan, BoundTotalButtons.HoldTheTotal)>Hold the total</button>
+<button type="button" @Html.Raises(plan, BoundTotalButtons.CountTheActiveItems)>Count the active items</button>
+<dl>
+    <dt>Total read first</dt>
+    <dd id="total-1"></dd>
+    <dt>Total read second</dt>
+    <dd id="total-2"></dd>
+    <dt>First call</dt>
+    <dd id="call-1"></dd>
+    <dt>Second call</dt>
+    <dd id="call-2"></dd>
+    <dt>Held total</dt>
+    <dd id="held-total"></dd>
+    <dt>New total</dt>
+    <dd id="new-total"></dd>
+    <dt>Active items</dt>
+    <dd id="active"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(BoundTotalButtons.ReadTheTotalTwice, pipeline =>
+        {
+            var total = pipeline.Component<ConformanceComponent>("conformance").Total();
+            pipeline.Element("total-1").Text.Set(total);
+            pipeline.Element("total-2").Text.Set(total);
+        })
+        .CustomEvent(BoundTotalButtons.CallTheTotalTwice, pipeline =>
+        {
+            var conformance = pipeline.Component<ConformanceComponent>("conformance");
+            pipeline.Element("call-1").Text.Set(conformance.Total());
+            pipeline.Element("call-2").Text.Set(conformance.Total());
+        })
+        .CustomEvent(BoundTotalButtons.HoldTheTotal, pipeline =>
+        {
+            var conformance = pipeline.Component<ConformanceComponent>("conformance");
+            var total = conformance.Total();
+            conformance.Count.Set(40);
+            pipeline.Element("held-total").Text.Set(total);
+            pipeline.Element("new-total").Text.Set(conformance.Total());
+        })
+        .CustomEvent(BoundTotalButtons.CountTheActiveItems, pipeline => pipeline.Element("active").Text.Set(pipeline.Component<ConformanceComponent>("conformance").Items.Count(item => item.Check()))));
+}
+@Html.RenderPlan(plan)

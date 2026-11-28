@@ -1,0 +1,20 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CarePlanDraft
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Care plan draft";
+    var plan = Html.ReactivePlan<CarePlanDraft>();
+}
+<h1>Care plan draft</h1>
+<fieldset>
+    <legend>Care plan</legend>
+    @(Html.InputField(plan, m => m.CarePlan, options => options.Label("Care plan"))
+        .FusionUploader()
+        .Reactive(uploader => uploader.FilesChanged, (_, pipeline) => pipeline.Element("chosen").Text.Set(pipeline.Input(m => m.CarePlan).Component<FusionUploader>().Files.Count())))
+</fieldset>
+<p>Files chosen: <output id="chosen">0</output></p>
+@Html.RenderPlan(plan)

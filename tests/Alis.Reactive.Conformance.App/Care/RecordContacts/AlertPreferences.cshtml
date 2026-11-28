@@ -1,0 +1,319 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@model AlertPreferences
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident alert preferences";
+    var plan = Html.ReactivePlan<AlertPreferences>();
+    var fieldLabel = "Night alerts";
+}
+<style>
+    .alert-switch.e-switch-wrapper {
+        width: 12rem;
+    }
+
+    .compact-alert.e-switch-wrapper {
+        width: 9rem;
+    }
+
+    .wide-alert.e-switch-wrapper {
+        width: 16rem;
+    }
+    .display-choice, .layout-choice {
+        display: none;
+    }
+
+    .alert-preferences:has(.e-switch-wrapper:not(.compact-alert, .wide-alert)) .standard-display,
+    .alert-preferences:has(.e-switch-wrapper.compact-alert:not(.wide-alert)) .compact-display,
+    .alert-preferences:has(.e-switch-wrapper.wide-alert:not(.compact-alert)) .wide-display,
+    .alert-preferences:has(.e-switch-wrapper.e-rtl) .right-to-left,
+    .alert-preferences:has(.e-switch-wrapper:not(.e-rtl)) .left-to-right {
+        display: inline;
+    }
+</style>
+<h1>Resident alert preferences</h1>
+<div class="alert-preferences">
+    @using (Html.BeginRequestContainer(plan, "resident-alert-routing"))
+    {
+        <fieldset>
+            <legend>Alert routing</legend>
+            @(Html.InputField(plan, m => m.NightAlerts, options => options.Label(fieldLabel))
+                .FusionSwitch(build =>
+                {
+                    build.Disabled(Model.Locked).EnableRtl(Model.RightToLeft).EnablePersistence(Model.StartWithPersistence)
+                        .OnLabel("Dispatch on").OffLabel("Dispatch paused")
+                        .CssClass(Model.Compact ? "alert-switch compact-alert" : "alert-switch");
+                    if (Model.ReviewChannel && Model.ExplicitChannelLabel)
+                    {
+                        build.HtmlAttributes(new Dictionary<string, object>
+                        {
+                            ["aria-label"] = Model.NightAlerts ? "Night alert channel" : "Day alert channel"
+                        });
+                    }
+                })
+                .Reactive(toggle => toggle.BeforeChange, (changing, pipeline) =>
+                {
+                    if (Model.WardManaged)
+                    {
+                        changing.Cancel.Set(true);
+                        pipeline.Element("alert-policy").Text.Set("Managed by the ward");
+                    }
+                    pipeline.When(changing.Cancel)
+                        .Then(pipeline => pipeline.Element("alert-decision").Text.Set("Ward approval required"))
+                        .Else(pipeline => pipeline.Element("alert-decision").Text.Set("Resident can apply"));
+                    if (Model.ReplacingSetting)
+                    {
+                        pipeline.When(changing.Checked)
+                            .Then(pipeline =>
+                            {
+                                pipeline.Element("alert-policy").Text.Set("Replacing enabled setting");
+                                changing.Checked.Set(false);
+                            })
+                            .Else(pipeline => pipeline.Element("alert-policy").Text.Set("Replacing paused setting"));
+                    }
+                    pipeline.When(changing.OriginalEvent.IsTrusted.Eq(true))
+                        .Then(pipeline => pipeline.Element("alert-request-source").Text.Set("Resident requested routing"))
+                        .ElseIf(changing.OriginalEvent.IsTrusted.Eq(false))
+                        .Then(pipeline => pipeline.Element("alert-request-source").Text.Set("Control requested routing"))
+                        .Else(pipeline => pipeline.Element("alert-request-source").Text.Set("Panel requested routing"));
+                })
+                .Reactive(toggle => toggle.Change, (changed, pipeline) =>
+                {
+                    pipeline.When(changed.Checked.Eq(true))
+                        .Then(applied =>
+                        {
+                            applied.Element("alert-change").Text.Set("Night alerts enabled");
+                            applied.Element("alert-routing").Text.Set("Send to night desk");
+                        })
+                        .ElseIf(changed.Checked.Eq(false))
+                        .Then(applied =>
+                        {
+                            applied.Element("alert-change").Text.Set("Night alerts paused");
+                            applied.Element("alert-routing").Text.Set("Do not send alerts");
+                        });
+                    pipeline.When(changed.OriginalEvent.IsTrusted.Eq(true))
+                        .Then(applied => applied.Element("alert-activation").Text.Set("Resident activation"))
+                        .ElseIf(changed.OriginalEvent.IsTrusted.Eq(false))
+                        .Then(applied => applied.Element("alert-activation").Text.Set("Panel activated control"))
+                        .Else(applied => applied.Element("alert-activation").Text.Set("Panel adjustment"));
+                    pipeline.When(changed.Name.Eq("change"))
+                        .Then(pipeline => pipeline.When(changed.Checked)
+                            .Then(pipeline => pipeline.Element("alert-activity").Text.Set("Night alert activation recorded"))
+                            .Else(pipeline => pipeline.Element("alert-activity").Text.Set("Night alert pause recorded")))
+                        .Else(pipeline => pipeline.Element("alert-activity").Text.Set("Routing activity was not recorded"));
+                }))
+            <p>Routing: <output id="alert-routing" aria-label="Routing status">@(Model.NightAlerts ? "Send to night desk" : "Do not send alerts")</output></p>
+            <p>Change: <output id="alert-change" aria-label="Change receipt">No changes yet</output></p>
+            <p>Last routing activity: <output id="alert-activity" aria-label="Activity receipt">No routing activity recorded</output></p>
+            <p>Activation: <output id="alert-activation" aria-label="Activation receipt">Awaiting activation</output></p>
+            <p>Decision: <output id="alert-decision" aria-label="Decision review">Awaiting choice</output></p>
+            <p>Request source: <output id="alert-request-source" aria-label="Request source">Awaiting activation</output></p>
+            <p>Policy: <output id="alert-policy" aria-label="Policy status">Awaiting confirmation</output></p>
+            @if (Model.ReplacingSetting)
+            {
+                @(Html.NativeButton("keep-alerts-enabled", "Keep alerts enabled")
+                    .Reactive(plan, button => button.Click, (_, pipeline) =>
+                        pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>().Toggle()))
+            }
+            else
+            {
+                @(Html.NativeButton("change-alert-routing", Model.NightAlerts ? "Pause night alerts" : "Enable night alerts")
+                    .Reactive(plan, button => button.Click, (_, pipeline) =>
+                    {
+                        var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                        alerts.Checked.Set(!Model.NightAlerts);
+                        alerts.DataBind();
+                        pipeline.When(alerts.Checked)
+                            .Then(applied => applied.Element("alert-routing").Text.Set("Send to night desk"))
+                            .Else(applied => applied.Element("alert-routing").Text.Set("Do not send alerts"));
+                    }))
+                @(Html.NativeButton("apply-panel-choice", "Apply panel choice")
+                    .Reactive(plan, button => button.Click, (_, pipeline) =>
+                        pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>().Toggle()))
+                @(Html.NativeButton("activate-alert-control", "Activate alert control")
+                    .Reactive(plan, button => button.Click, (_, pipeline) =>
+                        pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>().Click()))
+            }
+            @(Html.NativeButton("save-alert-preferences", "Save alert preferences")
+                .Reactive(plan, button => button.Click, (_, pipeline) => pipeline
+                    .Post<AlertPreferenceChange>(CarePages.AlertPreferencesSave, request => request.Input(sent => sent.NightAlerts, pipeline.Input(m => m.NightAlerts)))
+                    .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved-alert-preference").Text.Set(saved.Body))))
+            <p><output id="saved-alert-preference" aria-label="Saved preference">No preference saved</output></p>
+        </fieldset>
+    }
+    @if (Model.ReviewChannel)
+    {
+        <fieldset>
+            <legend>Channel review</legend>
+            @(Html.NativeButton("review-alert-channel", "Review alert channel")
+                .Reactive(plan, button => button.Click, (_, pipeline) =>
+                {
+                    var input = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>().Element;
+                    pipeline.When(input.HasAttribute("aria-label"))
+                        .Then(pipeline =>
+                        {
+                            pipeline.Element("alert-channel-review").Text.Set(input.GetAttribute("aria-label"));
+                            pipeline.Element("alert-channel-label-source").Text.Set("Uses custom wording");
+                        })
+                        .Else(pipeline =>
+                        {
+                            pipeline.Element("alert-channel-review").Text.Set(fieldLabel);
+                            pipeline.Element("alert-channel-label-source").Text.Set("Uses the field label");
+                        });
+                }))
+            <p><output id="alert-channel-review" aria-label="Channel review">Awaiting review</output></p>
+            <p><output id="alert-channel-label-source" aria-label="Channel label source">Awaiting review</output></p>
+            @(Html.NativeButton("review-alert-root", "Check screen-reader wording")
+                .Reactive(plan, button => button.Click, (_, pipeline) =>
+                {
+                    var root = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>().GetRootElement();
+                    pipeline.When(root.HasAttribute("aria-label"))
+                        .Then(pipeline =>
+                        {
+                            pipeline.Element("alert-root-review").Text.Set(root.GetAttribute("aria-label"));
+                            pipeline.Element("alert-root-label-source").Text.Set("Uses custom wording");
+                        })
+                        .Else(pipeline =>
+                        {
+                            pipeline.Element("alert-root-review").Text.Set(fieldLabel);
+                            pipeline.Element("alert-root-label-source").Text.Set("Uses the field label");
+                        });
+                }))
+            <p><output id="alert-root-review" aria-label="Screen-reader wording">Awaiting review</output></p>
+            <p><output id="alert-root-label-source" aria-label="Screen-reader label source">Awaiting review</output></p>
+        </fieldset>
+    }
+    <fieldset>
+        <legend>Editing access</legend>
+        <p>Review: <output id="alert-access" aria-label="Access review">Awaiting review</output></p>
+        @(Html.NativeButton("change-alert-access", Model.Locked ? "Unlock and apply" : "Lock and apply")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                alerts.Disabled.Set(!Model.Locked);
+                alerts.DataBind();
+                alerts.Click();
+                pipeline.When(alerts.Checked)
+                    .Then(applied => applied.Element("alert-access").Text.Set(Model.Locked ? "Editable and enabled" : "Locked while enabled"))
+                    .Else(applied => applied.Element("alert-access").Text.Set(Model.Locked ? "Editable and paused" : "Locked and paused"));
+            }))
+        @(Html.NativeButton("review-alert-access", "Review only")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                pipeline.When(alerts.Disabled)
+                    .Then(pipeline => pipeline.Element("alert-access").Text.Set("Locked for review"))
+                    .Else(pipeline => pipeline.Element("alert-access").Text.Set("Editable"));
+            }))
+    </fieldset>
+    <fieldset>
+        <legend>Control display</legend>
+        <p>Display:
+            <output aria-label="Display review">
+                <span class="display-choice standard-display">Standard display</span>
+                <span class="display-choice compact-display">Compact display</span>
+                <span class="display-choice wide-display">Wide display</span>
+            </output>
+        </p>
+        <p>Layout:
+            <output aria-label="Layout review">
+                <span class="layout-choice right-to-left">Right to left</span>
+                <span class="layout-choice left-to-right">Left to right</span>
+            </output>
+        </p>
+        @(Html.NativeButton("use-night-display", "Use night display")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                alerts.OnLabel.Set("Night dispatch on");
+                alerts.OffLabel.Set("Night dispatch paused");
+                alerts.DataBind();
+            }))
+        @(Html.NativeButton("change-alert-density", Model.Compact ? "Use wide display" : "Use compact display")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                alerts.CssClass.Set(Model.Compact ? "alert-switch wide-alert" : "alert-switch compact-alert");
+                alerts.DataBind();
+            }))
+        @(Html.NativeButton("change-alert-direction", Model.RightToLeft ? "Use left-to-right layout" : "Use right-to-left layout")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                alerts.EnableRtl.Set(!Model.RightToLeft);
+                alerts.DataBind();
+            }))
+        @(Html.NativeButton("review-alert-direction", "Review active layout")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                pipeline.When(alerts.EnableRtl)
+                    .Then(pipeline => pipeline.Element("alert-direction-review").Text.Set("Right to left"))
+                    .Else(pipeline => pipeline.Element("alert-direction-review").Text.Set("Left to right"));
+            }))
+        <p><output id="alert-direction-review" aria-label="Direction review">Awaiting review</output></p>
+        @(Html.NativeButton("review-alert-density", "Review display density")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                pipeline.When(alerts.CssClass.Eq("alert-switch compact-alert"))
+                    .Then(pipeline => pipeline.Element("alert-density-review").Text.Set("Compact switch layout"))
+                    .ElseIf(alerts.CssClass.Eq("alert-switch wide-alert"))
+                    .Then(pipeline => pipeline.Element("alert-density-review").Text.Set("Wide switch layout"))
+                    .Else(pipeline => pipeline.Element("alert-density-review").Text.Set("Standard switch layout"));
+            }))
+        <p><output id="alert-density-review" aria-label="Density review">Awaiting review</output></p>
+        @(Html.NativeButton("review-alert-wording", "Review active wording")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                pipeline.When(alerts.Checked)
+                    .Then(pipeline => pipeline.Element("alert-wording-review").Text.Set(alerts.OnLabel))
+                    .Else(pipeline => pipeline.Element("alert-wording-review").Text.Set(alerts.OffLabel));
+            }))
+        @(Html.NativeButton("clear-alert-wording", "Clear display wording")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+            {
+                var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                alerts.OnLabel.Set(string.Empty);
+                alerts.OffLabel.Set(string.Empty);
+                alerts.DataBind();
+                pipeline.When(alerts.OnLabel.Eq(string.Empty).And(alerts.OffLabel.Eq(string.Empty)))
+                    .Then(pipeline => pipeline.Element("alert-wording-review").Text.Set("No wording override"));
+            }))
+        <p><output id="alert-wording-review" aria-label="Wording review">Awaiting review</output></p>
+        @(Html.NativeButton("focus-alert-control", "Focus alert control")
+            .Reactive(plan, button => button.Click, (_, pipeline) =>
+                pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>().FocusIn()))
+    </fieldset>
+    @if (Model.ReviewStorage)
+    {
+        <fieldset>
+            <legend>Browser storage</legend>
+            @(Html.NativeButton("remember-alerts-on-browser", "Remember on this browser")
+                .Reactive(plan, button => button.Click, (_, pipeline) =>
+                {
+                    var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                    alerts.EnablePersistence.Set(true);
+                    alerts.Refresh();
+                }))
+            @(Html.NativeButton("review-alert-storage", "Review storage policy")
+                .Reactive(plan, button => button.Click, (_, pipeline) =>
+                {
+                    var alerts = pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>();
+                    pipeline.When(alerts.EnablePersistence)
+                        .Then(pipeline => pipeline.Element("alert-storage-review").Text.Set("Remembered here"))
+                        .Else(pipeline => pipeline.Element("alert-storage-review").Text.Set("Use server default"));
+                }))
+            <p><output id="alert-storage-review" aria-label="Storage review">Awaiting review</output></p>
+            <p><a href="@CarePages.AlertPreferencesSavedOnBrowser">Review saved alert preference</a></p>
+        </fieldset>
+    }
+</div>
+@Html.RenderPlan(plan)

@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MedicationReview
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Medication review";
+    var plan = Html.ReactivePlan<MedicationReview>();
+    var doses = new HeldStart { Items = [new ItemStart { Name = "Dose A" }, new ItemStart { Name = "Dose B" }, new ItemStart { Name = "Dose C" }] };
+}
+<h1>Medication review: @Model.Resident</h1>
+@(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner", Held = doses })
+    .Reactive(scanner => scanner.Raised, Model.Policy, (raised, pipeline) => pipeline
+        .Post(MedicationReviewEndpoints.Reviews)
+        .Busy("review-busy")
+        .OnSuccess(pipeline => raised.Held.ItemAt(raised.Count).Act())
+        .Finally(pipeline => pipeline.Element("review-history").Text.Append("Finished"))))
+<section id="review-busy" aria-label="Review">
+    <p>History: <span id="review-history"></span></p>
+</section>
+@Html.RenderPlan(plan)

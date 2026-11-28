@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Navigations
+@model CareSections
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Care sections";
+    var plan = Html.ReactivePlan<CareSections>();
+}
+<h1>Care sections</h1>
+@(Html.FusionAccordion(plan, "care-sections", build => build
+    .Items(new List<AccordionItem>
+    {
+        new() { Header = "Medications", Content = "Metformin with breakfast" },
+        new() { Header = "Allergies", Content = "Penicillin and latex" },
+        new() { Header = "Diet", Content = "Soft food, no added salt" },
+    })
+    .ExpandedIndices(new[] { Model.OpenSection })))
+<button type="button" @Html.Raises(plan, CareSectionOpenings.Diet)>Open diet</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CareSectionOpenings.Diet, pipeline => pipeline.Component<FusionAccordion>("care-sections").ExpandItem(true, 2)));
+}
+@Html.RenderPlan(plan)

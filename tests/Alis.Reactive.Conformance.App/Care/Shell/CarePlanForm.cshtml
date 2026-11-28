@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model CarePlanGoals
+@{
+    var plan = Html.ReactivePlan<CarePlanGoals>();
+}
+@(Html.InputField(plan, m => m.Goals, options => options.Label("Goals")).NativeTextBox())
+@Html.RenderPlan(plan)

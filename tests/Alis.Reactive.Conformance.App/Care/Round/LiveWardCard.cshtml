@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Realtime
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedCard
+@{
+    var plan = Html.ReactivePlan<BedCard>();
+}
+<section aria-label="Bed card">
+    <h2>@Model.Bed</h2>
+    <button type="button" @Html.Raises(plan, LiveRoundButtons.ShowTheBoardsState)>Show the board's state</button>
+    <p>Board state: <span id="board-state"></span></p>
+</section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(LiveRoundButtons.ShowTheBoardsState, pipeline => pipeline
+        .When(pipeline.Stream(WardBoardStream.Live).State.Eq(ConnectionState.Open))
+        .Then(pipeline => pipeline.Element("board-state").Text.Set("open"))
+        .Else(pipeline => pipeline.Element("board-state").Text.Set("closed"))));
+}
+@Html.RenderPlan(plan)

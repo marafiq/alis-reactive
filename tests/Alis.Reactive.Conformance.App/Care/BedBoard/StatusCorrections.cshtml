@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model StatusCorrections
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Status corrections";
+    var plan = Html.ReactivePlan<StatusCorrections>();
+    var columns = FusionGridColumns.Of<CorrectedStatus>();
+}
+<h1>Status corrections</h1>
+@(Html.FusionGrid(plan, "status-corrections", Model.Residents, build => build
+    .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Normal })
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.ResidentId), HeaderText = "Resident id", IsPrimaryKey = true, Visible = false },
+        new() { Field = columns.Field(r => r.Name), HeaderText = "Resident", AllowEditing = false },
+        new() { Field = columns.Field(r => r.Status), HeaderText = "Status", EditTemplate = FusionGridEditTemplates.Select((CorrectedStatus r) => r.Status, Model.Statuses) },
+    })))
+@Html.RenderPlan(plan)

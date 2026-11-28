@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model TeamBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Team board";
+    var plan = Html.ReactivePlan<TeamBoard>();
+}
+<h1>Team board of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, TeamBoards.OpenTheTools)>Open the board's tools</button>
+<button type="button" @Html.Raises(plan, TeamBoards.ClearTheBoard)>Clear the board</button>
+<button type="button" @Html.Raises(plan, TeamBoards.ClearTheNoticeboard)>Clear the noticeboard</button>
+<section id="board" aria-label="Board">
+    <section id="board-tools" aria-label="Board tools"></section>
+</section>
+<section id="noticeboard" aria-label="Noticeboard">
+    <p>Fire drill at ten</p>
+</section>
+<p>Status: <output id="board-status">Open</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(TeamBoards.OpenTheTools, pipeline => pipeline.Get(TeamBoardEndpoints.Tools).Into("board-tools"))
+        .CustomEvent(TeamBoards.ClearTheBoard, pipeline =>
+        {
+            pipeline.Element("board-status").Text.Set("Clearing");
+            pipeline.Element("board").Text.Set("Cleared");
+            pipeline.Element("board-status").Text.Set("Board cleared");
+        })
+        .CustomEvent(TeamBoards.ClearTheNoticeboard, pipeline => pipeline.Element("noticeboard").Text.Set("Noticeboard cleared")));
+}
+@Html.RenderPlan(plan)

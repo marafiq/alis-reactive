@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model BedTurnover
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed turnover";
+    var plan = Html.ReactivePlan<BedTurnover>();
+    var columns = FusionGridColumns.Of<TurnoverBed>();
+    var turnover = FusionTemplate.Create<TurnoverBed>();
+    var shown = (Model.Ordered
+            ? turnover.When(m => m.Stage > TurnoverStage.Stripped, then: t => t.Span("ready"), @else: e => e.Span("stripped"))
+            : turnover.When(m => m.Stage == TurnoverStage.Made, then: t => t.Span("ready"), @else: e => e.Span("stripped")))
+        .Render(plan);
+}
+<h1>Bed turnover</h1>
+@(Html.FusionGrid(plan, "bed-turnover", Model.Beds, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(b => b.Bed), HeaderText = "Bed" },
+        new() { HeaderText = "Turnover", Template = shown },
+    })))
+@Html.RenderPlan(plan)

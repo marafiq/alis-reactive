@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AddressAdmission
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<AddressAdmission>();
+}
+<h1>Admission</h1>
+@using (Html.BeginRequestContainer(plan, "address-admission"))
+{
+    <button type="button" @Html.Raises(plan, AddressAdmissions.LoadTheHomeAddress)>Load the home address</button>
+    <button type="button" @Html.Raises(plan, AddressAdmissions.LoadThePostalAddress)>Load the postal address</button>
+    <div id="address-slot"></div>
+}
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(AddressAdmissions.LoadTheHomeAddress, pipeline => pipeline
+            .Get(AddressAdmissionEndpoints.HomeAddress)
+            .Into("address-slot"))
+        .CustomEvent(AddressAdmissions.LoadThePostalAddress, pipeline => pipeline
+            .Get(AddressAdmissionEndpoints.PostalAddress)
+            .Into("address-slot")));
+}
+@Html.RenderPlan(plan)

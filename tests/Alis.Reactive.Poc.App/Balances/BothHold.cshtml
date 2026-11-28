@@ -1,0 +1,21 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Both hold";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Both hold</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Assessment: <span id="both">unassessed</span></p>
+
+@(plan.Button("assess", "Assess the weight and the intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Weight.Gt(60).And(balance.Intake.Gt(0))).Then(both => both.Element("both").Text.Set("both"))
+            .Else(other => other.Element("both").Text.Set("not both"));
+    }))
+
+@Html.RenderPlan(plan)

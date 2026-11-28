@@ -1,0 +1,212 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model LaundryWeighingSlip
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Laundry scale worksheet";
+    var plan = Html.ReactivePlan<LaundryWeighingSlip>();
+    var scalePrefix = FusionTemplate.Create<LaundryWeighingSlip>().Text("Scale ").Render(plan);
+    var wardSource = FusionTemplate.Create<LaundryWeighingSlip>().Text("Ward scale").Render(plan);
+    var wardLaundry = FusionTemplate.Create<LaundryWeighingSlip>().Text("Ward laundry").Render(plan);
+    var supplierDelivery = FusionTemplate.Create<LaundryWeighingSlip>().Text("Supplier delivery").Render(plan);
+    var netKilos = FusionTemplate.Create<LaundryWeighingSlip>().Text("Net kilograms").Render(plan);
+    var grossPounds = FusionTemplate.Create<LaundryWeighingSlip>().Text("Gross pounds").Render(plan);
+    var kiloSuffix = FusionTemplate.Create<LaundryWeighingSlip>().Text("Kilograms").Render(plan);
+}
+<style>
+    .compact-scale { font-size: .9rem; }
+    .standard-scale { font-size: 1.1rem; }
+</style>
+<h1>Laundry scale worksheet</h1>
+<template id="receiving-source"><span>Receiving scale</span></template>
+<template id="supplier-unit"><span>Pounds</span></template>
+<fieldset>
+    <legend>Weighing slip</legend>
+    @(Html.InputField(plan, m => m.Reading, options => options.Label("Scale reading"))
+        .FusionNumericTextBox(build => build.Format("n3").Placeholder("Weight to record").PrependTemplate(scalePrefix).AppendTemplate(kiloSuffix)))
+</fieldset>
+<fieldset>
+    <legend>Print layout</legend>
+    @(Html.NativeButton("narrow-column", "Print narrow Arabic column")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.CssClass.Set("compact-scale");
+            scale.EnableRtl.Set(true);
+            scale.WidthInPixels.Set(180d);
+            scale.DataBind();
+            pipeline.When(scale.CssClass.Eq("compact-scale").And(scale.EnableRtl.Eq(true)))
+                .Then(p => p.Element("printed-layout").Text.Set("Right-to-left scale column"));
+        }))
+    @(Html.NativeButton("wide-column", "Print standard column")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.CssClass.Set("standard-scale");
+            scale.EnableRtl.Set(false);
+            scale.Width.Set("75%");
+            scale.DataBind();
+            pipeline.When(scale.CssClass.Eq("standard-scale").And(scale.EnableRtl.Eq(false)))
+                .Then(p => p.Element("printed-layout").Text.Set("Standard scale column"));
+        }))
+    @(Html.NativeButton("keep-narrow", "Keep narrow width")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.Width.Set((string?)null);
+            scale.DataBind();
+        }))
+    @(Html.NativeButton("keep-wide", "Keep standard width")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.WidthInPixels.Set((double?)null);
+            scale.DataBind();
+        }))
+    <p><output id="printed-layout" aria-label="Print layout">Choose the print layout</output></p>
+</fieldset>
+<fieldset>
+    <legend>Printed caption</legend>
+    @(Html.NativeButton("fixed-caption", "Keep caption raised")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.FloatLabelType.Set(FusionNumericLabelMode.Always);
+            scale.DataBind();
+            pipeline.When(scale.FloatLabelType.Eq(FusionNumericLabelMode.Always))
+                .Then(p => p.Element("printed-caption").Text.Set("Permanent weight caption"));
+        }))
+    @(Html.NativeButton("float-caption", "Raise caption on focus")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.FloatLabelType.Set(FusionNumericLabelMode.Auto);
+            scale.DataBind();
+            pipeline.When(scale.FloatLabelType.Eq(FusionNumericLabelMode.Auto))
+                .Then(p => p.Element("printed-caption").Text.Set("Focus-raised weight caption"));
+        }))
+    @(Html.NativeButton("inline-caption", "Use inline caption")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.FloatLabelType.Set(FusionNumericLabelMode.Never);
+            scale.Refresh();
+            pipeline.When(scale.FloatLabelType.Eq(FusionNumericLabelMode.Never))
+                .Then(p => p.Element("printed-caption").Text.Set("Inline weight caption"));
+        }))
+    <p><output id="printed-caption" aria-label="Printed caption">Choose a caption</output></p>
+</fieldset>
+<fieldset>
+    <legend>Weighing instructions</legend>
+    @(Html.NativeButton("ward-instructions", "Use ward instructions")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.Placeholder.Set("Weigh without the cart");
+            scale.DataBind();
+            pipeline.When(scale.Locale.Eq("en-US").And(scale.Placeholder.Eq("Weigh without the cart")))
+                .Then(p => p.Element("weighing-instructions").Text.Set("Ward weighing instructions"));
+        }))
+    @(Html.NativeButton("community-instructions", "Use community language")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.Locale.Set("en-GB");
+            scale.DataBind();
+            pipeline.When(scale.Locale.Eq("en-GB").And(scale.Placeholder.Eq("Weight to record")))
+                .Then(p => p.Element("weighing-instructions").Text.Set("Community weighing instructions"));
+        }))
+    @(Html.NativeButton("remove-instructions", "Remove local wording")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.Placeholder.Set((string?)null);
+            scale.DataBind();
+            pipeline.When(scale.Placeholder.IsNull().And(scale.Element.HasAttribute("placeholder").Not()))
+                .Then(p => p.Element("weighing-guide").Text.Set("Use the ward weighing handbook"));
+        }))
+    @(Html.NativeButton("suppress-instructions", "Suppress wording")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.Placeholder.Set(string.Empty);
+            scale.DataBind();
+            pipeline.When(scale.Placeholder.Eq(string.Empty).And(scale.Element.HasAttribute("placeholder").Not()))
+                .Then(p => p.Element("weighing-guide").Text.Set("Use the scale diagram"));
+        }))
+    <p><output id="weighing-instructions" aria-label="Weighing instructions">Choose the local instructions</output></p>
+    <p><output id="weighing-guide" aria-label="Weighing guide">Use the printed instructions</output></p>
+</fieldset>
+<fieldset>
+    <legend>Slip labels</legend>
+    @(Html.NativeButton("ward-slip", "Prepare ward slip")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.PrependTemplate.Set(wardSource);
+            scale.AppendTemplate.Set(kiloSuffix);
+            scale.DataBind();
+        }))
+    @(Html.NativeButton("delivery-slip", "Prepare delivery slip")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.PrependTemplate.Set("#receiving-source");
+            scale.AppendTemplate.Set("#supplier-unit");
+            scale.DataBind();
+        }))
+    @(Html.NativeButton("plain-slip", "Use plain replacement slip")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.PrependTemplate.Set((string?)null);
+            scale.AppendTemplate.Set((string?)null);
+            scale.DataBind();
+            pipeline.Element("replacement-slip").Text.Set("Write the unit on the slip");
+        }))
+    @(Html.NativeButton("ward-labels", "Attach ward labels")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.Format.Set("n3");
+            scale.PrependTemplateCallback.Set(request => request.TemplateName.Eq("template").And(scale.Format.Eq("n3")).Choose(wardLaundry, supplierDelivery));
+            scale.AppendTemplateCallback.Set(request => request.TemplateName.Eq("template").And(scale.Format.Eq("n3")).Choose(netKilos, grossPounds));
+            scale.DataBind();
+        }))
+    @(Html.NativeButton("delivery-labels", "Attach receiving labels")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.Format.Set("n1");
+            scale.PrependTemplateCallback.Set(request => request.TemplateName.Eq("template").And(scale.Format.Eq("n3")).Choose(wardLaundry, supplierDelivery));
+            scale.AppendTemplateCallback.Set(request => request.TemplateName.Eq("template").And(scale.Format.Eq("n3")).Choose(netKilos, grossPounds));
+            scale.DataBind();
+        }))
+    <p><output id="replacement-slip" aria-label="Replacement slip">Use the printed unit</output></p>
+</fieldset>
+@(Html.NativeButton("community-style", "Use community print style")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.CssClass.Set((string?)null);
+            scale.DataBind();
+            pipeline.When(scale.CssClass.IsNull())
+                .Then(p => p.Element("printed-layout").Text.Set("Community print style"));
+        }))
+@(Html.NativeButton("unbranded", "Make unbranded copy")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var scale = pipeline.Input(m => m.Reading).Component<FusionNumericTextBox<decimal?>>();
+            scale.CssClass.Set(string.Empty);
+            scale.DataBind();
+            pipeline.When(scale.CssClass.Eq(string.Empty))
+                .Then(p => p.Element("printed-layout").Text.Set("Unbranded print copy"));
+        }))
+@Html.RenderPlan(plan)

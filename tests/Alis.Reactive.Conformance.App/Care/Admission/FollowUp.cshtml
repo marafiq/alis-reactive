@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FollowUp
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Follow-up";
+    var plan = Html.ReactivePlan<FollowUp>();
+}
+<h1>Follow-up</h1>
+@using (var followUp = Html.BeginRequestContainer(plan, "follow-up"))
+{
+    @(Html.InputField(plan, m => m.Reason, options => options.Label("Reason")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Due, options => options.Label("Due")).NativeTextBox())
+    @(Html.NativeButton("save-follow-up", "Save follow-up").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<FollowUp>(FollowUpEndpoints.FollowUps, request => request.UrlEncoded(followUp.Container, body => { }))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("followed-up").Text.Set(saved.Body))))
+    @(Html.NativeButton("send-to-the-gp", "Send to the GP").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<FollowUp>(FollowUpEndpoints.Referrals, request => request.Json(followUp.Container, body => { }))
+        .OnSuccess(Content.Text, (sent, pipeline) => pipeline.Element("followed-up").Text.Set(sent.Body))))
+}
+<p>Follow-up: <span id="followed-up"></span></p>
+@Html.RenderPlan(plan)

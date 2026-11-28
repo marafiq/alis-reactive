@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardRoundDose
+@{
+    Layout = "/Care/Round/_TracedLayout.cshtml";
+    ViewData["Title"] = "Ward round";
+    var plan = Html.ReactivePlan<WardRoundDose>();
+}
+<h1>Ward round</h1>
+@using (var dose = Html.BeginRequestContainer(plan, "ward-dose"))
+{
+    <fieldset>
+        <legend>Dose</legend>
+        @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-dose", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<WardRoundDose>(CareEndpoints.WardDoses, request => request.Inputs(dose.Container).Path(sent => sent.Ward, pipeline.PageUrl<WardRoundDose>(CarePages.WardRound).Read(page => page.Ward)))
+        .Validate<WardRoundDoseRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))
+        .Chained((saved, pipeline) => pipeline
+            .Get<WardCensusAsk>(CareEndpoints.WardCensus, request => request.Path(ask => ask.Ward, pipeline.PageUrl<WardRoundDose>(CarePages.WardRound).Read(page => page.Ward)))
+            .OnSuccess<WardHeadcount>((census, pipeline) => pipeline.Element("census").Text.Set(census.Body.Read(count => count.Count))))))
+}
+<p>Saved: <span id="saved"></span></p>
+<p>Census: <span id="census"></span></p>
+<p><a href="@CareEndpoints.WardCensus.Replace("{Ward}", Uri.EscapeDataString(Model.Ward), StringComparison.Ordinal)">Census of the @Model.Ward ward</a></p>
+@Html.RenderPlan(plan)

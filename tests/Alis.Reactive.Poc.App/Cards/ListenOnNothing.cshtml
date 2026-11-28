@@ -1,0 +1,12 @@
+@using Alis.Reactive.Poc.App.Cards
+@model CardsWard
+@{
+    var plan = Html.ReactivePlan<CardsWard>();
+    plan.Plugin<WardPager>().Reactive(pager => pager.Paged, (paged, pipeline) =>
+        pipeline.Listen(paged.Relief, call => call.Answered, (answered, heard) =>
+            heard.Component<CallLog>("calls").Note("The relief heard the call answered")));
+}
+
+@plan.CallLog("calls")
+
+@Html.RenderPlan(plan)

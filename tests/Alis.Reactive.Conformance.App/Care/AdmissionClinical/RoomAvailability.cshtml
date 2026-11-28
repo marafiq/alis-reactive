@@ -1,0 +1,36 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomAvailability
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Room release";
+    var plan = Html.ReactivePlan<RoomAvailability>();
+}
+<h1>Room release</h1>
+@(Html.FusionRadioButton(plan, "release-room", build => build.Label("Single room").Name("placement").Value("Garden suite").Disabled(Model.Held)))
+@(Html.NativeButton("issue-slip", "Issue availability slip")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var input = pipeline.Component<FusionRadioButton>("release-room").Element;
+        pipeline.When(input.HasAttribute("disabled").And(input.GetAttribute("disabled").Eq(string.Empty)))
+            .Then(pipeline => pipeline.Element("slip").Text.Set("Hold for housekeeping"))
+            .ElseIf(input.GetAttribute("disabled").IsNull())
+            .Then(pipeline => pipeline.Element("slip").Text.Set(input.GetAttribute("value")));
+    }))
+<p><output id="slip" aria-label="Availability slip">Slip not issued</output></p>
+@(Html.NativeButton("check-transfer", "Check transfer destination")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var input = pipeline.Component<FusionRadioButton>("release-room").GetRootElement();
+        pipeline.When(input.HasAttribute("disabled").And(input.GetAttribute("disabled").Eq(string.Empty)))
+            .Then(pipeline => pipeline.Element("transfer").Text.Set("Transfer on hold"))
+            .ElseIf(input.GetAttribute("disabled").IsNull())
+            .Then(pipeline => pipeline.Element("transfer").Text.Set(input.GetAttribute("value")));
+    }))
+<p><output id="transfer" aria-label="Transfer destination">Transfer awaiting review</output></p>
+@Html.RenderPlan(plan)

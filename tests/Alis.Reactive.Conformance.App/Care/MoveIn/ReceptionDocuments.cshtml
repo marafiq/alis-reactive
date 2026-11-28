@@ -1,0 +1,41 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model DocumentsPage
+@{
+    var plan = Html.ReactivePlan<DocumentsPage>();
+}
+@using (var documents = Html.BeginRequestContainer(plan, "reception-documents"))
+{
+    @(Html.NativeHiddenField(plan, m => m.LastModified[0]))
+    <label for="reception-document">Reception document</label>
+    @(plan.Render<AdmissionFileInput>("reception-document", Html.TextBoxFor(m => m.Files, new { type = "file", id = "reception-document" }))
+        .Reactive(input => input.Change, (change, pipeline) =>
+        {
+            var files = pipeline.Component<AdmissionFileInput>("reception-document").Files.Items;
+            pipeline.When(files.Any()).Then(pipeline => pipeline.Input(m => m.LastModified[0]).Component<NativeHiddenField>().Value.Set(pipeline.Concat(files.At(0).LastModified)));
+        }))
+    @(Html.NativeButton("file-reception-document", "File reception document").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        var draft = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Post<DocumentsPage>(MoveInEndpoints.Documents, request => request
+            .Path(m => m.DraftId, Model.DraftId)
+            .Header(MoveInEndpoints.CoordinatorHeader, draft.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, draft.Read(m => m.OperationId))
+            .Multipart(documents.Container, body => body
+                .Set(r => r.Version, Model.Version)
+                .Set(r => r.Kind, Model.Kind)
+                .Set(r => r.Caption, pipeline.Component<NativeTextBox>("reception-document-caption").Value)
+                .File(m => m.Files, pipeline.Component<AdmissionFileInput>("reception-document").Files.Items)))
+        .OnSuccess<DocumentReply>((filed, pipeline) => pipeline.Get<ReceiptQuery>(CareEndpoints.MoveInReceipts, request => request
+            .Query(m => m.DraftId, filed.Body.Read(r => r.Admission.DraftId))
+            .Query(m => m.Reference, filed.Body.Read(r => r.Admission.Documents.Receipt.Id))).Into("reception-document-receipt"))
+        .OnError((failure, pipeline) => pipeline.Notice().Error("The document could not be filed."));
+    }))
+}
+<div id="reception-document-receipt"></div>
+@Html.RenderPlan(plan)

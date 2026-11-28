@@ -1,0 +1,269 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@using Newtonsoft.Json.Linq
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.DropDowns
+@model CommunicationPreferences
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Communication preferences";
+    var plan = Html.ReactivePlan<CommunicationPreferences>();
+    const string languageId = "preferred-language";
+    var languageOption = FusionTemplate.Create<CommunicationLanguage>()
+        .Span(language => language.Label)
+        .Text(" · ")
+        .Span(language => language.Script)
+        .Render(plan);
+    var languageBox = Html.EJS().ComboBox(languageId)
+        .DataSource(new JRaw(plan.Json(CommunicationPreferences.Languages)))
+        .Fields(new ComboBoxFieldSettings
+        {
+            Text = plan.JsonPath((CommunicationLanguage language) => language.Label).Single(),
+            Value = plan.JsonPath((CommunicationLanguage language) => language.Code).Single(),
+        })
+        .AllowCustom(false)
+        .ShowClearButton(false)
+        .ItemTemplate(languageOption)
+        .AllowObjectBinding(true)
+        .Value(new JRaw(plan.Json(Model.Selected)));
+
+    void DirectoryRefused(Pipeline<CommunicationPreferences> pipeline, string message)
+    {
+        pipeline.Input(m => m.InterpreterServiceCode).Component<FusionComboBox<string?>>().HideSpinner();
+        pipeline.Element("directory-error").Text.Set(message);
+    }
+
+    void ReviewSupport(Pipeline<CommunicationPreferences> pipeline, TypedSource<bool> needsInterpreter, TypedSource<bool> needsTranslatedPack)
+    {
+        var consentGiven = pipeline.Input(m => m.Consent).Component<FusionComboBox<bool?>>().Value.Eq(true);
+        var telephone = pipeline.Input(m => m.Channel).Component<FusionComboBox<string?>>().Value.Eq("telephone");
+        var enoughNotice = pipeline.Input(m => m.LeadMinutes).Component<FusionComboBox<int?>>().Value.Gte(30);
+
+        pipeline.When(needsInterpreter.And(consentGiven).And(telephone.Or(enoughNotice)))
+            .Then(pipeline =>
+            {
+                pipeline.Element("guidance").Text.Set(CommunicationPreferences.Book);
+                pipeline.Element("booking").Show();
+                pipeline.Element("pack").Hide();
+            })
+            .ElseIf(needsTranslatedPack)
+            .Then(pipeline =>
+            {
+                pipeline.Element("guidance").Text.Set(CommunicationPreferences.PreparePack);
+                pipeline.Element("booking").Hide();
+                pipeline.Element("pack").Show();
+            })
+            .Else(pipeline =>
+            {
+                pipeline.Element("guidance").Text.Set(CommunicationPreferences.Standard);
+                pipeline.Element("booking").Hide();
+                pipeline.Element("pack").Hide();
+            });
+    }
+
+    void ReviewSelectedLanguage(Pipeline<CommunicationPreferences> pipeline)
+    {
+        var language = pipeline.Component<FusionComboBox<CommunicationLanguage?>>(languageId).Value;
+        ReviewSupport(pipeline,
+            language.Read(row => row!.Support.Spoken.RequiresInterpreter),
+            language.Read(row => row!.Support.Written.NeedsTranslatedPack));
+    }
+}
+<h1>Communication preferences for Helen Martinez</h1>
+<fieldset>
+    <legend>Contact channel</legend>
+    @(Html.InputField(plan, m => m.Channel, label => label.Label("Contact channel"))
+        .FusionComboBox(CommunicationPreferences.Channels, box => box
+            .Fields((ContactChoice<string> choice) => choice.Label, choice => choice.Code)
+            .AllowCustom(false)
+            .ShowClearButton(false))
+        .Reactive(box => box.Change, (changed, pipeline) =>
+        {
+            pipeline.When(changed.Value.Eq("letter"))
+                .Then(pipeline =>
+                {
+                    pipeline.Element("channel-instruction").Text.Set(CommunicationPreferences.LetterInstruction);
+                    pipeline.Element("mailing-address").Show();
+                })
+                .ElseIf(changed.Value.Eq("telephone"))
+                .Then(pipeline =>
+                {
+                    pipeline.Element("channel-instruction").Text.Set(CommunicationPreferences.TelephoneInstruction);
+                    pipeline.Element("mailing-address").Hide();
+                })
+                .Else(pipeline =>
+                {
+                    pipeline.Element("channel-instruction").Text.Set("Choose a contact channel.");
+                    pipeline.Element("mailing-address").Hide();
+                });
+            ReviewSelectedLanguage(pipeline);
+        }))
+    <p id="channel-instruction">@(Model.Channel == "letter" ? CommunicationPreferences.LetterInstruction : CommunicationPreferences.TelephoneInstruction)</p>
+    <p id="mailing-address" hidden="@(Model.Channel != "letter")">Records desk mailing address: 18 Maple Lane, West Wing.</p>
+</fieldset>
+<fieldset>
+    <legend>Advance notice</legend>
+    @(Html.InputField(plan, m => m.LeadMinutes, label => label.Label("Advance notice"))
+        .FusionComboBox(CommunicationPreferences.Notice, box => box
+            .Fields((ContactChoice<int> choice) => choice.Label, choice => choice.Code)
+            .AllowCustom(false)
+            .ShowClearButton(false))
+        .Reactive(box => box.Change, (changed, pipeline) =>
+        {
+            pipeline.When(changed.Value.Eq(0))
+                .Then(pipeline =>
+                {
+                    pipeline.Element("notice-instruction").Text.Set(CommunicationPreferences.ShortNotice);
+                    pipeline.Element("arrival-contact").Show();
+                })
+                .ElseIf(changed.Value.Eq(30))
+                .Then(pipeline =>
+                {
+                    pipeline.Element("notice-instruction").Text.Set(CommunicationPreferences.PreparationNotice);
+                    pipeline.Element("arrival-contact").Hide();
+                })
+                .Else(pipeline =>
+                {
+                    pipeline.Element("notice-instruction").Text.Set("Choose an advance notice period.");
+                    pipeline.Element("arrival-contact").Hide();
+                });
+            ReviewSelectedLanguage(pipeline);
+        }))
+    <p id="notice-instruction">@(Model.LeadMinutes == 0 ? CommunicationPreferences.ShortNotice : CommunicationPreferences.PreparationNotice)</p>
+    <p id="arrival-contact" hidden="@(Model.LeadMinutes != 0)">Arrival calls go to reception, extension 204.</p>
+</fieldset>
+<fieldset>
+    <legend>Interpreter consent</legend>
+    @(Html.InputField(plan, m => m.Consent, label => label.Label("Interpreter consent"))
+        .FusionComboBox(CommunicationPreferences.Permissions, box => box
+            .Fields((ContactChoice<bool> choice) => choice.Label, choice => choice.Code)
+            .AllowCustom(false)
+            .ShowClearButton(false))
+        .Reactive(box => box.Change, (changed, pipeline) =>
+        {
+            pipeline.When(changed.Value.Eq(false))
+                .Then(pipeline =>
+                {
+                    pipeline.Element("consent-instruction").Text.Set(CommunicationPreferences.ConsentWithheld);
+                    pipeline.Element("consent-review").Show();
+                })
+                .ElseIf(changed.Value.Eq(true))
+                .Then(pipeline =>
+                {
+                    pipeline.Element("consent-instruction").Text.Set(CommunicationPreferences.ConsentGiven);
+                    pipeline.Element("consent-review").Hide();
+                })
+                .Else(pipeline =>
+                {
+                    pipeline.Element("consent-instruction").Text.Set("Record interpreter consent.");
+                    pipeline.Element("consent-review").Hide();
+                });
+            ReviewSelectedLanguage(pipeline);
+        }))
+    <p id="consent-instruction">@(Model.Consent == true ? CommunicationPreferences.ConsentGiven : CommunicationPreferences.ConsentWithheld)</p>
+    <p id="consent-review" hidden="@(Model.Consent != false)">The admissions nurse reviews support with Helen at her next visit.</p>
+</fieldset>
+<fieldset>
+    <legend>Preferred language</legend>
+    <label for="@languageId">Preferred language</label>
+    @(plan.Render<FusionComboBox<CommunicationLanguage?>>(languageId, languageBox.Render())
+        .Reactive(box => box.Focus, pipeline => pipeline.Element("language-keys").Show())
+        .Reactive(box => box.Blur, pipeline => pipeline.Element("language-keys").Hide())
+        .Reactive(box => box.Change, (changed, pipeline) =>
+        {
+            var previous = changed.PreviousItemData<CommunicationLanguage>();
+            var selected = changed.ItemData<CommunicationLanguage>();
+            pipeline.Element("previous-language").Text.Set(previous.Read(language => language!.Label));
+            pipeline.Element("selected-language").Text.Set(changed.Item.TextContent);
+            pipeline.Element("booking-team").Text.Set(selected.Read(language => language!.Support.Spoken.BookingTeam));
+            ReviewSupport(pipeline,
+                changed.Value.Read(language => language!.Support.Spoken.RequiresInterpreter),
+                changed.Value.Read(language => language!.Support.Written.NeedsTranslatedPack));
+        }))
+    <p id="language-keys" hidden>Use the arrow keys to choose a language and Enter to confirm.</p>
+</fieldset>
+<fieldset id="interpreter-directory">
+    <legend>Interpreter service</legend>
+    @(Html.InputField(plan, m => m.InterpreterServiceCode, label => label.Label("Interpreter service"))
+        .FusionComboBox(box => box
+            .Fields((InterpreterService service) => service.Name, service => service.Code)
+            .AllowFiltering(true)
+            .AllowCustom(false)
+            .ShowClearButton(false)
+            .Placeholder("Search by language")
+            .NoRecordsTemplate("No interpreter services found."))
+        .Reactive(box => box.Filtering, HandlerPolicy.Replace, (filtering, pipeline) =>
+        {
+            filtering.PreventDefaultAction.Set(true);
+            pipeline.Get<InterpreterSearch>(CareEndpoints.CommunicationInterpreters, request => request
+                .Query(query => query.Language, filtering.Text))
+                .Busy("interpreter-directory")
+                .WhileLoading(pipeline =>
+                {
+                    pipeline.Input(m => m.InterpreterServiceCode).Component<FusionComboBox<string?>>().ShowSpinner();
+                    pipeline.Element("directory-error").Text.Set("");
+                })
+                .OnSuccess<IReadOnlyList<InterpreterService>>((services, pipeline) =>
+                {
+                    filtering.UpdateData<InterpreterService>(services.Body);
+                    pipeline.Input(m => m.InterpreterServiceCode).Component<FusionComboBox<string?>>().HideSpinner();
+                })
+                .OnError(400, Content.None, (rejected, pipeline) => DirectoryRefused(pipeline, "Interpreter search is unavailable. Try again."))
+                .OnError(401, Content.None, (expired, pipeline) =>
+                {
+                    DirectoryRefused(pipeline, "Sign in again to search for an interpreter.");
+                    pipeline.Notice().Warning("Your session has ended.");
+                })
+                .OnError((unavailable, pipeline) => DirectoryRefused(pipeline, "Interpreter search is unavailable. Try again."));
+        })
+        .Reactive(box => box.Change, (changed, pipeline) =>
+        {
+            var service = changed.ItemData<InterpreterService>();
+            pipeline.Element("service-booking").Text.Set(service.Read(row => row!.BookingInstruction));
+        }))
+    <p id="directory-error" role="alert"></p>
+    <p id="service-booking">Choose an interpreter service for booking instructions.</p>
+</fieldset>
+<h2>Support review</h2>
+<dl>
+    <dt>Previous language</dt>
+    <dd id="previous-language">@Model.PreviousLanguage</dd>
+    <dt>Selected language</dt>
+    <dd id="selected-language">@Model.Selected.OptionLabel</dd>
+</dl>
+<p id="guidance">@Model.Guidance</p>
+<section aria-label="Interpreter booking" id="booking" hidden="@(Model.Guidance != CommunicationPreferences.Book)">
+    <p>Send the booking to <span id="booking-team">@Model.Selected.Support.Spoken.BookingTeam</span>.</p>
+</section>
+<section aria-label="Translated pack" id="pack" hidden="@(Model.Guidance != CommunicationPreferences.PreparePack)">
+    <p>Give Helen the admission pack in her selected language.</p>
+</section>
+<button type="button" @Html.Raises(plan, CommunicationPreferences.Save)>Save communication plan</button>
+<p id="receipt">@(Model.Saved ? "Communication plan on file." : "No changes saved.")</p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CommunicationPreferences.Save, pipeline =>
+    {
+        var language = pipeline.Component<FusionComboBox<CommunicationLanguage?>>(languageId).Value;
+        pipeline.Post<CommunicationPlan>(CommunicationPreferences.SaveEndpoint, request => request
+            .Json(body => body
+                .Set(sent => sent.Channel, pipeline.Input(m => m.Channel).Component<FusionComboBox<string?>>().Value)
+                .Set(sent => sent.LeadMinutes, pipeline.Input(m => m.LeadMinutes).Component<FusionComboBox<int?>>().Value)
+                .Set(sent => sent.Consent, pipeline.Input(m => m.Consent).Component<FusionComboBox<bool?>>().Value)
+                .Set(sent => sent.LanguageCode, language.Read(row => row!.Code))
+                .Set(sent => sent.RequiresInterpreter, language.Read(row => row!.Support.Spoken.RequiresInterpreter))
+                .Set(sent => sent.NeedsTranslatedPack, language.Read(row => row!.Support.Written.NeedsTranslatedPack))
+                .Set(sent => sent.PreviousLanguage, pipeline.Element("previous-language").Text)
+                .Set(sent => sent.SelectedLabel, pipeline.Element("selected-language").Text)
+                .Set(sent => sent.BookingTeam, pipeline.Element("booking-team").Text)))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("receipt").Text.Set(saved.Body))
+            .OnError(400, Content.None, (refused, pipeline) => pipeline.Element("receipt").Text.Set("Review the communication choices before saving."));
+    }));
+}
+@Html.RenderPlan(plan)

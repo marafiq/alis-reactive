@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalSavedZone
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Saved transfer timezone";
+    var plan = Html.ReactivePlan<ArrivalSavedZone>();
+}
+<h1>Saved transfer timezone</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").ServerTimezoneOffset(Model.Alternate ? -6 : 6)))
+</fieldset>
+@(Html.NativeButton("review-transfer-time", "Review transfer time")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        pipeline.When(date.ServerTimezoneOffset.Eq(-6))
+            .Then(pipeline => pipeline.Element("transfer-review").Text.Set("Western transfer schedule"))
+            .ElseIf(date.ServerTimezoneOffset.Eq(6))
+            .Then(pipeline => pipeline.Element("transfer-review").Text.Set("Eastern transfer schedule"));
+    }))
+<p><output id="transfer-review" aria-label="Transfer review">Time not reviewed</output></p>
+@Html.RenderPlan(plan)

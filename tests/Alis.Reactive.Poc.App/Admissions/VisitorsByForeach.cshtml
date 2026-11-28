@@ -1,0 +1,14 @@
+@using Alis.Reactive.Poc.App.Admissions
+@model IntakeForm
+@{
+    ViewData["Title"] = "Resident intake";
+    var plan = Html.ReactivePlan<IntakeForm>();
+}
+<h1>Resident intake</h1>
+
+@foreach (var visitor in Model.Visitors)
+{
+    @Html.InputField(plan, m => visitor.Name).TextBox("Visitor")
+}
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,36 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalSeason
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission season limits";
+    var plan = Html.ReactivePlan<ArrivalSeason>();
+}
+<h1>Admission season limits</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").StrictMode().Min(new DateTime(2026, 1, 1)).Max(new DateTime(2026, 12, 31))))
+</fieldset>
+@(Html.NativeButton("release-the-lower-limit", "Release the lower limit")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Min.Set((DateTime?)null);
+        date.DataBind();
+    }))
+@(Html.NativeButton("release-the-upper-limit", "Release the upper limit")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Max.Set((DateTime?)null);
+        date.DataBind();
+    }))
+@Html.RenderPlan(plan)

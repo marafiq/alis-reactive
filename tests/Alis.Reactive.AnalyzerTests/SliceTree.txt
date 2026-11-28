@@ -1,0 +1,2 @@
+.
+Analyzers TypeKnowledge PartialsAndSlots ValuesAndSources ArrayLambdas Vendors Validation

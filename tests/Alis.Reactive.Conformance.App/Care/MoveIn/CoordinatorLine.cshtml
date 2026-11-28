@@ -1,0 +1,111 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.Realtime
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model CoordinatorLinePage
+@{
+    var plan = Html.ReactivePlan<CoordinatorLinePage>();
+    void Display(Pipeline<CoordinatorLinePage> pipeline, TypedSource<int> sequence, TypedSource<List<PersonLabel>> coordinators, TypedSource<List<CoordinatorMessage>> messages)
+    {
+        var state = pipeline.Container<CoordinatorLinePage>("coordinator-line");
+        pipeline.When(sequence.Gte(state.Read(m => m.DisplayedSequence))).Then(pipeline =>
+        {
+            var format = pipeline.Plugin<CoordinatorLineFormat>();
+            pipeline.Input(m => m.DisplayedSequence).Component<NativeHiddenField>().Value.Set(pipeline.Concat(sequence));
+            pipeline.Element("line-sequence").Text.Set(pipeline.Concat("Sequence ", sequence));
+            pipeline.Element("line-coordinators").Text.Set(format.Members(coordinators.Select(person => person.Name)));
+            pipeline.Element("line-messages").Text.Set(format.Transcript(messages));
+        });
+    }
+    void Snapshot(Pipeline<CoordinatorLinePage> pipeline)
+    {
+        var snapshot = pipeline.Hub(CoordinatorHub.Line).Snapshot(Model.DraftId);
+        Display(pipeline, snapshot.Read(r => r.Line.Sequence), snapshot.Read(r => r.Line.Coordinators), snapshot.Read(r => r.Line.Messages));
+    }
+    void PrepareWard(Posted posted, Pipeline<CoordinatorLinePage> pipeline)
+    {
+        var draft = pipeline.Container<MoveInPage>("move-in");
+        pipeline.When(posted.Message.Contains("Bed 4").And(posted.Message.StartsWith("Bed"))).Then(pipeline => pipeline
+            .Post<WardPreparation>(MoveInEndpoints.WardPreparation, request => request.Set(m => m.DraftId, draft.Read(m => m.DraftId))
+                .Header(MoveInEndpoints.CoordinatorHeader, draft.Read(m => m.CoordinatorId)).Header(MoveInEndpoints.OperationHeader, draft.Read(m => m.OperationId))
+                .Set(m => m.Message, posted.Message).Set(m => m.BedId, draft.Read(m => m.Location.BedId)).Set(m => m.CoordinatorId, draft.Read(m => m.CoordinatorId)))
+            .NoValidation()
+            .OnSuccess(Content.Text, (accepted, pipeline) => pipeline.Element("ward-instruction").Text.Set(accepted.Body))
+            .OnError(400, Content.Text, (invalid, pipeline) => pipeline.Element("ward-instruction").Text.Set(invalid.Body))
+            .OnError(409, Content.Text, (closed, pipeline) => pipeline.Element("ward-instruction").Text.Set(closed.Body))
+            .OnError((failed, pipeline) => pipeline.Element("ward-instruction").Text.Set("Ward preparation unavailable.")));
+    }
+    void Join(Pipeline<CoordinatorLinePage> pipeline)
+    {
+        var hub = pipeline.Hub(CoordinatorHub.Line);
+        hub.Join(Model.DraftId, Model.CoordinatorId);
+        pipeline.When(hub.State.Eq(ConnectionState.Open)).Then(pipeline =>
+        {
+            Snapshot(pipeline);
+            pipeline.Element("line-id").Text.Set(hub.ConnectionId);
+        });
+    }
+}
+@using (var line = Html.BeginRequestContainer(plan, "coordinator-line"))
+{
+    @(Html.NativeHiddenField(plan, m => m.DisplayedSequence))
+    <p>Connected coordinators: <span id="line-coordinators"></span></p>
+    <p id="line-sequence"></p>
+    <p id="line-messages"></p>
+    <p>Connection: <span id="line-id"></span> <span id="line-connection"></span></p>
+    @(Html.InputField(plan, m => m.Message, o => o.Label("Line message")).NativeTextBox())
+    @(Html.NativeButton("send-line-message", "Send message").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        var message = line.Container.Read(m => m.Message);
+        var draft = pipeline.Container<MoveInPage>("move-in");
+        var hub = pipeline.Hub(CoordinatorHub.Line);
+        pipeline.When(message.NotEmpty().And(message.MinLength(3))).Then(pipeline => pipeline
+            .When(message.NotIn("test", "spam")).Then(pipeline => pipeline
+                .When(draft.Read(m => m.DraftId).Eq(Model.DraftId).And(hub.State.Eq(ConnectionState.Open))).Then(pipeline =>
+                {
+                    pipeline.Element("line-post-receipt").Text.Set("Awaiting confirmation");
+                    var posted = hub.Post(draft.Read(m => m.DraftId), draft.Read(m => m.CoordinatorId), message);
+                    pipeline.Element("line-post-receipt").Text.Set(pipeline.Concat(posted.Read(m => m.Id), " · ", posted.Read(m => m.Text)));
+                }).Else(pipeline => pipeline.Element("line-post-receipt").Text.Set("Open the current draft's line.")))
+            .Else(pipeline => pipeline.Element("line-post-receipt").Text.Set("Choose a message other than test or spam.")))
+            .Else(pipeline => pipeline.Element("line-post-receipt").Text.Set("Enter at least three characters."));
+    }))
+    <p id="line-post-receipt"></p>
+    @(Html.NativeButton("refresh-coordinator-line", "Refresh line").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        Snapshot(pipeline);
+        pipeline.Element("line-refresh").Text.Set("Snapshot refreshed");
+    }))
+    <p id="line-refresh"></p>
+    <p id="ward-instruction"></p>
+    Html.On(plan, trigger => trigger.DomReady(pipeline =>
+    {
+        pipeline.Listen(pipeline.Component<ConformanceStore>("ward-preparation-store"), store => store.Posted, PrepareWard);
+        Join(pipeline);
+    })
+        .SignalR(CoordinatorHub.Line, hub => hub.Changed, (change, pipeline) =>
+            Display(pipeline, change.Read(r => r.Line.Sequence), change.Read(r => r.Line.Coordinators), change.Read(r => r.Line.Messages)))
+        .SignalR(CoordinatorHub.Line, hub => hub.Refused, (refusal, pipeline) => pipeline.Element("line-post-receipt").Text.Set(refusal.Read(r => r.Reason)))
+        .SignalR(CoordinatorHub.Line, hub => hub.Reconnecting, pipeline =>
+        {
+            pipeline.Element("line-connection").Text.Set("Reconnecting");
+            pipeline.Element("line-messages").Text.Set("Waiting for the current messages.");
+        })
+        .SignalR(CoordinatorHub.Line, hub => hub.Reconnected, (connected, pipeline) =>
+        {
+            var id = connected.ConnectionId;
+            pipeline.When(id.NotEmpty().And(id.OrNull().NotEq(pipeline.Element("line-id").Text))).Then(pipeline =>
+            {
+                Join(pipeline);
+                pipeline.Element("line-connection").Text.Set("Reconnected on a new connection");
+            });
+        })
+        .SignalR(CoordinatorHub.Line, hub => hub.Closed, pipeline => pipeline.Element("line-connection").Text.Set("Line unavailable")));
+}
+@Html.RenderPlan(plan)

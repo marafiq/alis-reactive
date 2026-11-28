@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ResidentsByWing
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents by wing";
+    var plan = Html.ReactivePlan<ResidentsByWing>();
+}
+<h1>Residents by wing</h1>
+@(Html.InputField(plan, m => m.Wing, options => options.Label("Wing")).NativeDropDown(build => build.Items(Model.Wings)))
+@Html.RenderPlan(plan)

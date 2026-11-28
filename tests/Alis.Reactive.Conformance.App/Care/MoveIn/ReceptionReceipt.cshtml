@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model VisitorReceipt
+@{
+    var plan = Html.ReactivePlan<VisitorReceipt>();
+    if (Model.Navigation)
+    {
+        Layout = "/Care/MoveIn/_MoveInLayout.cshtml";
+        ViewData["Title"] = "Visitor receipt";
+    }
+}
+<span id="visitor-receipt">@Model.SignIn</span>
+@if (Model.Navigation)
+{
+    <p>@Html.ActionLink("Admission history", nameof(MoveInDeskController.AdmissionHistory), "MoveInDesk", new { Model.DraftId })</p>
+}
+@Html.RenderPlan(plan)

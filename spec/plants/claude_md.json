@@ -1,0 +1,46 @@
+[
+ {
+  "name": "the old order back",
+  "edits": [
+   {
+    "file": "CLAUDE.md",
+    "old": "its Playwright tests written from\n  their promises and failing, the code until they pass, each test failing on its planted defect, commit.",
+    "new": "code, its Playwright tests failing on\n  the planted defect then passing, commit."
+   }
+  ],
+  "expect": "still holds 'code, its Playwright tests failing on the planted defect then passing'"
+ },
+ {
+  "name": "code before the tests",
+  "edits": [
+   {
+    "file": "CLAUDE.md",
+    "old": "its Playwright tests written from\n  their promises and failing, the code until they pass,",
+    "new": "the code until they pass, its Playwright tests written from\n  their promises and failing,"
+   }
+  ],
+  "expect": "puts 'the code until they pass' before 'written from their promises and failing'"
+ },
+ {
+  "name": "no planted defect",
+  "edits": [
+   {
+    "file": "CLAUDE.md",
+    "old": " each test failing on its planted defect, commit.",
+    "new": " commit."
+   }
+  ],
+  "expect": "lacks 'failing on its planted defect'"
+ },
+ {
+  "name": "the unit order rewrapped at another word",
+  "edits": [
+   {
+    "file": "CLAUDE.md",
+    "old": "- A unit runs in this order: its spec lines, TLC green with each mutant failing, its Playwright tests written from\n  their promises and failing,",
+    "new": "- A unit runs in this order: its spec lines, TLC green with each mutant failing, its Playwright tests\n  written from their promises and failing,"
+   }
+  ],
+  "expect": null
+ }
+]

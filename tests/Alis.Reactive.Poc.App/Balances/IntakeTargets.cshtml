@@ -1,0 +1,56 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Intake targets";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Intake targets</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("check", "Check against the target")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Intake.OrNull().Gt(balance.Target))
+            .Then(over => over.Element("verdict").Text.Set("over target"))
+            .Else(within => within.Element("verdict").Text.Set("within target"));
+    }))
+
+@(plan.Button("reached", "Check the target is reached")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Intake.OrNull().Gte(balance.Target))
+            .Then(reached => reached.Element("verdict").Text.Set("reached"))
+            .Else(notYet => notYet.Element("verdict").Text.Set("not reached"));
+    }))
+
+@(plan.Button("under", "Check the intake is under the target")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Intake.OrNull().Lt(balance.Target))
+            .Then(under => under.Element("verdict").Text.Set("under"))
+            .Else(notUnder => notUnder.Element("verdict").Text.Set("not under"));
+    }))
+
+@(plan.Button("capped", "Check the intake is capped by the target")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Intake.OrNull().Lte(balance.Target))
+            .Then(capped => capped.Element("verdict").Text.Set("capped"))
+            .Else(over => over.Element("verdict").Text.Set("not capped"));
+    }))
+
+@(plan.Button("keep", "Keep the intake as the target")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        balance.Target.Set(balance.Intake.OrNull());
+    }))
+
+@Html.RenderPlan(plan)

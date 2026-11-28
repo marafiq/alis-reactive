@@ -1,0 +1,150 @@
+[
+ {
+  "name": "a redesign door's row dropped",
+  "edits": [
+   {
+    "file": "spec/inventory/doors.tsv",
+    "old": "Alis.Reactive.Native\t\tspec\tnet10.0\tCheckListItem\tredesign-only\tCheckListItem\tAlis.Reactive.Native.CheckListItem\t\n",
+    "new": ""
+   }
+  ],
+  "expect": "redesign Alis.Reactive.Native net10.0: 1 door lines no row holds and 0 rows no door line holds"
+ },
+ {
+  "name": "one of main's lines dropped from its text",
+  "edits": [
+   {
+    "file": "spec/inventory/main/Alis.Reactive.Native/net10.0/PublicAPI.Unshipped.txt",
+    "old": "Alis.Reactive.Native.AppLevel.DrawerSize.Lg = 2 -> Alis.Reactive.Native.AppLevel.DrawerSize\n",
+    "new": ""
+   }
+  ],
+  "expect": "main Alis.Reactive.Native net10.0: 0 door lines no row holds and 1 rows no door line holds"
+ },
+ {
+  "name": "a door on both lines marked moved",
+  "edits": [
+   {
+    "file": "spec/inventory/doors.tsv",
+    "old": "Alis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\tDrawerSize\tboth\tDrawerSize.Md = 1 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Md = 1 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Md = 1 -> Alis.Reactive.Native.AppLevel.DrawerSize\n",
+    "new": "Alis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\tDrawerSize\tmoved\tDrawerSize.Md = 1 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Md = 1 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Md = 1 -> Alis.Reactive.Native.AppLevel.DrawerSize\n"
+   }
+  ],
+  "expect": "door row DrawerSize.Md = 1 -> DrawerSize: status moved, declaring type 'DrawerSize'"
+ },
+ {
+  "name": "a door row with no declaring type",
+  "edits": [
+   {
+    "file": "spec/inventory/doors.tsv",
+    "old": "Alis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\tDrawerSize\tboth\tDrawerSize.Lg = 2 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Lg = 2 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Lg = 2 -> Alis.Reactive.Native.AppLevel.DrawerSize\n",
+    "new": "Alis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\t\tboth\tDrawerSize.Lg = 2 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Lg = 2 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Lg = 2 -> Alis.Reactive.Native.AppLevel.DrawerSize\n"
+   }
+  ],
+  "expect": "door row DrawerSize.Lg = 2 -> DrawerSize: status both, declaring type ''"
+ },
+ {
+  "name": "a test row counting a case too many",
+  "edits": [
+   {
+    "file": "spec/inventory/tests.tsv",
+    "old": "redesign\tAlis.Reactive.Framework.PlaywrightTests\ttests/Alis.Reactive.Framework.PlaywrightTests/Conditions/WhenAPageTestsAList.cs\tWhenAPageTestsAList\ta_list_holds_an_item_whatever_collection_it_is_declared_as\t8\t/Conditions/Round\ttest\n",
+    "new": "redesign\tAlis.Reactive.Framework.PlaywrightTests\ttests/Alis.Reactive.Framework.PlaywrightTests/Conditions/WhenAPageTestsAList.cs\tWhenAPageTestsAList\ta_list_holds_an_item_whatever_collection_it_is_declared_as\t9\t/Conditions/Round\ttest\n"
+   }
+  ],
+  "expect": "redesign tests: 2979 test attributes, 2980 cases in rows"
+ },
+ {
+  "name": "a grammar kind renamed in its row alone",
+  "edits": [
+   {
+    "file": "spec/inventory/kinds.tsv",
+    "old": "redesign\tgrammar\tAlis.Reactive/Grammar/Expressions.cs\tas\n",
+    "new": "redesign\tgrammar\tAlis.Reactive/Grammar/Expressions.cs\tcast\n"
+   }
+  ],
+  "expect": "kinds.tsv's redesign grammar rows differ from the source: ['as', 'cast']"
+ },
+ {
+  "name": "a main door row whose text differs from its line",
+  "edits": [
+   {
+    "file": "spec/inventory/doors.tsv",
+    "old": "Alis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\tDrawerSize\tboth\tDrawerSize.Md = 1 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Md = 1 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Md = 1 -> Alis.Reactive.Native.AppLevel.DrawerSize",
+    "new": "Alis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\tDrawerSize\tboth\tDrawerSize.Md = 1 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Md = 1 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Medium = 1 -> Alis.Reactive.Native.AppLevel.DrawerSize"
+   }
+  ],
+  "expect": "main Alis.Reactive.Native net10.0: 1 door lines no row holds and 1 rows no door line holds, first 'Alis.Reactive.Native.AppLevel.DrawerSize.Md = 1"
+ },
+ {
+  "name": "a kind renamed in both its grammar and schema rows",
+  "edits": [
+   {
+    "file": "spec/inventory/kinds.tsv",
+    "old": "redesign\tgrammar\tAlis.Reactive/Grammar/Expressions.cs\tas\n",
+    "new": "redesign\tgrammar\tAlis.Reactive/Grammar/Expressions.cs\tcast\n"
+   },
+   {
+    "file": "spec/inventory/kinds.tsv",
+    "old": "redesign\tplan.schema.json\tAsExpr\tas\n",
+    "new": "redesign\tplan.schema.json\tAsExpr\tcast\n"
+   }
+  ],
+  "expect": "kinds.tsv's redesign plan.schema.json rows differ from the source: ['as', 'cast']"
+ },
+ {
+  "name": "an analyzer's row dropped",
+  "edits": [
+   {
+    "file": "spec/inventory/analyzers.tsv",
+    "old": "ALIS002\tmain-only\t\tAlis.Reactive.Analyzers/NativeActionLink/NativeActionLinkSingleRequestAnalyzer.cs#DiagnosticId\n",
+    "new": ""
+   }
+  ],
+  "expect": "analyzers.tsv: the main line declares ALIS002 at Alis.Reactive.Analyzers/NativeActionLink/NativeActionLinkSingleRequestAnalyzer.cs#DiagnosticId, and no row holds it"
+ },
+ {
+  "name": "an analyzer marked on a line that lacks it",
+  "edits": [
+   {
+    "file": "spec/inventory/analyzers.tsv",
+    "old": "ALIS002\tmain-only\t",
+    "new": "ALIS002\tboth\t"
+   }
+  ],
+  "expect": "analyzers.tsv: ALIS002 is marked both"
+ },
+ {
+  "name": "a case label renamed",
+  "edits": [
+   {
+    "file": "spec/inventory/cases.tsv",
+    "old": "main\tAlis.Reactive.Assets/runtime/browser-objects/execution-context.ts\t64\tsuccess\n",
+    "new": "main\tAlis.Reactive.Assets/runtime/browser-objects/execution-context.ts\t64\tsucceeded\n"
+   }
+  ],
+  "expect": "cases.tsv: main Alis.Reactive.Assets/runtime/browser-objects/execution-context.ts:64 holds no case \"succeeded\""
+ },
+ {
+  "name": "two door rows in another order",
+  "edits": [
+   {
+    "file": "spec/inventory/doors.tsv",
+    "old": "Alis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\tDrawerSize\tboth\tDrawerSize.Lg = 2 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Lg = 2 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Lg = 2 -> Alis.Reactive.Native.AppLevel.DrawerSize\nAlis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\tDrawerSize\tboth\tDrawerSize.Md = 1 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Md = 1 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Md = 1 -> Alis.Reactive.Native.AppLevel.DrawerSize\n",
+    "new": "Alis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\tDrawerSize\tboth\tDrawerSize.Md = 1 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Md = 1 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Md = 1 -> Alis.Reactive.Native.AppLevel.DrawerSize\nAlis.Reactive.Native\tAlis.Reactive.Native\tspec\tnet10.0\tDrawerSize\tboth\tDrawerSize.Lg = 2 -> DrawerSize\tAlis.Reactive.Native.DrawerSize.Lg = 2 -> Alis.Reactive.Native.DrawerSize\tAlis.Reactive.Native.AppLevel.DrawerSize.Lg = 2 -> Alis.Reactive.Native.AppLevel.DrawerSize\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "two kind rows in another order",
+  "edits": [
+   {
+    "file": "spec/inventory/kinds.tsv",
+    "old": "redesign\tgrammar\tAlis.Reactive/Grammar/Expressions.cs\tas\nredesign\tgrammar\tAlis.Reactive/Grammar/Expressions.cs\tcall\n",
+    "new": "redesign\tgrammar\tAlis.Reactive/Grammar/Expressions.cs\tcall\nredesign\tgrammar\tAlis.Reactive/Grammar/Expressions.cs\tas\n"
+   }
+  ],
+  "expect": null
+ }
+]

@@ -1,0 +1,42 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalIntakeEdition
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission filing edition";
+    var plan = Html.ReactivePlan<ArrivalIntakeEdition>();
+}
+<h1>Admission filing edition</h1>
+@using (var admission = Html.BeginRequestContainer(plan, "arrival-edition"))
+{
+<fieldset>
+    <legend>Arrival date</legend>
+    @if (Model.Transfer)
+    {
+        var arrival = Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"));
+        @arrival.FusionDatePicker(build => build.Format("dd.MM.yyyy").HtmlAttributes(new Dictionary<string, object>
+        {
+            ["name"] = arrival.Name, ["aria-description"] = "Use the transfer letter date"
+        }))
+    }
+    else
+    {
+        @Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on")).FusionDatePicker()
+    }
+</fieldset>
+@(Html.NativeButton("file-this-admission", "File this admission")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        pipeline.Post<ArrivalIntakeEdition>(CarePages.FileArrivalEdition, request => request.Inputs(admission.Container).Set(file => file.Transfer, Model.Transfer))
+            .OnSuccess(Content.Text, (filed, pipeline) => pipeline.Element("filing-receipt").Text.Set(filed.Body));
+    }))
+}
+<p><output id="filing-receipt" aria-label="Filing receipt">No admission filed</output></p>
+@Html.RenderPlan(plan)

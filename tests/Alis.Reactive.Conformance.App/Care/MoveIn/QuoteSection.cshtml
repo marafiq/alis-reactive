@@ -1,0 +1,58 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model ServiceReviewRead
+@{
+    var plan = Html.ReactivePlan<ServiceReviewRead>();
+    void Panel(Pipeline<ServiceReviewRead> pipeline) => pipeline.Get<DeskQuery>(MoveInEndpoints.ServicePanel, request => request.Query(q => q.DraftId, Model.DraftId)).NoBusy().Into("service-review-owner");
+    void Offer(Pipeline<ServiceReviewRead> pipeline) => pipeline.Get<DeskQuery>(MoveInEndpoints.CurrentOffer, request => request.Query(q => q.DraftId, Model.DraftId)).NoBusy().Into("current-offer");
+}
+<p>Quote on file: <span id="quote-on-file">@Model.Quote</span></p>
+<p>Price acceptance: <span id="quote-acceptance">@Model.Acceptance</span></p>
+<p>Review on file: <span id="review-on-file">@Model.Summary</span></p>
+@(Html.NativeButton("read-saved-review", "Read saved service review").Reactive(plan, b => b.Click, (clicked, pipeline) => pipeline
+    .Get<DeskQuery>(MoveInEndpoints.ReviewContext, request => request.Query(q => q.DraftId, Model.DraftId)).NoBusy()
+    .WhileLoading(pipeline => pipeline.Element("saved-review").Text.Set("Reading saved review"))
+    .OnSuccess<ServiceReviewRead>((review, pipeline) =>
+    {
+        pipeline.Element("saved-review").Text.Set(review.Body.Read(r => r.SavedReview));
+        pipeline.Element("quote-on-file").Text.Set(review.Body.Read(r => r.Quote));
+        pipeline.Element("quote-acceptance").Text.Set(review.Body.Read(r => r.Acceptance));
+    })))
+<p id="saved-review"></p>
+@(Html.NativeButton("refresh-review", "Refresh service review").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Dispatch(QuoteEvents.ServicesEdited)))
+<div id="service-review-owner"></div>
+<div id="current-offer"></div>
+<p id="acceptance-status"></p>
+<p>Acceptance receipt: <span id="acceptance-receipt"></span></p>
+<div id="accepted-assistance"></div>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline =>
+    {
+        Panel(pipeline);
+        Offer(pipeline);
+    }).CustomEvent(QuoteEvents.ServicesEdited, HandlerPolicy.Replace, pipeline =>
+    {
+        pipeline.Unload("service-review-owner");
+        var main = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Post<QuoteRequest>(MoveInEndpoints.ServicePanel, request => request.Query(q => q.DraftId, Model.DraftId)
+            .Json(body => body.Set(q => q.Services, main.Read(m => m.Services)))).NoBusy().NoValidation().Into("service-review-owner");
+    }).CustomEvent(QuoteEvents.CheckCurrentPrice, HandlerPolicy.Replace, (previous, pipeline) =>
+    {
+        pipeline.Unload("current-offer");
+        pipeline.Element("acceptance-status").Text.Set("Checking the current quote.");
+        pipeline.Element("acceptance-receipt").Text.Set("");
+        pipeline.Unload("accepted-assistance");
+        pipeline.Element("quote-acceptance").Text.Set("Checking");
+        pipeline.Get<QuoteOfferQuery>(MoveInEndpoints.CurrentOffer, request => request.Query(q => q.DraftId, Model.DraftId)
+            .Query(q => q.PreviousRevision, previous)).NoBusy().Into("current-offer");
+    }).CustomEvent(QuoteEvents.Calculated, pipeline =>
+    {
+        pipeline.Unload("current-offer");
+        Offer(pipeline);
+    }));
+}
+@Html.RenderPlan(plan)

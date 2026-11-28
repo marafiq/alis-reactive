@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveRound
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveRound>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+<button type="button" @Html.Raises(plan, LiveLineButtons.CallNurse)>Call nurse</button>
+<p>Called: <span id="called"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(LiveLineButtons.CallNurse, pipeline => pipeline.Element("called").Text.Set(pipeline.Hub(NurseLine.Live).Call())));
+}
+@Html.RenderPlan(plan)

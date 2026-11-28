@@ -1,0 +1,41 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model LinenTransfer
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward stock transfer";
+    var plan = Html.ReactivePlan<LinenTransfer>();
+}
+<h1>Ward stock transfer</h1>
+<fieldset>
+    <legend>Ward transfer</legend>
+    @(Html.InputField(plan, m => m.Towels, o => o.Label("Towels")).FusionNumericTextBox(build => build.Format("n0").Min(6).Max(10)))
+    @(Html.NativeButton("issue-pack", "Release reserve and issue pack")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<double?>>();
+            stock.Min.Set((double?)null);
+            stock.DataBind();
+            stock.Decrement(6d);
+            pipeline.When(stock.Min.Eq(double.MinValue))
+                .Then(p => p.Element("transfer-policy").Text.Set("Reserve released"));
+        }))
+    @(Html.NativeButton("receive-pack", "Release capacity and receive pack")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<double?>>();
+            stock.Max.Set((double?)null);
+            stock.DataBind();
+            stock.Increment(6d);
+            pipeline.When(stock.Max.Eq(double.MaxValue))
+                .Then(p => p.Element("transfer-policy").Text.Set("Cart capacity released"));
+        }))
+</fieldset>
+<p><output id="transfer-policy" aria-label="Transfer policy">Transfer limits in force</output></p>
+@Html.RenderPlan(plan)

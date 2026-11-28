@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Schedule
+@model NamedShifts
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Named shifts";
+    var plan = Html.ReactivePlan<NamedShifts>();
+    var shift = FusionScheduleFields.Of<NamedShift>();
+}
+<h1>Named shifts</h1>
+@(Html.FusionSchedule(plan, "named-shifts", build => build
+    .CurrentView(View.Week)
+    .SelectedDate(Model.SelectedDate)
+    .EventSettings(new ScheduleEventSettings
+    {
+        DataSource = Model.Shifts,
+        Fields = new ScheduleField
+        {
+            Subject = new ScheduleFieldOptions { Name = shift.Field(s => s.Carer) },
+            StartTime = new ScheduleFieldOptions { Name = shift.Field(s => s.Starts) },
+            EndTime = new ScheduleFieldOptions { Name = shift.Field(s => s.Ends) },
+        },
+    })))
+@Html.RenderPlan(plan)

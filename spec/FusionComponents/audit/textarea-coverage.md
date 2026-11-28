@@ -1,0 +1,12 @@
+# FusionTextArea care-note editing
+
+The resident profile lets staff lock the current note for handover and reopen it for a correction. In M21.X2010 the same keyboard input reaches the same rendered textarea before and after staff reopen it. M21.X1029 remains the reference for the initial populated and blank model values.
+
+| Public contract | Typed path and evidence |
+|---|---|
+| `readonly: boolean`, default false | `FusionTextArea.Readonly` is a `Property<bool>` on net10.0 and net48. The profile reads the current value to toggle it, writes the result and reads the new value for the button caption. With the note locked, typing at its end preserves “Prefers tea at seven”. After reopening, the same correction yields “Prefers tea at seven with milk”. EJ2 Inputs 33.1.47 declares the property at `@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:33` and applies it to the actual textarea at `@syncfusion/ej2-inputs/src/textarea/textarea.js:110`. |
+| `dataBind(): void` | The profile invokes the existing `FusionTextArea.DataBind()` after the write. EJ2 Base 33.1.45 declares the inherited method at `@syncfusion/ej2-base/src/component.d.ts:129`. The browser case observes the resulting keyboard behavior. |
+
+The pinned inventory lists the component and four event payloads at `spec/FusionComponents/audit/slice-rows.tsv:485` through line 489. The width union (`number | string`, documented default null at `@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:95`) and template unions (`string | Function`, documented default null at lines 136 and 148) lack case-specific evidence for their alternative shapes. FusionTextArea declares no corresponding width or template member. The existing focus and blur payload holders expose their value. Reading their optional browser event or container would need observations for the TextArea's own gestures. The pinned declarations are `@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:7`, `:9`, `:15` and `:17`. The owner excludes `created` across Fusion.
+
+The pre-wiring case failed at the locked-note text. The always-writable plant allowed the correction at line 24. The always-read-only plant lost it at line 29. The restored M21.F48 net10 selection passed both cases with zero failures and zero over budget. The worktree recorded 7m21s from assignment to the restored result, including build-lock waits. The six individual runner starts through their TRX writes totaled 2m24s. Local browser proof covers net10.

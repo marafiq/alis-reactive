@@ -1,0 +1,24 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CarersOnDuty
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Carers on duty";
+    var plan = Html.ReactivePlan<CarersOnDuty>();
+}
+<h1>Carers on duty on the @Model.Wing</h1>
+<p>On duty: <span id="carers-count">-</span></p>
+<p>First by name: <span id="first-carer">-</span></p>
+<p>Rota: <span id="rota-status">Waiting</span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(CarersOnDutyEndpoints.Carers)
+        .OnSuccess<List<DutyCarer>>((carers, pipeline) =>
+        {
+            pipeline.Element("carers-count").Text.Set(carers.Body.Count());
+            pipeline.Element("first-carer").Text.Set(carers.Body.OrderBy(c => c.Name).Find(c => true, c => c.Name));
+            pipeline.Element("rota-status").Text.Set("Sorted");
+        })));
+}
+@Html.RenderPlan(plan)

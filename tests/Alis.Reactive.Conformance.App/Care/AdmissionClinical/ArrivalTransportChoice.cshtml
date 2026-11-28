@@ -1,0 +1,43 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model TransferBookingChoice
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Transport after an arrival choice";
+    var plan = Html.ReactivePlan<TransferBookingChoice>();
+}
+<h1>Transport after an arrival choice</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Change, (changed, pipeline) =>
+        {
+            var appointment = pipeline.Input(m => m.TransportOn).Component<FusionDatePicker<DateTime?>>();
+            if (Model.OfficeArranged)
+            {
+                appointment.Show();
+            }
+            else
+            {
+                appointment.Show(changed.Interaction);
+            }
+        }))
+</fieldset>
+<fieldset>
+    <legend>Transport date</legend>
+    @(Html.InputField(plan, m => m.TransportOn, options => options.Label("Transport date"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Open, (notice, pipeline) => pipeline.When(notice.OriginalEvent.Type.Eq("click"))
+            .Then(pipeline => pipeline.Element("transport-instruction").Text.Set("Confirm the resident’s chosen transfer."))
+            .Else(pipeline => pipeline.Element("transport-instruction").Text.Set("Review the office transport referral."))))
+</fieldset>
+<p><output id="transport-instruction" aria-label="Transport instruction">Awaiting arrival choice.</output></p>
+@Html.RenderPlan(plan)

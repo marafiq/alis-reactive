@@ -1,0 +1,58 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model AdmissionRegisterMargins
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission register margins";
+    var plan = Html.ReactivePlan<AdmissionRegisterMargins>();
+}
+<h1>Admission register margins</h1>
+<style>
+    .edge-board .booking-slot { position: fixed; left: 48px; top: 72px; height: 36px; box-sizing: border-box; }
+    .moving-board .booking-slot { position: absolute; }
+    .moving-board.preparing-handover .booking-slot { left: 80px; top: 104px; }
+    .moving-board.handing-over { position: fixed; left: 0; top: 0; }
+    .moving-board.handing-over .booking-slot { left: -36px; top: -24px; }
+    .final-entry .booking-slot { left: 900px; top: 500px; }
+    .handing-over .booking-slot { left: -36px; top: -24px; }
+    .board-actions { margin-top: 10rem; }
+</style>
+<div id="booking-column" class="edge-board">
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").CssClass("booking-slot").Width(220).ZIndex(2950))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            var panel = opening.Popup;
+            panel.Position.LeftInPixels.Set(-36);
+            panel.Position.TopInPixels.Set(-24);
+            panel.Collision.Horizontal.Set(Model.UseVerticalPaperMargin ? FusionDatePickerCollision.None : FusionDatePickerCollision.Fit);
+            panel.Collision.Vertical.Set(Model.UseVerticalPaperMargin ? FusionDatePickerCollision.Fit : FusionDatePickerCollision.None);
+            panel.WidthInPixels.Set(320);
+            panel.HeightInPixels.Set(300);
+            panel.DataBind();
+            pipeline.When(panel.Collision.Horizontal.Eq(FusionDatePickerCollision.Fit).And(panel.Collision.Vertical.Eq(FusionDatePickerCollision.None)))
+                .Then(pipeline => pipeline.Element("margin-advice").Text.Set("Leave the top margin for the transfer heading."))
+                .ElseIf(panel.Collision.Horizontal.Eq(FusionDatePickerCollision.None).And(panel.Collision.Vertical.Eq(FusionDatePickerCollision.Fit)))
+                .Then(pipeline => pipeline.Element("margin-advice").Text.Set("Leave the side margin for the registration marks."));
+        }))
+</fieldset>
+</div>
+<div class="board-actions">
+@(Html.NativeButton("open-appointment-board", "Open appointment board")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+<p><output id="margin-advice" aria-label="Margin advice">Open the booking calendar first.</output></p>
+</div>
+@Html.RenderPlan(plan)

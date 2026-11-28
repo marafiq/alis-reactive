@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Rota
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Rota";
+    var plan = Html.ReactivePlan<Rota>();
+}
+<h1>Rota</h1>
+@using (var rota = Html.BeginRequestContainer(plan, "rota"))
+{
+    @(Html.InputField(plan, m => m.Cover, options => options.Label("Cover")).NativeDropDown(build => build.Items(RotaLists.Covers())))
+    @(Html.NativeButton("save-rota", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<Rota>(RefusalEndpoints.Rotas, request => request.UrlEncoded(rota.Container, body => { }))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

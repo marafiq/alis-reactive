@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CareWeek
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care week";
+    var plan = Html.ReactivePlan<CareWeek>();
+}
+<h1>Care week of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, CareWeeks.Load)>Load</button>
+<button type="button" @Html.Raises(plan, CareWeeks.Send)>Send care</button>
+<p>Plan of: <span id="care-plan">-</span></p>
+<p>Care sent: <span id="care-echo"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CareWeeks.Load, pipeline => pipeline.Get(Model.Plan)
+        .OnSuccess<CareWeekPlan>((loaded, pipeline) => pipeline.Element("care-plan").Text.Set(loaded.Body.Read(week => week.Resident)))));
+    Html.On(plan, trigger => trigger.CustomEvent(CareWeeks.Send, pipeline => pipeline.Get(Model.Plan)
+        .OnSuccess<CareWeekPlan>((loaded, pipeline) => pipeline
+            .Get<CareWeekQuery>(CareWeekEndpoints.Care, request => request.Set(r => r.Care, loaded.Body.Read(week => week.Care)))
+            .OnSuccess(Content.Text, (sent, pipeline) => pipeline.Element("care-echo").Text.Set(sent.Body)))));
+}
+@Html.RenderPlan(plan)

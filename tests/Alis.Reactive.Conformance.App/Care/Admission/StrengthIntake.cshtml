@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StrengthIntake
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Intake strength";
+    var plan = Html.ReactivePlan<StrengthIntake>();
+}
+<h1>Intake strength</h1>
+@using (var intake = Html.BeginRequestContainer(plan, "strength-intake"))
+{
+    @(Html.InputField(plan, m => m.Strength, options => options.Label("Strength")).NativeTextBox())
+    @(Html.NativeButton("save-strength", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<StrengthIntake>(StrengthIntakeEndpoints.IntakesInGerman, request => request.Inputs(intake.Container))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved-strength").Html.Set(saved.Body))))
+}
+<section aria-label="Saved strength">
+    <h2>Saved strength</h2>
+    <div id="saved-strength"></div>
+</section>
+<section aria-label="Send recorded strength">
+    <h2>Send recorded strength</h2>
+    <form method="post" action="@StrengthIntakeEndpoints.IntakesInGerman" target="sent-strength">
+        <input type="hidden" name="Strength" value="1.5" />
+        <button type="submit">Send</button>
+    </form>
+    <iframe id="sent-strength" name="sent-strength" title="Sent strength"></iframe>
+</section>
+@Html.RenderPlan(plan)

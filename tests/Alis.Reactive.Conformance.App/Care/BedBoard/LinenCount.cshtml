@@ -1,0 +1,104 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LinenCount
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward linen count";
+    var plan = Html.ReactivePlan<LinenCount>();
+    void SelectBundle(Pipeline<LinenCount> pipeline, double quantity)
+    {
+        var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+        stock.Step.Set(quantity);
+        stock.DataBind();
+        pipeline.When(stock.Step.Eq(3d))
+            .Then(p => p.Element("pick-list").Text.Set("Bundle of 3"))
+            .ElseIf(stock.Step.Eq(4d)).Then(p => p.Element("pick-list").Text.Set("Bundle of 4"));
+    }
+    void PostAdjustment(Pipeline<LinenCount> pipeline, bool delivery)
+    {
+        var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+        var previous = stock.GetText();
+        if (delivery)
+            stock.Increment(0d);
+        else
+            stock.Decrement(0d);
+        pipeline.When(stock.GetText().Eq(previous))
+            .Then(p => p.Element("adjustment-receipt").Text.Set("No stock adjustment"))
+            .Else(p => p.Element("adjustment-receipt").Text.Set("Stock adjusted"));
+    }
+    void SetCartPolicy(Pipeline<LinenCount> pipeline, bool strict)
+    {
+        var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+        stock.Max.Set(10);
+        stock.StrictMode.Set(strict);
+        stock.DataBind();
+    }
+}
+<h1>Ward linen count</h1>
+<fieldset>
+    <legend>Ward linen stock</legend>
+    @(Html.InputField(plan, m => m.Towels, options => options.Label("Towels"))
+        .FusionNumericTextBox(build => build.Format("n0").Decimals(0).Min(0).Step(1))
+        .Reactive(box => box.Change, (changed, pipeline) =>
+        {
+            var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+            pipeline.When(stock.StrictMode.And(changed.Value.Lte(stock.Max)))
+                .Then(p => p.Element("discrepancy-review").Text.Set("Within cart capacity"))
+                .ElseIf(stock.StrictMode.Eq(false).And(changed.Value.Gt(stock.Max)))
+                .Then(p => p.Element("discrepancy-review").Text.Set("Supervisor review required"));
+        }))
+    <button type="button" @Html.Raises(plan, LinenCounts.AddPack)>Add a pack</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.AddOne)>Add one</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.TakePack)>Take a pack</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.TakeOne)>Take one</button>
+</fieldset>
+<fieldset>
+    <legend>Replenishment and discrepancy policy</legend>
+    <button type="button" @Html.Raises(plan, LinenCounts.ThreePerBundle)>Three per bundle</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.FourPerBundle)>Four per bundle</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.ZeroDelivery)>Post zero delivery</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.ZeroReturn)>Post zero return</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.ProtectReserve)>Protect six towels</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.ChooseCart)>Use ten-towel cart</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.EnforceCapacity)>Enforce cart capacity</button>
+    <button type="button" @Html.Raises(plan, LinenCounts.PermitDiscrepancy)>Permit discrepancy</button>
+</fieldset>
+<p>Pick list: <output id="pick-list" aria-label="Pick list">No bundle selected</output></p>
+<p>Stock policy: <output id="stock-policy" aria-label="Stock policy">Standard ward stock</output></p>
+<p>Adjustment receipt: <output id="adjustment-receipt" aria-label="Adjustment receipt">No adjustments posted</output></p>
+<p>Discrepancy review: <output id="discrepancy-review" aria-label="Discrepancy review">Count awaiting review</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.AddPack, pipeline =>
+        pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>().Increment(6d)));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.AddOne, pipeline =>
+        pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>().Increment()));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.TakePack, pipeline =>
+        pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>().Decrement(6d)));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.TakeOne, pipeline =>
+        pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>().Decrement()));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.ThreePerBundle, pipeline => SelectBundle(pipeline, 3d)));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.FourPerBundle, pipeline => SelectBundle(pipeline, 4d)));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.ZeroDelivery, pipeline => PostAdjustment(pipeline, true)));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.ZeroReturn, pipeline => PostAdjustment(pipeline, false)));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.EnforceCapacity, pipeline => SetCartPolicy(pipeline, true)));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.PermitDiscrepancy, pipeline => SetCartPolicy(pipeline, false)));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.ProtectReserve, pipeline =>
+    {
+        var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+        stock.Max.Set(20);
+        stock.Min.Set(6);
+        stock.DataBind();
+        pipeline.When(stock.Min.Eq(6)).Then(p => p.Element("stock-policy").Text.Set("Reserve of 6"));
+    }));
+    Html.On(plan, trigger => trigger.CustomEvent(LinenCounts.ChooseCart, pipeline =>
+    {
+        var stock = pipeline.Input(m => m.Towels).Component<FusionNumericTextBox<int?>>();
+        stock.Max.Set(10);
+        stock.DataBind();
+        pipeline.When(stock.Max.Eq(10)).Then(p => p.Element("stock-policy").Text.Set("Capacity of 10"));
+    }));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,39 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model OwnerDeskPage
+@{
+    var plan = Html.ReactivePlan<OwnerDeskPage>();
+}
+<h2>Room handoff</h2>
+@(plan.ConformanceCallbacks("room-handoff", new CallbacksStart { Own = "Desk" }))
+<h2>Admission capacity</h2>
+@(plan.ConformanceRegistered("admission-capacity", new RegisteredStart { Reading = Model.Capacity })
+    .Reactive(gauge => gauge.Alarmed, pipeline =>
+    {
+        var gauge = pipeline.Component<ConformanceRegistered>("admission-capacity");
+        pipeline.When(gauge.Reading.Gte(gauge.Threshold))
+            .Then(pipeline => pipeline.Component<ConformanceRegistered>("admission-capacity").Raise())
+            .Else(pipeline => pipeline.Component<ConformanceRegistered>("admission-capacity").Lower());
+        pipeline.Element("assessment-capacity").Text.Set(pipeline.Concat(gauge.Reading, " places under review"));
+    }))
+<p id="assessment-capacity"></p>
+@(Html.NativeButton("open-allocation-owner", "Open allocation assessment").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Get<DeskQuery>(CareEndpoints.MoveInAllocationOwner, request => request.Query(query => query.DraftId, Model.DraftId)).Into("allocation-owner")))
+@(Html.NativeButton("close-allocation-owner", "Close allocation assessment").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Unload("allocation-owner")))
+<div id="allocation-owner"></div>
+@await Html.PartialAsync("/Care/MoveIn/AssessmentFiling.cshtml", new MobilityRequest { DraftId = Model.DraftId })
+<p id="room-result"></p>
+<p id="room-search-result"></p>
+<div id="owner-history">
+    @await Html.PartialAsync("/Care/MoveIn/OwnerHistory.cshtml", Model.History)
+</div>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Component<ConformanceRegistered>("admission-capacity").Threshold.Set(2)));
+}
+@Html.RenderPlan(plan)

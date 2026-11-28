@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model RoomAdmission
+@{
+    var plan = Html.ReactivePlan<RoomAdmission>();
+}
+<fieldset>
+    <legend>Room</legend>
+    @(Html.InputField(plan, m => m.Room, options => options.Label("Room")).NativeTextBox())
+</fieldset>
+@Html.RenderPlan(plan)

@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LobbyResident
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Lobby";
+    var plan = Html.ReactivePlan<LobbyResident>();
+}
+<h1>Lobby</h1>
+<p>Room: @Model.Room</p>
+@await Html.PartialAsync("/Care/Admission/LobbyPersonName.cshtml", Model)
+<button type="button" @Html.Raises(plan, Lobbies.Greet)>Greet</button>
+<p>Greeting: <span id="greeting"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(Lobbies.Greet, pipeline => pipeline.Element("greeting").Text.Set(pipeline.Input(m => m.Name).Component<NativeTextBox>().Value)));
+}
+@Html.RenderPlan(plan)

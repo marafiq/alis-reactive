@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FrozenCallbacksNotes
+@{
+    var plan = Html.ReactivePlan<FrozenCallbacksNotes>();
+}
+<p>@Model.Note</p>
+<button type="button" @Html.Raises(plan, FrozenCallbacksButtons.ListenToA)>Listen to A</button>
+<dl>
+    <dt>Listen tried</dt>
+    <dd id="listen-tried"></dd>
+    <dt>Listen done</dt>
+    <dd id="listen-done"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(FrozenCallbacksButtons.ListenToA, pipeline =>
+    {
+        pipeline.Element("listen-tried").Text.Set("listening");
+        pipeline.Listen(
+            pipeline.Component<ConformanceCallbacks>("callbacks-a"),
+            callbacks => callbacks.OnRaised,
+            (raised, pipeline) => pipeline.Component<ConformanceCallbacks>("callbacks-a").Append("notes"));
+        pipeline.Element("listen-done").Text.Set("listened");
+    }));
+}
+@Html.RenderPlan(plan)

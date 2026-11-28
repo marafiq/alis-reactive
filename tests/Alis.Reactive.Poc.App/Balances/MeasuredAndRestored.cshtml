@@ -1,0 +1,26 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Measured and restored";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Measured and restored</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("restore", "Restore the measured intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        var measured = balance.Measure();
+        pipeline.When(balance.Intake.Gt(500).Or(measured.Gt(50))).Then(high =>
+        {
+            var held = high.Component<FluidBalance>("balance");
+            held.Intake.Set(999);
+            held.Intake.Set(measured);
+        });
+    }))
+
+@Html.RenderPlan(plan)

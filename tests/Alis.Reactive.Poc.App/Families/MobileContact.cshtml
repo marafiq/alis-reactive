@@ -1,0 +1,8 @@
+@using Alis.Reactive.Poc.App.Families
+@model FamilyForm
+@{
+    ViewData["Title"] = "Family";
+}
+<h1>Family</h1>
+
+@await Html.PartialFor(m => m.Contacts.Find(contact => contact.Kind == "Mobile"), "_Contact")

@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StandingNoteBoard
+@{
+    var plan = Html.ReactivePlan<StandingNoteBoard>();
+}
+<h2>@Model.Title</h2>
+<button type="button" @Html.Raises(plan, StandingNoteButtons.TakeTheNoteDown)>Take the note down</button>
+<section id="standing-note-slot" aria-label="Standing note">
+    @await Html.PartialAsync("/Care/Record/StandingNoteCard.cshtml", Model.Note)
+</section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(StandingNoteButtons.TakeTheNoteDown, pipeline => pipeline.Unload("standing-note-slot")));
+}
+@Html.RenderPlan(plan)

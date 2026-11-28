@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@inject MoveInReads Reads
+@model MedicationSection
+@{
+    var plan = Html.ReactivePlan<MedicationSection>();
+}
+<ul aria-label="Medication orders on file">
+    @foreach (var row in Model.Rows)
+    {
+        <li>@Reads.MedicationOnFile(row)</li>
+    }
+</ul>
+@for (var position = 0; position < Model.Rows.Count; position++)
+{
+    var at = position;
+    @await Html.PartialFor(m => m.Rows[at], "/Care/MoveIn/Medication.cshtml")
+}
+<p id="round-doses-on-file">@MoveInReads.RoundDosesOnFile(Model)</p>
+@(Html.InputField(plan, m => m.MinimumRoundDose, o => o.Label("Minimum round dose")).NativeTextBox())
+@for (var position = 0; position < Model.RoundDoses.Count; position++)
+{
+    var at = position;
+    @(Html.InputField(plan, m => m.RoundDoses[at], o => o.Label($"Round dose {at + 1}")).NativeTextBox())
+}
+@Html.RenderPlan(plan)

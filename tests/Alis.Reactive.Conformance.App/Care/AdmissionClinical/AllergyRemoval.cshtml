@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.InputsAndIds
+@using Alis.Reactive.RequestsAndResponses
+@model AllergyRemoval
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Helen Martinez's intake";
+    var plan = Html.ReactivePlan<AllergyRemoval>();
+}
+<h1>Helen Martinez's intake</h1>
+<p>Log: <output id="log">Nothing logged</output></p>
+<section id="card" aria-label="Card"></section>
+<button type="button" @Html.Raises(plan, AllergyRemovalCards.Close)>Close card</button>
+<button type="button" @Html.Raises(plan, AllergyRemovalCards.Open)>Open card</button>
+<button type="button" @Html.Raises(plan, AllergyRemovalCards.Remove)>Remove box</button>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Get(AllergyRemovalEndpoints.Card).Into("card"))
+        .CustomEvent(AllergyRemovalCards.Close, pipeline => pipeline.Unload("card"))
+        .CustomEvent(AllergyRemovalCards.Open, pipeline => pipeline.Get(AllergyRemovalEndpoints.Card).Into("card"))
+        .CustomEvent(AllergyRemovalCards.Remove, pipeline => pipeline
+            .Component<FusionMultiSelect<int[]?>>(IdGenerator.For<AllergyRemovalCard, int[]?>(m => m.AllergyCodes)).Destroy()));
+}
+@Html.RenderPlan(plan)

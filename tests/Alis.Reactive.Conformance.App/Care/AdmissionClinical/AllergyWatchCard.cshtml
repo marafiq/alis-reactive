@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.InputsAndIds
+@model AllergyWatchCard
+@{
+    var plan = Html.ReactivePlan<AllergyWatchCard>();
+}
+<p>@Model.Note</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Listen(
+        pipeline.Component<FusionMultiSelect<int[]?>>(IdGenerator.For<AllergyWatch, int[]?>(m => m.AllergyCodes)),
+        box => box.Change,
+        (changed, pipeline) => pipeline.Element("log").Text.Set("Card saw a change"))));
+}
+@Html.RenderPlan(plan)

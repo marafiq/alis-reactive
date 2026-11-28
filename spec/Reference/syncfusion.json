@@ -1,0 +1,924 @@
+{
+  "component": "MultiSelect",
+  "slice": "FusionMultiSelect<TValue>, M21.N1 of spec/FusionComponents/module.md",
+  "ej2": "33.1.47",
+  "rule": "a member runs a cell only where EJ2's TypeScript declares it public with a concrete type, or a fact of spec/probes/facts.json pins what the browser hands or takes (spec/CLAUDE.md, the owner, 2026-11-09); value is M21.N1's Property<TValue>, typed by the bound member (M21.X1)",
+  "chain": [
+    "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:31 MultiSelect",
+    "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:185 DropDownBase",
+    "@syncfusion/ej2-base/src/component.d.ts:16 Component",
+    "@syncfusion/ej2-base/src/base.d.ts:20 Base"
+  ],
+  "kept": [
+    {
+      "js": "value",
+      "door": "Property<TValue>",
+      "csharp": "Value",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+    },
+    {
+      "js": "dataSource",
+      "door": "DataSource<TItem>()",
+      "csharp": "DataSource",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:170"
+    },
+    {
+      "js": "dataBind",
+      "door": "Method",
+      "csharp": "DataBind",
+      "cite": "@syncfusion/ej2-base/src/component.d.ts:129"
+    },
+    {
+      "js": "hidePopup",
+      "door": "Method",
+      "csharp": "HidePopup",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:945"
+    },
+    {
+      "js": "showPopup",
+      "door": "Method",
+      "csharp": "ShowPopup",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:952"
+    },
+    {
+      "js": "change",
+      "door": "Event<MultiSelectChangeEventArgs>",
+      "csharp": "Change",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
+    },
+    {
+      "js": "filtering",
+      "door": "Event<FilteringEventArgs>",
+      "csharp": "Filtering",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:615"
+    }
+  ],
+  "added": [
+    {
+      "js": "placeholder",
+      "door": "Property",
+      "csharp": "Placeholder",
+      "type": "string?",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277",
+      "cells": [
+        "prop.scalar.read",
+        "prop.scalar.write",
+        "source.ConditionLeft",
+        "source.ConditionRight",
+        "source.ElementClass",
+        "source.ElementHtml",
+        "source.ElementText",
+        "source.Header",
+        "source.MatchesPattern",
+        "source.TextTestOperand"
+      ]
+    },
+    {
+      "js": "fields",
+      "door": "LiveObject",
+      "csharp": "Fields",
+      "type": "FusionMultiSelect<TValue>.FieldSettings, with Text and GroupBy as Property<string?>, optional",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:102",
+      "cells": [
+        "prop.dotted.read",
+        "prop.dotted.write",
+        "prop.object.memberRead",
+        "prop.object.memberWrite"
+      ]
+    },
+    {
+      "js": "selectAll",
+      "door": "Method",
+      "csharp": "SelectAll",
+      "type": "one Arg<bool>",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:962",
+      "cells": [
+        "method.arg.scalar"
+      ]
+    },
+    {
+      "js": "tagging",
+      "door": "Event<T>",
+      "csharp": "Tagging",
+      "type": "FusionMultiSelect<TValue>.TaggingEventArgs, whose ItemData is read with Read",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:622",
+      "cells": [
+        "event.object",
+        "absence.past"
+      ]
+    },
+    {
+      "js": "open",
+      "door": "Event<T>",
+      "csharp": "Open",
+      "type": "FusionMultiSelect<TValue>.PopupEventArgs, whose Popup is a LiveObject<T> of a Component declaration of EJ2's Popup with OffsetY as Property<double>",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:565",
+      "cells": [
+        "event.poc15.component.held.before",
+        "event.poc15.component.held.after"
+      ]
+    },
+    {
+      "js": "destroy",
+      "door": "Method",
+      "csharp": "Destroy",
+      "type": "no argument",
+      "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1018",
+      "cells": [
+        "lane.slot.hostDestroyed"
+      ]
+    }
+  ],
+  "own": {
+    "prop.scalar.read": "a property EJ2 holds on its component object, read where the vendor data locates it",
+    "prop.scalar.write": "a property written through EJ2's setter, which commits it by EJ2's own change detection",
+    "prop.dotted.read": "a member of fields, the nested settings object EJ2 holds, read by its path",
+    "prop.dotted.write": "a member of fields written, which EJ2 commits through the component that holds it",
+    "method.void": "an EJ2 method called on the located component",
+    "method.arg.scalar": "an EJ2 method that takes an argument",
+    "event.scalar": "EJ2's change event, subscribed by the vendor data, and a scalar of its payload",
+    "event.object": "a data object EJ2 hands in the tagging payload, walked by its path",
+    "event.list": "the list EJ2 hands as change's value, typed by the bound member",
+    "event.method": "the filtering payload's updateData called after an await, as the browser fact pins it",
+    "event.poc15.component.held.before": "EJ2's Popup component, which the open payload hands, declared over EJ2's own type",
+    "http.post": "the value, a list of the bound member's type, sent in a request's body",
+    "http.into": "the render helper's component started inside the partial a request loads",
+    "lane.slot.unloadListener": "the listener the vendor data adds by addEventListener, removed by removeEventListener when its slot unloads",
+    "lane.slot.hostDestroyed": "EJ2's destroy, after which the slot's unload leaves the destroyed component alone, as the browser fact pins it",
+    "template.render": "Syncfusion's template engine renders an item template, as the browser fact pins it",
+    "template.conditional": "the template engine's condition, as the browser fact pins it",
+    "validation.live": "EJ2 commits its value through change when the input loses focus, which live validation follows",
+    "validation.prefix": "the render helper's ids under a partial's prefix, which the rule bound to them finds"
+  },
+  "cells": {
+    "prop.scalar.read": {
+      "member": "placeholder",
+      "door": "Property<string?>",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"Choose Helen's allergies\", and a Show hint button whose click sets the element hint's text to the box's Placeholder; hint starts as No hint.",
+        "gesture": "Click Show hint.",
+        "outcome": "hint reads Choose Helen's allergies.",
+        "opposite": "On the same page with the box rendered without Placeholder, which EJ2 holds as null, the click leaves hint empty.",
+        "defect": "The read takes placeholder from the input element's placeholder attribute instead of EJ2's placeholder property, so it reads the attribute EJ2 rewrote and the null case shows text."
+      }
+    },
+    "prop.scalar.write": {
+      "member": "placeholder",
+      "door": "Property<string?>",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered empty with Placeholder \"Choose allergies\", and a Penicillin only button whose click sets the box's Placeholder to \"Helen: penicillin only\".",
+        "gesture": "Click Penicillin only.",
+        "outcome": "The empty box shows the placeholder Helen: penicillin only.",
+        "opposite": "A Clear hint button whose click sets Placeholder from the note box, which holds no text, writes null, and the empty box shows no placeholder.",
+        "defect": "The write sets the input element's placeholder attribute instead of EJ2's placeholder property, so EJ2 keeps Choose allergies and shows it again when it next renders the input."
+      }
+    },
+    "prop.dotted.read": {
+      "member": "fields.text",
+      "door": "LiveObject<FieldSettings>, then Property<string?>",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:102",
+        "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:15"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and a Show field button whose click sets the element field's text to the box's Fields.Text.",
+        "gesture": "Click Show field.",
+        "outcome": "field reads name, the JSON name Fields gave the allergy's Name under the app's camel-case options.",
+        "opposite": "In an app whose JSON options keep Pascal case, the same click reads Name.",
+        "defect": "The read names fields.text as one JavaScript name on the component, so it reads nothing and field shows empty."
+      }
+    },
+    "prop.dotted.write": {
+      "member": "fields.text",
+      "door": "LiveObject<FieldSettings>, then Property<string?>",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:102",
+        "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:15"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and a Use labels button whose click sets the box's Fields.Text to \"label\" and then sets the element field's text to the box's Fields.Text.",
+        "gesture": "Click Use labels.",
+        "outcome": "field reads label.",
+        "opposite": "Before the click a Show field button sets field to name, the text field the render helper gave.",
+        "defect": "The write sends fields.text as one JavaScript name and creates a member of that name on the component, so EJ2's fields still name the text field name and field reads name."
+      }
+    },
+    "prop.object.memberRead": {
+      "member": "fields.groupBy",
+      "door": "LiveObject<FieldSettings>, its Property<string?>",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:102",
+        "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:36"
+      ]
+    },
+    "prop.object.memberWrite": {
+      "member": "fields.groupBy",
+      "door": "LiveObject<FieldSettings>, its Property<string?>",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:102",
+        "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:36"
+      ]
+    },
+    "prop.list.lambda": {
+      "lacks": "the one property that holds a list of objects, dataSource, is a union that carries DataManager and lists of four kinds with no probe fact, and a read fits every type the API holds (D17.5), so no read of its items is high-confidence",
+      "scan": "the public members of the class chain @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:31 MultiSelect, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:185 DropDownBase, @syncfusion/ej2-base/src/component.d.ts:16 Component, @syncfusion/ej2-base/src/base.d.ts:20 Base, read member by member with their modifiers and JSDoc tags; dataSource at @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:170 and @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:390"
+    },
+    "prop.readOnly": {
+      "lacks": "no member of the class chain carries TypeScript's readonly modifier or a getter without a setter",
+      "scan": "grep -n -E '^\\s+(public\\s+)?readonly\\s+[A-Za-z_]' over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-base/src/component.d.ts and @syncfusion/ej2-base/src/base.d.ts: 0 lines; the property named readonly (@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:393) is a writable boolean"
+    },
+    "prop.writeOnly": {
+      "lacks": "no EJ2 .d.ts declares an accessor, so no contract states a setter without a getter",
+      "scan": "grep -rn -E '^\\s*(get|set)\\s+[A-Za-z_$][A-Za-z0-9_$]*\\s*\\(' --include='*.d.ts' node_modules/@syncfusion | wc -l: 0"
+    },
+    "method.void": {
+      "member": "showPopup",
+      "door": "Method (M21.N1 ShowPopup)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:952"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and a Show allergies button whose click calls the box's ShowPopup().",
+        "gesture": "Click Show allergies.",
+        "outcome": "The box's list is open and shows Penicillin, Latex and Peanut.",
+        "opposite": "The Show allergies button of a page whose When(ward's Name equals \"South\") holds the call, on the North ward, leaves the list closed.",
+        "defect": "The call writes showPopup as a property instead of calling it, so the list stays closed."
+      }
+    },
+    "method.value": {
+      "lacks": "no documented-public method of the chain returns text, a number, a boolean, a date or a data object: getItems and getRootElement return DOM elements, getDataByValue returns an index-signature object or a scalar union, and requiredModules carries no JSDoc",
+      "scan": "the public members of the class chain @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:31 MultiSelect, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:185 DropDownBase, @syncfusion/ej2-base/src/component.d.ts:16 Component, @syncfusion/ej2-base/src/base.d.ts:20 Base, read member by member with their modifiers and JSDoc tags; @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:746, @syncfusion/ej2-base/src/component.d.ts:81, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:803, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:677; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "method.object.memberRead": {
+      "lacks": "the one method that returns a vendor-declared object, getDataByValue, returns an index-signature object or a scalar union, and getRootElement returns a DOM element",
+      "scan": "the public members of the class chain @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:31 MultiSelect, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:185 DropDownBase, @syncfusion/ej2-base/src/component.d.ts:16 Component, @syncfusion/ej2-base/src/base.d.ts:20 Base, read member by member with their modifiers and JSDoc tags; @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:803, @syncfusion/ej2-base/src/component.d.ts:81; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "method.object.methodCall": {
+      "lacks": "no method of the chain returns an object whose type declares a method, other than DOM elements",
+      "scan": "the public members of the class chain @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:31 MultiSelect, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:185 DropDownBase, @syncfusion/ej2-base/src/component.d.ts:16 Component, @syncfusion/ej2-base/src/base.d.ts:20 Base, read member by member with their modifiers and JSDoc tags; @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:803, @syncfusion/ej2-base/src/component.d.ts:81, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:746; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "method.async.void": {
+      "lacks": "no method of the chain returns a Promise",
+      "scan": "grep -c Promise over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts, @syncfusion/ej2-base/src/component.d.ts, @syncfusion/ej2-base/src/base.d.ts and @syncfusion/ej2-popups/src/popup/popup.d.ts: 0 in each"
+    },
+    "method.async.value": {
+      "lacks": "no method of the chain returns a Promise",
+      "scan": "grep -c Promise over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts, @syncfusion/ej2-base/src/component.d.ts, @syncfusion/ej2-base/src/base.d.ts and @syncfusion/ej2-popups/src/popup/popup.d.ts: 0 in each"
+    },
+    "method.arg.scalar": {
+      "member": "selectAll(state)",
+      "door": "Method with one Arg<bool>",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:962"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered empty, and a Select every allergy button whose click calls the box's SelectAll(true).",
+        "gesture": "Click Select every allergy.",
+        "outcome": "The box holds the chips Penicillin, Latex and Peanut.",
+        "opposite": "A Select none button whose click calls SelectAll(false) on a box holding Latex leaves it with no chip.",
+        "defect": "The argument is written as the text \"true\", which EJ2 reads as truthy, so Select none selects every allergy."
+      }
+    },
+    "method.arg.object": {
+      "lacks": "every method of the chain that takes an object takes it as an index-signature object or a union that carries DataManager, with no probe fact: addItem, filter and disableItem",
+      "scan": "the public members of the class chain @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:31 MultiSelect, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:185 DropDownBase, @syncfusion/ej2-base/src/component.d.ts:16 Component, @syncfusion/ej2-base/src/base.d.ts:20 Base, read member by member with their modifiers and JSDoc tags; @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:934, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:718, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1011"
+    },
+    "method.arg.list": {
+      "lacks": "every method of the chain that takes a list takes a union of index-signature objects, DataManager and scalar lists, with no probe fact for what it takes: addItem and filter",
+      "scan": "the public members of the class chain @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:31 MultiSelect, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:185 DropDownBase, @syncfusion/ej2-base/src/component.d.ts:16 Component, @syncfusion/ej2-base/src/base.d.ts:20 Base, read member by member with their modifiers and JSDoc tags; @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:934, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:718"
+    },
+    "event.scalar": {
+      "member": "change -> isInteracted",
+      "door": "Event<MultiSelectChangeEventArgs> (M21.N1 Change), its IsInteracted",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1061"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) and changeOnBlur left on, and a Change handler that sets the element source's text to \"user\" when the payload's IsInteracted holds and to \"system\" otherwise.",
+        "gesture": "Choose Latex in the box's list and press Tab to leave the box.",
+        "outcome": "source reads user.",
+        "opposite": "A Load from discharge button whose click sets the box's Value to [7] raises change with isInteracted false, and source reads system.",
+        "defect": "The handler reads the payload's members from the event's second argument, where EJ2 hands nothing, so source reads system for both."
+      }
+    },
+    "event.object": {
+      "member": "tagging -> itemData.text",
+      "door": "Event<TaggingEventArgs>, Read past ItemData",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:622",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1040",
+        "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:15"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and a Tagging handler that sets the element tagged's text to the payload's ItemData read with Read(d => d.Name).",
+        "gesture": "Choose Latex in the box's list.",
+        "outcome": "tagged reads Latex.",
+        "opposite": "Choosing Peanut instead reads Peanut, the item of that tagging.",
+        "defect": "The read names itemData's member by its C# name Name instead of its JSON name name, so tagged shows empty."
+      }
+    },
+    "event.list": {
+      "member": "change -> value",
+      "door": "Event<MultiSelectChangeEventArgs> (M21.N1 Change), its Value",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1073"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin, and a Change handler that sets the element peanut's text to \"Peanut on file\" when the payload's Value holds 12 (Value.Any(code => code == 12)) and to \"No peanut\" otherwise.",
+        "gesture": "Choose Peanut in the box's list and press Tab to leave the box.",
+        "outcome": "peanut reads Peanut on file.",
+        "opposite": "Choosing Latex instead and leaving the box sets peanut to No peanut.",
+        "defect": "The lambda reads the payload's value as text, \"7,12\", so no item equals 12 and peanut reads No peanut."
+      }
+    },
+    "event.method": {
+      "member": "filtering -> updateData",
+      "door": "Event<FilteringEventArgs> (M21.N1 Filtering), its UpdateData",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:615",
+        "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:847"
+      ],
+      "facts": [
+        "ej2-filtering-args-members"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), AllowFiltering on, and a Filtering handler that writes PreventDefaultAction, sends GET /allergies?text= with the payload's Text and on success calls the payload's UpdateData with the reply's body; the endpoint answers [Latex] for lat.",
+        "gesture": "Type lat into the box.",
+        "outcome": "Once the endpoint answers, the list shows Latex alone.",
+        "opposite": "Typing xyz, which the endpoint answers with no allergy, shows No records found.",
+        "defect": "The call of updateData after the awaited request is dropped as a write to the payload is, so the list keeps all three allergies.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "event.promise": {
+      "lacks": "no payload of MultiSelect's events declares a member that holds a Promise",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -c Promise over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts, @syncfusion/ej2-base/src/component.d.ts, @syncfusion/ej2-base/src/base.d.ts and @syncfusion/ej2-popups/src/popup/popup.d.ts: 0 in each"
+    },
+    "event.deepAsync": {
+      "lacks": "no payload of MultiSelect's events, and no object one holds, declares a method that returns a Promise",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -c Promise over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts, @syncfusion/ej2-base/src/component.d.ts, @syncfusion/ej2-base/src/base.d.ts and @syncfusion/ej2-popups/src/popup/popup.d.ts: 0 in each"
+    },
+    "event.poc15.writeOnly.payload.before": {
+      "lacks": "no payload of MultiSelect's events declares a write-only member",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -rn -E '^\\s*(get|set)\\s+[A-Za-z_$][A-Za-z0-9_$]*\\s*\\(' --include='*.d.ts' node_modules/@syncfusion | wc -l: 0"
+    },
+    "event.poc15.writeOnly.payload.after": {
+      "lacks": "no payload of MultiSelect's events declares a write-only member",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -rn -E '^\\s*(get|set)\\s+[A-Za-z_$][A-Za-z0-9_$]*\\s*\\(' --include='*.d.ts' node_modules/@syncfusion | wc -l: 0"
+    },
+    "event.poc15.writeOnly.held.before": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a write-only member",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -rn -E '^\\s*(get|set)\\s+[A-Za-z_$][A-Za-z0-9_$]*\\s*\\(' --include='*.d.ts' node_modules/@syncfusion | wc -l: 0"
+    },
+    "event.poc15.writeOnly.held.after": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a write-only member",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -rn -E '^\\s*(get|set)\\s+[A-Za-z_$][A-Za-z0-9_$]*\\s*\\(' --include='*.d.ts' node_modules/@syncfusion | wc -l: 0"
+    },
+    "event.poc15.liveObjects.payload.before": {
+      "lacks": "no payload of MultiSelect's events declares a member that holds a list of vendor-declared live objects; ISelectAllEventArgs.items holds DOM elements",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.liveObjects.payload.after": {
+      "lacks": "no payload of MultiSelect's events declares a member that holds a list of vendor-declared live objects; ISelectAllEventArgs.items holds DOM elements",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.liveObjects.held.before": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a member that holds a list of vendor-declared live objects; ISelectAllEventArgs.items holds DOM elements",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.liveObjects.held.after": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a member that holds a list of vendor-declared live objects; ISelectAllEventArgs.items holds DOM elements",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.methodValue.payload.before": {
+      "lacks": "no payload of MultiSelect's events declares a method that returns a value; updateData returns nothing and setClass is typed Function",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.methodValue.payload.after": {
+      "lacks": "no payload of MultiSelect's events declares a method that returns a value; updateData returns nothing and setClass is typed Function",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.methodValue.held.before": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a method that returns a value; updateData returns nothing and setClass is typed Function",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.methodValue.held.after": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a method that returns a value; updateData returns nothing and setClass is typed Function",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.methodAsyncValue.payload.before": {
+      "lacks": "no payload of MultiSelect's events declares a method that returns a Promise",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -c Promise over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts, @syncfusion/ej2-base/src/component.d.ts, @syncfusion/ej2-base/src/base.d.ts and @syncfusion/ej2-popups/src/popup/popup.d.ts: 0 in each"
+    },
+    "event.poc15.methodAsyncValue.payload.after": {
+      "lacks": "no payload of MultiSelect's events declares a method that returns a Promise",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -c Promise over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts, @syncfusion/ej2-base/src/component.d.ts, @syncfusion/ej2-base/src/base.d.ts and @syncfusion/ej2-popups/src/popup/popup.d.ts: 0 in each"
+    },
+    "event.poc15.methodAsyncValue.held.before": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a method that returns a Promise",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -c Promise over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts, @syncfusion/ej2-base/src/component.d.ts, @syncfusion/ej2-base/src/base.d.ts and @syncfusion/ej2-popups/src/popup/popup.d.ts: 0 in each"
+    },
+    "event.poc15.methodAsyncValue.held.after": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a method that returns a Promise",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; grep -c Promise over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts, @syncfusion/ej2-base/src/component.d.ts, @syncfusion/ej2-base/src/base.d.ts and @syncfusion/ej2-popups/src/popup/popup.d.ts: 0 in each"
+    },
+    "event.poc15.returnedObject.payload.before": {
+      "lacks": "no payload of MultiSelect's events declares a method that returns an object other than DOM elements",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.returnedObject.payload.after": {
+      "lacks": "no payload of MultiSelect's events declares a method that returns an object other than DOM elements",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.returnedObject.held.before": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a method that returns an object other than DOM elements",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.returnedObject.held.after": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a method that returns an object other than DOM elements",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.returnedObjects.payload.before": {
+      "lacks": "no payload of MultiSelect's events declares a method that returns a list of objects other than DOM elements; Popup.getScrollableParent returns HTMLElement[]",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.returnedObjects.payload.after": {
+      "lacks": "no payload of MultiSelect's events declares a method that returns a list of objects other than DOM elements; Popup.getScrollableParent returns HTMLElement[]",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.returnedObjects.held.before": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a method that returns a list of objects other than DOM elements; Popup.getScrollableParent returns HTMLElement[]",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.returnedObjects.held.after": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a method that returns a list of objects other than DOM elements; Popup.getScrollableParent returns HTMLElement[]",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member; DOM types lie outside the reference's contract, its .d.ts members under node_modules/@syncfusion (spec/BRIEF.md section 8)"
+    },
+    "event.poc15.callback.payload.before": {
+      "lacks": "no payload of MultiSelect's events declares a callback the vendor calls for an answer; setClass is a Function the vendor hands, and Popup's open, close and targetExitViewport are EmitType<Object> events",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.callback.payload.after": {
+      "lacks": "no payload of MultiSelect's events declares a callback the vendor calls for an answer; setClass is a Function the vendor hands, and Popup's open, close and targetExitViewport are EmitType<Object> events",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.callback.held.before": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a callback the vendor calls for an answer; setClass is a Function the vendor hands, and Popup's open, close and targetExitViewport are EmitType<Object> events",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.callback.held.after": {
+      "lacks": "no object a payload of MultiSelect's events holds (the Popup of PopupEventArgs, the data of itemData) declares a callback the vendor calls for an answer; setClass is a Function the vendor hands, and Popup's open, close and targetExitViewport are EmitType<Object> events",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.component.payload.before": {
+      "lacks": "no event of MultiSelect hands the component as its payload: created, dataBound, destroyed and the others with no args interface are EmitType<Object>",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.component.payload.after": {
+      "lacks": "no event of MultiSelect hands the component as its payload: created, dataBound, destroyed and the others with no args interface are EmitType<Object>",
+      "scan": "the payload interfaces of MultiSelect's events, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:11 RemoveEventArgs (SelectEventArgs's members), @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1020 CustomValueEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1031 TaggingEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1057 MultiSelectChangeEventArgs, @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1088 ISelectAllEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:66 SelectEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:822 FilteringEventArgs, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:851 PopupEventArgs, and the object they hold, @syncfusion/ej2-popups/src/popup/popup.d.ts:64 Popup; every other event is EmitType<Object>, which declares no member"
+    },
+    "event.poc15.component.held.before": {
+      "member": "open -> popup.offsetY",
+      "door": "Event<PopupEventArgs>, its Popup a LiveObject<T> of a Component declaration of EJ2's Popup, its Property<double> OffsetY",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:565",
+        "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:857",
+        "@syncfusion/ej2-popups/src/popup/popup.d.ts:125"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and an Open handler that sets the payload's Popup's OffsetY to 8 and then sets the element offset's text to Popup's OffsetY.",
+        "gesture": "Click the box to open its list.",
+        "outcome": "offset reads 8.",
+        "opposite": "An Open handler that only reads Popup's OffsetY sets offset to 1, the offset EJ2's multi-select gives its popup (@syncfusion/ej2-dropdowns/src/multi-select/multi-select.js:3277).",
+        "defect": "The write lands on the payload object instead of the Popup component it holds, so the read shows 1."
+      }
+    },
+    "event.poc15.component.held.after": {
+      "member": "open -> popup.offsetY",
+      "door": "Event<PopupEventArgs>, its Popup a LiveObject<T> of a Component declaration of EJ2's Popup, its Property<double> OffsetY",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:565",
+        "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:857",
+        "@syncfusion/ej2-popups/src/popup/popup.d.ts:125"
+      ]
+    },
+    "absence.member": {
+      "member": "index, which DropDownList declares and the MultiSelect chain does not",
+      "door": "Property<int?> on a test's declaration over the MultiSelect element, the drift arranged on purpose and suppressed naming its test (spec/CLAUDE.md, the vendor contract's SuppressMessage)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:325"
+      ],
+      "scan": "grep -c -E '^\\s+index\\??:' over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-base/src/component.d.ts and @syncfusion/ej2-base/src/base.d.ts: 0 in each"
+    },
+    "absence.past": {
+      "member": "tagging -> itemData.groupBy, which the item's data lacks",
+      "door": "Event<TaggingEventArgs>, Read past ItemData",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:622",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1040",
+        "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:36"
+      ]
+    },
+    "absence.promise": {
+      "lacks": "no method of the chain returns a Promise, so no declaration of a value meets one",
+      "scan": "grep -c Promise over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts, @syncfusion/ej2-base/src/component.d.ts, @syncfusion/ej2-base/src/base.d.ts and @syncfusion/ej2-popups/src/popup/popup.d.ts: 0 in each"
+    },
+    "source.PropertySet": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "source.WriteOnlySet": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "source.ElementText": {
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ]
+    },
+    "source.ElementHtml": {
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ]
+    },
+    "source.ElementClass": {
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ]
+    },
+    "source.ConditionLeft": {
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ]
+    },
+    "source.ConditionRight": {
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ]
+    },
+    "source.TextTestOperand": {
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ]
+    },
+    "source.MatchesPattern": {
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ]
+    },
+    "source.RequestMember": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "source.Header": {
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ]
+    },
+    "source.DispatchPayloadMember": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "source.MethodArgument": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "source.PluginArgument": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "source.HubArgument": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.get": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.post": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Save button whose click sends POST /residents/helen/allergies with r.AllergyCodes set from the box's Value, its success route setting saved's text to the reply's Message.",
+        "gesture": "Click Save.",
+        "outcome": "Once the endpoint answers, saved reads Saved 7, 9.",
+        "opposite": "With the box emptied first, saved reads Saved none.",
+        "defect": "The body sends the chips' texts instead of the codes, so the endpoint binds none.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.put": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.delete": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.beside.route": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.beside.query": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.beside.header": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.beside.static": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.beside.hidden": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.into": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1), the component rendered by field.FusionMultiSelect() in the loaded partial",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ],
+      "promise": {
+        "page": "Helen Martinez's page holds an empty card element and an Open allergies button whose click sends GET /residents/helen/allergy-card Into(card); the partial renders field.FusionMultiSelect(m => m.AllergyCodes) holding Penicillin, over Penicillin, Latex and Peanut.",
+        "gesture": "Click Open allergies.",
+        "outcome": "Once the endpoint answers, the card shows the allergy box with the chip Penicillin.",
+        "opposite": "Before the endpoint answers, the card is empty.",
+        "defect": "The loaded HTML is inserted without starting its plan, so the box shows a bare input with no chip.",
+        "observes": "Request.tla:Route"
+      }
+    },
+    "http.whileLoading": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.response.success": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.response.error": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.chained": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.parallel": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "http.finally": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "lane.confirm": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "lane.push": {
+      "member": "value",
+      "door": "Property<TValue> (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
+      ]
+    },
+    "lane.slot.load": {
+      "member": "change, subscribed by addEventListener",
+      "door": "Event<MultiSelectChangeEventArgs> (M21.N1 Change), subscribed by addEventListener (M21.N2's vendor)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528",
+        "@syncfusion/ej2-base/src/base.d.ts:86"
+      ]
+    },
+    "lane.slot.unloadListener": {
+      "member": "change, removed by removeEventListener",
+      "door": "Event<MultiSelectChangeEventArgs> (M21.N1 Change), removed by removeEventListener (M21.N2's vendor)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528",
+        "@syncfusion/ej2-base/src/base.d.ts:94"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) on the page, a card element, and an Open card button that loads a partial whose plan listens to the page's allergy box, reached by its element id, with a Change handler that appends Card saw a change to the page's log; a Close card button unloads the card.",
+        "gesture": "With the card closed, choose Latex in the page's allergy box and press Tab to leave the box.",
+        "outcome": "The log stays empty.",
+        "opposite": "With the card open, the same gesture appends Card saw a change to the log.",
+        "defect": "Unload leaves the card's listener on the page's box, so the log reads Card saw a change after the card closed.",
+        "observes": "Ownership.tla:UnloadA"
+      }
+    },
+    "lane.slot.hostDestroyed": {
+      "member": "destroy() and isDestroyed",
+      "door": "Method Destroy, called by the host",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1018",
+        "@syncfusion/ej2-base/src/base.d.ts:22"
+      ],
+      "facts": [
+        "ej2-destroy-sets-is-destroyed",
+        "ej2-destroy-removes-instance"
+      ],
+      "promise": {
+        "page": "Helen Martinez's page loads a card whose partial renders the allergy box with field.FusionMultiSelect(m => m.AllergyCodes) and listens to its Change; the page's Remove box button calls the box's Destroy(), as its host does, and a Close card button unloads the card.",
+        "gesture": "With the box destroyed, click Close card.",
+        "outcome": "The card closes and the page shows no error, and the console holds no error.",
+        "opposite": "Opening the card again shows the allergy box holding Penicillin, and its Change handler runs.",
+        "defect": "Release calls removeEventListener on the destroyed component, which throws, so the card stays open and the console names the error.",
+        "observes": "Ownership.tla:HostDestroys"
+      }
+    },
+    "template.render": {
+      "member": "itemTemplate",
+      "door": "the item template M22's FusionTemplate renders, handed as text through EJ2's builder in the render helper's build",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:335"
+      ],
+      "facts": [
+        "ej2-multiselect-item-template-text"
+      ],
+      "promise": {
+        "page": "An intake page whose allergy FusionMultiSelect renders its items with the item template FusionTemplate.Create<Allergy>().Span(m => m.Name).Render(plan), over Penicillin and an allergy named <i>Latex</i>.",
+        "gesture": "Click the allergy box to open its list.",
+        "outcome": "The list reads Penicillin and <i>Latex</i> as text, and holds no italic element.",
+        "opposite": "With the item template written as a raw read of name, the list renders Latex in italics, the engine writing data unencoded (ej2-template-unencoded).",
+        "defect": "The builder writes the read raw instead of through the text helper, so <i>Latex</i> renders as an italic element."
+      }
+    },
+    "template.conditional": {
+      "member": "itemTemplate",
+      "door": "the item template M22's FusionTemplate renders, handed as text through EJ2's builder in the render helper's build",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:335"
+      ],
+      "facts": [
+        "ej2-multiselect-item-template-condition"
+      ],
+      "promise": {
+        "page": "An intake page whose allergy FusionMultiSelect renders its items with an item template holding When(m => m.Severity == \"severe\", then: t => t.Badge(\"Severe\"), @else: e => e.Span(\"Mild\")), over Penicillin, severe, and Latex, mild.",
+        "gesture": "Click the allergy box to open its list.",
+        "outcome": "Penicillin's item shows the badge Severe and Latex's shows Mild.",
+        "opposite": "An allergy whose severity is moderate shows Mild.",
+        "defect": "The conditional compares severity with the text between double quotes the engine reads as another word, so every item shows Mild."
+      }
+    },
+    "validation.rule": {
+      "member": "value, committed by change",
+      "door": "Property<TValue> with IInputComponent.Input committed by Change (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
+      ]
+    },
+    "validation.condition": {
+      "member": "value, committed by change",
+      "door": "Property<TValue> with IInputComponent.Input committed by Change (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
+      ]
+    },
+    "validation.live": {
+      "member": "value, committed by change",
+      "door": "Property<TValue> with IInputComponent.Input committed by Change (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake form renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes) over Penicillin, Latex and Peanut, an IntakeValidator : ReactiveValidator<IntakeForm> registered through DI with RuleFor(m => m.AllergyCodes).NotEmpty().WithMessage(\"Record at least one allergy\"), a Save button, and the box's message showing Record at least one allergy after a failed Save.",
+        "gesture": "Choose Latex in the box's list and press Tab to leave the box.",
+        "outcome": "The box's message is gone without another Save.",
+        "opposite": "Removing Latex's chip and leaving the box shows Record at least one allergy again.",
+        "defect": "Live checking listens to the native input's blur instead of the component's commit event, so the message stays until the next Save."
+      }
+    },
+    "validation.summary": {
+      "member": "value, committed by change",
+      "door": "Property<TValue> with IInputComponent.Input committed by Change (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
+      ]
+    },
+    "validation.listItem": {
+      "member": "value, committed by change",
+      "door": "Property<TValue> with IInputComponent.Input committed by Change (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
+      ]
+    },
+    "validation.prefix": {
+      "member": "value, committed by change, rendered under the partial's prefix by field.FusionMultiSelect()",
+      "door": "Property<TValue> with IInputComponent.Input committed by Change (M21.N1)",
+      "cites": [
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
+      ],
+      "promise": {
+        "page": "Helen Martinez's family form renders Html.PartialFor(m => m.Guardian), whose partial renders field.FusionMultiSelect(m => m.AllergyCodes) for the guardian, and a FamilyValidator with RuleFor(m => m.Guardian.AllergyCodes).NotEmpty().WithMessage(\"Record the guardian's allergies\").",
+        "gesture": "With Latex chosen in the guardian's box, click Save.",
+        "outcome": "The endpoint binds Guardian.AllergyCodes and saved reads Guardian allergies 9.",
+        "opposite": "With the guardian's box empty, the box shows Record the guardian's allergies and the form is not sent.",
+        "defect": "The box posts under AllergyCodes without the partial's prefix, so the endpoint binds Family.AllergyCodes and saved reads Guardian allergies none.",
+        "observes": "Request.tla:Check"
+      }
+    }
+  }
+}

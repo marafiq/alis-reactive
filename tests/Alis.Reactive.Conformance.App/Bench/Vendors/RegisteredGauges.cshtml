@@ -1,0 +1,46 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model GaugesBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<GaugesBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceRegistered("registered-1", new RegisteredStart { Reading = Model.FirstReading })
+    .Reactive(gauge => gauge.Alarmed, pipeline => pipeline.Element("alarm-heard").Text.Set("alarmed")))
+@(plan.ConformanceRegistered("registered-2", new RegisteredStart { Reading = Model.SecondReading, MadeBy = "make-the-second" }))
+<button type="button" id="make-the-second">Make the second</button>
+<button type="button" @Html.Raises(plan, GaugeButtons.ReadTheFirst)>Read the first</button>
+<button type="button" @Html.Raises(plan, GaugeButtons.SetTheThreshold)>Set the threshold to 92</button>
+<button type="button" @Html.Raises(plan, GaugeButtons.RaiseTheAlarm)>Raise the alarm</button>
+<button type="button" @Html.Raises(plan, GaugeButtons.LowerTheAlarm)>Lower the alarm</button>
+<button type="button" @Html.Raises(plan, GaugeButtons.ReadTheSecond)>Read the second</button>
+<dl>
+    <dt>First reading</dt>
+    <dd id="reading-1"></dd>
+    <dt>Alarm heard</dt>
+    <dd id="alarm-heard"></dd>
+    <dt>Second read tried</dt>
+    <dd id="second-tried"></dd>
+    <dt>Second reading</dt>
+    <dd id="reading-2"></dd>
+    <dt>Second read done</dt>
+    <dd id="second-done"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(GaugeButtons.ReadTheFirst, pipeline => pipeline.Element("reading-1").Text.Set(pipeline.Component<ConformanceRegistered>("registered-1").Reading))
+        .CustomEvent(GaugeButtons.SetTheThreshold, pipeline => pipeline.Component<ConformanceRegistered>("registered-1").Threshold.Set(92))
+        .CustomEvent(GaugeButtons.RaiseTheAlarm, pipeline => pipeline.Component<ConformanceRegistered>("registered-1").Raise())
+        .CustomEvent(GaugeButtons.LowerTheAlarm, pipeline => pipeline.Component<ConformanceRegistered>("registered-1").Lower())
+        .CustomEvent(GaugeButtons.ReadTheSecond, pipeline =>
+        {
+            pipeline.Element("second-tried").Text.Set("reading");
+            pipeline.Element("reading-2").Text.Set(pipeline.Component<ConformanceRegistered>("registered-2").Reading);
+            pipeline.Element("second-done").Text.Set("read");
+        }));
+}
+@Html.RenderPlan(plan)

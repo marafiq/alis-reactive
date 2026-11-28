@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveRound
+@{
+    Layout = Model.Layout;
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<LiveRound>();
+}
+<h1>Medication round of the @Model.Ward ward</h1>
+<button type="button" @Html.Raises(plan, LiveRoundButtons.StopLiveAlerts)>Stop live alerts</button>
+<p>Alert: <span id="alert"></span></p>
+<p>Alerts closed: <span id="alerts-closed"></span></p>
+<p>Alerts: <span id="alerts-state"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .ServerPush(FacilityAlerts.Live, alerts => alerts.Alert, (alert, pipeline) => pipeline.Element("alert").Text.Set(alert.Read(a => a.Message)))
+        .ServerPush(FacilityAlerts.Live, alerts => alerts.Closed, pipeline => pipeline.Element("alerts-closed").Text.Set("closed"))
+        .CustomEvent(LiveRoundButtons.StopLiveAlerts, pipeline =>
+        {
+            pipeline.Stream(FacilityAlerts.Live).Close();
+            pipeline.Element("alerts-state").Text.Set("stopped");
+        }));
+}
+@Html.RenderPlan(plan)

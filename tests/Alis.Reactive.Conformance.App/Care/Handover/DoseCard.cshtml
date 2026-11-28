@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseCardLabel
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Dose card";
+    var plan = Html.ReactivePlan<DoseCardLabel>();
+}
+<h1>Dose card</h1>
+@(Html.FusionButton(plan, "give-dose", build => build.Content(Model.Content)))
+<button type="button" @Html.Raises(plan, DoseCardReads.ReadLabel)>Read label</button>
+<p>Label: <output id="dose-label">-</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DoseCardReads.ReadLabel, pipeline => pipeline
+        .Element("dose-label").Text.Set(pipeline.Component<FusionButton>("give-dose").Content)));
+}
+@Html.RenderPlan(plan)

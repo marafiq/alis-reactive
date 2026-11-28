@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CallDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Call desk";
+    var plan = Html.ReactivePlan<CallDesk>();
+}
+<h1>Call desk of ward @Model.Ward</h1>
+<button type="button" @Html.Raises(plan, CallDesks.LogTheCall)>Log the call</button>
+<p>Log: <span id="call-log">-</span></p>
+<p>Last scan: <span id="last-scan">-</span></p>
+<p>Pager: <span id="pager">Idle</span></p>
+<p>Desk: <span id="desk-status">-</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(CallDesks.LogTheCall, pipeline =>
+        {
+            pipeline.Dispatch(CallDesks.CallLogged);
+            pipeline.Element("desk-status").Text.Set(pipeline.Element("pager").Text);
+        })
+        .CustomEvent(CallDesks.CallLogged, pipeline =>
+        {
+            pipeline.Element("call-log").Text.Set("Logged");
+            pipeline.Element("last-scan").Text.Set(pipeline.Component<ConformanceComponent>("absent-scanner").Text);
+        })
+        .CustomEvent(CallDesks.CallLogged, pipeline => pipeline.Element("pager").Text.Set("Paged")));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Kanban
+@model StagedRound
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Staged round";
+    var plan = Html.ReactivePlan<StagedRound>();
+    var card = FusionKanbanFields.Of<StagedDose>();
+}
+<h1>Staged round</h1>
+@(Html.FusionKanban(plan, "staged-round", build => build
+    .KeyField(card.Field(c => c.Status))
+    .Columns([new KanbanColumn { HeaderText = "To give", KeyField = "Due" }, new KanbanColumn { HeaderText = "Given", KeyField = "Given" }])
+    .CardSettings(new KanbanCardSettings { HeaderField = card.Field(c => c.Medicine) })
+    .DataSource(Model.Doses)))
+@Html.RenderPlan(plan)

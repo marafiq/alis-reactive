@@ -1,0 +1,128 @@
+#nullable enable
+Alis.Reactive.NativeTagHelpers.Card.NativeCardBodyTagHelper
+Alis.Reactive.NativeTagHelpers.Card.NativeCardBodyTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Card.NativeCardBodyTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardBodyTagHelper.NativeCardBodyTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardBodyTagHelper.Padding.get -> Alis.Reactive.DesignSystem.Tokens.CardPadding
+Alis.Reactive.NativeTagHelpers.Card.NativeCardBodyTagHelper.Padding.set -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardFooterTagHelper
+Alis.Reactive.NativeTagHelpers.Card.NativeCardFooterTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Card.NativeCardFooterTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardFooterTagHelper.Divider.get -> Alis.Reactive.DesignSystem.Tokens.CardDivider
+Alis.Reactive.NativeTagHelpers.Card.NativeCardFooterTagHelper.Divider.set -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardFooterTagHelper.NativeCardFooterTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardHeaderTagHelper
+Alis.Reactive.NativeTagHelpers.Card.NativeCardHeaderTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Card.NativeCardHeaderTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardHeaderTagHelper.Divider.get -> Alis.Reactive.DesignSystem.Tokens.CardDivider
+Alis.Reactive.NativeTagHelpers.Card.NativeCardHeaderTagHelper.Divider.set -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardHeaderTagHelper.NativeCardHeaderTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardTagHelper
+Alis.Reactive.NativeTagHelpers.Card.NativeCardTagHelper.Accent.get -> Alis.Reactive.DesignSystem.Tokens.AccentColor?
+Alis.Reactive.NativeTagHelpers.Card.NativeCardTagHelper.Accent.set -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Card.NativeCardTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardTagHelper.Elevation.get -> Alis.Reactive.DesignSystem.Tokens.CardElevation
+Alis.Reactive.NativeTagHelpers.Card.NativeCardTagHelper.Elevation.set -> void
+Alis.Reactive.NativeTagHelpers.Card.NativeCardTagHelper.NativeCardTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Container.NativeContainerTagHelper
+Alis.Reactive.NativeTagHelpers.Container.NativeContainerTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Container.NativeContainerTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Container.NativeContainerTagHelper.NativeContainerTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Divider.DividerStyle
+Alis.Reactive.NativeTagHelpers.Divider.DividerStyle.Dashed = 1 -> Alis.Reactive.NativeTagHelpers.Divider.DividerStyle
+Alis.Reactive.NativeTagHelpers.Divider.DividerStyle.Plain = 0 -> Alis.Reactive.NativeTagHelpers.Divider.DividerStyle
+Alis.Reactive.NativeTagHelpers.Divider.NativeDividerTagHelper
+Alis.Reactive.NativeTagHelpers.Divider.NativeDividerTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Divider.NativeDividerTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Divider.NativeDividerTagHelper.Label.get -> string?
+Alis.Reactive.NativeTagHelpers.Divider.NativeDividerTagHelper.Label.set -> void
+Alis.Reactive.NativeTagHelpers.Divider.NativeDividerTagHelper.NativeDividerTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Divider.NativeDividerTagHelper.Style.get -> Alis.Reactive.NativeTagHelpers.Divider.DividerStyle
+Alis.Reactive.NativeTagHelpers.Divider.NativeDividerTagHelper.Style.set -> void
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.Cols.get -> Alis.Reactive.DesignSystem.Tokens.GridCols
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.Cols.set -> void
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.Gap.get -> Alis.Reactive.DesignSystem.Tokens.SpacingScale
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.Gap.set -> void
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.NativeGridTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.Responsive.get -> bool
+Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.Responsive.set -> void
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.Level.get -> Alis.Reactive.DesignSystem.Tokens.HeadingLevel
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.Level.set -> void
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.NativeHeadingTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.Overline.get -> string?
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.Overline.set -> void
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.Spacing.get -> Alis.Reactive.DesignSystem.Tokens.ElementSpacing
+Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.Spacing.set -> void
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.Align.get -> Alis.Reactive.DesignSystem.Tokens.AlignItems
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.Align.set -> void
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.Gap.get -> Alis.Reactive.DesignSystem.Tokens.SpacingScale
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.Gap.set -> void
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.Justify.get -> Alis.Reactive.DesignSystem.Tokens.JustifyContent
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.Justify.set -> void
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.NativeHStackTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.Wrap.get -> bool
+Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.Wrap.set -> void
+Alis.Reactive.NativeTagHelpers.Kv.KvLayout
+Alis.Reactive.NativeTagHelpers.Kv.KvLayout.Inline = 1 -> Alis.Reactive.NativeTagHelpers.Kv.KvLayout
+Alis.Reactive.NativeTagHelpers.Kv.KvLayout.Stacked = 0 -> Alis.Reactive.NativeTagHelpers.Kv.KvLayout
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.Label.get -> string!
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.Label.set -> void
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.Layout.get -> Alis.Reactive.NativeTagHelpers.Kv.KvLayout
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.Layout.set -> void
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.NativeKvTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.Value.get -> string!
+Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.Value.set -> void
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.AsSpan.get -> bool
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.AsSpan.set -> void
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.Bold.get -> bool
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.Bold.set -> void
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.Color.get -> Alis.Reactive.DesignSystem.Tokens.TextColor
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.Color.set -> void
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.NativeTextTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.Size.get -> Alis.Reactive.DesignSystem.Tokens.TextSize
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.Size.set -> void
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.Spacing.get -> Alis.Reactive.DesignSystem.Tokens.ElementSpacing
+Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.Spacing.set -> void
+Alis.Reactive.NativeTagHelpers.ValidationSummary.NativeValidationSummaryTagHelper
+Alis.Reactive.NativeTagHelpers.ValidationSummary.NativeValidationSummaryTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.ValidationSummary.NativeValidationSummaryTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.ValidationSummary.NativeValidationSummaryTagHelper.NativeValidationSummaryTagHelper() -> void
+Alis.Reactive.NativeTagHelpers.ValidationSummary.NativeValidationSummaryTagHelper.PlanId.get -> string!
+Alis.Reactive.NativeTagHelpers.ValidationSummary.NativeValidationSummaryTagHelper.PlanId.set -> void
+Alis.Reactive.NativeTagHelpers.VStack.NativeVStackTagHelper
+Alis.Reactive.NativeTagHelpers.VStack.NativeVStackTagHelper.CssClass.get -> string?
+Alis.Reactive.NativeTagHelpers.VStack.NativeVStackTagHelper.CssClass.set -> void
+Alis.Reactive.NativeTagHelpers.VStack.NativeVStackTagHelper.DivideY.get -> bool
+Alis.Reactive.NativeTagHelpers.VStack.NativeVStackTagHelper.DivideY.set -> void
+Alis.Reactive.NativeTagHelpers.VStack.NativeVStackTagHelper.Gap.get -> Alis.Reactive.DesignSystem.Tokens.SpacingScale
+Alis.Reactive.NativeTagHelpers.VStack.NativeVStackTagHelper.Gap.set -> void
+Alis.Reactive.NativeTagHelpers.VStack.NativeVStackTagHelper.NativeVStackTagHelper() -> void
+override Alis.Reactive.NativeTagHelpers.Card.NativeCardBodyTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.Card.NativeCardFooterTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.Card.NativeCardHeaderTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.Card.NativeCardTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.Container.NativeContainerTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.Divider.NativeDividerTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.Grid.NativeGridTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.Heading.NativeHeadingTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.HStack.NativeHStackTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.Kv.NativeKvTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.Text.NativeTextTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.ValidationSummary.NativeValidationSummaryTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void
+override Alis.Reactive.NativeTagHelpers.VStack.NativeVStackTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext! context, Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput! output) -> void

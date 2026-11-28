@@ -1,0 +1,20 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Fluid targets";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Fluid targets</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("target", "Set the fluid target")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        balance.Intake.Set(balance.Weight.Lt(80).Choose(1500, balance.Measure()));
+    }))
+
+@Html.RenderPlan(plan)

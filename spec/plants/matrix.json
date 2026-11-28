@@ -1,0 +1,106 @@
+[
+ {
+  "name": "a matrix bullet drifts from BRIEF.md",
+  "edits": [
+   {
+    "file": "spec/Reference/matrix.json",
+    "old": "\"brief\": \"read and write a scalar\",",
+    "new": "\"brief\": \"read and write one scalar\","
+   }
+  ],
+  "expect": "matrix bullet 'read and write one scalar' (properties) is not BRIEF.md section 8's"
+ },
+ {
+  "name": "a cell under no bullet",
+  "edits": [
+   {
+    "file": "spec/Reference/matrix.json",
+    "old": "\"brief\": \"read and write a scalar\",\n      \"cells\": [\n        \"prop.scalar.read\",\n        \"prop.scalar.write\"\n      ]",
+    "new": "\"brief\": \"read and write a scalar\",\n      \"cells\": [\n        \"prop.scalar.read\"\n      ]"
+   }
+  ],
+  "expect": "matrix cell prop.scalar.write is under 0 bullets"
+ },
+ {
+  "name": "a cell rests on a D line DESIGN.md lacks",
+  "edits": [
+   {
+    "file": "spec/Reference/matrix.json",
+    "old": "\"id\": \"prop.scalar.read\",\n      \"group\": \"properties\",\n      \"cell\": \"read a scalar property\",\n      \"meaning\": [\n        \"D5.1\",\n        \"D5.3\"",
+    "new": "\"id\": \"prop.scalar.read\",\n      \"group\": \"properties\",\n      \"cell\": \"read a scalar property\",\n      \"meaning\": [\n        \"D5.1\",\n        \"D5.99\""
+   }
+  ],
+  "expect": "prop.scalar.read rests on D5.99, which spec/Core/DESIGN.md does not state"
+ },
+ {
+  "name": "the native reference runs a cell through a member it does not declare",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"prop.scalar.read\": {\n      \"members\": [\n        \"ConformanceComponent.text\"",
+    "new": "\"prop.scalar.read\": {\n      \"members\": [\n        \"ConformanceComponent.txt\""
+   }
+  ],
+  "expect": "prop.scalar.read: ConformanceComponent.txt: ConformanceComponent declares no txt"
+ },
+ {
+  "name": "the native reference drops a cell",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "    \"prop.scalar.write\": {\n      \"members\": [\n        \"ConformanceComponent.text\"\n      ],\n      \"version\": \"current\",\n      \"promise\": {\n        \"page\": \"A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Rename button whose click sets conformance.Text to \\\"Alpha, renamed\\\".\",\n        \"gesture\": \"Click Rename.\",\n        \"outcome\": \"The component's heading reads Alpha, renamed.\",\n        \"opposite\": \"Before the click the heading reads Alpha.\",\n        \"defect\": \"The set writes text on the host element instead of the component the vendor's objectPath finds, so the heading keeps Alpha.\"\n      }\n    },\n",
+    "new": ""
+   }
+  ],
+  "expect": "native.json lacks prop.scalar.write"
+ },
+ {
+  "name": "a vendor listens by a kind outside D17.3",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"name\": \"conformance-peer\",\n        \"locate\": {\n          \"kind\": \"path\",\n          \"path\": \"conformancePeer\"\n        },\n        \"listening\": {\n          \"kind\": \"pair\",",
+    "new": "\"name\": \"conformance-peer\",\n        \"locate\": {\n          \"kind\": \"path\",\n          \"path\": \"conformancePeer\"\n        },\n        \"listening\": {\n          \"kind\": \"pairs\","
+   }
+  ],
+  "expect": "the component ConformancePeer's vendor listening is 'pairs', none of D17.3's"
+ },
+ {
+  "name": "a MultiSelect cite on a line that names another member",
+  "edits": [
+   {
+    "file": "spec/Reference/syncfusion.json",
+    "old": "\"prop.scalar.read\": {\n      \"member\": \"placeholder\",\n      \"door\": \"Property<string?>\",\n      \"cites\": [\n        \"@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277\"",
+    "new": "\"prop.scalar.read\": {\n      \"member\": \"placeholder\",\n      \"door\": \"Property<string?>\",\n      \"cites\": [\n        \"@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:270\""
+   }
+  ],
+  "expect": "prop.scalar.read: @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:270 reads 'popupWidth: string | number;', which names none of 'placeholder'"
+ },
+ {
+  "name": "a BRIEF.md bullet and its matrix bullet reworded together",
+  "edits": [
+   {
+    "file": "spec/BRIEF.md",
+    "old": "    - read and write a scalar;\n",
+    "new": "    - read and write a scalar value;\n"
+   },
+   {
+    "file": "spec/Reference/matrix.json",
+    "old": "\"brief\": \"read and write a scalar\",",
+    "new": "\"brief\": \"read and write a scalar value\","
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a cell's description reworded",
+  "edits": [
+   {
+    "file": "spec/Reference/matrix.json",
+    "old": "\"cell\": \"read a scalar property\",",
+    "new": "\"cell\": \"read a property that holds a scalar\","
+   }
+  ],
+  "expect": null
+ }
+]

@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Navigations
+@model WardTour
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward tour";
+    var plan = Html.ReactivePlan<WardTour>();
+    var slides = new List<CarouselItem>
+    {
+        new() { Template = "<p>Ward A</p>" },
+        new() { Template = "<p>Ward B</p>" },
+        new() { Template = "<p>Ward C</p>" },
+    };
+}
+<h1>Ward tour</h1>
+@(Html.FusionCarousel(plan, "ward-tour", build => build.Items(slides).SelectedIndex(Model.StartingSlide).AutoPlay(false)))
+<button type="button" @Html.Raises(plan, WardTours.WhichWard)>Which ward</button>
+<p>Ward shown: <output id="ward-shown">-</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardTours.WhichWard, pipeline =>
+        pipeline.Element("ward-shown").Text.Set(pipeline.Component<FusionCarousel>("ward-tour").SelectedIndex)));
+}
+@Html.RenderPlan(plan)

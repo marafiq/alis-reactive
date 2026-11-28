@@ -1,0 +1,191 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@using Newtonsoft.Json.Linq
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.DropDowns
+@model WardTransferDesk
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward transfer";
+    var plan = Html.ReactivePlan<WardTransferDesk>();
+}
+<h1>Ward transfer</h1>
+<fieldset>
+    <legend>Transfer destination</legend>
+    @(Html.InputField(plan, m => m.Destination, options => options.Label("Destination"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((TransferWard ward) => ward.Label, ward => ward.Code))
+        .Reactive(list => list.Change, (changed, pipeline) =>
+        {
+            var current = changed.ItemData<TransferWard>();
+            var previous = changed.PreviousItemData<TransferWard>();
+            pipeline.When(current.NotNull())
+                .Then(pipeline => pipeline.Element("arrival-instruction").Text.Set(current.Read(ward => ward!.Instruction)))
+                .Else(pipeline => pipeline.Element("arrival-instruction").Text.Set("Choose a destination."));
+            pipeline.When(previous.NotNull())
+                .Then(pipeline => pipeline.Element("previous-ward").Text.Set(previous.Read(ward => ward!.Label)))
+                .Else(pipeline => pipeline.Element("previous-ward").Text.Set("None"));
+        }))
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.RemoveDestination)>Remove destination</button>
+    <p id="arrival-instruction">Choose a destination.</p>
+    <p>Previous destination: <output id="previous-ward">None</output></p>
+</fieldset>
+@using (var handover = Html.BeginRequestContainer(plan, "transfer-handover"))
+{
+    <fieldset>
+        <legend>Travel route</legend>
+        @(Html.InputField(plan, m => m.Route, options => options.Label("Travel route")).FusionDropDownList(new[] { "Lift", "Courtyard" }, build => build.ShowClearButton(false))
+            .Reactive(list => list.Change, (changed, pipeline) =>
+            {
+                var choice = changed.ItemData<TransferChoice<string>>();
+                pipeline.When(choice.Read(row => row!.Value).Eq("Lift"))
+                    .Then(pipeline => pipeline.Element("route-action").Text.Set("Send the lift team."))
+                    .Else(pipeline => pipeline.Element("route-action").Text.Set("Arrange the outdoor escort."));
+            }))
+        <p id="route-action">Choose a travel route.</p>
+    </fieldset>
+    <fieldset>
+        <legend>Advance notice</legend>
+        @(Html.InputField(plan, m => m.NoticeMinutes, options => options.Label("Minutes of notice")).FusionDropDownList(new[] { 0, 30 }, build => build.ShowClearButton(false))
+            .Reactive(list => list.Change, (changed, pipeline) =>
+            {
+                var choice = changed.ItemData<TransferChoice<int>>();
+                pipeline.When(choice.Read(row => row!.Value).Eq(0))
+                    .Then(pipeline => pipeline.Element("notice-action").Text.Set("Meet the resident now."))
+                    .Else(pipeline => pipeline.Element("notice-action").Text.Set("Prepare the room in thirty minutes."));
+            }))
+        <p id="notice-action">Choose the notice period.</p>
+    </fieldset>
+    <fieldset>
+        <legend>Bedside escort</legend>
+        @(Html.InputField(plan, m => m.Escort, options => options.Label("Escort required")).FusionDropDownList(new[] { false, true }, build => build.ShowClearButton(false))
+            .Reactive(list => list.Change, (changed, pipeline) =>
+            {
+                var choice = changed.ItemData<TransferChoice<bool>>();
+                pipeline.When(choice.Read(row => row!.Value).Eq(false))
+                    .Then(pipeline => pipeline.Element("escort-action").Text.Set("Keep the escort team available."))
+                    .Else(pipeline => pipeline.Element("escort-action").Text.Set("Reserve the bedside escort."));
+            }))
+        <p id="escort-action">Choose the escort requirement.</p>
+    </fieldset>
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.Save)>Save handover</button>
+    Html.On(plan, trigger => trigger.CustomEvent(WardTransferDeskActions.Save, pipeline => pipeline
+        .Post<WardTransferDesk>(WardTransferDeskActions.Receipt, request => request.Inputs(handover.Container))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("handover-receipt").Text.Set(saved.Body))));
+}
+<p id="handover-receipt">Handover pending.</p>
+<fieldset>
+    <legend>Receiving team</legend>
+    <label for="transfer-team">Receiving team</label>
+    @(plan.Render<FusionDropDownList<ReceivingTeam?>>("transfer-team", Html.EJS().DropDownList("transfer-team")
+        .DataSource(new JRaw(plan.Json(Model.Teams)))
+        .Fields(new DropDownListFieldSettings { Text = plan.JsonPath((ReceivingTeam team) => team.Label).Single(), Value = plan.JsonPath((ReceivingTeam team) => team.Code).Single() })
+        .AllowObjectBinding(true).Render())
+        .Reactive(list => list.Change, (changed, pipeline) => pipeline.Element("receiving-team").Text.Set(changed.Value.Read(team => team!.Contact.Handover))))
+    <p id="receiving-team">Choose the receiving team.</p>
+</fieldset>
+<fieldset>
+    <legend>Incoming referral</legend>
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.MapleReferral)>Check referral M1</button>
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.CedarReferral)>Check referral C2</button>
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.UnknownReferral)>Check referral R9</button>
+    <p id="referral-contact">Select a referral.</p>
+</fieldset>
+<fieldset>
+    <legend>Overflow wards</legend>
+    @(Html.InputField(plan, m => m.Overflow, options => options.Label("Overflow ward"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((TransferWard ward) => ward.Label, ward => ward.Code)))
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.ReleaseOak)>Release Oak</button>
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.PrioritizeOak)>Prioritize Oak</button>
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.ReleaseBoth)>Release both wards</button>
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.PrioritizeBoth)>Prioritize both wards</button>
+</fieldset>
+<fieldset>
+    <legend>Ward directory</legend>
+    @(Html.InputField(plan, m => m.Directory, options => options.Label("Search the ward directory"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((TransferWard ward) => ward.Label, ward => ward.Code)
+            .AllowFiltering(true).DebounceDelay(0).FilterBarPlaceholder("Search by service").NoRecordsTemplate("No wards provide this service."))
+        .Reactive(list => list.Filtering, (filtering, pipeline) =>
+        {
+            filtering.PreventDefaultAction.Set(true);
+            pipeline.When(filtering.Text.Eq("s"))
+                .Then(pipeline => filtering.UpdateData<TransferWard>(Model.ReleasedWards.ToArray()))
+                .ElseIf(filtering.Text.Eq("a"))
+                .Then(pipeline => filtering.UpdateData<TransferWard>(Model.Wards.Where(ward => ward.Service == "Assisted care").ToArray()))
+                .Else(pipeline => filtering.UpdateData<TransferWard>(Array.Empty<TransferWard>()));
+        }))
+</fieldset>
+<fieldset>
+    <legend>Bed assignment</legend>
+    @(Html.InputField(plan, m => m.BedAssignment, options => options.Label("Bed assignment"))
+        .FusionDropDownList(Model.Wards.Concat(Model.ReleasedWards).ToArray(), build => build.Fields((TransferWard ward) => ward.Label, ward => ward.Code))
+        .Reactive(list => list.Select, (selected, pipeline) =>
+        {
+            var candidate = selected.ItemData<TransferWard>();
+            pipeline.When(candidate.Read(ward => ward!.Held))
+                .Then(pipeline =>
+                {
+                    selected.Cancel.Set(true);
+                    pipeline.Element("bed-review").Text.Set("A nurse must release the isolation hold.");
+                })
+                .Else(pipeline =>
+                {
+                    pipeline.Element("bed-review").Text.Set(candidate.Read(ward => ward!.Label));
+                    pipeline.Element("bed-review").Text.Append(" is ready for transfer.");
+                });
+        }))
+    <p id="bed-review">Maple is assigned.</p>
+</fieldset>
+<fieldset>
+    <legend>Transfer confirmation</legend>
+    @(Html.InputField(plan, m => m.OpeningHeld, options => options.Label("Hold placement review")).NativeCheckBox())
+    @(Html.InputField(plan, m => m.KeepOpen, options => options.Label("Keep choices for confirmation")).NativeCheckBox())
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.OpenConfirmation)>Review placement choices</button>
+    <button type="button" @Html.Raises(plan, WardTransferDeskActions.CloseConfirmation)>Return to transfer form</button>
+    @(Html.InputField(plan, m => m.Confirmation, options => options.Label("Confirm destination"))
+        .FusionDropDownList(Model.Wards, build => build.Fields((TransferWard ward) => ward.Label, ward => ward.Code).AllowFiltering(true))
+        .Reactive(list => list.BeforeOpen, (opening, pipeline) => pipeline
+            .When(pipeline.Input(m => m.OpeningHeld).Component<NativeCheckBox>().Checked)
+            .Then(pipeline =>
+            {
+                opening.Cancel.Set(true);
+                pipeline.Element("confirmation-instruction").Text.Set("A nurse must release the placement hold.");
+            }))
+        .Reactive(list => list.Close, (closing, pipeline) => pipeline
+            .When(pipeline.Input(m => m.KeepOpen).Component<NativeCheckBox>().Checked)
+            .Then(pipeline =>
+            {
+                closing.Cancel.Set(true);
+                pipeline.Element("confirmation-instruction").Text.Set("Confirm a destination before closing.");
+            })
+            .Else(pipeline => pipeline.Element("confirmation-instruction").Text.Set("Placement review closed."))))
+    <p id="confirmation-instruction">Start placement review.</p>
+</fieldset>
+@{
+    void CheckReferral(Pipeline<WardTransferDesk> pipeline, string code)
+    {
+        var ward = pipeline.Input(m => m.Destination).Component<FusionDropDownList<string?>>().GetDataByValue<TransferWard>(code);
+        pipeline.When(ward.NotNull())
+            .Then(pipeline => pipeline.Element("referral-contact").Text.Set(ward.Read(row => row!.Instruction)))
+            .Else(pipeline => pipeline.Element("referral-contact").Text.Set("Return this referral to placement review."));
+    }
+
+    Html.On(plan, trigger => trigger
+        .CustomEvent(WardTransferDeskActions.RemoveDestination, pipeline => pipeline.Input(m => m.Destination).Component<FusionDropDownList<string?>>().Clear())
+        .CustomEvent(WardTransferDeskActions.MapleReferral, pipeline => CheckReferral(pipeline, "M1"))
+        .CustomEvent(WardTransferDeskActions.CedarReferral, pipeline => CheckReferral(pipeline, "C2"))
+        .CustomEvent(WardTransferDeskActions.UnknownReferral, pipeline => CheckReferral(pipeline, "R9"))
+        .CustomEvent(WardTransferDeskActions.ReleaseOak, pipeline => pipeline.Input(m => m.Overflow).Component<FusionDropDownList<string?>>().AddItem<TransferWard>(Model.ReleasedWards[0]))
+        .CustomEvent(WardTransferDeskActions.PrioritizeOak, pipeline => pipeline.Input(m => m.Overflow).Component<FusionDropDownList<string?>>().AddItem<TransferWard>(Model.ReleasedWards[0], 1))
+        .CustomEvent(WardTransferDeskActions.ReleaseBoth, pipeline => pipeline.Input(m => m.Overflow).Component<FusionDropDownList<string?>>().AddItems<TransferWard>(Model.ReleasedWards.ToArray()))
+        .CustomEvent(WardTransferDeskActions.PrioritizeBoth, pipeline => pipeline.Input(m => m.Overflow).Component<FusionDropDownList<string?>>().AddItems<TransferWard>(Model.ReleasedWards.ToArray(), 1))
+        .CustomEvent(WardTransferDeskActions.OpenConfirmation, pipeline => pipeline.Input(m => m.Confirmation).Component<FusionDropDownList<string?>>().ShowPopup())
+        .CustomEvent(WardTransferDeskActions.CloseConfirmation, pipeline => pipeline.Input(m => m.Confirmation).Component<FusionDropDownList<string?>>().HidePopup()));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,78 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalRota
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Admission rota";
+    var plan = Html.ReactivePlan<ArrivalRota>();
+}
+<h1>Admission rota</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd")))
+</fieldset>
+@(Html.NativeButton("open-nursing-rota", "Open nursing rota")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FirstDayOfWeek.Set(1);
+        date.DayHeaderFormat.Set(FusionDatePickerHeader.Wide);
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("open-transport-rota", "Open transport rota")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FirstDayOfWeek.Set(0);
+        date.DayHeaderFormat.Set(FusionDatePickerHeader.Short);
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("open-iso-reporting-weeks", "Open ISO reporting weeks")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FirstDayOfWeek.Set(1);
+        date.WeekNumber.Set(true);
+        date.WeekRule.Set(FusionDatePickerWeekRule.FirstFourDayWeek);
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("open-local-reporting-weeks", "Open local reporting weeks")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FirstDayOfWeek.Set(1);
+        date.WeekNumber.Set(true);
+        date.WeekRule.Set(FusionDatePickerWeekRule.FirstDay);
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("open-same-day-intake", "Open same-day intake")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.WeekNumber.Set(true);
+        date.ShowTodayButton.Set(true);
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("open-historical-transfer", "Open historical transfer")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.WeekNumber.Set(false);
+        date.ShowTodayButton.Set(false);
+        date.DataBind();
+        date.Show();
+    }))
+@Html.RenderPlan(plan)

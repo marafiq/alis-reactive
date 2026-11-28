@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model SavedIntake
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Review intake dates";
+    var plan = Html.ReactivePlan<SavedIntake>();
+}
+<h1>Review intake dates</h1>
+@using (var intake = Html.BeginRequestContainer(plan, "intake-dates"))
+{
+    @(Html.InputField(plan, m => m.MoveIn, options => options.Label("Move-in date")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Orientation, options => options.Label("Orientation date and time")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Discharge, options => options.Label("Discharge date")).NativeTextBox())
+    @(Html.NativeButton("save-intake", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<SavedIntake>(CarePages.SavedIntakeInGerman, request => request.Inputs(intake.Container))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("intake-receipt").Text.Set(saved.Body))))
+}
+<output id="intake-receipt" aria-label="Intake receipt"></output>
+@Html.RenderPlan(plan)

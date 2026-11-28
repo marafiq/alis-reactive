@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AlertSwitchPreview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident alert preview";
+    var plan = Html.ReactivePlan<AlertSwitchPreview>();
+}
+<h1>Resident alert preview</h1>
+<fieldset>
+    <legend>Alert preference preview</legend>
+    @(Html.InputField(plan, m => m.NightAlerts, options => options.Label("Night alerts")).FusionSwitch(build => build.OnLabel("Preview enabled").OffLabel("Preview paused")))
+    @(Html.NativeButton("close-alert-preview", "Close switch preview")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+            pipeline.Input(m => m.NightAlerts).Component<FusionSwitch>().Destroy()))
+</fieldset>
+@Html.RenderPlan(plan)

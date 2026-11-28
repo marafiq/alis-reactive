@@ -1,0 +1,38 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomCardPrinting
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Print the room card";
+    var plan = Html.ReactivePlan<RoomCardPrinting>();
+    const string printCaption = "Single room<style>.room-print-legend { display: block; }</style>";
+    void ApplyCard(Pipeline<RoomCardPrinting> pipeline, bool imported)
+    {
+        var room = pipeline.Component<FusionRadioButton>("print-room");
+        room.EnableHtmlSanitizer.Set(imported);
+        room.Label.Set(printCaption);
+        room.Refresh();
+        pipeline.When(room.EnableHtmlSanitizer)
+            .Then(pipeline => pipeline.Element("print-policy").Text.Set("Imported styling filtered"))
+            .Else(pipeline => pipeline.Element("print-policy").Text.Set("House styling enabled"));
+    }
+}
+<h1>Print the room card</h1>
+<style>
+    .room-print-legend { display: none; }
+</style>
+@(Html.FusionRadioButton(plan, "print-room", build => build.Name("printed-room").Value("single")))
+<p class="room-print-legend">Print on cream stock</p>
+@(Html.NativeButton("imported-card", "Apply imported card")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+        ApplyCard(pipeline, imported: true)))
+@(Html.NativeButton("house-card", "Apply house card")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+        ApplyCard(pipeline, imported: false)))
+<p><output id="print-policy" aria-label="Print policy">Card source awaiting review</output></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@model ResidentPanels
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident panels";
+}
+<h1>Resident panels</h1>
+<nav aria-label="Resident panels">
+    <ul>
+        @foreach (var resident in Model.Residents)
+        {
+            <li><a href="/Residents/@resident.Id">@resident.Name</a></li>
+        }
+    </ul>
+</nav>

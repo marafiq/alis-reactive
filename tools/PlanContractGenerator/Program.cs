@@ -1,60 +1,25 @@
 using System;
 using System.IO;
-using Alis.Reactive.PlanModel;
 
-namespace Alis.Reactive.ContractGeneration
+namespace Alis.Reactive.PlanContractGenerator;
+
+internal static class Program
 {
-    internal static class Program
+    private static int Main(string[] args)
     {
-        private static int Main(string[] args)
+        if (args.Length != 1)
         {
-            var check = Array.IndexOf(args, "--check") >= 0;
-
-            var outputPath = ResolveOutputPath(args);
-            var fullPath = System.IO.Path.GetFullPath(outputPath);
-
-            return check ? CheckDrift(fullPath) : WriteContract(fullPath);
+            Console.Error.WriteLine("Usage: PlanContractGenerator <the folder that holds plan.ts and plan.schema.json>");
+            return 2;
         }
 
-        private static string ResolveOutputPath(string[] args)
-        {
-            foreach (var commandLineArgument in args)
-            {
-                if (commandLineArgument != "--check")
-                    return commandLineArgument;
-            }
+        var contract = PlanContract.ReadCore();
 
-            return System.IO.Path.Combine("Alis.Reactive.Assets", "runtime", "types", "plan.ts");
-        }
-
-        private static int WriteContract(string fullPath)
-        {
-            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath)
-                ?? throw new InvalidOperationException("Output path must include a directory."));
-
-            File.WriteAllText(fullPath, PlanContractGenerator.Render());
-            Console.WriteLine("Generated " + fullPath);
-            return 0;
-        }
-
-        private static int CheckDrift(string fullPath)
-        {
-            if (!File.Exists(fullPath))
-            {
-                Console.Error.WriteLine("plan.ts not found at " + fullPath + ". Run the generator first.");
-                return 1;
-            }
-
-            var result = ContractDriftGate.Check(fullPath);
-            if (!result.HasDrift)
-            {
-                Console.WriteLine("plan.ts is in sync with PlanContractGenerator.");
-                return 0;
-            }
-
-            Console.Error.WriteLine("plan.ts drift detected. Rerun the generator to regenerate it.");
-            Console.Error.WriteLine(result.Diff);
-            return 1;
-        }
+        var folder = Path.GetFullPath(args[0]);
+        Directory.CreateDirectory(folder);
+        File.WriteAllText(Path.Combine(folder, "plan.ts"), contract.TypeScript());
+        File.WriteAllText(Path.Combine(folder, "plan.schema.json"), contract.Schema());
+        Console.WriteLine("[contract] wrote plan.ts and plan.schema.json to " + folder);
+        return 0;
     }
 }

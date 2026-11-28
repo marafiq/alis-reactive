@@ -1,0 +1,39 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model OwnerHistoryPage
+@{
+    var plan = Html.ReactivePlan<OwnerHistoryPage>();
+}
+<p>Current assessment: <span id="assessment-reference">@Model.Assessment</span></p>
+<p id="room-lock">@(Model.Locked ? "Room handoff is locked." : "Room handoff is open.")</p>
+<div id="mobility-history" aria-label="Mobility history">
+    @if (Model.Mobility.Count == 0)
+    {
+        <p>No mobility reviews.</p>
+    }
+    else
+    {
+        <ul aria-label="Mobility reviews">
+            @foreach (var entry in Model.Mobility)
+            {
+                <li>@entry</li>
+            }
+        </ul>
+    }
+</div>
+<div id="room-history" aria-label="Room history">
+    @if (Model.Rooms.Count == 0)
+    {
+        <p>No room reviews.</p>
+    }
+    else
+    {
+        <ul aria-label="Room reviews">
+            @foreach (var entry in Model.Rooms)
+            {
+                <li>@entry</li>
+            }
+        </ul>
+    }
+</div>
+@Html.RenderPlan(plan)

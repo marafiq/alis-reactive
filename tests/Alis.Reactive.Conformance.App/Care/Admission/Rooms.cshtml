@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@model FloorRooms
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Rooms";
+}
+<h1>Rooms of the @Model.Floor</h1>
+<nav aria-label="Rooms">
+    <ul>
+        @foreach (var code in Model.Codes)
+        {
+            <li><a href="/Rooms/@code">@code</a></li>
+        }
+    </ul>
+</nav>

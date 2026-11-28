@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AllocationReviewPage
+@{
+    var plan = Html.ReactivePlan<AllocationReviewPage>();
+}
+<p>Bed on file: <span id="allocation-bed">@Model.BedOnFile</span></p>
+@(plan.ConformanceComponent("allocation-panel", Model.ComponentStart))
+<div id="allocation-desk"></div>
+<p>Reviews on file:</p>
+<ul aria-label="Allocation reviews">
+    @foreach (var review in Model.Reviews)
+    {
+        <li>@review</li>
+    }
+</ul>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline
+        .Get<DeskQuery>(CareEndpoints.MoveInAllocationDesk, request => request.Query(query => query.DraftId, Model.DraftId))
+        .Into("allocation-desk")));
+}
+@Html.RenderPlan(plan)

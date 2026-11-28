@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ChartStatusDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Chart status";
+    var plan = Html.ReactivePlan<ChartStatusDesk>();
+}
+<h1>Chart status of @Model.Resident</h1>
+<p>Answer: <span id="bound">-</span></p>
+<p>Sending: <span id="sending">Open</span></p>
+<button type="button" @Html.Raises(plan, ChartStatuses.Send)>Send the status</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ChartStatuses.Send, pipeline => pipeline.Get(Model.Chart)
+        .OnSuccess<ChartStatusReply>((found, pipeline) => pipeline
+            .Post<ChartStatusSent>(ChartStatuses.Bound, request => request.Json(body => body.Set(r => r.Status, found.Body.Read(reply => reply.Chart.Status))))
+            .OnSuccess(Content.Text, (bound, pipeline) => pipeline.Element("bound").Text.Set(bound.Body))
+            .Finally(pipeline => pipeline.Element("sending").Text.Set("Finished")))));
+}
+@Html.RenderPlan(plan)

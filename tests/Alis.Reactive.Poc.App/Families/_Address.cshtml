@@ -1,0 +1,7 @@
+@using Alis.Reactive.Poc.App.Families
+@model Address
+@{
+    var plan = Html.ReactivePlan<Address>();
+}
+@Html.InputField(plan, m => m.City).TextBox("City")
+@Html.RenderPlan(plan)

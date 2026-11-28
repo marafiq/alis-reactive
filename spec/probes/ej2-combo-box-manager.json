@@ -1,0 +1,35 @@
+{
+  "dropdowns": "33.1.47",
+  "data": "33.1.45",
+  "defaultSourceIsEmptyList": true,
+  "defaultBoxQueryIsNull": true,
+  "registeredManagerIsSameInstance": true,
+  "received": [
+    {
+      "queryIsActualInstance": true,
+      "nativePromise": true,
+      "resultIsArray": true,
+      "delivery": "Northbank delivers Monday at 09:30"
+    },
+    {
+      "queryIsActualInstance": true,
+      "nativePromise": true,
+      "resultIsArray": true,
+      "delivery": "Harbor delivers Tuesday at 14:00"
+    }
+  ],
+  "requests": [
+    {
+      "method": "POST",
+      "supplier": null
+    },
+    {
+      "method": "POST",
+      "supplier": "northbank"
+    },
+    {
+      "method": "POST",
+      "supplier": "harbor"
+    }
+  ]
+}

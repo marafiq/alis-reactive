@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NightPanel
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Night panel";
+    var plan = Html.ReactivePlan<NightPanel>();
+}
+<h1>Night care of @Model.Resident</h1>
+@(plan.ConformanceComponent("day-panel", new ConformanceStart { Text = "Day panel", Days = Model.Care }))
+@(plan.ConformanceComponent("night-panel", new ConformanceStart { Text = "Night panel" }))
+<button type="button" @Html.Raises(plan, PanelWeeks.Copy)>Copy the day panel's days</button>
+<button type="button" @Html.Raises(plan, PanelWeeks.Send)>Send night care</button>
+<p>Days copied: <span id="days-copied">no</span></p>
+<p>Care sent: <span id="care-echo"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PanelWeeks.Copy, pipeline =>
+    {
+        pipeline.Component<ConformanceComponent>("night-panel").Days.Set(pipeline.Component<ConformanceComponent>("day-panel").Days);
+        pipeline.Element("days-copied").Text.Set("yes");
+    }));
+    Html.On(plan, trigger => trigger.CustomEvent(PanelWeeks.Send, pipeline => pipeline
+        .Get<PanelWeekQuery>(PanelWeekEndpoints.Care, request => request.Set(r => r.Care, pipeline.Component<ConformanceComponent>("night-panel").Days))
+        .OnSuccess(Content.Text, (sent, pipeline) => pipeline.Element("care-echo").Text.Set(sent.Body))));
+}
+@Html.RenderPlan(plan)

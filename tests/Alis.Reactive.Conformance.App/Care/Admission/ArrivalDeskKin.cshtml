@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ArrivalKin
+@{
+    var plan = Html.ReactivePlan<ArrivalKin>();
+}
+@using (var kin = Html.BeginRequestContainer(plan, "arrival-kin-details"))
+{
+    <fieldset>
+        <legend>Kin's name</legend>
+        @(Html.InputField(plan, m => m.Name, options => options.Label("Kin's name")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>Kin's phone</legend>
+        @(Html.InputField(plan, m => m.Phone, options => options.Label("Kin's phone")).NativeTextBox())
+    </fieldset>
+    <button type="button" @Html.Raises(plan, ArrivalDeskButtons.SaveKin)>Save next of kin</button>
+    Html.On(plan, trigger => trigger.CustomEvent(ArrivalDeskButtons.SaveKin, pipeline => pipeline
+        .Post<ArrivalKin>(ArrivalDeskEndpoints.KinSaves, request => request.Inputs(kin.Container))
+        .Validate<ArrivalKinRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("arrival-kin-saved").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

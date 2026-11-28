@@ -1,0 +1,43 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalWithdrawal
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Withdraw an arrival";
+    var plan = Html.ReactivePlan<ArrivalWithdrawal>();
+}
+<h1>Withdraw an arrival</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Cleared, (cleared, pipeline) => pipeline.When(cleared.OriginalEvent.Type.Eq("mousedown"))
+            .Then(pipeline => pipeline.Element("withdrawal-receipt").Text.Set("Arrival withdrawn by staff"))))
+</fieldset>
+@(Html.NativeButton("permit-date-withdrawal", "Permit date withdrawal")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.ShowClearButton.Set(true);
+        date.DataBind();
+        pipeline.When(date.ShowClearButton.Not())
+            .Then(pipeline => pipeline.Element("withdrawal-receipt").Text.Set("Signed arrival retained"));
+    }))
+@(Html.NativeButton("protect-transfer-date", "Protect transfer date")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.ShowClearButton.Set(false);
+        date.DataBind();
+        pipeline.When(date.ShowClearButton.Not())
+            .Then(pipeline => pipeline.Element("withdrawal-receipt").Text.Set("Signed arrival retained"));
+    }))
+<p><output id="withdrawal-receipt" aria-label="Withdrawal receipt">Arrival retained</output></p>
+@Html.RenderPlan(plan)

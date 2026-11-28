@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomTypeChoice
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Room type";
+    var plan = Html.ReactivePlan<RoomTypeChoice>();
+}
+<h1>Room type of @Model.Resident</h1>
+<fieldset>
+    <legend>Room type</legend>
+    @(Html.FusionRadioButton(plan, "room-companion", build => build.Label("Companion suite").Name("room").Value("companion")))
+    @(Html.FusionRadioButton(plan, "room-single", build => build.Label("Single room").Name("room").Value("single")))
+</fieldset>
+<button type="button" @Html.Raises(plan, RoomTypeChecks.ShowRoom)>Show room</button>
+<p>Room: <output id="room-choice">No room</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RoomTypeChecks.ShowRoom, pipeline => pipeline
+        .Element("room-choice").Text.Set(pipeline.Component<FusionRadioButton>("room-companion").GetSelectedValue())));
+}
+@Html.RenderPlan(plan)

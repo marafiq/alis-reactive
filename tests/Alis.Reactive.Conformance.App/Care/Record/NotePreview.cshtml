@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NotePreview
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident record";
+    var plan = Html.ReactivePlan<NotePreview>();
+}
+<h1>Record of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, NotePreviews.OpenTheNote)>Open the note</button>
+<button type="button" @Html.Raises(plan, NotePreviews.Preview)>Preview</button>
+<p>Preview: <span id="preview">-</span></p>
+<section id="record-tab" aria-label="Tab"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(NotePreviews.OpenTheNote, pipeline => pipeline.Get(NotePreviewEndpoints.Draft).Into("record-tab"))
+        .CustomEvent(NotePreviews.Preview, pipeline => pipeline.Element("preview").Text.Set(pipeline.Container<NoteDraft>("note-draft").Read(m => m.Note))));
+}
+@Html.RenderPlan(plan)

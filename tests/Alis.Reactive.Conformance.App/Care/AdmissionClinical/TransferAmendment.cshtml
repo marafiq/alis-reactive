@@ -1,0 +1,94 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model TransferAmendment
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Transport amendment";
+    var plan = Html.ReactivePlan<TransferAmendment>();
+}
+<h1>Transport amendment</h1>
+@(Html.InputField(plan, m => m.Safeguards, options => options.Label("Keep confirmed transfer safeguards")).NativeCheckBox())
+<fieldset>
+    <legend>Route amendment</legend>
+    @(Html.InputField(plan, m => m.Route, options => options.Label("Booked travel route"))
+        .FusionDropDownList(new[] { "Lift", "Courtyard" }, build => build.ShowClearButton(false))
+        .Reactive(list => list.Select, (selection, pipeline) =>
+        {
+            var proposed = selection.ItemData<TransferChoice<string>>();
+            var held = pipeline.Input(m => m.Safeguards).Component<NativeCheckBox>().Checked;
+            pipeline.When(held.And(proposed.Read(choice => choice!.Text).Eq("Courtyard")))
+                .Then(pipeline =>
+                {
+                    selection.Cancel.Set(true);
+                    pipeline.Element("route-approval").Text.Set("Keep the lift booking until an outdoor escort is available.");
+                })
+                .Else(pipeline => pipeline.Element("route-approval").Text.Set("Travel route accepted."));
+        })
+        .Reactive(list => list.Change, (change, pipeline) =>
+        {
+            var previous = change.PreviousItemData<TransferChoice<string>>();
+            pipeline.When(previous.NotNull())
+                .Then(pipeline => pipeline.Element("route-release").Text.Set(previous.Read(choice => choice!.Value).Eq("Lift").Choose("Cancel the lift booking.", "Release the outdoor escort.")))
+                .Else(pipeline => pipeline.Element("route-release").Text.Set("There is no prior travel route to cancel."));
+        }))
+    <p id="route-approval">Choose an arrangement.</p>
+    <p id="route-release">The existing booking is unchanged.</p>
+</fieldset>
+<fieldset>
+    <legend>Notice amendment</legend>
+    @(Html.InputField(plan, m => m.NoticeMinutes, options => options.Label("Booked notice in minutes"))
+        .FusionDropDownList(new[] { 0, 30 }, build => build.ShowClearButton(false))
+        .Reactive(list => list.Select, (selection, pipeline) =>
+        {
+            var proposed = selection.ItemData<TransferChoice<int>>();
+            var held = pipeline.Input(m => m.Safeguards).Component<NativeCheckBox>().Checked;
+            pipeline.When(held.And(proposed.Read(choice => choice!.Text).Eq(0)))
+                .Then(pipeline =>
+                {
+                    selection.Cancel.Set(true);
+                    pipeline.Element("notice-approval").Text.Set("Keep thirty minutes while the advance-notice requirement is active.");
+                })
+                .Else(pipeline => pipeline.Element("notice-approval").Text.Set("Notice interval accepted."));
+        })
+        .Reactive(list => list.Change, (change, pipeline) =>
+        {
+            var previous = change.PreviousItemData<TransferChoice<int>>();
+            pipeline.When(previous.NotNull())
+                .Then(pipeline => pipeline.Element("notice-release").Text.Set(previous.Read(choice => choice!.Value).Eq(30).Choose("Withdraw the thirty-minute notice.", "Withdraw the immediate departure.")))
+                .Else(pipeline => pipeline.Element("notice-release").Text.Set("There is no earlier notice to withdraw."));
+        }))
+    <p id="notice-approval">Choose an arrangement.</p>
+    <p id="notice-release">The existing booking is unchanged.</p>
+</fieldset>
+<fieldset>
+    <legend>Escort amendment</legend>
+    @(Html.InputField(plan, m => m.Escort, options => options.Label("Booked escort requirement"))
+        .FusionDropDownList(new[] { false, true }, build => build.ShowClearButton(false))
+        .Reactive(list => list.Select, (selection, pipeline) =>
+        {
+            var proposed = selection.ItemData<TransferChoice<bool>>();
+            var held = pipeline.Input(m => m.Safeguards).Component<NativeCheckBox>().Checked;
+            pipeline.When(held.And(proposed.Read(choice => choice!.Text).Eq(false)))
+                .Then(pipeline =>
+                {
+                    selection.Cancel.Set(true);
+                    pipeline.Element("escort-approval").Text.Set("Keep the bedside escort while the escort requirement is active.");
+                })
+                .Else(pipeline => pipeline.Element("escort-approval").Text.Set("Escort arrangement accepted."));
+        })
+        .Reactive(list => list.Change, (change, pipeline) =>
+        {
+            var previous = change.PreviousItemData<TransferChoice<bool>>();
+            pipeline.When(previous.NotNull())
+                .Then(pipeline => pipeline.Element("escort-release").Text.Set(previous.Read(choice => choice!.Value).Eq(true).Choose("Release the previously reserved escort.", "Update the prior independent departure.")))
+                .Else(pipeline => pipeline.Element("escort-release").Text.Set("There is no earlier escort arrangement."));
+        }))
+    <p id="escort-approval">Choose an arrangement.</p>
+    <p id="escort-release">The existing booking is unchanged.</p>
+</fieldset>
+@Html.RenderPlan(plan)

@@ -1,0 +1,42 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalReviewHistory
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Calendar review history";
+    var plan = Html.ReactivePlan<ArrivalReviewHistory>();
+}
+<h1>Calendar review history</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Open, (opening, pipeline) => pipeline.When(opening.OriginalEvent.Type.Eq("keydown"))
+            .Then(pipeline => pipeline.Element("opening-history").Text.Set("Keyboard calendar opened"))
+            .Else(pipeline => pipeline.Element("opening-history").Text.Set("Desk calendar opened")))
+        .Reactive(picker => picker.Close, (closing, pipeline) => pipeline.When(closing.OriginalEvent.Type.Eq("keydown"))
+            .Then(pipeline => pipeline.Element("closing-history").Text.Set("Keyboard review finished"))
+            .Else(pipeline => pipeline.Element("closing-history").Text.Set("Desk review finished"))))
+</fieldset>
+@(Html.NativeButton("open-from-booking-desk", "Open from booking desk")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+    }))
+@(Html.NativeButton("close-from-booking-desk", "Close from booking desk")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Hide();
+    }))
+<p><output id="opening-history" aria-label="Opening history">No opening recorded</output></p>
+<p><output id="closing-history" aria-label="Closing history">No closing recorded</output></p>
+@Html.RenderPlan(plan)

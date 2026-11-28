@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentDirectory
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents";
+    var plan = Html.ReactivePlan<ResidentDirectory>();
+    var open = plan.Rows<ResidentRow>("residents").NativeActionLink(Model.Policy, (activated, pipeline) => pipeline
+        .Get<ResidentPanelQuery>(CareEndpoints.ResidentPanel, request => request.Set(panel => panel.ResidentId, activated.Row.Read(row => row.Id)))
+        .Into("resident-detail"));
+}
+<h1>Residents</h1>
+<ul aria-label="Residents">
+    @foreach (var resident in Model.Residents)
+    {
+        <li>@open.Render(resident, resident.Name)</li>
+    }
+</ul>
+<section id="resident-detail" aria-label="Resident detail"></section>
+@Html.RenderPlan(plan)

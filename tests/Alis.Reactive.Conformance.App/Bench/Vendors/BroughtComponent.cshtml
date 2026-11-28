@@ -1,0 +1,33 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BroughtComponentBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<BroughtComponentBoard>();
+    var raises = new[]
+    {
+        new RaiseStart { Button = "Raise", Text = Model.RaisedFor },
+    };
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Amount = Model.Amount, Raises = raises })
+    .Reactive(component => component.Raised, (raised, pipeline) => pipeline.Element("raised-for").Text.Set(raised.Text)))
+<button type="button" @Html.Raises(plan, AmountButtons.ReadTheAmount)>Read the amount</button>
+<button type="button" @Html.Raises(plan, AmountButtons.SetFifteen)>Set 15</button>
+<button type="button" @Html.Raises(plan, AmountButtons.AddFifteen)>Add 15</button>
+<dl>
+    <dt>Amount read</dt>
+    <dd id="amount-read"></dd>
+    <dt>Raised for</dt>
+    <dd id="raised-for"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(AmountButtons.ReadTheAmount, pipeline => pipeline.Element("amount-read").Text.Set(pipeline.Component<ConformanceComponent>("conformance").Amount))
+        .CustomEvent(AmountButtons.SetFifteen, pipeline => pipeline.Component<ConformanceComponent>("conformance").Amount.Set(15m))
+        .CustomEvent(AmountButtons.AddFifteen, pipeline => pipeline.Component<ConformanceComponent>("conformance").Add(15m)));
+}
+@Html.RenderPlan(plan)

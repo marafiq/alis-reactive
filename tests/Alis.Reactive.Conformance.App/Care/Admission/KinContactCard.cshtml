@@ -1,0 +1,10 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model KinContact
+@{
+    var plan = Html.ReactivePlan<KinContact>();
+}
+@(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+@(Html.InputField(plan, m => m.Phone, options => options.Label("Phone")).NativeTextBox())
+@Html.RenderPlan(plan)

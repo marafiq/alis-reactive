@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model LunchFeedback
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Meal feedback";
+    var plan = Html.ReactivePlan<LunchFeedback>();
+}
+<h1>Meal feedback</h1>
+<fieldset>
+    <legend>Lunch</legend>
+    @(Html.InputField(plan, m => m.LunchRating, options => options.Label("Lunch")).FusionRating())
+</fieldset>
+@Html.RenderPlan(plan)

@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AttemptsSentOnce
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Attempts";
+    var plan = Html.ReactivePlan<AttemptsSentOnce>();
+}
+<h1>Attempts on the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, ResidentsBusyEvents.LoadFirst)>Load first</button>
+<button type="button" @Html.Raises(plan, ResidentsBusyEvents.LoadSecond)>Load second</button>
+<p>Log: <output id="attempts-log"></output></p>
+<p>Second: <span id="second-status">-</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ResidentsBusyEvents.LoadFirst, pipeline => pipeline.Get(CareEndpoints.FailingAttempt)
+            .OnSuccess(pipeline => pipeline.Element("attempts-log").Text.Append("answered "))
+            .OnError(500, Content.None, (failed, pipeline) => pipeline.Element("attempts-log").Text.Append("error ")))
+        .CustomEvent(ResidentsBusyEvents.LoadSecond, pipeline => pipeline.Get(CareEndpoints.RetriedAttempt).NoRetry()
+            .OnSuccess(pipeline => pipeline.Element("second-status").Text.Set("Answered"))
+            .OnError(503, Content.None, (unavailable, pipeline) => pipeline.Element("second-status").Text.Set("Unavailable"))));
+}
+@Html.RenderPlan(plan)

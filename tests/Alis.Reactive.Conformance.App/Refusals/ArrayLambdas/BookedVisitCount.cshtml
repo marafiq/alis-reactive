@@ -1,0 +1,19 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitCutoff
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The visit count";
+    var plan = Html.ReactivePlan<VisitCutoff>();
+    var cutoff = Model.Cutoff;
+}
+<h1>The visit count</h1>
+<button type="button" @Html.Raises(plan, BookedVisitCounts.Count)>Count</button>
+<p>Visits before the cutoff: <span id="visit-count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BookedVisitCounts.Count, pipeline => pipeline.Get(BookedVisitEndpoints.Visits)
+        .OnSuccess<List<BookedVisit>>((visits, pipeline) => pipeline.Element("visit-count").Text.Set(visits.Body.Count(v => v.At < cutoff)))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,63 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalBooking
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Arrival booking";
+    var plan = Html.ReactivePlan<ArrivalBooking>();
+}
+<h1>Arrival booking</h1>
+@using (var booking = Html.BeginRequestContainer(plan, "arrival-booking"))
+{
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Change, (changed, pipeline) =>
+        {
+            var referralDay = changed.Value.Eq(new DateTime(2026, 7, 16));
+            var input = changed.Element.GetAttribute("name").Eq("ArrivesOn");
+            pipeline.When(referralDay.And(input).And(changed.Name.Eq("change")).And(changed.IsInteracted).And(changed.OriginalEvent.Type.Eq("click")))
+                .Then(pipeline => pipeline.Element("placement-history").Text.Set("Resident chose 16 July"))
+                .ElseIf(referralDay.And(input).And(changed.IsInteracted.Not()))
+                .Then(pipeline => pipeline.Element("placement-history").Text.Set("Referral assigned 16 July"));
+        }))
+</fieldset>
+@(Html.NativeButton("apply-confirmed-referral", "Apply confirmed referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Value.Set(new DateTime(2026, 7, 14));
+        date.DataBind();
+    }))
+@(Html.NativeButton("release-referral", "Release referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Value.Set((DateTime?)null);
+        date.DataBind();
+    }))
+@(Html.NativeButton("apply-transfer-referral", "Apply transfer referral")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Value.Set(new DateTime(2026, 7, 16));
+        date.DataBind();
+    }))
+@(Html.NativeButton("file-arrival", "File arrival")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        pipeline.Post<ArrivalBooking>(CarePages.FileArrival, request => request.Inputs(booking.Container))
+            .OnSuccess(Content.Text, (filed, pipeline) => pipeline.Element("arrival-receipt").Text.Set(filed.Body));
+    }))
+}
+<p><output id="arrival-receipt" aria-label="Arrival receipt">Unfiled arrival</output></p>
+<p><output id="placement-history" aria-label="Placement history">No selection recorded</output></p>
+@Html.RenderPlan(plan)

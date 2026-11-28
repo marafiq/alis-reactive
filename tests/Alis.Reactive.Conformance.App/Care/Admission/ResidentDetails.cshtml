@@ -1,0 +1,47 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NewResidentDetails
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<NewResidentDetails>();
+}
+<h1>Resident details</h1>
+@using (var resident = Html.BeginRequestContainer(plan, "resident"))
+{
+    using (var identity = Html.BeginRequestContainer(plan, "identity"))
+    {
+        <legend>Identity</legend>
+        <fieldset>
+            <legend>Name</legend>
+            @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+        </fieldset>
+        <fieldset>
+            <legend>Email</legend>
+            @(Html.InputField(plan, m => m.Email, options => options.Label("Email")).NativeTextBox())
+        </fieldset>
+        <fieldset>
+            <legend>Confirm email</legend>
+            @(Html.InputField(plan, m => m.EmailConfirmation, options => options.Label("Confirm email")).NativeTextBox())
+        </fieldset>
+        @(Html.NativeButton("next", "Next").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+        {
+            pipeline.Validate(identity.Container, ResidentDetailsRules.Identity);
+            pipeline.Element("step").Text.Set("Step 2: the bed");
+        }))
+        @(Html.NativeButton("review", "Review").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+        {
+            pipeline.Validate(identity.Container);
+            pipeline.Element("saved").Text.Set("Details ready");
+        }))
+    }
+    <fieldset>
+        <legend>Bed</legend>
+        @(Html.InputField(plan, m => m.Bed, options => options.Label("Bed")).NativeTextBox())
+    </fieldset>
+}
+<p>Step: <span id="step"></span></p>
+<p>Saved: <span id="saved"></span></p>
+@Html.RenderPlan(plan)

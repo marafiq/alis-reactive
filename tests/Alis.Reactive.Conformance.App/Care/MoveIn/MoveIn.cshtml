@@ -1,0 +1,222 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@inject MoveInReads Reads
+@model MoveInPage
+@{
+    Layout = "/Care/MoveIn/_MoveInLayout.cshtml";
+    ViewData["Title"] = "Move-in";
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+<h1>Move-in @Model.DraftId</h1>
+<div id="draft-workspace">
+<p>Saved version: <span id="saved-version">@Model.Version</span></p>
+@using (var moveIn = Html.BeginRequestContainer(plan, "move-in"))
+{
+    @(Html.NativeHiddenField(plan, m => m.DraftId))
+    @(Html.NativeHiddenField(plan, m => m.Version))
+    @(Html.NativeHiddenField(plan, m => m.ResidentId))
+    @(Html.NativeHiddenField(plan, m => m.CoordinatorId))
+    @(Html.NativeHiddenField(plan, m => m.OperationId))
+    @(Html.NativeHiddenField(plan, m => m.AcceptedQuoteRevision))
+
+    <section id="move-in-location" aria-label="Location">
+        @await Html.PartialFor(m => m.Location, "/Care/MoveIn/Location.cshtml")
+    </section>
+
+    <section id="move-in-resident" aria-label="Resident">
+        <p>Identity review on file: <span id="identity-review">@Reads.IdentityReviewOf(Model.DraftId)</span></p>
+        <p>Active admission: <span id="active-admission">@Reads.ActiveAdmissionOf(Model.ResidentId)</span></p>
+        @await Html.PartialFor(m => m.Resident, "/Care/MoveIn/Resident.cshtml")
+    </section>
+
+    <section id="move-in-care" aria-label="Care">
+        @await Html.PartialFor(m => m.Care, "/Care/MoveIn/Care.cshtml")
+        <div id="care-branch">
+            @await Html.PartialAsync("/Care/MoveIn/CareBranch.cshtml", Reads.CareQuestionsOf(Model))
+        </div>
+    </section>
+
+    <section id="move-in-contacts" aria-label="Contacts">
+        @await Html.PartialAsync("/Care/MoveIn/ContactDesk.cshtml", Model)
+    </section>
+
+    <section id="move-in-payer" aria-label="Payer">
+        @await Html.PartialFor(m => m.Payer, "/Care/MoveIn/PayerDesk.cshtml")
+        <p id="verification-context">@Reads.VerificationContext(Model.DraftId)</p>
+        <div id="primary-payer">
+            @await Html.PartialAsync("/Care/MoveIn/PrimaryPayer.cshtml", Model)
+        </div>
+    </section>
+
+    <section id="move-in-medications" aria-label="Medications">
+        @await Html.PartialAsync("/Care/MoveIn/MedicationDesk.cshtml", Model)
+    </section>
+
+    <section id="move-in-services" aria-label="Services">
+        @if (Reads.OffersServices(Model))
+        {
+            @await Html.PartialFor(m => m.Services, "/Care/MoveIn/Services.cshtml")
+        }
+    </section>
+
+    <section id="move-in-diet" aria-label="Diet">
+        @if (Model.Location.CommunityId.Length != 0)
+        {
+            @await Html.PartialFor(m => m.Diet, "/Care/MoveIn/Diet.cshtml")
+            @(Html.InputField(plan, m => m.Documents.RequiredKinds, o => o.Label("Kitchen documents")).NativeCheckList(list =>
+                list.Items(Enum.GetValues<DocumentKind>().Select(kind => new CheckListItem(kind.ToString(), kind.ToString())))))
+            @for (var index = 0; index < Model.Services.OptionalLabels.Count; index++)
+            {
+                var at = index;
+                @(Html.InputField(plan, m => m.Services.OptionalLabels[at], o => o.Label($"Meal service label {at + 1}")).NativeTextBox())
+            }
+        }
+    </section>
+
+    <section id="move-in-documents" aria-label="Documents">
+    </section>
+
+    <section id="move-in-draft" aria-label="Draft">
+        @await Html.PartialAsync("/Care/MoveIn/DraftCommands.cshtml", Model)
+        @(Html.NativeButton("refresh-draft-actions", "Refresh draft actions")
+            .Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+                .Get<DeskQuery>(CareEndpoints.MoveInDraftActions, request => request
+                    .Query(query => query.DraftId, Model.DraftId))
+                .Into("draft-actions")))
+        <div id="draft-actions">
+            @await Html.PartialAsync("/Care/MoveIn/DraftActions.cshtml", Reads.DraftActionsOf(Model.DraftId))
+        </div>
+        @{
+            Html.On(plan, trigger => trigger.CustomEvent(QuoteEvents.Accepted, (revision, pipeline) => pipeline.Input(m => m.AcceptedQuoteRevision).Component<NativeHiddenField>().Value.Set(pipeline.Concat(revision))));
+            Html.On(plan, trigger => trigger.CustomEvent(MealEvents.Saved, (version, pipeline) => pipeline.Input(m => m.Version).Component<NativeHiddenField>().Value.Set(pipeline.Concat(version))));
+        }
+    </section>
+}
+
+@await Html.PartialAsync("/Care/MoveIn/MedicationProposal.cshtml", new MedicationEdit { NewMedication = new MedicationInput { Unit = "mg", Schedule = ["Morning"] } })
+
+<section id="move-in-desk-options" aria-label="Desk options">
+</section>
+
+<section id="move-in-allocation-review" aria-label="Allocation review">
+    @await Html.PartialAsync("/Care/MoveIn/AllocationReview.cshtml", Reads.AllocationReviewOf(Model))
+</section>
+
+<section id="move-in-service-review" aria-label="Service review">
+    @await Html.PartialAsync("/Care/MoveIn/QuoteSection.cshtml", Reads.ReviewRead(Model.DraftId))
+</section>
+
+<section id="move-in-waitlist" aria-label="Waitlist">
+    @if (Model.Location.CommunityId.Length != 0)
+    {
+        @Html.ActionLink("Read community waitlist terms", nameof(MoveInDeskController.WaitlistTerms), "MoveInDesk", new { Model.DraftId, TermsId = "WT-" + Model.Location.CommunityId })
+    }
+    <div id="waitlist-terms"></div>
+    <div id="waitlist-file">
+        @await Html.PartialAsync("/Care/MoveIn/WaitlistRecord.cshtml", Reads.WaitlistOf(Model.DraftId))
+    </div>
+</section>
+
+<section id="move-in-documents-upload" aria-label="Documents upload">
+    <h2>Admission documents</h2>
+    @if (Reads.PacketDeskOf(Model.DraftId) is { } packet)
+    {
+        @await Html.PartialAsync("/Care/MoveIn/PacketDesk.cshtml", packet)
+    }
+    @if (Reads.SignatureOf(Model.DraftId) is { } signature)
+    {
+        @await Html.PartialAsync("/Care/MoveIn/Signature.cshtml", signature)
+    }
+    <div id="stored-documents">
+        @if (Reads.DocumentsOnFile(Model.DraftId) is { Count: > 0 } register)
+        {
+            @foreach (var entry in register)
+            {
+                <p id="document-@entry.Id">@entry.Id · @entry.Name · @entry.Size bytes · @entry.Kind · @entry.Caption</p>
+            }
+        }
+        else
+        {
+            <p>No documents on file.</p>
+        }
+    </div>
+    @(Html.NativeButton("open-upload-card", "Open upload card").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Get<DeskQuery>(CareEndpoints.MoveInDocumentCard, request => request.Query(q => q.DraftId, Model.DraftId)).Into("upload-card")))
+    @(Html.NativeButton("close-upload-card", "Close upload card").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Unload("upload-card")))
+    <div id="upload-card">
+        @if (Reads.DocumentForm(Model.DraftId) is { } documents)
+        {
+            @await Html.PartialAsync("/Care/MoveIn/Documents.cshtml", documents)
+        }
+    </div>
+</section>
+
+<section id="move-in-deposit" aria-label="Deposit">
+    @if (Reads.DepositForm(Model.DraftId) is { } deposit)
+    {
+        @await Html.PartialAsync("/Care/MoveIn/Deposit.cshtml", deposit)
+    }
+</section>
+
+<section id="move-in-reception" aria-label="Reception">
+    @if (Reads.ReceptionOf(Model.DraftId) is { } reception)
+    {
+        @await Html.PartialAsync("/Care/MoveIn/Reception.cshtml", reception)
+        @await Html.PartialAsync("/Care/MoveIn/ReceptionDocuments.cshtml", new DocumentsPage { DraftId = Model.DraftId, Version = Model.Version, Kind = DocumentKind.Consent, LastModified = [0] })
+    }
+</section>
+
+<section id="move-in-bed-card" aria-label="Bed card">
+    <div id="availability-owner"></div>
+</section>
+
+<section id="move-in-coordinator-line" aria-label="Coordinator line">
+    <h2>Coordinators' line</h2>
+    @if (Reads.WaterOnFile(Model.DraftId) is { } water)
+    {
+        <p id="saved-ward-preparation">@water</p>
+    }
+    @(Html.NativeButton("open-coordinator-line", "Open coordinators' line").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Get<DeskQuery>(CareEndpoints.MoveInCoordinatorCard, request => request.Query(q => q.DraftId, Model.DraftId)).Into("coordinator-card")))
+    @(Html.NativeButton("close-coordinator-line", "Close coordinators' line").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Unload("coordinator-card")))
+    @plan.ConformanceStore("ward-preparation-store")
+    <div id="coordinator-card"></div>
+</section>
+
+<section id="move-in-allocation-owner" aria-label="Allocation owner">
+    @await Html.PartialAsync("/Care/MoveIn/OwnerDesk.cshtml", Reads.OwnerDeskOf(Model.DraftId))
+</section>
+
+<section id="move-in-receipt" aria-label="Receipt">
+</section>
+
+<section id="move-in-comparison" aria-label="Comparison">
+</section>
+
+<section id="move-in-checklist" aria-label="Checklist">
+</section>
+
+<section id="move-in-policy" aria-label="Policy">
+</section>
+
+<section id="move-in-alternatives" aria-label="Alternatives">
+</section>
+
+<section id="move-in-terms" aria-label="Terms">
+</section>
+
+</div>
+<a href="@Context.Request.Path">Read saved draft</a>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DraftActionEvents.Discarded, pipeline =>
+    {
+        pipeline.Notice().Success("Draft discarded");
+        pipeline.Unload("draft-workspace");
+    }));
+}
+@Html.RenderPlan(plan)

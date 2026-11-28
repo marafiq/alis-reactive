@@ -1,0 +1,80 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalSheet
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bedside arrival sheet";
+    var plan = Html.ReactivePlan<ArrivalSheet>();
+}
+<h1>Bedside arrival sheet</h1>
+<style>
+    .bedside-arrival { font-size: .95rem; }
+    .full-arrival { font-size: 1.1rem; }
+</style>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd"))
+        .Reactive(picker => picker.Open, (opening, pipeline) =>
+        {
+            var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+            var width = opening.Popup.Anchor.GetAttribute("style");
+            var popupClass = opening.Popup.Element.GetAttribute("class");
+            pipeline.When(date.CssClass.Eq("bedside-arrival").And(date.EnableRtl).And(width.Contains("180px")).And(popupClass.Contains("bedside-arrival")))
+                .Then(pipeline => pipeline.Element("layout-slip").Text.Set("Narrow bedside calendar"))
+                .ElseIf(date.CssClass.Eq("full-arrival").And(date.EnableRtl.Not()).And(width.Contains("75%")).And(popupClass.Contains("full-arrival")))
+                .Then(pipeline => pipeline.Element("layout-slip").Text.Set("Full admission calendar"));
+            pipeline.When(date.ZIndex.Eq(4400).And(opening.Popup.ZIndex.Eq(4400)))
+                .Then(pipeline => pipeline.Element("calendar-layer").Text.Set("Priority overlay"))
+                .ElseIf(date.ZIndex.Eq(1000).And(opening.Popup.ZIndex.Eq(1000)))
+                .Then(pipeline => pipeline.Element("calendar-layer").Text.Set("Standard desk calendar"));
+        }))
+</fieldset>
+@(Html.NativeButton("open-bedside-calendar", "Open bedside calendar")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.CssClass.Set("bedside-arrival");
+        date.EnableRtl.Set(true);
+        date.WidthInPixels.Set(180);
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("open-full-admission-calendar", "Open full admission calendar")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.CssClass.Set("full-arrival");
+        date.EnableRtl.Set(false);
+        date.Width.Set("75%");
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("open-protected-transfer", "Open protected transfer")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.ZIndex.Set(4400);
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("open-ordinary-desk", "Open ordinary desk")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.ZIndex.Set(1000);
+        date.DataBind();
+        date.Show();
+    }))
+<p><output id="layout-slip" aria-label="Layout slip">Choose a paper layout</output></p>
+<p><output id="calendar-layer" aria-label="Calendar layer">Choose a calendar layer</output></p>
+<a href="@CarePages.ArrivalSavedLedger">Open saved ledger edition</a>
+<a href="@CarePages.ArrivalSavedLetter">Open saved resident edition</a>
+@Html.RenderPlan(plan)

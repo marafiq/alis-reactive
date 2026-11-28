@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SourceBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<SourceBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, Options = Model.Codes }))
+<p id="shown"></p>
+<button type="button" @Html.Raises(plan, SourceCells.Check)>Check</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(SourceCells.Check, pipeline => pipeline.When(pipeline.Component<ConformanceComponent>("conformance").Value.Eq("a-1"))
+        .Then(pipeline => pipeline.Element("shown").Text.Set("Picked first"))
+        .Else(pipeline => pipeline.Element("shown").Text.Set("Elsewhere"))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Statement
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Statement";
+    var plan = Html.ReactivePlan<Statement>();
+}
+<h1>@Model.Resident's statement</h1>
+@(plan.ConformanceComponent("statement", new ConformanceStart()))
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Statements.BalanceWrittenAsText)
+        .OnSuccess(Content.Json<BalanceWrittenAsText>(), (balance, pipeline) => pipeline.Component<ConformanceComponent>("statement").Amount.Set(balance.Body.Read(owed => owed.Due)))));
+}
+@Html.RenderPlan(plan)

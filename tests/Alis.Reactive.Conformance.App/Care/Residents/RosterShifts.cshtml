@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.World
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RosterShifts
+@{
+    Layout = "/Care/Residents/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Roster";
+    var plan = Html.ReactivePlan<RosterShifts>();
+}
+<h1>Roster of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, RosterShiftsEvents.Refresh)>Refresh</button>
+<p>Roster: <output id="roster-status"></output></p>
+<p>Roster log: <output id="@DefaultHooks.RequestLog"></output></p>
+<p>Session: <output id="@DefaultHooks.FlushLine"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RosterShiftsEvents.Refresh, Model.Policy, pipeline => pipeline
+        .Get(RosterShiftsEndpoints.Roster)
+        .OnSuccess(Content.None, (roster, pipeline) => pipeline
+            .Get(CareEndpoints.RosterShifts)
+            .OnSuccess(Content.None, (shifts, pipeline) => pipeline.Element("roster-status").Text.Append("shifts shown "))
+            .Finally(pipeline => pipeline.Element(DefaultHooks.RequestLog).Text.Append("inner finally ")))
+        .Finally(pipeline => pipeline.Element(DefaultHooks.RequestLog).Text.Append("outer finally "))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,24 @@
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Pump settings";
+    var plan = Html.ReactivePlan<InfusionPage>();
+}
+<h1>Pump settings</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+
+@plan.StationCensus("census")
+
+<p>Note: <span id="note"></span></p>
+
+@(plan.Button("note", "Show the settings note")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        TypedSource<string?>? note = null;
+        pipeline.When(pipeline.Component<StationCensus>("census").Count.Gt(0))
+            .Then(counted => note = counted.Component<InfusionPump>("pump").Settings().Read(s => s.Note));
+        pipeline.Element("note").Text.Set(note!);
+    }))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,50 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionHandover
+@{
+    Layout = "/Care/MoveIn/_MoveInLayout.cshtml";
+    ViewData["Title"] = "Admission handover";
+    var plan = Html.ReactivePlan<AdmissionHandover>();
+    var bed = Model.BedId;
+}
+<h1>Admission handover</h1>
+<p id="handover-version">Version @Model.Version</p>
+<p id="handover-history">@Model.History</p>
+<p id="saved-handover-quote">@Model.Quote</p>
+<p id="saved-handover-bed">@Model.Bed</p>
+@(Html.NativeButton("check-desk", "Check desk availability").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Get(CareEndpoints.AdmissionDeskStatus).Busy("desk-status")
+    .WhileLoading(pipeline => pipeline.Element("desk-status").Text.Set("Checking the admission desk"))
+    .OnSuccess(Content.Text, (status, pipeline) => pipeline.Element("desk-status").Text.Set(status.Body))))
+<p id="desk-status" role="status">Desk status unknown</p>
+@(Html.NativeButton("read-placement", "Read current quote and bed").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Parallel(
+        pipeline => pipeline.Get<QuoteOfferQuery>(MoveInEndpoints.CurrentOffer, request => request.Query(q => q.DraftId, Model.DraftId))
+            .Busy("placement-handover").Into("handover-quote"),
+        pipeline => pipeline.Get<AvailabilityQuery>(MoveInEndpoints.Availability, request => request
+            .Query(q => q.DraftId, Model.DraftId).Query(q => q.CommunityId, Model.CommunityId)
+            .Query(q => q.BedId, Model.BedId).Query(q => q.SinceRevision, 0))
+            .Busy("placement-handover")
+            .OnSuccess<AvailabilityReply>((availability, pipeline) => pipeline.Element("handover-bed").Text.Set(
+                pipeline.Concat(Model.BedId, " revision ", availability.Body.Read(r => r.Revision), ", ",
+                    availability.Body.Read(r => r.Beds).Find(b => b.Id == bed, b => b.Available).Choose("available", "unavailable"))))))))
+<section id="placement-handover" aria-label="Current placement">
+    <div id="handover-quote"></div>
+    <p id="handover-bed"></p>
+</section>
+@(Html.NativeButton("read-catalogue", "Read service catalogue").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Get<ServiceCatalogueQuery>(MoveInEndpoints.Services, request => request.Query(q => q.DraftId, Model.DraftId)
+        .Query(q => q.CareLevel, Model.Level).Query(q => q.PayerKind, Model.Payer).Query(q => q.Culture, System.Globalization.CultureInfo.CurrentCulture.Name))
+    .NoValidation()
+    .OnSuccess<List<ServiceDefinition>>((services, pipeline) => pipeline.When(services.Body.Any(service => service.Available))
+        .Then(pipeline => pipeline.Element("handover-services").Text.Set(pipeline.Concat(services.Body.Count(service => service.Available), " available services")))
+        .Else(pipeline => pipeline.Element("handover-services").Text.Set("No services are currently available.")))))
+<p id="handover-services"></p>
+<a href="@CarePages.MoveIn">Open saved admission</a>
+@Html.RenderPlan(plan)

@@ -1,0 +1,8 @@
+<Project>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="AlisSliceTree" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(AlisSliceTree)' == 'true' and Exists('$(MSBuildProjectDirectory)/SliceTree.txt')">
+    <AdditionalFiles Include="$(MSBuildProjectDirectory)/SliceTree.txt" />
+  </ItemGroup>
+</Project>

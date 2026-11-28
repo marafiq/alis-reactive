@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionRequest
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission desk";
+    var plan = Html.ReactivePlan<AdmissionRequest>();
+}
+<h1>Admission desk</h1>
+<section aria-label="Admission">
+    @using (var admission = Html.BeginRequestContainer(plan, "admission"))
+    {
+        <fieldset>
+            <legend>Name</legend>
+            @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+        </fieldset>
+        <button type="button" @Html.Raises(plan, AdmissionDeskButtons.Admit)>Admit</button>
+        Html.On(plan, trigger => trigger.CustomEvent(AdmissionDeskButtons.Admit, pipeline => pipeline
+            .Post<AdmissionRequest>(AdmissionDeskEndpoints.Admissions, request => request.Inputs(admission.Container))
+            .OnSuccess(Content.Text, (admitted, pipeline) => pipeline.Element("admission-status").Text.Set(admitted.Body))));
+    }
+    <p>Admission: <span id="admission-status">Not admitted</span></p>
+</section>
+@Html.RenderPlan(plan)

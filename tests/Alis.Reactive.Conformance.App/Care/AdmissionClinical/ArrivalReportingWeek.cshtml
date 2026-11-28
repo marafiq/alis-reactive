@@ -1,0 +1,44 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalReportingWeek
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "New-year admission rota";
+    var plan = Html.ReactivePlan<ArrivalReportingWeek>();
+}
+<h1>New-year admission rota</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd").FirstDayOfWeek(1)))
+</fieldset>
+@(Html.NativeButton("open-local-reporting-week", "Open local reporting week")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FirstDayOfWeek.Set((int?)null);
+        date.DayHeaderFormat.Set(FusionDatePickerHeader.Narrow);
+        date.WeekRule.Set(FusionDatePickerWeekRule.FirstFullWeek);
+        date.WeekNumber.Set(true);
+        date.DataBind();
+        date.Show();
+    }))
+@(Html.NativeButton("open-dispatch-reporting-week", "Open dispatch reporting week")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.FirstDayOfWeek.Set(2);
+        date.DayHeaderFormat.Set(FusionDatePickerHeader.Abbreviated);
+        date.WeekRule.Set(FusionDatePickerWeekRule.FirstDay);
+        date.WeekNumber.Set(true);
+        date.DataBind();
+        date.Show();
+    }))
+@Html.RenderPlan(plan)

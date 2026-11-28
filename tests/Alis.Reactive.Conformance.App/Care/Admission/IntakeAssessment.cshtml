@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model IntakeAssessment
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Intake assessment";
+    var plan = Html.ReactivePlan<IntakeAssessment>();
+}
+<h1>Intake assessment</h1>
+@using (var intake = Html.BeginRequestContainer(plan, "intake-assessment"))
+{
+    <fieldset>
+        <legend>Strength</legend>
+        @(Html.InputField(plan, m => m.Strength, options => options.Label("Strength")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-intake", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<IntakeAssessment>(IntakeAssessmentEndpoints.IntakesInGerman, request => request.Inputs(intake.Container))
+        .Validate<IntakeAssessmentRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("intake-status").Text.Set(saved.Body))))
+}
+<p id="intake-status">Not saved</p>
+@Html.RenderPlan(plan)

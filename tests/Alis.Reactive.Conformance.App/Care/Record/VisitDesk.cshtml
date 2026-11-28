@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visit desk";
+    var plan = Html.ReactivePlan<VisitDesk>();
+}
+<h1>Visits of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, VisitDesks.OpenTheDesk)>Open the desk</button>
+<button type="button" @Html.Raises(plan, VisitDesks.CloseTheDesk)>Close the desk</button>
+<button type="button" @Html.Raises(plan, VisitDesks.MarkNoVisit)>Mark no visit</button>
+<section id="visit-desk" aria-label="Desk"></section>
+<section id="visit-note" aria-label="Visit note"></section>
+<p>Status: <output id="visit-status">Open</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(VisitDesks.OpenTheDesk, pipeline => pipeline.Get(VisitDeskEndpoints.Tools).Into("visit-desk"))
+        .CustomEvent(VisitDesks.CloseTheDesk, pipeline => pipeline.Unload("visit-desk"))
+        .CustomEvent(VisitDesks.MarkNoVisit, pipeline =>
+        {
+            pipeline.Element("visit-status").Text.Set("Marking");
+            pipeline.Element("visit-note").Text.Set("No visit today");
+            pipeline.Element("visit-status").Text.Set("Marked");
+        }));
+}
+@Html.RenderPlan(plan)

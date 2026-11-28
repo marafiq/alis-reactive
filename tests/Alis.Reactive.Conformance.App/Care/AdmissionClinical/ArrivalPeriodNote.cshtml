@@ -1,0 +1,42 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalPeriodNote
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Allocation period note";
+    var plan = Html.ReactivePlan<ArrivalPeriodNote>();
+}
+<h1>Allocation period note</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build => build.Format("yyyy-MM-dd")))
+</fieldset>
+@(Html.NativeButton("prepare-unopened-note", "Prepare unopened note")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.NavigateTo(FusionDatePickerView.Month, new DateTime(2027, 12, 14));
+        pipeline.When(date.CurrentView().Eq("Month"))
+            .Then(pipeline => pipeline.Element("period-note").Text.Set("File the monthly allocation note"))
+            .Else(pipeline => pipeline.Element("period-note").Text.Set("Open the calendar before filing the note"));
+    }))
+@(Html.NativeButton("open-allocation-period", "Open allocation period")
+    .Reactive(plan, button => button.Click, (_, pipeline) =>
+    {
+        var date = pipeline.Input(m => m.ArrivesOn).Component<FusionDatePicker<DateTime?>>();
+        date.Show();
+        date.NavigateTo(FusionDatePickerView.Month, new DateTime(2027, 12, 14));
+        pipeline.When(date.CurrentView().Eq("Month"))
+            .Then(pipeline => pipeline.Element("period-note").Text.Set("File the monthly allocation note"))
+            .Else(pipeline => pipeline.Element("period-note").Text.Set("Open the calendar before filing the note"));
+    }))
+<p><output id="period-note" aria-label="Period note">Note pending</output></p>
+@Html.RenderPlan(plan)

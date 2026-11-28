@@ -1,0 +1,296 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@using Syncfusion.EJ2.DropDowns
+@model WardRoundCatalogue
+@{
+    Layout = "/Care/AdmissionClinical/_WardRoundLayout.cshtml";
+    ViewData["Title"] = "Ward round catalogue";
+    var plan = Html.ReactivePlan<WardRoundCatalogue>();
+    var directory = Html.InputField(plan, m => m.DirectoryCode, options => options.Label("Round destination"));
+    var searchField = Html.InputField(plan, m => m.LocalQuery, options => options.Label("Find a ward on the round"));
+    var dayFields = directory.ListFields((RoundWard ward) => ward.Name, ward => ward.Code, ward => ward.Wing);
+    var nightFields = directory.ListFields((RoundWard ward) => ward.NightName, ward => ward.NightCode, ward => ward.NightWing);
+    var nightResults = searchField.ListFields((RoundWard ward) => ward.NightName, ward => ward.NightCode);
+}
+<h1>Ward round catalogue</h1>
+<fieldset>
+    <legend>Round directory</legend>
+    <button type="button" @Html.Raises(plan, WardRoundActions.Day)>Day round</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.Night)>Night round</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.Closed)>Close the round</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.Print)>Print round sheet</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.SaveWard)>Record referral key</button>
+    @(directory
+        .FusionDropDownList(Model.Day, build => build.Fields((RoundWard ward) => ward.Name, ward => ward.Code, ward => ward.Wing)))
+    <p id="round-sheet">Round sheet pending.</p>
+    <p id="round-key">Referral pending.</p>
+    <p id="round-desk">No destination instructions.</p>
+</fieldset>
+<fieldset>
+    <legend>Bed availability</legend>
+    @(Html.InputField(plan, m => m.AvailabilityCode, options => options.Label("Available beds"))
+        .FusionDropDownList(Model.Directory, build => build.Fields(new DropDownListFieldSettings { Text = plan.JsonPath((RoundWard ward) => ward.Name).Single(), Value = plan.JsonPath((RoundWard ward) => ward.Code).Single(), Disabled = plan.JsonPath((RoundWard ward) => ward.Held).Single() })))
+    <button type="button" @Html.Raises(plan, WardRoundActions.WithdrawCode)>Withdraw bed M1</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.WithdrawIndex)>Withdraw the second bed</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.WithdrawRow)>Withdraw the Oak referral</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.WithdrawUnknown)>Withdraw referral R9</button>
+</fieldset>
+<fieldset>
+    <legend>Referral catalogue</legend>
+    @(Html.InputField(plan, m => m.Route, options => options.Label("Known routes"))
+        .FusionDropDownList(new[] { "Lift", "Courtyard" }, build => build.ShowClearButton(false)))
+    @(Html.InputField(plan, m => m.Interval, options => options.Label("Known intervals"))
+        .FusionDropDownList(new[] { 0d, 30d }, build => build.ShowClearButton(false)))
+    @(Html.InputField(plan, m => m.Escort, options => options.Label("Known escort options"))
+        .FusionDropDownList(new[] { false, true }, build => build.ShowClearButton(false)))
+    <button type="button" @Html.Raises(plan, WardRoundActions.Known)>Check standard referral</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.Alternative)>Check alternate referral</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.Missing)>Check incomplete referral</button>
+    <p id="lookup-route">Route pending.</p>
+    <p id="lookup-interval">Notice pending.</p>
+    <p id="lookup-escort">Escort pending.</p>
+</fieldset>
+<fieldset>
+    <legend>Route releases</legend>
+    @(Html.InputField(plan, m => m.RouteRelease, options => options.Label("Travel routes"))
+        .FusionDropDownList(new[] { "Lift" }, build => build.ShowClearButton(false)))
+    <button type="button" @Html.Raises(plan, WardRoundActions.AppendRoutes)>Release transfer routes</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.PriorityRoutes)>Prioritize transfer routes</button>
+</fieldset>
+<fieldset>
+    <legend>Interval releases</legend>
+    @(Html.InputField(plan, m => m.IntervalRelease, options => options.Label("Notice intervals"))
+        .FusionDropDownList(new[] { 15d }, build => build.ShowClearButton(false)))
+    <button type="button" @Html.Raises(plan, WardRoundActions.AppendIntervals)>Release notice intervals</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.PriorityIntervals)>Prioritize notice intervals</button>
+</fieldset>
+<fieldset>
+    <legend>Escort releases</legend>
+    @(Html.InputField(plan, m => m.EscortRelease, options => options.Label("Escort answers"))
+        .FusionDropDownList(new[] { true }, build => build.ShowClearButton(false)))
+    <button type="button" @Html.Raises(plan, WardRoundActions.AppendEscort)>Release independent travel</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.PriorityEscort)>Prioritize independent travel</button>
+</fieldset>
+<fieldset>
+    <legend>Ward name matching</legend>
+    <button type="button" @Html.Raises(plan, WardRoundActions.SearchGuidance)>Read ward search guidance</button>
+    <p id="name-guidance">Instructions pending.</p>
+    @(Html.InputField(plan, m => m.WardSearch, options => options.Label("Search ward names"))
+        .FusionDropDownList(new[] { "Élan", "North Élan", "Élan House", "ELAN", "Elan House", "élan" }, build => build.AllowFiltering(true).DebounceDelay(0).FilterBarPlaceholder("Search ward names")))
+    <button type="button" @Html.Raises(plan, WardRoundActions.Exact)>Exact ward search</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.Broad)>Broad ward search</button>
+    <button type="button" @Html.Raises(plan, WardRoundActions.End)>Match name endings</button>
+</fieldset>
+<fieldset>
+    <legend>Round query</legend>
+    @(searchField
+        .FusionDropDownList(Model.Directory, build => build.Fields((RoundWard ward) => ward.Name, ward => ward.Code).AllowFiltering(true).DebounceDelay(0).FilterBarPlaceholder("Day, night or handover"))
+        .Reactive(list => list.Filtering, (filtering, pipeline) =>
+        {
+            var queries = pipeline.Plugin<WardRoundQueries>();
+            var catalogue = pipeline.Input(m => m.LocalQuery).Component<FusionDropDownList<string?>>();
+            var rows = Model.Directory.ToArray();
+            filtering.PreventDefaultAction.Set(true);
+            pipeline.When(filtering.Text.Eq("d"))
+                .Then(pipeline => filtering.UpdateData<RoundWard>(rows, queries.FirstStop))
+                .ElseIf(filtering.Text.Eq("n"))
+                .Then(pipeline => filtering.UpdateData<RoundWard>(rows, queries.LastStop))
+                .ElseIf(filtering.Text.Eq("h"))
+                .Then(pipeline => filtering.UpdateData<RoundWard>(rows, queries.LastStop, nightResults))
+                .ElseIf(filtering.Text.Eq("r"))
+                .Then(pipeline => catalogue.Filter<RoundWard>(Model.Night.ToArray()))
+                .ElseIf(filtering.Text.Eq("s"))
+                .Then(pipeline => catalogue.Filter<RoundWard>(rows, queries.FirstStop))
+                .Else(pipeline => catalogue.Filter<RoundWard>(rows, queries.LastStop, nightResults));
+        }))
+</fieldset>
+<fieldset>
+    <legend>Route directory</legend>
+    @(Html.InputField(plan, m => m.RouteSearch, options => options.Label("Route search"))
+        .FusionDropDownList(new[] { "Original route" }, build => build.AllowFiltering(true).DebounceDelay(0).NoRecordsTemplate("No matching transfer choices."))
+        .Reactive(list => list.Filtering, (filtering, pipeline) => pipeline
+            .When(filtering.Text.Eq("r"))
+            .Then(pipeline => filtering.UpdateData<string>(new[] { "Courtyard", "Tunnel" }))
+            .Else(pipeline => filtering.UpdateData<string>(Array.Empty<string>())))))
+</fieldset>
+<fieldset>
+    <legend>Notice directory</legend>
+    @(Html.InputField(plan, m => m.IntervalSearch, options => options.Label("Notice search"))
+        .FusionDropDownList(new[] { 15d }, build => build.AllowFiltering(true).DebounceDelay(0).NoRecordsTemplate("No matching transfer choices."))
+        .Reactive(list => list.Filtering, (filtering, pipeline) => pipeline
+            .When(filtering.Text.Eq("n"))
+            .Then(pipeline => filtering.UpdateData<double>(new[] { 0d, 30d }))
+            .Else(pipeline => filtering.UpdateData<double>(Array.Empty<double>())))))
+</fieldset>
+<fieldset>
+    <legend>Escort directory</legend>
+    @(Html.InputField(plan, m => m.EscortSearch, options => options.Label("Escort search"))
+        .FusionDropDownList(new[] { true }, build => build.AllowFiltering(true).DebounceDelay(0).NoRecordsTemplate("No matching transfer choices."))
+        .Reactive(list => list.Filtering, (filtering, pipeline) => pipeline
+            .When(filtering.Text.Eq("i"))
+            .Then(pipeline => filtering.UpdateData<bool>(new[] { false }))
+            .ElseIf(filtering.Text.Eq("a"))
+            .Then(pipeline => filtering.UpdateData<bool>(new[] { true }))
+            .Else(pipeline => filtering.UpdateData<bool>(Array.Empty<bool>())))))
+</fieldset>
+@{
+    void ReadReferral(Pipeline<WardRoundCatalogue> pipeline, TypedSource<string?> route, TypedSource<double?> notice, TypedSource<bool?> escort)
+    {
+        pipeline.When(route.Eq("Lift"))
+            .Then(pipeline => pipeline.Element("lookup-route").Text.Set("Lift team."))
+            .ElseIf(route.Eq("Courtyard"))
+            .Then(pipeline => pipeline.Element("lookup-route").Text.Set("Outdoor escort."))
+            .Else(pipeline => pipeline.Element("lookup-route").Text.Set("Review the route."));
+        pipeline.When(notice.Eq(0d))
+            .Then(pipeline => pipeline.Element("lookup-interval").Text.Set("Immediate transfer."))
+            .ElseIf(notice.Eq(30d))
+            .Then(pipeline => pipeline.Element("lookup-interval").Text.Set("Thirty minutes of notice."))
+            .Else(pipeline => pipeline.Element("lookup-interval").Text.Set("Review the notice."));
+        pipeline.When(escort.Eq(false))
+            .Then(pipeline => pipeline.Element("lookup-escort").Text.Set("Independent travel."))
+            .ElseIf(escort.Eq(true))
+            .Then(pipeline => pipeline.Element("lookup-escort").Text.Set("Reserve an escort."))
+            .Else(pipeline => pipeline.Element("lookup-escort").Text.Set("Review the escort."));
+    }
+
+    Html.On(plan, trigger => trigger
+        .CustomEvent(WardRoundActions.SearchGuidance, pipeline =>
+        {
+            var ward = pipeline.Input(m => m.WardSearch).Component<FusionDropDownList<string?>>();
+            var strict = ward.IgnoreAccent.Not().And(ward.IgnoreCase.Not());
+            var folded = ward.IgnoreAccent.And(ward.IgnoreCase);
+            pipeline.When(strict.And(ward.FilterType.Eq(FusionDropDownListMatchMode.StartsWith)))
+                .Then(pipeline => pipeline.Element("name-guidance").Text.Set("Enter the initial letters with the ward’s exact accents and capital letters."))
+                .ElseIf(folded.And(ward.FilterType.Eq(FusionDropDownListMatchMode.Contains)))
+                .Then(pipeline => pipeline.Element("name-guidance").Text.Set("Enter any part of the ward name. Accents and capital letters are optional."))
+                .ElseIf(folded.And(ward.FilterType.Eq(FusionDropDownListMatchMode.EndsWith)))
+                .Then(pipeline => pipeline.Element("name-guidance").Text.Set("Enter the final letters of the ward name. Accents and capital letters are optional."));
+        })
+        .CustomEvent(WardRoundActions.Day, pipeline => {
+            var wards = pipeline.Input(m => m.DirectoryCode).Component<FusionDropDownList<string?>>();
+            wards.Fields<RoundWard>().Set(dayFields);
+            wards.DataSource<RoundWard>().Set(Model.Day);
+            wards.DataBind();
+        })
+        .CustomEvent(WardRoundActions.Night, pipeline => {
+            var wards = pipeline.Input(m => m.DirectoryCode).Component<FusionDropDownList<string?>>();
+            wards.Fields<RoundWard>().Set(nightFields);
+            wards.DataSource<RoundWard>().Set(Model.Night);
+            wards.DataBind();
+        })
+        .CustomEvent(WardRoundActions.Closed, pipeline => {
+            var wards = pipeline.Input(m => m.DirectoryCode).Component<FusionDropDownList<string?>>();
+            wards.Fields<RoundWard>().Set(dayFields);
+            wards.DataSource<RoundWard>().Set(Array.Empty<RoundWard>());
+            wards.DataBind();
+        })
+        .CustomEvent(WardRoundActions.Print, pipeline => {
+            var wards = pipeline.Input(m => m.DirectoryCode).Component<FusionDropDownList<string?>>();
+            var choices = wards.GetItems().Items;
+            var rows = wards.DataSource<RoundWard>();
+            pipeline.When(choices.Count().Gt(0))
+                .Then(pipeline =>
+                {
+                    pipeline.Element("round-sheet").Text.Set(choices.At(0).TextContent);
+                    pipeline.Element("round-sheet").Text.Append(" to ");
+                    pipeline.Element("round-sheet").Text.Append(choices.At(1).TextContent);
+                    pipeline.Element("round-desk").Text.Set("First contact: ");
+                    pipeline.Element("round-desk").Text.Append(rows.Find(row => row.Code == "M1" || row.Code == "O3", row => row.Name));
+                })
+                .Else(pipeline =>
+                {
+                    pipeline.Element("round-sheet").Text.Set("No destinations on this round.");
+                    pipeline.Element("round-desk").Text.Set("Contact the placement office.");
+                });
+        })
+        .CustomEvent(WardRoundActions.SaveWard, pipeline => pipeline.Element("round-key").Text.Set(pipeline.Input(m => m.DirectoryCode).Component<FusionDropDownList<string?>>().Value))
+        .CustomEvent(WardRoundActions.WithdrawCode, pipeline => pipeline.Input(m => m.AvailabilityCode).Component<FusionDropDownList<string?>>().DisableItem("M1"))
+        .CustomEvent(WardRoundActions.WithdrawIndex, pipeline => pipeline.Input(m => m.AvailabilityCode).Component<FusionDropDownList<string?>>().DisableItem(1))
+        .CustomEvent(WardRoundActions.WithdrawRow, pipeline => pipeline.Input(m => m.AvailabilityCode).Component<FusionDropDownList<string?>>().DisableItem<RoundWard>(Model.Night[0]))
+        .CustomEvent(WardRoundActions.WithdrawUnknown, pipeline => pipeline.Input(m => m.AvailabilityCode).Component<FusionDropDownList<string?>>().DisableItem("R9"))
+        .CustomEvent(WardRoundActions.Known, pipeline => {
+            var routes = pipeline.Input(m => m.Route).Component<FusionDropDownList<string?>>();
+            var intervals = pipeline.Input(m => m.Interval).Component<FusionDropDownList<double?>>();
+            var escort = pipeline.Input(m => m.Escort).Component<FusionDropDownList<bool?>>();
+            var route = routes.GetDataByValue("Lift");
+            var notice = intervals.GetDataByValue(0d);
+            var support = escort.GetDataByValue(false);
+            ReadReferral(pipeline, route, notice, support);
+        })
+        .CustomEvent(WardRoundActions.Alternative, pipeline => {
+            var routes = pipeline.Input(m => m.Route).Component<FusionDropDownList<string?>>();
+            var intervals = pipeline.Input(m => m.Interval).Component<FusionDropDownList<double?>>();
+            var escort = pipeline.Input(m => m.Escort).Component<FusionDropDownList<bool?>>();
+            var route = routes.GetDataByValue("Courtyard");
+            var notice = intervals.GetDataByValue(30d);
+            var support = escort.GetDataByValue(true);
+            ReadReferral(pipeline, route, notice, support);
+        })
+        .CustomEvent(WardRoundActions.Missing, pipeline => {
+            var routes = pipeline.Input(m => m.Route).Component<FusionDropDownList<string?>>();
+            var intervals = pipeline.Input(m => m.Interval).Component<FusionDropDownList<double?>>();
+            var escort = pipeline.Input(m => m.Escort).Component<FusionDropDownList<bool?>>();
+            escort.DataSource<bool>().Set(new[] { false });
+            escort.DataBind();
+            var route = routes.GetDataByValue("Ramp");
+            var notice = intervals.GetDataByValue(90d);
+            var support = escort.GetDataByValue(true);
+            ReadReferral(pipeline, route, notice, support);
+        })
+        .CustomEvent(WardRoundActions.AppendRoutes, pipeline => {
+            var list = pipeline.Input(m => m.RouteRelease).Component<FusionDropDownList<string?>>();
+            list.AddItem<string>("Courtyard");
+            list.AddItem<string>("Tunnel");
+        })
+        .CustomEvent(WardRoundActions.PriorityRoutes, pipeline => {
+            var list = pipeline.Input(m => m.RouteRelease).Component<FusionDropDownList<string?>>();
+            list.AddItem<string>("Tunnel", 0);
+            list.AddItem<string>("Courtyard", 0);
+        })
+        .CustomEvent(WardRoundActions.AppendIntervals, pipeline => {
+            var list = pipeline.Input(m => m.IntervalRelease).Component<FusionDropDownList<double?>>();
+            list.AddItem(0d);
+            list.AddItem(30d);
+        })
+        .CustomEvent(WardRoundActions.PriorityIntervals, pipeline => {
+            var list = pipeline.Input(m => m.IntervalRelease).Component<FusionDropDownList<double?>>();
+            list.AddItem(30d, 0);
+            list.AddItem(0d, 0);
+        })
+        .CustomEvent(WardRoundActions.AppendEscort, pipeline => {
+            var list = pipeline.Input(m => m.EscortRelease).Component<FusionDropDownList<bool?>>();
+            list.AddItem(false);
+        })
+        .CustomEvent(WardRoundActions.PriorityEscort, pipeline => {
+            var list = pipeline.Input(m => m.EscortRelease).Component<FusionDropDownList<bool?>>();
+            list.AddItem(false, 0);
+        })
+        .CustomEvent(WardRoundActions.Exact, pipeline => {
+            var list = pipeline.Input(m => m.WardSearch).Component<FusionDropDownList<string?>>();
+            list.FilterType.Set(FusionDropDownListMatchMode.StartsWith);
+            list.IgnoreCase.Set(false);
+            list.IgnoreAccent.Set(false);
+            list.DataBind();
+        })
+        .CustomEvent(WardRoundActions.Broad, pipeline => {
+            var list = pipeline.Input(m => m.WardSearch).Component<FusionDropDownList<string?>>();
+            list.FilterType.Set(FusionDropDownListMatchMode.Contains);
+            list.IgnoreCase.Set(true);
+            list.IgnoreAccent.Set(true);
+            list.DataBind();
+        })
+        .CustomEvent(WardRoundActions.End, pipeline => {
+            var list = pipeline.Input(m => m.WardSearch).Component<FusionDropDownList<string?>>();
+            list.FilterType.Set(FusionDropDownListMatchMode.EndsWith);
+            list.IgnoreCase.Set(true);
+            list.IgnoreAccent.Set(true);
+            list.DataBind();
+        }));
+}
+@Html.RenderPlan(plan)

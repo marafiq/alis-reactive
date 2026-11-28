@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model ArrivalIncomingProfile
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Incoming transfer desk";
+    var plan = Html.ReactivePlan<ArrivalIncomingProfile>();
+}
+<h1>Incoming transfer desk</h1>
+<fieldset>
+    <legend>Arrival date</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on"))
+        .FusionDatePicker(build =>
+        {
+            build.Format("yyyy-MM-dd").StrictMode();
+            if (Model.Alternate)
+            {
+                build.KeyConfigs(new Dictionary<string, string> { ["altDownArrow"] = "f2" });
+                build.InputFormats(["dd.MM.yyyy"]);
+                build.Width(220);
+            }
+            else
+            {
+                build.Width("75%");
+            }
+        }))
+</fieldset>
+@Html.RenderPlan(plan)

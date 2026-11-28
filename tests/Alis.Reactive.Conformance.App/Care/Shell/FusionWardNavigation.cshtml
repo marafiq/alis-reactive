@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Navigations
+@model FusionWardNavigation
+@{
+    Layout = "/Care/Shell/_FusionShellLayout.cshtml";
+    ViewData["Title"] = "Ward navigation";
+    var plan = Html.ReactivePlan<FusionWardNavigation>();
+    var wards = new List<MenuItem>
+    {
+        new()
+        {
+            Text = Model.MenuLabel,
+            Items = new List<MenuItem>
+            {
+                new() { Text = "North", Url = CarePages.FusionNorthWingTrail },
+                new() { Text = "East", Url = CarePages.FusionWardTrail },
+            },
+        },
+    };
+}
+<h1>Ward navigation</h1>
+@(Html.FusionMenu(plan, "ward-menu", build => build.Items(wards).ShowItemOnClick(true))
+    .Reactive(menu => menu.BeforeOpen, (opening, pipeline) => pipeline.When(opening.IsFocused)
+        .Then(pipeline => pipeline.Element("opening-status").Text.Set("Focused"))
+        .Else(pipeline => pipeline.Element("opening-status").Text.Set("No focus")))
+    .Reactive(menu => menu.BeforeClose, (closing, pipeline) => pipeline.When(closing.IsFocused)
+        .Then(pipeline => pipeline.Element("focus-status").Text.Set("Focused"))
+        .Else(pipeline => pipeline.Element("focus-status").Text.Set("No focus"))))
+<p>Opening focus: <output id="opening-status">—</output></p>
+<p>Closing focus: <output id="focus-status">—</output></p>
+@Html.RenderPlan(plan)

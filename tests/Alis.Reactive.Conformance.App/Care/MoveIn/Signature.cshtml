@@ -1,0 +1,80 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model SignaturePage
+@{
+    var plan = Html.ReactivePlan<SignaturePage>();
+    TypedSource<bool> HasSignature(Pipeline<SignaturePage> pipeline)
+    {
+        var files = pipeline.Component<AdmissionFileInput>("signature-file").Files.Items;
+        var file = files.At(0);
+        return files.Any().And(file.Name.EndsWith(".txt")).And(file.Type.In("text/plain"))
+            .And(file.Size.Between(1L, 1048576L)).And(pipeline.Container<SignaturePage>("signature").Read(m => m.DocumentId).NotEmpty());
+    }
+    void Inspect(Pipeline<SignaturePage> pipeline, bool replace)
+    {
+        pipeline.Head<SignatureRequest>(MoveInEndpoints.Document, request => request
+                .Path(m => m.DraftId, Model.DraftId).Path(m => m.DocumentId, Model.DocumentId))
+            .NoValidation().NoRetry()
+            .OnSuccess((document, pipeline) =>
+            {
+                pipeline.Element("signature-metadata").Text.Set(pipeline.Concat(Model.Name, " — ", document.Headers.Get("Content-Length"), " bytes"));
+                pipeline.Element("signature-version").Text.Set(pipeline.Concat("HTTP ", document.Status, " · ", document.Headers.Get("Content-Type"), " · ETag ", document.Headers.Get("ETag")));
+                if (!replace) return;
+                var draft = pipeline.Container<MoveInPage>("move-in");
+                var file = pipeline.Component<AdmissionFileInput>("signature-file").Files.Items.At(0);
+                pipeline.When(HasSignature(pipeline)).Then(pipeline => pipeline
+                    .Put<SignatureRequest>(MoveInEndpoints.DocumentContent, request => request
+                        .Path(m => m.DraftId, Model.DraftId)
+                        .Path(m => m.DocumentId, Model.DocumentId)
+                        .Query(m => m.Name, file.Name).Query(m => m.Type, file.Type)
+                        .Query(m => m.Size, file.Size).Query(m => m.LastModified, file.LastModified)
+                        .Query(m => m.Caption, document.Headers.Get(MoveInEndpoints.DocumentCaption))
+                        .Header(MoveInEndpoints.CoordinatorHeader, draft.Read(m => m.CoordinatorId))
+                        .Header(MoveInEndpoints.OperationHeader, draft.Read(m => m.OperationId))
+                        .Header(MoveInEndpoints.VersionHeader, document.Headers.Get("ETag"))
+                        .File(file))
+                    .NoValidation().NoRetry()
+                    .OnSuccess<DocumentReply>((saved, pipeline) => pipeline.Element("signature-status").Text.Set(pipeline.Concat(
+                        "Signature replaced: revision ", saved.Body.Read(r => r.Admission.Documents.Accepted).Find(d => true, d => d.Revision))))
+                    .OnError<ErrorEnvelope>(409, (stale, pipeline) => pipeline.Element("signature-status").Text.Set(stale.Body.Read(r => r.Error.Message)))
+                    .OnError((failed, pipeline) => pipeline.Element("signature-status").Text.Set("Signature replacement failed.")))
+                    .Else(pipeline => pipeline.Element("signature-status").Text.Set("Choose a signature file."));
+            })
+            .OnError((failed, pipeline) => pipeline.Element("signature-status").Text.Set("Document metadata unavailable."));
+    }
+}
+@using (Html.BeginRequestContainer(plan, "signature"))
+{
+@(Html.NativeHiddenField(plan, m => m.DocumentId))
+<h3>Admission signature</h3>
+<p id="signature-on-file">@Model.DocumentId · @Model.Name</p>
+<label for="stored-document-text">Stored document text</label>
+<textarea id="stored-document-text" readonly>@Model.Contents</textarea>
+<div id="signature-picker">
+    <label for="signature-file">Signature file</label>
+    @plan.AdmissionFiles("signature-file", false)
+</div>
+@(Html.NativeButton("inspect-document", "Inspect document").Reactive(plan, b => b.Click, (clicked, pipeline) => Inspect(pipeline, false)))
+@(Html.NativeButton("replace-signature", "Replace signature").Reactive(plan, b => b.Click, (clicked, pipeline) =>
+{
+    pipeline.When(HasSignature(pipeline))
+        .Then(pipeline => Inspect(pipeline, true))
+        .Else(pipeline => pipeline.Element("signature-status").Text.Set("Choose a signature file."));
+}))
+@(Html.NativeButton("close-signature-picker", "Close signature picker").Reactive(plan, b => b.Click, (clicked, pipeline) =>
+{
+    pipeline.Unload("signature-picker");
+    pipeline.Element("signature-picker-status").Text.Set("Signature picker closed");
+}))
+<p id="signature-picker-status">Signature picker open</p>
+<p id="signature-metadata"></p>
+<p id="signature-version"></p>
+<p id="signature-status"></p>
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VideoCalls
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Video calls";
+    var plan = Html.ReactivePlan<VideoCalls>();
+}
+<h1>Video calls</h1>
+@using (var calls = Html.BeginRequestContainer(plan, "video-calls"))
+{
+    @(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Calls[0].Link, options => options.Label("First call")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Calls[0].Note, options => options.Label("First call note")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Calls[1].Link, options => options.Label("Follow-up call")).NativeTextBox())
+    @(Html.NativeButton("save-calls", "Save calls").Reactive(plan, button => button.Click, (clicked, pipeline) =>
+    {
+        pipeline.Element("save-status").Text.Set("Saving the calls");
+        pipeline.Post<VideoCalls>(VideoCallsEndpoints.Calls, request => request.UrlEncoded(calls.Container, body => { }))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved-calls").Text.Set(saved.Body));
+    }))
+}
+<p><span id="save-status"></span></p>
+<p>Saved: <span id="saved-calls"></span></p>
+@Html.RenderPlan(plan)

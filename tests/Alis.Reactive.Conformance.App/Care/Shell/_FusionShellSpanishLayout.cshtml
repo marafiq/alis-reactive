@@ -1,0 +1,9 @@
+@using Alis.Reactive.Fusion.FusionAppLevelObjects
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+}
+<section lang="es">
+    @RenderBody()
+    @Html.FusionConfirmDialog("Confirmar", "Sí", "Cancelar")
+    @Html.FusionToast()
+</section>

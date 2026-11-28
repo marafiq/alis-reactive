@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model ContactBoard
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident board";
+    var plan = Html.ReactivePlan<ContactBoard>();
+    var columns = FusionGridColumns.Of<VisitedResident>();
+    var contact = FusionTemplate.Create<VisitedResident>()
+        .When(m => m.Visits * m.Calls > 3, then: t => t.Badge("Busy"), @else: e => e.Span("Quiet"))
+        .Render(plan);
+}
+<h1>Resident board</h1>
+@(Html.FusionGrid(plan, "resident-contacts", Model.Residents, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.Name), HeaderText = "Name" },
+        new() { HeaderText = "Contact", Template = contact },
+    })))
+@Html.RenderPlan(plan)

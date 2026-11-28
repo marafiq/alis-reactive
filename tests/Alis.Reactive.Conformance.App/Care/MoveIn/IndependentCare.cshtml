@@ -1,0 +1,13 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model IndependentCareInput
+@{
+    var plan = Html.ReactivePlan<IndependentCareInput>();
+}
+<fieldset>
+    <legend>Independent care</legend>
+    @(Html.InputField(plan, m => m.EmergencyCallAcknowledged, options => options.Label("Emergency call acknowledged")).NativeCheckBox())
+</fieldset>
+@Html.RenderPlan(plan)

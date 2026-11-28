@@ -1,0 +1,84 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.TriggersAndPipelines
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject AdmissionDeskProfile Admissions
+@model DietInput
+@{
+    var plan = Html.ReactivePlan<DietInput>();
+    var namedBits = Enum.GetValues<DietaryNeeds>().Aggregate(DietaryNeeds.None, (mask, bit) => mask | bit);
+    var combinations = Enumerable.Range(0, (int)namedBits + 1).Select(bits => (DietaryNeeds)bits).Where(needs => (needs & namedBits) == needs).ToArray();
+    var restricted = combinations.Where(needs => (needs & Model.UnavailableMeals) != 0).ToArray();
+    var choices = combinations.Select(needs =>
+        new SelectListItem(MoveInDesk.KitchenNames(needs), needs.ToString())).ToList();
+    if (Model.Referral is { } referral && !choices.Any(item => item.Value == referral.ToString()))
+        choices.Add(new SelectListItem($"Imported referral ({referral})", referral.ToString()));
+    void WithKnownDiet(Pipeline<DietInput> pipeline, string status, Action<Pipeline<DietInput>> next)
+    {
+        if (Model.ReferralRefusal is { } refusal && Model.Referral is { } imported)
+        {
+            pipeline.When(pipeline.Input(m => m.Needs).Component<NativeDropDown>().Value.Eq(imported.ToString()))
+                .Then(pipeline => pipeline.Element(status).Text.Set(refusal)).Else(next);
+        }
+        else next(pipeline);
+    }
+    void Save(Pipeline<DietInput> pipeline)
+    {
+        var main = pipeline.Container<MoveInPage>("move-in");
+        pipeline.Put<DietRequest>(MoveInEndpoints.Diet, request => request
+            .Path(q => q.DraftId, main.Read(m => m.DraftId))
+            .Header(MoveInEndpoints.CoordinatorHeader, main.Read(m => m.CoordinatorId))
+            .Header(MoveInEndpoints.OperationHeader, main.Read(m => m.OperationId))
+            .Header(MoveInEndpoints.VersionHeader, main.Read(m => m.Version))
+            .Json(body => body.Set(q => q.Diet.Needs, main.Read(m => m.Diet.Needs)).Set(q => q.Diet.MealCount, main.Read(m => m.Diet.MealCount))
+                .Set(q => q.Diet.KitchenNote, main.Read(m => m.Diet.KitchenNote)).Set(q => q.Diet.Confirmed, main.Read(m => m.Diet.Confirmed))
+                .Set(q => q.Kinds, main.Read(m => m.Documents.RequiredKinds)).Set(q => q.OptionalLabels, main.Read(m => m.Services.OptionalLabels))))
+            .Busy("save-diet").Validate<DietRules>()
+            .OnSuccess<SaveReply>((saved, pipeline) =>
+            {
+                pipeline.Element("diet-status").Text.Set(pipeline.Concat("Diet saved: ", saved.Body.Read(r => r.Receipt.Reference)));
+                pipeline.Element("saved-version").Text.Set(saved.Body.Read(r => r.Receipt.Version));
+                pipeline.Dispatch(MealEvents.Saved, saved.Body.Read(r => r.Receipt.Version));
+            })
+            .OnError<ValidationProblem>(400, (invalid, pipeline) => pipeline.ShowValidationErrors(invalid.Body))
+            .OnError<ErrorEnvelope>(422, (invalid, pipeline) => pipeline.Element("diet-status").Text.Set(invalid.Body.Read(r => r.Error.Message)))
+            .OnError<ErrorEnvelope>(409, (invalid, pipeline) => pipeline.Element("diet-status").Text.Set(invalid.Body.Read(r => r.Error.Message)));
+    }
+}
+<div id="confirmed-diet">@await Html.PartialAsync("/Care/MoveIn/ConfirmedDiet.cshtml", Model)</div>
+@(Html.InputField(plan, m => m.Needs, o => o.Label("Dietary needs")).NativeDropDown(o => o.Items(choices))
+    .Reactive(diet => diet.Change, (changed, pipeline) =>
+        pipeline.Element("kitchen-readiness").Text.Set(pipeline.Container<MoveInPage>("move-in").Read(m => m.Diet.Needs).In(restricted).Choose("Kitchen review required", "Meal plan ready"))))
+@(Html.InputField(plan, m => m.MealCount, o => o.Label("Meals per day")).NativeTextBox())
+@(Html.InputField(plan, m => m.KitchenNote, o => o.Label("Kitchen note")).NativeTextBox())
+@(Html.InputField(plan, m => m.Confirmed, o => o.Label("Confirm kitchen plan")).NativeCheckBox())
+<p id="kitchen-readiness">@(restricted.Contains(Model.Needs) ? "Kitchen review required" : "Meal plan ready")</p>
+@(Html.NativeButton("save-diet", "Save diet").Reactive(plan, b => b.Click, (clicked, pipeline) => WithKnownDiet(pipeline, "diet-status", Save)))
+<p id="diet-status"></p>
+@(Html.NativeButton("preview-diet", "Preview meals").Reactive(plan, b => b.Click, (clicked, pipeline) => WithKnownDiet(pipeline, "meal-preview", pipeline => pipeline.Dispatch(MealEvents.Preview, true))))
+<div id="meal-slot"><p id="meal-preview">Preview the working kitchen plan.</p></div>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MealEvents.Saved, (version, pipeline) =>
+    {
+        var confirmed = pipeline.Get<DeskQuery>(MoveInEndpoints.ConfirmedDiet, request => request.Query(q => q.DraftId, pipeline.Container<MoveInPage>("move-in").Read(m => m.DraftId)));
+        (Admissions.UsesSession ? confirmed.NoDefaults() : confirmed).NoBusy().NoValidation().Into("confirmed-diet");
+    })
+        .CustomEvent(MoveInCareEvents.AnswersReplaced, pipeline => pipeline.Dispatch(MealEvents.Preview, false))
+        .CustomEvent(MealEvents.Preview, HandlerPolicy.Replace, (preview, pipeline) => pipeline.When(preview)
+            .Then(pipeline =>
+            {
+                var main = pipeline.Container<MoveInPage>("move-in");
+                pipeline.Get<MealPlanQuery>(MoveInEndpoints.MealPlan, request => request.Query(q => q.DraftId, main.Read(m => m.DraftId))
+                    .Query(q => q.DietaryNeeds, main.Read(m => m.Diet.Needs)).Query(q => q.MealCount, main.Read(m => m.Diet.MealCount))
+                    .Query(q => q.Kinds, main.Read(m => m.Documents.RequiredKinds)).Query(q => q.OptionalLabels, main.Read(m => m.Services.OptionalLabels)))
+                    .NoValidation().NoBusy().NoRetry().WhileLoading(pipeline => pipeline.Element("meal-preview").Text.Set("Reading meal preview"))
+                    .Into("meal-slot")
+                    .OnError<ErrorEnvelope>(422, (refused, pipeline) => pipeline.Element("meal-preview").Text.Set(refused.Body.Read(r => r.Error.Message)))
+                    .OnError((failed, pipeline) => pipeline.Element("meal-preview").Text.Set("Meal preview unavailable."));
+            })
+            .Else(pipeline => pipeline.Element("meal-preview").Text.Set("Care changed. Preview meals for the new care level."))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StatusCard
+@{
+    var plan = Html.ReactivePlan<StatusCard>();
+    var statusId = Model.Key + "-status";
+}
+<section aria-label="@Model.Resident's card">
+    <h2>@Model.Resident</h2>
+    <p>Status: <span id="@statusId"></span></p>
+</section>
+@{
+    Html.On(plan, trigger => trigger.SignalR(WardLine.Live, line => line.StatusChanged, (status, pipeline) => pipeline
+        .When(status.Read(s => s.Resident).Eq(Model.Resident))
+        .Then(pipeline => pipeline.Element(statusId).Text.Set(status.Read(s => s.Status)))));
+}
+@Html.RenderPlan(plan)

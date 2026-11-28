@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FamilyDischarge
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Discharge";
+    var plan = Html.ReactivePlan<FamilyDischarge>();
+}
+<h1>Discharge @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, FamilyDischargeButtons.RefreshFamily)>Refresh family</button>
+<section aria-label="Family">
+    <div id="family-panel"></div>
+</section>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Get(FamilyDischargeEndpoints.Panel).Into("family-panel"))
+        .CustomEvent(FamilyDischargeButtons.RefreshFamily, pipeline => pipeline.Get(CareEndpoints.FamilyRefresh).Into("family-panel")));
+}
+@Html.RenderPlan(plan)

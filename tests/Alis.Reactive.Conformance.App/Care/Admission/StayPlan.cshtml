@@ -1,0 +1,47 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StayPlan
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Plan a stay";
+    var plan = Html.ReactivePlan<StayPlan>();
+}
+<h1>A stay for @Model.Resident</h1>
+<h2>Arrives</h2>
+@(plan.ConformanceComponent("arrive", new ConformanceStart { Text = "Arrives" }))
+<h2>Leaves</h2>
+@(plan.ConformanceComponent("leave", new ConformanceStart { Text = "Leaves" }))
+<button type="button" @Html.Raises(plan, StayPlans.Check)>Check</button>
+<dl>
+    <dt>Leaves after arriving</dt>
+    <dd id="later"></dd>
+    <dt>Leaves on or after arriving</dt>
+    <dd id="same-or-later"></dd>
+    <dt>Leaves before arriving</dt>
+    <dd id="earlier"></dd>
+    <dt>Leaves on or before arriving</dt>
+    <dd id="same-or-earlier"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(StayPlans.Check, pipeline =>
+    {
+        var arrives = pipeline.Component<ConformanceComponent>("arrive").Day;
+        var leaves = pipeline.Component<ConformanceComponent>("leave").Day;
+        pipeline.When(leaves.Gt(arrives))
+            .Then(pipeline => pipeline.Element("later").Text.Set("leaves after arriving"))
+            .Else(pipeline => pipeline.Element("later").Text.Set("does not leave after arriving"));
+        pipeline.When(leaves.Gte(arrives))
+            .Then(pipeline => pipeline.Element("same-or-later").Text.Set("leaves on or after arriving"))
+            .Else(pipeline => pipeline.Element("same-or-later").Text.Set("leaves before arriving"));
+        pipeline.When(leaves.Lt(arrives))
+            .Then(pipeline => pipeline.Element("earlier").Text.Set("leaves before arriving"))
+            .Else(pipeline => pipeline.Element("earlier").Text.Set("does not leave before arriving"));
+        pipeline.When(leaves.Lte(arrives))
+            .Then(pipeline => pipeline.Element("same-or-earlier").Text.Set("leaves on or before arriving"))
+            .Else(pipeline => pipeline.Element("same-or-earlier").Text.Set("leaves after arriving"));
+    }));
+}
+@Html.RenderPlan(plan)

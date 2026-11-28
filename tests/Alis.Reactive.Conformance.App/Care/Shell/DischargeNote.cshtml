@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model DischargeNote
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Discharge";
+    var plan = Html.ReactivePlan<DischargeNote>();
+}
+<h1>Discharge</h1>
+@(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+<button type="button" @Html.Raises(plan, DischargeNoteButtons.Discharge)>Discharge</button>
+<p>Decision: <output id="decision"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DischargeNoteButtons.Discharge, pipeline =>
+        pipeline.When(pipeline.Component<NativeConfirm>().Ask(pipeline.Input(m => m.Note).Component<NativeTextBox>().Value.OrNull()))
+            .Then(pipeline => pipeline.Element("decision").Text.Set("Discharged"))
+            .Else(pipeline => pipeline.Element("decision").Text.Set("Kept"))));
+}
+@Html.RenderPlan(plan)

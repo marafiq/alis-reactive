@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FamilyDischargePanel
+@{
+    var plan = Html.ReactivePlan<FamilyDischargePanel>();
+}
+<p>Family contact: @Model.Contact</p>
+<button type="button" @Html.Raises(plan, FamilyDischargeButtons.Discharge)>Discharge</button>
+<p>Discharge: <output id="discharge"></output></p>
+<p>Notify the family: <output id="notify"></output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(FamilyDischargeButtons.Discharge, pipeline =>
+            pipeline.Element("discharge").Text.Set(pipeline.Component<NativeConfirm>().Ask("Discharge Ada?")))
+        .CustomEvent(FamilyDischargeButtons.Discharge, pipeline =>
+            pipeline.Element("notify").Text.Set(pipeline.Component<NativeConfirm>().Ask("Notify the family?"))));
+}
+@Html.RenderPlan(plan)
