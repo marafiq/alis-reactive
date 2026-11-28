@@ -1,31 +1,31 @@
 # Handoff
 
-Written at `date`: Fri Nov 27 19:43:39 EST 2026
+Written at `date`: Fri Nov 27 20:18:05 EST 2026
 
 ## State, as `scripts/state.py` reads it from git
 note: open: 29, each in the notes block below
 note: closed 2026-11-25 | direction | the queue of this file | RowContainers | "1 seems more aligned, but make sure that : its follow-up RowContainers landed
-unit: landed (99): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionCareInputs, FusionCheckBoxWave, FusionDatePickerWave, FusionDateTimePickerCare, FusionDropDownListWave, FusionEditorsWave, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionInputsWave, FusionMaskedTextBoxCare, FusionNumericStep, FusionNumericTextBoxWave, FusionOnboardingConfidence, FusionOnboardingPilotFollowup, FusionRadioButtonWave, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, FusionSwitchContinuation, FusionSwitchFull, FusionTextAreaCare, FusionTextBoxWave, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
+unit: landed (100): BodilessCheck, CheckoutTrap, SpecCiCold, MacTlc, ContainerOnly, CoreLeads, NarrowedPlan, CoreStatus, DefinitionOfDone, DesignCounts, DesignedAsks, DesignerClaims, EmptyTextItem, FormDataBoundaryNet48, FlagsAttribute, FormDataBoundary, MultipartFileList, NativeDateValue, FreshAppSlice, FusionAudit, FusionComboBoxFollowThrough, FusionOnboardingNotes, FusionComboBoxPayload, G13Forms, InputForm, InputSent, InputSentForms, JsonNoContent, ListFromSources, ListPosition, MarkdownLand, MistakesAsRules, MistakesCarried, MistakesShort, MoveInDoorMap, MoveInAvailability, MoveInContacts, MoveInCoordinators, MoveInDefaults, MoveInDepositDiet, MoveInDiscard, MoveInDocuments, MoveInDraftAdmission, MoveInMedicationsPharmacy, MoveInNavigationReadiness, MoveInOwners, MoveInPayerPricing, MoveInReception, MoveInReviewAcceptance, MoveInSessionScope, Mvc5JsonNames, Mvc5Razor, Mvc5Roster, Mvc5ViewsCompiled, Net48BrowserHost, Net48TwinFollowThrough, OneDoor, Operators, QueueReach, RetirePicomatchException, FusionCareInputs, FusionCheckBoxWave, FusionDatePickerWave, FusionDateTimePickerCare, FusionDropDownListWave, FusionEditorsWave, FusionFullOnboardingHandoff, FusionGridDownloadEvidence, FusionInputsWave, FusionMaskedTextBoxCare, FusionNumericStep, FusionNumericTextBoxWave, FusionOnboardingConfidence, FusionOnboardingPilotFollowup, FusionRadioButtonWave, FusionBreadcrumb, FusionConfirm, FusionMenu, FusionSidebar, FusionToast, FusionToolbar, FusionSmartPasteButton, FusionSwitchContinuation, FusionSwitchFull, FusionTextAreaCare, FusionTextBoxWave, GridBedsRule, RowContainers, Section4Close, SentPosition, SplitValue, StateSpecUnits, TextBodyCheck, UnitsClosed, UnitsReread, ValidationForms, WorldRecords, WriterMove, X37Net48, ZshModifier
 unit: unbriefed (20): NativeDateInput, FreshAppDocs, FusionApiOperations, IntegrationPrep, FusionFormBuilder, FusionGridApi, GridBulkActions, GridCellReview, FusionGridColumns, FusionGridContract, GridEditorApi, FusionGridExports, GridLargeCensus, GridQueryApi, FusionGridRemote, FusionGridSelection, GridWardTransfer, FusionQueryBuilder, TanStackCharts, TanStackTable
 unit: returned (6): FusionComboBoxDataManager, FusionComboBoxEquipmentAvailability, FusionComboBoxLiveCatalogue, FusionComboBoxOnboardingReplay, FusionComboBoxServerSearch, FusionNumericDecrement
 unit: building (2): MoveInOwners, FusionSwitchLunaExperiment
 unit: ready (1): FusionNumericDecrementApi
 Each unit's worktree, reason and next command: `python3 scripts/state.py`.
-lane: pushing at c849b3b96 on feature/rewrite
-  leaves by: the last line `scripts/push.sh` prints
-  exit line: "remote equals HEAD"
-  goes to: lane: pushed
-ci: unread at c849b3b96
+lane: checking at 6fe24526a on feature/rewrite
+  leaves by: the last line `scripts/full-check.sh` prints
+  exit line: "spec check at" its commit
+  goes to: lane: checked
+ci: unread at 6fe24526a
   leaves by: `python3 scripts/ci.py`
   exit line: "ci at" the commit, with each job
   goes to: ci: running, ci: failed or ci: passed
-file: over spec/CLAUDE.md: holds 2157 lines, its limit 150
+file: over spec/CLAUDE.md: holds 2160 lines, its limit 150
   leaves by: a unit that splits or cuts it; the mistakes are condensed, kinds merged, each line short enough to follow
   exit line: "landed"
   goes to: gone
 file: over tests/Alis.Reactive.Conformance.App/CLAUDE.md: holds 201 lines, its limit 150
 file: over tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md: holds 237 lines, its limit 150
-machine: review due : 35 units have landed since .claude/rules/process.md last changed
+machine: review due : 36 units have landed since .claude/rules/process.md last changed
   leaves by: a unit that changes this file, the lead's without waiting for the owner, the framework's quality bar never lowered
   read first: the units sent back, the kinds of mistake that grew, the states no unit met
   exit line: "landed"
@@ -33,24 +33,20 @@ machine: review due : 35 units have landed since .claude/rules/process.md last c
 
 ## Where it stands
 - Branch: feature/rewrite
-- HEAD: c849b3b96 Fusion: prepare contact numbers, lock care notes and schedule first visits
-- Full check: .work/logs/spec-check-c849b3b96.log: spec check at c849b3b96: 40 of 40 checks pass
-- .work/last-run.txt: 20261127-192228-69926 c849b3b96
+- HEAD: 6fe24526a Grid: show the ward validator message when a bed count is zero
+- Full check: .work/logs/spec-check-6fe24526a.log: spec check at 6fe24526a: 40 of 40 checks pass
+- .work/last-run.txt: 20261127-195647-34794 6fe24526a
 
 ## Landed since the commit before the last spec: STATE commit
-c849b3b96 Fusion: prepare contact numbers, lock care notes and schedule first visits
-6fa70b650 spec: STATE and handoff at 1f33c53ff
+6fe24526a Grid: show the ward validator message when a bed count is zero
+03b29e2fe spec: STATE and handoff at c849b3b96
 
 ## Open
 open: 9 promises with no browser test, 0 runtime cases not built, 0 doors not implemented
 Each, by file and line: `python3 scripts/open.py`.
 
 ## The owner's latest decisions
-spec/CLAUDE.md:9: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): FusionToast.Hide keeps EJ2's zero-argument call and
-spec/CLAUDE.md:11: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), closing the flags enum: an enum is flags to the framework when
-spec/CLAUDE.md:16: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`), on the forms gate 2's G13 left to the owner: yes to
-spec/CLAUDE.md:22: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): one door for each list operation. An object JavaScript iterates
-spec/CLAUDE.md:26: - The owner, 2026-11-26 (verbatim in `spec/NOTES.md`): the mistakes log stays short enough to stay in context, each kind
+spec/CLAUDE.md:9: - The owner, 2026-11-27 (verbatim in `spec/NOTES.md`), on the ward Grid: the unconditional Beds rule is checked when
 
 ## The owner's notes that are open: date | kind | home | follow-up | the owner's words
 <!-- notes -->
@@ -112,9 +108,9 @@ and oldest-first dismissal. M23.X2 and X3 prove the confirmation text and locali
       but all three diagnostics saw Exported when expecting Exporting. On EJ2 33.1.47, XLSX resolves before save
       starts the download, while CSV and PDF dispatch their links before settlement. Blob mode only returns data.
       A later browser read misses initiation and D11.3 stops a sync declaration at Exporting.
-      The three M21.X203 refusals and two M21.X205 edits need rules at GridColumn.ValidationRules. N16.2 holds
-      them internally, N16.3 checks a request container and the public validator returns results. X203_0’s opposite
-      and X203_1 also disagree on the rendering or refusal of the same unconditional GreaterThan(0).
+      On the bed board the unconditional Beds rule runs on edit. Saving 0 shows the validator's message under
+      the cell, and correcting the count to 1 saves (M21.X211). That case, two M21.X203 refusals and the two
+      M21.X205 edits need a typed way to supply the app validator's rules to GridColumn.ValidationRules.
    3. Smart Paste net10 proves the protected POST and late mount. M21.X803_1 still needs Fusion assets and a
       protected MVC 5 intake route and fixture under IIS Express.
 

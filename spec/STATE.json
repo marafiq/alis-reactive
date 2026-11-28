@@ -1436,7 +1436,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 1156,
+        "defects": 1157,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1687,7 +1687,7 @@
         "unrefused": 0
       },
       "detail": "276 refused plants caught and 89 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "bb0d7671747c0b45fbe731fb4337df2c215e5ffe5bc339de1051133f6a062d0d",
+      "digest": "d9e21097aaf506e73d6216196485272120b71f703d7b57406c59aa9dff8a215c",
       "pass": true
     },
     "probes": {
@@ -4755,7 +4755,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "c849b3b96578144ba7a8381d444be3652ea28b89",
+  "read_at_head": "6fe24526a9253bc6842b30fd636ff4a1587e1ac1",
   "step": {
     "failing": [],
     "name": "End of session",
