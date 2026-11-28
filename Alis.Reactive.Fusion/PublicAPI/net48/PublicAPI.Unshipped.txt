@@ -615,6 +615,7 @@ Alis.Reactive.Fusion.FusionComponents.FusionDateTimePicker<TValue>.ChangedEventA
 Alis.Reactive.Fusion.FusionComponents.FusionDateTimePicker<TValue>.FocusIn() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionDateTimePicker<TValue>.FocusOut() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionDateTimePicker<TValue>.FusionDateTimePicker() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionDateTimePicker<TValue>.Step.get -> Alis.Reactive.Declarations.Property<double>!
 Alis.Reactive.Fusion.FusionComponents.FusionDateTimePicker<TValue>.Value.get -> Alis.Reactive.Declarations.Property<TValue>!
 Alis.Reactive.Fusion.FusionComponents.FusionDateTimePickerHtml
 Alis.Reactive.Fusion.FusionComponents.FusionDialog
@@ -1247,6 +1248,7 @@ Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBox
 Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBox.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBox.MaskChangeEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBox.FocusIn() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBox.FusionMaskedTextBox() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBox.GetMaskedValue() -> Alis.Reactive.Declarations.MethodResult<string!>!
 Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBox.MaskChangeEventArgs
 Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBox.MaskChangeEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
 Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBox.MaskChangeEventArgs.MaskChangeEventArgs() -> void
@@ -1881,6 +1883,7 @@ Alis.Reactive.Fusion.FusionComponents.FusionTextArea.InputEventArgs
 Alis.Reactive.Fusion.FusionComponents.FusionTextArea.InputEventArgs.InputEventArgs() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionTextArea.InputEventArgs.PreviousValue.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
 Alis.Reactive.Fusion.FusionComponents.FusionTextArea.InputEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionTextArea.Readonly.get -> Alis.Reactive.Declarations.Property<bool>!
 Alis.Reactive.Fusion.FusionComponents.FusionTextArea.Value.get -> Alis.Reactive.Declarations.Property<string?>!
 Alis.Reactive.Fusion.FusionComponents.FusionTextAreaHtml
 Alis.Reactive.Fusion.FusionComponents.FusionTextBox

@@ -1,6 +1,8 @@
 @using Alis.Reactive.Conformance.App.Care
 @using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
 @using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
 @model FirstVisitBooking
 @{
     Layout = "/Shared/_FusionLayout.cshtml";
@@ -10,6 +12,15 @@
 <h1>First visit</h1>
 <fieldset>
     <legend>First visit</legend>
-    @(Html.InputField(plan, m => m.FirstVisit, options => options.Label("First visit")).FusionDateTimePicker(build => build.Format("yyyy-MM-dd HH:mm")))
+    <p>Morning round appointments start between 09:00 and 09:30.</p>
+    @(Html.NativeButton("brief-check-in", "Brief check-in")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+            pipeline.Input(m => m.FirstVisit).Component<FusionDateTimePicker<DateTime?>>().Step.Set(15)))
+    @(Html.NativeButton("admission-assessment", "Admission assessment")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+            pipeline.Input(m => m.FirstVisit).Component<FusionDateTimePicker<DateTime?>>().Step.Set(30)))
+    @(Html.InputField(plan, m => m.FirstVisit, options => options.Label("First visit"))
+        .FusionDateTimePicker(build => build.Format("yyyy-MM-dd HH:mm").TimeFormat("HH:mm")
+            .MinTime(new DateTime(2026, 7, 14, 9, 0, 0)).MaxTime(new DateTime(2026, 7, 14, 9, 30, 0))))
 </fieldset>
 @Html.RenderPlan(plan)

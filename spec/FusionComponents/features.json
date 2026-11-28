@@ -7754,7 +7754,7 @@
   },
   {
    "id": "M21.F17",
-   "summary": "FusionDateTimePicker: one declaration of the Syncfusion DateTimePicker by its JavaScript names, value, focusIn, focusOut and change, each EJ2 33.1.47's public member; the payload of change; the input it is, generic over the member it binds, its value that member's own type, committed by change and sent as a DateTime with no offset or, for a DateTimeOffset member, as an instant with the browser's offset; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters, a write that drops the seconds and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value and its payload's typed by the bound member, nullable as EJ2 documents the value, and its payload nested under EJ2's interface name.",
+   "summary": "FusionDateTimePicker: one declaration of the Syncfusion DateTimePicker by its JavaScript names, value, step, focusIn, focusOut and change, each EJ2 33.1.47's public member; the payload of change; the input it is, generic over the member it binds, its value that member's own type, committed by change and sent as a DateTime with no offset or, for a DateTimeOffset member, as an instant with the browser's offset; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters, a write that drops the seconds and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value and its payload's typed by the bound member, nullable as EJ2 documents the value, and its payload nested under EJ2's interface name.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionDateTimePicker",
@@ -7939,6 +7939,11 @@
      "id": "M21.X1010",
      "rung": "behavior",
      "defect": "Both lines render the DateTimePicker by EJ2's DateTimePickerFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:74 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the DateTimePicker at the member's value, written by M21.D1; a helper that drops it shows an empty box, EJ2's value null (@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts:90-93), though the member holds a time, against D17.13."
+    },
+    {
+     "id": "M21.X2020",
+     "rung": "behavior",
+     "defect": "Keeping the other visit interval offers an incorrect set of appointment times."
     }
    ],
    "promises": [
@@ -7949,6 +7954,14 @@
      "opposite": "A model whose FirstVisit is null shows an empty box.",
      "defect": "The DateTimePicker is rendered with no starting value, so the box shows empty though the model holds 2026-07-14 09:30.",
      "for": "M21.X1010"
+    },
+    {
+     "for": "M21.X2020",
+     "page": "First visit",
+     "gesture": "Choose a brief check-in or an admission assessment and open the first-visit time list.",
+     "outcome": "Brief check-ins offer 09:00, 09:15 and 09:30 on the morning round.",
+     "opposite": "Admission assessments offer 09:00 and 09:30 on the same round.",
+     "defect": "Keeping the other visit interval offers an incorrect set of appointment times."
     }
    ],
    "verdicts": [
@@ -13433,7 +13446,7 @@
   },
   {
    "id": "M21.F25",
-   "summary": "FusionMaskedTextBox, both lines' FusionInputMask renamed to Fusion and EJ2's class name: one declaration of the Syncfusion MaskedTextBox by its JavaScript names, value, focusIn and change, each EJ2 33.1.47's public member; the payload of change; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and its change payload nested under EJ2's interface name.",
+   "summary": "FusionMaskedTextBox, both lines' FusionInputMask renamed to Fusion and EJ2's class name: one declaration of the Syncfusion MaskedTextBox by its JavaScript names, value, getMaskedValue, focusIn and change, each EJ2 33.1.47's public member; the payload of change; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and its change payload nested under EJ2's interface name.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionInputMask",
@@ -13621,6 +13634,11 @@
      "id": "M21.X1016",
      "rung": "behavior",
      "defect": "Both lines render the MaskedTextBox by EJ2's MaskedTextBoxFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:67 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the MaskedTextBox at the member's value, written by M21.D1; a helper that drops it shows no digits, EJ2's value null (@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts:142-144), though the member holds them, against D17.13."
+    },
+    {
+     "id": "M21.X2000",
+     "rung": "behavior",
+     "defect": "Reading Value for the contact slip drops its separators. Reading GetMaskedValue for the dialer includes the separators."
     }
    ],
    "promises": [
@@ -13631,6 +13649,14 @@
      "opposite": "A model whose Phone is 5559876543 shows 555-987-6543.",
      "defect": "The MaskedTextBox is rendered with no starting value, so the box shows no digits though the model holds 5551234567.",
      "for": "M21.X1016"
+    },
+    {
+     "for": "M21.X2000",
+     "page": "Next of kin on the home and mobile contact routes, with a phone number masked as 000-000-0000.",
+     "gesture": "Replace the saved home number with 2125550146 and select Prepare contact slip.",
+     "outcome": "The contact slip number shows 212-555-0146.",
+     "opposite": "Prepare the saved mobile number 555-987-6543 for the dialer. The dialer number shows 5559876543.",
+     "defect": "Reading Value for the contact slip drops its separators. Reading GetMaskedValue for the dialer includes the separators."
     }
    ],
    "verdicts": [
@@ -25047,7 +25073,7 @@
   },
   {
    "id": "M21.F48",
-   "summary": "FusionTextArea: one declaration of the Syncfusion TextArea by its JavaScript names, value, dataBind, focusIn, focusOut, input, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its four events; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over nine files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and its payloads nested under EJ2's interface names.",
+   "summary": "FusionTextArea: one declaration of the Syncfusion TextArea by its JavaScript names, value, readonly, dataBind, focusIn, focusOut, input, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its four events; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over nine files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and its payloads nested under EJ2's interface names.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionTextArea",
@@ -25231,6 +25257,11 @@
      "id": "M21.X1029",
      "rung": "behavior",
      "defect": "Both lines start the TextArea at the bound member through EJ2's own builder, EJS().TextAreaFor(expr) (Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:111 at 65fdf118d); a helper that drops the start shows the area empty, EJ2's null (@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:37-39) whatever the member holds, against D17.13. The rewrite's render helper starts the TextArea at the member's value, written by M21.D1."
+    },
+    {
+     "id": "M21.X2010",
+     "rung": "behavior",
+     "defect": "Leaving the care note writable when staff lock it appends the correction too early. Leaving it read-only when staff revise it drops the correction."
     }
    ],
    "promises": [
@@ -25241,6 +25272,14 @@
      "outcome": "The care note shows Prefers tea at seven.",
      "opposite": "A model whose CareNote is null shows an empty care note.",
      "defect": "The area is rendered with no starting value, so it shows empty though the model holds the note."
+    },
+    {
+     "for": "M21.X2010",
+     "page": "The resident profile shows a care note that staff can lock before handing it over and reopen for a correction.",
+     "gesture": "Lock the care note and type at its end.",
+     "outcome": "The locked care note still reads Prefers tea at seven.",
+     "opposite": "Choose Revise care note and append the correction. The care note reads Prefers tea at seven with milk.",
+     "defect": "Leaving the care note writable when staff lock it appends the correction too early. Leaving it read-only when staff revise it drops the correction."
     }
    ],
    "verdicts": [

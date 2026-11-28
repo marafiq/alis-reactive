@@ -16,6 +16,9 @@ public sealed class FusionMaskedTextBox : FusionComponent, IInputComponent
     /// <summary>Gets the characters the box holds without the mask's literals and prompt characters, null until a person types.</summary>
     public Property<string?> Value => Property<string?>();
 
+    /// <summary>Returns the displayed text, including mask literals and any prompt characters.</summary>
+    public MethodResult<string> GetMaskedValue() => Method<string>();
+
     /// <summary>Moves the keyboard's focus to the box.</summary>
     public void FocusIn() => Method();
 

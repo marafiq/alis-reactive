@@ -1003,6 +1003,7 @@ public static class Promises
     public static class M21_F17
     {
         public const string M21_X1010_0 = "M21.F17 M21.X1010 0";
+        public const string M21_X2020_0 = "M21.F17 M21.X2020 0";
     }
 
     public static class M21_F18
@@ -1113,6 +1114,7 @@ public static class Promises
     public static class M21_F25
     {
         public const string M21_X1016_0 = "M21.F25 M21.X1016 0";
+        public const string M21_X2000_0 = "M21.F25 M21.X2000 0";
     }
 
     public static class M21_F26
@@ -1336,6 +1338,7 @@ public static class Promises
     public static class M21_F48
     {
         public const string M21_X1029_0 = "M21.F48 M21.X1029 0";
+        public const string M21_X2010_0 = "M21.F48 M21.X2010 0";
     }
 
     public static class M21_F49

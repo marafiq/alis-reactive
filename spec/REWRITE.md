@@ -1437,6 +1437,8 @@ The full input onboarding wave covers the [CheckBox](FusionComponents/audit/chec
 
 Ward staff can now file an empty linen cart, book a calendar date in the receiving desk’s time zone and select a transfer ward from a locally filtered directory. The net10 pages exercise bound values, original vendor events, rendering and persistence. The [NumericTextBox](FusionComponents/audit/numerictextbox-coverage.md), [DatePicker](FusionComponents/audit/datepicker-coverage.md) and [DropDownList](FusionComponents/audit/dropdownlist-coverage.md) records give the pinned contracts, the typed operations the pages use and the exact limits each audit found.
 
+On the next-of-kin page, staff can prepare a formatted phone number for the contact slip or the digits for the dialer. The resident profile lets staff lock a care note for handover and reopen it for a correction. The first-visit page offers different start times for brief check-ins and admission assessments. The [MaskedTextBox](FusionComponents/audit/maskedtextbox-coverage.md), [TextArea](FusionComponents/audit/textarea-coverage.md) and [DateTimePicker](FusionComponents/audit/datetimepicker-coverage.md) records name the typed calls and their browser cases.
+
 ### U27. Fusion's app-level objects
 Features: M23.F1, M23.F2
 

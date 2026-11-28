@@ -1,6 +1,9 @@
+@using Alis.Reactive.Conditions
 @using Alis.Reactive.Conformance.App.Care
 @using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Native.NativeComponents
 @using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
 @model ProfileNote
 @{
     Layout = "/Shared/_FusionLayout.cshtml";
@@ -11,5 +14,15 @@
 <fieldset>
     <legend>Care note</legend>
     @(Html.InputField(plan, m => m.CareNote, options => options.Label("Care note")).FusionTextArea())
+    @(Html.NativeButton("care-note-lock", "Lock care note")
+        .Reactive(plan, button => button.Click, (_, pipeline) =>
+        {
+            var note = pipeline.Input(m => m.CareNote).Component<FusionTextArea>();
+            note.Readonly.Set(note.Readonly.Not());
+            note.DataBind();
+            pipeline.When(note.Readonly)
+                .Then(pipeline => pipeline.Element("care-note-lock").Text.Set("Revise care note"))
+                .Else(pipeline => pipeline.Element("care-note-lock").Text.Set("Lock care note"));
+        }))
 </fieldset>
 @Html.RenderPlan(plan)

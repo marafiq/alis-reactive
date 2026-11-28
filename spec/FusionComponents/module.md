@@ -254,6 +254,8 @@ Each name is gate 2's; each door is the capability it carries.
   their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts:93`, `:511`, `:517`,
   `@syncfusion/ej2-calendars/src/calendar/calendar.d.ts:551`, `:698`, `:710`).
+  The first-visit page writes `Step` in minutes to offer different appointment intervals for check-ins and assessments
+  (M21.X2020, `@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts:71`).
 - `M21.N18` kept: `FusionDialog`: `Show`, `Hide` and `RefreshPosition`; `BeforeOpen` and `BeforeClose` and their
   payloads `FusionDialog.BeforeOpenEventArgs` (`Cancel`) and `FusionDialog.BeforeCloseEventArgs` (`Cancel`,
   `IsInteracted`); `Open`, `Close` and `OverlayClick`, each an `Event` with no payload (D17.4), as EJ2 types them
@@ -350,6 +352,8 @@ Each name is gate 2's; each door is the capability it carries.
   replaces main's six files (`Alis.Reactive.Fusion/Components/FusionInputMask/` at 623dd4a27), whose doors carry their
   verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts:144`, `:198`, `:284`, `:308`, `:315`).
+  The contact slip reads the displayed phone number through `GetMaskedValue()`, while the dialer reads the digits
+  through `Value` (M21.X2000, `@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts:278`).
 - `M21.N26` kept: `FusionKanban`: `DataSource<TCard>()`, `GetColumnData<TCard, TKey>`, `GetSwimlaneData<TCard>`,
   `DataBind`, `AddCard`, `UpdateCard`, `DeleteCard` (a card, a list or a key, M21.X302), `AddColumn<TKey>`,
   `DeleteColumn`, `ShowColumn<TKey>`, `HideColumn<TKey>`, `ShowSpinner`, `HideSpinner`, `OpenDialog` with
@@ -609,6 +613,8 @@ Each name is gate 2's; each door is the capability it carries.
   (`@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:39`, `:186`, `:192`, `:198`, `:204`, `:281`, `:287`,
   `@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:11`, `:19`, `:23`, `:27`, `:31`,
   `@syncfusion/ej2-base/src/component.d.ts:129`).
+  Writing `Readonly` and calling `DataBind()` locks the resident’s note for handover or opens it for a correction
+  (M21.X2010, `@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:33`).
 - `M21.N49` kept: `FusionTextBox`: `Value` as `Property<string?>` (M21.X601), `DataBind`, `FocusIn`, `FocusOut`,
   `AddIcon` with its place typed (M21.X602), `Input`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input`
   committed by `Change` (M7.N3); the payloads `FusionTextBox.InputEventArgs` (`Value`, `PreviousValue`),

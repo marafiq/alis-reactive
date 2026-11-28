@@ -13661,6 +13661,21 @@
       ]
     },
     {
+      "feature": "M21.F17",
+      "for": "M21.X2020",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "firstVisit"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M21.F18",
       "for": "M21.X1011",
       "index": 0,
@@ -13801,6 +13816,21 @@
     {
       "feature": "M21.F25",
       "for": "M21.X1016",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "kinPhone"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F25",
+      "for": "M21.X2000",
       "index": 0,
       "screen": "record-contacts",
       "hosts": [
@@ -15386,6 +15416,21 @@
     {
       "feature": "M21.F48",
       "for": "M21.X1029",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "profile"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F48",
+      "for": "M21.X2010",
       "index": 0,
       "screen": "record-contacts",
       "hosts": [

@@ -2018,6 +2018,13 @@
       "/Shared/_FusionLayout.cshtml"
     ]
   },
+  "M21.F17 M21.X2020 0": {
+    "modules": [],
+    "views": [
+      "/Care/AdmissionClinical/FirstVisit.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
   "M21.F18 M21.X1011 0": {
     "modules": [],
     "views": [
@@ -2503,6 +2510,13 @@
     ]
   },
   "M21.F25 M21.X1016 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/KinPhone.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F25 M21.X2000 0": {
     "modules": [],
     "views": [
       "/Care/RecordContacts/KinPhone.cshtml",
@@ -3440,6 +3454,13 @@
     ]
   },
   "M21.F48 M21.X1029 0": {
+    "modules": [],
+    "views": [
+      "/Care/RecordContacts/ProfileNote.cshtml",
+      "/Shared/_FusionLayout.cshtml"
+    ]
+  },
+  "M21.F48 M21.X2010 0": {
     "modules": [],
     "views": [
       "/Care/RecordContacts/ProfileNote.cshtml",

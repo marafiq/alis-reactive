@@ -17,6 +17,9 @@ public sealed class FusionDateTimePicker<TValue> : FusionComponent, IInputCompon
     /// <summary>Gets the day and time the picker holds, null until a person chooses one.</summary>
     public Property<TValue> Value => Property<TValue>();
 
+    /// <summary>Gets the interval in minutes between adjacent choices in the time list.</summary>
+    public Property<double> Step => Property<double>();
+
     /// <summary>Moves the keyboard's focus to the picker.</summary>
     public void FocusIn() => Method();
 

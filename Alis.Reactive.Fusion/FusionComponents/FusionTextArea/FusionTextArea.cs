@@ -17,6 +17,9 @@ public sealed class FusionTextArea : FusionComponent, IInputComponent
     /// <summary>Gets the text the area holds, null until set.</summary>
     public Property<string?> Value => Property<string?>();
 
+    /// <summary>Gets or sets whether the text is protected from editing.</summary>
+    public Property<bool> Readonly => Property<bool>();
+
     /// <summary>Applies the changes written to the area's properties now.</summary>
     public void DataBind() => Method();
 
